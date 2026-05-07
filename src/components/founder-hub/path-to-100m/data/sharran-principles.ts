@@ -79,8 +79,7 @@ export interface OneOneOneViolation {
 export const ONE_ONE_ONE_VIOLATIONS: OneOneOneViolation[] = [
   {
     pillar: 'Traffic',
-    claimed:
-      'ONE traffic source — LinkedIn DMs to four HXC personas + 2 London events/month max.',
+    claimed: 'ONE traffic source — LinkedIn DMs to four HXC personas + 2 London events/month max.',
     actualShipped:
       'N ingestion doors visible to a Phase 1 buyer: manual upload, batch upload (×10), email forwarding, Slack ingestion, meeting transcripts, direct API.',
     fix: 'Hide every ingestion door except the single drag-drop upload box for new Phase 1 sign-ups. Email/Slack/meeting ingest stays in product but lives BEHIND a feature flag until day-14.',
@@ -109,7 +108,7 @@ export const SHARRAN_PRINCIPLES: SharranPrinciple[] = [
     name: 'The 1-1-1 Rule + The Curse of Capability',
     subhead: 'ONE traffic / ONE conversion / ONE delivery — and hide the rest.',
     sharranFraming:
-      "Smart founders build complex webs simply because they have the intellectual capacity to do so. Complexity chokes scale. Focus on EXACTLY one traffic source, one conversion mechanism, one delivery model. Build to $300K baseline. Beyond that, growth by subtraction, not multiplication.",
+      'Smart founders build complex webs simply because they have the intellectual capacity to do so. Complexity chokes scale. Focus on EXACTLY one traffic source, one conversion mechanism, one delivery model. Build to $300K baseline. Beyond that, growth by subtraction, not multiplication.',
     appliedToDi:
       'DI today VIOLATES 1-1-1 in three places (see violation table). The locked Phase 1 wedge motion in CLAUDE.md GTM v3.5 IS 1-1-1 on paper, but the shipped platform is N-N-N — Phase 4-architected for a Phase 1 buyer. The discipline isn\'t "build the wedge" — it\'s HIDE THE PLUMBING for Phase 1 users.',
     phaseTag: 'APPLICABLE_NOW',
@@ -140,7 +139,7 @@ export const SHARRAN_PRINCIPLES: SharranPrinciple[] = [
     subhead:
       'Build as if someone is buying tomorrow. Ask advisors what 5 things lift the valuation by 50%.',
     sharranFraming:
-      'Build the business as if someone is going to buy it tomorrow. Regularly package it as if for sale and ask potential buyers what THEY would value it at. If they say $50M, ask exactly what 5 things would raise it to $75M. Those 5 things become the team\'s operational business plan for the next 12 months.',
+      "Build the business as if someone is going to buy it tomorrow. Regularly package it as if for sale and ask potential buyers what THEY would value it at. If they say $50M, ask exactly what 5 things would raise it to $75M. Those 5 things become the team's operational business plan for the next 12 months.",
     appliedToDi:
       'CLAUDE.md $30M+ founder cash exit math already targets specific acquirers (LRQA / IBM watsonx.governance arm / Big-4 governance practice / strategic AI-governance). The Valuation Hack is an actionable mechanic Folahan can run TODAY with Mr. Reiner — using the two pre-built prompt templates (Path-to-Benchmark + Zero-Value Subtraction). The catch: advisors default to VC-coded "scale fast / burn money" advice unless filtered for procurement-buyer logic.',
     phaseTag: 'APPLICABLE_NOW',
@@ -156,7 +155,7 @@ export const SHARRAN_PRINCIPLES: SharranPrinciple[] = [
     name: 'A-Players + Phantom Equity (DEFERRED to Phase 3)',
     subhead: 'AI-written job description · true value prop · phantom equity.',
     sharranFraming:
-      "Don't write generic job descriptions. Use AI to outline every specific stress point + operational failure in your current business — A-players read the chaos and feel the job was written for them. Find their TRUE value prop (Sharran's agents wanted time, not money — \"save you one day a week\" became the pitch). Phantom equity = contractual % of the liquidity event without complicating the cap table.",
+      'Don\'t write generic job descriptions. Use AI to outline every specific stress point + operational failure in your current business — A-players read the chaos and feel the job was written for them. Find their TRUE value prop (Sharran\'s agents wanted time, not money — "save you one day a week" became the pitch). Phantom equity = contractual % of the liquidity event without complicating the cap table.',
     appliedToDi:
       'A-Player recruitment is the ONE Sharran principle the KB synthesis explicitly tagged "LATER" for DI specifically — defer to Phase 3 mid-market scaling. Hiring before PMF validation exhausts the $200K pre-seed runway before the first 5 paid customers land. Phantom-equity worksheet locked but DO NOT USE until Phase 3.',
     phaseTag: 'ABOUT_TO_BE_RELEVANT',
@@ -204,7 +203,7 @@ export const SHARRAN_PRINCIPLES: SharranPrinciple[] = [
     sharranFraming:
       'Great founders anticipate second and third-order consequences. Run a mental simulation: "If my business doubled in size tomorrow, where exactly would it break?" The answer dictates what systems to build today, ensuring you aren\'t scrambling when the market actually rewards your efforts.',
     appliedToDi:
-      'The KB synthesis flagged the Agentic Shift (Palantir AIP / Snowflake / autonomous agents replacing memos) as the #1 second-order risk DI is under-prepared for. Other 2× bottlenecks: Outcome Gate Phase 4 auto-detection (10+ paid users triggers manual-logging trap = Cloverpop External Attack Vector); founder-hub tab discoverability (50+ tabs = AI chat can\'t route fast enough); seed-fund pipeline activation (5 candidates need explicit-yes from Reiner / Gabe before Q4 2026).',
+      "The KB synthesis flagged the Agentic Shift (Palantir AIP / Snowflake / autonomous agents replacing memos) as the #1 second-order risk DI is under-prepared for. Other 2× bottlenecks: Outcome Gate Phase 4 auto-detection (10+ paid users triggers manual-logging trap = Cloverpop External Attack Vector); founder-hub tab discoverability (50+ tabs = AI chat can't route fast enough); seed-fund pipeline activation (5 candidates need explicit-yes from Reiner / Gabe before Q4 2026).",
     phaseTag: 'APPLICABLE_NOW',
     phaseRationale:
       'Agentic-shift investigation deadline is end of June 2026 per CLAUDE.md. Outcome Gate Phase 4 needs to ship before paid customer #10. Both clocks are running.',
@@ -240,7 +239,7 @@ export const VALUATION_HACK_PROMPTS: ValuationHackPrompt[] = [
     promptTemplate:
       'Assume we execute our Phase 1 plan and secure 5 paid £249/mo individual pilots and the Sankore design partner. From the perspective of a Big-4 governance acquirer or a top-tier Series A fund, what are the 3 to 5 specific things that MUST be true about the Brier-scored outcome data or the product architecture to turn that initial traction into a $10M+ seed valuation?',
     expectedSignal:
-      'The 3-5 named gaps between today\'s state and acquirer-grade. Each becomes a Q3-Q4 2026 sprint priority IF the advisor explains exactly WHY a specific enterprise buyer would pay a premium.',
+      "The 3-5 named gaps between today's state and acquirer-grade. Each becomes a Q3-Q4 2026 sprint priority IF the advisor explains exactly WHY a specific enterprise buyer would pay a premium.",
   },
   {
     id: 'zero_value_subtraction',
@@ -368,10 +367,10 @@ export const STRESS_TEST_BOTTLENECKS: StressTestBottleneck[] = [
     inputId: 'warm_intros_per_week',
     doubledState: '4+ warm intros/week — follow-up cadence breaks',
     bottleneck:
-      "Founder Hub Outreach Hub centralizes pipeline but doesn't enforce follow-up cadence. At 4+/week the \"did I follow up after the audit?\" thread breaks → warm-intro waste.",
+      'Founder Hub Outreach Hub centralizes pipeline but doesn\'t enforce follow-up cadence. At 4+/week the "did I follow up after the audit?" thread breaks → warm-intro waste.',
     severity: 'high',
     preEmptiveBuild:
-      "Add follow-up cadence enforcement to Outreach Hub: T+0 / T+3d / T+7d / T+14d reminders. Each warm intro auto-creates the cadence; missed reminders surface as a red badge on the founder-hub home.",
+      'Add follow-up cadence enforcement to Outreach Hub: T+0 / T+3d / T+7d / T+14d reminders. Each warm intro auto-creates the cadence; missed reminders surface as a red badge on the founder-hub home.',
   },
   {
     inputId: 'london_events_per_month',
@@ -386,7 +385,7 @@ export const STRESS_TEST_BOTTLENECKS: StressTestBottleneck[] = [
     inputId: 'founder_hub_tabs',
     doubledState: '50+ Founder Hub tabs — discoverability collapses',
     bottleneck:
-      'Already at the ceiling. At 50+, the AI chat can\'t route founder questions fast enough; founder loses context faster than the chat can recover. This is a Phase 4 reality, not Phase 1.',
+      "Already at the ceiling. At 50+, the AI chat can't route founder questions fast enough; founder loses context faster than the chat can recover. This is a Phase 4 reality, not Phase 1.",
     severity: 'high',
     preEmptiveBuild:
       'Stop adding tabs. Consolidation candidates: 3-positioning-tab cluster (CompetitivePositioningTab + PositioningCopilotTab + CategoryPositionTab — 65% overlap). Audit before any new tab ships.',
@@ -418,7 +417,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'Vendor Continuity Engineer',
     whyItMatters:
       "Senior full-stack engineer on 30-day standby to eliminate the '16-yo solo founder' key-person risk during F500 procurement. Procurement reviewers ask 'what happens if the founder gets hit by a bus?' — the named engineer is the answer.",
-    channelToFind: 'Ask Mr. Reiner for an introduction via the Wiz network. Target someone who has already shipped enterprise-grade SaaS at scale.',
+    channelToFind:
+      'Ask Mr. Reiner for an introduction via the Wiz network. Target someone who has already shipped enterprise-grade SaaS at scale.',
     cadence: 'quarterly',
     phase: 'Phase 4',
   },
@@ -427,7 +427,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'Governance Coalition Insider',
     whyItMatters:
       "Strategic alliances lead at an AI-governance platform (Credo AI–class) who can orchestrate joint procurement packages — DI's decision-tier audits paired with their model-tier audits. Closes the IBM watsonx.governance bundling External Attack Vector.",
-    channelToFind: 'Ask Mr. Reiner via Wiz governance contacts. AI Verify Foundation and the LRQA / Ian Spaulding warm intro are also natural channels.',
+    channelToFind:
+      'Ask Mr. Reiner via Wiz governance contacts. AI Verify Foundation and the LRQA / Ian Spaulding warm intro are also natural channels.',
     cadence: 'quarterly',
     phase: 'Phase 3',
   },
@@ -436,7 +437,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'Elite Consulting Channel Partner',
     whyItMatters:
       'Senior leader at McKinsey QuantumBlack / BCG X who can embed DI as a scalable line-item inside their $1M+ strategy engagements. This is the highest-leverage non-acquirer revenue path — every consulting engagement that ships with the DPR is a reference case.',
-    channelToFind: 'CLAUDE.md already names QuantumBlack as an untapped network node. Mr. Reiner has consulting-firm relationships via Wiz governance work.',
+    channelToFind:
+      'CLAUDE.md already names QuantumBlack as an untapped network node. Mr. Reiner has consulting-firm relationships via Wiz governance work.',
     cadence: 'monthly',
     phase: 'Phase 3',
   },
@@ -445,7 +447,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'F500 General Counsel Validator',
     whyItMatters:
       'Enterprise legal chief who battle-tests the DPR against real EU AI Act Article 14 + SEC AI Disclosure scrutiny BEFORE Phase 4. Without this, the procurement-grade claims on /security stay hypothetical until the first F500 deal collapses on a real audit-committee question.',
-    channelToFind: 'Ask Mr. Gabe via UK-investor-side portfolio GCs. LRQA / Ian Spaulding warm intro for FTSE 250 GCs.',
+    channelToFind:
+      'Ask Mr. Gabe via UK-investor-side portfolio GCs. LRQA / Ian Spaulding warm intro for FTSE 250 GCs.',
     cadence: 'quarterly',
     phase: 'Phase 4',
   },
@@ -454,7 +457,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'Agentic-Shift Technologist',
     whyItMatters:
       "Architecture insider at Palantir AIP / Snowflake / Aera who can guide DI's Structurer Node to natively ingest autonomous-agent decision logs. Closes the agentic-shift External Attack Vector — the path-lock decision in June 2026 needs this person's architectural input.",
-    channelToFind: 'Mr. Reiner network for Palantir / Snowflake. Cold outreach via Wiz advisor cred. AI Verify Foundation participants.',
+    channelToFind:
+      'Mr. Reiner network for Palantir / Snowflake. Cold outreach via Wiz advisor cred. AI Verify Foundation participants.',
     cadence: 'monthly',
     phase: 'Cross-phase',
   },
@@ -462,8 +466,9 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     id: 'fractional_cso_evangelist',
     role: 'Fractional CSO Evangelist',
     whyItMatters:
-      "Independent strategy advisor whose multi-client portfolio acts as a frictionless word-of-mouth acquisition engine for the £249/mo Phase 1 wedge. ONE evangelist with 5 clients = 5 leveraged sign-ups. Direct fit with the GTM v3.5 fractional-CSO HXC persona.",
-    channelToFind: 'Mr. Gabe via UK fractional-CSO network. Strategy World London June 9-10 BAFTA event is the highest-signal venue.',
+      'Independent strategy advisor whose multi-client portfolio acts as a frictionless word-of-mouth acquisition engine for the £249/mo Phase 1 wedge. ONE evangelist with 5 clients = 5 leveraged sign-ups. Direct fit with the GTM v3.5 fractional-CSO HXC persona.',
+    channelToFind:
+      'Mr. Gabe via UK fractional-CSO network. Strategy World London June 9-10 BAFTA event is the highest-signal venue.',
     cadence: 'monthly',
     phase: 'Phase 1',
   },
@@ -472,7 +477,8 @@ export const TEN_TEN_FOREVER_SLOTS: TenTenSlot[] = [
     role: 'Behavioral Science Academic Anchor',
     whyItMatters:
       "Cognitive psychology / neuroeconomics professor (Stanford Symbolic Systems network) to empirically validate R²F and co-author primary research. Closes the academic-credentials moat layer — no competitor (Cloverpop / Aera / IBM) has this. Also: load-bearing for Folahan's Stanford / Berkeley application November 2027.",
-    channelToFind: 'Stanford Symbolic Systems faculty (Folahan applies November 2027 — start the relationship now). Klein / Lovallo / Tetlock collaborators.',
+    channelToFind:
+      'Stanford Symbolic Systems faculty (Folahan applies November 2027 — start the relationship now). Klein / Lovallo / Tetlock collaborators.',
     cadence: 'quarterly',
     phase: 'Cross-phase',
   },
