@@ -395,8 +395,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     id: 'platform_risk',
     topic: 'defensibility',
     question: 'What if OpenAI or Anthropic just builds this into their platform?',
-    answer:
-      "LLM providers are infrastructure, not vertical SaaS. They don't have 17 compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 143 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + 17-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.",
+    answer: `LLM providers are infrastructure, not vertical SaaS. They don't have ${FRAMEWORK_COUNT} compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 143 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + ${FRAMEWORK_COUNT}-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.`,
   },
   {
     id: 'traction',
@@ -453,8 +452,7 @@ export const COMMON_OBJECTIONS: Objection[] = [
   {
     id: 'commoditization',
     objection: 'AI is commoditizing — LLMs are a race to the bottom',
-    response:
-      'The LLM layer IS commodity — by design. We swap Gemini, Claude, and GPT freely. Our 5 proprietary layers ABOVE the LLM are the moat: compound scoring engine, toxic combination detection, noise decomposition, knowledge graph, and compliance frameworks. A competitor can copy our prompts. They cannot copy 18 months of org-specific outcome data or 7 regulatory frameworks worth of legal review.',
+    response: `The LLM layer IS commodity — by design. We swap Gemini, Claude, and GPT freely. Our 5 proprietary layers ABOVE the LLM are the moat: compound scoring engine, toxic combination detection, noise decomposition, knowledge graph, and compliance frameworks. A competitor can copy our prompts. They cannot copy 18 months of org-specific outcome data or ${FRAMEWORK_COUNT} regulatory frameworks worth of legal review.`,
     tag: 'Moat',
   },
   {

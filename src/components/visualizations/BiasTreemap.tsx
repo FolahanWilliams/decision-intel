@@ -2,18 +2,16 @@
 
 import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
+// Canonical SEVERITY_COLORS — locked 2026-05-01. The prior local map at this
+// site was carrying var(--accent-primary) (brand green) for `high` severity,
+// which rendered high-severity biases in the success color. Corrected by
+// importing from the canonical source.
+import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
 
 interface BiasTreemapProps {
   data: { name: string; count: number }[];
   severityMap?: Record<string, number>;
 }
-
-const SEVERITY_COLORS = {
-  critical: 'var(--error)',
-  high: 'var(--accent-primary)',
-  medium: 'var(--warning)',
-  low: 'var(--success)',
-};
 
 interface TreemapContentProps {
   x: number;
@@ -167,5 +165,3 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
     </div>
   );
 }
-
-export { SEVERITY_COLORS };
