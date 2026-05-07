@@ -17,7 +17,15 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import { ArrowRight, Check, ShieldCheck, GraduationCap, Globe2, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  ShieldCheck,
+  GraduationCap,
+  Globe2,
+  AlertCircle,
+  Search,
+} from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -299,17 +307,22 @@ export default function LandingPage() {
             {/* PROBLEM / SOLUTION mini-cards — the McKinsey-anchored
                   visual rhythm break that anchors the hero in real data
                   + the product framing without competing with the H1.
-                  Refactored 2026-05-07: was a stacked column to the
-                  right of WeWorkProofPanel; now a centered horizontal
-                  row below the CTAs in the single-column layout. Same
-                  copy, same severity colours, cleaner placement. */}
+                  Refactored 2026-05-07 (twice): was a stacked column to
+                  the right of WeWorkProofPanel; then a centered 2-card
+                  horizontal row; NOW a 3-card pain → mechanism →
+                  solution flow. PROBLEM updated from generic Fortune
+                  500 cost framing to the canonical 70-90% deal-failure
+                  rate that VC GPs + Corp Dev heads + M&A teams all
+                  recognise immediately. PATTERN bridges to the SOLUTION
+                  by naming the failure mechanic (the four bias families)
+                  so the reader sees pain → cause → fix in one row. */}
             <div
               className="hero-mini-cards"
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                gridTemplateColumns: '1fr 1fr 1fr',
                 gap: 16,
-                maxWidth: 720,
+                maxWidth: 880,
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 textAlign: 'left',
@@ -355,7 +368,75 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  $250M / yr
+                  70-90%
+                </p>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: C.slate700,
+                    lineHeight: 1.5,
+                    margin: '0 0 6px',
+                  }}
+                >
+                  of M&amp;A and venture deals miss their thesis. Most failures trace back to bias
+                  patterns visible in the original memo nobody named at the time.
+                </p>
+                <p
+                  style={{
+                    fontSize: 10,
+                    color: C.slate500,
+                    fontStyle: 'italic',
+                    margin: 0,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  HBR &middot; KPMG
+                </p>
+              </div>
+              {/* PATTERN — amber. The bridge card: names the four bias
+                  families that drive most deal failures, framing the
+                  audit as the cheap fix for a known mechanism. Uses the
+                  Search icon to suggest "we identify what others miss"
+                  rather than the warning iconography of the PROBLEM card. */}
+              <div
+                className="hero-mini-card"
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderTop: '3px solid #D97706',
+                  borderRadius: 12,
+                  padding: '16px 18px',
+                  boxShadow: '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: '#D97706',
+                    margin: '0 0 10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <Search size={11} strokeWidth={2.6} />
+                  The pattern
+                </p>
+                <p
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: '0 0 8px',
+                    lineHeight: 1.05,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  Same four biases
                 </p>
                 <p
                   style={{
@@ -365,8 +446,8 @@ export default function LandingPage() {
                     margin: 0,
                   }}
                 >
-                  What unchecked decisions cost the typical Fortune 500 company (McKinsey). The
-                  pattern shows up at every scale of capital allocation.
+                  Confirmation, anchoring, sunk cost, narrative coherence. Visible in the memo,
+                  missed by the team that wrote it.
                 </p>
               </div>
               {/* SOLUTION — green */}
@@ -420,7 +501,7 @@ export default function LandingPage() {
                   }}
                 >
                   Every memo gets a structured audit. Biases named, counterfactuals quantified, the
-                  record signed and shareable, the outcome tracked from there.
+                  record signed and shareable.
                 </p>
               </div>
             </div>
@@ -448,11 +529,13 @@ export default function LandingPage() {
             .hero-mini-card,
             .hero-mini-card:hover { transform: none; transition: none; }
           }
-          @media (max-width: 700px) {
-            .hero-grid-section { padding: 64px 20px 48px !important; }
+          @media (max-width: 900px) {
             .hero-mini-cards {
               grid-template-columns: 1fr !important;
             }
+          }
+          @media (max-width: 700px) {
+            .hero-grid-section { padding: 64px 20px 48px !important; }
           }
         `}</style>
       </section>
