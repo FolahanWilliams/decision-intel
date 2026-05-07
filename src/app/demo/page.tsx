@@ -41,6 +41,7 @@ import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-tr
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
+import { WeWorkProofPanel } from '@/components/marketing/proof/WeWorkProofPanel';
 
 /* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
 const C = {
@@ -592,6 +593,36 @@ export default function DemoPage() {
                 objections. What-if interventions. Your decision mapped into the Knowledge Graph.
                 Everything on your actual text &mdash; no signup, no card.
               </p>
+            </div>
+
+            {/* WeWork S-1 specimen — moved here from the landing hero
+                2026-05-07 founder refactor. Cold readers who landed on
+                /demo but don't yet have a memo to paste can click the
+                WeWork specimen and see what a real audit looks like
+                first. The panel is a clickable card to the public DPR
+                sample PDF. */}
+            <div
+              style={{
+                marginBottom: 32,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 14,
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: C.slate500,
+                  margin: 0,
+                }}
+              >
+                Or see one we already ran
+              </p>
+              <WeWorkProofPanel eventName="demo_wework_proof_panel_clicked" />
             </div>
 
             <div

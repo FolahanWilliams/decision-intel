@@ -17,15 +17,7 @@ import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynt
 import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
 import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
 import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
-import {
-  ArrowRight,
-  Check,
-  ShieldCheck,
-  GraduationCap,
-  Globe2,
-  FileText,
-  AlertCircle,
-} from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, GraduationCap, Globe2, AlertCircle } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -177,355 +169,276 @@ export default function LandingPage() {
       <MarketingNav />
 
       {/* ── Hero (beat 01) ──────────────────────────────────────────────
-          Asymmetric 55/45 grid: claim column left, sample audit card right,
-          static credibility strip full-width below. Replaces the prior
-          centered single-column stack — the persona audit (CSO + GC + M&A
-          partner + design lead + board director) flagged the centered
-          stack as the visual signature of a Series-A SaaS template, and
-          the buried sample card as a confidence tell. The card now sits
-          beside the claim so claim + proof land in one eye-pass. */}
+          Single-column centered structure (locked 2026-05-07 founder
+          refactor). Replaces the prior 55/45 two-column hero with the
+          WeWorkProofPanel right card. Founder feedback: "even on YC-funded
+          startup pages, clarity is always what triumphs over everything
+          else" — the WeWork panel + asymmetric-tail body paragraph + DPR
+          tertiary link were ALL competing for the reader's attention
+          before the H1 had landed. The WeWork sample now lives on /demo
+          with the DPR link surfaced there. The hero stack is now: pain
+          stat → eyebrow → H1 → contrast sub-head → CTAs → 2-card
+          PROBLEM/SOLUTION row → credibility strip. Single eye-pass to
+          the H1; the McKinsey-anchored data still lands via the
+          PROBLEM/SOLUTION mini-cards as the visual rhythm break. */}
       <section
         className="hero-grid-section"
-        style={{ maxWidth: 1200, margin: '0 auto', padding: '96px 24px 64px' }}
+        style={{ maxWidth: 880, margin: '0 auto', padding: '96px 24px 64px' }}
       >
         <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-          <div
-            className="hero-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)',
-              gap: 64,
-              alignItems: 'start',
-            }}
-          >
-            {/* LEFT — claim column */}
-            <div className="hero-claim" style={{ textAlign: 'left' }}>
-              {/* Pain-stat tag — McKinsey "Strategy Beyond the Hockey Stick"
+          <div className="hero-claim" style={{ textAlign: 'center' }}>
+            {/* Pain-stat tag — McKinsey "Strategy Beyond the Hockey Stick"
                   (Bradley/Hirt/Smit, 2018). The 8% finding is the most
                   defensible broad-pain framing we can ship: covers strategy
                   + corp dev + funds in one breath, not narrow to M&A or
                   to board-presented decisions. Source verified before ship;
                   the prior "$1.3T McKinsey" claim could not be sourced and
                   was rejected. */}
-              <p
+            <p
+              style={{
+                fontSize: 13,
+                color: C.slate500,
+                fontStyle: 'italic',
+                lineHeight: 1.5,
+                marginBottom: 16,
+                maxWidth: 640,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Only 8% of strategic moves break out of the middle. The other 92% carry biases nobody
+              named in the memo (McKinsey).
+            </p>
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: C.green,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                marginBottom: 18,
+              }}
+            >
+              Decisions worth defending
+            </p>
+            <h1
+              className="marketing-display"
+              style={{
+                fontSize: 'clamp(36px, 5.2vw, 60px)',
+                color: C.slate900,
+                lineHeight: 1.04,
+                marginBottom: 22,
+              }}
+            >
+              Decision Intel is{' '}
+              <span style={{ color: C.green, fontStyle: 'italic' }}>
+                the reasoning audit platform.
+              </span>
+            </h1>
+            <p
+              style={{
+                fontSize: 18,
+                color: C.slate600,
+                lineHeight: 1.6,
+                marginBottom: 32,
+                maxWidth: 680,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                fontWeight: 500,
+              }}
+            >
+              Most tools audit your data. We audit your reasoning &mdash; and catch the fatal blind
+              spots in strategic memos before the committee does.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: 14,
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 40,
+              }}
+            >
+              <Link
+                href="/demo"
+                onClick={() => trackEvent('hero_try_demo_clicked')}
                 style={{
-                  fontSize: 13,
-                  color: C.slate500,
-                  fontStyle: 'italic',
-                  lineHeight: 1.5,
-                  marginBottom: 16,
-                  maxWidth: 520,
-                }}
-              >
-                Only 8% of strategic moves break out of the middle. The other 92% carry biases
-                nobody named in the memo (McKinsey).
-              </p>
-              <p
-                style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: C.green,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  marginBottom: 18,
-                }}
-              >
-                Decisions worth defending
-              </p>
-              <h1
-                className="marketing-display"
-                style={{
-                  fontSize: 'clamp(36px, 5.2vw, 60px)',
-                  color: C.slate900,
-                  lineHeight: 1.04,
-                  marginBottom: 22,
-                }}
-              >
-                Decision Intel is{' '}
-                <span style={{ color: C.green, fontStyle: 'italic' }}>
-                  the reasoning audit platform.
-                </span>
-              </h1>
-              <p
-                style={{
-                  fontSize: 18,
-                  color: C.slate600,
-                  lineHeight: 1.6,
-                  marginBottom: 18,
-                  maxWidth: 560,
-                  fontWeight: 500,
-                }}
-              >
-                Most tools audit your data. We audit your reasoning &mdash; and catch the fatal
-                blind spots in strategic memos before the committee does.
-              </p>
-              <p
-                style={{
-                  fontSize: 15,
-                  color: C.slate600,
-                  lineHeight: 1.6,
-                  marginBottom: 28,
-                  maxWidth: 560,
-                }}
-              >
-                Most strategic memos pass cleanly. The ones that don&rsquo;t are the ones that
-                destroy value. You can&rsquo;t tell the catastrophic memo from the clean memo
-                without auditing both. Built on {HISTORICAL_CASE_COUNT} historical corporate
-                decisions and 30+ biases from Kahneman and Klein.
-              </p>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 14,
-                  flexWrap: 'wrap',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  marginBottom: 14,
+                  gap: 8,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: C.white,
+                  background: C.green,
+                  padding: '14px 28px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
                 }}
               >
-                <Link
-                  href="/demo"
-                  onClick={() => trackEvent('hero_try_demo_clicked')}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: C.white,
-                    background: C.green,
-                    padding: '14px 28px',
-                    borderRadius: 10,
-                    textDecoration: 'none',
-                    boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
-                  }}
-                >
-                  One free audit. Paste your memo. <ArrowRight size={16} />
-                </Link>
-                <Link
-                  href="/how-it-works"
-                  onClick={() => trackEvent('hero_how_it_works_clicked')}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: C.slate600,
-                    textDecoration: 'none',
-                    padding: '14px 10px',
-                  }}
-                >
-                  How it works <ArrowRight size={14} />
-                </Link>
-              </div>
-              {/* Tertiary off-ramp for the cold reader who's curious
-                  but not ready to paste a real memo. Empathic framing:
-                  names the actual desired path (see-it-on-a-known-doc-
-                  first) without diagnosing the reader. Points at the
-                  same PDF the WeWork panel opens, so a reader who
-                  doesn't notice the panel is clickable still gets there. */}
-              <a
-                href="/dpr-sample-wework.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent('hero_dpr_sample_clicked')}
+                One free audit. Paste your memo. <ArrowRight size={16} />
+              </Link>
+              <Link
+                href="/how-it-works"
+                onClick={() => trackEvent('hero_how_it_works_clicked')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: C.slate500,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.slate600,
                   textDecoration: 'none',
-                  padding: '4px 0',
+                  padding: '14px 10px',
                 }}
               >
-                Or see one we ran on the WeWork S-1
-                <ArrowRight size={12} />
-              </a>
+                How it works <ArrowRight size={14} />
+              </Link>
             </div>
-
-            {/* RIGHT — proof column. Was a synthetic SampleAuditCard with
-                DQI / biases / what-if / compound analysis stacked. Replaced
-                2026-04-26 with WeWorkProofPanel — a clickable panel anchored
-                to the public WeWork S-1 audit. Three rounds of persona +
-                blind reads (8 readers total) all converged: the synthetic
-                card asked the cold reader to parse domain vocabulary (DQI
-                / Knowledge Graph / EU AI Act Art 14) before the trust to
-                do that work had been earned. The WeWork case is a real
-                public document with a famous outcome, eliminates the
-                "synthetic sample" disclaimer, and naturally elevates the
-                already-published DPR sample PDF as the validation path. */}
+            {/* PROBLEM / SOLUTION mini-cards — the McKinsey-anchored
+                  visual rhythm break that anchors the hero in real data
+                  + the product framing without competing with the H1.
+                  Refactored 2026-05-07: was a stacked column to the
+                  right of WeWorkProofPanel; now a centered horizontal
+                  row below the CTAs in the single-column layout. Same
+                  copy, same severity colours, cleaner placement. */}
             <div
-              className="hero-proof"
+              className="hero-mini-cards"
               style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-start',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 16,
+                maxWidth: 720,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                textAlign: 'left',
               }}
             >
+              {/* PROBLEM — red */}
               <div
-                className="hero-proof-stack"
+                className="hero-mini-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 16,
-                  width: '100%',
-                  maxWidth: 520,
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderTop: '3px solid #DC2626',
+                  borderRadius: 12,
+                  padding: '16px 18px',
+                  boxShadow: '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
                 }}
               >
-                <WeWorkProofPanel />
-                {/* Two mini-cards: PROBLEM (red) + SOLUTION (green).
-                    Reframed 2026-04-26 from "COST OF SLOW DECISIONS" /
-                    "WHAT YOU GET" because the prior framing (a) leaked
-                    product jargon (DPR / DQI) above the fold before any
-                    awareness-building had earned it, and (b) reduced the
-                    product to a single artifact when the actual deliverable
-                    is a full audit + biases + counterfactuals + outcome
-                    flywheel + the DPR. PROBLEM card anchors on the McKinsey
-                    $250M / Fortune 500 stat (verified primary source);
-                    SOLUTION card anchors on the 60-second product spec and
-                    describes the WHOLE deliverable in plain language —
-                    "biases named, counterfactuals quantified, the record
-                    signed and shareable, the outcome tracked from there."
-                    Coloured top-borders + icons make them stand out from
-                    the all-white panel above. */}
-                <div
-                  className="hero-mini-cards"
+                <p
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 12,
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: '#DC2626',
+                    margin: '0 0 10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
-                  {/* PROBLEM — red */}
-                  <div
-                    className="hero-mini-card"
-                    style={{
-                      background: C.white,
-                      border: `1px solid ${C.slate200}`,
-                      borderTop: '3px solid #DC2626',
-                      borderRadius: 12,
-                      padding: '16px 18px',
-                      boxShadow:
-                        '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
-                      transition: 'transform 0.18s, box-shadow 0.18s',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        color: '#DC2626',
-                        margin: '0 0 10px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <AlertCircle size={11} strokeWidth={2.6} />
-                      The problem
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 800,
-                        color: C.slate900,
-                        margin: '0 0 8px',
-                        lineHeight: 1.05,
-                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                        letterSpacing: '-0.02em',
-                      }}
-                    >
-                      $250M / yr
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: C.slate700,
-                        lineHeight: 1.5,
-                        margin: 0,
-                      }}
-                    >
-                      What unchecked decisions cost the typical Fortune 500 company (McKinsey). The
-                      pattern shows up at every scale of capital allocation.
-                    </p>
-                  </div>
-                  {/* SOLUTION — green */}
-                  <div
-                    className="hero-mini-card"
-                    style={{
-                      background: C.white,
-                      border: `1px solid ${C.slate200}`,
-                      borderTop: `3px solid ${C.green}`,
-                      borderRadius: 12,
-                      padding: '16px 18px',
-                      boxShadow:
-                        '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
-                      transition: 'transform 0.18s, box-shadow 0.18s',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        color: C.green,
-                        margin: '0 0 10px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <ShieldCheck size={11} strokeWidth={2.6} />
-                      The solution
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 800,
-                        color: C.slate900,
-                        margin: '0 0 8px',
-                        lineHeight: 1.05,
-                        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-                        letterSpacing: '-0.02em',
-                      }}
-                    >
-                      60 seconds
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 12,
-                        color: C.slate700,
-                        lineHeight: 1.5,
-                        margin: 0,
-                      }}
-                    >
-                      Every memo gets a structured audit. Biases named, counterfactuals quantified,
-                      the record signed and shareable, the outcome tracked from there.
-                    </p>
-                  </div>
-                </div>
+                  <AlertCircle size={11} strokeWidth={2.6} />
+                  The problem
+                </p>
+                <p
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: '0 0 8px',
+                    lineHeight: 1.05,
+                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  $250M / yr
+                </p>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: C.slate700,
+                    lineHeight: 1.5,
+                    margin: 0,
+                  }}
+                >
+                  What unchecked decisions cost the typical Fortune 500 company (McKinsey). The
+                  pattern shows up at every scale of capital allocation.
+                </p>
+              </div>
+              {/* SOLUTION — green */}
+              <div
+                className="hero-mini-card"
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderTop: `3px solid ${C.green}`,
+                  borderRadius: 12,
+                  padding: '16px 18px',
+                  boxShadow: '0 4px 16px -8px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04)',
+                  transition: 'transform 0.18s, box-shadow 0.18s',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: C.green,
+                    margin: '0 0 10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <ShieldCheck size={11} strokeWidth={2.6} />
+                  The solution
+                </p>
+                <p
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.slate900,
+                    margin: '0 0 8px',
+                    lineHeight: 1.05,
+                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  60 seconds
+                </p>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: C.slate700,
+                    lineHeight: 1.5,
+                    margin: 0,
+                  }}
+                >
+                  Every memo gets a structured audit. Biases named, counterfactuals quantified, the
+                  record signed and shareable, the outcome tracked from there.
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Credibility strip — full-width below both columns, static
-              (no rotation). All four signals visible at once so the
+          {/* Credibility strip — full-width below the centered hero stack,
+              static (no rotation). All five signals visible at once so the
               reader sees the full posture in one pass instead of waiting
-              for a 4.2s carousel cycle. */}
+              for a carousel cycle. */}
           <div style={{ marginTop: 56 }}>
             <HeroCredibilityStrip />
           </div>
         </motion.div>
 
-        {/* Mobile: collapse to single column, restore stacking, scale the
-            sample card down to fit the narrower viewport. The hero is the
-            highest-traffic surface on mobile (LinkedIn outbound), and the
-            inline-style asymmetric grid otherwise crushes at <900px. */}
+        {/* Mobile: shrink padding + stack the PROBLEM/SOLUTION mini-cards.
+            The hero is the highest-traffic surface on mobile (LinkedIn
+            outbound), and the 2-column mini-cards otherwise crush at
+            narrow viewports. */}
         <style>{`
           .hero-mini-card:hover {
             transform: translateY(-2px);
@@ -535,15 +448,8 @@ export default function LandingPage() {
             .hero-mini-card,
             .hero-mini-card:hover { transform: none; transition: none; }
           }
-          @media (max-width: 900px) {
+          @media (max-width: 700px) {
             .hero-grid-section { padding: 64px 20px 48px !important; }
-            .hero-grid {
-              grid-template-columns: 1fr !important;
-              gap: 40px !important;
-            }
-            .hero-proof {
-              justify-content: center !important;
-            }
             .hero-mini-cards {
               grid-template-columns: 1fr !important;
             }
@@ -1660,221 +1566,5 @@ function HeroCredibilityStrip() {
         })}
       </div>
     </div>
-  );
-}
-
-/* ─── WeWorkProofPanel ─────────────────────────────────────────────────
-   Replaces the prior SampleAuditCard (synthetic DQI + biases + what-if
-   stack). The synthetic card asked cold readers to parse domain
-   vocabulary (DQI score / Knowledge Graph / EU AI Act Art 14) before
-   the trust to do that work had been earned — three rounds of persona +
-   blind reads (8 readers total) all flagged it as proof-of-concept
-   theater rather than evidence. This panel anchors the proof to the
-   public WeWork S-1 (2019), a famous outcome every buyer recognises
-   without being primed. The whole panel is a clickable card that
-   opens the existing DPR sample PDF in a new tab — the validation
-   path Elena, Sarah, David, and the blind readers explicitly asked
-   for. No "ILLUSTRATIVE" or "synthetic sample" disclaimer needed.
-   Em-dash discipline: the page's one allowed em-dash lives in the
-   pain-stat tag in the left column, so this panel uses colons +
-   middle-dots throughout. */
-
-function WeWorkProofPanel() {
-  const biases = [
-    {
-      name: 'Overconfidence',
-      finding:
-        'adjusted EBITDA excluded standard operating costs (marketing, design, member acquisition) and was presented as the headline metric.',
-      sev: '#DC2626',
-    },
-    {
-      name: 'Anchoring',
-      finding:
-        'every projection tethered to the $47B private valuation set by SoftBank, not to market comparables.',
-      sev: '#D97706',
-    },
-    {
-      name: 'Sunk cost',
-      finding:
-        '$4B+ of prior funding shaped the IPO as the only path forward, narrowing the alternatives the document considered.',
-      sev: '#D97706',
-    },
-  ];
-
-  return (
-    <a
-      className="wework-proof-panel"
-      href="/dpr-sample-wework.pdf"
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={() => trackEvent('hero_dpr_sample_clicked')}
-      style={{
-        width: '100%',
-        maxWidth: 520,
-        borderRadius: 18,
-        background: C.white,
-        border: `1px solid ${C.slate200}`,
-        boxShadow:
-          '0 32px 64px -20px rgba(15,23,42,0.22), 0 16px 36px -16px rgba(15,23,42,0.12), 0 2px 4px rgba(15,23,42,0.04)',
-        overflow: 'hidden',
-        textDecoration: 'none',
-        color: 'inherit',
-        cursor: 'pointer',
-        transform: 'perspective(1600px) rotateY(-1.4deg)',
-        transformOrigin: 'left center',
-        transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s',
-        display: 'block',
-      }}
-    >
-      {/* Reduced-motion: drop the perspective rotation + hover transform.
-          Mobile: drop both perspective and the rightward shadow bias so
-          the card sits flat in the stacked column. */}
-      <style>{`
-        .wework-proof-panel:hover {
-          transform: perspective(1600px) rotateY(-1.4deg) translateY(-3px) !important;
-          box-shadow: 0 38px 72px -20px rgba(15,23,42,0.26), 0 18px 40px -16px rgba(15,23,42,0.14), 0 2px 4px rgba(15,23,42,0.04) !important;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .wework-proof-panel,
-          .wework-proof-panel:hover {
-            transform: none !important;
-            transition: none !important;
-          }
-        }
-        @media (max-width: 900px) {
-          .wework-proof-panel,
-          .wework-proof-panel:hover {
-            transform: none !important;
-          }
-          .wework-proof-panel {
-            max-width: 560px !important;
-            margin-left: auto;
-            margin-right: auto;
-          }
-        }
-      `}</style>
-
-      {/* Title bar */}
-      <div
-        style={{
-          padding: '16px 22px',
-          borderBottom: `1px solid ${C.slate200}`,
-          background: C.slate50,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: C.green,
-            marginBottom: 6,
-          }}
-        >
-          What we&apos;d have flagged in the WeWork S-1
-        </div>
-        <div
-          style={{
-            fontSize: 12,
-            color: C.slate500,
-            fontWeight: 500,
-          }}
-        >
-          Public document &middot; 2019 IPO prospectus &middot; 60-second audit
-        </div>
-      </div>
-
-      {/* Body — three biases */}
-      <div style={{ padding: '20px 22px 18px' }}>
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: C.slate500,
-            marginBottom: 14,
-          }}
-        >
-          Three biases the prospectus carried
-        </div>
-        <ul
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 13,
-          }}
-        >
-          {biases.map(b => (
-            <li
-              key={b.name}
-              style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 10,
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: 999,
-                  background: b.sev,
-                  flexShrink: 0,
-                  marginTop: 7,
-                }}
-              />
-              <div style={{ fontSize: 13.5, color: C.slate900, lineHeight: 1.5 }}>
-                <span style={{ fontWeight: 700 }}>{b.name}:</span>
-                <span style={{ color: C.slate700 }}> {b.finding}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* CTA footer — visible affordance for the clickable panel */}
-      <div
-        style={{
-          padding: '14px 22px',
-          borderTop: `1px solid ${C.slate200}`,
-          background: C.slate50,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 13,
-            fontWeight: 700,
-            color: C.green,
-          }}
-        >
-          <FileText size={14} />
-          Read the full audit report
-          <ArrowRight size={14} />
-        </span>
-        <span
-          style={{
-            fontSize: 11,
-            color: C.slate500,
-            fontWeight: 600,
-          }}
-        >
-          PDF &middot; opens in new tab
-        </span>
-      </div>
-    </a>
   );
 }
