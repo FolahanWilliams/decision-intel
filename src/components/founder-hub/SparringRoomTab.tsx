@@ -44,6 +44,7 @@ import {
   GRADING_DIMENSIONS,
   findPersonaById,
   findScenarioById,
+  type BuyerPersona,
   type BuyerPersonaId,
   type ScenarioMode,
   type SparringSessionResult,
@@ -89,7 +90,10 @@ const MAX_HISTORY = 50;
 
 export function SparringRoomTab({ founderPass }: Props) {
   const [step, setStep] = useState<FlowStep>('setup');
-  const [personaId, setPersonaId] = useState<BuyerPersonaId>('mid_market_pe_associate');
+  // Default to a Phase 1 HXC persona (Item 1 lock 2026-05-07). Was
+  // 'mid_market_pe_associate' which is now tagged as expansion — that
+  // surfaced the wrong wedge as the first-rehearsal default.
+  const [personaId, setPersonaId] = useState<BuyerPersonaId>('fractional_cso');
   const [mode, setMode] = useState<ScenarioMode>('cold_first_meeting');
   const [isWarmContext, setIsWarmContext] = useState<boolean>(false);
   const [brief, setBrief] = useState<ScenarioBrief | null>(null);
@@ -343,6 +347,132 @@ export function SparringRoomTab({ founderPass }: Props) {
   );
 }
 
+// ─── PersonaPicker ──────────────────────────────────────────────────
+// Item 1 lock 2026-05-07. Renders BUYER_PERSONAS in two tier-grouped
+// strips: Phase 1 HXC wedge (green eyebrow) on top, expansion personas
+// (info-blue eyebrow, collapsible) below. The HXC group surfaces by
+// default so the founder reaches for the wedge personas first when
+// rehearsing before high-signal events.
+
+function PersonaPicker({
+  activePersonaId,
+  onPersonaChange,
+}: {
+  activePersonaId: BuyerPersonaId;
+  onPersonaChange: (id: BuyerPersonaId) => void;
+}) {
+  const hxc = BUYER_PERSONAS.filter(p => p.tier === 'phase1_hxc');
+  const expansion = BUYER_PERSONAS.filter(p => p.tier === 'expansion');
+  const [expansionOpen, setExpansionOpen] = useState(
+    BUYER_PERSONAS.find(p => p.id === activePersonaId)?.tier === 'expansion'
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Phase 1 HXC wedge — surfaced first */}
+      <div>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--success)',
+            background: 'color-mix(in srgb, var(--success) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--success) 30%, var(--border-color))',
+            padding: '3px 9px',
+            borderRadius: 999,
+            marginBottom: 8,
+          }}
+        >
+          Phase 1 HXC wedge · 4 buyer-class-continuous personas
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {hxc.map(p => (
+            <PersonaButton
+              key={p.id}
+              persona={p}
+              isActive={p.id === activePersonaId}
+              onClick={() => onPersonaChange(p.id)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Expansion personas — collapsed by default unless one is active */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setExpansionOpen(o => !o)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--info)',
+            background: 'color-mix(in srgb, var(--info) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--info) 30%, var(--border-color))',
+            padding: '3px 9px',
+            borderRadius: 999,
+            marginBottom: 8,
+            cursor: 'pointer',
+          }}
+        >
+          {expansionOpen ? '▾' : '▸'} Beyond Phase 1 · expansion rehearsal · {expansion.length}{' '}
+          personas
+        </button>
+        {expansionOpen && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {expansion.map(p => (
+              <PersonaButton
+                key={p.id}
+                persona={p}
+                isActive={p.id === activePersonaId}
+                onClick={() => onPersonaChange(p.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PersonaButton({
+  persona,
+  isActive,
+  onClick,
+}: {
+  persona: BuyerPersona;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '8px 12px',
+        background: isActive ? persona.color : 'var(--bg-elevated)',
+        border: `1px solid ${isActive ? persona.color : 'var(--border-color)'}`,
+        borderRadius: 'var(--radius-md)',
+        color: isActive ? '#fff' : 'var(--text-primary)',
+        fontSize: 12,
+        fontWeight: isActive ? 700 : 500,
+        cursor: 'pointer',
+        transition: 'all 0.15s',
+      }}
+    >
+      {persona.label} <span style={{ opacity: 0.7, marginLeft: 4 }}>· {persona.archetype}</span>
+    </button>
+  );
+}
+
 // ─── Hero ──────────────────────────────────────────────────────────
 
 function Hero() {
@@ -444,32 +574,42 @@ function SetupCard(props: SetupProps) {
         >
           Buyer persona
         </label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {BUYER_PERSONAS.map(p => {
-            const isActive = p.id === props.personaId;
-            return (
-              <button
-                key={p.id}
-                onClick={() => props.onPersonaChange(p.id)}
-                style={{
-                  padding: '8px 12px',
-                  background: isActive ? p.color : 'var(--bg-elevated)',
-                  border: `1px solid ${isActive ? p.color : 'var(--border-color)'}`,
-                  borderRadius: 'var(--radius-md)',
-                  color: isActive ? '#fff' : 'var(--text-primary)',
-                  fontSize: 12,
-                  fontWeight: isActive ? 700 : 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {p.label} <span style={{ opacity: 0.7, marginLeft: 4 }}>· {p.archetype}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Tier-grouped picker — Item 1 lock 2026-05-07. Phase 1 HXC
+            wedge personas surface first under a green eyebrow; expansion
+            personas live in a collapsed second group below so the
+            founder doesn't accidentally rehearse against a Phase 4
+            ceiling buyer (F500 CSO / GC) when prepping for Strategy
+            World London or a Phase 1 cold DM. */}
+        <PersonaPicker activePersonaId={props.personaId} onPersonaChange={props.onPersonaChange} />
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>
           {persona.rolePlayIntro}
+        </div>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginTop: 8,
+            padding: '3px 9px',
+            background:
+              persona.tier === 'phase1_hxc'
+                ? 'color-mix(in srgb, var(--success) 12%, transparent)'
+                : 'color-mix(in srgb, var(--info) 10%, transparent)',
+            border:
+              persona.tier === 'phase1_hxc'
+                ? '1px solid color-mix(in srgb, var(--success) 35%, var(--border-color))'
+                : '1px solid color-mix(in srgb, var(--info) 30%, var(--border-color))',
+            borderRadius: 999,
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: persona.tier === 'phase1_hxc' ? 'var(--success)' : 'var(--info)',
+          }}
+        >
+          {persona.tier === 'phase1_hxc'
+            ? 'Phase 1 HXC wedge · drill before every event'
+            : 'Beyond Phase 1 · expansion rehearsal'}
         </div>
       </div>
 

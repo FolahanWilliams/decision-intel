@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Telescope, History, Activity, ExternalLink } from 'lucide-react';
+import { Telescope, History, Activity, ExternalLink, Scale } from 'lucide-react';
 import type { ValidityClassification } from '@/lib/learning/validity-classifier';
 import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
+import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
+import { calibratedRejectionVerdictLabel } from '@/lib/learning/calibrated-rejection';
 import { SignalBlock, SignalBlockGrid, type SignalBand } from '@/components/ui/SignalBlock';
 
 /**
@@ -35,6 +37,7 @@ interface InsightsResponse {
   validityClassification: ValidityClassification;
   referenceClassForecast: ReferenceClassForecast;
   feedbackAdequacy: FeedbackAdequacy;
+  calibratedRejection: CalibratedRejection;
   validitySource: 'persisted' | 'live';
 }
 
@@ -80,6 +83,18 @@ const FA_BAND: Record<FeedbackAdequacy['verdict'], SignalBand> = {
   sparse: 'medium',
   cold_start: 'unknown',
   unknown: 'unknown',
+};
+
+// Calibrated Rejection of Subjective Confidence — Kahneman & Klein 2009
+// closes both conditions. Item 3 lock 2026-05-07. Renders as the 4th
+// SignalBlock answering the Margaret-class CSO's most-asked question:
+// "does this memo's confidence match the evidence?"
+const CR_BAND: Record<CalibratedRejection['verdict'], SignalBand> = {
+  well_calibrated: 'low',
+  mildly_overconfident: 'medium',
+  materially_overconfident: 'high',
+  severely_overconfident: 'critical',
+  cannot_assess: 'unknown',
 };
 
 export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
@@ -128,9 +143,11 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
     return null; // Silent failure — non-load-bearing on the audit page
   }
 
-  const { validityClassification, referenceClassForecast, feedbackAdequacy } = data;
+  const { validityClassification, referenceClassForecast, feedbackAdequacy, calibratedRejection } =
+    data;
   const rc = referenceClassForecast;
   const fa = feedbackAdequacy;
+  const cr = calibratedRejection;
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -232,6 +249,70 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
           tooltip="Feedback Adequacy — Kahneman & Klein 2009 second condition: has the author had enough closed-loop feedback in this domain to be calibrated? An 'adequate' verdict means experience-based confidence in this domain is trustworthy; 'sparse' or 'cold start' means treat experience claims with more scrutiny."
           citation={<>Kahneman &amp; Klein 2009 · author 18-month closed outcomes</>}
         />
+
+        {/* Calibrated Rejection (plain-language eyebrow for the verdict
+            band that closes both K&K conditions). Item 3 lock 2026-05-07.
+            This is the Margaret-class CSO's most-asked question rendered
+            as a verdict: "does the memo's confidence match the evidence?"
+            The detector is a pure-function combination of the validity
+            class + feedback adequacy + bias-detective hits on confidence-
+            language patterns (illusion_of_validity / overconfidence /
+            authority / anchoring). When the gap is material, the audit-
+            committee-readiness flag fires. */}
+        <SignalBlock
+          eyebrow="Confidence Calibration"
+          icon={Scale}
+          verdict={calibratedRejectionVerdictLabel(cr.verdict)}
+          band={CR_BAND[cr.verdict]}
+          metric={
+            cr.verdict !== 'cannot_assess'
+              ? `gap ${cr.calibrationGap.toFixed(2)} · rhetoric ${cr.rhetoricalConfidenceScore.toFixed(2)} · earned ${cr.earnedConfidenceScore.toFixed(2)}`
+              : null
+          }
+          rationale={cr.note}
+          tooltip="Calibrated Rejection of Subjective Confidence — Kahneman & Klein 2009 closes both conditions. Subjective confidence is a valid accuracy indicator only when both validity AND feedback adequacy are present. The detector compares the memo's rhetorical confidence (proxied by bias-detective hits on illusion_of_validity / overconfidence / authority / anchoring) against the earned confidence (validity × feedback). Material gaps fire an audit-committee-readiness flag."
+          citation={<>Kahneman &amp; Klein 2009 · paper-application #10</>}
+        >
+          {cr.triggers.length > 0 && (
+            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  fontWeight: 600,
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Confidence-language triggers
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 4,
+                }}
+              >
+                {cr.triggers.slice(0, 4).map((trig, i) => (
+                  <span
+                    key={`${trig}-${i}`}
+                    style={{
+                      fontSize: 'var(--fs-3xs)',
+                      fontFamily: 'ui-monospace, monospace',
+                      padding: '2px 6px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-sm)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {trig}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </SignalBlock>
       </SignalBlockGrid>
     </div>
   );

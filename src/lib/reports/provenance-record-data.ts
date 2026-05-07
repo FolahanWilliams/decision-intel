@@ -51,6 +51,10 @@ import {
 } from '@/lib/learning/reference-class-forecast';
 import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
+  computeCalibratedRejection,
+  type CalibratedRejection,
+} from '@/lib/learning/calibrated-rejection';
+import {
   getUserPlan,
   getOrgPlan,
   getRetentionDaysForUser,
@@ -166,6 +170,17 @@ export interface ProvenanceRecordData {
    * with the validity shift applied.
    */
   validityClassification?: ValidityClassification;
+  /**
+   * Calibrated Rejection of Subjective Confidence (R²F paper-app #10,
+   * Item 3 lock 2026-05-07). Pure-function combination of validity +
+   * feedback adequacy + bias-detective hits on confidence-language
+   * patterns. Renders as a 4th first-class strip on the DPR cover
+   * answering Margaret-class CSO's most-asked question: "does this
+   * memo's confidence match the evidence?" Always populated on per-
+   * analysis DPRs — `cannot_assess` is the explicit honest answer when
+   * feedback is unknown.
+   */
+  calibratedRejection?: CalibratedRejection;
   /**
    * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
    * populated — this is the procurement-grade contractual statement of
@@ -1054,6 +1069,25 @@ export async function assembleProvenanceRecordData(
       industry,
     });
 
+  // Calibrated Rejection of Subjective Confidence — Item 3 lock
+  // 2026-05-07. Pure function combining the validity class + feedback
+  // adequacy + bias-detective hits on confidence-language patterns
+  // (illusion_of_validity / overconfidence / authority / anchoring).
+  // Renders as the 4th first-class strip on the DPR cover answering
+  // Margaret-class CSO's most-asked question: "does this memo's
+  // confidence match the evidence?" Always populated — `cannot_assess`
+  // is the explicit honest answer when feedback verdict is 'unknown'.
+  const calibratedRejection = computeCalibratedRejection({
+    validity: validityClassification,
+    feedback: feedbackAdequacy,
+    biases: (analysis.biases ?? []).map(b => ({
+      biasType: b.biasType,
+      severity: ['critical', 'high', 'medium', 'low'].includes((b.severity ?? '').toLowerCase())
+        ? ((b.severity ?? '').toLowerCase() as 'critical' | 'high' | 'medium' | 'low')
+        : 'medium',
+    })),
+  });
+
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
   // reads this map to populate finding cards with verbatim memo
@@ -1099,6 +1133,7 @@ export async function assembleProvenanceRecordData(
     feedbackAdequacy,
     referenceClassForecast,
     validityClassification,
+    calibratedRejection,
     dataLifecycle,
     clientSafe: undefined,
     schemaVersion: 2,
