@@ -58,7 +58,11 @@ const C = {
 };
 
 export function DiscoveryPitchPanel() {
-  const [persona, setPersona] = useState<PersonaId>('cso');
+  // Default persona — fractional_cso is the v3.5 HXC wedge default
+  // (mirrors Sparring Room's default per Item 1 lock 2026-05-07).
+  // Re-aligned 2026-05-08 from legacy 'cso' to 'fractional_cso' as
+  // part of the discovery-toolkit v3.5 refresh.
+  const [persona, setPersona] = useState<PersonaId>('fractional_cso');
   const [expandedTrigger, setExpandedTrigger] = useState<number | null>(null);
   const [expandedPattern, setExpandedPattern] = useState<PainPattern['id'] | null>(null);
   const activePersona = PERSONA_OPENERS.find(p => p.id === persona)!;
@@ -257,9 +261,107 @@ export function DiscoveryPitchPanel() {
         >
           &ldquo;{activePersona.opener}&rdquo;
         </div>
+
+        {/* Per-persona discovery question + pain cue + bridge sentence —
+            NotebookLM synthesis 2026-05-08, v3.5 HXC narrowing. The Mom-
+            Test 4 questions in DISCOVERY_QUESTIONS still get asked in
+            fixed order; this is the SHARPER lead-in for cold-context
+            DMs to this specific persona. */}
+        <div
+          style={{
+            marginTop: 10,
+            padding: '10px 12px',
+            background: 'var(--bg-secondary)',
+            border: `1px solid ${C.indigoBorder}`,
+            borderLeft: `3px solid ${C.indigo}`,
+            borderRadius: 'var(--radius-sm)',
+            fontSize: 11.5,
+            lineHeight: 1.55,
+            color: 'var(--text-primary)',
+            display: 'grid',
+            gap: 8,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: C.indigo,
+                marginBottom: 4,
+              }}
+            >
+              Sharpened discovery question · {activePersona.archetype}-archetype
+            </div>
+            <div style={{ fontSize: 12.5, fontStyle: 'italic' }}>
+              &ldquo;{activePersona.discoveryQuestion}&rdquo;
+            </div>
+          </div>
+          <div>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: 'var(--text-secondary)',
+                marginBottom: 2,
+              }}
+            >
+              Listen for
+            </div>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 16,
+                fontSize: 11.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+              }}
+            >
+              {activePersona.painSignalCue.map(cue => (
+                <li key={cue} style={{ marginBottom: 2 }}>
+                  &ldquo;{cue}&rdquo;
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: 'var(--text-secondary)',
+                marginBottom: 2,
+              }}
+            >
+              Bridge sentence (if cue fires)
+            </div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-primary)' }}>
+              {activePersona.bridgeSentence}
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              color: 'var(--text-muted)',
+              lineHeight: 1.45,
+              paddingTop: 6,
+              borderTop: '1px dashed var(--border-color)',
+            }}
+          >
+            Master-KB anchor: {activePersona.kbAnchor}
+          </div>
+        </div>
+
         {activePersona.disciplineNote && (
           <div
             style={{
+              marginTop: 8,
               fontSize: 11.5,
               color: C.red,
               fontWeight: 600,

@@ -24,7 +24,8 @@
       "Bash(wait)",
       "Bash(break)",
       "Bash(pdfimages -list public/dpr-sample-wework.pdf)",
-      "Bash(bash .husky/pre-push)"
+      "Bash(bash .husky/pre-push)",
+      "Bash(xxd)"
     ],
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",

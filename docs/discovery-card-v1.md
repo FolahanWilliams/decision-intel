@@ -1,8 +1,10 @@
-# Decision Intel · Discovery + Tailored-Pitch Card · v1 · 2026-05-01
+# Decision Intel · Discovery + Tailored-Pitch Card · v2 · 2026-05-08
 
 **Print, phone-screenshot, or laminate. Read in the Uber. Do not skip steps.**
 
 Your one job: find out if their pain is real. Discovery questions ALL FOUR before any pitch. Then pivot with tailored language keyed to what they revealed.
+
+**v2 changes (2026-05-08):** the 4 personas are re-aligned to the locked v3.5 HXC wedge (fractional CSO / mid-mkt corp dev / smaller-fund GP / PE-backed founder). Each persona now carries a SHARPER discovery question + pain-cue + bridge sentence (NotebookLM master-KB synthesis). The pain framing is **"capital eroded by unaudited reasoning in strategic decisions"** — see `src/lib/constants/icp.ts` POSITIONING_PAIN_FRAMING for the canonical phrasing.
 
 ---
 
@@ -14,14 +16,29 @@ Your one job: find out if their pain is real. Discovery questions ALL FOUR befor
 
 ---
 
-## The opener · pick before the conversation
+## The opener · pick the persona before the conversation
 
-| Persona | Opener |
-|---|---|
-| **CSO at FTSE 250 / S&P 500** | *"I'm researching how strategic memos get reviewed before the room sees them. Could I ask you about the last one you put together?"* |
-| **Head of M&A / Corp Dev** | *"I'm researching cross-border deal memos and what the room misses pre-IC. Could I ask you about the last one?"* |
-| **Fund Partner (Sankore-class)** | *"I'm researching how IC memos get audited before the partnership votes. Could I ask you about the last one?"* — never name Sankore aloud, keep "your fund" abstract |
-| **GC / Compliance officer** | *"I'm researching how strategic-decision audit trails get produced for audit-committee review. Could I ask about the last one your team had to produce?"* |
+| HXC persona | Archetype | Opener (cold-context) |
+| --- | --- | --- |
+| **Fractional CSO / strategy consultant** | Marcus | *"I'm researching how strategic memos get reviewed before the room sees them. Could I ask you about the last one you put together for a client?"* |
+| **Head of Corp Dev / M&A at scale-up** | Damien | *"I'm researching how mid-market deal teams audit IC packs pre-vote. Could I ask you about the last diligence process you ran?"* |
+| **GP / principal at smaller fund** | Aisha | *"I'm researching how smaller-fund GPs document conviction for their LPs. Could I ask you about your last contrarian investment?"* — never name a specific fund (Sankore or any prospect) aloud, keep "smaller-fund GPs" / "your fund" / "LP-governance pressure" abstract |
+| **PE-backed founder / CEO** | Henrik | *"I'm researching how PE-backed CEOs prep board decks. Could I ask you about your last major strategic pivot — what the sponsor pushed back on?"* |
+
+---
+
+## The sharpened discovery question (lead-in, per persona)
+
+After the opener, lead with the persona-specific question below. Only AFTER this answer, move into the 4 fixed Mom-Test questions in order.
+
+| HXC persona | Sharpened discovery question | Listen for | Bridge sentence (if cue fires) |
+| --- | --- | --- | --- |
+| **Fractional CSO** | *"Walk me through your last client strategy deliverable. When the board reviewed it, what was the one question that surprised you?"* | "They challenged our base assumptions" / "They asked for comparables we didn't have" | *"Based on what you said about the board catching that blind spot, we run reasoning audits on strategic memos before the room sees them — the technical name is a reasoning layer, scored as a Decision Quality Index."* |
+| **Head of Corp Dev / M&A** | *"In your last M&A diligence process, how did you formally document the deal team's dissenting views before the investment committee vote?"* | "We didn't really" / "Everyone just nodded along once the sponsor liked it" | *"Because you mentioned the team acting like an echo chamber, we run reasoning audits on M&A diligence packs to formalize that dissent — the technical name is a reasoning layer, scored as a Decision Quality Index."* |
+| **Smaller-fund GP** | *"When you make a contrarian investment, how do you document your conviction so LPs see institutional rigor rather than just your gut feel?"* | "LPs are demanding more process" / "It's hard to put the narrative on paper" | *"Because LPs are demanding that verifiable process to back up your intuition, we run reasoning audits on investment memos — the technical name is a reasoning layer, scored as a Decision Quality Index."* |
+| **PE-backed founder** | *"Think about your last major strategic pivot. What was the one underlying assumption the PE board tore apart that you didn't see coming?"* | "Market sizing" / "We were too optimistic on the timeline" | *"Since you mentioned the board tearing apart that timeline assumption, we run reasoning audits on board decks to catch those gaps first — the technical name is a reasoning layer, scored as a Decision Quality Index."* |
+
+**Master-KB anchors:** Mercier & Sperber argumentative theory · Kahneman & Lovallo 2003 "Delusions of Success" + Planning Fallacy · Klein 1995 pre-mortem framework · 143-case library WeWork "Echo Chamber" + Nokia "Yes Committee" failure patterns · Deep Research PMF findings on LP governance pressure on smaller-fund GPs.
 
 ---
 

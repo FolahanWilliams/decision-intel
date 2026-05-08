@@ -24,6 +24,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { CheckCircle2, Sparkles, Compass, ArrowRight, Activity } from 'lucide-react';
+import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_CONTRAST,
@@ -204,6 +205,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
       {renderPositioningAnchor()}
       {renderCalibrationCard(onNavigateToTab)}
       {renderInvestorAnswerCard()}
+      <TrustEvidencePackPointer variant="default" />
       {renderNoiseJuryCard()}
       {renderBiasGenomeMoatCard()}
 
@@ -533,6 +535,11 @@ function renderInvestorAnswerCard() {
     </div>
   );
 }
+
+// Trust evidence pack pointer (5.4 lock 2026-05-08) — moved to
+// TrustEvidencePackPointer component, shared with FounderOSTab via the
+// compact variant. Mounted as <TrustEvidencePackPointer variant="default" />
+// in the render tree above.
 
 // ─── 3-frame noise jury card (locked 2026-05-01) ───────────────────
 //
@@ -918,6 +925,9 @@ const investorAnswerNote: React.CSSProperties = {
   lineHeight: 1.55,
   marginBottom: 4,
 };
+
+// /trust evidence-pack styles moved to TrustEvidencePackPointer component
+// (5.4 lock 2026-05-08).
 
 // ─── 3-frame noise jury card styles ────────────────────────────────
 

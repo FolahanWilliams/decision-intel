@@ -26,7 +26,24 @@
 
 // ─── Types ────────────────────────────────────────────────────────
 
-export type PersonaId = 'cso' | 'ma_corpdev' | 'fund_partner' | 'gc_compliance';
+/**
+ * Persona ids — locked v3.5 HXC wedge personas (mirrors the four
+ * `phase1_hxc`-tagged personas in sparring-room-data.ts and the
+ * PHASE_1_HXC_PERSONAS export in icp.ts). Re-aligned 2026-05-08
+ * during the discovery-toolkit refresh — replaces the prior
+ * `cso / ma_corpdev / fund_partner / gc_compliance` set which mixed
+ * Phase 1 wedge with Phase 4 ceiling.
+ *
+ * The `gc_compliance` persona is now treated as Phase 4 procurement-
+ * pull (per CLAUDE.md GTM v3.5 §1) and removed from the Phase 1
+ * cold-discovery surface; the four below ARE the Phase 1 wedge
+ * cold-DM targets.
+ */
+export type PersonaId =
+  | 'fractional_cso'
+  | 'midmarket_corpdev_head'
+  | 'smallfund_gp'
+  | 'pebacked_founder';
 
 export interface DiscoveryQuestion {
   /** Order in the conversation (1-4). Always asked in this order. */
@@ -42,9 +59,33 @@ export interface DiscoveryQuestion {
 export interface PersonaOpener {
   id: PersonaId;
   label: string;
-  /** First-line opener variant per persona. Discovery questions are the same; the OPENER framing varies. */
+  /** Archetype name (matches Sparring Room — "Marcus" / "Damien" / "Aisha" / "Henrik"). */
+  archetype: string;
+  /** First-line opener variant per persona. The 4 Mom-Test discovery
+   *  questions in DISCOVERY_QUESTIONS are still asked in fixed order
+   *  AFTER the opener; this opener is the cold-context invitation. */
   opener: string;
-  /** One-line discipline note (e.g. "never name Sankore" for fund_partner). */
+  /** Sharpened per-persona discovery question (≤25 words, NotebookLM
+   *  synthesis 2026-05-08 against master KB). Surfaces the unaudited-
+   *  reasoning pain in the persona's specific language WITHOUT naming
+   *  the platform. Use as the LEAD-IN question once the conversation
+   *  is open — it sharpens the Mom-Test 4 with persona-specific framing
+   *  rather than replacing them. */
+  discoveryQuestion: string;
+  /** What to listen for in the answer — 1-2 phrases that cue you the
+   *  persona has just signalled the unaudited-reasoning pain. */
+  painSignalCue: string[];
+  /** The bridge sentence to pitch IF the cue fires. Converts cold →
+   *  warm in two beats: their pain in their words → "we run reasoning
+   *  audits — the technical name is a reasoning layer, scored as a
+   *  Decision Quality Index." */
+  bridgeSentence: string;
+  /** Master-KB anchor — which case studies / primary research the
+   *  per-persona discovery question pulls from. Sourced from the
+   *  2026-05-08 NotebookLM synthesis. */
+  kbAnchor: string;
+  /** One-line discipline note (e.g. "never name Sankore" for
+   *  smallfund_gp). */
   disciplineNote?: string;
 }
 
@@ -125,32 +166,98 @@ export const DEFLECTION_DISCIPLINE = [
 
 // ─── Persona-specific openers ────────────────────────────────────
 
+/**
+ * v3.5 HXC wedge personas — locked 2026-05-04 ICP + 2026-05-08
+ * NotebookLM-synthesised discovery questions + bridge sentences.
+ *
+ * Each entry carries (a) the cold-context opener (the line that goes
+ * IN the LinkedIn DM / cold email / conference 1:1 introduction) and
+ * (b) the SHARPER per-persona discovery question to ask once the
+ * conversation is open. The 4 fixed Mom-Test questions in
+ * DISCOVERY_QUESTIONS are still asked in fixed order; the per-persona
+ * `discoveryQuestion` is the lead-in that sharpens the framing for
+ * THIS persona's specific pain language.
+ *
+ * Bridge sentences are deliberately uniform in shape ("Based on what
+ * you said about X, we run reasoning audits — the technical name is
+ * a reasoning layer, scored as a Decision Quality Index") so the
+ * founder can rehearse one pattern across all four personas.
+ *
+ * NotebookLM synthesis source: master KB notebook 809f5104 query
+ * 2026-05-08, anchored in (a) the 143-case library WeWork "Echo
+ * Chamber" + Nokia "Yes Committee" failure patterns, (b) Mercier &
+ * Sperber argumentative theory of reasoning, (c) Kahneman & Lovallo
+ * 2003 "Delusions of Success" + Planning Fallacy, (d) Klein 1995
+ * pre-mortem framework, (e) Deep Research PMF findings on LP
+ * governance pressure on smaller fund GPs.
+ */
 export const PERSONA_OPENERS: PersonaOpener[] = [
   {
-    id: 'cso',
-    label: 'CSO at FTSE 250 / S&P 500',
+    id: 'fractional_cso',
+    label: 'Fractional CSO / strategy consultant',
+    archetype: 'Marcus',
     opener:
-      "I'm researching how strategic memos get reviewed before the room sees them. Could I ask you about the last one you put together?",
+      "I'm researching how strategic memos get reviewed before the room sees them. Could I ask you about the last one you put together for a client?",
+    discoveryQuestion:
+      'Walk me through your last client strategy deliverable. When the board reviewed it, what was the one question that surprised you?',
+    painSignalCue: [
+      'They challenged our base assumptions',
+      "They asked for comparables we didn't have",
+    ],
+    bridgeSentence:
+      'Based on what you said about the board catching that blind spot, we run reasoning audits on strategic memos before the room sees them — the technical name is a reasoning layer, scored as a Decision Quality Index.',
+    kbAnchor:
+      "Kahneman's 'Inside View' theory — strategists build a coherent narrative but fail to anticipate the 'Outside View' pushback. GTM v3.3 Hybrid Discovery Toolkit pattern.",
   },
   {
-    id: 'ma_corpdev',
-    label: 'Head of M&A / Corp Dev',
+    id: 'midmarket_corpdev_head',
+    label: 'Head of Corp Dev / M&A at scale-up',
+    archetype: 'Damien',
     opener:
-      "I'm researching cross-border deal memos and what the room misses pre-IC. Could I ask you about the last one?",
+      "I'm researching how mid-market deal teams audit IC packs pre-vote. Could I ask you about the last diligence process you ran?",
+    discoveryQuestion:
+      "In your last M&A diligence process, how did you formally document the deal team's dissenting views before the investment committee vote?",
+    painSignalCue: [
+      "We didn't really",
+      'Everyone just nodded along once the sponsor liked it',
+    ],
+    bridgeSentence:
+      'Because you mentioned the team acting like an echo chamber, we run reasoning audits on M&A diligence packs to formalize that dissent — the technical name is a reasoning layer, scored as a Decision Quality Index.',
+    kbAnchor:
+      "Mercier & Sperber argumentative theory (isolated teams suppress dissent to justify prior intuitions) + 143-case library WeWork 'Echo Chamber' + Nokia 'Yes Committee' failure patterns.",
   },
   {
-    id: 'fund_partner',
-    label: 'Fund Partner (Sankore-class)',
+    id: 'smallfund_gp',
+    label: 'GP / principal at smaller fund',
+    archetype: 'Aisha',
     opener:
-      "I'm researching how IC memos get audited before the partnership votes. Could I ask you about the last one?",
+      "I'm researching how smaller-fund GPs document conviction for their LPs. Could I ask you about your last contrarian investment?",
+    discoveryQuestion:
+      'When you make a contrarian investment, how do you document your conviction so LPs see institutional rigor rather than just your gut feel?',
+    painSignalCue: [
+      'LPs are demanding more process',
+      "It's hard to put the narrative on paper",
+    ],
+    bridgeSentence:
+      'Because LPs are demanding that verifiable process to back up your intuition, we run reasoning audits on investment memos — the technical name is a reasoning layer, scored as a Decision Quality Index.',
+    kbAnchor:
+      'Deep Research PMF findings: fund partners view their gut feel as their proprietary edge (high ego threat), but LPs are actively demanding institutionalized, repeatable decision frameworks.',
     disciplineNote:
-      'Never name Sankore aloud. Never reference "your fund" specifically — keep it abstract. The relationship is private.',
+      'Never name a specific fund (Sankore or any prospect) aloud. Keep the framing abstract — "smaller-fund GPs" / "your fund" / "LP-governance pressure" — never the firm name. The relationship is private.',
   },
   {
-    id: 'gc_compliance',
-    label: 'GC / Compliance officer',
+    id: 'pebacked_founder',
+    label: 'PE-backed founder / CEO',
+    archetype: 'Henrik',
     opener:
-      "I'm researching how strategic-decision audit trails get produced for audit-committee review. Could I ask about the last one your team had to produce?",
+      "I'm researching how PE-backed CEOs prep board decks. Could I ask you about your last major strategic pivot — what the sponsor pushed back on?",
+    discoveryQuestion:
+      'Think about your last major strategic pivot. What was the one underlying assumption the PE board tore apart that you didn\'t see coming?',
+    painSignalCue: ['Market sizing', 'We were too optimistic on the timeline'],
+    bridgeSentence:
+      'Since you mentioned the board tearing apart that timeline assumption, we run reasoning audits on board decks to catch those gaps first — the technical name is a reasoning layer, scored as a Decision Quality Index.',
+    kbAnchor:
+      "Kahneman & Lovallo 'Planning Fallacy' (founders defaulting to extreme optimism + base-rate neglect) + Klein 1995 pre-mortem framework (surfacing what the room forgot to ask).",
   },
 ];
 

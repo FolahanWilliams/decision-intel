@@ -53,6 +53,8 @@ import {
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
 import { LifestyleFreezeCard } from '@/components/founder-hub/founder-os/LifestyleFreezeCard';
+import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
+import { SparringRehearsalBalance } from '@/components/founder-hub/founder-os/SparringRehearsalBalance';
 
 interface DailyCheckin {
   id: string;
@@ -549,6 +551,21 @@ export function FounderOSTab() {
 
       {/* EVENT PREP — Phase 1 wedge calendar (deep nightly audit Section 9.1, locked 2026-05-05) */}
       <EventPrepCard />
+
+      {/* TRUST EVIDENCE PACK — procurement-grade pointer card (5.4 lock
+          2026-05-08). Compact variant — when a F500 GC / vendor-risk
+          reviewer asks for SOC 2 / sub-processors / DPA on a call, this
+          puts the URL one click from the daily entry point. */}
+      <TrustEvidencePackPointer variant="compact" />
+
+      {/* HXC REHEARSAL BALANCE — Sparring Room reps tracker (5.2 lock
+          2026-05-08). Reads localStorage['di-sparring-room-history-v1']
+          and surfaces "you've rehearsed fractional_cso 3× this week,
+          skipped midmarket_corpdev_head" so the founder rebalances
+          before Strategy World London T-32. Calendar context (T-32
+          to T-25 prep window) intersects with rehearsal balance —
+          sit alongside EventPrepCard for the full event-prep cluster. */}
+      <SparringRehearsalBalance />
 
       {/* STREAK + TODAY CHECKIN */}
       <div
