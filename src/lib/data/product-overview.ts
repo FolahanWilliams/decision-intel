@@ -100,9 +100,10 @@ export const PROBLEM_STATEMENTS: ProblemStatement[] = [
   },
   {
     id: 'single_decision_cost',
-    headline: 'A single bad strategic decision costs organizations millions in value destruction.',
+    headline:
+      'A single strategic decision shipped on unaudited reasoning costs organizations millions in value destruction.',
     detail:
-      'One uncaught bias in a capital-allocation memo can compound into nine-figure write-downs.',
+      'One uncaught bias in a capital-allocation memo can compound into nine-figure write-downs. Reasoning is never objectively sound; it is either audited or unaudited.',
     severity: 'critical',
   },
   {

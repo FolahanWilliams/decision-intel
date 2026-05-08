@@ -69,9 +69,34 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 - **The category-claim move ("THE platform" not "A platform")** asserts category ownership the way "Stripe is the payments infrastructure for the internet" does. The category — _reasoning-audit-platform_ — does not exist as a Gartner segment, which means it's ours by usage. The claim differentiates cleanly from BI tools (audit data) and model-risk-management tools (audit algorithms) by baking the human-reasoning differentiator into the noun itself.
 - **The contrast sub-head** does the differentiator work the H1 alone can't carry. Use as the second sentence on the landing page and pitch deck slide 1.
 - **The asymmetric-tail body** captures the "very much might not but when it does, it's a big thing" insight that justifies running the audit on EVERY memo. Goes immediately below the contrast sub-head; never in the H1 itself.
-- **Do NOT** use "collaborative," "collaborator," "medium," or "protect outcomes" framings. **Banned drift targets** (per `BANNED_VOCABULARY` in `icp.ts`): `decision intelligence platform` (Gartner-crowded), `decision hygiene` (Kahneman's term), `boardroom strategic decision` (audience-narrowing), `company knowledge base` (dilutes the decision-specific moat), `AI decision tool` (generic SaaS tell), `AI-powered decision platform` (AI-powered prefix is a generic SaaS tell), and **`native reasoning layer`** (deprecated 2026-05-04 — failed Pursey 15-second test).
+- **Do NOT** use "collaborative," "collaborator," "medium," or "protect outcomes" framings. **Banned drift targets** (per `BANNED_VOCABULARY` in `icp.ts`): `decision intelligence platform` (Gartner-crowded), `decision hygiene` (Kahneman's term), `boardroom strategic decision` (audience-narrowing), `company knowledge base` (dilutes the decision-specific moat), `AI decision tool` (generic SaaS tell), `AI-powered decision platform` (AI-powered prefix is a generic SaaS tell), **`native reasoning layer`** (deprecated 2026-05-04 — failed Pursey 15-second test), **`bad strategic decisions`** (deprecated 2026-05-08 — accusatory toward elite buyers), and **`unaudited decisions`** alone without "reasoning" (deprecated 2026-05-08 — drops the IP differentiator).
 - "Reasoning layer" stays valid in long-form technical writing where the architectural metaphor is load-bearing (e.g., explaining how DI sits between data infrastructure and decision execution), but it is NEVER the H1 or first impression. The category is "the reasoning audit platform"; "reasoning layer" is now legacy supporting vocabulary.
 - "Protected revenue" framing (per the 2026-04-27 lock) stays valid as a body-copy explainer but the H1 leads with the category claim, not the protected-revenue framing. The two layer cleanly: H1 = category, body = protected revenue.
+
+## Pain Framing (RE-LOCKED 2026-05-08 — NotebookLM-VERIFIED PIVOT FROM "BAD STRATEGIC DECISIONS")
+
+**Canonical pain phrase** (slide 2 of pitch deck, landing-page problem statement, cold outreach openers, anywhere we name the problem):
+
+> **Capital eroded by unaudited reasoning in strategic decisions.**
+
+**Money-line philosophical claim** (rehearsable, quotable, pitch-deck-ready — anchored in Mercier & Sperber argumentative theory + Kahneman & Klein 2009 conditions for trustworthy intuition):
+
+> **Reasoning is never objectively sound; it is either audited or unaudited.**
+
+**Source-of-truth in code:** `POSITIONING_PAIN_FRAMING` + `POSITIONING_PAIN_PHILOSOPHICAL_CLAIM` + `COMPETITIVE_DEFENSIVE_LINES` exports in [src/lib/constants/icp.ts](src/lib/constants/icp.ts). When the pain framing changes, edit `icp.ts` first; every consumer reads by import.
+
+**Why "unaudited reasoning" beats "bad / flawed reasoning":** elite decision-makers (CSO, M&A head, GP, PE-backed founder) view their intuition as their proprietary edge and reject framing that says their reasoning is broken. Per the master-KB synthesis: "telling a Fortune 500 CSO that their reasoning is FLAWED triggers immediate ego threat and destroys the sale." "Unaudited" names a missing process, not broken thinking — ego-safe + procurement-grade.
+
+**Why "unaudited reasoning" beats "unaudited decisions" alone:** dropping "reasoning" abandons the IP moat. Cloverpop logs decisions; IBM watsonx audits models. Both can co-opt "we audit decisions." The word **reasoning** is the legal lock — it preserves the 22-bias taxonomy + R²F + 143-case corpus + Kahneman/Klein synthesis as the differentiator no competitor carries.
+
+**Underlying philosophical claim:** human reasoning is biologically and evolutionarily flawed by default. Capital is not destroyed because executives have cognitive biases — biases are the OS of the human mind. Capital is destroyed because organizations lack the structural friction (the audit) required to catch and neutralize bias before capital is committed.
+
+**Competitive defensive lines** (locked alongside the pain framing 2026-05-08, use verbatim when buyer / investor names a competitor):
+
+- **Cloverpop:** _"Cloverpop logs decisions; Decision Intel audits them."_
+- **IBM watsonx.governance:** _"IBM audits the model; Decision Intel audits the human reasoning."_
+
+These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
 ## Positioning & Vocabulary (locked 2026-04-13)
 

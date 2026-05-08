@@ -23,7 +23,8 @@
       "Bash(tee /tmp/dpr-dev.log)",
       "Bash(wait)",
       "Bash(break)",
-      "Bash(pdfimages -list public/dpr-sample-wework.pdf)"
+      "Bash(pdfimages -list public/dpr-sample-wework.pdf)",
+      "Bash(bash .husky/pre-push)"
     ],
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",

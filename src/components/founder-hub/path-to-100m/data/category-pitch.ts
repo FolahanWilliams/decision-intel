@@ -212,12 +212,13 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
   {
     id: 'protected_revenue_anchor',
     pattern: 'The Protected-Revenue Anchor Pattern',
-    featureFraming: 'We protect against bad strategic decisions.',
+    featureFraming: 'We protect against unaudited reasoning in strategic decisions.',
     protectedRevenueFraming:
       'One avoided £5-15M strategic mistake per quarter pays for the entire team subscription five years over.',
     whyItWorks:
-      'Frames the subscription as a protection product, not a software cost. The buyer\'s purchase decision becomes "is one bad call worth more than five years of subscription" — the answer is always yes.',
-    source: 'CLAUDE.md PricingPageClient.tsx Strategy-tier protected-value strap (2026-04-27)',
+      'Frames the subscription as a protection product, not a software cost. The buyer\'s purchase decision becomes "is one prevented blowup worth more than five years of subscription" — the answer is always yes.',
+    source:
+      'CLAUDE.md PricingPageClient.tsx Strategy-tier protected-value strap (2026-04-27); pain-framing pivot to "unaudited reasoning" 2026-05-08',
   },
 ];
 

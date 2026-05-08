@@ -4,12 +4,16 @@ import type { ExtractedProfile, GeneratedOutreach, IntentCallouts, OutreachInten
 
 const log = createLogger('MessageGenerator');
 
-// Source of truth for the wedge personas + sequencing: src/lib/constants/icp.ts
-// (PHASE_1_HXC_PERSONAS, ICP_WEDGE, ICP_CEILING). When the v3.5 ICP lock
-// changes, edit icp.ts first; this prompt follows the same vocabulary.
+// Source of truth for the wedge personas + sequencing + pain framing:
+// src/lib/constants/icp.ts (PHASE_1_HXC_PERSONAS, ICP_WEDGE, ICP_CEILING,
+// POSITIONING_PAIN_FRAMING, COMPETITIVE_DEFENSIVE_LINES). When the v3.5
+// ICP lock or 2026-05-08 pain-framing lock changes, edit icp.ts first;
+// this prompt follows the same vocabulary.
 const FOUNDER_PITCH_CONTEXT = `DECISION INTEL — FOUNDER POSITIONING CONTEXT
 
-What it is: Decision Intel is an AI cognitive bias auditing platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. 22-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
+What it is: Decision Intel is the reasoning audit platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive reasoning audit in under 60 seconds. 22-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
+
+The pain (canonical phrasing — locked 2026-05-08): capital eroded by unaudited reasoning in strategic decisions. Money-line: reasoning is never objectively sound; it is either audited or unaudited. (Anchored in Mercier & Sperber argumentative theory + Kahneman & Klein 2009 conditions for trustworthy intuition.) Do NOT say "bad strategic decisions" or "flawed reasoning" — both trigger ego threat with elite decision-makers who view their intuition as their proprietary edge. Do NOT say "unaudited decisions" alone — drops the IP differentiator (Cloverpop logs decisions, IBM audits models — the word "reasoning" is what locks them out).
 
 Who it's for (Phase 1 wedge — months 1-6, NOW, v3.5 ratified 2026-05-04): the FOUR buyer-class-continuous personas at £249/mo Individual tier — (a) Fractional CSOs running 3-5 client engagements with regular memo flow, (b) Heads of Corp Dev / M&A at $50M-$500M revenue scale-ups with personal-decisive budget, (c) GPs / principals at smaller funds (£5M-£100M AUM) with active deal flow OR LP-governance pressure, (d) PE-backed founders / CEOs owning the strategic memo workflow. UK + US. Junior analysts and roles outside these four are out-of-scope for Phase 1 (auto-waitlisted at sign-up).
 
@@ -17,11 +21,11 @@ Where this is going (NOT the Phase 1 message — context only): Phase 2 bridge (
 
 Moat: per-org Brier-scored outcome calibration — once a customer logs enough decisions with outcomes, our engine learns which biases actually mattered for THEM specifically and recalibrates future DQI scores accordingly. The Recognition-Rigor Framework (Kahneman's debiasing + Klein's Recognition-Primed Decisions arbitrated in one pipeline) is the IP layer. The 19-framework cross-border regulatory map (G7 / EU / GCC / African markets including NDPR / CBN / WAEMU / PoPIA / SARB / ISA Nigeria 2007) is the moat layer Cloverpop and IBM watsonx.governance don't carry. Advised by a senior consultant who took Wiz from startup to $32B.
 
-Competitor reality: There is no direct competitor in "decision quality auditing." Cloverpop does decision tracking (not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
+Competitor reality: there is no direct competitor in reasoning auditing. Defensive lines (use verbatim if a competitor name comes up): "Cloverpop logs decisions; Decision Intel audits them." / "IBM audits the model; Decision Intel audits the human reasoning." The real competition is "do nothing" — teams don't audit the reasoning behind strategic decisions at all.
 
 Economics: ~90% blended gross margins (~£0.30-0.50 per audit on Gemini paid tier 1, ~17 LLM calls across 12 nodes). Pricing: £249/mo Individual (15 audits, the wedge tier), £2,499/mo Strategy (fair-use 250 audits/mo + team), Enterprise custom with volume floor + overage.
 
-The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). EU AI Act high-risk decision-support obligations enforce August 2026. LLMs finally make real-time bias detection feasible at <£0.50 per document. The per-org Brier-scored flywheel is live in production.
+The "why now" hook: boards demanding rigor after a decade of capital eroded by unaudited reasoning (WeWork, Microsoft-Nokia, Boeing 737 MAX, Quibi). EU AI Act high-risk decision-support obligations enforce August 2026. LLMs finally make real-time reasoning audit feasible at <£0.50 per document. The per-org Brier-scored flywheel is live in production.
 
 Founder: Solo technical founder, 16, raised between Lagos (home) and the UK (current residence). Raising pre-seed/seed in the next ~6 months. No paying customers yet — actively outreaching to the four Phase 1 HXC personas via LinkedIn DMs and warm intros (5-10/week target).
 
@@ -85,7 +89,7 @@ Return this exact JSON shape:
 
 Hard requirements — validation will reject outputs that fail these:
 1. The message MUST reference at least one specific detail from the profile (name, role, company, recent topic, or inferred priority).
-2. The message MUST reference at least one specific detail from the founder context (the 60-second audit, the Wiz advisor, the 18-month causal moat, the ~90% blended gross margins, the "do nothing" competitor, or the "why now" hook).
+2. The message MUST reference at least one specific detail from the founder context (the 60-second reasoning audit, the Wiz advisor, the per-org Brier-scored outcome flywheel, the ~90% blended gross margins, the "capital eroded by unaudited reasoning" pain framing, or the EU AI Act August 2026 enforcement "why now" hook).
 3. The message MUST stay within the word limit specified by the intent (200 words for connect, 150 words for all other intents).
 4. The message MUST include a formal salutation on the first line (e.g. "Good Afternoon Ms. Smith,") and end with the "Warm regards, Folahan Williams, decision-intel.com" sign-off.
 5. No emojis, no em dashes, no markdown.`;

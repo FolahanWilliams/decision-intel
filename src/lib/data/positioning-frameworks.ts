@@ -164,7 +164,8 @@ export const POSITIONING_FLOW: FlowStep[] = [
     step: 5,
     title: 'Value',
     question: 'Is the value obvious?',
-    yesAnswer: 'One prevented bad strategic decision > 10x annual subscription cost.',
+    yesAnswer:
+      'One strategic decision rescued from unaudited reasoning > 10x annual subscription cost.',
     noFailure: 'Confusion kills conversion. Simplify it.',
     diFlag: 'partial',
     diNote:

@@ -92,6 +92,71 @@ export const ICP_AUDIENCE_SUMMARY =
   'Individual CSOs + M&A heads + corp dev directors (UK + US wedge) → Sankore design partner bridge (London summer 2026) → F500 corporate strategy + corp dev M&A teams (ceiling, 12-24+ months).';
 
 /**
+ * Pain framing — locked 2026-05-08 (NotebookLM-verified, supersedes the
+ * prior "bad strategic decisions" phrasing).
+ *
+ * The canonical pain phrase for slide 2 of the pitch deck, the landing
+ * page problem statement, cold outreach openers, and any surface that
+ * names the problem we solve. Synthesised from a master-KB query that
+ * ran two evaluations against the 143-case library + Kahneman & Klein
+ * 2009 / Kahneman & Lovallo 2003 / Klein 1995 / Mercier & Sperber:
+ *
+ * - "bad" / "flawed" reasoning loses on buyer psychology — elite
+ *   decision-makers (CSO, M&A head, GP, PE-backed founder) view their
+ *   intuition as their proprietary edge and reject framing that says
+ *   their reasoning is broken. Triggers ego threat at procurement.
+ * - "unaudited decisions" alone loses the IP moat — Cloverpop logs
+ *   decisions, IBM watsonx audits models. Both can co-opt "we audit
+ *   decisions." The word "reasoning" is what legally locks them out.
+ * - "unaudited reasoning in strategic decisions" survives both tests:
+ *   ego-saving (names a missing process, not broken thinking) AND
+ *   IP-defensible (preserves "reasoning" as the category differentiator).
+ *
+ * Underlying philosophical claim (Mercier & Sperber + K&K 2009):
+ * Human reasoning is biologically and evolutionarily flawed by default.
+ * Capital is not destroyed because executives have cognitive biases —
+ * biases are the OS of the human mind. Capital is destroyed because
+ * organizations lack the structural friction (the audit) required to
+ * catch and neutralize bias before capital is committed. Reasoning is
+ * never objectively "sound"; it is either audited or unaudited.
+ */
+export const POSITIONING_PAIN_FRAMING =
+  'Capital eroded by unaudited reasoning in strategic decisions.';
+
+/**
+ * Money-line claim that justifies the audit category. Derived directly
+ * from the master-KB synthesis. Use as a follow-up sentence to the
+ * pain framing on the pitch-deck pain slide, or as a standalone in
+ * investor conversation. Quotable / rehearsable.
+ */
+export const POSITIONING_PAIN_PHILOSOPHICAL_CLAIM =
+  'Reasoning is never objectively sound; it is either audited or unaudited.';
+
+/**
+ * Competitive defensive lines — the canonical responses when a buyer or
+ * investor names Cloverpop / IBM watsonx as competitive. Locked alongside
+ * the pain framing 2026-05-08 because the pain phrase deliberately
+ * preserves "reasoning" as the IP differentiator, and these lines are
+ * the operational follow-through. Use verbatim.
+ */
+export const COMPETITIVE_DEFENSIVE_LINES: ReadonlyArray<{
+  competitor: string;
+  line: string;
+  why: string;
+}> = [
+  {
+    competitor: 'Cloverpop',
+    line: 'Cloverpop logs decisions; Decision Intel audits them.',
+    why: 'Cloverpop is positioned as a decision system of record (logging + voting + accountability) but has no bias detection. The pain framing "unaudited reasoning" is precisely the gap they cannot close without our 22-bias taxonomy + R²F + 143-case corpus.',
+  },
+  {
+    competitor: 'IBM watsonx.governance',
+    line: 'IBM audits the model; Decision Intel audits the human reasoning.',
+    why: 'IBM watsonx audits AI model behaviour (model lineage, fairness metrics, drift detection). It does NOT audit the human-authored memo or the human reasoning chain that drove the capital-allocation decision. The "human reasoning" qualifier is the procurement-grade differentiator.',
+  },
+] as const;
+
+/**
  * Decision system of record · positioning extension (locked v3.2).
  *
  * Decision Intel is the system of record for DECISIONS specifically — not
@@ -332,6 +397,16 @@ export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }
     reason:
       'Deprecated 2026-05-04. Failed Pursey 15-second test (reader has to define "reasoning layer" before the sentence resolves). Replaced by "the reasoning audit platform" — keeps the human-reasoning differentiator but in a noun phrase a stranger immediately understands.',
   },
+  {
+    phrase: 'bad strategic decisions',
+    reason:
+      'Deprecated 2026-05-08 (NotebookLM-verified pain-framing pivot). Accusatory toward elite decision-makers — they view their intuition as their proprietary edge and reject framing that says their reasoning is broken. Replaced by "unaudited reasoning in strategic decisions" (POSITIONING_PAIN_FRAMING) which names a missing process, not broken thinking. Same applies to "flawed strategic decisions" / "wrong strategic decisions" — generic + accusatory.',
+  },
+  {
+    phrase: 'unaudited decisions',
+    reason:
+      'Banned ALONE (without "reasoning") 2026-05-08. Drops the IP differentiator — Cloverpop (logs decisions) and IBM watsonx (audits models) can both legally claim "we solve unaudited decisions." The word "reasoning" is what locks them out. Always use "unaudited reasoning in strategic decisions" or pair with "reasoning" in the same sentence.',
+  },
 ] as const;
 
 /**
@@ -387,12 +462,26 @@ export function buildIcpPromptBlock(): string {
  * explicit about WHEN to use the contrast sub-head + asymmetric-tail body.
  */
 export function buildPositioningPromptBlock(): string {
+  const competitiveLines = COMPETITIVE_DEFENSIVE_LINES.map(
+    c => `  - ${c.competitor}: "${c.line}" (why: ${c.why})`
+  ).join('\n');
   return [
     `CATEGORY CLAIM (locked 2026-05-04 — replaces the prior "native reasoning layer" lock):`,
     `Primary H1: "${POSITIONING_HERO_PRIMARY}"`,
     `Contrast sub-head (use as second sentence on landing / pitch deck): "${POSITIONING_HERO_CONTRAST}"`,
     `Asymmetric-tail body (use as JUSTIFICATION for running the audit on every memo): "${POSITIONING_ASYMMETRIC_TAIL_BODY}"`,
     `Secondary H1 (cold investor / regulatory-tailwind contexts only): "${POSITIONING_HERO_SECONDARY}"`,
+    ``,
+    `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,
+    `Canonical pain phrase: "${POSITIONING_PAIN_FRAMING}"`,
+    `Money-line philosophical claim (rehearsable): "${POSITIONING_PAIN_PHILOSOPHICAL_CLAIM}"`,
+    ``,
+    `Why "unaudited reasoning" beats "bad/flawed reasoning": elite decision-makers (CSO, M&A head, GP, PE-backed founder) view their intuition as their proprietary edge and reject framing that says their reasoning is broken. "Unaudited" names a missing process, not broken thinking — ego-safe + procurement-grade.`,
+    ``,
+    `Why "unaudited reasoning" beats "unaudited decisions" alone: dropping "reasoning" abandons the IP moat — Cloverpop (logs decisions) and IBM watsonx (audits models) can both legally claim "we audit decisions." The word "reasoning" is what locks them out.`,
+    ``,
+    `COMPETITIVE DEFENSIVE LINES — use verbatim when buyer / investor names a competitor:`,
+    competitiveLines,
     ``,
     `Protected category noun: "${CATEGORY_CLAIM}". Treat like R²F / DPR / DQI — never substitute synonyms in shipped surfaces. Only allowed deviation: "the reasoning audit" (drop "platform") for cold LinkedIn DMs / conference introductions where SaaS-platform vocabulary sounds heavy.`,
     ``,

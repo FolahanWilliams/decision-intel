@@ -263,7 +263,7 @@ export const TRAP_PERSONAS: TrapPersona[] = [
     id: 'f500_cso',
     label: 'Fortune 500 Chief Strategy Officer',
     whyTheyLookAttractive:
-      '$50K-$150K ACV ceiling. $250M pain from bad strategic decisions. The unicorn-revenue path runs through them. They look like the obvious target on a TAM slide.',
+      '$50K-$150K ACV ceiling. $250M pain per F500 from unaudited reasoning in strategic decisions. The unicorn-revenue path runs through them. They look like the obvious target on a TAM slide.',
     whyTheyAreATrap:
       'Structurally 12-18 months out. Selling to them requires surviving a 6-12 month procurement cycle that demands SOC 2 Type II compliance, EU AI Act Article 14 mapping, Audit Committee sign-off, and a vendor-risk register review. You do not have the outcome data flywheel or the published reference cases to survive this cycle yet. Pitching them today bleeds runway.',
     whenToRevisit:

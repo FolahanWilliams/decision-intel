@@ -282,7 +282,7 @@ export const MARKET_DIMENSIONS: MarketDimension[] = [
       },
       {
         q: 'Is solving this valuable enough?',
-        a: 'Yes — a single prevented bad strategic decision > 10x annual subscription cost. ROI is obvious to the buyer.',
+        a: 'Yes — a single strategic decision rescued from unaudited reasoning > 10x annual subscription cost. ROI is obvious to the buyer.',
       },
       {
         q: 'Can this become repeat revenue?',
