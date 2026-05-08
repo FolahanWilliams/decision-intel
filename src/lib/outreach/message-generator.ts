@@ -4,21 +4,26 @@ import type { ExtractedProfile, GeneratedOutreach, IntentCallouts, OutreachInten
 
 const log = createLogger('MessageGenerator');
 
+// Source of truth for the wedge personas + sequencing: src/lib/constants/icp.ts
+// (PHASE_1_HXC_PERSONAS, ICP_WEDGE, ICP_CEILING). When the v3.5 ICP lock
+// changes, edit icp.ts first; this prompt follows the same vocabulary.
 const FOUNDER_PITCH_CONTEXT = `DECISION INTEL — FOUNDER POSITIONING CONTEXT
 
 What it is: Decision Intel is an AI cognitive bias auditing platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. 22-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
 
-Who it's for: Corporate strategy and M&A teams at F1000 and PE-backed mid-market. Expansion: investment committees at PE/VC.
+Who it's for (Phase 1 wedge — months 1-6, NOW, v3.5 ratified 2026-05-04): the FOUR buyer-class-continuous personas at £249/mo Individual tier — (a) Fractional CSOs running 3-5 client engagements with regular memo flow, (b) Heads of Corp Dev / M&A at $50M-$500M revenue scale-ups with personal-decisive budget, (c) GPs / principals at smaller funds (£5M-£100M AUM) with active deal flow OR LP-governance pressure, (d) PE-backed founders / CEOs owning the strategic memo workflow. UK + US. Junior analysts and roles outside these four are out-of-scope for Phase 1 (auto-waitlisted at sign-up).
 
-Moat: 18 months of causal outcome data per org — once a team logs enough decisions with outcomes, our engine learns which biases actually mattered and deducts from future DQI scores accordingly. No competitor has this primitive. Advised by a senior consultant who took Wiz from startup to $32B.
+Where this is going (NOT the Phase 1 message — context only): Phase 2 bridge (months 6-12) is Sankore-class design partner pilots producing reference-grade DPRs. Phase 3-4 ceiling (12-24+ months) is F500 corporate strategy + corp dev M&A teams running cross-border acquisitions @ £50K-150K ACV. Do NOT pitch the ceiling to a wedge prospect — different motion, different price, different gate.
+
+Moat: per-org Brier-scored outcome calibration — once a customer logs enough decisions with outcomes, our engine learns which biases actually mattered for THEM specifically and recalibrates future DQI scores accordingly. The Recognition-Rigor Framework (Kahneman's debiasing + Klein's Recognition-Primed Decisions arbitrated in one pipeline) is the IP layer. The 19-framework cross-border regulatory map (G7 / EU / GCC / African markets including NDPR / CBN / WAEMU / PoPIA / SARB / ISA Nigeria 2007) is the moat layer Cloverpop and IBM watsonx.governance don't carry. Advised by a senior consultant who took Wiz from startup to $32B.
 
 Competitor reality: There is no direct competitor in "decision quality auditing." Cloverpop does decision tracking (not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
 
-Economics: ~90% blended gross margins (~£0.30-0.50 per audit on Gemini paid tier 1, ~17 LLM calls across 12 nodes). Pricing: £2,499/mo Strategy (fair-use 250 audits/mo + team), £249/mo Individual (15 audits). Enterprise custom with volume floor + overage.
+Economics: ~90% blended gross margins (~£0.30-0.50 per audit on Gemini paid tier 1, ~17 LLM calls across 12 nodes). Pricing: £249/mo Individual (15 audits, the wedge tier), £2,499/mo Strategy (fair-use 250 audits/mo + team), Enterprise custom with volume floor + overage.
 
-The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). Compliance frameworks are citing cognitive hygiene. LLMs finally make real-time bias detection feasible at <$0.10 per document. The 18-month causal flywheel just turned on (production code path that was silently broken for months is now live).
+The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). EU AI Act high-risk decision-support obligations enforce August 2026. LLMs finally make real-time bias detection feasible at <£0.50 per document. The per-org Brier-scored flywheel is live in production.
 
-Founder: Solo technical founder, 16, raised between Lagos (home) and the UK (current residence). Raising pre-seed/seed in the next ~6 months. No pilot users yet — actively outreaching to corp dev/M&A teams via advisor network.
+Founder: Solo technical founder, 16, raised between Lagos (home) and the UK (current residence). Raising pre-seed/seed in the next ~6 months. No paying customers yet — actively outreaching to the four Phase 1 HXC personas via LinkedIn DMs and warm intros (5-10/week target).
 
 WRITING STYLE RULES (mandatory for every message):
 - No emojis, no em dashes, no bullet-point formatting in the message body.

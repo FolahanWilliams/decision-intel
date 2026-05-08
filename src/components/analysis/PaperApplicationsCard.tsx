@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import {
   Telescope,
   History,
@@ -26,6 +25,7 @@ import { decisionRubricVerdictLabel } from '@/lib/learning/decision-rubric';
 import type { AlgorithmAversion } from '@/lib/learning/algorithm-aversion';
 import { algorithmAversionVerdictLabel } from '@/lib/learning/algorithm-aversion';
 import { SignalBlock, SignalBlockGrid, type SignalBand } from '@/components/ui/SignalBlock';
+import { useAnalysisInsights } from '@/hooks/useAnalysisInsights';
 
 /**
  * PaperApplicationsCard — surfaces the three Kahneman-Klein-anchored
@@ -50,17 +50,9 @@ import { SignalBlock, SignalBlockGrid, type SignalBand } from '@/components/ui/S
  * forecast + feedback adequacy. Typical response <50ms.
  */
 
-interface InsightsResponse {
-  analysisId: string;
-  validityClassification: ValidityClassification;
-  referenceClassForecast: ReferenceClassForecast;
-  feedbackAdequacy: FeedbackAdequacy;
-  calibratedRejection: CalibratedRejection;
-  fractionationOfExpertise: FractionationOfExpertise;
-  decisionRubric: DecisionRubric;
-  algorithmAversion: AlgorithmAversion;
-  validitySource: 'persisted' | 'live';
-}
+// InsightsResponse shape moved to @/hooks/useAnalysisInsights as the
+// shared canonical type. Both this card and VerdictBand read from the
+// same module-level cache via useAnalysisInsights(analysisId).
 
 // Validity Classification — Kahneman & Klein 2009 first condition.
 const VALIDITY_VERDICT: Record<ValidityClassification['validityClass'], string> = {
@@ -154,31 +146,13 @@ const AVERSION_BAND: Record<AlgorithmAversion['verdict'], SignalBand> = {
 };
 
 export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
-  const [data, setData] = useState<InsightsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const res = await fetch(`/api/analysis/${analysisId}/insights`);
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
-        const json = (await res.json()) as InsightsResponse;
-        if (!cancelled) setData(json);
-      } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'fetch failed');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [analysisId]);
+  // Shared module-level cache via useAnalysisInsights — VerdictBand
+  // (J.2 + M.2 author-calibration chip) reads the same payload from the
+  // same fetch, so the page only hits /api/analysis/[id]/insights once.
+  const insights = useAnalysisInsights(analysisId);
+  const data = insights.data;
+  const loading = insights.status === 'loading';
+  const error = insights.status === 'error' ? insights.error : null;
 
   if (loading) {
     return (

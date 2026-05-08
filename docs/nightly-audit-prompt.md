@@ -1,4 +1,4 @@
-# Nightly Audit Prompt v1.0 (locked 2026-05-02)
+# Nightly Audit Prompt v1.1 (locked 2026-05-08)
 
 Copy-paste this prompt into a fresh Claude Code session at the start of an
 audit run. It composes with the V2 persona-audit disciplines codified in
@@ -18,7 +18,7 @@ random findings per audit; one fabricated trace rejects the whole report.
 or fetches `main` from `github.com/FolahanWilliams/decision-intel`, and
 the working tree contains every file the prompt references —
 `CLAUDE.md`, `TODO.md`, `src/lib/constants/icp.ts`,
-`src/lib/constants/trust-copy.ts`, `docs/gtm-plan-v3-3-2026-05-01.md`,
+`src/lib/constants/trust-copy.ts`, `docs/gtm-plan-v3-5-2026-05-04.md`,
 `src/components/founder-hub/persona-audit/persona-audit-prompt.ts`,
 `DESIGN.md`, plus the full codebase. Filesystem access is assumed.
 
@@ -109,8 +109,10 @@ context, 70k for findings + implementation.
    (V2 audit disciplines — read `V1_AUDIT_FAILURE_MODES` carefully)
 7. `git log --oneline -30` (recent ship history — DO NOT propose work that
    already shipped in the last 7 days)
-8. `docs/gtm-plan-v3-3-2026-05-01.md` (current GTM lock — the canonical
-   plan that supersedes v3.2)
+8. `docs/gtm-plan-v3-5-2026-05-04.md` (current GTM lock — RATIFIED
+   2026-05-04; supersedes v3.4 DRAFT entirely + v3.3 selectively on
+   wedge motion / ICP sequencing / regulatory-tailwind timing /
+   graduation rules. v3.3 honesty repairs all carry forward unchanged.)
 
 After loading: state in one sentence what phase Decision Intel is in
 RIGHT NOW (per CLAUDE.md). If you can't, you haven't read enough.
@@ -494,6 +496,10 @@ Founder triages by phase tag + severity. Anything tagged
 ## Versioning
 
 - v1.0 (2026-05-02) — initial lock; composes with persona-audit-prompt.ts V2
+- v1.1 (2026-05-08) — bumped GTM canonical reference from v3.3 → v3.5
+  (v3.5 RATIFIED 2026-05-04, supersedes v3.4 DRAFT entirely + v3.3
+  selectively per CLAUDE.md "Reference source-of-truth" lock). Caught
+  by the 2026-05-08 audit's own Section 9.1.
 - Edit this doc, not a copy in chat. The lock travels with the file.
 
 When updating: bump version + add changelog entry above. The discipline

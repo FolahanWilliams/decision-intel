@@ -1222,6 +1222,58 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     source: 'src/lib/constants/bias-education.ts DI-B-022 + Kahneman & Lovallo 2003',
     tag: 'kahneman_klein',
   },
+  {
+    id: 'bias_fractionation_of_expertise',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the fractionation of expertise (Kahneman & Klein 2009), and what gap does DI's Fractionation detector close that Feedback Adequacy leaves open?",
+    canonicalAnswer:
+      "Kahneman & Klein (2009) finding: an expert's validity is NOT uniform across their domain. A clinical psychologist is high-validity on short-term mood prediction and zero-validity on long-term life outcomes. A fund partner can be calibrated on Series A SaaS but completely uncalibrated on emerging-market consumer rollups. Same person, same job title, dramatically different track record per sub-domain. The 2009 paper labels this the 'fractionation of expertise.' DI's existing Feedback Adequacy detector (paper-app #6, 2026-04-30) computes ONE verdict per author across ALL closed decisions — answers 'do they have a track record?' but NOT 'a track record on THIS kind of decision?' The Fractionation of Expertise detector (paper-app #1, locked 2026-05-07) closes the gap: it slices the user's outcome history by decision class (M&A integration / capital deployment / market entry / long-horizon strategy / operations / unknown) and contrasts this-class to other-class calibration. Verdict bands: class_calibrated (≥10 in this class — experience claims carry weight), broadly_calibrated (track record but mostly OUTSIDE this class), fractionated_uncalibrated (cold-start on THIS class despite signal on another — the canonical pattern), broadly_cold_start, cannot_assess. Implementation: src/lib/learning/fractionation-of-expertise.ts; surfaced as DPR strip §4.7 + PaperApplicationsCard SignalBlock + R²F Detector Atlas.",
+    difficulty: 'advanced',
+    applicationContext:
+      "When Margaret-class CSO or Adaeze-class fund partner asks 'your feedback is sparse — sparse FOR WHICH decision class?' — the Fractionation verdict names it explicitly.",
+    source: 'src/lib/learning/fractionation-of-expertise.ts + Kahneman & Klein 2009',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_decision_rubric',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is Robyn Dawes' 1979 'improper linear models' finding, and how does DI's Decision Rubric detector operationalise it?",
+    canonicalAnswer:
+      "Dawes 1979 'The Robust Beauty of Improper Linear Models in Decision Making' (American Psychologist): a SIMPLE LINEAR COMBINATION of relevant features — each criterion weighted equally OR even with random coefficients — consistently outperforms expert intuition on prediction tasks. The expert's judgment adds NOISE, not signal. The structured rubric outperforms the structured rubric + expert override. Replicated across 50+ years on graduate-student selection, parole decisions, medical diagnoses, mental-health intake, financial planning. Actionable consequence for strategic memos: the most reliable memos are STRUCTURED — they identify decision criteria, weight them, and evaluate options against the criteria. The least reliable are NARRATIVE-ONLY — arguing for a foregone conclusion through narrative coherence (which DI-B-021 illusion_of_validity already flags). DI's Decision Rubric detector (paper-app #4, locked 2026-05-07) scans bias-detective excerpts for rubric markers (numbered criteria / weighted criteria / decision matrix / scored alternatives / multi-option comparison) AND for narrative-only signals via severity-weighted hits on coherence biases. Verdict bands: explicit_rubric (Dawes' robust pattern), partial_criteria, narrative_dominant (inside-view error pattern likely), narrative_only (canonical Dawes-failure pattern), cannot_assess. Pure function — no LLM call. Implementation: src/lib/learning/decision-rubric.ts.",
+    difficulty: 'advanced',
+    applicationContext:
+      "Auditing an IC memo that argues for one option through 5 pages of narrative without ever naming the criteria the alternatives would be scored against — Decision Rubric flags it as narrative_dominant.",
+    source: 'src/lib/learning/decision-rubric.ts + Dawes 1979 American Psychologist',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_algorithm_aversion',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is algorithm aversion (Dietvorst, Simmons & Massey 2015), and why is the detector strategically load-bearing for DI's most common buyer objection?",
+    canonicalAnswer:
+      "Dietvorst, Simmons & Massey (2015) 'Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err' (Journal of Experimental Psychology: General, doi:10.1037/xge0000033): humans are SYSTEMATICALLY MORE FORGIVING of human errors than equivalent algorithm errors. After seeing a forecasting algorithm err once, people prefer human judgment EVEN WHEN the algorithm is statistically superior. Replicated across 5 experimental conditions in the original paper and 15+ follow-up studies through 2023. Actionable consequence for memos: when a memo dismisses quantitative or systematic analysis in favor of narrative judgment ('the numbers don't tell the whole story', 'experience tells me', 'this is more art than science'), the memo is exhibiting a documented cognitive bias — not exercising sophisticated qualitative judgment. Strategic load-bearing: algorithm aversion is the SINGLE MOST COMMON buyer objection to DI itself ('we don't want AI overriding our CSO's judgment'). The detector counter-programs the objection — turns it from a vague critique into an audited bias with a 2015 paper to back it. Buyers who dismiss DI on algorithm-aversion grounds are exhibiting the exact pattern DI detects. Verdict bands: no_aversion_signal, mild_aversion, material_aversion, severe_aversion (with illusion_of_validity hits — the classic experienced-operator-overriding-the-data pattern), cannot_assess. Pure function. Implementation: src/lib/learning/algorithm-aversion.ts.",
+    difficulty: 'advanced',
+    applicationContext:
+      "When a CSO buyer says 'our team doesn't trust AI to question their judgment' — the detector is the procurement-grade response: 'with respect, that pattern is documented as an error in Dietvorst, Simmons & Massey 2015 — and it's exactly what we audit for.'",
+    source: 'src/lib/learning/algorithm-aversion.ts + Dietvorst, Simmons & Massey 2015',
+    tag: 'kahneman_klein',
+  },
+  {
+    id: 'bias_calibrated_rejection',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the Calibrated Rejection detector (R²F paper-app #10), and what specific question does its verdict answer for a procurement reviewer?",
+    canonicalAnswer:
+      "Kahneman & Klein (2009) reached one of the most actionable conclusions in decision research: subjective confidence — how certain a decision-maker FEELS — is not a valid indicator of accuracy unless TWO conditions hold: (1) the environment is high-validity (Validity Classifier check, paper-app #2), AND (2) the decision-maker has had adequate feedback to learn the cue→outcome mapping (Feedback Adequacy check, paper-app #6). Both prior detectors are necessary but not sufficient on their own. The Calibrated Rejection detector (paper-app #10, locked 2026-05-07) closes the loop — it explicitly compares (a) the RHETORICAL CONFIDENCE the memo projects (proxied by bias-detective hits on illusion_of_validity / overconfidence / authority / anchoring) against (b) the EARNED CONFIDENCE the author has actually paid for (validity class × feedback adequacy). When the gap is material, the verdict surfaces a procurement-grade signal Margaret-class CSO names directly: 'does this memo's confidence match its evidence?' Verdict bands: well_calibrated (gap ≤ 0.20), mildly_overconfident (≤ 0.40), materially_overconfident (≤ 0.60 — fires the audit-committee-readiness flag), severely_overconfident (> 0.60), cannot_assess. Pure function — same input → same output, no LLM call. Implementation: src/lib/learning/calibrated-rejection.ts.",
+    difficulty: 'advanced',
+    applicationContext:
+      "On a procurement-stage call when a F500 GC asks 'how do you tell whether a memo's confidence is earned or rhetorical?' — the Calibrated Rejection block on the DPR cover answers in one verdict band.",
+    source: 'src/lib/learning/calibrated-rejection.ts + Kahneman & Klein 2009',
+    tag: 'kahneman_klein',
+  },
 ];
 
 // ─── Cards: 12-Node Pipeline (representative 6) ──────────────────

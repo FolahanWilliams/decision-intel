@@ -41,9 +41,13 @@ import {
   Hash,
   Clock,
   ExternalLink,
+  Archive,
+  UserCheck,
 } from 'lucide-react';
 import { gradeMetaFromScore } from '@/lib/utils/grade';
 import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
+import { useAnalysisInsights } from '@/hooks/useAnalysisInsights';
+import { usePlanLabels } from '@/hooks/usePlanLabels';
 
 interface VerdictBandProps {
   /** Canonical DQI score (0-100). Required because the verdict band is
@@ -73,7 +77,38 @@ interface VerdictBandProps {
   auditedAt?: string | null;
   /** Document id, used for the audit-log deep link. */
   documentId?: string | null;
+  /** Document upload timestamp (ISO). Drives the retention countdown
+   *  chip on the monospace strip (J.2 lock 2026-05-08, James persona
+   *  "retained until YYYY-MM-DD per Enterprise plan" ask). Plan tier
+   *  comes from usePlanLabels() so the surface stays in lockstep with
+   *  the canonical AUDIT_LOG_RETENTION_TIERS in trust-copy.ts. */
+  uploadedAt?: string | null;
+  /** Analysis id — when supplied, the band fetches /api/analysis/[id]/
+   *  insights (deduped via useAnalysisInsights) and renders the author-
+   *  calibration chip from feedbackAdequacy in the top row (M.2 lock
+   *  2026-05-08, Margaret persona "SVP has authored 4 prior memos in
+   *  this domain; 1 outcome logged; Brier 0.31" ask). */
+  analysisId?: string | null;
 }
+
+// J.2 lock 2026-05-08 — retention window in YEARS keyed by plan tier.
+// Mirrors AUDIT_LOG_RETENTION_TIERS in @/lib/constants/trust-copy.ts.
+// Free is treated as the Individual floor (1y) since the Free user is
+// the same buyer-class as Individual; the retention contract on /trust
+// is the floor a procurement reader checks against. Edit trust-copy.ts
+// FIRST when the contract changes; this map mirrors it.
+const RETENTION_YEARS_BY_PLAN: Record<string, number> = {
+  free: 1,
+  pro: 1,
+  team: 3,
+  enterprise: 7,
+};
+const RETENTION_LABEL_BY_PLAN: Record<string, string> = {
+  free: 'Individual floor',
+  pro: 'Individual plan',
+  team: 'Strategy plan',
+  enterprise: 'Enterprise plan',
+};
 
 /**
  * Status pill semantics — derived from grade letter + presence of high
@@ -110,6 +145,73 @@ function formatRelativeDays(iso: string | null | undefined, mountTime: number): 
   return `audited ${Math.round(days / 365)}y ago`;
 }
 
+// J.2 — compute the retention end date from uploadedAt + plan years.
+// Returns the ISO yyyy-mm-dd suffix and a plan label for the chip.
+function computeRetention(
+  uploadedAt: string | null | undefined,
+  plan: string,
+  planLoading: boolean
+): { until: string; planLabel: string } | null {
+  if (!uploadedAt || planLoading) return null;
+  const years = RETENTION_YEARS_BY_PLAN[plan] ?? 1;
+  const start = new Date(uploadedAt);
+  if (!Number.isFinite(start.getTime())) return null;
+  const end = new Date(start);
+  end.setFullYear(end.getFullYear() + years);
+  const iso = end.toISOString().slice(0, 10);
+  return { until: iso, planLabel: RETENTION_LABEL_BY_PLAN[plan] ?? 'Individual floor' };
+}
+
+// M.2 — render copy for the author-calibration chip. Returns null when
+// feedbackAdequacy is in the cold-start band so the band doesn't surface
+// "0 outcomes" as a finding (cold-start IS surfaced via PaperApplicationsCard
+// SignalBlock — the chip is the procurement-grade earned-confidence signal,
+// not the cold-start signal).
+function buildAuthorCalibrationCopy(
+  fa:
+    | {
+        verdict: 'adequate' | 'sparse' | 'cold_start' | 'unknown';
+        closedOutcomes: number;
+        recentClosedOutcomes: number;
+        meanBrier: number | null;
+        domainMatchCount: number | null;
+        domainHint: string | null;
+      }
+    | null
+    | undefined
+): { label: string; tooltip: string; color: string } | null {
+  if (!fa) return null;
+  if (fa.verdict === 'unknown') return null;
+  if (fa.closedOutcomes === 0) return null;
+
+  const brierFragment =
+    fa.meanBrier !== null && Number.isFinite(fa.meanBrier)
+      ? ` · Brier ${fa.meanBrier.toFixed(2)}`
+      : '';
+  const domainFragment =
+    fa.domainMatchCount !== null && fa.domainHint
+      ? ` (${fa.domainMatchCount} in domain)`
+      : '';
+  const memoWord = fa.closedOutcomes === 1 ? 'memo' : 'memos';
+  const label = `Author · ${fa.closedOutcomes} prior ${memoWord} closed${domainFragment}${brierFragment}`;
+  const tooltipBase =
+    fa.verdict === 'adequate'
+      ? 'Calibrated track record per Kahneman & Klein 2009 second condition'
+      : fa.verdict === 'sparse'
+        ? 'Sparse track record — closed-loop calibration is partial'
+        : 'Cold-start author — limited closed-loop history';
+  const tooltip =
+    `${tooltipBase}. ${fa.closedOutcomes} closed outcomes total, ${fa.recentClosedOutcomes} in last 18mo` +
+    (fa.meanBrier !== null ? `, mean Brier ${fa.meanBrier.toFixed(3)}.` : '.');
+  const color =
+    fa.verdict === 'adequate'
+      ? 'var(--success)'
+      : fa.verdict === 'sparse'
+        ? 'var(--warning)'
+        : 'var(--text-muted)';
+  return { label, tooltip, color };
+}
+
 export function VerdictBand({
   overallScore,
   metaVerdict,
@@ -119,6 +221,8 @@ export function VerdictBand({
   conflictHref,
   auditedAt,
   documentId,
+  uploadedAt,
+  analysisId,
 }: VerdictBandProps) {
   // Capture mount-time so relative-time copy stays pure across renders
   // (per react-hooks/purity — Date.now() in render is flagged).
@@ -132,6 +236,20 @@ export function VerdictBand({
   const StatusIcon = status.icon;
 
   const auditedRelative = formatRelativeDays(auditedAt, mountTime);
+
+  // J.2 — retention countdown chip. usePlanLabels() reads /api/billing
+  // (deduped by its own internal cache), so the same fetch covers any
+  // other plan-aware surface on the page.
+  const { plan, isLoading: planLoading } = usePlanLabels();
+  const retention = computeRetention(uploadedAt, plan, planLoading);
+
+  // M.2 — author-calibration chip. useAnalysisInsights deduplicates the
+  // /api/analysis/[id]/insights fetch with PaperApplicationsCard so the
+  // page only hits the endpoint once. Renders null until the fetch
+  // resolves, and null again when the author has no closed outcomes —
+  // the chip is the earned-confidence signal, not the cold-start signal.
+  const insights = useAnalysisInsights(analysisId);
+  const authorCopy = buildAuthorCalibrationCopy(insights.data?.feedbackAdequacy);
 
   // Conflict chip — only renders when the document has cross-doc
   // conflicts attached. Color rule mirrors DealKanban + deal-page chip.
@@ -209,6 +327,32 @@ export function VerdictBand({
             color={conflictColor}
             href={conflictHref ?? null}
           />
+        )}
+
+        {/* M.2 — author calibration chip. Procurement-grade earned-
+            confidence signal anchored in Kahneman & Klein 2009 second
+            condition. Renders only when feedbackAdequacy reports ≥1
+            closed outcome. */}
+        {authorCopy && (
+          <span
+            title={authorCopy.tooltip}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 700,
+              color: authorCopy.color,
+              background: `color-mix(in srgb, ${authorCopy.color} 12%, transparent)`,
+              border: `1px solid ${authorCopy.color}`,
+              padding: '3px 9px',
+              borderRadius: 999,
+              letterSpacing: '0.04em',
+            }}
+          >
+            <UserCheck size={11} strokeWidth={2.25} aria-hidden />
+            {authorCopy.label}
+          </span>
         )}
 
         <span style={{ flex: 1 }} />
@@ -325,6 +469,25 @@ export function VerdictBand({
           ·
         </span>
         <span>methodology v{METHODOLOGY_VERSION}</span>
+        {/* J.2 — retention countdown chip. Reads from
+            AUDIT_LOG_RETENTION_TIERS (mirrored in RETENTION_YEARS_BY_PLAN
+            above). Stays in the monospace strip so it reads as
+            procurement-grade evidence (James persona ask), not
+            UI-decoration. */}
+        {retention && (
+          <>
+            <span style={{ color: 'var(--border-color)' }} aria-hidden>
+              ·
+            </span>
+            <span
+              title={`Audit log + DPR retained until ${retention.until} on the ${retention.planLabel} retention window. Custom retention (HIPAA / banking / government) negotiable on Enterprise pilot agreement.`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            >
+              <Archive size={11} strokeWidth={2} aria-hidden />
+              retained until {retention.until}
+            </span>
+          </>
+        )}
         {documentId && (
           <>
             <span style={{ color: 'var(--border-color)' }} aria-hidden>

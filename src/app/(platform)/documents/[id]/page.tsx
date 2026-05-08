@@ -76,6 +76,20 @@ import { OutcomeReporter } from './OutcomeReporter';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 import type { Severity } from '@/components/documents/detail/primitives';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import type { PerspectiveLens } from '@/components/documents/detail/tabs/PerspectivesTab';
+import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
+
+// Per-role default Perspectives lens (R.3 lock 2026-05-08; persona audit
+// finding from Richard archetype). M&A and PE/VC roles deliberate at the
+// IC level — defaulting to CSO costs them one click per document load,
+// 6 days/wk. Bizops users live in Analyst lens. CSOs default to CSO.
+// Other / unknown / loading falls through to CSO (legacy default).
+function defaultLensForRole(role: EmptyStateRole | null): PerspectiveLens {
+  if (role === 'ma' || role === 'pe_vc') return 'ic';
+  if (role === 'bizops') return 'analyst';
+  return 'cso';
+}
 
 /* ---------------- Lazy-loaded heavy components ---------------- */
 
@@ -219,6 +233,12 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
   // /api/deals/[id] which already returns deal.crossReference shape.
   const [dealConflictCount, setDealConflictCount] = useState<number | null>(null);
   const [dealHighSeverityCount, setDealHighSeverityCount] = useState<number | null>(null);
+
+  // Onboarding role drives per-role default Perspectives lens (R.3 lock
+  // 2026-05-08). Hook is one-shot module-cached, so multiple consumers
+  // on the same page don't fan out independent fetches.
+  const onboardingRole = useOnboardingRole();
+  const initialLens = defaultLensForRole(onboardingRole);
 
   /* ───── data fetch ───── */
   const refetch = useCallback(async () => {
@@ -598,6 +618,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
       case 'perspectives':
         return (
           <PerspectivesTab
+            initialLens={initialLens}
             csoSlot={
               analysis ? (
                 <CsoLensView
@@ -746,6 +767,8 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   conflictHref={document.deal?.id ? `/dashboard/deals/${document.deal.id}` : null}
                   auditedAt={analysis.createdAt}
                   documentId={document.id}
+                  uploadedAt={document.uploadedAt ?? null}
+                  analysisId={analysis.id}
                 />
               </ErrorBoundary>
               {biases.length > 0 && (
