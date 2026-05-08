@@ -6,7 +6,7 @@ const log = createLogger('MessageGenerator');
 
 const FOUNDER_PITCH_CONTEXT = `DECISION INTEL — FOUNDER POSITIONING CONTEXT
 
-What it is: Decision Intel is an AI cognitive bias auditing platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. 20-bias taxonomy (DI-B-001 to DI-B-020), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
+What it is: Decision Intel is an AI cognitive bias auditing platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive bias audit in under 60 seconds. 22-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
 
 Who it's for: Corporate strategy and M&A teams at F1000 and PE-backed mid-market. Expansion: investment committees at PE/VC.
 
@@ -14,11 +14,11 @@ Moat: 18 months of causal outcome data per org — once a team logs enough decis
 
 Competitor reality: There is no direct competitor in "decision quality auditing." Cloverpop does decision tracking (not bias detection). The real competition is "do nothing" — teams don't audit their decision processes at all.
 
-Economics: ~90% blended gross margins (~$0.40-0.65 per audit on Gemini paid tier 1, 17 LLM calls across 12 nodes). Pricing: $2,499/mo Strategy (fair-use 250 audits/mo + team), $249/mo Individual (15 audits). Enterprise custom with volume floor + overage.
+Economics: ~90% blended gross margins (~£0.30-0.50 per audit on Gemini paid tier 1, ~17 LLM calls across 12 nodes). Pricing: £2,499/mo Strategy (fair-use 250 audits/mo + team), £249/mo Individual (15 audits). Enterprise custom with volume floor + overage.
 
 The "why now" hook: Boards are demanding decision rigor after a decade of bad M&A (Boeing MAX, WeWork, Microsoft-Nokia). Compliance frameworks are citing cognitive hygiene. LLMs finally make real-time bias detection feasible at <$0.10 per document. The 18-month causal flywheel just turned on (production code path that was silently broken for months is now live).
 
-Founder: Solo technical founder, 16, based in Nigeria. Raising pre-seed/seed in the next ~6 months. No pilot users yet — actively outreaching to corp dev/M&A teams via advisor network.
+Founder: Solo technical founder, 16, raised between Lagos (home) and the UK (current residence). Raising pre-seed/seed in the next ~6 months. No pilot users yet — actively outreaching to corp dev/M&A teams via advisor network.
 
 WRITING STYLE RULES (mandatory for every message):
 - No emojis, no em dashes, no bullet-point formatting in the message body.
