@@ -210,7 +210,7 @@ export const DECKS: EducationDeck[] = [
   },
   {
     id: 'regulatory_frameworks',
-    label: '17 Regulatory Frameworks',
+    label: `${FRAMEWORK_COUNT} Regulatory Frameworks`,
     description:
       'EU AI Act, Basel III, SEC Reg D, GDPR Art 22, NDPR, CBN, WAEMU, PoPIA, ISA 2007, and the rest. Jurisdiction + key article + DPR mapping.',
     iconName: 'Lock',
