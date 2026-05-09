@@ -58,8 +58,8 @@ export interface BiasAttribution {
 }
 
 export interface ROIAttribution {
-  dealId: string;
-  dealName: string;
+  containerId: string;
+  containerName: string;
   ticketSize: number;
   totalBiasesDetected: number;
   confirmedBiases: number;
@@ -70,30 +70,34 @@ export interface ROIAttribution {
 }
 
 /**
- * Compute value-protected attribution for a single deal.
+ * Compute value-protected attribution for a single DecisionContainer.
  */
-export async function computeROIAttribution(dealId: string): Promise<ROIAttribution | null> {
+export async function computeROIAttribution(containerId: string): Promise<ROIAttribution | null> {
   try {
-    const deal = await prisma.deal.findUnique({
-      where: { id: dealId },
+    const container = await prisma.decisionContainer.findUnique({
+      where: { id: containerId },
       select: {
         id: true,
         name: true,
         ticketSize: true,
         documents: {
           select: {
-            analyses: {
+            document: {
               select: {
-                biases: {
+                analyses: {
                   select: {
-                    biasType: true,
-                    severity: true,
-                  },
-                },
-                outcome: {
-                  select: {
-                    confirmedBiases: true,
-                    falsePositiveBiases: true,
+                    biases: {
+                      select: {
+                        biasType: true,
+                        severity: true,
+                      },
+                    },
+                    outcome: {
+                      select: {
+                        confirmedBiases: true,
+                        falsePositiveBiases: true,
+                      },
+                    },
                   },
                 },
               },
@@ -103,20 +107,20 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
       },
     });
 
-    if (!deal) return null;
+    if (!container) return null;
 
     // Prisma Decimal comes back as an object with toNumber() or as a string
-    const ticketSize = deal.ticketSize ? Number(deal.ticketSize) : 0;
+    const ticketSize = container.ticketSize ? Number(container.ticketSize) : 0;
 
     if (ticketSize === 0) return null;
 
-    // Aggregate all biases and outcomes across documents/analyses
+    // Aggregate all biases and outcomes across member documents
     const allBiases: { biasType: string; severity: string }[] = [];
     const allConfirmed = new Set<string>();
     const allFalsePositive = new Set<string>();
 
-    for (const doc of deal.documents) {
-      for (const analysis of doc.analyses) {
+    for (const member of container.documents) {
+      for (const analysis of member.document.analyses) {
         for (const bias of analysis.biases) {
           allBiases.push(bias);
         }
@@ -131,8 +135,8 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
 
     if (allBiases.length === 0) {
       return {
-        dealId,
-        dealName: deal.name,
+        containerId,
+        containerName: container.name,
         ticketSize,
         totalBiasesDetected: 0,
         confirmedBiases: 0,
@@ -171,8 +175,8 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
     const valueProtected = breakdown.reduce((sum, b) => sum + b.estimatedLoss, 0);
 
     return {
-      dealId,
-      dealName: deal.name,
+      containerId,
+      containerName: container.name,
       ticketSize,
       totalBiasesDetected: allBiases.length,
       confirmedBiases: confirmedCount,
@@ -182,7 +186,7 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
       breakdown,
     };
   } catch (error) {
-    log.error('ROI attribution failed for deal ' + dealId, error);
+    log.error('ROI attribution failed for container ' + containerId, error);
     return null;
   }
 }

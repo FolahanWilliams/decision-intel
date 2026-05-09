@@ -104,7 +104,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             contentIv: true,
             contentTag: true,
             contentKeyVersion: true,
-            deal: { select: { sector: true } },
+            // Container.sector context re-lands in Phase 2 of the
+            // refactor via Document → ContainerDoc → Container.sector.
           },
         },
       },
@@ -147,7 +148,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           .join(', ') || undefined
       : undefined;
     const prompt = buildStructuralAssumptionsPrompt(capped, {
-      industry: analysis.document.deal?.sector ?? undefined,
+      // industry is sourced from the parent DecisionContainer.sector in
+      // Phase 2; until the join is rewired the prompt runs without a
+      // sector hint (the structural-assumptions agent gracefully
+      // degrades to a generic Dalio scan).
+      industry: undefined,
       region,
       marketContext:
         effectiveContext?.context && effectiveContext.context !== 'unknown'

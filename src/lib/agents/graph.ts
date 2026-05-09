@@ -49,10 +49,18 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',
   }),
-  dealId: Annotation<string>({
+  containerId: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',
   }),
+  containerKind: Annotation<string>({
+    reducer: (x, y) => y ?? x ?? '',
+    default: () => '',
+  }),
+  /// Legacy `dealType` value carried for compatibility with prompts +
+  /// reference-class lookups that still key on it. Populated from
+  /// DecisionContainer.dealType when kind === 'acquisition' OR derived
+  /// from kind for the other modes.
   dealType: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',

@@ -37,12 +37,7 @@ import {
   SAMPLE_FINDINGS_AUGMENT,
   DANGOTE_FINDINGS_AUGMENT,
 } from '@/lib/reports/sample-dpr';
-import {
-  assembleProvenanceRecordData,
-  assembleProvenanceRecordDataForPackage,
-  assembleProvenanceRecordDataForDeal,
-} from '@/lib/reports/provenance-record-data';
-import { resolvePackageAccess } from '@/lib/utils/decision-package-access';
+import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
 import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
 import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
@@ -220,21 +215,13 @@ async function loadDprData(type: DprType, id: string): Promise<ProvenanceRecordD
       return assembleProvenanceRecordData(id);
     }
 
-    if (type === 'package') {
-      const pkg = await resolvePackageAccess(id, user.id);
-      if (!pkg) return null;
-      return assembleProvenanceRecordDataForPackage(id);
-    }
-
-    if (type === 'deal') {
-      // Deal access: must belong to the same org as the user.
-      const orgId = await getUserOrgId(user.id);
-      const deal = await prisma.deal.findFirst({
-        where: { id, orgId: orgId || user.id },
-        select: { id: true },
-      });
-      if (!deal) return null;
-      return assembleProvenanceRecordDataForDeal(id);
+    if (type === 'package' || type === 'deal' || type === 'container') {
+      // Container-rooted DPR (replaces legacy deal/package paths) is
+      // rebuilt in Phase 2 of the DecisionContainer refactor with a
+      // mode-aware assembler. Until that lands, document-rooted DPRs
+      // are the supported procurement-grade output.
+      log.warn(`DPR type ${type} pending Phase 2 container-aware assembler`);
+      return null;
     }
   } catch (err) {
     log.error(`Failed to load DPR data for ${type}/${id}:`, err);
@@ -256,18 +243,6 @@ async function userIsInOrg(userId: string, orgId: string): Promise<boolean> {
   }
 }
 
-async function getUserOrgId(userId: string): Promise<string | null> {
-  try {
-    const m = await prisma.teamMember.findFirst({
-      where: { userId },
-      select: { orgId: true },
-    });
-    return m?.orgId ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function computeClassification(
   type: DprType,
   clientSafe: boolean
@@ -284,14 +259,9 @@ function titleForData(data: ProvenanceRecordData, type: DprType): string {
     }
     return 'Audit of a private-market growth-company prospectus';
   }
-  // Deal-rooted DPR: lead with the deal name.
-  if (type === 'deal' && data.dealContext?.dealName) {
-    return data.dealContext.dealName;
-  }
-  // Package-rooted DPR: lead with the package name.
-  if (type === 'package' && data.packageContext?.packageName) {
-    return data.packageContext.packageName;
-  }
+  // Container-rooted DPR (deal/package/container) titles re-land in
+  // Phase 2 of the DecisionContainer refactor with a mode-aware
+  // assembler. Falls through to the document-level filename title.
   const filename = data.meta.filename ?? 'Strategic decision audit';
   return filename
     .replace(/\.[^.]+$/, '')
@@ -306,26 +276,8 @@ function subtitleForData(data: ProvenanceRecordData, type: DprType): string {
     }
     return 'Anonymised from a 2019 Form S-1 that was withdrawn 33 days after filing. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.';
   }
-  if (type === 'deal' && data.dealContext) {
-    const ctx = data.dealContext;
-    const parts = [
-      ctx.dealType ? prettyCase(ctx.dealType) : null,
-      ctx.sector ? prettyCase(ctx.sector) : null,
-      ctx.fundName,
-      ctx.targetCompany,
-      ctx.compositeDqi != null ? `Composite DQI ${Math.round(ctx.compositeDqi)}/100` : null,
-    ].filter(Boolean);
-    return `${parts.join(' · ')}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
-  }
-  if (type === 'package' && data.packageContext) {
-    const ctx = data.packageContext;
-    const parts = [
-      ctx.decisionFrame,
-      ctx.compositeDqi != null ? `Composite DQI ${Math.round(ctx.compositeDqi)}/100` : null,
-      `${ctx.members.length} member${ctx.members.length === 1 ? '' : 's'}`,
-    ].filter(Boolean);
-    return `${parts.join(' · ')}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
-  }
+  // Container-rooted DPR subtitles (deal/package/container) re-land in
+  // Phase 2 alongside the mode-aware assembler.
   const firstSentence = data.meta.summary?.split('. ')[0] ?? '';
   return `${firstSentence}. Independently re-verifiable hashed evidence record produced by the Decision Intel pipeline.`;
 }
@@ -339,10 +291,6 @@ function formatRecordId(data: ProvenanceRecordData): string {
 function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
   const nodes = Object.keys(data.modelLineage.nodes ?? {});
   return `di-pipeline · ${nodes.length} nodes · v2.1.0`;
-}
-
-function prettyCase(s: string): string {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /**

@@ -102,7 +102,11 @@ export async function computeOrgCausalWeights(
           include: {
             biases: { select: { biasType: true, severity: true } },
             document: {
-              select: { documentType: true, deal: { select: { sector: true } } },
+              // Sector context (previously sourced from Document.deal.sector)
+              // is rebuilt in Phase 2 via the new Document → ContainerDoc →
+              // Container.sector path. For now causal-learning runs on
+              // documentType + bias signature only; sector is null.
+              select: { documentType: true },
             },
           },
         },
@@ -145,7 +149,11 @@ export async function computeOrgCausalWeights(
     // Group outcomes by observable confounders to protect against Simpson's paradox
     const stratumKey = (o: OutcomeRecord): string => {
       const docType = o.analysis?.document?.documentType || 'unknown';
-      const sector = o.analysis?.document?.deal?.sector || 'unknown';
+      // Sector context (Container.sector) joins via the new container
+      // join-table in Phase 2. Stratification falls back to docType-only
+      // until the join is rewired; the second axis stays in the key shape
+      // so persisted stratum-aware outputs continue to read consistently.
+      const sector = 'unknown';
       return `${docType}::${sector}`;
     };
 

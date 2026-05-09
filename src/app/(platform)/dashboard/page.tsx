@@ -61,7 +61,9 @@ import { SampleBadge } from '@/components/ui/SampleBadge';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
-import { UnifiedDecisionsFeed } from '@/components/dashboard/UnifiedDecisionsFeed';
+// UnifiedDecisionsFeed re-lands in Phase 2 of the DecisionContainer
+// refactor — replaces the legacy deals + packages merger with a single
+// container feed (kind = strategic | investment | acquisition).
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -75,8 +77,19 @@ import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { useActivityFeed } from '@/hooks/useActivityFeed';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { SparklineChart } from '@/components/ui/SparklineChart';
-import { useDeals } from '@/hooks/useDeals';
-import { DOCUMENT_TYPES } from '@/types/deals';
+// useDeals + DOCUMENT_TYPES were sourced from src/hooks/useDeals.ts
+// and src/types/deals.ts — both removed in the DecisionContainer
+// refactor. Phase 2 reintroduces a useContainers hook reading from the
+// unified DecisionContainer model. Document-type filter chips below
+// derive from the canonical INVESTMENT_DOCUMENT_TYPES export.
+import { INVESTMENT_DOCUMENT_TYPES } from '@/lib/prompts/investment-vertical';
+const DOCUMENT_TYPES: ReadonlyArray<{ value: string; label: string }> = [
+  ...INVESTMENT_DOCUMENT_TYPES.map(value => ({
+    value,
+    label: value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+  })),
+  { value: 'other', label: 'Other' },
+];
 import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap, Lock as LockIcon, Sparkles } from 'lucide-react';
@@ -229,8 +242,18 @@ export default function Dashboard() {
   const [selectedDocType, setSelectedDocType] = useState<string>('');
   const [selectedDealId, setSelectedDealId] = useState<string>('');
 
-  // Deal list for upload deal selector
-  const { deals: dealsList } = useDeals(undefined, 1, 100);
+  // Container list (replaces legacy useDeals) re-lands in Phase 2 of
+  // the DecisionContainer refactor. Until then the upload deal-selector
+  // dropdown reads from an empty list — uploads still work, just
+  // without the in-flight container-attach affordance.
+  const dealsList: ReadonlyArray<{
+    id: string;
+    name: string;
+    stage?: string;
+    updatedAt: string | Date;
+    fundName?: string | null;
+    targetCompany?: string | null;
+  }> = [];
 
   // Decision Frame context — when user comes from /decisions/new
   const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
@@ -1190,16 +1213,11 @@ export default function Dashboard() {
         <NudgeWidget />
       </ErrorBoundary>
 
-      {/* Unified decisions feed — locked 2026-05-06 (Option B refactor).
-         The home dashboard's "across all my decisions" surface, merging
-         documents + deals + packages chronologically. Each row deep-
-         links to the McKinsey-grade detail page for that surface. The
-         list pages (deals kanban, packages grid, documents browse)
-         stay separate per the Option B architectural call — workflow
-         shape differs even if the underlying primitive doesn't. */}
-      <ErrorBoundary sectionName="Unified decisions feed">
-        <UnifiedDecisionsFeed />
-      </ErrorBoundary>
+      {/* Unified decisions feed — re-lands in Phase 2 of the
+         DecisionContainer refactor (locked 2026-05-09 evening). The
+         legacy deals + packages merger is replaced with a single
+         container feed reading kind = strategic | investment |
+         acquisition off the unified DecisionContainer table. */}
 
       <ErrorBoundary sectionName="Journal">
         <JournalWidget />

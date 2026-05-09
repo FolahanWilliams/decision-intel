@@ -54,7 +54,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const frameId = formData.get('frameId') as string | null;
     const documentType = formData.get('documentType') as string | null;
-    const dealId = formData.get('dealId') as string | null;
+    // Container-context attach (replaces legacy `dealId`). Phase 2 of
+    // the DecisionContainer refactor wires the actual containerId →
+    // DecisionContainerDocument join on upload; for now any incoming
+    // value is captured but not persisted to a join row.
+    const containerId =
+      (formData.get('containerId') as string | null) ?? (formData.get('dealId') as string | null);
     /** When set, this upload becomes a NEW VERSION of the referenced document.
      *  parentDocumentId is normalised to point at the chain root (v1.id), and
      *  versionNumber is computed as max(existing siblings) + 1. The analyze
@@ -170,19 +175,14 @@ export async function POST(request: NextRequest) {
       // Schema drift — TeamMember table may not exist yet
     }
 
-    // Verify deal ownership if dealId provided
-    if (dealId) {
-      try {
-        const deal = await prisma.deal.findFirst({
-          where: { id: dealId, orgId: userOrgId || userId },
-        });
-        if (!deal) {
-          return NextResponse.json({ error: 'Deal not found or access denied' }, { status: 400 });
-        }
-      } catch {
-        // Schema drift — Deal table may not exist yet, allow upload without deal link
-        log.warn('Deal ownership check failed (schema drift), proceeding without deal link');
-      }
+    // Container ownership verification ships in Phase 2 of the
+    // DecisionContainer refactor (will check the user-can-write-to
+    // -container path on the new DecisionContainer model). For now the
+    // upload accepts the containerId but does not persist a
+    // DecisionContainerDocument join row — the unified UI shell is the
+    // authoritative attach point.
+    if (containerId) {
+      log.debug(`Container attach pending Phase 2 wiring: ${containerId}`);
     }
 
     // Resolve version-chain ancestor when versionOfDocumentId is provided.
@@ -302,7 +302,8 @@ export async function POST(request: NextRequest) {
           ...(parsedStructuredData
             ? { parsedStructuredData: parsedStructuredData as unknown as Prisma.InputJsonValue }
             : {}),
-          ...(dealId ? { dealId } : {}),
+          // Container attach via DecisionContainerDocument join row
+          // ships in Phase 2; Document.dealId column is removed.
           ...(resolvedParentDocumentId
             ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }
             : {}),
@@ -355,7 +356,8 @@ export async function POST(request: NextRequest) {
             content,
             status: 'pending',
             ...(documentType ? { documentType } : {}),
-            ...(dealId ? { dealId } : {}),
+            // Container attach via DecisionContainerDocument join row
+            // ships in Phase 2; Document.dealId column is removed.
             ...(resolvedParentDocumentId
               ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }
               : {}),
@@ -410,7 +412,7 @@ export async function POST(request: NextRequest) {
         fileType: file.type,
         fileSize: file.size,
         documentType: documentType || undefined,
-        dealId: dealId || undefined,
+        containerId: containerId || undefined,
       },
     });
 

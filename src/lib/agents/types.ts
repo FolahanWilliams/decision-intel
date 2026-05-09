@@ -21,10 +21,21 @@ export interface AuditState {
   documentId: string;
   userId: string;
   orgId?: string;
-  documentType?: string; // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report
-  dealId?: string;
-  dealType?: string; // buyout | growth_equity | venture | secondary | add_on | recapitalization
-  dealStage?: string; // screening | due_diligence | ic_review | closing | portfolio | exited
+  documentType?: string; // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | qofe | synergy_model | integration_plan
+  /// DecisionContainer the document belongs to (Phase 1 refactor —
+  /// replaces legacy `dealId`). Populated when the audit fires inside
+  /// a container context; null for standalone document audits.
+  containerId?: string;
+  /// DecisionContainer.kind — 'investment' | 'acquisition' | 'strategic'.
+  containerKind?: string;
+  /// Legacy free-text `dealType` value carried for compatibility with
+  /// prompts + reference-class lookups that key on it. Mostly meaningful
+  /// for kind === 'acquisition' where it maps to buyout / growth_equity /
+  /// venture / secondary / add_on / recapitalization.
+  dealType?: string;
+  /// Legacy stage label. Now sourced from DecisionContainer.stageId
+  /// (mode-specific) — see CONTAINER_MODES for valid values per kind.
+  dealStage?: string;
   originalContent: string;
 
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing

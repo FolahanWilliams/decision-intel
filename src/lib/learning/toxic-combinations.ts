@@ -335,24 +335,11 @@ export async function detectToxicCombinations(
       );
     }
 
-    // Enrich with dollar impact estimation if deal is linked
-    try {
-      const dealLink = await prisma.document.findUnique({
-        where: { id: analysis.documentId },
-        select: { dealId: true, deal: { select: { ticketSize: true } } },
-      });
-      if (dealLink?.deal?.ticketSize) {
-        const ticketSize = Number(dealLink.deal.ticketSize);
-        for (const combo of flagged) {
-          combo.dealTicketSize = ticketSize;
-          if (combo.historicalFailRate != null && combo.historicalFailRate > 0) {
-            combo.estimatedRiskAmount = Math.round(ticketSize * combo.historicalFailRate);
-          }
-        }
-      }
-    } catch {
-      // @schema-drift-tolerant — deal table may not exist in older deployments.
-    }
+    // Dollar-impact enrichment from container ticketSize is rebuilt in Phase 2
+    // of the DecisionContainer refactor — needs the new join-table lookup
+    // Document → DecisionContainerDocument → DecisionContainer.ticketSize.
+    // For now combos surface without estimatedRiskAmount; the bias-detective
+    // verdict text + severity are unaffected.
 
     return {
       analysisId,

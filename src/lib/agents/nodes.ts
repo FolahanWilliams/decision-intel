@@ -1719,14 +1719,14 @@ export async function forgottenQuestionsNode(state: AuditState): Promise<Partial
     // Look up deal context if we have a dealId — mirrors the rpd node pattern.
     let sector: string | null = null;
     let ticketSize: number | null = null;
-    if (state.dealId) {
+    if (state.containerId) {
       try {
-        const deal = await prisma.deal.findUnique({
-          where: { id: state.dealId },
+        const container = await prisma.decisionContainer.findUnique({
+          where: { id: state.containerId },
           select: { sector: true, ticketSize: true },
         });
-        sector = deal?.sector ?? null;
-        ticketSize = deal?.ticketSize != null ? Number(deal.ticketSize) : null;
+        sector = container?.sector ?? null;
+        ticketSize = container?.ticketSize != null ? Number(container.ticketSize) : null;
       } catch {
         // Non-fatal — fall back to global reference class
       }

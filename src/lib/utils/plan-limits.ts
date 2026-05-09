@@ -95,19 +95,19 @@ export async function checkTeamSizeLimit(
 
 export async function checkAnalysisLimit(
   userId: string,
-  dealId?: string | null
+  containerId?: string | null
 ): Promise<{ allowed: boolean; plan: PlanType; used: number; limit: number }> {
-  // If a deal audit has been purchased, bypass subscription limits for that deal
-  if (dealId) {
+  // If a per-container audit has been purchased, bypass subscription limits.
+  if (containerId) {
     try {
-      const dealAudit = await prisma.dealAuditPurchase.findFirst({
-        where: { dealId, status: 'active' },
+      const containerAudit = await prisma.decisionContainerAuditPurchase.findFirst({
+        where: { containerId, status: 'active' },
       });
-      if (dealAudit) {
+      if (containerAudit) {
         return { allowed: true, plan: 'enterprise' as PlanType, used: 0, limit: -1 };
       }
     } catch (_driftErr) {
-      // @schema-drift-tolerant — DealAuditPurchase may not be migrated in older deployments.
+      // @schema-drift-tolerant — DecisionContainerAuditPurchase may not be migrated in older deployments.
       void _driftErr;
     }
   }

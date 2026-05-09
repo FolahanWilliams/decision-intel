@@ -82,20 +82,20 @@ export async function POST(request: NextRequest) {
           // a schema column.
           try {
             const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-            const recentAudit = await prisma.dealAuditPurchase.findFirst({
+            const recentAudit = await prisma.decisionContainerAuditPurchase.findFirst({
               where: { userId, status: 'active', createdAt: { gte: thirtyDaysAgo } },
               orderBy: { createdAt: 'desc' },
-              select: { id: true, dealId: true, tier: true, createdAt: true },
+              select: { id: true, containerId: true, tier: true, createdAt: true },
             });
             if (recentAudit) {
               await prisma.analyticsEvent.create({
                 data: {
-                  name: 'deal_audit_converted_to_subscription',
+                  name: 'container_audit_converted_to_subscription',
                   userId,
                   properties: {
                     plan,
                     auditId: recentAudit.id,
-                    auditDealId: recentAudit.dealId,
+                    auditContainerId: recentAudit.containerId,
                     auditTier: recentAudit.tier,
                     daysFromAuditToSubscribe: Math.floor(
                       (Date.now() - recentAudit.createdAt.getTime()) / (1000 * 60 * 60 * 24)
@@ -105,27 +105,36 @@ export async function POST(request: NextRequest) {
               });
             }
           } catch (attrErr) {
-            log.warn('Deal-audit attribution failed (non-fatal):', attrErr);
+            log.warn('Container-audit attribution failed (non-fatal):', attrErr);
           }
         }
 
-        // Handle one-time deal audit payment
-        if (session.mode === 'payment' && session.metadata?.type === 'deal_audit') {
+        // Handle one-time per-container audit payment. Accepts both the
+        // legacy 'deal_audit' metadata.type (Stripe checkout sessions
+        // already in flight pre-refactor) and the new 'container_audit'
+        // shape. The metadata key 'dealId' is similarly aliased to
+        // 'containerId' for forward compat.
+        if (
+          session.mode === 'payment' &&
+          (session.metadata?.type === 'deal_audit' || session.metadata?.type === 'container_audit')
+        ) {
           const {
             userId: auditUserId,
+            containerId,
             dealId,
             tier,
             ticketSize,
             orgId: metaOrgId,
-          } = session.metadata;
+          } = session.metadata as Record<string, string | undefined>;
+          const resolvedContainerId = containerId ?? dealId;
           orgId = metaOrgId;
-          if (auditUserId && dealId && tier) {
+          if (auditUserId && resolvedContainerId && tier) {
             try {
-              await prisma.dealAuditPurchase.create({
+              await prisma.decisionContainerAuditPurchase.create({
                 data: {
                   userId: auditUserId,
                   orgId: orgId || null,
-                  dealId,
+                  containerId: resolvedContainerId,
                   stripePaymentId: session.id,
                   tier,
                   amount: session.amount_total || 0,
@@ -134,9 +143,11 @@ export async function POST(request: NextRequest) {
                   status: 'active',
                 },
               });
-              log.info(`Deal audit purchased: ${tier} for deal ${dealId} by user ${auditUserId}`);
+              log.info(
+                `Container audit purchased: ${tier} for container ${resolvedContainerId} by user ${auditUserId}`
+              );
             } catch (err) {
-              log.error('Failed to create DealAuditPurchase:', err);
+              log.error('Failed to create DecisionContainerAuditPurchase:', err);
             }
           }
           break;

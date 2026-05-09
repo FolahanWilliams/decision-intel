@@ -108,7 +108,8 @@ export async function GET(request: NextRequest) {
           contentHash: true,
           uploadedAt: true,
           status: true,
-          dealId: true,
+          // dealId removed in DecisionContainer refactor; container
+          // membership re-included in Phase 2 via the join table.
           orgId: true,
         },
         orderBy: { uploadedAt: 'desc' },

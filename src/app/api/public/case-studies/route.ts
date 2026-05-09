@@ -43,15 +43,12 @@ export async function GET() {
                 confirmedBiases: true,
               },
             },
+            // DecisionContainer membership lookup re-lands in Phase 2 of
+            // the refactor. Anonymised case-study cards fall back to a
+            // generic "Investment — Diversified" label until the join
+            // path Document → ContainerDoc → Container is rewired.
             document: {
-              select: {
-                deal: {
-                  select: {
-                    dealType: true,
-                    sector: true,
-                  },
-                },
-              },
+              select: { documentType: true },
             },
           },
         },
@@ -62,16 +59,12 @@ export async function GET() {
 
     const caseStudies = shareLinks.map(link => {
       const { analysis } = link;
-      const deal = analysis.document?.deal;
-
-      // Generate anonymized label from deal metadata
-      const dealType = deal?.dealType
-        ? deal.dealType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-        : 'Investment';
-      const sector = deal?.sector
-        ? deal.sector.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-        : 'Diversified';
-      const label = `${dealType} — ${sector}`;
+      // Container metadata (sector, dealType) re-introduced in Phase 2.
+      // Until then anonymised cards label by documentType only.
+      const docType = analysis.document?.documentType;
+      const label = docType
+        ? docType.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())
+        : 'Strategic Decision';
 
       // Count biases by severity
       const biasCounts: Record<string, number> = {};

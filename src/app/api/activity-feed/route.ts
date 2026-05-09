@@ -100,12 +100,11 @@ export async function GET(request: NextRequest) {
       allowedTypes.has('blind_prior_revealed') ||
       allowedTypes.has('blind_prior_outcome_logged');
 
-    // 4.4 deep — Decision Package events. Same schema-drift posture.
-    const wantsPackage =
-      allowedTypes.has('decision_package_created') ||
-      allowedTypes.has('decision_package_decided') ||
-      allowedTypes.has('decision_package_outcome_logged') ||
-      allowedTypes.has('decision_package_conflict_flagged');
+    // DecisionContainer event types (replacing legacy decision_package_*)
+    // are wired in Phase 2 of the refactor. The existing event-type
+    // strings stay in the allowedTypes set for backward compat with
+    // saved feed-filter preferences.
+    void allowedTypes;
 
     // Fetch from multiple sources in parallel
     const [documents, nudges, outcomes, packages, blindPriorRooms] = await Promise.allSettled([
@@ -182,39 +181,12 @@ export async function GET(request: NextRequest) {
             .catch(() => [])
         : Promise.resolve([]),
 
-      // Decision Package events — packages the user owns or has access
-      // to (via team membership). Cross-references with high-severity
-      // counts surface as their own event so a CSO sees "3 conflicts
-      // flagged on DACH market entry" in the activity feed. Schema-drift
-      // tolerant.
-      wantsPackage
-        ? prisma.decisionPackage
-            .findMany({
-              where: {
-                OR: [{ ownerUserId: user.id }, { documents: { some: { document: docWhere } } }],
-                ...(cursorDate ? { updatedAt: { lt: cursorDate } } : {}),
-              },
-              orderBy: { updatedAt: 'desc' },
-              take: limit,
-              select: {
-                id: true,
-                name: true,
-                status: true,
-                decidedAt: true,
-                createdAt: true,
-                updatedAt: true,
-                conflictCount: true,
-                highSeverityConflictCount: true,
-                outcome: { select: { id: true, reportedAt: true } },
-                crossReferences: {
-                  orderBy: { runAt: 'desc' },
-                  take: 1,
-                  select: { runAt: true, conflictCount: true, highSeverityCount: true },
-                },
-              },
-            })
-            .catch(() => [])
-        : Promise.resolve([]),
+      // DecisionContainer events ship in Phase 2 of the refactor — the
+      // activity feed will read from the unified DecisionContainer table
+      // (kind = strategic | investment | acquisition) rather than the
+      // legacy DecisionPackage / Deal split. Falls through to an empty
+      // array meanwhile; document + analysis events still flow.
+      Promise.resolve([] as unknown[]),
 
       // Blind-prior events — fetch rooms the user is involved with that
       // have crossed any of the three milestones (distributed via deadline

@@ -83,9 +83,7 @@ export async function computeContextualPatterns(orgId: string): Promise<number> 
           document: { orgId },
         },
       },
-      select: {
-        biasType: true,
-        severity: true,
+      include: {
         analysis: {
           select: {
             id: true,
@@ -93,9 +91,6 @@ export async function computeContextualPatterns(orgId: string): Promise<number> 
             document: {
               select: {
                 documentType: true,
-                deal: {
-                  select: { dealType: true },
-                },
               },
             },
           },
@@ -117,7 +112,12 @@ export async function computeContextualPatterns(orgId: string): Promise<number> 
 
     for (const bi of biasInstances) {
       const docType = bi.analysis.document.documentType ?? null;
-      const dealType = bi.analysis.document.deal?.dealType ?? null;
+      // dealType context dropped post-DecisionContainer-refactor; rebuilt
+      // in Phase 2 via the new join-table path Document → ContainerDoc →
+      // Container.kind+dealType. Keeping the contextKey shape stable so
+      // downstream `ContextualBiasPattern.dealType` rows that already
+      // exist in the DB continue to read consistently.
+      const dealType: string | null = null;
       const quarter = toQuarter(bi.analysis.createdAt);
       const biasType = bi.biasType.toLowerCase().replace(/\s+/g, '_');
 

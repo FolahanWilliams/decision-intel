@@ -21,7 +21,7 @@ export interface BriefStreamEvent {
   text?: string;
   brief?: DecisionBrief;
   metadata?: {
-    dealName: string;
+    containerName: string;
     documentCount: number;
     analysisCount: number;
   };
@@ -120,40 +120,44 @@ interface AnalysisData {
   createdAt: Date;
 }
 
-async function assembleAnalysisData(dealId: string): Promise<{
-  dealName: string;
+async function assembleAnalysisData(containerId: string): Promise<{
+  containerName: string;
   analyses: AnalysisData[];
 }> {
-  const deal = await prisma.deal.findUnique({
-    where: { id: dealId },
+  const container = await prisma.decisionContainer.findUnique({
+    where: { id: containerId },
     select: {
       name: true,
       documents: {
         select: {
-          id: true,
-          filename: true,
-          content: true,
-          contentEncrypted: true,
-          contentIv: true,
-          contentTag: true,
-          analyses: {
-            orderBy: { createdAt: 'desc' },
-            take: 1,
+          document: {
             select: {
-              overallScore: true,
-              summary: true,
-              preMortem: true,
-              compliance: true,
-              factCheck: true,
-              simulation: true,
-              recognitionCues: true,
-              narrativePreMortem: true,
-              createdAt: true,
-              biases: {
+              id: true,
+              filename: true,
+              content: true,
+              contentEncrypted: true,
+              contentIv: true,
+              contentTag: true,
+              analyses: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
                 select: {
-                  biasType: true,
-                  severity: true,
-                  explanation: true,
+                  overallScore: true,
+                  summary: true,
+                  preMortem: true,
+                  compliance: true,
+                  factCheck: true,
+                  simulation: true,
+                  recognitionCues: true,
+                  narrativePreMortem: true,
+                  createdAt: true,
+                  biases: {
+                    select: {
+                      biasType: true,
+                      severity: true,
+                      explanation: true,
+                    },
+                  },
                 },
               },
             },
@@ -163,11 +167,12 @@ async function assembleAnalysisData(dealId: string): Promise<{
     },
   });
 
-  if (!deal) throw new Error('Deal not found');
+  if (!container) throw new Error('Container not found');
 
   const analyses: AnalysisData[] = [];
 
-  for (const doc of deal.documents) {
+  for (const member of container.documents) {
+    const doc = member.document;
     const analysis = doc.analyses[0];
     if (!analysis) continue;
 
@@ -175,11 +180,13 @@ async function assembleAnalysisData(dealId: string): Promise<{
       filename: doc.filename,
       overallScore: analysis.overallScore,
       summary: analysis.summary,
-      biases: analysis.biases.map(b => ({
-        biasType: b.biasType,
-        severity: b.severity,
-        explanation: b.explanation,
-      })),
+      biases: analysis.biases.map(
+        (b: { biasType: string; severity: string; explanation: string }) => ({
+          biasType: b.biasType,
+          severity: b.severity,
+          explanation: b.explanation,
+        })
+      ),
       preMortem: analysis.preMortem,
       compliance: analysis.compliance,
       factCheck: analysis.factCheck,
@@ -190,7 +197,7 @@ async function assembleAnalysisData(dealId: string): Promise<{
     });
   }
 
-  return { dealName: deal.name, analyses };
+  return { containerName: container.name, analyses };
 }
 
 function buildAnalysisContext(analyses: AnalysisData[]): string {
@@ -229,18 +236,18 @@ Analyzed: ${a.createdAt.toISOString().split('T')[0]}`;
 // ---------------------------------------------------------------------------
 
 export async function* generateDecisionBrief(
-  dealId: string,
+  containerId: string,
   userId: string,
   orgId: string
 ): AsyncGenerator<BriefStreamEvent> {
   try {
     // Step 1: Assemble data
-    const { dealName, analyses } = await assembleAnalysisData(dealId);
+    const { containerName, analyses } = await assembleAnalysisData(containerId);
 
     if (analyses.length === 0) {
       yield {
         type: 'error',
-        error: 'No analyzed documents found for this deal. Analyze documents first.',
+        error: 'No analyzed documents found in this container. Analyze documents first.',
       };
       return;
     }
@@ -248,7 +255,7 @@ export async function* generateDecisionBrief(
     yield {
       type: 'metadata',
       metadata: {
-        dealName,
+        containerName,
         documentCount: analyses.length,
         analysisCount: analyses.length,
       },
@@ -260,7 +267,7 @@ export async function* generateDecisionBrief(
 
     const result = await model.generateContentStream([
       DECISION_BRIEF_PROMPT,
-      `Deal: ${dealName}\nNumber of documents: ${analyses.length}\n\nANALYSIS DATA:\n${analysisContext}`,
+      `Decision: ${containerName}\nNumber of documents: ${analyses.length}\n\nANALYSIS DATA:\n${analysisContext}`,
     ]);
 
     // Step 3: Stream chunks
@@ -288,14 +295,14 @@ export async function* generateDecisionBrief(
       yield { type: 'done', brief: fallback };
 
       // Persist
-      await persistBrief(dealId, userId, orgId, fallback);
+      await persistBrief(containerId, userId, orgId, fallback);
       return;
     }
 
     yield { type: 'done', brief: validated.data };
 
     // Step 5: Persist to database
-    await persistBrief(dealId, userId, orgId, validated.data);
+    await persistBrief(containerId, userId, orgId, validated.data);
   } catch (error) {
     log.error('Decision brief generation failed:', error);
     yield {
@@ -310,7 +317,7 @@ export async function* generateDecisionBrief(
 // ---------------------------------------------------------------------------
 
 async function persistBrief(
-  dealId: string,
+  containerId: string,
   userId: string,
   orgId: string,
   brief: DecisionBrief
@@ -318,7 +325,7 @@ async function persistBrief(
   try {
     // Get next version number
     const latest = await prisma.decisionBriefRecord.findFirst({
-      where: { dealId },
+      where: { containerId },
       orderBy: { version: 'desc' },
       select: { version: true },
     });
@@ -327,7 +334,7 @@ async function persistBrief(
 
     await prisma.decisionBriefRecord.create({
       data: {
-        dealId,
+        containerId,
         userId,
         orgId,
         brief: JSON.parse(JSON.stringify(brief)) as Prisma.InputJsonValue,
@@ -335,7 +342,7 @@ async function persistBrief(
       },
     });
 
-    log.info(`Persisted decision brief v${nextVersion} for deal ${dealId}`);
+    log.info(`Persisted decision brief v${nextVersion} for container ${containerId}`);
   } catch (error) {
     log.error('Failed to persist decision brief:', error);
     // Non-critical — brief was already streamed to client
@@ -347,11 +354,11 @@ async function persistBrief(
 // ---------------------------------------------------------------------------
 
 export async function getLatestBrief(
-  dealId: string
+  containerId: string
 ): Promise<{ brief: DecisionBrief; version: number; createdAt: Date } | null> {
   try {
     const record = await prisma.decisionBriefRecord.findFirst({
-      where: { dealId },
+      where: { containerId },
       orderBy: { version: 'desc' },
       select: { brief: true, version: true, createdAt: true },
     });

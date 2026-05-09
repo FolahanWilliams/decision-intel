@@ -321,7 +321,8 @@ export async function POST(request: NextRequest) {
 
           // Resolve project context for analysis
           let documentType = '';
-          let dealId = '';
+          let containerId = '';
+          let containerKind = '';
           let dealType = '';
           let dealStage = '';
           // parsedStructuredData read from Document at audit-start (locked
@@ -335,25 +336,29 @@ export async function POST(request: NextRequest) {
             const docAny = doc as Record<string, unknown>;
             documentType = (docAny.documentType as string) || '';
             parsedStructuredData = (docAny.parsedStructuredData as unknown) ?? null;
-            dealId = (docAny.dealId as string) || '';
-            if (dealId) {
-              // Verify deal belongs to same org as the document
-              const deal = await prisma.deal.findFirst({
-                where: { id: dealId, orgId: doc.orgId || userId },
-                select: { dealType: true, stage: true },
-              });
-              if (deal) {
-                dealType = deal.dealType;
-                dealStage = deal.stage;
-              } else {
-                log.warn(
-                  `Deal ${dealId} referenced by document ${documentId} not found or access denied`
-                );
-                dealId = '';
-              }
+            // Container context: look up the FIRST DecisionContainer this
+            // doc belongs to (a doc can sit in 0..n containers via the join
+            // table; the pipeline assumes a single decision context for
+            // prompt injection). Phase 2 of the refactor will surface
+            // multi-container audits via an explicit containerId arg.
+            const containerJoin = await prisma.decisionContainerDocument.findFirst({
+              where: { documentId },
+              select: {
+                containerId: true,
+                container: {
+                  select: { kind: true, dealType: true, stageId: true },
+                },
+              },
+            });
+            if (containerJoin) {
+              containerId = containerJoin.containerId;
+              containerKind = containerJoin.container.kind;
+              dealType = containerJoin.container.dealType ?? '';
+              dealStage = containerJoin.container.stageId;
             }
           } catch {
-            // Schema drift — documentType/dealId or Deal table may not exist yet
+            // @schema-drift-tolerant — documentType / DecisionContainerDocument
+            // may not be migrated on older deployments.
           }
 
           const auditGraph = await getGraph();
@@ -364,7 +369,8 @@ export async function POST(request: NextRequest) {
               userId,
               orgId: doc.orgId || '',
               documentType,
-              dealId,
+              containerId,
+              containerKind,
               dealType,
               dealStage,
               parsedStructuredData,
@@ -879,254 +885,15 @@ export async function POST(request: NextRequest) {
             })().catch(() => null);
           }
 
-          // 3.1 deep — auto-trigger cross-document review when this doc is
-          // attached to a deal that now has ≥2 analyzed documents. Runs in
-          // the background; never blocks the SSE pipeline. Uses the same
-          // RBAC + agent path as the manual button on the deal page.
-          //
-          // 30-minute cooldown (added 2026-04-26 for parity with the
-          // package-side auto-trigger below): prevents a burst-fire when a
-          // deal team uploads several docs back-to-back, which would
-          // otherwise burn ~£0.40 per Gemini call × N. The manual button
-          // on the deal page bypasses this cooldown via its own rate
-          // limiter.
-          if (doc.dealId) {
-            const dealIdForCrossRef = doc.dealId;
-            (async () => {
-              try {
-                const analyzedCount = await prisma.document.count({
-                  where: {
-                    dealId: dealIdForCrossRef,
-                    deletedAt: null,
-                    analyses: { some: {} },
-                  },
-                });
-                if (analyzedCount < 2) return;
-
-                const RECENT_DEAL_RUN_MS = 30 * 60 * 1000;
-                const recent = await prisma.dealCrossReference
-                  .findFirst({
-                    where: {
-                      dealId: dealIdForCrossRef,
-                      runAt: { gt: new Date(Date.now() - RECENT_DEAL_RUN_MS) },
-                    },
-                    select: { id: true },
-                  })
-                  .catch(() => null);
-                if (recent) {
-                  log.info(
-                    `Auto cross-reference for deal ${dealIdForCrossRef} skipped: recent run within ${RECENT_DEAL_RUN_MS / 60_000} minutes`
-                  );
-                  return;
-                }
-
-                // Pull all analyzed docs on the deal — owner-context run, not
-                // teammate-context, so we use the document owner's userId.
-                // The auto-trigger represents the OWNER's action (their doc
-                // just landed). Visibility filtering is handled implicitly
-                // because we read all docs on the deal regardless and the
-                // agent doesn't expose results until the user opens the
-                // deal page (which is itself RBAC-gated).
-                const docs = await prisma.document.findMany({
-                  where: { dealId: dealIdForCrossRef, deletedAt: null },
-                  select: {
-                    id: true,
-                    filename: true,
-                    content: true,
-                    contentEncrypted: true,
-                    contentIv: true,
-                    contentTag: true,
-                    contentKeyVersion: true,
-                    analyses: {
-                      orderBy: { createdAt: 'desc' },
-                      take: 1,
-                      select: {
-                        id: true,
-                        overallScore: true,
-                        biases: {
-                          select: { biasType: true, severity: true },
-                          take: 5,
-                        },
-                      },
-                    },
-                  },
-                });
-
-                const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
-                const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
-                const inputs = docs
-                  .map(d => {
-                    const a = d.analyses?.[0];
-                    if (!a) return null;
-                    const content = decrypt(d as Parameters<typeof decrypt>[0]);
-                    if (!content || content.trim().length < 200) return null;
-                    return {
-                      documentId: d.id,
-                      documentName: d.filename,
-                      analysisId: a.id,
-                      overallScore: a.overallScore,
-                      content,
-                      topBiases: a.biases.map(b => ({
-                        biasType: b.biasType,
-                        severity: b.severity ?? null,
-                      })),
-                    };
-                  })
-                  .filter((x): x is NonNullable<typeof x> => x !== null);
-                if (inputs.length < 2) return;
-
-                const output = await runCrossReferenceAgent(inputs);
-                const conflictCount = output.findings.length;
-                const highSeverityCount = output.findings.filter(
-                  f => f.severity === 'critical' || f.severity === 'high'
-                ).length;
-
-                await prisma.dealCrossReference.create({
-                  data: {
-                    dealId: dealIdForCrossRef,
-                    documentSnapshot: output.documentSnapshot as unknown as Prisma.InputJsonValue,
-                    findings: output as unknown as Prisma.InputJsonValue,
-                    conflictCount,
-                    highSeverityCount,
-                    status: 'complete',
-                  },
-                });
-                log.info(
-                  `Auto cross-reference run complete for deal ${dealIdForCrossRef}: ${conflictCount} conflicts, ${highSeverityCount} high-severity`
-                );
-              } catch (err) {
-                log.warn(
-                  'Auto cross-reference run failed (non-critical): ' +
-                    (err instanceof Error ? err.message : String(err))
-                );
-              }
-            })().catch(() => null);
-          }
-
-          // 4.4 deep — DecisionPackage auto-recompute + cross-reference. Same
-          // shape as the deal hook above, but for non-deal contexts. A doc
-          // can sit in 0..n packages; we recompute every package the doc is
-          // in, then auto-fire the cross-ref agent for each that has ≥2
-          // analyzed members and no run in the last 30 minutes (avoids a
-          // burst-fire when a CSO uploads several docs sequentially).
-          (async () => {
-            try {
-              const memberships = await prisma.decisionPackageDocument
-                .findMany({
-                  where: { documentId },
-                  select: { packageId: true },
-                })
-                .catch(() => [] as Array<{ packageId: string }>);
-              if (memberships.length === 0) return;
-
-              const { recomputePackageMetrics } = await import('@/lib/scoring/package-aggregation');
-              const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
-              const { getDocumentContent: decrypt } = await import('@/lib/utils/encryption');
-
-              const RECENT_RUN_MS = 30 * 60 * 1000;
-              for (const m of memberships) {
-                await recomputePackageMetrics(m.packageId);
-
-                // Cross-ref auto-trigger: ≥2 analyzed docs AND no run in
-                // the last 30min. Mirrors the deal hook's "fresh material
-                // arrived" semantics.
-                const analyzedCount = await prisma.decisionPackageDocument.count({
-                  where: {
-                    packageId: m.packageId,
-                    document: { deletedAt: null, analyses: { some: {} } },
-                  },
-                });
-                if (analyzedCount < 2) continue;
-                const recent = await prisma.decisionPackageCrossReference
-                  .findFirst({
-                    where: { packageId: m.packageId },
-                    orderBy: { runAt: 'desc' },
-                    select: { runAt: true },
-                  })
-                  .catch(() => null);
-                if (recent && Date.now() - recent.runAt.getTime() < RECENT_RUN_MS) continue;
-
-                const docs = await prisma.decisionPackageDocument.findMany({
-                  where: {
-                    packageId: m.packageId,
-                    document: { deletedAt: null },
-                  },
-                  select: {
-                    document: {
-                      select: {
-                        id: true,
-                        filename: true,
-                        content: true,
-                        contentEncrypted: true,
-                        contentIv: true,
-                        contentTag: true,
-                        contentKeyVersion: true,
-                        analyses: {
-                          orderBy: { createdAt: 'desc' },
-                          take: 1,
-                          select: {
-                            id: true,
-                            overallScore: true,
-                            biases: {
-                              select: { biasType: true, severity: true },
-                              take: 5,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                });
-
-                const inputs = docs
-                  .map(row => {
-                    const a = row.document.analyses[0];
-                    if (!a) return null;
-                    const content = decrypt(row.document as Parameters<typeof decrypt>[0]);
-                    if (!content || content.trim().length < 200) return null;
-                    return {
-                      documentId: row.document.id,
-                      documentName: row.document.filename,
-                      analysisId: a.id,
-                      overallScore: a.overallScore,
-                      content,
-                      topBiases: a.biases.map(b => ({
-                        biasType: b.biasType,
-                        severity: b.severity ?? null,
-                      })),
-                    };
-                  })
-                  .filter((x): x is NonNullable<typeof x> => x !== null);
-                if (inputs.length < 2) continue;
-
-                const output = await runCrossReferenceAgent(inputs);
-                const conflictCount = output.findings.length;
-                const highSeverityCount = output.findings.filter(
-                  f => f.severity === 'critical' || f.severity === 'high'
-                ).length;
-
-                await prisma.decisionPackageCrossReference.create({
-                  data: {
-                    packageId: m.packageId,
-                    documentSnapshot: output.documentSnapshot as unknown as Prisma.InputJsonValue,
-                    findings: output as unknown as Prisma.InputJsonValue,
-                    conflictCount,
-                    highSeverityCount,
-                    status: 'complete',
-                  },
-                });
-                await recomputePackageMetrics(m.packageId);
-                log.info(
-                  `Auto package cross-reference for ${m.packageId}: ${conflictCount} conflicts, ${highSeverityCount} high-severity`
-                );
-              }
-            } catch (err) {
-              log.warn(
-                'Auto package recompute failed (non-critical): ' +
-                  (err instanceof Error ? err.message : String(err))
-              );
-            }
-          })().catch(() => null);
+          // Container-aware cross-reference auto-trigger re-lands in
+          // Phase 2 of the DecisionContainer refactor — replaces the
+          // legacy deal + package auto-fire blocks with a single
+          // container-scoped lookup (kind = strategic | investment |
+          // acquisition) that mirrors the prior 30-minute cooldown +
+          // ≥2-analyzed-docs gate. Manual cross-reference triggers
+          // are exposed on the unified surface via /api/containers
+          // (Phase 2). Bias-detective + structural-assumptions
+          // auto-runs above continue to fire unchanged.
 
           // Store embedding (fire and forget)
           try {

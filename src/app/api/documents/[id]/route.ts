@@ -68,14 +68,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               createdAt: true,
             },
           },
-          deal: {
-            select: {
-              id: true,
-              name: true,
-              sector: true,
-              ticketSize: true,
-            },
-          },
+          // DecisionContainer membership lookup ships in Phase 2 of the
+          // refactor (read from Document → DecisionContainerDocument →
+          // DecisionContainer with kind + name + sector + ticketSize).
           analyses: {
             orderBy: { createdAt: 'desc' },
             select: {
@@ -165,20 +160,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         { status: 500 }
       );
     }
-    // Normalise Prisma Decimal (deal.ticketSize) to a plain number so the
-    // client can compare it numerically without importing Decimal.
-    const dealRaw = (docFields as { deal?: { ticketSize?: unknown } | null }).deal;
-    const deal = dealRaw
-      ? {
-          ...dealRaw,
-          ticketSize:
-            dealRaw.ticketSize != null ? Number(dealRaw.ticketSize as unknown as string) : null,
-        }
-      : null;
+    // DecisionContainer membership lookup re-lands in Phase 2 of the
+    // refactor (Document → DecisionContainerDocument → DecisionContainer).
+    // Until then the document detail returns without container context;
+    // the doc-detail UI gates its container chips on this field's
+    // presence so the absence degrades gracefully.
     const isOwner = (docFields as { userId?: string }).userId === userId;
     return NextResponse.json({
       ...docFields,
-      deal,
       content: decryptedContent,
       isOwner,
     });

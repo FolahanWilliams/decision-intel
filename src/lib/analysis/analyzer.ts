@@ -88,9 +88,20 @@ export async function analyzeDocument(
   }
 
   // Enforce plan analysis limit before running the expensive pipeline.
-  // dealId is a newer column — cast defensively against schema drift.
-  const dealId = (document as Record<string, unknown>).dealId as string | undefined;
-  const planCheck = await checkAnalysisLimit(document.userId, dealId ?? null);
+  // Look up the FIRST DecisionContainer this doc belongs to (if any) so
+  // per-container audit purchases bypass subscription limits.
+  let containerIdForLimit: string | null = null;
+  try {
+    const containerJoin = await prisma.decisionContainerDocument.findFirst({
+      where: { documentId },
+      select: { containerId: true },
+    });
+    containerIdForLimit = containerJoin?.containerId ?? null;
+  } catch {
+    // @schema-drift-tolerant — DecisionContainerDocument may not be
+    // migrated in older deployments.
+  }
+  const planCheck = await checkAnalysisLimit(document.userId, containerIdForLimit);
   if (!planCheck.allowed) {
     const err = new Error(
       `Analysis limit reached (${planCheck.used}/${planCheck.limit} this month on the ${planCheck.plan} plan)`
@@ -103,26 +114,42 @@ export async function analyzeDocument(
   try {
     // Resolve project context for analysis
     let dealContext:
-      | { documentType?: string; dealId?: string; dealType?: string; dealStage?: string }
+      | {
+          documentType?: string;
+          containerId?: string;
+          containerKind?: string;
+          dealType?: string;
+          dealStage?: string;
+        }
       | undefined;
     try {
       const docType = (document as Record<string, unknown>).documentType as string | undefined;
-      const docDealId = (document as Record<string, unknown>).dealId as string | undefined;
-      if (docType || docDealId) {
-        dealContext = { documentType: docType || undefined, dealId: docDealId || undefined };
-        if (docDealId) {
-          const deal = await prisma.deal.findUnique({
-            where: { id: docDealId },
-            select: { dealType: true, stage: true },
-          });
-          if (deal) {
-            dealContext.dealType = deal.dealType;
-            dealContext.dealStage = deal.stage;
-          }
-        }
+      // Container context — find the FIRST DecisionContainer this doc belongs
+      // to (a doc can sit in 0..n containers via the join table; for the
+      // pipeline's bias-detective we use the first match, since the prompts
+      // currently assume a single decision context). Phase 2 will expose
+      // multi-container audits via an explicit containerId arg.
+      const containerJoin = await prisma.decisionContainerDocument.findFirst({
+        where: { documentId },
+        select: {
+          containerId: true,
+          container: {
+            select: { kind: true, dealType: true, stageId: true },
+          },
+        },
+      });
+      if (docType || containerJoin) {
+        dealContext = {
+          documentType: docType || undefined,
+          containerId: containerJoin?.containerId,
+          containerKind: containerJoin?.container.kind,
+          dealType: containerJoin?.container.dealType ?? undefined,
+          dealStage: containerJoin?.container.stageId,
+        };
       }
     } catch {
-      // Schema drift — documentType/dealId columns or Deal table may not exist yet
+      // Schema drift — documentType column or DecisionContainerDocument
+      // table may not exist on older deployments.
     }
 
     const result = await runAnalysis(
@@ -447,17 +474,25 @@ export async function analyzeDocument(
         });
         if (savedForFp) {
           const { generatePredictiveWarnings } = await import('@/lib/learning/fingerprint-engine');
-          const deal = document.dealId
-            ? await prisma.deal.findUnique({
-                where: { id: document.dealId },
-                select: { dealType: true },
-              })
-            : null;
+          // dealType context is sourced from the first DecisionContainer
+          // this doc belongs to (when kind === 'acquisition'). Phase 2 of
+          // the container refactor surfaces a richer kind+dealType context
+          // through a single helper; for now the join lookup runs inline.
+          let dealTypeForFp: string | undefined;
+          try {
+            const containerJoin = await prisma.decisionContainerDocument.findFirst({
+              where: { documentId },
+              select: { container: { select: { dealType: true } } },
+            });
+            dealTypeForFp = containerJoin?.container.dealType ?? undefined;
+          } catch {
+            // @schema-drift-tolerant — DecisionContainerDocument may not be migrated.
+          }
           await generatePredictiveWarnings(
             savedForFp.id,
             document.orgId,
             document.documentType,
-            deal?.dealType ?? undefined
+            dealTypeForFp
           );
         }
       }
@@ -604,7 +639,13 @@ export async function runAnalysis(
   userId: string,
   onProgress?: (update: ProgressUpdate) => void,
   orgId?: string,
-  dealContext?: { documentType?: string; dealId?: string; dealType?: string; dealStage?: string }
+  dealContext?: {
+    documentType?: string;
+    containerId?: string;
+    containerKind?: string;
+    dealType?: string;
+    dealStage?: string;
+  }
 ): Promise<AnalysisResult> {
   const auditGraph = await getGraph();
 
@@ -644,7 +685,8 @@ export async function runAnalysis(
               userId,
               orgId: orgId || '',
               documentType: dealContext?.documentType || '',
-              dealId: dealContext?.dealId || '',
+              containerId: dealContext?.containerId || '',
+              containerKind: dealContext?.containerKind || '',
               dealType: dealContext?.dealType || '',
               dealStage: dealContext?.dealStage || '',
             },
@@ -732,7 +774,8 @@ export async function runAnalysis(
           userId,
           orgId: orgId || '',
           documentType: dealContext?.documentType || '',
-          dealId: dealContext?.dealId || '',
+          containerId: dealContext?.containerId || '',
+          containerKind: dealContext?.containerKind || '',
           dealType: dealContext?.dealType || '',
           dealStage: dealContext?.dealStage || '',
         }),
