@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { ToxicCombinationTrendingCard } from '@/components/insights/ToxicCombinationTrendingCard';
 // Breadcrumbs handled by parent page
 import { BackToTop } from '@/components/ui/BackToTop';
 import dynamic from 'next/dynamic';
@@ -1290,6 +1291,17 @@ export function InsightsPageContent() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Toxic-combination trending — top named patterns over the last 90
+          days, sorted by occurrence count. Cascade-depth audit ship #5
+          lock 2026-05-09 evening. Reads /api/toxic-combinations/trends?
+          groupBy=patternLabel; cross-references against NAMED_PATTERNS
+          for bias-pair vocabulary + M&A tags. */}
+      <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+        <ErrorBoundary sectionName="Toxic Combination Trending">
+          <ToxicCombinationTrendingCard orgId={graphOrgId} />
+        </ErrorBoundary>
       </div>
 
       {/* ── [07] BOARDROOM CONSENSUS ─────────────────────── */}
