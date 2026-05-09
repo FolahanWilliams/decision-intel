@@ -301,6 +301,76 @@ export function TaxonomyClient() {
         </div>
       </section>
 
+      {/* COMPOUND PATTERNS — locked 2026-05-09 (M&A cascade depth ship).
+          The 22 individual biases above amplify when they co-occur. The
+          named patterns below are the 13 first-class compound failure
+          modes our toxic-combination engine fires on, including the 3
+          M&A-specific patterns shipped in the 2026-05-09 P1 cascade.
+          Each pattern surfaces here as a procurement-grade reference so
+          a Head of Corp Dev / PE Deal Partner reading the public
+          taxonomy can see the M&A vocabulary without leaving the
+          /taxonomy page. */}
+      <section style={{ padding: '64px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: C.green,
+              marginBottom: 12,
+            }}
+          >
+            Compound patterns · 13 named
+          </div>
+          <h2
+            style={{
+              fontSize: 'clamp(24px, 3vw, 32px)',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              marginBottom: 12,
+              color: C.slate900,
+            }}
+          >
+            How biases combine into named failure modes.
+          </h2>
+          <p
+            style={{
+              fontSize: 14.5,
+              color: C.slate500,
+              margin: 0,
+              marginBottom: 28,
+              maxWidth: 820,
+              lineHeight: 1.6,
+            }}
+          >
+            Detection in live memos is 8× harder for compound patterns than for individual biases.
+            Three of these are M&A workflow-native (Synergy Mirage / Conglomerate Fallacy /
+            Winner&rsquo;s Curse) — the failure modes McKinsey + KPMG track on 70-90% of
+            acquisitions that miss synergies. Click through to{' '}
+            <Link href="/bias-genome" style={{ color: C.green, fontWeight: 600 }}>
+              /bias-genome
+            </Link>{' '}
+            for the full case-anchor coverage.
+          </p>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 14,
+            }}
+          >
+            {COMPOUND_PATTERNS.map(p => (
+              <CompoundPatternCard key={p.label} pattern={p} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FILTER BAR */}
       <section
         id="browse"
@@ -1268,6 +1338,210 @@ function BiasCard({
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Compound patterns surface (locked 2026-05-09, M&A cascade depth ship) ───
+//
+// The 13 first-class compound failure modes the toxic-combination engine
+// fires on. Three of these are M&A workflow-native (locked 2026-05-09 P1)
+// and surface alongside the original 10 cross-domain patterns.
+// Mirrors NAMED_PATTERNS in src/lib/learning/toxic-combinations.ts.
+
+interface CompoundPattern {
+  label: string;
+  category: 'cross-domain' | 'mna';
+  primaryBiases: string;
+  description: string;
+  anchorCases?: string;
+}
+
+const COMPOUND_PATTERNS: CompoundPattern[] = [
+  // M&A-specific patterns first — load-bearing for procurement readers
+  {
+    label: 'The Synergy Mirage',
+    category: 'mna',
+    primaryBiases: 'Overconfidence × Planning Fallacy',
+    description:
+      'Synergy claims without a NAMED operational mechanism, accountable executive, or 90-day milestone. The canonical M&A failure mode (70-90% of acquisitions miss projected synergies per McKinsey + KPMG).',
+    anchorCases: 'AOL-Time Warner · HP-Autonomy · Microsoft-Nokia · GE-Alstom · WorldCom',
+  },
+  {
+    label: 'The Conglomerate Fallacy',
+    category: 'mna',
+    primaryBiases: 'Illusion of Validity × Halo Effect',
+    description:
+      'Far-adjacency acquisition justified by target growth and brand halo, with no answer to Porter’s "why us as the best parent" thesis.',
+    anchorCases:
+      'AOL-Time Warner · Bed Bath & Beyond · Sears Holdings · Daimler-Chrysler · Microsoft-Nokia · Steinhoff · Carillion · GE financial-conglomerate · WorldCom',
+  },
+  {
+    label: "The Winner's Curse",
+    category: 'mna',
+    primaryBiases: 'Anchoring × Overconfidence',
+    description:
+      'Auction-dynamic anchoring drives bids above intrinsic value; "strategic necessity" and "competitive process" language flag the deal-fever pattern.',
+    anchorCases: 'WeWork S-1 · Quibi · HP-Autonomy · Yahoo-Tumblr · GE-Alstom',
+  },
+  // Cross-domain patterns
+  {
+    label: 'The Echo Chamber',
+    category: 'cross-domain',
+    primaryBiases: 'Confirmation × Groupthink',
+    description:
+      'Confirmation bias amplified by unchallenged consensus. Teams hear what they already believe.',
+  },
+  {
+    label: 'The Sunk Ship',
+    category: 'cross-domain',
+    primaryBiases: 'Sunk Cost × Confirmation',
+    description:
+      'Past investment justifies continued commitment — the "we’re too deep to stop" pattern.',
+  },
+  {
+    label: 'The Blind Sprint',
+    category: 'cross-domain',
+    primaryBiases: 'Overconfidence × Planning Fallacy',
+    description: 'Overconfidence meets systematic underestimation of time and complexity.',
+  },
+  {
+    label: 'The Yes Committee',
+    category: 'cross-domain',
+    primaryBiases: 'Groupthink × Authority',
+    description:
+      'Deference to authority suppresses dissent; decisions ratified rather than debated.',
+  },
+  {
+    label: 'The Optimism Trap',
+    category: 'cross-domain',
+    primaryBiases: 'Anchoring × Overconfidence',
+    description:
+      'Favorable initial estimates become reference points; downside scenarios are discounted.',
+  },
+  {
+    label: 'The Status Quo Lock',
+    category: 'cross-domain',
+    primaryBiases: 'Status Quo × Loss Aversion',
+    description: 'The fear of loss from any change outweighs the documented cost of inaction.',
+  },
+  {
+    label: 'The Recency Spiral',
+    category: 'cross-domain',
+    primaryBiases: 'Recency × Availability',
+    description:
+      'Vivid recent events distort base rates; the most-recent quarter dominates the model.',
+  },
+  {
+    label: 'The Golden Child',
+    category: 'cross-domain',
+    primaryBiases: 'Halo × Confirmation',
+    description: 'A favored initiative receives uncritical support; scrutiny reserved for alternatives.',
+  },
+  {
+    label: 'The Doubling Down',
+    category: 'cross-domain',
+    primaryBiases: 'Sunk Cost × Loss Aversion',
+    description: 'Escalating commitment to a losing course to avoid realizing the loss.',
+  },
+  {
+    label: 'The Deadline Panic',
+    category: 'cross-domain',
+    primaryBiases: 'Zeigarnik × Cognitive Misering',
+    description: 'Time pressure collapses option-set search; closure is favoured over correctness.',
+  },
+];
+
+function CompoundPatternCard({ pattern }: { pattern: CompoundPattern }) {
+  const isMna = pattern.category === 'mna';
+  const accent = isMna ? '#8B5CF6' : C.slate400;
+  return (
+    <div
+      style={{
+        background: C.white,
+        border: `1px solid ${C.slate200}`,
+        borderTop: `3px solid ${accent}`,
+        borderRadius: 12,
+        padding: '18px 18px 16px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
+        <h3
+          style={{
+            fontSize: 17,
+            fontWeight: 700,
+            color: C.slate900,
+            margin: 0,
+            letterSpacing: '-0.01em',
+            flex: 1,
+          }}
+        >
+          {pattern.label}
+        </h3>
+        {isMna && (
+          <span
+            style={{
+              fontSize: 9.5,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: accent,
+              background: `${accent}15`,
+              padding: '2px 7px',
+              borderRadius: 999,
+            }}
+          >
+            M&A
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: C.slate400,
+          marginBottom: 10,
+        }}
+      >
+        {pattern.primaryBiases}
+      </div>
+      <p
+        style={{
+          fontSize: 13,
+          color: C.slate600,
+          margin: 0,
+          marginBottom: pattern.anchorCases ? 10 : 0,
+          lineHeight: 1.55,
+        }}
+      >
+        {pattern.description}
+      </p>
+      {pattern.anchorCases && (
+        <div
+          style={{
+            fontSize: 11.5,
+            color: C.slate500,
+            paddingTop: 10,
+            borderTop: `1px solid ${C.slate100}`,
+            lineHeight: 1.5,
+          }}
+        >
+          <span
+            style={{
+              fontWeight: 700,
+              color: C.slate700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              fontSize: 10,
+            }}
+          >
+            Anchor cases ·{' '}
+          </span>
+          {pattern.anchorCases}
+        </div>
+      )}
     </div>
   );
 }
