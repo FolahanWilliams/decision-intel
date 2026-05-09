@@ -76,6 +76,29 @@ if [ $COUNT_LINT_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "🔁 Running canonical-imports lint (drift-class blocker)..."
+echo ""
+
+npm run lint:canonical-imports
+CANONICAL_LINT_EXIT_CODE=$?
+
+if [ $CANONICAL_LINT_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: canonical-imports lint failed            ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  Local function shadows a canonical export. Either:         ║"
+    echo "║   • Replace with the canonical import (recommended)         ║"
+    echo "║   • Add // canonical-exception — <reason> on same / above   ║"
+    echo "║   • Add file to BASELINE_EXCEPTIONS in the lint script      ║"
+    echo "║                                                              ║"
+    echo "║  See CLAUDE.md > Drift-class lint discipline.               ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
 echo "🧹 Running ESLint --fix (auto-fix what we can, fail on remaining errors)..."
 echo ""
 

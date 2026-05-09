@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface FlywheelData {
   successDecisions: Array<{
@@ -62,9 +63,6 @@ interface FlywheelData {
   };
 }
 
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function formatCurrency(value: number, currency: string): string {
   try {
@@ -78,6 +76,7 @@ function formatCurrency(value: number, currency: string): string {
   }
 }
 
+// canonical-exception — uses en-GB ("9 May 2026") for outcome-flywheel timestamps; canonical is en-US.
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-GB', {
     day: 'numeric',

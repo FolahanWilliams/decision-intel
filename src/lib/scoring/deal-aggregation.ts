@@ -128,13 +128,10 @@ function normalizeBiasKey(input: string | null | undefined): string {
   return input.toLowerCase().replace(/\s+/g, '_').trim();
 }
 
-function gradeFromScore(score: number): 'A' | 'B' | 'C' | 'D' | 'F' {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
-}
+// Grade-from-score uses the canonical helper in @/lib/utils/grade.
+// Re-imported here under the same local name so the rest of this
+// module's code reads unchanged.
+import { gradeFromScore } from '@/lib/utils/grade';
 
 export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesAggregation {
   if (latestAnalyses.length === 0) {

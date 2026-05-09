@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import useSWR from 'swr';
 import { FileText, BarChart3, Calendar, Loader2, AlertTriangle } from 'lucide-react';
 import { ExplainabilityDashboard } from '@/components/explainability/ExplainabilityDashboard';
+import { formatDate } from '@/lib/utils/format-date';
 
 interface Analysis {
   id: string;
@@ -30,15 +31,6 @@ function getScoreColor(score: number): string {
   if (score >= 60) return 'var(--warning)';
   if (score >= 40) return 'var(--accent-warning)';
   return 'var(--error)';
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
 }
 
 function RecentAnalysesPicker() {

@@ -71,6 +71,7 @@ const STATUS_COLORS: Record<BiasTask['status'], string> = {
   dismissed: 'var(--text-muted)',
 };
 
+// canonical-exception — locale-aware date+time for collaboration timestamps; canonical formatDate is en-US UTC date-only.
 function formatDate(iso: string): string {
   try {
     return new Date(iso).toLocaleString(undefined, {

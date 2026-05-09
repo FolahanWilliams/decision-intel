@@ -6,6 +6,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import type { BiasInstance } from '@/types';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, FileText, AlertTriangle } from 'lucide-react';
+import { formatBiasNameCompact as formatBiasName } from '@/lib/utils/labels';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
@@ -15,13 +16,6 @@ const SEVERITY_COLORS: Record<string, string> = {
   medium: '#EAB308',
   low: '#84CC16',
 };
-
-function formatBiasName(type: string): string {
-  return type
-    .replace(/_bias$/, '')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
 
 interface BiasAnnotatedPDFViewerProps {
   documentId: string;

@@ -5,6 +5,7 @@ import { GitBranch, Loader2, TrendingUp, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClientLogger } from '@/lib/utils/logger';
 import { confidenceColor as getConfidenceColor } from '@/lib/utils/confidence';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const log = createClientLogger('CounterfactualPanel');
 
@@ -40,10 +41,6 @@ interface CounterfactualPanelProps {
    * above the analysis tabs as a demo-grade ROI statement.
    */
   variant?: 'full' | 'featured';
-}
-
-function formatBiasName(s: string): string {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function CounterfactualPanel({ analysisId, variant = 'full' }: CounterfactualPanelProps) {

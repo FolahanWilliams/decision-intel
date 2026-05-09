@@ -40,6 +40,7 @@ import { getBiasEducation } from '@/lib/constants/bias-education';
 import { getCrossFrameworkRisk } from '@/lib/compliance/bias-regulation-map';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { createLogger } from '@/lib/utils/logger';
+import { formatBiasName as formatBiasLabel } from '@/lib/utils/labels';
 import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
 import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
@@ -1300,9 +1301,6 @@ function normaliseSeverity(
   return undefined;
 }
 
-function formatBiasLabel(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 /**
  * Assemble a Decision Package-rooted Provenance Record (4.4 deep).

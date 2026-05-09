@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { GitBranch, ArrowUpRight, TrendingUp } from 'lucide-react';
 import { confidenceLabel } from '@/lib/utils/confidence';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface TopScenario {
   analysisId: string;
@@ -37,10 +38,6 @@ interface TopResponse {
   scenarios: TopScenario[];
   windowDays: number;
   sampleAnalyses: number;
-}
-
-function formatBiasName(s: string): string {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function formatMonetary(value: number | null, currency: string): string | null {

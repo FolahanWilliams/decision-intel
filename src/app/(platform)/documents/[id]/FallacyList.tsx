@@ -18,6 +18,7 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
     );
   }
 
+  // canonical-exception — returns Tailwind utility classnames, not CSS-var expressions.
   const severityColor = (s: string) => {
     switch (s) {
       case 'critical':

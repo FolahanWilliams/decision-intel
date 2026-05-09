@@ -10,6 +10,8 @@ import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph'
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
+import { formatBiasName } from '@/lib/utils/labels';
+import { severityColor } from '@/lib/utils/severity';
 // Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
 // sync with the canonical DQIResult shape without forcing the dqi module
 // onto the post-upload reveal critical path.
@@ -56,11 +58,6 @@ interface Props {
   preResolvedAnalysisId?: string | null;
 }
 
-function humanizeBias(type: string): string {
-  const words = type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  return /bias$/i.test(words) ? words : `${words} Bias`;
-}
-
 const SEVERITY_ORDER: Record<string, number> = {
   critical: 4,
   high: 3,
@@ -68,18 +65,6 @@ const SEVERITY_ORDER: Record<string, number> = {
   low: 1,
   unknown: 0,
 };
-
-function severityColor(severity: string | undefined): string {
-  switch (severity) {
-    case 'critical':
-    case 'high':
-      return 'var(--severity-high, #ef4444)';
-    case 'medium':
-      return 'var(--warning, #eab308)';
-    default:
-      return 'var(--text-muted)';
-  }
-}
 
 export function InlineAnalysisResultCard({
   analysis,
@@ -584,7 +569,7 @@ export function InlineAnalysisResultCard({
                       >
                         #{i + 1}
                       </span>
-                      <span style={{ fontWeight: 600 }}>{humanizeBias(b.type)}</span>
+                      <span style={{ fontWeight: 600 }}>{formatBiasName(b.type)}</span>
                       {b.severity && b.severity !== 'unknown' && (
                         <span
                           style={{
@@ -1205,7 +1190,7 @@ function InlineCoEditPanel({ originalBiasCount }: { originalBiasCount: number })
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {humanizeBias(b.type)}
+                      {formatBiasName(b.type)}
                     </span>
                     {b.evidence && (
                       <div

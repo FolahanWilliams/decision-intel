@@ -17,6 +17,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
+import { formatDate } from '@/lib/utils/format-date';
 
 interface BillingData {
   plan: string;
@@ -59,14 +60,6 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
   canceled: { label: 'Canceled', color: '#fbbf24', icon: <XCircle size={12} /> },
   none: { label: 'No Plan', color: '#A1A1AA', icon: <Shield size={12} /> },
 };
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 function daysUntil(iso: string): number {
   return Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));

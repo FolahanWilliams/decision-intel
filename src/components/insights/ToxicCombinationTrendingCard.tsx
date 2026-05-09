@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from 'react';
 import { AlertTriangle, GitCompareArrows } from 'lucide-react';
-import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
+import { NAMED_PATTERNS } from '@/lib/learning/named-patterns';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('ToxicCombinationTrendingCard');

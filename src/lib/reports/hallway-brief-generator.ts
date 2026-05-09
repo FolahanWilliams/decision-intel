@@ -19,6 +19,7 @@
 
 import jsPDF from 'jspdf';
 import { formatBiasName } from '@/lib/utils/labels';
+import { gradeFromScore } from '@/lib/utils/grade';
 
 const PAGE_W = 210; // mm (A4)
 const MARGIN_L = 18;
@@ -57,14 +58,6 @@ export interface HallwayBriefData {
   biases: HallwayBriefBias[];
   generatedAt?: Date;
   reviewerName?: string | null;
-}
-
-function gradeFromScore(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
 }
 
 function oneLineVerdict(score: number, metaVerdict: string | null | undefined): string {

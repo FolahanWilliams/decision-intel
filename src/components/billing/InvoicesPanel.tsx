@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Clock,
 } from 'lucide-react';
+import { formatDate } from '@/lib/utils/format-date';
 
 interface Invoice {
   id: string;
@@ -51,14 +52,6 @@ function formatMoney(cents: number, currency = 'usd'): string {
   }).format(cents / 100);
 }
 
-function formatDate(iso: string | null): string {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 const STATUS_TINT: Record<string, string> = {
   paid: '#16A34A',

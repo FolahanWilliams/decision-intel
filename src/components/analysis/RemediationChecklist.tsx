@@ -26,6 +26,7 @@
 
 import { CheckCircle2, AlertTriangle, ChevronRight } from 'lucide-react';
 import type { BiasInstance } from '@/types';
+import { formatBiasName as humanizeBiasType } from '@/lib/utils/labels';
 
 interface Props {
   biases: BiasInstance[];
@@ -47,10 +48,6 @@ const STEP_VERB_DESCRIPTOR = [
   'next-largest blocker',
   'cleanup pass · lower priority',
 ];
-
-function humanizeBiasType(t: string): string {
-  return t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function severityAccent(severity: string): string {
   const k = severity.toLowerCase();

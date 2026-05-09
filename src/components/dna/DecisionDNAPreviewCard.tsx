@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Brain, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useDecisionDNA } from '@/hooks/useDecisionDNA';
 import { SparklineChart } from '@/components/ui/SparklineChart';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // Personal-calibration moat preview for the main dashboard. Three stats sourced
 // from /api/decision-dna: top-triggered bias (computed from biasTimeline by
@@ -21,10 +22,6 @@ import { SparklineChart } from '@/components/ui/SparklineChart';
 // shows the last 6 months of that bias's frequency (the data is in
 // dna.biasTimeline). Sample-size provenance ("X audits · Y outcomes")
 // renders below the stats so the buyer knows what's grounding the numbers.
-
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function topBiasFromTimeline(
   biasTimeline: Array<{ biasType: string; month: string; count: number }>

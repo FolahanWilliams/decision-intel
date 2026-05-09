@@ -19,6 +19,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import { formatBiasName as formatBiasLabel } from '@/lib/utils/labels';
 
 interface SharedBias {
   biasType: string;
@@ -76,6 +77,7 @@ const GRADE_META: Array<{ min: number; grade: string; ring: string; label: strin
   { min: 0, grade: 'F', ring: '#ef4444', label: 'Critical' },
 ];
 
+// canonical-exception — returns the full GRADE_META entry (label/color/grade) for the public share viewer.
 function gradeFor(score: number) {
   for (const t of GRADE_META) if (score >= t.min) return t;
   return GRADE_META[GRADE_META.length - 1];
@@ -92,9 +94,6 @@ const SEV_META: Record<string, { bg: string; fg: string; border: string; label: 
   low: { bg: '#F1F5F9', fg: '#475569', border: '#E2E8F0', label: 'Low' },
 };
 
-function formatBiasLabel(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function extractPreviewText(data: unknown, maxLength = 200): string {
   if (!data) return '';

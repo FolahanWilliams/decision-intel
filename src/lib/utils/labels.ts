@@ -92,6 +92,21 @@ export function formatBiasName(raw: string | null | undefined): string {
 }
 
 /**
+ * Compact bias label — strips the trailing `_bias` token before
+ * humanizing. Used in space-constrained surfaces (graph visualisations,
+ * radar axes, PDF annotation chips) where "Anchoring Bias" doesn't fit
+ * but "Anchoring" does. Falls back to the canonical display name when
+ * the catalog entry doesn't end in "Bias".
+ */
+export function formatBiasNameCompact(raw: string | null | undefined): string {
+  if (!raw) return '';
+  const stripped = raw.toString().replace(/_bias$/i, '');
+  const display = formatBiasName(stripped);
+  // Strip a trailing " Bias" the catalog might have added back.
+  return display.replace(/\s+Bias$/, '').trim();
+}
+
+/**
  * Toxic combination labels. These are stored as short snake_case handles
  * from the toxic-combinations catalog. A small alias map handles the cases
  * where we want a specific branded name (e.g. "Echo Chamber").

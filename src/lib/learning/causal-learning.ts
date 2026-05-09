@@ -12,6 +12,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const log = createLogger('CausalLearning');
 
@@ -1415,6 +1416,3 @@ async function correlationBasedIntervention(
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}

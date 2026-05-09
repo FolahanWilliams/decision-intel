@@ -16,7 +16,7 @@ import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
 import { getBiasEducation, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
 import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
-import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
+import { NAMED_PATTERNS } from '@/lib/learning/named-patterns';
 import { normalizeBiasType } from '@/lib/utils/bias-normalize';
 
 const log = createClientLogger('BiasDetailModal');

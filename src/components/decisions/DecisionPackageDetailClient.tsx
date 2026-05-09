@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { formatDate } from '@/lib/utils/format-date';
 import {
   Package,
   ChevronLeft,
@@ -146,13 +147,6 @@ function dqiTint(score: number | null): string {
   return 'var(--severity-critical, #b91c1c)';
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 
 type PackageTab = 'documents' | 'findings' | 'verdict' | 'stress' | 'outcome';
 

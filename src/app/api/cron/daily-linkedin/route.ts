@@ -14,6 +14,7 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { safeCompare } from '@/lib/utils/safe-compare';
+import { formatBiasName } from '@/lib/utils/labels';
 import { ALL_CASES } from '@/lib/data/case-studies';
 import { getSlugForCase } from '@/lib/data/case-studies/slugs';
 import { generateText } from '@/lib/ai/providers/gateway';
@@ -25,13 +26,6 @@ const log = createLogger('DailyLinkedIn');
 
 const CACHE_KEY = 'daily-linkedin:index';
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
-
-function formatBiasName(s: string): string {
-  return s
-    .split('_')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-}
 
 export async function GET() {
   const headerList = await headers();

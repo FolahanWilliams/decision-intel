@@ -20,6 +20,7 @@
  */
 
 import { createLogger } from '@/lib/utils/logger';
+import { gradeFromScore } from '@/lib/utils/grade';
 
 const log = createLogger('ConvictionScore');
 
@@ -62,16 +63,6 @@ const WEIGHTS = {
   judgeAgreement: 0.2,
   perspectiveDiversity: 0.15,
 };
-
-// ─── Grade Thresholds ───────────────────────────────────────────────────────
-
-function getGrade(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 50) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
-}
 
 // ─── Interpretation ─────────────────────────────────────────────────────────
 
@@ -133,7 +124,7 @@ export function computeConviction(input: ConvictionInput): ConvictionResult {
     perspectiveDiversity * WEIGHTS.perspectiveDiversity;
 
   const score = Math.round(Math.min(100, Math.max(0, rawScore)));
-  const grade = getGrade(score);
+  const grade = gradeFromScore(score);
   const interpretation = getInterpretation(score, components);
 
   log.debug(
