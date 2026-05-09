@@ -5,6 +5,10 @@ import { convert as htmlToText } from 'html-to-text';
 import JSZip from 'jszip';
 import ExcelJS from 'exceljs';
 import { createLogger } from '@/lib/utils/logger';
+import {
+  extractSynergyStructure,
+  formatSynergyStructureForAudit,
+} from '@/lib/parsers/synergy-model-parser';
 
 const log = createLogger('FileParser');
 
@@ -12,11 +16,22 @@ const log = createLogger('FileParser');
  * Parses the content of a file buffer based on its MIME type or filename extension.
  * Supports PDF, DOCX, XLSX, CSV, HTML, PPTX, and Plain Text.
  * Throws an error for legacy DOC files.
+ *
+ * The optional `documentType` parameter enables type-aware enrichment of the
+ * parsed output. Currently used for `synergy_model` uploads (locked 2026-05-09):
+ * when an .xlsx is uploaded as a synergy_model, the parser embeds a structured
+ * STRUCTURED_SYNERGY_MODEL block ABOVE the flattened sheet text so downstream
+ * audit nodes (structurer, biasDetective) see per-claim defensibility data
+ * (mechanism / owner / milestone presence + base-rate realisation gap) without
+ * needing a new state field on the audit graph. When documentType is omitted
+ * or doesn't match the enrichment trigger, parseFile behaves exactly as
+ * before — pure text extraction.
  */
 export async function parseFile(
   buffer: Buffer,
   mimeType: string,
-  filename: string
+  filename: string,
+  documentType?: string
 ): Promise<string> {
   const lowerFilename = filename.toLowerCase();
   const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
@@ -172,7 +187,31 @@ export async function parseFile(
         log.warn(`XLSX contains no extractable data: ${filename}`);
         return '';
       }
-      return sheetTexts.join('\n\n');
+      const flattenedText = sheetTexts.join('\n\n');
+
+      // Synergy-model enrichment (locked 2026-05-09). When the upload was
+      // explicitly typed as synergy_model, run the synergy-model parser to
+      // extract per-claim defensibility data and prepend it to the
+      // flattened text. The structured block is human-readable (no JSON
+      // markers in the audit's reading path) so the structurer + bias-
+      // detective see it as procurement-grade context. Failure to extract
+      // is non-fatal — fall through to flattened text only.
+      if (documentType === 'synergy_model') {
+        try {
+          const structure = extractSynergyStructure(workbook);
+          if (structure.detected) {
+            const block = formatSynergyStructureForAudit(structure);
+            log.info(
+              `synergy-model enrichment: ${structure.claims.length} claims · confidence=${structure.confidence}`
+            );
+            return `${block}\n${flattenedText}`;
+          }
+          log.info(`synergy-model enrichment: no claims detected, falling through to flat text`);
+        } catch (err) {
+          log.warn(`synergy-model enrichment failed (using flat text): ${String(err)}`);
+        }
+      }
+      return flattenedText;
     } catch (error) {
       throw new Error(
         `Failed to parse XLSX: ${error instanceof Error ? error.message : String(error)}`

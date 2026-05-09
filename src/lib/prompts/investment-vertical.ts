@@ -167,8 +167,12 @@ NAMED M&A TOXIC COMBINATIONS to flag explicitly:
 - "The Sunk Ship" — when QofE adjustments are made AFTER significant deal spend, with the implicit pressure to reach a target adjusted-EBITDA number that justifies the deal price.`,
 
   synergy_model: `DOCUMENT TYPE: SYNERGY MODEL / SYNERGY PROJECTION SPREADSHEET
-This is a synergy projection model — typically a spreadsheet (Excel / Google Sheets) breaking down expected revenue and cost synergies by initiative. The single most-mistrusted artefact in M&A: 70-90% of acquisitions fail to realize projected synergies (per McKinsey + KPMG). Evaluate with maximum rigor:
-- Does each synergy line item have a NAMED OPERATIONAL MECHANISM (e.g., "consolidate two AWS accounts → $X savings" not "IT efficiencies → $X savings")?
+This is a synergy projection model — typically a spreadsheet (Excel / Google Sheets) breaking down expected revenue and cost synergies by initiative. The single most-mistrusted artefact in M&A: 70-90% of acquisitions fail to realize projected synergies (per McKinsey + KPMG).
+
+PARSED-PRE-AUDIT BLOCK: when the upload was a synergy-model-shaped .xlsx, the file-parser has already extracted structured per-claim defensibility data and embedded it ABOVE the flattened sheet text in a "STRUCTURED SYNERGY MODEL — PARSED PRE-AUDIT" block. Each claim there carries: type (revenue / cost_cogs / cost_opex / capex), year-by-year amounts, mechanism / owner / milestone presence flags, severity band (critical / high / medium / low), and a verdict line citing the BCG/McKinsey base-rate realisation band for that claim type. USE THAT BLOCK AS YOUR PRIMARY EVIDENCE — do not re-derive defensibility from the flattened text when the structured block is present. Quote the per-claim verdict in your bias-detective excerpts where the flagged synergy claim sits.
+
+Evaluate with maximum rigor:
+- Does each synergy line item have a NAMED OPERATIONAL MECHANISM (e.g., "consolidate two AWS accounts → $X savings" not "IT efficiencies → $X savings")? The parsed block's hasMechanism flag is the structural signal; flat-text sheets fall back to your judgement.
 - Does each synergy line item have a NAMED ACCOUNTABLE EXECUTIVE who will own delivery?
 - Does each synergy line item have a MEASURABLE 90-DAY MILESTONE that proves the synergy is on track?
 - Are revenue synergies (cross-sell, channel expansion, pricing power) flagged HARDER than cost synergies — revenue synergies have a 30-50% realization rate vs cost synergies at 60-80%, and the model should reflect that base-rate gap?
@@ -176,8 +180,13 @@ This is a synergy projection model — typically a spreadsheet (Excel / Google S
 - Is there a base-case / bear-case / bull-case scenario, or only the bull case?
 - Are achieved synergies tracked against projected synergies in any comparable past deal by this acquirer? If not, this is a base-rate-blind model.
 
+CRITICAL-SEVERITY FLAGGING RULE (parsed block aware):
+- If the parsed block reports portfolio.summary indicating ANY claim at "critical" severity, fire "The Synergy Mirage" at Critical severity citing the specific claim labels.
+- If the parsed block reports portfolio fullyDefendedPct < 50%, fire "The Synergy Mirage" at High severity even if no individual claim is critical.
+- If the parsed block reports a high revenue-synergy share (>50% of run-rate from claims with type=revenue) AND fullyDefendedPct < 70%, fire "The Synergy Mirage" at High severity citing the revenue-vs-cost realisation gap.
+
 NAMED M&A TOXIC COMBINATIONS to flag explicitly:
-- "The Synergy Mirage" — fires HARDEST on this document type. If any synergy line item lacks mechanism + owner + milestone, flag this combination as Critical severity.
+- "The Synergy Mirage" — fires HARDEST on this document type. The parsed block's per-claim severity is your primary signal; aggregate to the document-level severity per the rules above.
 - "The Conglomerate Fallacy" — fires when the synergy model assumes operational integration that the acquirer's core capabilities cannot deliver (e.g., a financial buyer modeling "operational synergies" they cannot operationally deliver).`,
 
   integration_plan: `DOCUMENT TYPE: POST-MERGER INTEGRATION (PMI) PLAN
