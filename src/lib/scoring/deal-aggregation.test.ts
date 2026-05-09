@@ -11,7 +11,7 @@ function doc(
   id: string,
   overallScore: number,
   patterns: Array<{
-    patternLabel: string;
+    patternLabel: string | null;
     severity: 'critical' | 'high' | 'medium' | 'low' | null;
     toxicScore: number;
   }> = []

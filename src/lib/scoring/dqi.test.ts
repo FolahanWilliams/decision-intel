@@ -51,15 +51,16 @@ describe('WEIGHTS', () => {
     expect(Math.abs(sum - 1.0)).toBeLessThan(0.001);
   });
 
-  it('has all 6 components', () => {
+  it('has all 7 components', () => {
     const keys = Object.keys(WEIGHTS);
-    expect(keys).toHaveLength(6);
+    expect(keys).toHaveLength(7);
     expect(keys).toContain('biasLoad');
     expect(keys).toContain('noiseLevel');
     expect(keys).toContain('evidenceQuality');
     expect(keys).toContain('processMaturity');
     expect(keys).toContain('complianceRisk');
     expect(keys).toContain('historicalAlignment');
+    expect(keys).toContain('compoundRisk');
   });
 });
 
