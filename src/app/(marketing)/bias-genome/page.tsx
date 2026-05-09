@@ -10,10 +10,19 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import {
   computePlatformCalibrationBaseline,
   formatCalibrationFootnote,
 } from '@/lib/learning/platform-baseline';
+
+// Drift-tolerant derivation — the bias count flexes as DI-B-XXX entries
+// land. Hardcoded "20 / DI-B-001 → DI-B-020" was stale by 2 (DI-B-021 +
+// DI-B-022 added 2026-04-30 in the Kahneman-Klein paper-application
+// sprint; not caught by lint:counts because the value lives in JSX
+// attributes, not template literals matching the count regex).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const TAXONOMY_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
@@ -145,7 +154,7 @@ export default function BiasGenomePage() {
               borderTop: `1px solid ${C.slate200}`,
             }}
           >
-            <Pill label="Named biases" value="20" sublabel="DI-B-001 → DI-B-020" />
+            <Pill label="Named biases" value={String(BIAS_COUNT)} sublabel={TAXONOMY_RANGE} />
             <Pill label="Case studies" value={String(meta.totalCases)} sublabel="hand-curated" />
             <Pill
               label="Industries"
@@ -364,12 +373,16 @@ export default function BiasGenomePage() {
               color: C.slate500,
               margin: 0,
               marginBottom: 28,
-              maxWidth: 680,
+              maxWidth: 760,
             }}
           >
             Named patterns where two biases compound. Detection in live memos is 8x worse than
-            either bias alone. This is the product category our toxic-combination engine was built
-            for.
+            either bias alone. Includes the three M&A workflow-native patterns —{' '}
+            <strong style={{ color: C.slate700 }}>Synergy Mirage</strong>,{' '}
+            <strong style={{ color: C.slate700 }}>Conglomerate Fallacy</strong>, and{' '}
+            <strong style={{ color: C.slate700 }}>Winner&rsquo;s Curse</strong> — that account for
+            the 70-90% of acquisitions that miss projected synergies (McKinsey + KPMG). This is the
+            product category our toxic-combination engine was built for.
           </p>
 
           {/* Network viz first — shows which biases are the hubs */}
@@ -601,8 +614,7 @@ export default function BiasGenomePage() {
                 reports, FDA actions, post-mortems, or academic case studies.
               </li>
               <li>
-                Biases are assigned per-case by applying the Decision Intel taxonomy (DI-B-001 →
-                DI-B-020). Every named bias links to peer-reviewed academic sources at{' '}
+                Biases are assigned per-case by applying the Decision Intel taxonomy ({TAXONOMY_RANGE}). Every named bias links to peer-reviewed academic sources at{' '}
                 <Link
                   href="/taxonomy"
                   style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}

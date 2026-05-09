@@ -238,7 +238,7 @@ export const FINANCIAL_EXTENDED_CASES: FailureCase[] = [
       'overconfidence_bias',
     ],
     primaryBias: 'optimism_bias',
-    toxicCombinations: ['Optimism Trap', 'Sunk Ship'],
+    toxicCombinations: ['Optimism Trap', 'Sunk Ship', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,
@@ -394,7 +394,7 @@ export const FINANCIAL_EXTENDED_CASES: FailureCase[] = [
       'halo_effect',
     ],
     primaryBias: 'authority_bias',
-    toxicCombinations: ['Echo Chamber', 'Yes Committee', 'Golden Child'],
+    toxicCombinations: ['Echo Chamber', 'Yes Committee', 'Golden Child', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,

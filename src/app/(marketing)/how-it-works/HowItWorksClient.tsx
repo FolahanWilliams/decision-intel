@@ -447,7 +447,7 @@ export function HowItWorksClient() {
             }}
           >
             <StatPill value="30+" label="cognitive biases" />
-            <StatPill value="20" label="general (DI-B-001–020)" />
+            <StatPill value={String(BIAS_COUNT)} label={`general (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`} />
             <StatPill value="11" label="strategy-specific" />
             <StatPill value="0" label="detections without an excerpt" />
           </div>

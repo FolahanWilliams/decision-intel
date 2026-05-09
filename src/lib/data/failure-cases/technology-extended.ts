@@ -134,7 +134,7 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'planning_fallacy',
     ],
     primaryBias: 'sunk_cost_fallacy',
-    toxicCombinations: ['Sunk Ship', 'Optimism Trap'],
+    toxicCombinations: ['Sunk Ship', 'Optimism Trap', 'Synergy Mirage', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,
@@ -173,7 +173,7 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'hindsight_bias',
     ],
     primaryBias: 'status_quo_bias',
-    toxicCombinations: ['Status Quo Lock', 'Echo Chamber'],
+    toxicCombinations: ['Status Quo Lock', 'Echo Chamber', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'high',
       dissentAbsent: true,
