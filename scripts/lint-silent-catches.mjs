@@ -91,7 +91,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // "Reducing is encouraged" per the file header — every legitimate
 // silent catch the founder is willing to log.warn drops the noise floor
 // for the next audit.
-const SILENT_CATCH_BASELINE = 153;
+// 153 → 154: DQI explainability surface 2 (2026-05-09 evening) added a
+// `res.json().catch(() => null)` body-parse on the lazy DQI fetch in
+// InlineAnalysisResultCard — the canonical req.json() body-parse
+// exception class CLAUDE.md explicitly lists as legitimate.
+const SILENT_CATCH_BASELINE = 154;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

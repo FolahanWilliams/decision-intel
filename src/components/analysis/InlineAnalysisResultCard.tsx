@@ -9,6 +9,11 @@ import { ScoreReveal } from '@/components/ui/ScoreReveal';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
+import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
+// Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
+// sync with the canonical DQIResult shape without forcing the dqi module
+// onto the post-upload reveal critical path.
+type DQIResult = import('@/lib/scoring/dqi').DQIResult;
 import {
   Dialog,
   DialogContent,
@@ -167,6 +172,42 @@ export function InlineAnalysisResultCard({
     };
   }, [analysis.docId, preResolvedAnalysisId]);
 
+  // DQI breakdown panel — click-to-open on the score column. The data is
+  // lazy-fetched from /api/dqi on first open so the wow-moment reveal
+  // isn't slowed by a panel-fetch the user may never need. The dialog
+  // opens only after the fetch resolves so there's no empty-modal flash;
+  // until then a small "Loading…" hint sits below the score. (DQI
+  // explainability ship surface 2 — locked 2026-05-09 evening.)
+  const [dqiPanelOpen, setDqiPanelOpen] = useState(false);
+  const [dqiResult, setDqiResult] = useState<DQIResult | null>(null);
+  const [dqiLoading, setDqiLoading] = useState(false);
+
+  const openDqiPanel = async () => {
+    if (!analysisId) return;
+    if (dqiResult) {
+      setDqiPanelOpen(true);
+      return;
+    }
+    if (dqiLoading) return;
+    setDqiLoading(true);
+    try {
+      const res = await fetch(`/api/dqi?analysisId=${analysisId}`);
+      if (!res.ok) {
+        log.warn('DQI panel fetch failed:', res.status);
+        return;
+      }
+      const data = (await res.json().catch(() => null)) as { dqi?: DQIResult } | null;
+      if (data?.dqi) {
+        setDqiResult(data.dqi);
+        setDqiPanelOpen(true);
+      }
+    } catch (err) {
+      log.warn('DQI panel fetch failed:', err);
+    } finally {
+      setDqiLoading(false);
+    }
+  };
+
   // Pull the team's benchmark DQI so the post-upload reveal can show
   // "+12 above your org's avg." The endpoint returns null profile for
   // individual-plan users and for team-plan orgs with < 3 analyses —
@@ -301,19 +342,57 @@ export function InlineAnalysisResultCard({
         }}
       >
         <div>
-          <ScoreReveal
-            score={analysis.overallScore}
-            label="Decision Quality Index"
-            showGrade
-            /* Reduced 1200 → 400 2026-04-24. The card only mounts AFTER the
-             * SSE stream resolves — the user has already watched 30-60s of
-             * progress. Another 1.2s "scoring…" placeholder reads as
-             * artificial loading, not anticipation. 400ms is just enough
-             * for the AnimatedNumber count-up + grade spring to feel
-             * deliberate without faking work. */
-            suspenseMs={400}
-            benchmark={orgAvg !== null ? { value: orgAvg } : undefined}
-          />
+          {/* Score column is clickable — opens DqiBreakdownPanel with the
+              full per-component decomposition. Lazy-fetches the DQI on
+              first click so the wow-moment reveal stays fast. The hint
+              under the score makes the affordance visible even before
+              hover; without it most users wouldn't realise the score is
+              a doorway. (DQI explainability surface 2 — 2026-05-09.) */}
+          <button
+            type="button"
+            onClick={openDqiPanel}
+            disabled={!analysisId}
+            aria-label="Open DQI score breakdown — see how this score was computed"
+            style={{
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: analysisId ? 'pointer' : 'default',
+            }}
+          >
+            <ScoreReveal
+              score={analysis.overallScore}
+              label="Decision Quality Index"
+              showGrade
+              /* Reduced 1200 → 400 2026-04-24. The card only mounts AFTER the
+               * SSE stream resolves — the user has already watched 30-60s of
+               * progress. Another 1.2s "scoring…" placeholder reads as
+               * artificial loading, not anticipation. 400ms is just enough
+               * for the AnimatedNumber count-up + grade spring to feel
+               * deliberate without faking work. */
+              suspenseMs={400}
+              benchmark={orgAvg !== null ? { value: orgAvg } : undefined}
+            />
+            {analysisId && (
+              <div
+                style={{
+                  marginTop: 8,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: 'var(--accent-primary)',
+                }}
+              >
+                {dqiLoading
+                  ? 'Loading breakdown…'
+                  : 'Click to see how it’s computed →'}
+              </div>
+            )}
+          </button>
           {analysis.noiseScore != null && (
             <div
               style={{
@@ -680,6 +759,19 @@ export function InlineAnalysisResultCard({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* DQI breakdown panel — opens when the score column is clicked.
+          The dialog renders nothing until the lazy fetch resolves; on
+          fetch failure it stays closed silently rather than showing an
+          error placeholder (the score itself is still visible above). */}
+      {dqiResult && (
+        <DqiBreakdownPanel
+          dqi={dqiResult}
+          open={dqiPanelOpen}
+          onOpenChange={setDqiPanelOpen}
+          contextLabel={analysis.filename}
+        />
+      )}
       <style>{`
         @media (max-width: 700px) {
           .inline-result-body {

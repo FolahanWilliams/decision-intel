@@ -228,7 +228,14 @@ export default function DealDetailPage() {
 
       {deal.aggregation && (
         <ErrorBoundary sectionName="Composite hero">
-          <DealCompositeHero aggregation={deal.aggregation} totalDocs={totalDocCount} />
+          <DealCompositeHero
+            aggregation={deal.aggregation}
+            totalDocs={totalDocCount}
+            dealName={deal.name}
+            documents={deal.documents ?? []}
+            conflictCount={conflictCount}
+            conflictHighCount={conflictHighCount}
+          />
         </ErrorBoundary>
       )}
 
