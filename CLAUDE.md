@@ -237,6 +237,37 @@ TOGETHER
 
 **Forward-looking rule**: when a future audit identifies a sidebar entry as a thin-wrapper-around-a-content-component, the right move is NOT to delete the route silently — it's to fold the component as a SECTION on a sibling page (with a proper redesign that strips its self-page chrome) AND add a 308 redirect from the old URL. The Decision DNA fold is the canonical pattern. When a sidebar entry is a duplicate of per-decision functionality (the Provenance archive vs. per-document/per-container DPR export), delete the route + redirect to the canonical surface; don't fold what doesn't add value.
 
+## AccentCard primitive + visual-distinction discipline (locked 2026-05-09 evening — founder audit follow-up)
+
+**The pattern**: every platform surface that stacks ≥3 cards in a column gets a top accent stripe per card so semantic role becomes visible at a glance. The founder flagged 2026-05-09 evening as "too many white cards with no visual distinction tightly packed" — the all-`.card` flat-white pattern was the recurring drift class across Settings, AI Copilot empty state, decision-log new-entry stack, and any tab with multiple sections.
+
+**The primitive**: [src/components/ui/AccentCard.tsx](src/components/ui/AccentCard.tsx) — small wrapper with an `accent` prop (`'primary' | 'info' | 'success' | 'warning' | 'danger' | 'muted'`). Each accent maps to a CSS variable for the top stripe, plus optional `tinted` flag for a subtle background blend (used on Danger Zone). Optional `title` slot for the icon + heading row.
+
+**Semantic role mapping** (apply consistently across platform surfaces):
+
+- **primary** (green) — primary actions, the lead/hero card on a tab (Account Information, Notification Preferences)
+- **info** (indigo) — informational / data / export / preference surfaces (Display Preferences, Export your data, Slack workspace)
+- **success** (green-tinted) — verified state / "all good" status (Security with 2FA + encryption checks)
+- **warning** (amber) — contextual nudges, low-stakes attention (Product Tour replay, Pin-a-document hint on /ask)
+- **danger** (red, often `tinted`) — destructive zones (Delete account, force-push warnings)
+- **muted** (gray) — neutral / informational with no semantic colour
+
+**Surfaces migrated 2026-05-09 evening**: Settings → Account tab (5 cards) + Preferences tab (2 cards) + Integrations tab (Slack workspace card). AI Copilot empty state composer + starter chips + pinned-doc hint. Each migration drops the `.card` className in favour of `<AccentCard accent="..." title={...}>`.
+
+**Forward-looking rule**: when adding a new card to ANY platform surface that stacks ≥3 cards, default to AccentCard with a deliberate accent choice. Falling back to bare `<div className="card">` is fine for one-off surfaces but any tab / page with ≥3 cards stacked MUST use AccentCard so the eye has visual hierarchy. When a new accent semantic is needed (e.g. a "calibration" colour), extend `ACCENT_COLORS` in AccentCard.tsx + document the new mapping here in the same commit.
+
+## AI Copilot composer-first follow-up (locked 2026-05-09 evening — founder feedback rework)
+
+**The Phase E ship** (2026-05-09 evening earlier) replaced the slogan "Your AI advisory team" header + dual-CTA empty state with a no-header composer-first surface. The founder pushback the same evening: "i actually liked the your ai advisory team, go back to that, the problem was the odd layout of the cards, fix the left part bar with new decision and pin a decision, they are poorly formatted." Three rework moves landed:
+
+1. **Header restored**: [page.tsx](<src/app/(platform)/dashboard/ask/page.tsx>) carries the Sparkles eyebrow + Instrument Serif "Your AI advisory team." H1 + capability line ("Structured decisions · document Q&A with citations · cross-portfolio pattern recall."). The header now grounds the surface; the founder's framing of what these agents ARE.
+
+2. **Left rail rebuilt**: was a giant pill-shaped "+ New Decision" + a floating-ghost "Pin a document" with mismatched geometries. Now: unified header card with consistent `--radius-md` + matching widths + green top accent strip on the pin button when a doc is pinned (visual state of "this conversation has a doc grounding" is unmissable).
+
+3. **Empty-state cards rebuilt with AccentCard pattern**: composer card gets a 3px green top accent + green eyebrow ("START A DECISION SESSION"); quick-starter cards get 2px indigo top accents (distinct secondary group); pinned-document hint gets 2px amber accent (contextual nudge semantic). The duplicate inner `<h2>` "Ask, audit, or stress-test a decision." was REMOVED (page header is the source of truth).
+
+**Forward-looking rule**: when a Phase X ship lands and the founder pushes back on one specific element, the right move is the surgical rework that preserves what worked + fixes what didn't — NOT a full re-revert. The Phase E composer-first architecture (drop the prompt-input intermediate mode, single composer entry point) was the right call; the slogan-header drop was wrong. Surgical reverts with diff-of-the-diff awareness keep the velocity.
+
 ## 3-Layer Positioning Frame (locked 2026-05-09 evening — Gemini-pushback validation)
 
 **Architectural vocabulary** for cold investor conversations + pitch-deck slide 2 + senior-direct corp dev applications. Lifted from the 2026-05-09 Gemini-pushback validation pass; sharper than the prior CLAUDE.md positioning frame because it gives the reader a clean architectural slot for DI:

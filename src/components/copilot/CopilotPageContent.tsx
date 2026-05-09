@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Plus,
-  Sparkles,
   Clock,
   Trash2,
   Loader2,
@@ -260,7 +259,12 @@ export function CopilotPageContent() {
         <Menu className="h-4 w-4" />
       </button>
 
-      {/* Sidebar — Session List */}
+      {/* Sidebar — Session List. Phase E follow-up 2026-05-09 evening:
+          rebuilt the action header (was a giant pill + floating ghost
+          button with mismatched geometries). Now: a unified header card
+          with consistent radius, sentence-case labels, and a green top
+          accent strip when pinning is active so the visual state of
+          "this conversation has a doc grounding" is unmissable. */}
       <div
         className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r flex flex-col`}
         style={{
@@ -268,62 +272,130 @@ export function CopilotPageContent() {
           borderColor: 'var(--border-color)',
         }}
       >
-        <div className="p-4 border-b space-y-2" style={{ borderColor: 'var(--border-color)' }}>
-          <button onClick={handleNewDecision} className="btn btn-primary w-full" style={{ gap: 8 }}>
-            <Plus className="h-4 w-4" />
-            New Decision
+        <div
+          style={{
+            padding: 14,
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <button
+            onClick={handleNewDecision}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent-primary)',
+              border: 'none',
+              color: '#fff',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'opacity 0.15s',
+              boxShadow: '0 1px 2px rgba(22, 163, 74, 0.2)',
+            }}
+          >
+            <Plus size={14} />
+            New decision
           </button>
 
-          {/* Document pin */}
-          <div className="relative">
+          {/* Pin-a-document affordance — visually paired with the New
+              Decision button (same radius, same width). Top accent strip
+              fires green when a doc is pinned to make the active
+              grounding state visible without hunting. */}
+          <div style={{ position: 'relative' }}>
             <button
               onClick={() => setShowDocPicker(!showDocPicker)}
-              className="flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors ask-card"
-              style={
-                pinnedDoc
-                  ? {
-                      borderColor: 'var(--success)',
-                      background: 'rgba(22, 163, 74, 0.08)',
-                      color: 'var(--success)',
-                    }
-                  : {
-                      background: 'var(--bg-card)',
-                      borderColor: 'var(--border-color)',
-                      color: 'var(--text-secondary)',
-                    }
-              }
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 'var(--radius-md)',
+                background: pinnedDoc ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-card)',
+                border: `1px solid ${pinnedDoc ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                borderTop: pinnedDoc
+                  ? '2px solid var(--accent-primary)'
+                  : '1px solid var(--border-color)',
+                color: pinnedDoc ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                textAlign: 'left',
+              }}
             >
-              <Pin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate flex-1 text-left">
+              <Pin size={12} style={{ flexShrink: 0 }} />
+              <span
+                style={{
+                  flex: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {pinnedDoc ? pinnedDoc.filename : 'Pin a document'}
               </span>
               {pinnedDoc && (
-                <button
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={e => {
                     e.stopPropagation();
                     setPinnedDocumentId(null);
                   }}
-                  className="flex-shrink-0"
-                  style={{ color: 'var(--text-muted)' }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setPinnedDocumentId(null);
+                    }
+                  }}
+                  aria-label="Unpin document"
+                  style={{
+                    flexShrink: 0,
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                  }}
                 >
-                  <X className="h-3 w-3" />
-                </button>
+                  <X size={12} />
+                </span>
               )}
             </button>
 
             {showDocPicker && (
               <div
-                className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border max-h-48 overflow-y-auto"
                 style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: 4,
+                  zIndex: 50,
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-color)',
                   background: 'var(--bg-elevated)',
-                  borderColor: 'var(--border-color)',
                   boxShadow: 'var(--shadow-lg)',
+                  maxHeight: 224,
+                  overflowY: 'auto',
                 }}
               >
                 {analyzedDocs.length === 0 ? (
                   <div
-                    className="px-3 py-4 text-xs text-center"
-                    style={{ color: 'var(--text-muted)' }}
+                    style={{
+                      padding: '14px 12px',
+                      fontSize: 11.5,
+                      textAlign: 'center',
+                      color: 'var(--text-muted)',
+                    }}
                   >
                     No analyzed documents yet.
                   </div>
@@ -335,13 +407,35 @@ export function CopilotPageContent() {
                         setPinnedDocumentId(d.id === pinnedDocumentId ? null : d.id);
                         setShowDocPicker(false);
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors ask-session"
+                      className="ask-session"
                       style={{
-                        color: d.id === pinnedDocumentId ? 'var(--success)' : 'var(--text-primary)',
+                        display: 'flex',
+                        width: '100%',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 12px',
+                        fontSize: 11.5,
+                        background: 'transparent',
+                        border: 'none',
+                        color:
+                          d.id === pinnedDocumentId
+                            ? 'var(--accent-primary)'
+                            : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
                       }}
                     >
-                      <FileText className="h-3 w-3 flex-shrink-0" />
-                      <span className="truncate flex-1 text-left">{d.filename}</span>
+                      <FileText size={11} style={{ flexShrink: 0 }} />
+                      <span
+                        style={{
+                          flex: 1,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {d.filename}
+                      </span>
                       {d.score != null && (
                         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
                           {d.score}/100
@@ -441,158 +535,136 @@ export function CopilotPageContent() {
             onUnpinDoc={() => setPinnedDocumentId(null)}
           />
         ) : (
-          // Empty State — composer-first, single column. Phase E refactor
-          // 2026-05-09 evening: dropped the dual-CTA pattern (separate
-          // "+ New Decision Session" hero button + "Or try asking"
-          // starters + dangling document chips) and the intermediate
-          // prompt-input mode. Now the composer is the single starting
-          // point — type, press Enter, session opens with that prompt
-          // as the first turn. Starter chips are a quick-fire alt.
+          // Empty State — composer-first. Phase E refactor + follow-up
+          // 2026-05-09 evening: dropped the duplicate inner H1 (the page
+          // header carries "Your AI advisory team."). Composer card now
+          // gets a green top accent strip so it reads as the primary
+          // action; starter cards get an indigo accent so they read as
+          // a distinct secondary group, breaking up the white-on-white
+          // visual flatness. Pinned-doc hint card gets an amber accent
+          // when surfaced (it's a contextual nudge, not a primary path).
           <div
-            className="flex-1 flex flex-col items-center justify-center"
+            className="flex-1 flex flex-col items-center justify-start"
             style={{
-              padding: '24px 24px 40px',
+              padding: '32px 24px 40px',
               overflowY: 'auto',
             }}
           >
             <div className="w-full" style={{ maxWidth: 720 }}>
-              {/* Compact welcome row — single line, not a hero */}
+              {/* Composer card — primary action, green top accent.
+                  The page header above carries the H1 + capability line;
+                  this card is just the input + send button + key hint. */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  marginBottom: 20,
-                  paddingBottom: 16,
-                  borderBottom: '1px solid var(--border-color)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-color)',
+                  borderTop: '3px solid var(--accent-primary)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 16,
+                  marginBottom: 24,
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
                 }}
               >
                 <div
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 'var(--radius-md)',
-                    background: 'rgba(22, 163, 74, 0.10)',
-                    border: '1px solid rgba(22, 163, 74, 0.22)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 700,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    color: 'var(--accent-primary)',
+                    marginBottom: 8,
                   }}
                 >
-                  <Sparkles size={16} style={{ color: 'var(--accent-primary)' }} />
+                  Start a decision session
+                  {pinnedDoc && (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        padding: '1px 8px',
+                        background: 'rgba(22, 163, 74, 0.10)',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 10,
+                        textTransform: 'none',
+                        letterSpacing: '0.02em',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Pinned: {pinnedDoc.filename}
+                    </span>
+                  )}
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h2
-                    style={{
-                      fontSize: 16,
-                      fontWeight: 600,
-                      margin: 0,
-                      color: 'var(--text-primary)',
-                      lineHeight: 1.3,
+                <div style={{ position: 'relative' }}>
+                  <textarea
+                    value={composerInput}
+                    onChange={e => setComposerInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmitComposer();
+                      }
                     }}
-                  >
-                    Ask, audit, or stress-test a decision.
-                  </h2>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--text-muted)',
-                      margin: '2px 0 0 0',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    Structured decisions, document Q&amp;A with citations, cross-portfolio pattern
-                    recall.
-                    {pinnedDoc && (
-                      <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
-                        {' '}
-                        · Pinned: {pinnedDoc.filename}
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {/* Composer — the primary entry point */}
-              <div
-                style={{
-                  position: 'relative',
-                  marginBottom: 20,
-                }}
-              >
-                <textarea
-                  value={composerInput}
-                  onChange={e => setComposerInput(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmitComposer();
+                    placeholder={
+                      pinnedDoc
+                        ? `Ask anything about ${pinnedDoc.filename}, or pose a fresh decision…`
+                        : 'Pose a decision, paste a memo passage, or ask about a flagged bias…'
                     }
-                  }}
-                  placeholder={
-                    pinnedDoc
-                      ? `Ask anything about ${pinnedDoc.filename}, or pose a fresh decision…`
-                      : 'Pose a decision, paste a memo passage, or ask about a flagged bias…'
-                  }
-                  rows={3}
-                  autoFocus
-                  className="ask-input"
-                  style={{
-                    width: '100%',
-                    padding: '14px 56px 14px 16px',
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-lg)',
-                    color: 'var(--text-primary)',
-                    fontSize: 14,
-                    fontFamily: 'inherit',
-                    lineHeight: 1.5,
-                    resize: 'none',
-                    outline: 'none',
-                    transition: 'border-color 0.15s, box-shadow 0.15s',
-                  }}
-                  onFocus={e => {
-                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.12)';
-                  }}
-                  onBlur={e => {
-                    e.currentTarget.style.borderColor = 'var(--border-color)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                />
-                <button
-                  onClick={handleSubmitComposer}
-                  disabled={!composerInput.trim()}
-                  aria-label="Start session"
-                  style={{
-                    position: 'absolute',
-                    right: 10,
-                    bottom: 10,
-                    width: 32,
-                    height: 32,
-                    borderRadius: 'var(--radius-md)',
-                    background: composerInput.trim()
-                      ? 'var(--accent-primary)'
-                      : 'var(--bg-elevated)',
-                    border: 'none',
-                    color: composerInput.trim() ? '#fff' : 'var(--text-muted)',
-                    cursor: composerInput.trim() ? 'pointer' : 'not-allowed',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.15s',
-                  }}
-                >
-                  <ArrowUp size={16} />
-                </button>
+                    rows={3}
+                    autoFocus
+                    className="ask-input"
+                    style={{
+                      width: '100%',
+                      padding: '12px 52px 12px 14px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      color: 'var(--text-primary)',
+                      fontSize: 14,
+                      fontFamily: 'inherit',
+                      lineHeight: 1.5,
+                      resize: 'none',
+                      outline: 'none',
+                      transition: 'border-color 0.15s, box-shadow 0.15s',
+                    }}
+                    onFocus={e => {
+                      e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.10)';
+                    }}
+                    onBlur={e => {
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    onClick={handleSubmitComposer}
+                    disabled={!composerInput.trim()}
+                    aria-label="Start session"
+                    style={{
+                      position: 'absolute',
+                      right: 8,
+                      bottom: 8,
+                      width: 32,
+                      height: 32,
+                      borderRadius: 'var(--radius-md)',
+                      background: composerInput.trim()
+                        ? 'var(--accent-primary)'
+                        : 'var(--bg-elevated)',
+                      border: 'none',
+                      color: composerInput.trim() ? '#fff' : 'var(--text-muted)',
+                      cursor: composerInput.trim() ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'background 0.15s',
+                    }}
+                  >
+                    <ArrowUp size={16} />
+                  </button>
+                </div>
                 <div
                   style={{
-                    position: 'absolute',
-                    left: 16,
-                    bottom: -22,
                     fontSize: 10.5,
                     color: 'var(--text-muted)',
+                    marginTop: 8,
                   }}
                 >
                   Press <kbd style={kbdStyle}>↵</kbd> to start · <kbd style={kbdStyle}>Shift</kbd>+
@@ -600,9 +672,11 @@ export function CopilotPageContent() {
                 </div>
               </div>
 
-              {/* Starter chips — 4 role-tuned prompts. Click fires a
-                  session immediately, no intermediate confirmation. */}
-              <div style={{ marginTop: 32 }}>
+              {/* Quick starters — indigo top accent so they read as a
+                  distinct secondary group, breaking the white-on-white
+                  flatness flagged in the founder audit. Click fires a
+                  session immediately. */}
+              <div style={{ marginBottom: 24 }}>
                 <div
                   style={{
                     fontSize: 10.5,
@@ -611,15 +685,26 @@ export function CopilotPageContent() {
                     textTransform: 'uppercase',
                     color: 'var(--text-muted)',
                     marginBottom: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: 'var(--accent-secondary, #6366f1)',
+                    }}
+                  />
                   Quick starters · {effectiveRole === 'other' ? 'general' : effectiveRole}
                 </div>
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                    gap: 8,
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                    gap: 10,
                   }}
                 >
                   {STARTER_DECISION_PROMPTS[effectiveRole].map(q => (
@@ -629,15 +714,17 @@ export function CopilotPageContent() {
                       className="ask-card"
                       style={{
                         textAlign: 'left',
-                        padding: '12px 14px',
+                        padding: '14px 16px',
                         background: 'var(--bg-card)',
                         border: '1px solid var(--border-color)',
+                        borderTop: '2px solid var(--accent-secondary, #6366f1)',
                         borderRadius: 'var(--radius-md)',
                         color: 'var(--text-secondary)',
                         fontSize: 12.5,
                         lineHeight: 1.45,
                         cursor: 'pointer',
                         transition: 'all 0.15s',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.02)',
                       }}
                     >
                       {q}
@@ -646,23 +733,51 @@ export function CopilotPageContent() {
                 </div>
               </div>
 
-              {/* Pinned-document hint when ZERO docs pinned but analyzed
-                  docs exist — quick-pin chips inline, not as a dangling
-                  bottom strip. */}
+              {/* Pinned-document affordance — amber accent for "contextual
+                  nudge" semantics (vs primary green / secondary indigo).
+                  Only renders when no doc is pinned + analyzed docs exist. */}
               {!pinnedDoc && analyzedDocs.length > 0 && (
-                <div style={{ marginTop: 24 }}>
+                <div
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderTop: '2px solid var(--warning, #f59e0b)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: 14,
+                  }}
+                >
                   <div
                     style={{
-                      fontSize: 10.5,
-                      fontWeight: 700,
-                      letterSpacing: '0.10em',
-                      textTransform: 'uppercase',
-                      color: 'var(--text-muted)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
                       marginBottom: 8,
                     }}
                   >
-                    Pin a document for grounded Q&amp;A
+                    <Pin size={12} style={{ color: 'var(--warning, #f59e0b)' }} />
+                    <span
+                      style={{
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        letterSpacing: '0.10em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      Pin a document for grounded Q&amp;A
+                    </span>
                   </div>
+                  <p
+                    style={{
+                      fontSize: 11.5,
+                      color: 'var(--text-muted)',
+                      margin: '0 0 10px 0',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    Pinning grounds responses in the source — every claim cites the passage it came
+                    from.
+                  </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {analyzedDocs.slice(0, 6).map(d => (
                       <button
@@ -673,7 +788,7 @@ export function CopilotPageContent() {
                           alignItems: 'center',
                           gap: 6,
                           padding: '6px 10px',
-                          background: 'var(--bg-card)',
+                          background: 'var(--bg-secondary)',
                           border: '1px solid var(--border-color)',
                           borderRadius: 'var(--radius-full)',
                           color: 'var(--text-secondary)',
@@ -682,10 +797,10 @@ export function CopilotPageContent() {
                           transition: 'all 0.15s',
                         }}
                       >
-                        <Pin size={10} />
+                        <FileText size={10} />
                         <span
                           style={{
-                            maxWidth: 140,
+                            maxWidth: 160,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',

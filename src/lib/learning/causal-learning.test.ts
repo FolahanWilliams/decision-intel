@@ -193,7 +193,12 @@ describe('Causal Learning Service', () => {
             include: {
               biases: { select: { biasType: true, severity: true } },
               document: {
-                select: { documentType: true, deal: { select: { sector: true } } },
+                // Phase 2 container migration (2026-05-09): Document.deal
+                // relation removed. Sector now flows via Document →
+                // DecisionContainerDocument → Container.sector but
+                // causal-learning runs on documentType + bias signature
+                // only until that join is wired.
+                select: { documentType: true },
               },
             },
           },

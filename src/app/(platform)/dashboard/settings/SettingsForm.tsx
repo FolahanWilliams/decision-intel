@@ -30,6 +30,7 @@ import { PersonaManager } from './PersonaManager';
 import { BillingSection } from '@/components/ui/BillingSection';
 import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 const IntegrationsTabContent = dynamic(
   () =>
@@ -282,16 +283,24 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         </TabsList>
 
         {/* ── Account Tab ──────────────────────────── */}
+        {/* Cards use AccentCard primitive (locked 2026-05-09 evening
+            follow-up): primary green for the lead card, info indigo for
+            data/export, success green for security state, warning amber
+            for low-stakes nudges, danger red for destructive actions.
+            Stops the all-white-card flatness flagged in the founder
+            audit. */}
         <TabsContent value="account">
-          {/* Account Information */}
-          <div className="card mb-lg animate-fade-in">
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <User size={18} />
-                Account Information
-              </h3>
-            </div>
-            <div className="card-body">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Account Information — primary lead card */}
+            <AccentCard
+              accent="primary"
+              title={
+                <>
+                  <User size={16} style={{ color: 'var(--accent-primary)' }} />
+                  <span>Account Information</span>
+                </>
+              }
+            >
               <div className="grid grid-2 gap-lg">
                 <div>
                   <label className="text-xs text-muted mb-xs font-medium block">Email</label>
@@ -299,6 +308,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     style={{
                       padding: 'var(--spacing-md)',
                       background: 'var(--bg-secondary)',
+                      borderRadius: 'var(--radius-md)',
                       color: 'var(--text-secondary)',
                     }}
                   >
@@ -312,31 +322,33 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <BillingSection />
                 </div>
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Email Forwarding */}
-          <EmailForwardingSection />
+            {/* Email Forwarding — own component, retains its existing
+                shell. Phase F follow-up: migrate this internally too. */}
+            <EmailForwardingSection />
 
-          {/* Security */}
-          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <Shield size={18} />
-                Security
-              </h3>
-            </div>
-            <div className="card-body">
+            {/* Security — success green (verified state) */}
+            <AccentCard
+              accent="success"
+              title={
+                <>
+                  <Shield size={16} style={{ color: 'var(--success)' }} />
+                  <span>Security</span>
+                </>
+              }
+            >
               <div className="grid grid-2 gap-lg">
                 <div
                   style={{
                     padding: 'var(--spacing-md)',
-                    background: 'rgba(34, 197, 94, 0.1)',
-                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    background: 'rgba(34, 197, 94, 0.06)',
+                    border: '1px solid rgba(34, 197, 94, 0.22)',
+                    borderRadius: 'var(--radius-md)',
                   }}
                 >
                   <div className="flex items-center gap-sm mb-sm">
-                    <CheckCircle size={16} style={{ color: 'var(--success)' }} />
+                    <CheckCircle size={14} style={{ color: 'var(--success)' }} />
                     <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
                       Two-Factor Auth
                     </span>
@@ -346,12 +358,13 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 <div
                   style={{
                     padding: 'var(--spacing-md)',
-                    background: 'rgba(34, 197, 94, 0.1)',
-                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                    background: 'rgba(34, 197, 94, 0.06)',
+                    border: '1px solid rgba(34, 197, 94, 0.22)',
+                    borderRadius: 'var(--radius-md)',
                   }}
                 >
                   <div className="flex items-center gap-sm mb-sm">
-                    <CheckCircle size={16} style={{ color: 'var(--success)' }} />
+                    <CheckCircle size={14} style={{ color: 'var(--success)' }} />
                     <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
                       Data Encryption
                     </span>
@@ -359,22 +372,22 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <p className="text-xs text-muted">AES-256 at rest</p>
                 </div>
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Product Tour */}
-          <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <PlayCircle size={18} />
-                Product Tour
-              </h3>
-            </div>
-            <div className="card-body">
+            {/* Product Tour — warning amber (contextual nudge) */}
+            <AccentCard
+              accent="warning"
+              title={
+                <>
+                  <PlayCircle size={16} style={{ color: 'var(--warning)' }} />
+                  <span>Product Tour</span>
+                </>
+              }
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>Replay onboarding</div>
-                  <div className="text-xs text-muted">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 500, marginBottom: 4 }}>Replay onboarding</div>
+                  <div className="text-xs text-muted" style={{ lineHeight: 1.5 }}>
                     Rerun the welcome modal and guided product tour. Useful if you skipped it or
                     want a refresher on the core flow.
                   </div>
@@ -383,7 +396,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   onClick={handleReplayOnboarding}
                   disabled={replayingTour}
                   className="btn btn-primary flex items-center gap-sm"
-                  style={{ flexShrink: 0, marginLeft: '24px' }}
+                  style={{ flexShrink: 0, marginLeft: 24 }}
                 >
                   {replayingTour ? (
                     <Loader2 size={14} className="animate-spin" />
@@ -393,28 +406,25 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   {replayingTour ? 'Starting…' : 'Replay tour'}
                 </button>
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Bulk data export — backs Terms §10A + DPA §5 (P1 #27, 2026-04-26).
-              GDPR Art. 20 portability is technically per-record, but a single
-              account-scoped JSON bundle is the procurement-grade answer. */}
-          <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.18s' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <Download size={18} />
-                Export your data
-              </h3>
-            </div>
-            <div className="card-body">
+            {/* Bulk data export — info indigo (data / portability).
+                Backs Terms §10A + DPA §5 (P1 #27, 2026-04-26). */}
+            <AccentCard
+              accent="info"
+              title={
+                <>
+                  <Download size={16} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
+                  <span>Export your data</span>
+                </>
+              }
+            >
               <div
                 className="flex items-center justify-between"
                 style={{ gap: 16, flexWrap: 'wrap' }}
               >
                 <div style={{ flex: 1, minWidth: 240 }}>
-                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>
-                    Account-scoped JSON bundle
-                  </div>
+                  <div style={{ fontWeight: 500, marginBottom: 4 }}>Account-scoped JSON bundle</div>
                   <div className="text-xs text-muted" style={{ lineHeight: 1.55 }}>
                     Every analysis, outcome, Decision Provenance Record header, and decision-room
                     blind prior you&rsquo;ve authored, in one machine-readable bundle. Backs the
@@ -443,25 +453,24 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   Download JSON bundle
                 </a>
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Danger Zone */}
-          <div
-            className="card mt-xl animate-fade-in"
-            style={{ animationDelay: '0.2s', borderColor: 'var(--error)' }}
-          >
-            <div className="card-header" style={{ borderBottomColor: 'rgba(239,68,68,0.3)' }}>
-              <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
-                <AlertTriangle size={18} />
-                Danger Zone
-              </h3>
-            </div>
-            <div className="card-body">
+            {/* Danger Zone — red, tinted to reinforce destructive action */}
+            <AccentCard
+              accent="danger"
+              thickness={3}
+              tinted
+              title={
+                <>
+                  <AlertTriangle size={16} style={{ color: 'var(--error)' }} />
+                  <span style={{ color: 'var(--error)' }}>Danger Zone</span>
+                </>
+              }
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>Delete all my data</div>
-                  <div className="text-xs text-muted">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 500, marginBottom: 4 }}>Delete all my data</div>
+                  <div className="text-xs text-muted" style={{ lineHeight: 1.5 }}>
                     Permanently removes all your documents, analyses, audit logs, and settings. This
                     cannot be undone.
                   </div>
@@ -474,28 +483,30 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     borderColor: 'var(--error)',
                     color: 'var(--error)',
                     flexShrink: 0,
-                    marginLeft: '24px',
+                    marginLeft: 24,
                   }}
                 >
                   <Trash2 size={14} />
                   Delete my data
                 </button>
               </div>
-            </div>
+            </AccentCard>
           </div>
         </TabsContent>
 
         {/* ── Preferences Tab ──────────────────────────── */}
         <TabsContent value="preferences">
-          {/* Notification Preferences */}
-          <div className="card mb-lg animate-fade-in">
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <Bell size={18} />
-                Notification Preferences
-              </h3>
-            </div>
-            <div className="card-body">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Notification Preferences — primary lead card */}
+            <AccentCard
+              accent="primary"
+              title={
+                <>
+                  <Bell size={16} style={{ color: 'var(--accent-primary)' }} />
+                  <span>Notification Preferences</span>
+                </>
+              }
+            >
               <div className="flex flex-col gap-lg">
                 {!emailConfigured && (
                   <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
@@ -531,7 +542,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 {/* Notification Severity Threshold */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <div style={{ fontWeight: 500, marginBottom: '2px' }}>Severity Threshold</div>
+                    <div style={{ fontWeight: 500, marginBottom: 2 }}>Severity Threshold</div>
                     <div className="text-xs text-muted">
                       Only receive notifications at or above this severity level
                     </div>
@@ -548,9 +559,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       padding: 'var(--spacing-sm) var(--spacing-md)',
                       background: 'var(--bg-tertiary)',
                       border: '1px solid var(--border-color)',
-                      borderRadius: '4px',
+                      borderRadius: 4,
                       color: 'var(--text-primary)',
-                      fontSize: '13px',
+                      fontSize: 13,
                       cursor: isPending ? 'not-allowed' : 'pointer',
                       opacity: isPending ? 0.5 : 1,
                     }}
@@ -561,18 +572,18 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   </select>
                 </div>
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Display Preferences */}
-          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <Moon size={18} />
-                Display Preferences
-              </h3>
-            </div>
-            <div className="card-body">
+            {/* Display Preferences — info indigo (preference / data) */}
+            <AccentCard
+              accent="info"
+              title={
+                <>
+                  <Moon size={16} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
+                  <span>Display Preferences</span>
+                </>
+              }
+            >
               <div className="flex flex-col gap-lg">
                 <ToggleOption
                   label="Dark Mode"
@@ -582,180 +593,185 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   disabled={isPending}
                 />
               </div>
-            </div>
-          </div>
+            </AccentCard>
 
-          {/* Boardroom Personas */}
-          <PersonaManager />
+            {/* Boardroom Personas — own component, retains its existing
+                shell. Phase F follow-up: migrate this internally too. */}
+            <PersonaManager />
 
-          {/* Save Button */}
-          <div className="flex items-center justify-end gap-md mt-lg">
-            {saved && (
-              <span
-                className="flex items-center gap-sm text-sm"
-                style={{ color: 'var(--success)' }}
-              >
-                <CheckCircle size={16} />
-                Settings saved!
-              </span>
-            )}
-            <button
-              onClick={handleSave}
-              disabled={isPending}
-              className="btn btn-primary flex items-center gap-sm"
+            {/* Save Button */}
+            <div
+              className="flex items-center justify-end gap-md"
+              style={{ marginTop: 'var(--spacing-md)' }}
             >
-              {isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              {isPending ? 'Saving...' : 'Save Changes'}
-            </button>
+              {saved && (
+                <span
+                  className="flex items-center gap-sm text-sm"
+                  style={{ color: 'var(--success)' }}
+                >
+                  <CheckCircle size={16} />
+                  Settings saved!
+                </span>
+              )}
+              <button
+                onClick={handleSave}
+                disabled={isPending}
+                className="btn btn-primary flex items-center gap-sm"
+              >
+                {isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                {isPending ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </TabsContent>
 
         {/* ── Integrations Tab (merged Connections + Marketplace) ────── */}
         <TabsContent value="integrations">
-          {/* Integrations */}
-          <div className="card mb-xl animate-fade-in">
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <MessageSquare size={18} />
-                Integrations
-              </h3>
-            </div>
-            <div className="card-body">
-              <div
-                style={{
-                  padding: 'var(--spacing-lg)',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--liquid-border)',
-                  borderRadius: '8px',
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-md">
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        background: slackStatus?.connected
-                          ? 'rgba(34, 197, 94, 0.15)'
-                          : 'var(--bg-card-hover)',
-                        borderRadius: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <MessageSquare
-                        size={20}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <AccentCard
+              accent="info"
+              title={
+                <>
+                  <MessageSquare size={16} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
+                  <span>Slack workspace</span>
+                </>
+              }
+            >
+              <div>
+                <div
+                  style={{
+                    padding: 'var(--spacing-lg)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--liquid-border)',
+                    borderRadius: '8px',
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-md">
+                      <div
                         style={{
-                          color: slackStatus?.connected
-                            ? 'var(--success)'
-                            : 'var(--text-secondary)',
+                          width: 40,
+                          height: 40,
+                          background: slackStatus?.connected
+                            ? 'rgba(34, 197, 94, 0.15)'
+                            : 'var(--bg-card-hover)',
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                         }}
-                      />
+                      >
+                        <MessageSquare
+                          size={20}
+                          style={{
+                            color: slackStatus?.connected
+                              ? 'var(--success)'
+                              : 'var(--text-secondary)',
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, marginBottom: '2px' }}>Slack</div>
+                        {slackLoading ? (
+                          <div className="text-xs text-muted">Checking connection...</div>
+                        ) : slackStatus?.connected ? (
+                          <div className="text-xs" style={{ color: 'var(--success)' }}>
+                            Connected to <strong>{slackStatus.teamName}</strong>
+                            {slackStatus.installedAt && (
+                              <span className="text-muted">
+                                {' '}
+                                &middot; since{' '}
+                                {new Date(slackStatus.installedAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-muted">
+                            Connect your Slack workspace to audit decisions in real-time
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 600, marginBottom: '2px' }}>Slack</div>
-                      {slackLoading ? (
-                        <div className="text-xs text-muted">Checking connection...</div>
-                      ) : slackStatus?.connected ? (
-                        <div className="text-xs" style={{ color: 'var(--success)' }}>
-                          Connected to <strong>{slackStatus.teamName}</strong>
-                          {slackStatus.installedAt && (
-                            <span className="text-muted">
-                              {' '}
-                              &middot; since{' '}
-                              {new Date(slackStatus.installedAt).toLocaleDateString()}
-                            </span>
+                    <div className="flex items-center gap-sm">
+                      {slackStatus?.connected ? (
+                        <button
+                          onClick={handleSlackDisconnect}
+                          disabled={disconnecting}
+                          className="btn flex items-center gap-sm"
+                          style={{
+                            background: 'transparent',
+                            borderColor: 'var(--error)',
+                            color: 'var(--error)',
+                            fontSize: '13px',
+                          }}
+                        >
+                          {disconnecting ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Unplug size={14} />
                           )}
-                        </div>
+                          {disconnecting ? 'Disconnecting...' : 'Disconnect'}
+                        </button>
                       ) : (
-                        <div className="text-xs text-muted">
-                          Connect your Slack workspace to audit decisions in real-time
-                        </div>
+                        <a
+                          href="/api/integrations/slack/oauth"
+                          className="btn btn-primary flex items-center gap-sm"
+                          style={{ fontSize: '13px', textDecoration: 'none' }}
+                        >
+                          <ExternalLink size={14} />
+                          Add to Slack
+                        </a>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-sm">
-                    {slackStatus?.connected ? (
-                      <button
-                        onClick={handleSlackDisconnect}
-                        disabled={disconnecting}
-                        className="btn flex items-center gap-sm"
-                        style={{
-                          background: 'transparent',
-                          borderColor: 'var(--error)',
-                          color: 'var(--error)',
-                          fontSize: '13px',
-                        }}
+
+                  {slackStatus?.connected && slackStatus.scopes && (
+                    <div
+                      style={{
+                        marginTop: 'var(--spacing-md)',
+                        paddingTop: 'var(--spacing-md)',
+                        borderTop: '1px solid var(--liquid-border)',
+                      }}
+                    >
+                      <div
+                        className="text-xs text-muted"
+                        style={{ marginBottom: '6px', fontWeight: 600 }}
                       >
-                        {disconnecting ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Unplug size={14} />
-                        )}
-                        {disconnecting ? 'Disconnecting...' : 'Disconnect'}
-                      </button>
-                    ) : (
-                      <a
-                        href="/api/integrations/slack/oauth"
-                        className="btn btn-primary flex items-center gap-sm"
-                        style={{ fontSize: '13px', textDecoration: 'none' }}
-                      >
-                        <ExternalLink size={14} />
-                        Add to Slack
-                      </a>
-                    )}
-                  </div>
+                        Permissions granted
+                      </div>
+                      <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
+                        {slackStatus.scopes.map(scope => (
+                          <span
+                            key={scope}
+                            style={{
+                              fontSize: '11px',
+                              padding: '2px 8px',
+                              background: 'var(--bg-card-hover)',
+                              border: '1px solid var(--border-color)',
+                              borderRadius: '12px',
+                              color: 'var(--text-secondary)',
+                            }}
+                          >
+                            {scope}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {slackStatus?.connected && slackStatus.scopes && (
-                  <div
-                    style={{
-                      marginTop: 'var(--spacing-md)',
-                      paddingTop: 'var(--spacing-md)',
-                      borderTop: '1px solid var(--liquid-border)',
-                    }}
-                  >
-                    <div
-                      className="text-xs text-muted"
-                      style={{ marginBottom: '6px', fontWeight: 600 }}
-                    >
-                      Permissions granted
-                    </div>
-                    <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
-                      {slackStatus.scopes.map(scope => (
-                        <span
-                          key={scope}
-                          style={{
-                            fontSize: '11px',
-                            padding: '2px 8px',
-                            background: 'var(--bg-card-hover)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '12px',
-                            color: 'var(--text-secondary)',
-                          }}
-                        >
-                          {scope}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
+                  When connected, Decision Intel monitors decision-related messages in your channels
+                  and provides real-time cognitive bias nudges. All content is anonymized before
+                  analysis.
+                </p>
               </div>
+            </AccentCard>
 
-              <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
-                When connected, Decision Intel monitors decision-related messages in your channels
-                and provides real-time cognitive bias nudges. All content is anonymized before
-                analysis.
-              </p>
-            </div>
-          </div>
+            {/* API Keys */}
+            <ApiKeysSection />
 
-          {/* API Keys */}
-          <ApiKeysSection />
-
-          {/* Full integration marketplace (connect, disconnect, manage scopes) */}
-          <div className="mt-xl">
+            {/* Full integration marketplace (connect, disconnect, manage scopes) */}
             <IntegrationsTabContent />
           </div>
         </TabsContent>
