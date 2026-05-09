@@ -111,12 +111,15 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
     {
       ...SHARED_STOP_UPLOAD,
       icon: <Upload size={18} />,
-      title: 'Drop the IC memo, CIM, or model',
+      title: 'Drop the IC memo, CIM, or QofE',
       content: (
         <>
-          Upload the IC memo, CIM, or counsel review for a deal in flight. The audit catches the
-          biases that sink committee votes — anchoring on synergies, sunk-cost on a year-long
-          process, overconfidence on integration timelines.
+          Drop an IC memo, CIM, QofE, synergy model, integration plan, term sheet, or counsel
+          review for a deal in flight. The audit recognises nine M&A document types and fires the
+          named patterns that sink committee votes: <em>Synergy Mirage</em> (synergies without a
+          named mechanism, owner, or 90-day milestone), <em>Conglomerate Fallacy</em> (far-adjacency
+          with no &ldquo;why us as parent&rdquo; thesis), and <em>Winner&rsquo;s Curse</em>{' '}
+          (auction-dynamic anchoring above intrinsic value).
         </>
       ),
     },
@@ -135,12 +138,14 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
     {
       ...SHARED_STOP_ANALYTICS,
       icon: <GitCompare size={18} />,
-      title: 'Cross-document review + Decisions',
+      title: 'Cross-document review + Deal DQI',
       content: (
         <>
           When you upload more than one doc per deal, the cross-reference agent flags conflicts
           (&ldquo;CIM says 40% growth, model assumes 15%&rdquo;) and a composite Deal DQI lives on
-          the Deals page. Decision Packages do the same for non-deal decisions.
+          the Deals page. The IC Readiness Gate scores five gates (required docs, all analyzed,
+          DQI ≥ 55, cross-ref clean, IC date set) so you walk into committee knowing what&rsquo;s
+          shaky.
         </>
       ),
     },

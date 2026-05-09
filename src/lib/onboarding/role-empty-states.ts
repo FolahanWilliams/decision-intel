@@ -25,9 +25,9 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
         'Upload a board recommendation, market-entry memo, or quarterly review. The 60-second audit surfaces 30+ cognitive biases with traceable excerpts plus the questions a CEO or audit committee will surface — and produces a hashed, tamper-evident Decision Provenance Record on the way out.',
     },
     ma: {
-      title: 'Audit your first IC memo',
+      title: 'Audit your first IC memo or CIM',
       description:
-        'Upload an IC memo, CIM, model, or counsel review. The audit catches the biases that sink committee votes — anchoring on synergies, sunk-cost on a year-long process, planning fallacy on integration timelines.',
+        'Drop an IC memo, CIM, QofE, synergy model, integration plan, term sheet, or counsel review. The audit recognises nine M&A document types and fires the named patterns that sink committee votes — Synergy Mirage (synergies without mechanism, owner, or 90-day milestone), Conglomerate Fallacy (far-adjacency with no parenting thesis), Winner&rsquo;s Curse (auction-dynamic anchoring), Sunk Ship (deal-fever escalation), Yes Committee (rubber-stamp justification of a sponsor&rsquo;s pet acquisition).',
     },
     bizops: {
       title: 'Audit your first forecast or planning memo',
@@ -54,7 +54,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     ma: {
       title: 'No deals yet',
       description:
-        'Each deal is the atomic decision unit — CIM + model + counsel review + IC deck. Cross-doc cross-reference auto-fires when ≥2 docs are analyzed. Composite Deal DQI lives on the deal page.',
+        'Each deal is the atomic decision unit — CIM + QofE + synergy model + integration plan + counsel review + IC deck. Cross-doc cross-reference auto-fires when ≥2 docs are analyzed (CIM says 40% growth, model assumes 15%). Composite Deal DQI + the IC Readiness Gate (required docs, all analyzed, DQI ≥ 55, cross-ref clean, IC date set) live on the deal page so you walk into committee knowing what&rsquo;s shaky.',
     },
     bizops: {
       title: 'No deals yet',
@@ -81,7 +81,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     ma: {
       title: 'Your decision log is empty',
       description:
-        'Track every IC vote, deal pass, and pre-commitment review here. The log surfaces patterns across deals, including which biases tend to show up at IC.',
+        'Track every IC vote, deal pass, and pre-commitment review here. The log surfaces M&A failure patterns across deals — which named combinations recur at IC (Synergy Mirage on cross-sell theses, Winner&rsquo;s Curse on competitive processes, Conglomerate Fallacy on platform plays) — and feeds the calibration loop when you log realised IRR / MOIC outcomes 12-24 months after close.',
     },
     bizops: {
       title: 'Your decision log is empty',
@@ -108,7 +108,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     ma: {
       title: 'No analytics yet',
       description:
-        'Analytics aggregate DQI across deals, recurring biases at IC, and counterfactual scenarios. The Outcome Flywheel surfaces calibration — were the high-confidence decisions actually the better ones?',
+        'Analytics aggregate DQI across deals, the named M&A toxic combinations recurring at IC (Synergy Mirage / Winner&rsquo;s Curse / Conglomerate Fallacy / Sunk Ship / Yes Committee), and counterfactual ROI scenarios per deal. The Outcome Flywheel surfaces calibration once realised IRR / MOIC outcomes accumulate — were the high-confidence committee votes actually the better deals?',
     },
     bizops: {
       title: 'No analytics yet',
