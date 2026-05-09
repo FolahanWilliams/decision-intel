@@ -5,6 +5,7 @@ import { Brain, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useDecisionDNA } from '@/hooks/useDecisionDNA';
 import { SparklineChart } from '@/components/ui/SparklineChart';
 import { formatBiasName } from '@/lib/utils/labels';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 // Personal-calibration moat preview for the main dashboard. Three stats sourced
 // from /api/decision-dna: top-triggered bias (computed from biasTimeline by
@@ -159,49 +160,46 @@ export function DecisionDNAPreviewCard() {
   const { dna, isLoading, error } = useDecisionDNA();
 
   // Loading skeleton matches the populated 3-stat row footprint so first
-  // paint doesn't shift when SWR resolves.
+  // paint doesn't shift when SWR resolves. AccentCard with primary accent
+  // because Decision DNA is the proprietary calibration moat.
   if (isLoading) {
     return (
-      <div className="card" aria-label="Decision DNA loading">
-        <div className="card-body">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 'var(--spacing-md)',
-            }}
-          >
+      <AccentCard
+        accent="primary"
+        title={
+          <>
             <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-              Decision DNA
+            <span style={{ flex: 1 }}>Decision DNA</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+              loading…
             </span>
-          </div>
-          <div style={{ display: 'flex', gap: 24 }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{ flex: 1 }}>
-                <div
-                  style={{
-                    height: 11,
-                    width: 96,
-                    background: 'var(--bg-card-hover)',
-                    borderRadius: 4,
-                    marginBottom: 8,
-                  }}
-                />
-                <div
-                  style={{
-                    height: 24,
-                    width: 120,
-                    background: 'var(--bg-card-hover)',
-                    borderRadius: 4,
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          </>
+        }
+      >
+        <div style={{ display: 'flex', gap: 24 }} aria-label="Decision DNA loading">
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{ flex: 1 }}>
+              <div
+                style={{
+                  height: 11,
+                  width: 96,
+                  background: 'var(--bg-card-hover)',
+                  borderRadius: 4,
+                  marginBottom: 8,
+                }}
+              />
+              <div
+                style={{
+                  height: 24,
+                  width: 120,
+                  background: 'var(--bg-card-hover)',
+                  borderRadius: 4,
+                }}
+              />
+            </div>
+          ))}
         </div>
-      </div>
+      </AccentCard>
     );
   }
 
@@ -220,21 +218,15 @@ export function DecisionDNAPreviewCard() {
   // look-at-more-data CTA, not an action; "Run your first audit →" is.
   if (!hasAnyData) {
     return (
-      <div className="card">
-        <div className="card-body">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
-            }}
-          >
+      <AccentCard
+        accent="primary"
+        title={
+          <>
             <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-              Decision DNA
+            <span>Decision DNA</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+              · personal calibration
             </span>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
             <Link
               href="/dashboard/analytics?view=intelligence#dna"
               style={{
@@ -242,43 +234,45 @@ export function DecisionDNAPreviewCard() {
                 fontSize: 11,
                 color: 'var(--text-muted)',
                 textDecoration: 'none',
+                fontWeight: 500,
               }}
             >
               Preview empty surface →
             </Link>
-          </div>
-          <p
-            style={{
-              fontSize: 13,
-              color: 'var(--text-secondary)',
-              lineHeight: 1.5,
-              margin: '0 0 12px 0',
-            }}
-          >
-            The biases you trip most, the agents that help you most, the outcomes you log over time.
-            Recalibrated for you specifically — not a generic benchmark. Run a few audits and log
-            their outcomes to unlock yours.
-          </p>
-          <Link
-            href="/dashboard?view=upload"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12,
-              fontWeight: 600,
-              color: 'var(--accent-primary)',
-              textDecoration: 'none',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--accent-primary)',
-              background: 'rgba(22, 163, 74, 0.06)',
-            }}
-          >
-            Run your first audit <ArrowRight size={12} />
-          </Link>
-        </div>
-      </div>
+          </>
+        }
+      >
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+            margin: '0 0 12px 0',
+          }}
+        >
+          The biases you trip most, the agents that help you most, the outcomes you log over time.
+          Recalibrated for you specifically — not a generic benchmark. Run a few audits and log
+          their outcomes to unlock yours.
+        </p>
+        <Link
+          href="/dashboard?view=upload"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--accent-primary)',
+            textDecoration: 'none',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--accent-primary)',
+            background: 'rgba(22, 163, 74, 0.06)',
+          }}
+        >
+          Run your first audit <ArrowRight size={12} />
+        </Link>
+      </AccentCard>
     );
   }
 
@@ -310,21 +304,15 @@ export function DecisionDNAPreviewCard() {
   const sparklineColor = 'var(--text-muted)';
 
   return (
-    <div className="card">
-      <div className="card-body">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginBottom: 'var(--spacing-md)',
-          }}
-        >
+    <AccentCard
+      accent="primary"
+      title={
+        <>
           <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Decision DNA
+          <span>Decision DNA</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+            · personal calibration
           </span>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
           <Link
             href="/dashboard/analytics?view=intelligence#dna"
             style={{
@@ -340,83 +328,78 @@ export function DecisionDNAPreviewCard() {
           >
             Open your DNA <ArrowRight size={12} />
           </Link>
-        </div>
+        </>
+      }
+    >
+      <div
+        style={{
+          display: 'flex',
+          gap: 'var(--spacing-lg)',
+          flexWrap: 'wrap',
+        }}
+        className="dna-preview-stats"
+      >
+        <StatCell
+          label="Most-triggered bias"
+          value={topBias ? formatBiasName(topBias.biasType) : '—'}
+          sub={
+            topBias
+              ? `${topBias.total} instance${topBias.total === 1 ? '' : 's'} · click to study`
+              : 'No bias data yet'
+          }
+          unlocked={!!topBias}
+          href={
+            topBias ? `/dashboard/analytics?view=library#bias-card-${topBias.biasType}` : undefined
+          }
+          trailing={
+            topBias && topBias.monthlyCounts.some(c => c > 0) ? (
+              <SparklineChart
+                data={topBias.monthlyCounts}
+                color={sparklineColor}
+                width={56}
+                height={20}
+                strokeWidth={1.5}
+              />
+            ) : undefined
+          }
+        />
+        <StatCell
+          label="Belief delta"
+          value={
+            beliefDeltaUnlocked && style ? `${Math.round((style.avgBeliefDelta ?? 0) * 100)}%` : '—'
+          }
+          sub={
+            beliefDeltaUnlocked
+              ? 'how often you change your mind after analysis'
+              : `Unlocks at ${Math.max(0, 3 - sampleSize)} more outcome${sampleSize === 2 ? '' : 's'}`
+          }
+          unlocked={beliefDeltaUnlocked}
+        />
+        <StatCell
+          label="Follow-success rate"
+          value={
+            followRateUnlocked && style
+              ? `${Math.round((style.followAnalysisSuccessRate ?? 0) * 100)}%`
+              : '—'
+          }
+          sub={followRateUnlocked ? 'when you followed the audit' : 'Unlocks once you log outcomes'}
+          unlocked={followRateUnlocked}
+        />
+      </div>
+      {provenance && (
         <div
           style={{
-            display: 'flex',
-            gap: 'var(--spacing-lg)',
-            flexWrap: 'wrap',
+            marginTop: 'var(--spacing-md)',
+            paddingTop: 'var(--spacing-sm)',
+            borderTop: '1px solid var(--border-color)',
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            fontFamily: "'JetBrains Mono', monospace",
           }}
-          className="dna-preview-stats"
         >
-          <StatCell
-            label="Most-triggered bias"
-            value={topBias ? formatBiasName(topBias.biasType) : '—'}
-            sub={
-              topBias
-                ? `${topBias.total} instance${topBias.total === 1 ? '' : 's'} · click to study`
-                : 'No bias data yet'
-            }
-            unlocked={!!topBias}
-            href={
-              topBias
-                ? `/dashboard/analytics?view=library#bias-card-${topBias.biasType}`
-                : undefined
-            }
-            trailing={
-              topBias && topBias.monthlyCounts.some(c => c > 0) ? (
-                <SparklineChart
-                  data={topBias.monthlyCounts}
-                  color={sparklineColor}
-                  width={56}
-                  height={20}
-                  strokeWidth={1.5}
-                />
-              ) : undefined
-            }
-          />
-          <StatCell
-            label="Belief delta"
-            value={
-              beliefDeltaUnlocked && style
-                ? `${Math.round((style.avgBeliefDelta ?? 0) * 100)}%`
-                : '—'
-            }
-            sub={
-              beliefDeltaUnlocked
-                ? 'how often you change your mind after analysis'
-                : `Unlocks at ${Math.max(0, 3 - sampleSize)} more outcome${sampleSize === 2 ? '' : 's'}`
-            }
-            unlocked={beliefDeltaUnlocked}
-          />
-          <StatCell
-            label="Follow-success rate"
-            value={
-              followRateUnlocked && style
-                ? `${Math.round((style.followAnalysisSuccessRate ?? 0) * 100)}%`
-                : '—'
-            }
-            sub={
-              followRateUnlocked ? 'when you followed the audit' : 'Unlocks once you log outcomes'
-            }
-            unlocked={followRateUnlocked}
-          />
+          Calibrated on {provenance}
         </div>
-        {provenance && (
-          <div
-            style={{
-              marginTop: 'var(--spacing-md)',
-              paddingTop: 'var(--spacing-sm)',
-              borderTop: '1px solid var(--border-color)',
-              fontSize: 11,
-              color: 'var(--text-muted)',
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
-          >
-            Calibrated on {provenance}
-          </div>
-        )}
-      </div>
+      )}
       <style>{`
         @media (max-width: 700px) {
           .dna-preview-stats {
@@ -425,6 +408,6 @@ export function DecisionDNAPreviewCard() {
           }
         }
       `}</style>
-    </div>
+    </AccentCard>
   );
 }

@@ -1001,6 +1001,12 @@ export default function Dashboard() {
             visible: { transition: { staggerChildren: 0.08 } },
           }}
         >
+          {/* KPI grid — 4 cards. Each gets a 2px top accent stripe so
+              the eye reads semantic role at a glance (Phase F follow-up
+              2026-05-09 evening — solves the all-same-card flatness on
+              the dashboard hero). Avg Quality's accent dynamically
+              tracks the grade band so a returning CSO sees red instantly
+              when their average drops below D. */}
           {[
             {
               label: 'Total Documents',
@@ -1010,15 +1016,17 @@ export default function Dashboard() {
               iconBg: 'var(--bg-card-hover)',
               iconColor: 'var(--text-secondary)',
               sparkColor: 'var(--text-muted)',
+              accentColor: 'var(--accent-secondary, #6366f1)', // info / data
             },
             {
               label: 'Analyzed',
               value: uploadedDocs.filter(d => d.status === 'complete').length,
               numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
               icon: <CheckCircle size={18} />,
-              iconBg: 'var(--bg-card-hover)',
-              iconColor: 'var(--text-secondary)',
+              iconBg: 'rgba(22, 163, 74, 0.10)',
+              iconColor: 'var(--success)',
               sparkColor: 'var(--text-muted)',
+              accentColor: 'var(--success)', // completion / verified
             },
             {
               label: 'Avg Quality',
@@ -1030,16 +1038,28 @@ export default function Dashboard() {
               iconColor: 'var(--text-secondary)',
               sparkColor: 'var(--text-muted)',
               showSparkline: true,
+              // Dynamically grade-coded — A/B → green, C → amber, D/F → red
+              accentColor:
+                riskSummary.avg >= 70
+                  ? 'var(--success)'
+                  : riskSummary.avg >= 55
+                    ? 'var(--warning)'
+                    : riskSummary.avg >= 40
+                      ? 'var(--severity-high)'
+                      : riskSummary.avg > 0
+                        ? 'var(--severity-critical)'
+                        : 'var(--text-muted)',
             },
             {
               label: 'Decision IQ',
               value: -1, // Sentinel: replaced by custom component
               numericValue: -1,
               icon: <Brain size={18} />,
-              iconBg: 'var(--bg-card-hover)',
-              iconColor: 'var(--text-secondary)',
+              iconBg: 'rgba(22, 163, 74, 0.10)',
+              iconColor: 'var(--accent-primary)',
               sparkColor: 'var(--text-muted)',
               isCustom: true,
+              accentColor: 'var(--accent-primary)', // primary / proprietary metric
             },
           ].map(stat => {
             // Decision IQ uses its own self-contained component
@@ -1055,6 +1075,10 @@ export default function Dashboard() {
                   whileHover={{
                     y: -4,
                     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                  }}
+                  style={{
+                    borderTop: `2px solid ${stat.accentColor}`,
+                    borderRadius: 'var(--radius-lg)',
                   }}
                 >
                   <DecisionIQCard />
@@ -1075,6 +1099,7 @@ export default function Dashboard() {
                   y: -4,
                   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
                 }}
+                style={{ borderTop: `2px solid ${stat.accentColor}` }}
               >
                 <div
                   className="flex items-center justify-between"

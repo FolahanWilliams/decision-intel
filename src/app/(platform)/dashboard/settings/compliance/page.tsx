@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { AccentCard, type AccentColor } from '@/components/ui/AccentCard';
 
 // ─── Static compliance mapping: DI features → framework controls ────────────
 
@@ -331,19 +332,25 @@ function StatusBadge({ status }: { status: 'pass' | 'configured' | 'partial' }) 
   );
 }
 
+// Map cert status → AccentCard accent color. The certification status
+// is the load-bearing semantic on the Compliance page (a CISO needs to
+// see at a glance which frameworks are externally attested vs. internal
+// self-assessment) — colour-coding the top stripe makes it visible.
+function certStatusToAccent(status: CertificationStatus): AccentColor {
+  if (status === 'attested') return 'success';
+  if (status === 'targeted') return 'warning';
+  return 'info'; // self_assessed
+}
+
 function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
   const [expanded, setExpanded] = useState(false);
   const passCount = framework.controls.filter(c => c.status === 'pass').length;
   const coveragePercent = Math.round((passCount / framework.controls.length) * 100);
 
   return (
-    <div
-      style={{
-        borderRadius: 'var(--radius-xl, 16px)',
-        background: 'var(--bg-card, rgba(0,0,0,0.01))',
-        border: '1px solid var(--border-color, rgba(0,0,0,0.15))',
-        overflow: 'hidden',
-      }}
+    <AccentCard
+      accent={certStatusToAccent(framework.certificationStatus)}
+      bodyStyle={{ padding: 0 }}
     >
       {/* Header */}
       <button
@@ -483,7 +490,7 @@ function FrameworkCard({ framework }: { framework: FrameworkPosture }) {
           ))}
         </div>
       )}
-    </div>
+    </AccentCard>
   );
 }
 
