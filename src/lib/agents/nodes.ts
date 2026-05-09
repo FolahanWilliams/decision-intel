@@ -2490,3 +2490,61 @@ async function buildCausalIntelligenceReport(
     modelConfidence,
   };
 }
+
+// ============================================================================
+// Synergy Validation Node (Proposal 4 · M&A hard-layer ship 2026-05-09)
+// ============================================================================
+//
+// First-class deterministic pipeline node for synergy_model audits.
+// Reads state.parsedStructuredData (set at audit-start time from
+// Document.parsedStructuredData) and computes synergyDefensibility via
+// pure-function summarisation. No LLM call — runs in milliseconds.
+//
+// Architectural value-add over the prior text-extraction path:
+// (1) Deterministic — same input → same output, no LLM judgment in the
+//     hot path. Procurement-defensible: an auditor asking "how does the
+//     platform detect Synergy Mirage?" gets a code path that's reviewable
+//     line-by-line, not a prompt that's interpretation-dependent.
+// (2) First-class state — synergyDefensibility becomes a state field
+//     downstream nodes (metaJudge especially) can consume alongside
+//     their LLM signals. Future iterations can weight Synergy Mirage
+//     detection more heavily when the deterministic node flags critical
+//     claims.
+// (3) Pipeline observability — pattern detection happens in a NAMED
+//     PIPELINE NODE that shows up in the lineage on the DPR's pipeline
+//     manifest, not buried inside biasDetective LLM output.
+//
+// Skips silently when documentType !== 'synergy_model' OR
+// parsedStructuredData is null — returns no state mutation, downstream
+// consumers see synergyDefensibility: null.
+export async function synergyValidationNode(
+  state: AuditState
+): Promise<Partial<AuditState>> {
+  if (state.documentType !== 'synergy_model') {
+    return {};
+  }
+  if (!state.parsedStructuredData) {
+    log.debug('synergyValidationNode: no parsedStructuredData on state — skipping');
+    return {};
+  }
+  try {
+    const parserMod = await import('@/lib/parsers/synergy-model-parser');
+    type ParsedShape = Parameters<typeof parserMod.summariseSynergyDefensibility>[0];
+    const summary = parserMod.summariseSynergyDefensibility(
+      state.parsedStructuredData as ParsedShape
+    );
+    if (!summary) {
+      log.debug('synergyValidationNode: parsed structure has no synergy claims');
+      return {};
+    }
+    log.info(
+      `synergyValidationNode: ${summary.totalClaims} claims · fullyDefendedPct=${summary.fullyDefendedPct} · confidence=${summary.confidence}`
+    );
+    return {
+      synergyDefensibility: summary,
+    };
+  } catch (err) {
+    log.warn(`synergyValidationNode failed (non-fatal): ${String(err)}`);
+    return {};
+  }
+}

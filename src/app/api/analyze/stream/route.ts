@@ -71,6 +71,11 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
     label: 'Pattern Recognition',
     description: 'Identifying recognition cues from historical decisions using Klein RPD…',
   },
+  synergyValidationNode: {
+    label: 'Synergy Validation',
+    description:
+      'Deterministic per-claim synergy defensibility scoring (synergy_model documents only).',
+  },
   riskScorer: { label: 'Risk Scoring', description: 'Calculating final decision quality score…' },
 };
 
@@ -319,9 +324,17 @@ export async function POST(request: NextRequest) {
           let dealId = '';
           let dealType = '';
           let dealStage = '';
+          // parsedStructuredData read from Document at audit-start (locked
+          // 2026-05-09 hard-layer ship · Proposal 4). Pulled into the audit
+          // state so synergyValidationNode can compute deterministic
+          // defensibility without re-fetching from the DB. Null when the
+          // document type doesn't have a type-aware parser OR the column
+          // is missing (schema drift on legacy environments).
+          let parsedStructuredData: unknown | null = null;
           try {
             const docAny = doc as Record<string, unknown>;
             documentType = (docAny.documentType as string) || '';
+            parsedStructuredData = (docAny.parsedStructuredData as unknown) ?? null;
             dealId = (docAny.dealId as string) || '';
             if (dealId) {
               // Verify deal belongs to same org as the document
@@ -354,6 +367,7 @@ export async function POST(request: NextRequest) {
               dealId,
               dealType,
               dealStage,
+              parsedStructuredData,
             },
             { version: 'v2' }
           );

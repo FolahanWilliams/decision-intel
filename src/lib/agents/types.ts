@@ -30,6 +30,26 @@ export interface AuditState {
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing
   anonymizationStatus?: 'success' | 'failed';
 
+  /**
+   * Type-aware structured parser output (locked 2026-05-09 hard-layer
+   * ship · Proposal 1 + 4). Populated at audit-start time from
+   * Document.parsedStructuredData. Read by synergyValidationNode to
+   * compute deterministic synergy defensibility. The shape is
+   * ParsedSynergyModelData when documentType === 'synergy_model';
+   * future parsers (qofe, integration_plan) plug in their own kind-
+   * discriminated payloads.
+   */
+  parsedStructuredData?: unknown | null;
+
+  /**
+   * Deterministic synergy defensibility set by synergyValidationNode
+   * (locked 2026-05-09 hard-layer ship · Proposal 4). Pure-function
+   * pattern detection over parsedStructuredData — no LLM call. Carries
+   * SynergyDefensibilitySummary shape. Null when documentType !==
+   * 'synergy_model' OR parsedStructuredData absent.
+   */
+  synergyDefensibility?: unknown | null;
+
   // Internal Processing
   structuredContent?: string;
   speakers?: string[];

@@ -12,6 +12,7 @@ import {
   metaJudgeNode,
   rpdRecognitionNode,
   forgottenQuestionsNode,
+  synergyValidationNode,
 } from './nodes';
 import {
   AnalysisResult,
@@ -63,6 +64,30 @@ const GraphState = Annotation.Root({
   originalContent: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',
+  }),
+  /**
+   * Type-aware structured parser output (locked 2026-05-09 hard-layer
+   * ship · Proposal 1 + 4). Populated at audit-start time from
+   * Document.parsedStructuredData. Read by synergyValidationNode to
+   * compute the deterministic synergy defensibility summary; null when
+   * the document type doesn't have a type-aware parser or extraction
+   * bailed out.
+   */
+  parsedStructuredData: Annotation<unknown | null>({
+    reducer: (x, y) => y ?? x ?? null,
+    default: () => null,
+  }),
+  /**
+   * Deterministic synergy defensibility computed by synergyValidationNode
+   * (locked 2026-05-09 hard-layer ship · Proposal 4). Pure-function
+   * pattern detection over parsedStructuredData — no LLM call. Downstream
+   * nodes (metaJudge, biasDetective context) can read this for
+   * structured signal alongside their LLM judgment paths. Null when
+   * documentType !== 'synergy_model' OR parsedStructuredData absent.
+   */
+  synergyDefensibility: Annotation<unknown | null>({
+    reducer: (x, y) => y ?? x ?? null,
+    default: () => null,
   }),
   anonymizationStatus: Annotation<'success' | 'failed' | undefined>({
     reducer: (x, y) => y ?? x,
@@ -202,6 +227,16 @@ const workflow = new StateGraph(GraphState)
   .addNode('simulationNode', simulationNode) // decisionTwin + memoryRecall
   .addNode('rpdRecognitionNode', rpdRecognitionNode) // Klein RPD pattern recognition
   .addNode('forgottenQuestionsNode', forgottenQuestionsNode) // unknown-unknowns surface
+  // Synergy validation — pure-function, deterministic structural check
+  // (locked 2026-05-09 hard-layer ship · Proposal 4). Reads
+  // state.parsedStructuredData (set at audit-start time from
+  // Document.parsedStructuredData when documentType === 'synergy_model'),
+  // computes synergyDefensibility deterministically, writes to state.
+  // No LLM call — runs in parallel with the LLM-driven analysis nodes
+  // and finishes ~milliseconds. Downstream nodes can read state.
+  // synergyDefensibility for structured signal alongside their LLM
+  // judgment paths.
+  .addNode('synergyValidationNode', synergyValidationNode)
   .addNode('metaJudgeNode', metaJudgeNode) // debate orchestration
   .addNode('riskScorer', riskScorerNode)
 
@@ -217,7 +252,12 @@ const workflow = new StateGraph(GraphState)
   // structurer → intelligence gathering (extracts topics + assembles context)
   .addEdge('structurer', 'intelligenceGatherer')
 
-  // Fan-out: intelligenceGatherer → 7 parallel super-nodes (all receive context via state)
+  // Fan-out: intelligenceGatherer → 8 parallel super-nodes (all receive
+  // context via state). Bumped 7 → 8 with synergyValidationNode (locked
+  // 2026-05-09 hard-layer ship · Proposal 4). The new node is pure-
+  // function, milliseconds, no LLM call — adds no measurable latency
+  // and runs only meaningful work when documentType === 'synergy_model'
+  // and parsedStructuredData is populated.
   .addEdge('intelligenceGatherer', 'biasDetective')
   .addEdge('intelligenceGatherer', 'noiseJudge')
   .addEdge('intelligenceGatherer', 'verificationNode')
@@ -225,8 +265,9 @@ const workflow = new StateGraph(GraphState)
   .addEdge('intelligenceGatherer', 'simulationNode')
   .addEdge('intelligenceGatherer', 'rpdRecognitionNode')
   .addEdge('intelligenceGatherer', 'forgottenQuestionsNode')
+  .addEdge('intelligenceGatherer', 'synergyValidationNode')
 
-  // Fan-in: all 7 parallel super-nodes → metaJudgeNode
+  // Fan-in: all 8 parallel super-nodes → metaJudgeNode
   .addEdge('biasDetective', 'metaJudgeNode')
   .addEdge('noiseJudge', 'metaJudgeNode')
   .addEdge('verificationNode', 'metaJudgeNode')
@@ -234,6 +275,7 @@ const workflow = new StateGraph(GraphState)
   .addEdge('simulationNode', 'metaJudgeNode')
   .addEdge('rpdRecognitionNode', 'metaJudgeNode')
   .addEdge('forgottenQuestionsNode', 'metaJudgeNode')
+  .addEdge('synergyValidationNode', 'metaJudgeNode')
 
   // Meta Judge -> Final Risk Scorer
   .addEdge('metaJudgeNode', 'riskScorer')
