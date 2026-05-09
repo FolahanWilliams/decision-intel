@@ -217,10 +217,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       "I'm researching how mid-market deal teams audit IC packs pre-vote. Could I ask you about the last diligence process you ran?",
     discoveryQuestion:
       "In your last M&A diligence process, how did you formally document the deal team's dissenting views before the investment committee vote?",
-    painSignalCue: [
-      "We didn't really",
-      'Everyone just nodded along once the sponsor liked it',
-    ],
+    painSignalCue: ["We didn't really", 'Everyone just nodded along once the sponsor liked it'],
     bridgeSentence:
       'Because you mentioned the team acting like an echo chamber, we run reasoning audits on M&A diligence packs to formalize that dissent — the technical name is a reasoning layer, scored as a Decision Quality Index.',
     kbAnchor:
@@ -234,10 +231,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       "I'm researching how smaller-fund GPs document conviction for their LPs. Could I ask you about your last contrarian investment?",
     discoveryQuestion:
       'When you make a contrarian investment, how do you document your conviction so LPs see institutional rigor rather than just your gut feel?',
-    painSignalCue: [
-      'LPs are demanding more process',
-      "It's hard to put the narrative on paper",
-    ],
+    painSignalCue: ['LPs are demanding more process', "It's hard to put the narrative on paper"],
     bridgeSentence:
       'Because LPs are demanding that verifiable process to back up your intuition, we run reasoning audits on investment memos — the technical name is a reasoning layer, scored as a Decision Quality Index.',
     kbAnchor:
@@ -252,7 +246,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
     opener:
       "I'm researching how PE-backed CEOs prep board decks. Could I ask you about your last major strategic pivot — what the sponsor pushed back on?",
     discoveryQuestion:
-      'Think about your last major strategic pivot. What was the one underlying assumption the PE board tore apart that you didn\'t see coming?',
+      "Think about your last major strategic pivot. What was the one underlying assumption the PE board tore apart that you didn't see coming?",
     painSignalCue: ['Market sizing', 'We were too optimistic on the timeline'],
     bridgeSentence:
       'Since you mentioned the board tearing apart that timeline assumption, we run reasoning audits on board decks to catch those gaps first — the technical name is a reasoning layer, scored as a Decision Quality Index.',

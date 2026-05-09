@@ -1320,7 +1320,6 @@ function deriveSuppressedItems(biases: BiasInstance[], taxonomyIdByType: Record<
   }));
 }
 
-
 function deriveRegulatoryTriggers(
   compliance: ComplianceResult | undefined
 ): RegulatoryTabFrameworkTrigger[] {

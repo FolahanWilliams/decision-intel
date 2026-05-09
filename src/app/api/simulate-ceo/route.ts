@@ -137,9 +137,7 @@ on this memo. Bias your questions toward exposing the specific gaps these
 patterns name — the CEO is more likely to ask about a documented failure mode
 than a generic concern.
 
-${matchedPatterns
-  .map(p => `- ${p.label}: ${p.description}`)
-  .join('\n')}
+${matchedPatterns.map(p => `- ${p.label}: ${p.description}`).join('\n')}
 `
         : '';
 

@@ -52,7 +52,6 @@ function formatMoney(cents: number, currency = 'usd'): string {
   }).format(cents / 100);
 }
 
-
 const STATUS_TINT: Record<string, string> = {
   paid: '#16A34A',
   open: '#3b82f6',

@@ -1244,7 +1244,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
       "Dawes 1979 'The Robust Beauty of Improper Linear Models in Decision Making' (American Psychologist): a SIMPLE LINEAR COMBINATION of relevant features — each criterion weighted equally OR even with random coefficients — consistently outperforms expert intuition on prediction tasks. The expert's judgment adds NOISE, not signal. The structured rubric outperforms the structured rubric + expert override. Replicated across 50+ years on graduate-student selection, parole decisions, medical diagnoses, mental-health intake, financial planning. Actionable consequence for strategic memos: the most reliable memos are STRUCTURED — they identify decision criteria, weight them, and evaluate options against the criteria. The least reliable are NARRATIVE-ONLY — arguing for a foregone conclusion through narrative coherence (which DI-B-021 illusion_of_validity already flags). DI's Decision Rubric detector (paper-app #4, locked 2026-05-07) scans bias-detective excerpts for rubric markers (numbered criteria / weighted criteria / decision matrix / scored alternatives / multi-option comparison) AND for narrative-only signals via severity-weighted hits on coherence biases. Verdict bands: explicit_rubric (Dawes' robust pattern), partial_criteria, narrative_dominant (inside-view error pattern likely), narrative_only (canonical Dawes-failure pattern), cannot_assess. Pure function — no LLM call. Implementation: src/lib/learning/decision-rubric.ts.",
     difficulty: 'advanced',
     applicationContext:
-      "Auditing an IC memo that argues for one option through 5 pages of narrative without ever naming the criteria the alternatives would be scored against — Decision Rubric flags it as narrative_dominant.",
+      'Auditing an IC memo that argues for one option through 5 pages of narrative without ever naming the criteria the alternatives would be scored against — Decision Rubric flags it as narrative_dominant.',
     source: 'src/lib/learning/decision-rubric.ts + Dawes 1979 American Psychologist',
     tag: 'kahneman_klein',
   },
@@ -1265,7 +1265,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     id: 'bias_calibrated_rejection',
     deckId: 'cognitive_biases',
     prompt:
-      "What is the Calibrated Rejection detector (R²F paper-app #10), and what specific question does its verdict answer for a procurement reviewer?",
+      'What is the Calibrated Rejection detector (R²F paper-app #10), and what specific question does its verdict answer for a procurement reviewer?',
     canonicalAnswer:
       "Kahneman & Klein (2009) reached one of the most actionable conclusions in decision research: subjective confidence — how certain a decision-maker FEELS — is not a valid indicator of accuracy unless TWO conditions hold: (1) the environment is high-validity (Validity Classifier check, paper-app #2), AND (2) the decision-maker has had adequate feedback to learn the cue→outcome mapping (Feedback Adequacy check, paper-app #6). Both prior detectors are necessary but not sufficient on their own. The Calibrated Rejection detector (paper-app #10, locked 2026-05-07) closes the loop — it explicitly compares (a) the RHETORICAL CONFIDENCE the memo projects (proxied by bias-detective hits on illusion_of_validity / overconfidence / authority / anchoring) against (b) the EARNED CONFIDENCE the author has actually paid for (validity class × feedback adequacy). When the gap is material, the verdict surfaces a procurement-grade signal Margaret-class CSO names directly: 'does this memo's confidence match its evidence?' Verdict bands: well_calibrated (gap ≤ 0.20), mildly_overconfident (≤ 0.40), materially_overconfident (≤ 0.60 — fires the audit-committee-readiness flag), severely_overconfident (> 0.60), cannot_assess. Pure function — same input → same output, no LLM call. Implementation: src/lib/learning/calibrated-rejection.ts.",
     difficulty: 'advanced',
@@ -1313,7 +1313,7 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     applicationContext:
       "On a live competitive M&A diligence call: when the deal sponsor says 'we have to move on this — Apollo is in the data room' — flag the Winner's Curse pattern in the IC memo BEFORE the IC vote. The discipline question: 'what does this asset look like at our walk-away price, not the price needed to win?'",
     source:
-      'src/lib/learning/toxic-combinations.ts NAMED_PATTERNS + Capen, Clapp & Campbell (1971) original Winner\'s Curse paper + 143-case library WeWork / Quibi anchors',
+      "src/lib/learning/toxic-combinations.ts NAMED_PATTERNS + Capen, Clapp & Campbell (1971) original Winner's Curse paper + 143-case library WeWork / Quibi anchors",
     tag: 'mna_pattern',
   },
 ];

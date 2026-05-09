@@ -93,56 +93,54 @@ const ROLES: Array<{
  * VALUE_PROPS_BY_ROLE entry in the same commit; the type system
  * enforces this at compile time via the Record<Role, ...> shape.
  */
-const VALUE_PROPS_BY_ROLE: Record<
-  Role,
-  { eyebrow: string; headline: string; bullets: string[] }
-> = {
-  cso: {
-    eyebrow: 'For corporate strategy',
-    headline: "We audit the reasoning behind your committee's strategic memos.",
-    bullets: [
-      'Bias detection on board recommendations + market-entry memos in 60 seconds',
-      'Hashed, tamper-evident Decision Provenance Record for every audit',
-      'Predicted CEO + audit-committee questions before the room asks them',
-    ],
-  },
-  ma: {
-    eyebrow: 'For M&A and corp dev',
-    headline: 'Built for the M&A workflow — 9 document types, 5 toxic combinations.',
-    bullets: [
-      'Synergy Mirage detector (synergies without mechanism, owner, or 90-day milestone)',
-      "Conglomerate Fallacy + Winner's Curse on far-adjacency and auction-process deals",
-      'IC Readiness Gate scores 5 gates per deal so committee shows up green',
-    ],
-  },
-  bizops: {
-    eyebrow: 'For BizOps and FP&A',
-    headline: 'Audits the planning memos that drive quarterly forecasts.',
-    bullets: [
-      'Anchoring + overconfidence detection on forecasts and buy-vs-build memos',
-      'Outcome Flywheel surfaces calibration once realised quarterly outcomes accumulate',
-      'Decision Packages bundle related decisions for cross-document review',
-    ],
-  },
-  pe_vc: {
-    eyebrow: 'For PE / venture / fund',
-    headline: 'Audits IC memos against a 143-case M&A failure library.',
-    bullets: [
-      'Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting',
-      'Cross-fund DQI calibration once realised IRR / MOIC outcomes accumulate',
-      'LP-grade DPR mapped to NDPR / WAEMU / CMA Kenya for African-LP procurement',
-    ],
-  },
-  other: {
-    eyebrow: 'Get oriented',
-    headline: 'The reasoning audit platform — a 60-second take on any strategic memo.',
-    bullets: [
-      '22-bias taxonomy with academic citations',
-      'Decision Quality Index from A to F, with traceable component scores',
-      'Decision Knowledge Graph compounds quarter over quarter as outcomes accumulate',
-    ],
-  },
-};
+const VALUE_PROPS_BY_ROLE: Record<Role, { eyebrow: string; headline: string; bullets: string[] }> =
+  {
+    cso: {
+      eyebrow: 'For corporate strategy',
+      headline: "We audit the reasoning behind your committee's strategic memos.",
+      bullets: [
+        'Bias detection on board recommendations + market-entry memos in 60 seconds',
+        'Hashed, tamper-evident Decision Provenance Record for every audit',
+        'Predicted CEO + audit-committee questions before the room asks them',
+      ],
+    },
+    ma: {
+      eyebrow: 'For M&A and corp dev',
+      headline: 'Built for the M&A workflow — 9 document types, 5 toxic combinations.',
+      bullets: [
+        'Synergy Mirage detector (synergies without mechanism, owner, or 90-day milestone)',
+        "Conglomerate Fallacy + Winner's Curse on far-adjacency and auction-process deals",
+        'IC Readiness Gate scores 5 gates per deal so committee shows up green',
+      ],
+    },
+    bizops: {
+      eyebrow: 'For BizOps and FP&A',
+      headline: 'Audits the planning memos that drive quarterly forecasts.',
+      bullets: [
+        'Anchoring + overconfidence detection on forecasts and buy-vs-build memos',
+        'Outcome Flywheel surfaces calibration once realised quarterly outcomes accumulate',
+        'Decision Packages bundle related decisions for cross-document review',
+      ],
+    },
+    pe_vc: {
+      eyebrow: 'For PE / venture / fund',
+      headline: 'Audits IC memos against a 143-case M&A failure library.',
+      bullets: [
+        'Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting',
+        'Cross-fund DQI calibration once realised IRR / MOIC outcomes accumulate',
+        'LP-grade DPR mapped to NDPR / WAEMU / CMA Kenya for African-LP procurement',
+      ],
+    },
+    other: {
+      eyebrow: 'Get oriented',
+      headline: 'The reasoning audit platform — a 60-second take on any strategic memo.',
+      bullets: [
+        '22-bias taxonomy with academic citations',
+        'Decision Quality Index from A to F, with traceable component scores',
+        'Decision Knowledge Graph compounds quarter over quarter as outcomes accumulate',
+      ],
+    },
+  };
 
 export function WelcomeModal({ onClose }: WelcomeModalProps) {
   const router = useRouter();

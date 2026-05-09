@@ -189,9 +189,7 @@ function buildAuthorCalibrationCopy(
       ? ` · Brier ${fa.meanBrier.toFixed(2)}`
       : '';
   const domainFragment =
-    fa.domainMatchCount !== null && fa.domainHint
-      ? ` (${fa.domainMatchCount} in domain)`
-      : '';
+    fa.domainMatchCount !== null && fa.domainHint ? ` (${fa.domainMatchCount} in domain)` : '';
   const memoWord = fa.closedOutcomes === 1 ? 'memo' : 'memos';
   const label = `Author · ${fa.closedOutcomes} prior ${memoWord} closed${domainFragment}${brierFragment}`;
   const tooltipBase =

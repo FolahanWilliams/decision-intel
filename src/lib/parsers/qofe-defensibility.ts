@@ -97,11 +97,7 @@ const RULES: PhraseRule[] = [
   {
     id: 'recurring_one_time',
     label: 'Recurring "one-time" adjustments',
-    triggers: [
-      /\bone[\s-]?time\b/gi,
-      /\bnon[\s-]?recurring\b/gi,
-      /\bunusual\b/gi,
-    ],
+    triggers: [/\bone[\s-]?time\b/gi, /\bnon[\s-]?recurring\b/gi, /\bunusual\b/gi],
     // The flag fires when "one-time" / "non-recurring" language appears
     // alongside multi-year context — but heuristically we only require
     // multiple instances of the language since QofE that uses these terms

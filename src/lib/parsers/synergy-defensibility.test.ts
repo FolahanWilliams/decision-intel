@@ -5,10 +5,7 @@
  * to update the test expectations explicitly — no silent drift.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  scoreSynergyClaim,
-  aggregateDefensibility,
-} from './synergy-defensibility';
+import { scoreSynergyClaim, aggregateDefensibility } from './synergy-defensibility';
 
 describe('scoreSynergyClaim', () => {
   it('all-three-elements present → low severity, score 3', () => {
@@ -128,8 +125,18 @@ describe('aggregateDefensibility', () => {
 
   it('all critical → flags portfolio under-defence', () => {
     const claims = [
-      scoreSynergyClaim({ type: 'revenue', hasMechanism: false, hasOwner: false, hasMilestone: false }),
-      scoreSynergyClaim({ type: 'cost_opex', hasMechanism: false, hasOwner: false, hasMilestone: false }),
+      scoreSynergyClaim({
+        type: 'revenue',
+        hasMechanism: false,
+        hasOwner: false,
+        hasMilestone: false,
+      }),
+      scoreSynergyClaim({
+        type: 'cost_opex',
+        hasMechanism: false,
+        hasOwner: false,
+        hasMilestone: false,
+      }),
     ];
     const result = aggregateDefensibility(claims);
     expect(result.totalClaims).toBe(2);
@@ -140,8 +147,18 @@ describe('aggregateDefensibility', () => {
 
   it('all fully defended → 100% defended summary', () => {
     const claims = [
-      scoreSynergyClaim({ type: 'revenue', hasMechanism: true, hasOwner: true, hasMilestone: true }),
-      scoreSynergyClaim({ type: 'cost_cogs', hasMechanism: true, hasOwner: true, hasMilestone: true }),
+      scoreSynergyClaim({
+        type: 'revenue',
+        hasMechanism: true,
+        hasOwner: true,
+        hasMilestone: true,
+      }),
+      scoreSynergyClaim({
+        type: 'cost_cogs',
+        hasMechanism: true,
+        hasOwner: true,
+        hasMilestone: true,
+      }),
     ];
     const result = aggregateDefensibility(claims);
     expect(result.fullyDefendedPct).toBe(100);
@@ -151,10 +168,30 @@ describe('aggregateDefensibility', () => {
 
   it('mixed portfolio → reports per-severity counts', () => {
     const claims = [
-      scoreSynergyClaim({ type: 'revenue', hasMechanism: false, hasOwner: false, hasMilestone: false }), // critical
-      scoreSynergyClaim({ type: 'revenue', hasMechanism: true, hasOwner: false, hasMilestone: false }), // high
-      scoreSynergyClaim({ type: 'cost_cogs', hasMechanism: true, hasOwner: true, hasMilestone: false }), // medium
-      scoreSynergyClaim({ type: 'cost_cogs', hasMechanism: true, hasOwner: true, hasMilestone: true }), // low
+      scoreSynergyClaim({
+        type: 'revenue',
+        hasMechanism: false,
+        hasOwner: false,
+        hasMilestone: false,
+      }), // critical
+      scoreSynergyClaim({
+        type: 'revenue',
+        hasMechanism: true,
+        hasOwner: false,
+        hasMilestone: false,
+      }), // high
+      scoreSynergyClaim({
+        type: 'cost_cogs',
+        hasMechanism: true,
+        hasOwner: true,
+        hasMilestone: false,
+      }), // medium
+      scoreSynergyClaim({
+        type: 'cost_cogs',
+        hasMechanism: true,
+        hasOwner: true,
+        hasMilestone: true,
+      }), // low
     ];
     const result = aggregateDefensibility(claims);
     expect(result.totalClaims).toBe(4);

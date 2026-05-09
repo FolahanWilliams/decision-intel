@@ -116,7 +116,16 @@ const REVENUE_KEYWORDS = [
   'top line',
 ];
 
-const COGS_KEYWORDS = ['cogs', 'cost of goods', 'cost of revenue', 'manufacturing', 'procurement', 'supplier', 'sourcing', 'vendor consolidation'];
+const COGS_KEYWORDS = [
+  'cogs',
+  'cost of goods',
+  'cost of revenue',
+  'manufacturing',
+  'procurement',
+  'supplier',
+  'sourcing',
+  'vendor consolidation',
+];
 
 const OPEX_KEYWORDS = [
   'opex',
@@ -136,8 +145,24 @@ const OPEX_KEYWORDS = [
 
 const CAPEX_KEYWORDS = ['capex', 'capital expenditure', 'investment', 'capacity'];
 
-const OWNER_HEADER_KEYWORDS = ['owner', 'sponsor', 'lead', 'accountable', 'champion', 'responsible', 'raci'];
-const MECHANISM_HEADER_KEYWORDS = ['mechanism', 'how', 'driver', 'lever', 'initiative', 'action', 'method'];
+const OWNER_HEADER_KEYWORDS = [
+  'owner',
+  'sponsor',
+  'lead',
+  'accountable',
+  'champion',
+  'responsible',
+  'raci',
+];
+const MECHANISM_HEADER_KEYWORDS = [
+  'mechanism',
+  'how',
+  'driver',
+  'lever',
+  'initiative',
+  'action',
+  'method',
+];
 const MILESTONE_HEADER_KEYWORDS = [
   'milestone',
   'timeline',
@@ -402,9 +427,7 @@ export interface ParsedSynergyModelData {
  * returns null when the structure has zero claims so persistence
  * doesn't fill up with empty rows.
  */
-export function toParsedStructuredData(
-  structure: SynergyStructure
-): ParsedSynergyModelData | null {
+export function toParsedStructuredData(structure: SynergyStructure): ParsedSynergyModelData | null {
   if (!structure.detected || structure.claims.length === 0) return null;
   return {
     kind: 'synergy_model',
@@ -548,8 +571,7 @@ export function extractSynergyDefensibilityFromContent(
 
   const totalClaims = claims.length;
   const fullyDefended = claims.filter(c => c.score === 3).length;
-  const fullyDefendedPct =
-    totalClaims === 0 ? 0 : Math.round((fullyDefended / totalClaims) * 100);
+  const fullyDefendedPct = totalClaims === 0 ? 0 : Math.round((fullyDefended / totalClaims) * 100);
 
   // Sort by severity (critical first) for the top-5 DPR surface.
   const severityRank: Record<string, number> = {

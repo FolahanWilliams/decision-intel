@@ -626,7 +626,8 @@ export default function BiasGenomePage() {
                 reports, FDA actions, post-mortems, or academic case studies.
               </li>
               <li>
-                Biases are assigned per-case by applying the Decision Intel taxonomy ({TAXONOMY_RANGE}). Every named bias links to peer-reviewed academic sources at{' '}
+                Biases are assigned per-case by applying the Decision Intel taxonomy (
+                {TAXONOMY_RANGE}). Every named bias links to peer-reviewed academic sources at{' '}
                 <Link
                   href="/taxonomy"
                   style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}

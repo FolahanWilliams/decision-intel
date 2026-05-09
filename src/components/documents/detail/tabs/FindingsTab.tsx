@@ -516,11 +516,10 @@ function SynergyDefensibilityPanel({ summary }: { summary: FindingsTabSynergyDef
             borderRadius: 6,
           }}
         >
-          Per BCG / McKinsey integration-best-practices, every synergy claim should carry a
-          named operational mechanism, an accountable executive, and a measurable 90-day
-          milestone. Revenue synergies historically realise at 30-50% of projection; cost
-          synergies at 60-80%. Apply the appropriate base-rate discount to under-defended
-          claims before underwriting.
+          Per BCG / McKinsey integration-best-practices, every synergy claim should carry a named
+          operational mechanism, an accountable executive, and a measurable 90-day milestone.
+          Revenue synergies historically realise at 30-50% of projection; cost synergies at 60-80%.
+          Apply the appropriate base-rate discount to under-defended claims before underwriting.
         </div>
       </div>
 

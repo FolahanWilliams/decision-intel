@@ -5,7 +5,9 @@ describe('computeConviction', () => {
   it('returns neutral score (50) with all defaults', () => {
     const result = computeConviction({});
     expect(result.score).toBe(50);
-    expect(result.grade).toBe('C');
+    // Canonical grade scale (per CLAUDE.md GRADE_THRESHOLDS): A 85+ / B 70+ / C 55+ / D 40+ / F 0+.
+    // Score 50 sits in the D band (>= 40, < 55), not C.
+    expect(result.grade).toBe('D');
     expect(result.interpretation).toBeTruthy();
   });
 
@@ -61,6 +63,7 @@ describe('computeConviction', () => {
   });
 
   it('grade thresholds are correct', () => {
+    // Canonical GRADE_THRESHOLDS: A 85+ / B 70+ / C 55+ / D 40+ / F 0+.
     expect(
       computeConviction({
         factCheckScore: 100,
@@ -79,7 +82,8 @@ describe('computeConviction', () => {
         blindSpotGap: 70,
       }).grade
     ).toBe('B');
-    expect(computeConviction({}).grade).toBe('C');
+    // All-defaults conviction lands at score 50 → D band under canonical thresholds.
+    expect(computeConviction({}).grade).toBe('D');
   });
 
   it('high noise reduces judge agreement component', () => {

@@ -125,7 +125,9 @@ describe('scoreQofeAssessment', () => {
   });
 
   it('computes adjEbitdaInflationSignal as a 0-1 density signal', () => {
-    const heavyText = Array(20).fill('Adjusted EBITDA normalized EBITDA quality of earnings').join(' ');
+    const heavyText = Array(20)
+      .fill('Adjusted EBITDA normalized EBITDA quality of earnings')
+      .join(' ');
     const heavyResult = scoreQofeAssessment(heavyText);
     expect(heavyResult.adjEbitdaInflationSignal).toBeGreaterThan(0.5);
 
@@ -171,7 +173,10 @@ describe('scoreQofeAssessment', () => {
         text: 'one-time, non-recurring, unusual, one-time, non-recurring',
         expectId: 'recurring_one_time',
       },
-      { text: 'Owner salary added back. Related-party transactions.', expectId: 'owner_comp_full_add_back' },
+      {
+        text: 'Owner salary added back. Related-party transactions.',
+        expectId: 'owner_comp_full_add_back',
+      },
       {
         text: 'Pro-forma EBITDA on a run-rate annualized basis.',
         expectId: 'speculative_run_rate',

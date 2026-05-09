@@ -52,7 +52,6 @@ function formatDecisionType(type: string): string {
   return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-
 type FilterTab = 'all' | 'open' | 'closed' | 'archived';
 
 export function DecisionRoomsContent() {

@@ -1436,7 +1436,8 @@ const COMPOUND_PATTERNS: CompoundPattern[] = [
     label: 'The Golden Child',
     category: 'cross-domain',
     primaryBiases: 'Halo × Confirmation',
-    description: 'A favored initiative receives uncritical support; scrutiny reserved for alternatives.',
+    description:
+      'A favored initiative receives uncritical support; scrutiny reserved for alternatives.',
   },
   {
     label: 'The Doubling Down',

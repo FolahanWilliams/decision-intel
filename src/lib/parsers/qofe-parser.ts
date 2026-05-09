@@ -118,11 +118,12 @@ export function formatQofeAssessmentForAudit(parsed: ParsedQofeData): string {
     lines.push(`RED FLAGS DETECTED (${assessment.redFlags.length}):`);
     lines.push('');
     for (const flag of assessment.redFlags) {
-      lines.push(
-        `- [${flag.severity.toUpperCase()}] ${flag.label}: ${flag.verdict}`
-      );
+      lines.push(`- [${flag.severity.toUpperCase()}] ${flag.label}: ${flag.verdict}`);
       if (flag.matchedPhrases.length > 0) {
-        const samplePhrases = flag.matchedPhrases.slice(0, 3).map(p => `"${p}"`).join(', ');
+        const samplePhrases = flag.matchedPhrases
+          .slice(0, 3)
+          .map(p => `"${p}"`)
+          .join(', ');
         lines.push(`    Sample matches: ${samplePhrases}`);
       }
     }

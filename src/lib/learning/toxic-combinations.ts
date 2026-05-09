@@ -89,8 +89,8 @@ export interface DetectionResult {
 // import NAMED_PATTERNS without webpack pulling in @prisma/client (see
 // CLAUDE.md "M&A cascade-depth audit · phase 2" lock 2026-05-09).
 // Re-export here so existing import paths keep working.
-export { NAMED_PATTERNS, type NamedPattern } from "./named-patterns";
-import { NAMED_PATTERNS } from "./named-patterns";
+export { NAMED_PATTERNS, type NamedPattern } from './named-patterns';
+import { NAMED_PATTERNS } from './named-patterns';
 
 // ─── Core Detection ─────────────────────────────────────────────────────────
 

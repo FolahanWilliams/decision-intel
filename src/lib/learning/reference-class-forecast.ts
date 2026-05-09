@@ -192,8 +192,7 @@ function scoreCase(
   }
   // Combined: bias overlap (60%) + industry binary (25%) + stakes bonus (5%) +
   // toxic-combination overlap (up to 30% additive). Cap at 1.0.
-  const rawScore =
-    biasJaccard * 0.6 + industryMatch * 0.25 + stakesBonus + toxicComboOverlap;
+  const rawScore = biasJaccard * 0.6 + industryMatch * 0.25 + stakesBonus + toxicComboOverlap;
   const score = Math.min(1.0, rawScore);
   const reasonParts: string[] = [];
   if (matchedPatterns.length > 0) {

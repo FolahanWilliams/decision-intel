@@ -28,7 +28,6 @@ export interface CausalInsight {
   dataPoints: number;
 }
 
-
 function getCausalInsights(weights: CausalWeight[], totalOutcomes: number): CausalInsight[] {
   if (weights.length === 0 || totalOutcomes === 0) {
     return [

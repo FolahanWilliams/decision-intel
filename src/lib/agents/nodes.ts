@@ -2562,9 +2562,7 @@ async function buildCausalIntelligenceReport(
 // Skips silently when documentType !== 'synergy_model' OR
 // parsedStructuredData is null — returns no state mutation, downstream
 // consumers see synergyDefensibility: null.
-export async function synergyValidationNode(
-  state: AuditState
-): Promise<Partial<AuditState>> {
+export async function synergyValidationNode(state: AuditState): Promise<Partial<AuditState>> {
   if (state.documentType !== 'synergy_model') {
     return {};
   }

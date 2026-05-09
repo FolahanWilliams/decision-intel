@@ -39,7 +39,6 @@ interface BiasInput {
   id?: string;
 }
 
-
 function buildKeywords(type: string): string[] {
   return type.replace(/_bias$/, '').split('_');
 }

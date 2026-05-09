@@ -161,9 +161,9 @@ export function ToxicCombinationTrendingCard({ orgId }: Props) {
               lineHeight: 1.55,
             }}
           >
-            No toxic combinations fired in the last 90 days. Either the deal flow has been
-            clean or the team has been auditing decisions before they ship — check back
-            after the next IC cycle.
+            No toxic combinations fired in the last 90 days. Either the deal flow has been clean or
+            the team has been auditing decisions before they ship — check back after the next IC
+            cycle.
           </div>
         ) : (
           <ul
@@ -244,9 +244,7 @@ export function ToxicCombinationTrendingCard({ orgId }: Props) {
                       <span style={{ fontSize: 14, fontWeight: 800, color: severity.color }}>
                         {p.count}
                       </span>
-                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-                        fired
-                      </span>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>fired</span>
                     </div>
                   </div>
                   {partners && (
@@ -284,9 +282,7 @@ export function ToxicCombinationTrendingCard({ orgId }: Props) {
                     <span>·</span>
                     <span>peak {p.maxToxicScore.toFixed(0)}</span>
                     <span>·</span>
-                    <span style={{ color: severity.color, fontWeight: 700 }}>
-                      {severity.band}
-                    </span>
+                    <span style={{ color: severity.color, fontWeight: 700 }}>{severity.band}</span>
                   </div>
                 </li>
               );
@@ -304,12 +300,14 @@ export function ToxicCombinationTrendingCard({ orgId }: Props) {
             gap: 8,
           }}
         >
-          <AlertTriangle size={12} style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 1 }} />
+          <AlertTriangle
+            size={12}
+            style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 1 }}
+          />
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            Patterns are named compound failure modes — when two specific biases co-occur
-            with required context, the combination historically destroys more value than
-            either bias alone. Open any audit&rsquo;s toxic-combinations panel for per-deal
-            evidence.
+            Patterns are named compound failure modes — when two specific biases co-occur with
+            required context, the combination historically destroys more value than either bias
+            alone. Open any audit&rsquo;s toxic-combinations panel for per-deal evidence.
           </div>
         </div>
       </div>

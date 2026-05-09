@@ -447,7 +447,10 @@ export function HowItWorksClient() {
             }}
           >
             <StatPill value="30+" label="cognitive biases" />
-            <StatPill value={String(BIAS_COUNT)} label={`general (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`} />
+            <StatPill
+              value={String(BIAS_COUNT)}
+              label={`general (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`}
+            />
             <StatPill value="11" label="strategy-specific" />
             <StatPill value="0" label="detections without an excerpt" />
           </div>
@@ -1342,7 +1345,15 @@ function DealStageCard({
         minWidth: 0,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: 8,
+          marginBottom: 8,
+        }}
+      >
         <span
           style={{
             fontSize: 11,

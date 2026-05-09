@@ -490,8 +490,7 @@ function scoreEvidenceQuality(factCheck: DQIInput['factCheck']): DQIComponent {
       });
     }
     if (factCheck.contradictedClaims > 0) {
-      const contradictionImpact =
-        -(factCheck.contradictedClaims / factCheck.totalClaims) * 40;
+      const contradictionImpact = -(factCheck.contradictedClaims / factCheck.totalClaims) * 40;
       breakdownItems.push({
         label: `${factCheck.contradictedClaims} claim(s) contradicted by external sources`,
         impact: Math.round(contradictionImpact * 10) / 10,
@@ -590,7 +589,7 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
       impact: process.dissentPresent ? 20 : 0,
       evidence: process.dissentPresent
         ? 'Someone formally argued against the recommendation. This is the strongest single decision-hygiene signal.'
-        : 'Either nobody disagreed, or disagreements weren\'t recorded. Best practice: capture at least one written counter-argument before the IC vote.',
+        : "Either nobody disagreed, or disagreements weren't recorded. Best practice: capture at least one written counter-argument before the IC vote.",
     },
     {
       label: process.priorSubmitted
@@ -599,16 +598,14 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
       impact: process.priorSubmitted ? 15 : 0,
       evidence: process.priorSubmitted
         ? 'You wrote down what you expected before the analysis. This protects against hindsight bias when reviewing outcomes.'
-        : 'Without a prior, there\'s no honest way to tell later whether the decision was right or whether you reframed the success criteria.',
+        : "Without a prior, there's no honest way to tell later whether the decision was right or whether you reframed the success criteria.",
     },
     {
-      label: process.outcomeTracked
-        ? 'Outcome tracking enabled'
-        : 'Outcome not yet tracked',
+      label: process.outcomeTracked ? 'Outcome tracking enabled' : 'Outcome not yet tracked',
       impact: process.outcomeTracked ? 15 : 0,
       evidence: process.outcomeTracked
-        ? 'You\'re committed to revisiting this decision when the outcome lands. The audit becomes calibration data over time.'
-        : 'Without outcome tracking, this audit doesn\'t feed the calibration loop. Best practice: log expected outcome + check-in date.',
+        ? "You're committed to revisiting this decision when the outcome lands. The audit becomes calibration data over time."
+        : "Without outcome tracking, this audit doesn't feed the calibration loop. Best practice: log expected outcome + check-in date.",
     },
     {
       label:
@@ -633,8 +630,7 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
           : process.documentLength >= 500
             ? `Moderate-length memo (${process.documentLength.toLocaleString()} words)`
             : `Short memo (${process.documentLength.toLocaleString()} words)`,
-      impact:
-        process.documentLength >= 1000 ? 10 : process.documentLength >= 500 ? 5 : 0,
+      impact: process.documentLength >= 1000 ? 10 : process.documentLength >= 500 ? 5 : 0,
       evidence:
         process.documentLength < 500
           ? 'Strategic decisions of this magnitude typically warrant 1,000+ words of analysis. Short memos correlate with under-thought decisions.'
@@ -656,7 +652,7 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
         label: 'Deliberative reasoning detected (System 2 dominant)',
         impact: 5,
         evidence:
-          'The biases flagged are mostly slow-thinking patterns (overconfidence, planning fallacy). The memo reads as deliberative — you\'re thinking carefully, just optimistically.',
+          "The biases flagged are mostly slow-thinking patterns (overconfidence, planning fallacy). The memo reads as deliberative — you're thinking carefully, just optimistically.",
       });
     }
   }
@@ -700,7 +696,7 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
       label: 'No regulatory frameworks were assessed',
       impact: 0,
       evidence:
-        'Either the document type didn\'t trigger compliance review, or the audit didn\'t reach the regulatory node. Re-run the audit if you expected framework coverage.',
+        "Either the document type didn't trigger compliance review, or the audit didn't reach the regulatory node. Re-run the audit if you expected framework coverage.",
     });
   } else {
     breakdownItems.push({
@@ -721,7 +717,7 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
         label: 'No regulatory violations flagged',
         impact: 10,
         evidence:
-          'The audit didn\'t find any pattern matching the regulatory provisions in scope. This is a clean signal — but the GC review is still the final word.',
+          "The audit didn't find any pattern matching the regulatory provisions in scope. This is a clean signal — but the GC review is still the final word.",
       });
     }
   }
@@ -765,7 +761,7 @@ function scoreHistoricalAlignment(
             label: 'No biases detected — historical pattern match skipped',
             impact: 0,
             evidence:
-              'When no biases are flagged, there\'s nothing to match against the 143-case library. This usually means the memo was very brief or the audit didn\'t reach the bias-detection node.',
+              "When no biases are flagged, there's nothing to match against the 143-case library. This usually means the memo was very brief or the audit didn't reach the bias-detection node.",
           },
         ],
       };
@@ -822,7 +818,7 @@ function scoreHistoricalAlignment(
       label: 'No strong matches against the historical case library',
       impact: 0,
       evidence:
-        'Your decision pattern doesn\'t closely resemble any of the 143 documented strategic decisions in our reference library. This is neutral — could mean novel decision OR insufficient pattern data on this specific shape.',
+        "Your decision pattern doesn't closely resemble any of the 143 documented strategic decisions in our reference library. This is neutral — could mean novel decision OR insufficient pattern data on this specific shape.",
     });
   } else {
     if (alignment.matchedFailurePatterns > 0) {
@@ -830,7 +826,7 @@ function scoreHistoricalAlignment(
         label: `Matches ${alignment.matchedFailurePatterns} historical failure pattern(s)`,
         impact: -(alignment.matchedFailurePatterns * 8),
         evidence:
-          'Your bias profile resembles deals that didn\'t work out. Cross-reference these in /bias-genome to see which specific cases match — typically the same patterns that sank WeWork, AOL-Time Warner, or HP-Autonomy.',
+          "Your bias profile resembles deals that didn't work out. Cross-reference these in /bias-genome to see which specific cases match — typically the same patterns that sank WeWork, AOL-Time Warner, or HP-Autonomy.",
       });
     }
     if (alignment.matchedSuccessPatterns > 0) {
@@ -838,7 +834,7 @@ function scoreHistoricalAlignment(
         label: `Matches ${alignment.matchedSuccessPatterns} historical success pattern(s)`,
         impact: alignment.matchedSuccessPatterns * 10,
         evidence:
-          'Your bias profile resembles deals that DID work out. The historical match is positive evidence — but doesn\'t guarantee outcome; pair with the failure-pattern flags above for a balanced read.',
+          "Your bias profile resembles deals that DID work out. The historical match is positive evidence — but doesn't guarantee outcome; pair with the failure-pattern flags above for a balanced read.",
       });
     }
     if (alignment.correlationMultiplier > 1.0) {
@@ -854,7 +850,7 @@ function scoreHistoricalAlignment(
         label: 'Beneficial-pattern damping active',
         impact: Math.round((1.0 - alignment.beneficialDamping) * 20 * 10) / 10,
         evidence:
-          'The audit detected that some flagged biases are happening in a context where they typically don\'t cause harm (e.g., overconfidence on a clearly-priced asset). The damping lowers the compound risk accordingly.',
+          "The audit detected that some flagged biases are happening in a context where they typically don't cause harm (e.g., overconfidence on a clearly-priced asset). The damping lowers the compound risk accordingly.",
       });
     }
   }
@@ -889,9 +885,7 @@ function scoreHistoricalAlignment(
  * intentional — directly visible in the DQI score but not so
  * dominant that it overrides the bias-load + evidence-quality components.
  */
-function scoreCompoundRisk(
-  patterns: DQIInput['compoundPatterns']
-): DQIComponent {
+function scoreCompoundRisk(patterns: DQIInput['compoundPatterns']): DQIComponent {
   // No patterns supplied (legacy audits, audits without toxic-combo
   // detection) → perfect 100, neutral contribution. The methodology
   // version stamp (METHODOLOGY_VERSION_LEGACY) tells the reader.
@@ -1091,7 +1085,8 @@ export function computeSyntheticDQI(c: CaseStudy): number {
   // live methodology 2.2.0). historicalAlignment excluded (can't
   // recurse); five remaining weights renormalised to sum to 1.0.
   const W = SYNTHETIC_WEIGHTS_LEGACY_2_0_0;
-  const denom = W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
+  const denom =
+    W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
   const syntheticDQI =
     (biasScore * W.biasLoad +
       noiseScore * W.noiseLevel +

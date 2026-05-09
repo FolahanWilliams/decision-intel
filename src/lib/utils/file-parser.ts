@@ -290,8 +290,7 @@ export async function extractTypeAwareStructuredData(
 
   const lowerFilename = filename.toLowerCase();
   const isXlsx =
-    mimeType ===
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
     lowerFilename.endsWith('.xlsx');
   const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
 

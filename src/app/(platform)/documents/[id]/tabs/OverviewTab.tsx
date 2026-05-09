@@ -241,11 +241,7 @@ export function OverviewTab({
               </div>
             </div>
           </button>
-          <DqiBreakdownPanel
-            dqi={dqiData}
-            open={dqiPanelOpen}
-            onOpenChange={setDqiPanelOpen}
-          />
+          <DqiBreakdownPanel dqi={dqiData} open={dqiPanelOpen} onOpenChange={setDqiPanelOpen} />
         </ErrorBoundary>
       )}
 

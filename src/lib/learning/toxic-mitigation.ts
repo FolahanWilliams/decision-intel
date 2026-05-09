@@ -523,7 +523,7 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
       {
         title: 'Pre-commit to a walk-away ceiling in writing',
         description:
-          'Before the auction process starts, the IC commits to a maximum bid in writing. The deal team cannot exceed it without a fresh IC vote. This is the only structural defence against Winner\'s Curse — the discipline of writing the ceiling down BEFORE the process anchors the bid upward.',
+          "Before the auction process starts, the IC commits to a maximum bid in writing. The deal team cannot exceed it without a fresh IC vote. This is the only structural defence against Winner's Curse — the discipline of writing the ceiling down BEFORE the process anchors the bid upward.",
         owner: 'team_lead',
         timing: 'immediate',
         priority: 'critical',

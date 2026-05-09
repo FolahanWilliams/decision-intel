@@ -424,7 +424,6 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
   );
 }
 
-
 function ZoneBand({
   x,
   w,

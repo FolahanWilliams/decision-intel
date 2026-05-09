@@ -192,10 +192,7 @@ export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesA
   // patternLabel; aggregate documentCount + topSeverity + maxToxicScore
   // per pattern. Requires ToxicCombination.severity column populated
   // (Proposal 5 ship); falls back to score-derived severity when null.
-  const patternMap = new Map<
-    string,
-    { docs: Set<string>; maxSev: number; maxScore: number }
-  >();
+  const patternMap = new Map<string, { docs: Set<string>; maxSev: number; maxScore: number }>();
   for (const analysis of latestAnalyses) {
     if (!analysis.toxicCombinations) continue;
     for (const tc of analysis.toxicCombinations) {

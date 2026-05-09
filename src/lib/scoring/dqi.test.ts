@@ -631,7 +631,12 @@ describe('computeDQI · breakdownItems explainability', () => {
     const result = computeDQI({
       ...makeInput(),
       biases: [
-        { type: 'anchoring_bias', severity: 'critical', confidence: 0.9, excerpt: 'we anchored to $100M' },
+        {
+          type: 'anchoring_bias',
+          severity: 'critical',
+          confidence: 0.9,
+          excerpt: 'we anchored to $100M',
+        },
         { type: 'planning_fallacy', severity: 'high', confidence: 0.8 },
       ],
     });
@@ -742,9 +747,7 @@ describe('computeDQI · breakdownItems explainability', () => {
     const result = computeDQI({
       ...makeInput(),
       biases: [{ type: 'anchoring_bias', severity: 'medium', confidence: 0.6 }],
-      compoundPatterns: [
-        { patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 },
-      ],
+      compoundPatterns: [{ patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 }],
     });
     expect(result.components.biasLoad.breakdownItems).toBeDefined();
     expect(result.components.noiseLevel.breakdownItems).toBeDefined();
@@ -759,7 +762,9 @@ describe('computeDQI · breakdownItems explainability', () => {
     const result = computeDQI({
       ...makeInput(),
       biases: [{ type: 'sunk_cost_fallacy', severity: 'high', confidence: 0.8 }],
-      compoundPatterns: [{ patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 }],
+      compoundPatterns: [
+        { patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 },
+      ],
     });
     const allLabels = [
       ...(result.components.biasLoad.breakdownItems ?? []),

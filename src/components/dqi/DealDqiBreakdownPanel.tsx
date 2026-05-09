@@ -154,7 +154,9 @@ export function DealDqiBreakdownPanel({
           </DialogHeader>
         </div>
 
-        <div style={{ padding: '24px 28px 28px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+        <div
+          style={{ padding: '24px 28px 28px', display: 'flex', flexDirection: 'column', gap: 28 }}
+        >
           {/* SECTION 1 — Per-document rows. The composite is the average of these. */}
           <Section
             eyebrow="Where the composite came from"

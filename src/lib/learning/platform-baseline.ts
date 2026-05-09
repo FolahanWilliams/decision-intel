@@ -183,7 +183,8 @@ export function computeBrierFairPredictedDqi(c: CaseStudy): number {
   // they were computed under. Renormalise to sum to 1.0 over the 5
   // dimensions present in the synthetic.
   const W = SYNTHETIC_WEIGHTS_LEGACY_2_0_0;
-  const denom = W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
+  const denom =
+    W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
 
   const predictedDqi =
     (biasScore * W.biasLoad +

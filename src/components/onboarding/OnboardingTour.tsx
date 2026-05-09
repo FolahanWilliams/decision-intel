@@ -128,11 +128,11 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       title: 'Drop the IC memo, CIM, or QofE',
       content: (
         <>
-          Drop an IC memo, CIM, QofE, synergy model, integration plan, term sheet, or counsel
-          review for a deal in flight. The audit recognises nine M&A document types and fires the
-          named patterns that sink committee votes: <em>Synergy Mirage</em> (synergies without a
-          named mechanism, owner, or 90-day milestone), <em>Conglomerate Fallacy</em> (far-adjacency
-          with no &ldquo;why us as parent&rdquo; thesis), and <em>Winner&rsquo;s Curse</em>{' '}
+          Drop an IC memo, CIM, QofE, synergy model, integration plan, term sheet, or counsel review
+          for a deal in flight. The audit recognises nine M&A document types and fires the named
+          patterns that sink committee votes: <em>Synergy Mirage</em> (synergies without a named
+          mechanism, owner, or 90-day milestone), <em>Conglomerate Fallacy</em> (far-adjacency with
+          no &ldquo;why us as parent&rdquo; thesis), and <em>Winner&rsquo;s Curse</em>{' '}
           (auction-dynamic anchoring above intrinsic value).
         </>
       ),
@@ -143,11 +143,10 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       title: 'Each Project is the atomic decision unit',
       content: (
         <>
-          A deal is the unit of work: CIM + QofE + synergy model + integration plan + counsel
-          review + IC deck. Composite Deal DQI lives on the Project page along with the IC
-          Readiness Gate (required docs, all analyzed, DQI ≥ 55, cross-ref clean, IC date set).
-          Walk into committee with the Gate showing green, not with a stack of separately-audited
-          PDFs.
+          A deal is the unit of work: CIM + QofE + synergy model + integration plan + counsel review
+          + IC deck. Composite Deal DQI lives on the Project page along with the IC Readiness Gate
+          (required docs, all analyzed, DQI ≥ 55, cross-ref clean, IC date set). Walk into committee
+          with the Gate showing green, not with a stack of separately-audited PDFs.
         </>
       ),
     },

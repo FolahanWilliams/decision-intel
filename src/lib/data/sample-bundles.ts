@@ -522,12 +522,7 @@ const MA_PROJECT_MARLIN: SampleBundle = {
     'Distribution platform acquiring a content portfolio with $180M run-rate cross-promotion synergies — see what the audit catches in the synergy model.',
   hookCopy:
     'The classic content-distribution synergy thesis. Paste it and watch the Synergy Mirage detector fire on the unbacked claims.',
-  expectedBiases: [
-    'overconfidence_bias',
-    'planning_fallacy',
-    'halo_effect',
-    'confirmation_bias',
-  ],
+  expectedBiases: ['overconfidence_bias', 'planning_fallacy', 'halo_effect', 'confirmation_bias'],
   expectedDqi: 48,
   content: `# Project Marlin — Investment Committee Memo
 
@@ -667,15 +662,10 @@ const MA_PROJECT_APEX: SampleBundle = {
   role: 'ma',
   title: 'Project Apex — competitive-process IC memo',
   summary:
-    'Auction-process IC memo with strategic-necessity language and a bid 23% above prior-round valuation — fires the Winner\'s Curse detector on the deal-fever signal.',
+    "Auction-process IC memo with strategic-necessity language and a bid 23% above prior-round valuation — fires the Winner's Curse detector on the deal-fever signal.",
   hookCopy:
     'Auction-process language at the IC stage. Paste it and watch the audit surface the deal-fever pattern beneath the strategic rationale.',
-  expectedBiases: [
-    'anchoring_bias',
-    'overconfidence_bias',
-    'authority_bias',
-    'sunk_cost_fallacy',
-  ],
+  expectedBiases: ['anchoring_bias', 'overconfidence_bias', 'authority_bias', 'sunk_cost_fallacy'],
   expectedDqi: 46,
   content: `# Project Apex — Final Investment Committee Memo
 

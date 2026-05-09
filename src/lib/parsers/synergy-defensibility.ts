@@ -31,12 +31,7 @@
  *     a new state field on the audit graph)
  */
 
-export type SynergyClaimType =
-  | 'revenue'
-  | 'cost_cogs'
-  | 'cost_opex'
-  | 'capex'
-  | 'unknown';
+export type SynergyClaimType = 'revenue' | 'cost_cogs' | 'cost_opex' | 'capex' | 'unknown';
 
 export interface SynergyClaimInput {
   /** Whether the claim row carries an explicit operational-mechanism description. */
@@ -149,8 +144,7 @@ export function aggregateDefensibility(
   for (const s of scores) severityCounts[s.severity] += 1;
 
   const fullyDefended = severityCounts.low;
-  const fullyDefendedPct =
-    totalClaims === 0 ? 0 : Math.round((fullyDefended / totalClaims) * 100);
+  const fullyDefendedPct = totalClaims === 0 ? 0 : Math.round((fullyDefended / totalClaims) * 100);
 
   const criticalAndHigh = severityCounts.critical + severityCounts.high;
   let summary: string;

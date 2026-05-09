@@ -94,7 +94,6 @@ const SEV_META: Record<string, { bg: string; fg: string; border: string; label: 
   low: { bg: '#F1F5F9', fg: '#475569', border: '#E2E8F0', label: 'Low' },
 };
 
-
 function extractPreviewText(data: unknown, maxLength = 200): string {
   if (!data) return '';
   if (typeof data === 'string') return data.slice(0, maxLength);

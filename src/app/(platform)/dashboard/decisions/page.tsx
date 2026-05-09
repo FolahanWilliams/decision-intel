@@ -21,7 +21,6 @@ const STATUS_TINT: Record<string, string> = {
   superseded: '#94a3b8',
 };
 
-
 function dqiTint(score: number | null): string {
   if (score == null) return 'var(--text-muted)';
   if (score >= 85) return 'var(--success, #10b981)';

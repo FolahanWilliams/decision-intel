@@ -49,7 +49,6 @@ interface DealCounterfactualResponse {
   dataAsOf: string;
 }
 
-
 function currencySymbol(c: string): string {
   if (c === 'GBP') return '£';
   if (c === 'EUR') return '€';

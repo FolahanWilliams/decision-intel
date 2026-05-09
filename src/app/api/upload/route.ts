@@ -247,9 +247,7 @@ export async function POST(request: NextRequest) {
     // Document.parsedStructuredData below. Null when no structured parser
     // matches the documentType OR extraction bailed — downstream consumers
     // fall back to the legacy text-content extraction path.
-    let parsedStructuredData: Awaited<
-      ReturnType<typeof extractTypeAwareStructuredData>
-    > = null;
+    let parsedStructuredData: Awaited<ReturnType<typeof extractTypeAwareStructuredData>> = null;
 
     try {
       // Pass documentType to enable synergy_model spreadsheet enrichment

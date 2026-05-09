@@ -112,7 +112,6 @@ function colorMix(varOrHex: string, alpha: string): string {
   return `color-mix(in srgb, ${varOrHex} ${alpha}, transparent)`;
 }
 
-
 export default async function CognitiveAuditDetailPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();

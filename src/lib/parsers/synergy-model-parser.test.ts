@@ -7,10 +7,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import ExcelJS from 'exceljs';
-import {
-  extractSynergyStructure,
-  formatSynergyStructureForAudit,
-} from './synergy-model-parser';
+import { extractSynergyStructure, formatSynergyStructureForAudit } from './synergy-model-parser';
 
 function makeWorkbook(
   sheets: Array<{
@@ -186,7 +183,13 @@ describe('extractSynergyStructure', () => {
 describe('formatSynergyStructureForAudit', () => {
   it('returns empty string when no claims detected', () => {
     const wb = makeWorkbook([
-      { name: 'Sheet1', rows: [['Revenue', 'Q1'], ['Total', 100]] },
+      {
+        name: 'Sheet1',
+        rows: [
+          ['Revenue', 'Q1'],
+          ['Total', 100],
+        ],
+      },
     ]);
     const structure = extractSynergyStructure(wb);
     expect(formatSynergyStructureForAudit(structure)).toBe('');

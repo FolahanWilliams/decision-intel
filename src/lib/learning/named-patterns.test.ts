@@ -97,12 +97,7 @@ describe('matchNamedPatterns', () => {
   it('matches multiple patterns when biases overlap (M&A audit firing 3 patterns)', () => {
     // Bias set covering Synergy Mirage + Winner's Curse + Optimism Trap.
     const result = matchNamedPatterns({
-      biasTypes: [
-        'overconfidence_bias',
-        'planning_fallacy',
-        'anchoring_bias',
-        'confirmation_bias',
-      ],
+      biasTypes: ['overconfidence_bias', 'planning_fallacy', 'anchoring_bias', 'confirmation_bias'],
       context: { monetaryStakes: 'high', timePressure: true },
     });
     expect(result).toContain('The Synergy Mirage');

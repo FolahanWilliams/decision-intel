@@ -93,10 +93,10 @@ const COMPONENT_META: ComponentMeta[] = [
     key: 'evidenceQuality',
     displayName: 'Evidence quality',
     description:
-      'Whether the claims in your memo are backed by verifiable evidence — or contradicted by what\'s in the public record.',
+      "Whether the claims in your memo are backed by verifiable evidence — or contradicted by what's in the public record.",
     icon: CheckSquare,
     actionHint:
-      'Re-check the contradicted claims before the committee meeting. They\'re the ones an auditor will catch.',
+      "Re-check the contradicted claims before the committee meeting. They're the ones an auditor will catch.",
   },
   {
     key: 'processMaturity',
@@ -129,7 +129,7 @@ const COMPONENT_META: ComponentMeta[] = [
     key: 'compoundRisk',
     displayName: 'Compound failure patterns',
     description:
-      'Named failure patterns where two or more biases combine to produce known catastrophic outcomes (Synergy Mirage, Winner\'s Curse, Yes Committee, etc.).',
+      "Named failure patterns where two or more biases combine to produce known catastrophic outcomes (Synergy Mirage, Winner's Curse, Yes Committee, etc.).",
     icon: Combine,
     actionHint:
       'Apply the pattern-specific mitigation playbook. Critical patterns are deal-blocking signals — bring the remediation steps to the committee.',
@@ -145,12 +145,15 @@ function severityColorForScore(score: number): {
 } {
   if (score >= 85)
     return { bar: 'var(--success)', bg: 'rgba(22,163,74,0.08)', text: 'var(--success)' };
-  if (score >= 70)
-    return { bar: 'var(--info)', bg: 'rgba(59,130,246,0.08)', text: 'var(--info)' };
+  if (score >= 70) return { bar: 'var(--info)', bg: 'rgba(59,130,246,0.08)', text: 'var(--info)' };
   if (score >= 55)
     return { bar: 'var(--warning)', bg: 'rgba(245,158,11,0.08)', text: 'var(--warning)' };
   if (score >= 40)
-    return { bar: 'var(--severity-high)', bg: 'rgba(249,115,22,0.08)', text: 'var(--severity-high)' };
+    return {
+      bar: 'var(--severity-high)',
+      bg: 'rgba(249,115,22,0.08)',
+      text: 'var(--severity-high)',
+    };
   return { bar: 'var(--error)', bg: 'rgba(220,38,38,0.08)', text: 'var(--error)' };
 }
 
@@ -321,13 +324,7 @@ export function DqiBreakdownPanel({
 
 // ─── Per-component card ──────────────────────────────────────────────────────
 
-function ComponentCard({
-  meta,
-  component,
-}: {
-  meta: ComponentMeta;
-  component: DQIComponent;
-}) {
+function ComponentCard({ meta, component }: { meta: ComponentMeta; component: DQIComponent }) {
   const [expanded, setExpanded] = useState(false);
   const colors = severityColorForScore(component.score);
   const Icon = meta.icon;
@@ -544,11 +541,7 @@ function ComponentCard({
 
 // ─── Breakdown row ───────────────────────────────────────────────────────────
 
-function BreakdownRow({
-  item,
-}: {
-  item: NonNullable<DQIComponent['breakdownItems']>[number];
-}) {
+function BreakdownRow({ item }: { item: NonNullable<DQIComponent['breakdownItems']>[number] }) {
   const isPositive = item.impact > 0;
   const isNegative = item.impact < 0;
   const accentColor = isNegative

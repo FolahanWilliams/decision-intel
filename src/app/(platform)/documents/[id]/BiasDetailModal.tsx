@@ -377,9 +377,7 @@ export function BiasDetailModal({
               2026-05-09 evening. */}
           {(() => {
             const normalized = normalizeBiasType(bias.biasType);
-            const participatesIn = NAMED_PATTERNS.filter(p =>
-              p.biasTypes.includes(normalized)
-            );
+            const participatesIn = NAMED_PATTERNS.filter(p => p.biasTypes.includes(normalized));
             if (participatesIn.length === 0) return null;
             return (
               <div
@@ -400,10 +398,10 @@ export function BiasDetailModal({
                     marginBottom: 12,
                   }}
                 >
-                  When this bias co-occurs with the partner biases below, it forms a named
-                  failure pattern that historically destroys more value than the bias alone.
-                  Open the audit&rsquo;s toxic-combinations panel to see whether the pattern
-                  fired on this document.
+                  When this bias co-occurs with the partner biases below, it forms a named failure
+                  pattern that historically destroys more value than the bias alone. Open the
+                  audit&rsquo;s toxic-combinations panel to see whether the pattern fired on this
+                  document.
                 </p>
                 <div
                   style={{
@@ -415,9 +413,7 @@ export function BiasDetailModal({
                   {participatesIn.map(p => {
                     const partners = p.biasTypes.filter(b => b !== normalized);
                     const formattedPartners = partners
-                      .map(b =>
-                        b.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                      )
+                      .map(b => b.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))
                       .join(' + ');
                     return (
                       <div

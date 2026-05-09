@@ -40,7 +40,6 @@ interface ScoringBreakdownProps {
   overallScore: number;
 }
 
-
 function MultiplierBadge({ value }: { value: number }) {
   const isAmplifying = value > 1.05;
   const isDampening = value < 0.95;

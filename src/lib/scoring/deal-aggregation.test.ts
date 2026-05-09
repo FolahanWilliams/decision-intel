@@ -43,12 +43,8 @@ describe('aggregateAnalyses · namedPatterns', () => {
 
   it('groups patterns by patternLabel across documents, counts distinct docs', () => {
     const result = aggregateAnalyses([
-      doc('d1', 60, [
-        { patternLabel: 'The Synergy Mirage', severity: 'high', toxicScore: 70 },
-      ]),
-      doc('d2', 55, [
-        { patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 85 },
-      ]),
+      doc('d1', 60, [{ patternLabel: 'The Synergy Mirage', severity: 'high', toxicScore: 70 }]),
+      doc('d2', 55, [{ patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 85 }]),
       doc('d3', 70, [
         { patternLabel: 'The Conglomerate Fallacy', severity: 'medium', toxicScore: 50 },
       ]),
@@ -66,15 +62,9 @@ describe('aggregateAnalyses · namedPatterns', () => {
 
   it('sorts by severity (critical first) then documentCount', () => {
     const result = aggregateAnalyses([
-      doc('d1', 60, [
-        { patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 },
-      ]),
-      doc('d2', 50, [
-        { patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 },
-      ]),
-      doc('d3', 60, [
-        { patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 },
-      ]),
+      doc('d1', 60, [{ patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 }]),
+      doc('d2', 50, [{ patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 }]),
+      doc('d3', 60, [{ patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 }]),
     ]);
     expect(result.namedPatterns[0].patternLabel).toBe('The Synergy Mirage');
     expect(result.namedPatterns[1].patternLabel).toBe('The Echo Chamber');
@@ -87,9 +77,7 @@ describe('aggregateAnalyses · namedPatterns', () => {
         { patternLabel: 'The Yes Committee', severity: 'critical', toxicScore: 85 },
         { patternLabel: 'The Echo Chamber', severity: 'high', toxicScore: 65 },
       ]),
-      doc('d2', 60, [
-        { patternLabel: 'The Optimism Trap', severity: 'medium', toxicScore: 50 },
-      ]),
+      doc('d2', 60, [{ patternLabel: 'The Optimism Trap', severity: 'medium', toxicScore: 50 }]),
     ]);
     expect(result.criticalPatternCount).toBe(2);
     expect(result.highPatternCount).toBe(1);

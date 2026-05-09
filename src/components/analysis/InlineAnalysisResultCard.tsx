@@ -372,9 +372,7 @@ export function InlineAnalysisResultCard({
                   color: 'var(--accent-primary)',
                 }}
               >
-                {dqiLoading
-                  ? 'Loading breakdown…'
-                  : 'Click to see how it’s computed →'}
+                {dqiLoading ? 'Loading breakdown…' : 'Click to see how it’s computed →'}
               </div>
             )}
           </button>

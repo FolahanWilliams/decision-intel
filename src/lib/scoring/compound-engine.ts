@@ -305,10 +305,7 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
 // non-M&A docs see no DQI shift, so the platform-baseline calibration
 // stays stable.
 
-const PATTERN_PAIR_OVERRIDES: Record<
-  string,
-  { biases: [string, string]; weight: number }
-> = {
+const PATTERN_PAIR_OVERRIDES: Record<string, { biases: [string, string]; weight: number }> = {
   'The Synergy Mirage': {
     biases: ['overconfidence_bias', 'planning_fallacy'],
     weight: 1.75,

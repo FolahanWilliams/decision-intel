@@ -1120,9 +1120,11 @@ export async function assembleProvenanceRecordData(
   // patternLabels that fired on this audit so the RCF surfaces structurally-
   // analogous failures (M&A cascade depth ship 2026-05-09).
   const auditPatternLabels = (
-    (analysis as unknown as {
-      toxicCombinations?: Array<{ patternLabel: string | null }>;
-    }).toxicCombinations ?? []
+    (
+      analysis as unknown as {
+        toxicCombinations?: Array<{ patternLabel: string | null }>;
+      }
+    ).toxicCombinations ?? []
   )
     .map(t => t.patternLabel)
     .filter((p): p is string => Boolean(p));
@@ -1220,8 +1222,7 @@ export async function assembleProvenanceRecordData(
     }
     // Path 2 (fallback): inline-marker text extraction for legacy uploads
     if (!synergyDefensibility && doc.content) {
-      synergyDefensibility =
-        extractSynergyDefensibilityFromContent(doc.content) ?? undefined;
+      synergyDefensibility = extractSynergyDefensibilityFromContent(doc.content) ?? undefined;
     }
   }
 
@@ -1300,7 +1301,6 @@ function normaliseSeverity(
     return lower;
   return undefined;
 }
-
 
 /**
  * Assemble a Decision Package-rooted Provenance Record (4.4 deep).

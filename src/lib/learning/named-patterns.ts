@@ -61,7 +61,7 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Yes Committee',
     description:
-      'Authority bias + groupthink with unanimous consensus means the most senior voice dominates and no one challenges the decision. In M&A specifically: an IC memo that reads as a rubber-stamp justification of a CEO or sponsor\'s pet acquisition with zero documented dissent — the committee acted as a ratifying body rather than an adversarial audit. Microsoft-Nokia is the canonical \\$249B-evaporation anchor.',
+      "Authority bias + groupthink with unanimous consensus means the most senior voice dominates and no one challenges the decision. In M&A specifically: an IC memo that reads as a rubber-stamp justification of a CEO or sponsor's pet acquisition with zero documented dissent — the committee acted as a ratifying body rather than an adversarial audit. Microsoft-Nokia is the canonical \\$249B-evaporation anchor.",
     biasTypes: ['groupthink', 'authority_bias'],
     contextRequired: { unanimousConsensus: true },
     baseScore: 82,

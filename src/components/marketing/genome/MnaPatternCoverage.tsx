@@ -94,9 +94,7 @@ function casesForPattern(patternName: string): CaseEntry[] {
 
 export function MnaPatternCoverage() {
   const coverage = PATTERNS.map(p => ({ ...p, cases: casesForPattern(p.name) }));
-  const totalUniqueCases = new Set(
-    coverage.flatMap(p => p.cases.map(c => c.slug))
-  ).size;
+  const totalUniqueCases = new Set(coverage.flatMap(p => p.cases.map(c => c.slug))).size;
 
   return (
     <section style={{ padding: '64px 24px 0' }}>
@@ -137,9 +135,9 @@ export function MnaPatternCoverage() {
           }}
         >
           McKinsey + KPMG track 70-90% of acquisitions missing their projected synergies. The
-          patterns that drive most of those failures are nameable, repeatable, and detectable
-          before the IC vote. Each column below shows the named pattern, its mechanism, and every
-          deal in our 143-case library tagged with it.
+          patterns that drive most of those failures are nameable, repeatable, and detectable before
+          the IC vote. Each column below shows the named pattern, its mechanism, and every deal in
+          our 143-case library tagged with it.
         </p>
 
         {/* Procurement stat strip */}
@@ -199,9 +197,9 @@ export function MnaPatternCoverage() {
           }}
         >
           Coverage grows as the 143-case library expands. New patterns and anchors land in lockstep
-          across the audit pipeline, the DPR, and this page. When a pattern&rsquo;s case count
-          shows fewer entries than you expect, that&rsquo;s a tagging gap, not a detection gap
-          &mdash; the engine catches the pattern; the library is still being annotated.
+          across the audit pipeline, the DPR, and this page. When a pattern&rsquo;s case count shows
+          fewer entries than you expect, that&rsquo;s a tagging gap, not a detection gap &mdash; the
+          engine catches the pattern; the library is still being annotated.
         </p>
       </div>
 
@@ -216,11 +214,7 @@ export function MnaPatternCoverage() {
   );
 }
 
-function PatternColumn({
-  pattern,
-}: {
-  pattern: PatternMeta & { cases: CaseEntry[] };
-}) {
+function PatternColumn({ pattern }: { pattern: PatternMeta & { cases: CaseEntry[] } }) {
   return (
     <div
       style={{
@@ -360,15 +354,7 @@ function PatternColumn({
   );
 }
 
-function Stat({
-  value,
-  label,
-  sub,
-}: {
-  value: string;
-  label: string;
-  sub?: string;
-}) {
+function Stat({ value, label, sub }: { value: string; label: string; sub?: string }) {
   return (
     <div style={{ minWidth: 0 }}>
       <div

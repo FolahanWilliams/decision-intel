@@ -147,7 +147,6 @@ function dqiTint(score: number | null): string {
   return 'var(--severity-critical, #b91c1c)';
 }
 
-
 type PackageTab = 'documents' | 'findings' | 'verdict' | 'stress' | 'outcome';
 
 const PACKAGE_TAB_KEYS: PackageTab[] = ['documents', 'findings', 'verdict', 'stress', 'outcome'];
