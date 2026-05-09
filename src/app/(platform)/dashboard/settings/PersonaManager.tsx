@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Users, Plus, Trash2, Loader2, Edit3, Save, X } from 'lucide-react';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 interface Persona {
   id: string;
@@ -125,225 +126,222 @@ export function PersonaManager() {
   };
 
   return (
-    <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
-      <div
-        className="card-header"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+    <AccentCard
+      accent="warning"
+      title={
+        <>
+          <Users size={16} style={{ color: 'var(--warning)' }} />
+          <span style={{ flex: 1 }}>Decision Personas</span>
+          {!showNew && !editingId && personas.length < 10 && (
+            <button
+              onClick={() => {
+                setShowNew(true);
+                setDraft(EMPTY_PERSONA);
+              }}
+              className="btn btn-primary flex items-center gap-sm"
+              style={{ fontSize: 12, padding: '5px 12px' }}
+            >
+              <Plus size={14} />
+              Add persona
+            </button>
+          )}
+        </>
+      }
+    >
+      <p
+        className="text-xs text-muted"
+        style={{ marginBottom: 'var(--spacing-md)', lineHeight: 1.5 }}
       >
-        <h3 className="flex items-center gap-sm">
-          <Users size={18} />
-          Decision Personas
-        </h3>
-        {!showNew && !editingId && personas.length < 10 && (
-          <button
-            onClick={() => {
-              setShowNew(true);
-              setDraft(EMPTY_PERSONA);
-            }}
-            className="btn btn-primary flex items-center gap-sm"
-            style={{ fontSize: '12px', padding: '5px 12px' }}
-          >
-            <Plus size={14} />
-            Add Persona
-          </button>
-        )}
-      </div>
-      <div className="card-body">
-        <p
-          className="text-xs text-muted"
-          style={{ marginBottom: 'var(--spacing-md)', lineHeight: 1.5 }}
-        >
-          Custom personas replace the default AI-generated decision panel for your organization.
-          Each analysis will simulate these specific decision-makers voting on your proposals. If
-          none are defined, the AI generates domain-specific personas per document.
-        </p>
+        Custom personas replace the default AI-generated decision panel for your organization. Each
+        analysis will simulate these specific decision-makers voting on your proposals. If none are
+        defined, the AI generates domain-specific personas per document.
+      </p>
 
-        {loading ? (
-          <div className="flex items-center justify-center" style={{ padding: '20px' }}>
-            <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-          </div>
-        ) : (
-          <>
-            {/* Existing personas */}
-            {personas.map(persona => (
-              <div
-                key={persona.id}
-                style={{
-                  padding: '14px 16px',
-                  marginBottom: '8px',
-                  background:
-                    editingId === persona.id ? 'rgba(249,115,22,0.05)' : 'var(--bg-secondary)',
-                  border: `1px solid ${editingId === persona.id ? 'rgba(249,115,22,0.3)' : 'var(--liquid-border)'}`,
-                  borderRadius: '8px',
-                }}
-              >
-                {editingId === persona.id ? (
-                  <PersonaForm
-                    draft={draft}
-                    setDraft={setDraft}
-                    onSave={handleUpdate}
-                    onCancel={cancelEdit}
-                    saving={saving}
-                    isEdit
-                  />
-                ) : (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          marginBottom: '4px',
-                        }}
-                      >
-                        <span style={{ fontWeight: 600, fontSize: '13px' }}>{persona.name}</span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            padding: '1px 8px',
-                            borderRadius: '10px',
-                            background: 'rgba(249,115,22,0.12)',
-                            color: 'var(--warning)',
-                          }}
-                        >
-                          {persona.role}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            padding: '1px 8px',
-                            borderRadius: '10px',
-                            background:
-                              persona.riskTolerance === 'aggressive'
-                                ? 'rgba(239,68,68,0.1)'
-                                : persona.riskTolerance === 'conservative'
-                                  ? 'rgba(34,197,94,0.1)'
-                                  : 'rgba(245,158,11,0.1)',
-                            color:
-                              persona.riskTolerance === 'aggressive'
-                                ? '#f87171'
-                                : persona.riskTolerance === 'conservative'
-                                  ? '#4ade80'
-                                  : '#fbbf24',
-                            textTransform: 'capitalize',
-                          }}
-                        >
-                          {persona.riskTolerance}
-                        </span>
-                      </div>
-                      <p
-                        style={{
-                          fontSize: '11px',
-                          color: 'var(--text-muted)',
-                          margin: '2px 0',
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        <strong>Focus:</strong> {persona.focus}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: '11px',
-                          color: 'var(--text-muted)',
-                          margin: '2px 0',
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        <strong>Values:</strong> {persona.values}
-                      </p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '4px', flexShrink: 0, marginLeft: '12px' }}>
-                      <button
-                        onClick={() => startEdit(persona)}
-                        style={{
-                          padding: '4px',
-                          background: 'transparent',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          borderRadius: '6px',
-                          color: 'var(--text-muted)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <Edit3 size={13} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(persona.id)}
-                        style={{
-                          padding: '4px',
-                          background: 'transparent',
-                          border: '1px solid rgba(239,68,68,0.2)',
-                          borderRadius: '6px',
-                          color: 'var(--error)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {personas.length === 0 && !showNew && (
-              <div
-                style={{
-                  padding: '20px',
-                  textAlign: 'center',
-                  background: 'rgba(249,115,22,0.03)',
-                  border: '1px dashed rgba(249,115,22,0.2)',
-                  borderRadius: '8px',
-                }}
-              >
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 8px' }}>
-                  No custom personas defined. The AI will generate domain-specific personas for each
-                  document.
-                </p>
-                <button
-                  onClick={() => {
-                    setShowNew(true);
-                    setDraft(EMPTY_PERSONA);
-                  }}
-                  className="btn btn-primary flex items-center gap-sm"
-                  style={{ fontSize: '12px', margin: '0 auto' }}
-                >
-                  <Plus size={14} />
-                  Create your first persona
-                </button>
-              </div>
-            )}
-
-            {/* New persona form */}
-            {showNew && (
-              <div
-                style={{
-                  padding: '14px 16px',
-                  background: 'rgba(249,115,22,0.05)',
-                  border: '1px solid rgba(249,115,22,0.3)',
-                  borderRadius: '8px',
-                  marginTop: '8px',
-                }}
-              >
+      {loading ? (
+        <div className="flex items-center justify-center" style={{ padding: '20px' }}>
+          <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
+        </div>
+      ) : (
+        <>
+          {/* Existing personas */}
+          {personas.map(persona => (
+            <div
+              key={persona.id}
+              style={{
+                padding: '14px 16px',
+                marginBottom: '8px',
+                background:
+                  editingId === persona.id ? 'rgba(249,115,22,0.05)' : 'var(--bg-secondary)',
+                border: `1px solid ${editingId === persona.id ? 'rgba(249,115,22,0.3)' : 'var(--liquid-border)'}`,
+                borderRadius: '8px',
+              }}
+            >
+              {editingId === persona.id ? (
                 <PersonaForm
                   draft={draft}
                   setDraft={setDraft}
-                  onSave={handleCreate}
+                  onSave={handleUpdate}
                   onCancel={cancelEdit}
                   saving={saving}
+                  isEdit
                 />
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      <span style={{ fontWeight: 600, fontSize: '13px' }}>{persona.name}</span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          padding: '1px 8px',
+                          borderRadius: '10px',
+                          background: 'rgba(249,115,22,0.12)',
+                          color: 'var(--warning)',
+                        }}
+                      >
+                        {persona.role}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          padding: '1px 8px',
+                          borderRadius: '10px',
+                          background:
+                            persona.riskTolerance === 'aggressive'
+                              ? 'rgba(239,68,68,0.1)'
+                              : persona.riskTolerance === 'conservative'
+                                ? 'rgba(34,197,94,0.1)'
+                                : 'rgba(245,158,11,0.1)',
+                          color:
+                            persona.riskTolerance === 'aggressive'
+                              ? '#f87171'
+                              : persona.riskTolerance === 'conservative'
+                                ? '#4ade80'
+                                : '#fbbf24',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {persona.riskTolerance}
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        margin: '2px 0',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      <strong>Focus:</strong> {persona.focus}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        margin: '2px 0',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      <strong>Values:</strong> {persona.values}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px', flexShrink: 0, marginLeft: '12px' }}>
+                    <button
+                      onClick={() => startEdit(persona)}
+                      style={{
+                        padding: '4px',
+                        background: 'transparent',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '6px',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Edit3 size={13} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(persona.id)}
+                      style={{
+                        padding: '4px',
+                        background: 'transparent',
+                        border: '1px solid rgba(239,68,68,0.2)',
+                        borderRadius: '6px',
+                        color: 'var(--error)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {personas.length === 0 && !showNew && (
+            <div
+              style={{
+                padding: '20px',
+                textAlign: 'center',
+                background: 'rgba(249,115,22,0.03)',
+                border: '1px dashed rgba(249,115,22,0.2)',
+                borderRadius: '8px',
+              }}
+            >
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 8px' }}>
+                No custom personas defined. The AI will generate domain-specific personas for each
+                document.
+              </p>
+              <button
+                onClick={() => {
+                  setShowNew(true);
+                  setDraft(EMPTY_PERSONA);
+                }}
+                className="btn btn-primary flex items-center gap-sm"
+                style={{ fontSize: '12px', margin: '0 auto' }}
+              >
+                <Plus size={14} />
+                Create your first persona
+              </button>
+            </div>
+          )}
+
+          {/* New persona form */}
+          {showNew && (
+            <div
+              style={{
+                padding: '14px 16px',
+                background: 'rgba(249,115,22,0.05)',
+                border: '1px solid rgba(249,115,22,0.3)',
+                borderRadius: '8px',
+                marginTop: '8px',
+              }}
+            >
+              <PersonaForm
+                draft={draft}
+                setDraft={setDraft}
+                onSave={handleCreate}
+                onCancel={cancelEdit}
+                saving={saving}
+              />
+            </div>
+          )}
+        </>
+      )}
+    </AccentCard>
   );
 }
 

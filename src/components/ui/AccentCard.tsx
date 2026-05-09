@@ -51,6 +51,13 @@ export interface AccentCardProps {
   tinted?: boolean;
   className?: string;
   style?: CSSProperties;
+  /**
+   * Override styles on the inner body wrapper. Use when you need
+   * full-bleed content (`{ padding: 0 }`) — e.g. a list of rows that
+   * span edge-to-edge inside the card. Default body padding is
+   * 16-18px depending on whether `title` is present.
+   */
+  bodyStyle?: CSSProperties;
   children: ReactNode;
 }
 
@@ -65,6 +72,7 @@ export function AccentCard({
   tinted = false,
   className,
   style,
+  bodyStyle,
   children,
 }: AccentCardProps) {
   const color = ACCENT_COLORS[accent];
@@ -77,6 +85,8 @@ export function AccentCard({
     overflow: 'hidden',
     ...style,
   };
+
+  const defaultBodyPadding = title ? '16px 18px' : '18px';
 
   return (
     <div className={className} style={baseStyle}>
@@ -96,7 +106,7 @@ export function AccentCard({
           {title}
         </div>
       )}
-      <div style={{ padding: title ? '16px 18px' : '18px' }}>{children}</div>
+      <div style={{ padding: defaultBodyPadding, ...bodyStyle }}>{children}</div>
     </div>
   );
 }

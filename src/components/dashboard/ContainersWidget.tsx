@@ -18,6 +18,7 @@ import { useContainers } from '@/hooks/useContainers';
 import { dqiColorFor } from '@/lib/utils/grade';
 import { CONTAINER_MODES } from '@/lib/data/decision-container-modes';
 import { severityColor } from '@/lib/utils/severity';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 const MAX_ROWS = 5;
 
@@ -39,59 +40,50 @@ export function ContainersWidget() {
   const { containers, isLoading } = useContainers({ status: 'active' }, 1, MAX_ROWS);
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 12,
-        }}
-      >
-        <div>
-          <div
+    <AccentCard
+      accent="primary"
+      title={
+        <>
+          <Briefcase size={16} style={{ color: 'var(--accent-primary)' }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 'var(--fs-3xs)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.10em',
+                color: 'var(--text-muted)',
+                fontWeight: 600,
+                marginBottom: 2,
+              }}
+            >
+              Active decisions
+            </div>
+            <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
+              Across investments, acquisitions, and strategic decisions
+            </div>
+          </div>
+          <Link
+            href="/dashboard/decisions/new"
             style={{
-              fontSize: 'var(--fs-3xs)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.10em',
-              color: 'var(--text-muted)',
+              padding: '6px 10px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent-primary)',
+              color: '#fff',
+              textDecoration: 'none',
+              fontSize: 'var(--fs-xs)',
               fontWeight: 600,
-              marginBottom: 2,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              flexShrink: 0,
             }}
           >
-            Active decisions
-          </div>
-          <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 600 }}>
-            Across investments, acquisitions, and strategic decisions
-          </h2>
-        </div>
-        <Link
-          href="/dashboard/decisions/new"
-          style={{
-            padding: '6px 10px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--accent-primary)',
-            color: '#fff',
-            textDecoration: 'none',
-            fontSize: 'var(--fs-xs)',
-            fontWeight: 600,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <Plus size={12} />
-          New
-        </Link>
-      </div>
-
+            <Plus size={12} />
+            New
+          </Link>
+        </>
+      }
+    >
       {isLoading ? (
         <div style={{ padding: 12, color: 'var(--text-muted)', fontSize: 'var(--fs-sm)' }}>
           Loading…
@@ -262,6 +254,6 @@ export function ContainersWidget() {
       >
         All decisions <ChevronRight size={12} />
       </Link>
-    </div>
+    </AccentCard>
   );
 }

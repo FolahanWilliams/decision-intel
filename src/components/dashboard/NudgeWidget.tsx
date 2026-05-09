@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Bell, AlertTriangle, ThumbsUp, ThumbsDown, Loader2, ArrowRight } from 'lucide-react';
 import { useNudges, type NudgeSummary } from '@/hooks/useHumanDecisions';
 import { SEVERITY_STYLES, NUDGE_TYPE_LABELS } from '@/lib/constants/human-audit';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 export function NudgeWidget() {
   const { nudges: allNudges, mutate } = useNudges(false, 100);
@@ -33,40 +34,44 @@ export function NudgeWidget() {
   const totalUnacked = allNudges.filter(n => !n.acknowledgedAt).length;
 
   return (
-    <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.3s' }}>
-      <div
-        className="card-header flex items-center justify-between"
-        style={{ padding: '14px 20px' }}
-      >
-        <div className="flex items-center gap-sm">
+    <AccentCard
+      accent="warning"
+      title={
+        <>
           <Bell size={16} style={{ color: 'var(--warning)' }} />
-          <h3 style={{ fontSize: '14px', fontWeight: 600, margin: 0 }}>Active Nudges</h3>
+          <span style={{ flex: 1 }}>Active nudges</span>
           <span
             style={{
-              fontSize: '10px',
+              fontSize: 11,
               padding: '2px 8px',
-              background: 'var(--warning)',
-              color: '#000',
-              borderRadius: '10px',
-              fontWeight: 700,
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(245, 158, 11, 0.10)',
+              color: 'var(--warning)',
+              fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {totalUnacked}
           </span>
-        </div>
-        <Link
-          href="/dashboard/decision-quality?tab=nudges"
-          className="flex items-center gap-xs"
-          style={{
-            fontSize: '12px',
-            color: 'var(--text-muted)',
-            textDecoration: 'none',
-          }}
-        >
-          View all <ArrowRight size={12} />
-        </Link>
-      </div>
-      <div style={{ padding: 0 }}>
+          <Link
+            href="/dashboard/analytics?view=performance"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+          >
+            View all <ArrowRight size={12} />
+          </Link>
+        </>
+      }
+      bodyStyle={{ padding: 0 }}
+    >
+      <div>
         {unacked.map((nudge: NudgeSummary, idx: number) => {
           const severity = SEVERITY_STYLES[nudge.severity] || SEVERITY_STYLES.info;
           const isAcking = acknowledging === nudge.id;
@@ -160,6 +165,6 @@ export function NudgeWidget() {
           );
         })}
       </div>
-    </div>
+    </AccentCard>
   );
 }

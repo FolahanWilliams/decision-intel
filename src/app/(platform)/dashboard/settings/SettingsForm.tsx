@@ -918,89 +918,89 @@ function EmailForwardingSection() {
   };
 
   return (
-    <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.05s' }}>
-      <div className="card-header">
-        <h3 className="flex items-center gap-sm">
-          <MessageSquare size={18} />
-          Email Forwarding
-        </h3>
-      </div>
-      <div className="card-body">
-        <p className="text-xs text-muted mb-md" style={{ lineHeight: 1.6 }}>
-          Forward documents or paste decision text to your unique email address. Attachments (PDF,
-          DOCX, XLSX, CSV, PPTX) are auto-analyzed. No attachments? The email body is analyzed
-          instead.
-        </p>
-        {loading ? (
-          <div className="text-xs text-muted">Loading...</div>
-        ) : forwardingAddress ? (
-          <div className="flex flex-col gap-sm">
-            <div
-              className="flex items-center gap-sm"
-              style={{
-                padding: 'var(--spacing-sm) var(--spacing-md)',
-                background: 'var(--bg-secondary)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-              }}
+    <AccentCard
+      accent="info"
+      title={
+        <>
+          <MessageSquare size={16} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
+          <span>Email Forwarding</span>
+        </>
+      }
+    >
+      <p className="text-xs text-muted mb-md" style={{ lineHeight: 1.6 }}>
+        Forward documents or paste decision text to your unique email address. Attachments (PDF,
+        DOCX, XLSX, CSV, PPTX) are auto-analyzed. No attachments? The email body is analyzed
+        instead.
+      </p>
+      {loading ? (
+        <div className="text-xs text-muted">Loading...</div>
+      ) : forwardingAddress ? (
+        <div className="flex flex-col gap-sm">
+          <div
+            className="flex items-center gap-sm"
+            style={{
+              padding: 'var(--spacing-sm) var(--spacing-md)',
+              background: 'var(--bg-secondary)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <code
+              className="text-sm flex-1"
+              style={{ color: 'var(--accent-primary)', wordBreak: 'break-all' }}
             >
-              <code
-                className="text-sm flex-1"
-                style={{ color: 'var(--accent-primary)', wordBreak: 'break-all' }}
-              >
-                {forwardingAddress}
-              </code>
-              <button
-                onClick={handleCopy}
-                className="text-xs font-medium"
-                style={{
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-color)',
-                  background: copied ? 'var(--accent-primary)' : 'var(--bg-card)',
-                  color: copied ? '#fff' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
+              {forwardingAddress}
+            </code>
             <button
-              onClick={handleGenerate}
-              disabled={regenerating}
-              className="text-xs text-muted"
+              onClick={handleCopy}
+              className="text-xs font-medium"
               style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border-color)',
+                background: copied ? 'var(--accent-primary)' : 'var(--bg-card)',
+                color: copied ? '#fff' : 'var(--text-secondary)',
                 cursor: 'pointer',
-                background: 'none',
-                border: 'none',
-                textDecoration: 'underline',
-                textAlign: 'left',
-                padding: 0,
+                whiteSpace: 'nowrap',
               }}
             >
-              {regenerating ? 'Regenerating...' : 'Regenerate address'}
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
-        ) : (
           <button
             onClick={handleGenerate}
             disabled={regenerating}
-            className="text-sm font-medium"
+            className="text-xs text-muted"
             style={{
-              padding: '8px 20px',
-              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer',
+              background: 'none',
               border: 'none',
-              background: 'var(--accent-primary)',
-              color: '#fff',
-              cursor: regenerating ? 'wait' : 'pointer',
+              textDecoration: 'underline',
+              textAlign: 'left',
+              padding: 0,
             }}
           >
-            {regenerating ? 'Generating...' : 'Generate Forwarding Address'}
+            {regenerating ? 'Regenerating...' : 'Regenerate address'}
           </button>
-        )}
-      </div>
-    </div>
+        </div>
+      ) : (
+        <button
+          onClick={handleGenerate}
+          disabled={regenerating}
+          className="text-sm font-medium"
+          style={{
+            padding: '8px 20px',
+            borderRadius: 'var(--radius-md)',
+            border: 'none',
+            background: 'var(--accent-primary)',
+            color: '#fff',
+            cursor: regenerating ? 'wait' : 'pointer',
+          }}
+        >
+          {regenerating ? 'Generating...' : 'Generate Forwarding Address'}
+        </button>
+      )}
+    </AccentCard>
   );
 }
 
