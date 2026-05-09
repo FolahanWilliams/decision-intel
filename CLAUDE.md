@@ -252,7 +252,11 @@ TOGETHER
 - **danger** (red, often `tinted`) — destructive zones (Delete account, force-push warnings)
 - **muted** (gray) — neutral / informational with no semantic colour
 
-**Surfaces migrated 2026-05-09 evening**: Settings → Account tab (5 cards) + Preferences tab (2 cards) + Integrations tab (Slack workspace card). AI Copilot empty state composer + starter chips + pinned-doc hint. Each migration drops the `.card` className in favour of `<AccentCard accent="..." title={...}>`.
+**Surfaces migrated 2026-05-09 evening (initial batch)**: Settings → Account tab (5 cards) + Preferences tab (2 cards) + Integrations tab (Slack workspace card). AI Copilot empty state composer + starter chips + pinned-doc hint. Each migration drops the `.card` className in favour of `<AccentCard accent="..." title={...}>`.
+
+**Surfaces migrated 2026-05-09 evening (Phase F batch 2)**: Dashboard widget stack — DecisionTriageWidget (`accent="danger"`, also fixed dark-theme Tailwind drift), NudgeWidget (`accent="warning"`), ContainersWidget (`accent="primary"`). Settings sub-components — EmailForwardingSection (`accent="info"`), PersonaManager (`accent="warning"`). AccentCard primitive extended with `bodyStyle` prop for full-bleed row content (used by DecisionTriageWidget + NudgeWidget where rows carry their own padding).
+
+**Surfaces migrated 2026-05-09 evening (Phase F batch 3)**: Dashboard KPI grid — 4 hero cards each with metric-coded accents (Total Documents indigo, Analyzed green, Avg Quality DYNAMICALLY grade-coded by value, Decision IQ primary green). Inline `borderTop` instead of full AccentCard wrap to preserve the existing `.stat-card liquid-glass-premium` look. Decision DNA Preview Card (3 render states: loading skeleton + discovery + populated, all `accent="primary"` since DNA is the proprietary calibration moat). Compliance page FrameworkCard with new `certStatusToAccent()` helper mapping `attested` → success / `targeted` → warning / `self_assessed` → info — a CISO scanning the Compliance tab now reads cert posture at a glance via the top stripe.
 
 **Forward-looking rule**: when adding a new card to ANY platform surface that stacks ≥3 cards, default to AccentCard with a deliberate accent choice. Falling back to bare `<div className="card">` is fine for one-off surfaces but any tab / page with ≥3 cards stacked MUST use AccentCard so the eye has visual hierarchy. When a new accent semantic is needed (e.g. a "calibration" colour), extend `ACCENT_COLORS` in AccentCard.tsx + document the new mapping here in the same commit.
 
@@ -629,7 +633,7 @@ The internal-execution pre-mortems (cathedral-of-code, outcome-gate avoidance, i
 npm run dev          # Start dev server (port 3000)
 npm run build        # Production build (Next.js)
 npm run lint         # ESLint
-npm run test         # Vitest (unit tests, excludes e2e/)
+npm run test         # Vitest (unit tests, excludes e2e/ + voice-worker/ + all nested node_modules)
 npm run slop-scan    # modem-dev/slop-scan v0.3 — second quality gate
 npx playwright test  # E2E tests
 npx prisma migrate dev  # Run pending migrations
@@ -637,6 +641,8 @@ npx prisma generate  # Regenerate Prisma client
 ```
 
 **Pre-commit hook:** Runs four gates in order — `npm run lint:positioning` (banned-vocabulary scanner), `npm run lint:silent-catches` (silent-catch ratchet), `npm run lint:counts` (count-drift ratchet, see lock below), and `npm run audit:ai` (Gemini architectural audit). Can be bypassed with `--no-verify` but should generally be fixed instead.
+
+**Vitest exclude pattern (locked 2026-05-10).** [vitest.config.ts](vitest.config.ts) excludes `e2e/**` + `**/node_modules/**` + `voice-worker/**`. The first iteration only excluded `node_modules/**` (no glob), which **only matches the root `node_modules/`** — the voice-worker has its own nested `node_modules/` (separate Node app, Railway-hosted, NOT bundled with the Vercel main app per the voice-mode lock 2026-05-03), and vitest was recursively running upstream package tests shipped inside vendored packages (`@livekit/agents`, `pino`, `pino-pretty`, `on-exit-leak-free`). 60 "pre-existing failures" turned out to be those upstream tests failing under our vitest config — not our code. The 2026-05-10 fix: bare `node_modules/**` → `**/node_modules/**` to catch every nested location, plus `voice-worker/**` belt-and-braces to skip the whole sub-app. **Forward-looking rule**: when adding a new sub-app under `voice-worker/`-style architecture (separate Node app, own `node_modules`), add it to the vitest exclude in the same commit. The actual product test count is 713 across 53 files; if `npx vitest run` ever shows >50 failures, the first instinct should be "is the exclude pattern still right?" not "what production code broke?"
 
 **Pre-push hook (locked 2026-04-28).** [.husky/pre-push](.husky/pre-push) runs slop-scan with a hard 4.0 trip-wire. The push is blocked if `scorePerKloc >= 4.0`. Bypass with `git push --no-verify` for audited regressions but leave a commit-msg note. The hook lives alongside the pre-commit gate so the founder doesn't have to remember to run slop-scan manually before pushing.
 

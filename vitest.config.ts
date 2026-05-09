@@ -5,7 +5,16 @@ const vitestConfig = {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-    exclude: ['e2e/**', 'node_modules/**'],
+    // 'node_modules/**' on its own only matches the ROOT node_modules.
+    // The voice-worker has its own nested node_modules (separate Node
+    // app — Railway-hosted, NOT bundled with the Vercel main app per
+    // CLAUDE.md voice-mode lock 2026-05-03), and vitest was recursively
+    // running upstream package tests (@livekit/agents, pino, pino-pretty,
+    // on-exit-leak-free) shipped inside those vendored packages. Adding
+    // '**/node_modules/**' catches every nested node_modules; adding
+    // 'voice-worker/**' belt-and-braces skips the whole sub-app — it has
+    // its own test runner if/when needed.
+    exclude: ['e2e/**', '**/node_modules/**', 'voice-worker/**'],
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
     coverage: {
