@@ -616,6 +616,167 @@ describe('computeDQI · compoundRisk component', () => {
 // SYNTHETIC_WEIGHTS_LEGACY_2_0_0 — pinned for platform-baseline stability
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// computeDQI · breakdownItems for explainability panel (locked 2026-05-09)
+// ---------------------------------------------------------------------------
+//
+// Locks the buyer-facing decomposition: each component must populate
+// breakdownItems with plain-language labels + signed impact + (where
+// possible) verbatim evidence. The DqiBreakdownPanel UI consumes this
+// directly — no jargon translation in the UI layer.
+
+describe('computeDQI · breakdownItems explainability', () => {
+  it('biasLoad populates one breakdown item per detected bias', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      biases: [
+        { type: 'anchoring_bias', severity: 'critical', confidence: 0.9, excerpt: 'we anchored to $100M' },
+        { type: 'planning_fallacy', severity: 'high', confidence: 0.8 },
+      ],
+    });
+    const items = result.components.biasLoad.breakdownItems!;
+    expect(items).toHaveLength(2);
+    // Sorted worst-first
+    expect(items[0].label).toContain('Anchoring Bias');
+    expect(items[0].label).toContain('critical');
+    expect(items[0].impact).toBeLessThan(items[1].impact);
+    expect(items[0].evidence).toContain('we anchored to');
+  });
+
+  it('biasLoad evidence omitted when excerpt absent on input', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      biases: [{ type: 'overconfidence_bias', severity: 'high', confidence: 0.7 }],
+    });
+    expect(result.components.biasLoad.breakdownItems![0].evidence).toBeUndefined();
+  });
+
+  it('biasLoad label uses formatted bias name (snake_case → Title Case)', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      biases: [{ type: 'illusion_of_validity', severity: 'medium', confidence: 0.6 }],
+    });
+    const item = result.components.biasLoad.breakdownItems![0];
+    expect(item.label).toContain('Illusion Of Validity');
+    expect(item.label).not.toContain('illusion_of_validity');
+  });
+
+  it('noiseLevel populates judge-count + spread breakdown', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      noiseStats: { mean: 70, stdDev: 12, judgeCount: 3 },
+    });
+    const items = result.components.noiseLevel.breakdownItems!;
+    expect(items.length).toBeGreaterThanOrEqual(3);
+    expect(items.some(i => i.label.includes('3 independent judges'))).toBe(true);
+    expect(items.some(i => i.label.includes('Average score'))).toBe(true);
+    expect(items.some(i => i.label.includes('Disagreement spread'))).toBe(true);
+  });
+
+  it('evidenceQuality breakdown surfaces verified + contradicted + unverifiable buckets', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      factCheck: {
+        totalClaims: 10,
+        verifiedClaims: 6,
+        contradictedClaims: 2,
+        score: 70,
+      },
+    });
+    const items = result.components.evidenceQuality.breakdownItems!;
+    expect(items.some(i => i.label.includes('6 of 10 claims verified'))).toBe(true);
+    expect(items.some(i => i.label.includes('2 claim(s) contradicted'))).toBe(true);
+    expect(items.some(i => i.label.includes("couldn't be verified"))).toBe(true);
+  });
+
+  it('processMaturity breakdown surfaces all 5 hygiene checks', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      process: {
+        dissentPresent: true,
+        priorSubmitted: false,
+        outcomeTracked: true,
+        participantCount: 5,
+        documentLength: 1500,
+      },
+    });
+    const items = result.components.processMaturity.breakdownItems!;
+    // Expect at least the 5 base checks
+    expect(items.length).toBeGreaterThanOrEqual(5);
+    expect(items.some(i => i.label.includes('Dissent captured'))).toBe(true);
+    expect(items.some(i => i.label.includes('No pre-decision prediction'))).toBe(true);
+    expect(items.some(i => i.label.includes('Outcome tracking enabled'))).toBe(true);
+  });
+
+  it('complianceRisk breakdown labels frameworks + violations in plain language', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      compliance: { riskScore: 30, frameworksChecked: 5, violationsFound: 1 },
+    });
+    const items = result.components.complianceRisk.breakdownItems!;
+    expect(items.some(i => i.label.includes('5 regulatory framework'))).toBe(true);
+    expect(items.some(i => i.label.includes('1 potential violation'))).toBe(true);
+    // Evidence for violations explicitly says "potential", not legal verdict
+    const violationItem = items.find(i => i.label.includes('violation'));
+    expect(violationItem?.evidence).toContain('not legal determinations');
+  });
+
+  it('historicalAlignment breakdown names matched failure + success patterns', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      historicalAlignment: {
+        matchedFailurePatterns: 3,
+        matchedSuccessPatterns: 1,
+        correlationMultiplier: 1.4,
+        beneficialDamping: 1.0,
+      },
+    });
+    const items = result.components.historicalAlignment.breakdownItems!;
+    expect(items.some(i => i.label.includes('3 historical failure pattern'))).toBe(true);
+    expect(items.some(i => i.label.includes('1 historical success pattern'))).toBe(true);
+    expect(items.some(i => i.label.includes('Compound risk amplifier'))).toBe(true);
+  });
+
+  it('all 7 components have breakdownItems populated (after this ship)', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      biases: [{ type: 'anchoring_bias', severity: 'medium', confidence: 0.6 }],
+      compoundPatterns: [
+        { patternLabel: 'The Echo Chamber', severity: 'medium', toxicScore: 50 },
+      ],
+    });
+    expect(result.components.biasLoad.breakdownItems).toBeDefined();
+    expect(result.components.noiseLevel.breakdownItems).toBeDefined();
+    expect(result.components.evidenceQuality.breakdownItems).toBeDefined();
+    expect(result.components.processMaturity.breakdownItems).toBeDefined();
+    expect(result.components.complianceRisk.breakdownItems).toBeDefined();
+    expect(result.components.historicalAlignment.breakdownItems).toBeDefined();
+    expect(result.components.compoundRisk.breakdownItems).toBeDefined();
+  });
+
+  it('buyer-friendly language: no snake_case, no internal jargon in labels', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      biases: [{ type: 'sunk_cost_fallacy', severity: 'high', confidence: 0.8 }],
+      compoundPatterns: [{ patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 }],
+    });
+    const allLabels = [
+      ...(result.components.biasLoad.breakdownItems ?? []),
+      ...(result.components.noiseLevel.breakdownItems ?? []),
+      ...(result.components.evidenceQuality.breakdownItems ?? []),
+      ...(result.components.processMaturity.breakdownItems ?? []),
+      ...(result.components.complianceRisk.breakdownItems ?? []),
+      ...(result.components.historicalAlignment.breakdownItems ?? []),
+      ...(result.components.compoundRisk.breakdownItems ?? []),
+    ].map(i => i.label);
+    for (const label of allLabels) {
+      expect(label).not.toMatch(/_/); // no snake_case
+      expect(label).not.toContain('jaccard'); // no internal stat names
+      expect(label).not.toContain('biasJaccard');
+    }
+  });
+});
+
 describe('SYNTHETIC_WEIGHTS_LEGACY_2_0_0', () => {
   it('preserves the original 2.0.0-seed weight values', async () => {
     const { SYNTHETIC_WEIGHTS_LEGACY_2_0_0 } = await import('./dqi');

@@ -31,11 +31,17 @@ const logger = createLogger('DQI');
 // ---------------------------------------------------------------------------
 
 export interface DQIInput {
-  /** Detected biases with severity and confidence */
+  /** Detected biases with severity, confidence, and (optionally) the
+   *  verbatim memo excerpt that triggered the detection. The excerpt
+   *  feeds the buyer-facing breakdown UI on the DQI explainability
+   *  panel — when a buyer asks "where in my document did this fire?"
+   *  the answer is the verbatim text from their own memo, not a
+   *  paraphrase. Optional for backwards-compat with legacy callers. */
   biases: Array<{
     type: string;
     severity: 'low' | 'medium' | 'high' | 'critical';
     confidence: number;
+    excerpt?: string;
   }>;
   /** Noise statistics from judge panel */
   noiseStats: {
@@ -329,6 +335,29 @@ function scoreBiasLoad(biases: DQIInput['biases']): DQIComponent {
     detail += '.';
   }
 
+  // breakdownItems for the explainability panel — one item per detected
+  // bias. Sorted by impact (worst first) so the buyer sees the
+  // highest-leverage findings at the top. Label uses formatBiasName
+  // (snake_case → "Anchoring Bias"). Evidence carries the verbatim
+  // memo excerpt when present, otherwise a severity tag.
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = biases
+    .map(b => {
+      const cost = BIAS_SEVERITY_COST[b.severity] ?? 6;
+      const confidence = Math.max(0, Math.min(1, b.confidence ?? 0.5));
+      const impact = -Math.round(cost * confidence * 10) / 10; // signed delta from base 100
+      const niceName = formatBiasNameInline(b.type);
+      return {
+        label: `${niceName} (${b.severity})`,
+        impact,
+        evidence: b.excerpt
+          ? b.excerpt.length > 220
+            ? b.excerpt.slice(0, 217) + '…'
+            : b.excerpt
+          : undefined,
+      };
+    })
+    .sort((a, b) => a.impact - b.impact);
+
   return {
     name: 'Bias Load',
     score: Math.round(score),
@@ -336,7 +365,20 @@ function scoreBiasLoad(biases: DQIInput['biases']): DQIComponent {
     weighted: Math.round(score * WEIGHTS.biasLoad * 10) / 10,
     grade: getComponentGrade(score),
     detail,
+    breakdownItems,
   };
+}
+
+/** Inline buyer-friendly bias-name formatter — local fallback to avoid
+ *  a circular dep on labels.ts. snake_case → Title Case. */
+function formatBiasNameInline(raw: string): string {
+  if (!raw) return 'Unknown bias';
+  return raw
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .replace(/\bBias\b/g, 'Bias')
+    .replace(/\bFallacy\b/g, 'Fallacy')
+    .replace(/\bEffect\b/g, 'Effect');
 }
 
 function scoreNoiseLevel(noiseStats: DQIInput['noiseStats']): DQIComponent {
@@ -358,6 +400,34 @@ function scoreNoiseLevel(noiseStats: DQIInput['noiseStats']): DQIComponent {
     detail = `High noise (σ=${noiseStats.stdDev.toFixed(1)}). Significant disagreement between assessors.`;
   }
 
+  // breakdownItems for the buyer-facing panel. Translates the stat tuple
+  // (mean, stdDev, judgeCount) into human-readable rows the buyer
+  // recognises (judge count + average score + disagreement spread).
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [
+    {
+      label: `${noiseStats.judgeCount} independent judges scored this memo`,
+      impact: judgeBonus, // +5 when judgeCount >= 3
+      evidence:
+        noiseStats.judgeCount >= 3
+          ? 'Three or more judges = more reliable measurement.'
+          : 'Single-judge assessments are less reliable than multi-judge.',
+    },
+    {
+      label: `Average score: ${Math.round(noiseStats.mean)} / 100`,
+      impact: 0, // neutral — just informational
+    },
+    {
+      label: `Disagreement spread: ±${noiseStats.stdDev.toFixed(1)} points`,
+      impact: -Math.round(noisePenalty * 10) / 10,
+      evidence:
+        noiseStats.stdDev < 5
+          ? 'Tight agreement signals a clear-cut case.'
+          : noiseStats.stdDev < 15
+            ? 'Moderate disagreement — the memo is interpretable two ways.'
+            : 'Wide disagreement — judges saw fundamentally different stories in the same memo. This is a signal, not noise.',
+    },
+  ];
+
   return {
     name: 'Noise Level',
     score: Math.round(finalScore),
@@ -365,6 +435,7 @@ function scoreNoiseLevel(noiseStats: DQIInput['noiseStats']): DQIComponent {
     weighted: Math.round(finalScore * WEIGHTS.noiseLevel * 10) / 10,
     grade: getComponentGrade(finalScore),
     detail,
+    breakdownItems,
   };
 }
 
@@ -396,6 +467,50 @@ function scoreEvidenceQuality(factCheck: DQIInput['factCheck']): DQIComponent {
     detail += '.';
   }
 
+  // breakdownItems for the buyer panel — show claims-by-status. The
+  // contradicted bucket is the load-bearing one to surface (negative
+  // impact) because that's where buyers will see "you said X but the
+  // public record says NOT X." Verified claims are positive impact;
+  // unverifiable claims are neutral but still surfaced so the buyer
+  // sees what couldn't be checked.
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [];
+  if (factCheck.totalClaims === 0) {
+    breakdownItems.push({
+      label: 'No factual claims found in this document',
+      impact: 0,
+      evidence: 'Memo is largely qualitative — no numerical claims to verify.',
+    });
+  } else {
+    if (factCheck.verifiedClaims > 0) {
+      const verifiedRate = factCheck.verifiedClaims / factCheck.totalClaims;
+      breakdownItems.push({
+        label: `${factCheck.verifiedClaims} of ${factCheck.totalClaims} claims verified`,
+        impact: Math.round(verifiedRate * 30 * 10) / 10, // up to +30 boost
+        evidence: 'These claims hold up against external sources.',
+      });
+    }
+    if (factCheck.contradictedClaims > 0) {
+      const contradictionImpact =
+        -(factCheck.contradictedClaims / factCheck.totalClaims) * 40;
+      breakdownItems.push({
+        label: `${factCheck.contradictedClaims} claim(s) contradicted by external sources`,
+        impact: Math.round(contradictionImpact * 10) / 10,
+        evidence:
+          'These claims directly disagree with publicly available information. Worth re-checking before the committee meeting.',
+      });
+    }
+    const unverifiable =
+      factCheck.totalClaims - factCheck.verifiedClaims - factCheck.contradictedClaims;
+    if (unverifiable > 0) {
+      breakdownItems.push({
+        label: `${unverifiable} claim(s) couldn't be verified externally`,
+        impact: 0,
+        evidence:
+          'Either the data is private (proprietary forecasts, internal projections) or the claim was too vague to verify. Not necessarily wrong — just unsupported by external evidence.',
+      });
+    }
+  }
+
   return {
     name: 'Evidence Quality',
     score: Math.round(score),
@@ -403,6 +518,7 @@ function scoreEvidenceQuality(factCheck: DQIInput['factCheck']): DQIComponent {
     weighted: Math.round(score * WEIGHTS.evidenceQuality * 10) / 10,
     grade: getComponentGrade(score),
     detail,
+    breakdownItems,
   };
 }
 
@@ -462,6 +578,89 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
       ? `Process indicators: ${indicators.join(', ')}.`
       : 'No process maturity indicators detected. Consider recording priors and tracking outcomes.';
 
+  // breakdownItems for the buyer panel — one row per process check
+  // (pass/fail), so the buyer sees exactly which decision-hygiene
+  // boxes were ticked vs missed. Each row's impact reflects the
+  // bonus or penalty that check applied to the score.
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [
+    {
+      label: process.dissentPresent
+        ? 'Dissent captured during the decision'
+        : 'No dissent captured',
+      impact: process.dissentPresent ? 20 : 0,
+      evidence: process.dissentPresent
+        ? 'Someone formally argued against the recommendation. This is the strongest single decision-hygiene signal.'
+        : 'Either nobody disagreed, or disagreements weren\'t recorded. Best practice: capture at least one written counter-argument before the IC vote.',
+    },
+    {
+      label: process.priorSubmitted
+        ? 'Pre-decision prediction was submitted'
+        : 'No pre-decision prediction submitted',
+      impact: process.priorSubmitted ? 15 : 0,
+      evidence: process.priorSubmitted
+        ? 'You wrote down what you expected before the analysis. This protects against hindsight bias when reviewing outcomes.'
+        : 'Without a prior, there\'s no honest way to tell later whether the decision was right or whether you reframed the success criteria.',
+    },
+    {
+      label: process.outcomeTracked
+        ? 'Outcome tracking enabled'
+        : 'Outcome not yet tracked',
+      impact: process.outcomeTracked ? 15 : 0,
+      evidence: process.outcomeTracked
+        ? 'You\'re committed to revisiting this decision when the outcome lands. The audit becomes calibration data over time.'
+        : 'Without outcome tracking, this audit doesn\'t feed the calibration loop. Best practice: log expected outcome + check-in date.',
+    },
+    {
+      label:
+        process.participantCount >= 3 && process.participantCount <= 12
+          ? `Right-sized team (${process.participantCount} participants)`
+          : process.participantCount > 12
+            ? `Large team (${process.participantCount} participants — diffuse accountability risk)`
+            : process.participantCount > 0
+              ? `Small team (${process.participantCount} participants — limited dissent surface)`
+              : 'Participant count not recorded',
+      impact:
+        process.participantCount >= 3 && process.participantCount <= 12
+          ? 10
+          : process.participantCount > 0
+            ? 5
+            : 0,
+    },
+    {
+      label:
+        process.documentLength >= 1000
+          ? `Thorough memo (${process.documentLength.toLocaleString()} words)`
+          : process.documentLength >= 500
+            ? `Moderate-length memo (${process.documentLength.toLocaleString()} words)`
+            : `Short memo (${process.documentLength.toLocaleString()} words)`,
+      impact:
+        process.documentLength >= 1000 ? 10 : process.documentLength >= 500 ? 5 : 0,
+      evidence:
+        process.documentLength < 500
+          ? 'Strategic decisions of this magnitude typically warrant 1,000+ words of analysis. Short memos correlate with under-thought decisions.'
+          : undefined,
+    },
+  ];
+  // System 1 / System 2 ratio is a special signal — surface it only
+  // when it materially affects the score
+  if (process.system1Ratio !== undefined) {
+    if (process.system1Ratio > 0.7) {
+      breakdownItems.push({
+        label: 'Heuristic-driven thinking detected (System 1 dominant)',
+        impact: -8,
+        evidence:
+          'More than 70% of the biases the audit flagged are fast-thinking patterns (anchoring, availability, framing). The memo reads as gut-call rather than deliberative.',
+      });
+    } else if (process.system1Ratio < 0.4) {
+      breakdownItems.push({
+        label: 'Deliberative reasoning detected (System 2 dominant)',
+        impact: 5,
+        evidence:
+          'The biases flagged are mostly slow-thinking patterns (overconfidence, planning fallacy). The memo reads as deliberative — you\'re thinking carefully, just optimistically.',
+      });
+    }
+  }
+
   return {
     name: 'Process Maturity',
     score: Math.round(score),
@@ -469,6 +668,7 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
     weighted: Math.round(score * WEIGHTS.processMaturity * 10) / 10,
     grade: getComponentGrade(score),
     detail,
+    breakdownItems,
   };
 }
 
@@ -489,6 +689,43 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
     detail += '.';
   }
 
+  // breakdownItems for the buyer panel — surfaces the framework scan
+  // result in plain language. The buyer sees how many frameworks were
+  // checked and how many flagged a potential issue. The "potential"
+  // qualifier is load-bearing — these are AUDIT-detected risks, not
+  // legal verdicts; the GC still has to confirm.
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [];
+  if (compliance.frameworksChecked === 0) {
+    breakdownItems.push({
+      label: 'No regulatory frameworks were assessed',
+      impact: 0,
+      evidence:
+        'Either the document type didn\'t trigger compliance review, or the audit didn\'t reach the regulatory node. Re-run the audit if you expected framework coverage.',
+    });
+  } else {
+    breakdownItems.push({
+      label: `${compliance.frameworksChecked} regulatory framework(s) checked`,
+      impact: 0,
+      evidence:
+        'Each named framework runs against your memo to flag the specific provisions an auditor would invoke if your reasoning leaked through to a real decision.',
+    });
+    if (compliance.violationsFound > 0) {
+      breakdownItems.push({
+        label: `${compliance.violationsFound} potential violation(s) flagged`,
+        impact: -Math.min(40, compliance.violationsFound * 10),
+        evidence:
+          'These are audit-detected risk patterns, not legal determinations. Bring them to your GC or compliance officer before relying on the memo. The DPR cross-references each flag to the specific framework provision.',
+      });
+    } else {
+      breakdownItems.push({
+        label: 'No regulatory violations flagged',
+        impact: 10,
+        evidence:
+          'The audit didn\'t find any pattern matching the regulatory provisions in scope. This is a clean signal — but the GC review is still the final word.',
+      });
+    }
+  }
+
   return {
     name: 'Compliance Risk',
     score: Math.round(score),
@@ -496,6 +733,7 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
     weighted: Math.round(score * WEIGHTS.complianceRisk * 10) / 10,
     grade: getComponentGrade(score),
     detail,
+    breakdownItems,
   };
 }
 
@@ -522,6 +760,14 @@ function scoreHistoricalAlignment(
         weighted: Math.round(60 * WEIGHTS.historicalAlignment * 10) / 10,
         grade: getComponentGrade(60),
         detail: 'No historical correlation data available.',
+        breakdownItems: [
+          {
+            label: 'No biases detected — historical pattern match skipped',
+            impact: 0,
+            evidence:
+              'When no biases are flagged, there\'s nothing to match against the 143-case library. This usually means the memo was very brief or the audit didn\'t reach the bias-detection node.',
+          },
+        ],
       };
     }
   }
@@ -564,6 +810,55 @@ function scoreHistoricalAlignment(
     detail = parts.join(', ') + '.';
   }
 
+  // breakdownItems for the buyer panel — translates failure/success
+  // pattern counts into "your decision pattern matches X historical
+  // failures and Y successes" framing. Buyers immediately recognise the
+  // 143-case library reference because /bias-genome and /case-studies
+  // already surface it; this component shows them how their specific
+  // memo maps onto that library.
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [];
+  if (alignment.matchedFailurePatterns === 0 && alignment.matchedSuccessPatterns === 0) {
+    breakdownItems.push({
+      label: 'No strong matches against the historical case library',
+      impact: 0,
+      evidence:
+        'Your decision pattern doesn\'t closely resemble any of the 143 documented strategic decisions in our reference library. This is neutral — could mean novel decision OR insufficient pattern data on this specific shape.',
+    });
+  } else {
+    if (alignment.matchedFailurePatterns > 0) {
+      breakdownItems.push({
+        label: `Matches ${alignment.matchedFailurePatterns} historical failure pattern(s)`,
+        impact: -(alignment.matchedFailurePatterns * 8),
+        evidence:
+          'Your bias profile resembles deals that didn\'t work out. Cross-reference these in /bias-genome to see which specific cases match — typically the same patterns that sank WeWork, AOL-Time Warner, or HP-Autonomy.',
+      });
+    }
+    if (alignment.matchedSuccessPatterns > 0) {
+      breakdownItems.push({
+        label: `Matches ${alignment.matchedSuccessPatterns} historical success pattern(s)`,
+        impact: alignment.matchedSuccessPatterns * 10,
+        evidence:
+          'Your bias profile resembles deals that DID work out. The historical match is positive evidence — but doesn\'t guarantee outcome; pair with the failure-pattern flags above for a balanced read.',
+      });
+    }
+    if (alignment.correlationMultiplier > 1.0) {
+      breakdownItems.push({
+        label: `Compound risk amplifier active (${alignment.correlationMultiplier.toFixed(2)}×)`,
+        impact: -Math.round((alignment.correlationMultiplier - 1.0) * 30 * 10) / 10,
+        evidence:
+          'Multiple biases firing together raise the failure probability above what each individual bias would suggest. The amplifier reflects how dangerous these specific bias combinations have proven historically.',
+      });
+    }
+    if (alignment.beneficialDamping < 1.0) {
+      breakdownItems.push({
+        label: 'Beneficial-pattern damping active',
+        impact: Math.round((1.0 - alignment.beneficialDamping) * 20 * 10) / 10,
+        evidence:
+          'The audit detected that some flagged biases are happening in a context where they typically don\'t cause harm (e.g., overconfidence on a clearly-priced asset). The damping lowers the compound risk accordingly.',
+      });
+    }
+  }
+
   return {
     name: 'Historical Alignment',
     score: Math.round(score),
@@ -571,6 +866,7 @@ function scoreHistoricalAlignment(
     weighted: Math.round(score * WEIGHTS.historicalAlignment * 10) / 10,
     grade: getComponentGrade(score),
     detail,
+    breakdownItems,
   };
 }
 
