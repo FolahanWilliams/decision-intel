@@ -72,58 +72,20 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   board_memo: 'Board memo',
 };
 
-// M&A toxic combinations detected client-side from the aggregated biases
-// (locked 2026-05-09, M&A cascade depth ship). When BOTH biases of a
-// named pattern fire at high+critical severity across the deal's
-// documents, the pattern is treated as firing on the deal. Pure client-
-// side detection — no API change, no aggregator change, no schema change.
+// M&A toxic-combination patterns now read DIRECTLY from server-side
+// aggregation (locked 2026-05-09 hard-layer ship, Proposal 2). The
+// prior client-side detection from individual biases was a stopgap
+// during the cascade-depth audit; now superseded by
+// DealAggregationDto.namedPatterns / criticalPatternCount / highPatternCount
+// computed by aggregateAnalyses() from the actual ToxicCombination rows
+// the audit pipeline persisted. Server-side aggregation is the canonical
+// source — same shape across every consumer (deal kanban, deal page
+// header, IC Readiness Gate, future analytics).
 //
-// Pattern definitions match canonical NAMED_PATTERNS in
-// src/lib/learning/toxic-combinations.ts. Forward-looking rule: when a
-// new M&A pattern lands in NAMED_PATTERNS, add it here in the same
-// commit so the gate detects it.
-const MNA_PATTERNS: Array<{ label: string; biases: [string, string] }> = [
-  { label: 'Synergy Mirage', biases: ['overconfidence_bias', 'planning_fallacy'] },
-  { label: 'Conglomerate Fallacy', biases: ['illusion_of_validity', 'halo_effect'] },
-  { label: "Winner's Curse", biases: ['anchoring_bias', 'overconfidence_bias'] },
-];
-
-interface DetectedPattern {
-  label: string;
-  topSeverity: 'critical' | 'high' | 'medium' | 'low';
-}
-
-function detectMnaPatterns(
-  allBiases: NonNullable<DealDetail['aggregation']>['allBiases']
-): DetectedPattern[] {
-  const SEVERITY_RANK: Record<string, number> = {
-    critical: 4,
-    high: 3,
-    medium: 2,
-    low: 1,
-  };
-  // Build a lookup: biasType → topSeverity (the highest severity at which
-  // this bias was seen across the deal's documents).
-  const severityByBias = new Map<string, 'critical' | 'high' | 'medium' | 'low'>();
-  for (const b of allBiases) {
-    severityByBias.set(b.biasType, b.topSeverity);
-  }
-  const detected: DetectedPattern[] = [];
-  for (const p of MNA_PATTERNS) {
-    const sev1 = severityByBias.get(p.biases[0]);
-    const sev2 = severityByBias.get(p.biases[1]);
-    if (!sev1 || !sev2) continue;
-    // Pattern fires when BOTH biases are present. The pattern's top severity
-    // is the lower of the two — the pattern is only as severe as its weakest
-    // link. (e.g., Synergy Mirage with overconfidence Critical + planning
-    // Medium = Medium pattern severity, not Critical.)
-    const minRank = Math.min(SEVERITY_RANK[sev1], SEVERITY_RANK[sev2]);
-    const minSev: DetectedPattern['topSeverity'] =
-      minRank === 4 ? 'critical' : minRank === 3 ? 'high' : minRank === 2 ? 'medium' : 'low';
-    detected.push({ label: p.label, topSeverity: minSev });
-  }
-  return detected.sort((a, b) => SEVERITY_RANK[b.topSeverity] - SEVERITY_RANK[a.topSeverity]);
-}
+// Backwards-compat: when the deal-detail API hasn't yet been redeployed
+// or the analyses don't carry toxic combinations (legacy data), the
+// aggregator returns namedPatterns: [] / counts: 0, and Gate 6 silently
+// passes (no false-positive blockers).
 
 function computeGates(deal: DealDetail): Gate[] {
   const documents = deal.documents ?? [];
@@ -151,13 +113,19 @@ function computeGates(deal: DealDetail): Gate[] {
   // Gate 5: IC date scheduled
   const icDatePassed = !!deal.icDate;
 
-  // Gate 6: no M&A toxic combinations firing at critical severity (locked
-  // 2026-05-09, M&A cascade depth ship). Detects the 3 named M&A
-  // patterns from the aggregated bias signature client-side.
-  const detectedPatterns = detectMnaPatterns(deal.aggregation?.allBiases ?? []);
-  const criticalPatterns = detectedPatterns.filter(p => p.topSeverity === 'critical');
-  const highPatterns = detectedPatterns.filter(p => p.topSeverity === 'high');
-  const toxicCombosPassed = criticalPatterns.length === 0;
+  // Gate 6: no toxic combinations firing at critical severity. Reads
+  // directly from server-side aggregation (locked 2026-05-09 hard-layer
+  // ship, Proposal 2). The aggregator computes namedPatterns +
+  // criticalPatternCount + highPatternCount from actual ToxicCombination
+  // rows the pipeline persisted; same canonical signal across all
+  // consumers. Gate covers ALL named patterns (M&A + cross-domain) at
+  // critical severity, not just the 3 M&A patterns the prior client-
+  // side detection looked for — a critical Echo Chamber should also
+  // block IC readiness, not just Synergy Mirage.
+  const namedPatterns = deal.aggregation?.namedPatterns ?? [];
+  const criticalPatternCount = deal.aggregation?.criticalPatternCount ?? 0;
+  const highPatternCount = deal.aggregation?.highPatternCount ?? 0;
+  const toxicCombosPassed = criticalPatternCount === 0;
 
   return [
     {
@@ -225,16 +193,28 @@ function computeGates(deal: DealDetail): Gate[] {
         : 'Set an IC review date so the platform can sequence the readiness countdown.',
     },
     {
-      id: 'mna_toxic_combinations',
-      label: 'No critical M&A toxic combinations',
-      description:
-        detectedPatterns.length === 0
-          ? 'No M&A toxic combinations (Synergy Mirage / Conglomerate Fallacy / Winner’s Curse) detected'
-          : criticalPatterns.length > 0
-            ? `${criticalPatterns.length} pattern(s) at critical: ${criticalPatterns.map(p => p.label).join(', ')}${highPatterns.length > 0 ? ` · ${highPatterns.length} more at high` : ''}`
-            : highPatterns.length > 0
-              ? `${highPatterns.length} pattern(s) at high severity: ${highPatterns.map(p => p.label).join(', ')}`
-              : `${detectedPatterns.length} pattern(s) detected at medium/low severity: ${detectedPatterns.map(p => p.label).join(', ')}`,
+      id: 'toxic_combinations',
+      label: 'No critical toxic combinations',
+      description: (() => {
+        if (namedPatterns.length === 0) {
+          return 'No toxic combinations (compound bias patterns) detected on the deal';
+        }
+        if (criticalPatternCount > 0) {
+          const criticalLabels = namedPatterns
+            .filter(p => p.topSeverity === 'critical')
+            .map(p => p.patternLabel)
+            .join(', ');
+          return `${criticalPatternCount} pattern(s) at critical: ${criticalLabels}${highPatternCount > 0 ? ` · ${highPatternCount} more at high` : ''}`;
+        }
+        if (highPatternCount > 0) {
+          const highLabels = namedPatterns
+            .filter(p => p.topSeverity === 'high')
+            .map(p => p.patternLabel)
+            .join(', ');
+          return `${highPatternCount} pattern(s) at high severity: ${highLabels}`;
+        }
+        return `${namedPatterns.length} pattern(s) detected at medium/low severity: ${namedPatterns.map(p => p.patternLabel).join(', ')}`;
+      })(),
       passed: toxicCombosPassed,
       remediation: toxicCombosPassed
         ? undefined

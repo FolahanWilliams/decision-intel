@@ -33,6 +33,18 @@ export interface AnalyzedDocument {
     biasType: string;
     severity?: string | null;
   }>;
+  /**
+   * Toxic combinations fired on this analysis (locked 2026-05-09 hard-
+   * layer ship — Proposal 2). Optional for backwards-compat with callers
+   * that haven't been updated to fetch the relation; aggregator handles
+   * missing field as "no patterns detected on this doc". Each entry
+   * carries the canonical patternLabel + persisted severity column.
+   */
+  toxicCombinations?: Array<{
+    patternLabel: string | null;
+    severity: 'critical' | 'high' | 'medium' | 'low' | null;
+    toxicScore: number;
+  }>;
 }
 
 /** @deprecated Use AnalyzedDocument. Kept for backwards-compat. */
@@ -43,6 +55,26 @@ export interface BiasSignatureEntry {
   documentCount: number; // # of distinct docs in this deal where this bias was flagged
   totalOccurrences: number; // raw count across all docs (a doc can have the same bias flagged twice)
   topSeverity: 'critical' | 'high' | 'medium' | 'low';
+}
+
+/**
+ * Server-side aggregation of toxic combinations across the latest
+ * analyses on a deal/package (locked 2026-05-09 hard-layer ship,
+ * Proposal 2). Replaces the prior client-side detection in
+ * IcReadinessGate.tsx — every consumer (deal kanban, deal page header,
+ * analytics, future notifications) now reads the same canonical
+ * server-aggregated signal.
+ */
+export interface NamedPatternEntry {
+  /** The named pattern label (e.g., "The Synergy Mirage"). Null entries
+   *  in source rows are filtered out before aggregation. */
+  patternLabel: string;
+  /** Number of distinct documents in the bundle where this pattern fired. */
+  documentCount: number;
+  /** Highest severity at which the pattern fired across the documents. */
+  topSeverity: 'critical' | 'high' | 'medium' | 'low';
+  /** Maximum toxicScore across the documents (0-100). */
+  maxToxicScore: number;
 }
 
 export interface AnalysesAggregation {
@@ -60,6 +92,18 @@ export interface AnalysesAggregation {
   recurringBiases: BiasSignatureEntry[];
   /** All biases across all docs, including non-recurring (count===1). */
   allBiases: BiasSignatureEntry[];
+  /**
+   * Named toxic combinations aggregated across the bundle (locked
+   * 2026-05-09 hard-layer ship, Proposal 2). Sorted by severity then
+   * documentCount. Empty array when no patterns fired or when callers
+   * didn't supply toxicCombinations on AnalyzedDocument (backwards-compat).
+   */
+  namedPatterns: NamedPatternEntry[];
+  /** Count of named patterns at critical severity. Convenience field
+   *  for IC Readiness Gate + DealKanban chip rendering. */
+  criticalPatternCount: number;
+  /** Count at high severity. */
+  highPatternCount: number;
 }
 
 /** @deprecated Use AnalysesAggregation. Kept for backwards-compat. */
@@ -100,6 +144,9 @@ export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesA
       analyzedDocCount: 0,
       recurringBiases: [],
       allBiases: [],
+      namedPatterns: [],
+      criticalPatternCount: 0,
+      highPatternCount: 0,
     };
   }
 
@@ -143,12 +190,69 @@ export function aggregateAnalyses(latestAnalyses: AnalyzedDocument[]): AnalysesA
 
   const recurringBiases = allBiases.filter(b => b.documentCount >= 2);
 
+  // Named-pattern aggregation across the bundle (locked 2026-05-09
+  // hard-layer ship, Proposal 2). Group toxic-combination rows by
+  // patternLabel; aggregate documentCount + topSeverity + maxToxicScore
+  // per pattern. Requires ToxicCombination.severity column populated
+  // (Proposal 5 ship); falls back to score-derived severity when null.
+  const patternMap = new Map<
+    string,
+    { docs: Set<string>; maxSev: number; maxScore: number }
+  >();
+  for (const analysis of latestAnalyses) {
+    if (!analysis.toxicCombinations) continue;
+    for (const tc of analysis.toxicCombinations) {
+      if (!tc.patternLabel) continue;
+      // Severity priority: explicit column → derived from score → low
+      const severityKey =
+        tc.severity ??
+        (tc.toxicScore >= 80
+          ? 'critical'
+          : tc.toxicScore >= 60
+            ? 'high'
+            : tc.toxicScore >= 40
+              ? 'medium'
+              : 'low');
+      const sev = SEVERITY_ORDER[severityKey] ?? 1;
+      const existing = patternMap.get(tc.patternLabel);
+      if (existing) {
+        existing.docs.add(analysis.documentId);
+        if (sev > existing.maxSev) existing.maxSev = sev;
+        if (tc.toxicScore > existing.maxScore) existing.maxScore = tc.toxicScore;
+      } else {
+        patternMap.set(tc.patternLabel, {
+          docs: new Set([analysis.documentId]),
+          maxSev: sev,
+          maxScore: tc.toxicScore,
+        });
+      }
+    }
+  }
+  const namedPatterns: NamedPatternEntry[] = Array.from(patternMap.entries())
+    .map(([patternLabel, { docs, maxSev, maxScore }]) => ({
+      patternLabel,
+      documentCount: docs.size,
+      topSeverity: SEVERITY_LABELS[Math.max(0, maxSev - 1)],
+      maxToxicScore: Math.round(maxScore * 10) / 10,
+    }))
+    .sort((a, b) => {
+      if (SEVERITY_ORDER[a.topSeverity] !== SEVERITY_ORDER[b.topSeverity]) {
+        return SEVERITY_ORDER[b.topSeverity] - SEVERITY_ORDER[a.topSeverity];
+      }
+      return b.documentCount - a.documentCount;
+    });
+  const criticalPatternCount = namedPatterns.filter(p => p.topSeverity === 'critical').length;
+  const highPatternCount = namedPatterns.filter(p => p.topSeverity === 'high').length;
+
   return {
     compositeDqi,
     compositeGrade: gradeFromScore(compositeDqi),
     analyzedDocCount: latestAnalyses.length,
     recurringBiases,
     allBiases,
+    namedPatterns,
+    criticalPatternCount,
+    highPatternCount,
   };
 }
 
