@@ -70,7 +70,9 @@ The pre-AI-pair-programming velocity model is dead. Forward-looking rules:
 
 (6) **Calibration check before declaring scope:** if the proposed scope feels like it can ship in this session AND the founder asked for thorough work, the scope is too small — deepen until it's session-bounded but cascade-complete.
 
-This rule was added because pre-shrinking suboptimised the founder's leverage. The founder pays per session; the unit economics favour depth over caution. When in doubt, ship the deep version.
+(7) **Surface hard-layer improvements proactively (locked 2026-05-09 evening).** When auditing a multi-commit ship, scan for changes in the pipeline (`src/lib/agents/`), DQI scoring (`src/lib/scoring/`), graph state shape (`src/lib/agents/graph.ts`), or Prisma schema that would meaningfully deepen the architecture — and surface them to the founder with rationale + cost + risk before declaring the ship complete. Default-skipping these layers is pre-shrinking. The "Modifying the analysis pipeline" rule's true intent is "don't ship silently," not "don't propose." Every ship cycle ends with a brief self-audit: "what did I deliberately skip touching the hard layers, and was that the right call?" Items where the answer is "no" get surfaced as a brief decision matrix to the founder.
+
+This rule was added because pre-shrinking suboptimised the founder's leverage. The founder pays per session; the unit economics favour depth over caution. When in doubt, ship the deep version — and when in doubt about whether to TOUCH the hard layers, surface the proposal rather than silently skip.
 
 ## One-liner (RE-LOCKED 2026-05-04 — CATEGORY-CLAIM PIVOT)
 
@@ -722,6 +724,8 @@ Claude should ask the founder before:
 3. **Changing pricing, plan limits, or billing logic** — revenue-sensitive.
 4. **Deleting any route or component** — may have external links, bookmarks, or Slack deep links pointing to it.
 5. **Making changes visible to end users** (copy, labels, flow changes) — the founder has specific positioning and language preferences.
+
+**Proactive-surfacing rule (locked 2026-05-09 evening — supersedes the default-skip pattern).** "Ask first" does NOT mean "default skip." When working on a non-trivial ship, Claude should ACTIVELY scan for high-leverage improvements in the pipeline / DQI / graph / Prisma / scoring engine that would deepen the build, then PROACTIVELY surface them to the founder with: (a) the specific change, (b) why it's high-leverage (load-bearing for what specifically — demo, procurement defensibility, future-proofing, etc.), (c) cost estimate (LOC + complexity), (d) risk assessment (what existing behaviour might shift), (e) clear recommendation. The founder decides; Claude then ships the deep version. Pre-shrinking by silently classifying improvements as "out of scope per the pipeline rule" burns the founder's leverage. The rule's true intent is "don't ship pipeline changes silently" — not "avoid pipeline work." Forward-looking: at the end of every multi-commit ship, run a brief "what did I deliberately skip touching the hard layers, and was that the right call" audit; surface the items where the answer is "no, this should ship." See "Velocity & Scope Discipline" lock above for the parent calibration.
 
 ## Build Hang Triage (READ THIS BEFORE TOUCHING THE BUILD)
 

@@ -216,6 +216,8 @@ When the founder asks "how long will X take" or "is X feasible this quarter" —
 
 When the founder asks "what should we work on next" — propose the FULL cascade on the highest-leverage approved item, not the lean cut. The afternoon ship cluster proves the cascade is absorbable.
 
+PROACTIVE-SURFACING RULE (locked 2026-05-09 evening — supersedes default-skip pattern). The "ask first before modifying pipeline / DQI / graph / Prisma" rule's TRUE INTENT is "don't ship silently," NOT "default skip." When auditing a multi-commit ship, ACTIVELY scan for high-leverage improvements in those hard layers, then SURFACE them to the founder with the change + why it's high-leverage + cost (LOC + complexity) + risk (what existing behaviour might shift) + clear recommendation. The founder decides; Claude ships. Pre-shrinking by silently classifying as "out of scope per the pipeline rule" burns the founder's leverage. Every ship cycle ends with a brief "what did I deliberately skip touching the hard layers, and was that the right call" audit. When the founder asks "what's next" or "anything I should know" — surface the audit findings.
+
 === FOUNDER HUB TAB ROUTING ===
 When the founder asks for help with one of these workflows, route them to the named tab in the Founder Hub (use the AI-chat dispatch event so the tab actually opens — never just describe it). The hub is at /dashboard/founder-hub and is gated by NEXT_PUBLIC_FOUNDER_HUB_PASS. Tabs are organised in groups: Start, Product, Go-to-Market, Intelligence, Tools.
 
