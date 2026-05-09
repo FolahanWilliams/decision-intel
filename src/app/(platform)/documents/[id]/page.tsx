@@ -206,9 +206,19 @@ interface Document {
   isSample?: boolean;
   visibility?: string;
   analyses?: Analysis[];
-  deal?: {
+  /// First DecisionContainer this doc belongs to (Phase 3 P3.4 — replaces
+  /// legacy `deal` shape). A doc can sit in 0..n containers via the
+  /// DecisionContainerDocument join; the API surfaces the most-recent
+  /// container as the primary context. Null when the doc is standalone.
+  container?: {
     id: string;
     name: string;
+    kind: 'investment' | 'acquisition' | 'strategic';
+    stageId: string;
+    compositeDqi: number | null;
+    compositeGrade: string | null;
+    documentCount: number;
+    analyzedDocCount: number;
     sector?: string | null;
     ticketSize?: number | null;
   } | null;
@@ -266,10 +276,10 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     void refetch();
   }, [refetch]);
 
-  /* ───── deal cross-ref fetch (when document is part of a deal) ───── */
-  const dealId = document?.deal?.id ?? null;
+  /* ───── container cross-ref fetch (when doc is part of a container) ──── */
+  const containerId = document?.container?.id ?? null;
   useEffect(() => {
-    if (!dealId) {
+    if (!containerId) {
       setDealConflictCount(null);
       setDealHighSeverityCount(null);
       return;
@@ -277,16 +287,18 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     let cancelled = false;
     const run = async () => {
       try {
-        const res = await fetch(`/api/deals/${dealId}`);
+        const res = await fetch(`/api/containers/${containerId}`);
         if (!res.ok) return;
         const data = (await res.json()) as {
-          crossReference?: { conflictCount?: number; highSeverityCount?: number } | null;
+          crossRefConflictCount?: number;
+          crossRefHighSeverityCount?: number;
         };
         if (cancelled) return;
-        const cr = data.crossReference;
-        setDealConflictCount(typeof cr?.conflictCount === 'number' ? cr.conflictCount : null);
+        setDealConflictCount(
+          typeof data.crossRefConflictCount === 'number' ? data.crossRefConflictCount : null
+        );
         setDealHighSeverityCount(
-          typeof cr?.highSeverityCount === 'number' ? cr.highSeverityCount : null
+          typeof data.crossRefHighSeverityCount === 'number' ? data.crossRefHighSeverityCount : null
         );
       } catch (err) {
         if (!cancelled) {
@@ -301,7 +313,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     return () => {
       cancelled = true;
     };
-  }, [dealId]);
+  }, [containerId]);
 
   /* ───── derived ───── */
   const analysis = document?.analyses?.[0] ?? null;
@@ -601,7 +613,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
       case 'stress':
         return (
           <div style={{ display: 'grid', gap: 16 }}>
-            {document?.deal?.id ? (
+            {document?.container?.id ? (
               <div
                 style={{
                   display: 'inline-flex',
@@ -615,14 +627,30 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   color: 'var(--text-secondary)',
                 }}
               >
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {document.deal.name}
+                <span
+                  style={{
+                    fontSize: 11,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    color: 'var(--text-muted)',
+                    fontWeight: 600,
+                  }}
+                >
+                  {document.container.kind}
                 </span>
+                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {document.container.name}
+                </span>
+                {document.container.compositeDqi != null && (
+                  <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-muted)' }}>
+                    · DQI {Math.round(document.container.compositeDqi)}
+                  </span>
+                )}
                 <a
-                  href={`/dashboard/deals/${document.deal.id}`}
+                  href={`/dashboard/decisions/${document.container.id}`}
                   style={{ color: 'var(--accent-primary)', fontSize: 11, fontWeight: 600 }}
                 >
-                  View deal →
+                  View decision →
                 </a>
               </div>
             ) : null}
@@ -778,7 +806,9 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   contentHash={document.contentHash ?? null}
                   crossDocConflictCount={dealConflictCount}
                   crossDocHighSeverityCount={dealHighSeverityCount}
-                  conflictHref={document.deal?.id ? `/dashboard/deals/${document.deal.id}` : null}
+                  conflictHref={
+                    document.container?.id ? `/dashboard/decisions/${document.container.id}` : null
+                  }
                   auditedAt={analysis.createdAt}
                   documentId={document.id}
                   uploadedAt={document.uploadedAt ?? null}

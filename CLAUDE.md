@@ -128,6 +128,38 @@ This rule was added because pre-shrinking suboptimised the founder's leverage. T
 
 These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
+## DecisionContainer Phase 3 Tier 1+2 (locked 2026-05-09 evening — wedge-motion completion + cross-surface coherence)
+
+**Phase 3 closes the integration gaps the Phase 2 ship deliberately deferred.** Without these, the Outcome Gate enforcement + per-org Brier accumulation + Vohra ≥40% PMF graduation gate all stalled because users couldn't actually CLOSE outcomes.
+
+**Tier 1 (wedge-motion-blocking)**:
+
+- **P3.1** — `ContainerOutcomeCaptureModal` mounted on `/dashboard/decisions/[id]`. Reads `CONTAINER_MODES[kind].outcomeShape.fields` and renders one input per field with type-appropriate widget (number / percent / currency / enum / months / text). Server validates the metrics blob against the same schema in `/api/containers/[id]/outcome`. Required summary (≥10 chars); all metric fields optional (partial outcomes are useful). Without this, the Outcome Gate has no completion path.
+- **P3.2** — `ContainerCrossReferenceCard` renders `container.latestCrossReference.findings` with severity-coded conflict tiles + per-claim evidence quotes + deep-links to underlying documents. Empty-state copy is honest: "Click Cross-reference above when ≥2 documents are analyzed." Procurement-grade — closes the gap where conflicts existed but didn't render.
+- **P3.3** — Upload route now CREATES the `DecisionContainerDocument` join row when an upload carries `containerId`. Container access verified via owner-OR-same-org check before insert; `recomputeContainerMetrics` fires after successful join. Schema-drift-tolerant — if the migration hasn't landed, the join is skipped silently rather than blocking the upload. Form field still accepts the legacy `dealId` alias for forward-compat with in-flight code paths.
+
+**Tier 2 (cross-surface coherence)**:
+
+- **P3.4** — `Document.container` field on the doc-detail page. `/api/documents/[id]` reads the FIRST `DecisionContainerDocument` join row + flattens to `container: { id, name, kind, stageId, compositeDqi, compositeGrade, ... }`. Doc detail page renders a stress-tab chip with mode + container name + composite DQI + "View decision →" link. The Verdict Band's conflict-href routes to `/dashboard/decisions/[id]` (was `/dashboard/deals/[id]` legacy).
+- **P3.5** — `ContainersWidget` mounted on `/dashboard` home (replaces deleted `UnifiedDecisionsFeed`). Top-5 most-recently-updated active decisions across all modes (cross-mode roll-up via `useContainers` with no kind filter). Each row shows mode chip + name + stage + T-N committee countdown + cross-doc conflict count + composite DQI grade. Section footer links to `/dashboard/decisions` for the full kanban.
+
+**Quality gates at Phase 3 ship**:
+
+- tsc --noEmit clean (0 errors).
+- 44/44 SSOT + conviction tests pass.
+- 4 lint gates clean (positioning · silent-catches 150 below baseline 155 · counts at baseline 80 · canonical-imports clean).
+- Prettier clean.
+- slop-scan scorePerKloc 2.99 (unchanged from Phase 2 — new code composes cleanly from canonical helpers).
+
+**Deferred to Phase 4 (polish)**:
+
+- **P3.6** — Container-aware DPR with mode-specific lifecycle strip. Current state: `/api/containers/[id]/provenance-record` forwards to lead-doc DPR. Phase 4 extends `ProvenanceRecordData` with a `containerContext` field + DPR cover renders Sourcing → Diligence → IC Review → Closing for an investment, etc.
+- **P3.7** — `ContainerDqiBreakdownPanel` (composite-DQI explainability for containers). Per-doc panel exists; composite version is follow-up.
+- **P3.8** — Marketing parity (`/how-it-works` Section 4b + `/bias-genome` MnaPatternCoverage read from `CONTAINER_MODES` SSOT). Pure read-from-SSOT migration; surfaces still render correctly with the legacy hardcoded data.
+- **Decision Pipeline Constellation** — explicit `DecisionContainerLink` table (linkType: 'precedes' | 'spawned_from' | 'depends_on' | 'parent_of') + longitudinal/relational visualization with click-to-navigate popups + T-N committee-date highlights. Phase 3.5 ship — demo-magnetic for Cornerstone meetings + investor pitches.
+
+**Forward-looking rule**: when adding a new audit-landing surface that should reach the unified container, default to mounting `ContainersWidget` (cross-mode home roll-up) or linking to `/dashboard/decisions/[id]` (mode-aware detail) — never re-implement the kanban or detail panels per surface. Same drift-class lock as the canonical-imports rule.
+
 ## 3-Layer Positioning Frame (locked 2026-05-09 evening — Gemini-pushback validation)
 
 **Architectural vocabulary** for cold investor conversations + pitch-deck slide 2 + senior-direct corp dev applications. Lifted from the 2026-05-09 Gemini-pushback validation pass; sharper than the prior CLAUDE.md positioning frame because it gives the reader a clean architectural slot for DI:

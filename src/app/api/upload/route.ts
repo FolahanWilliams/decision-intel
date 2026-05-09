@@ -175,14 +175,39 @@ export async function POST(request: NextRequest) {
       // Schema drift — TeamMember table may not exist yet
     }
 
-    // Container ownership verification ships in Phase 2 of the
-    // DecisionContainer refactor (will check the user-can-write-to
-    // -container path on the new DecisionContainer model). For now the
-    // upload accepts the containerId but does not persist a
-    // DecisionContainerDocument join row — the unified UI shell is the
-    // authoritative attach point.
+    // Container ownership verification + access check (Phase 3 P3.3
+    // wiring). When the upload carries a containerId, verify the
+    // requesting user can write to it — owner OR same-org with team
+    // visibility. Failure modes:
+    //   - containerId provided but unknown / no access → 400, abort
+    //   - container exists but TeamMember check fails → ownership-only
+    //   - schema-drift error → log warn, proceed without attach
+    let resolvedContainerId: string | null = null;
     if (containerId) {
-      log.debug(`Container attach pending Phase 2 wiring: ${containerId}`);
+      try {
+        const container = await prisma.decisionContainer.findFirst({
+          where: {
+            id: containerId,
+            OR: [{ ownerUserId: userId }, { orgId: userOrgId ?? undefined }],
+          },
+          select: { id: true },
+        });
+        if (!container) {
+          return NextResponse.json(
+            { error: 'Container not found or access denied' },
+            { status: 400 }
+          );
+        }
+        resolvedContainerId = container.id;
+      } catch (driftErr) {
+        // @schema-drift-tolerant — DecisionContainer may not be migrated
+        // on older deployments. Drop the attach silently rather than
+        // blocking the upload; the user can attach manually post-create.
+        log.warn(
+          'Container attach skipped (schema drift?): ' +
+            (driftErr instanceof Error ? driftErr.message : String(driftErr))
+        );
+      }
     }
 
     // Resolve version-chain ancestor when versionOfDocumentId is provided.
@@ -400,6 +425,39 @@ export async function POST(request: NextRequest) {
           data: { documentId: document.id },
         })
         .catch(err => log.warn('Failed to link DecisionFrame:', err));
+    }
+
+    // Phase 3 P3.3 — attach to DecisionContainer via the join table.
+    // Container access was already verified above; this just creates
+    // the join row + recomputes the container metrics. Position
+    // defaults to the next slot (count + 1) so the doc lands at the
+    // bottom of the container's existing roster. Fire-and-forget —
+    // if the join fails the upload still succeeds; the user can
+    // attach manually post-create.
+    if (resolvedContainerId) {
+      void (async () => {
+        try {
+          const existingCount = await prisma.decisionContainerDocument.count({
+            where: { containerId: resolvedContainerId! },
+          });
+          await prisma.decisionContainerDocument.create({
+            data: {
+              containerId: resolvedContainerId!,
+              documentId: document.id,
+              role: documentType || null,
+              position: existingCount,
+            },
+          });
+          const { recomputeContainerMetrics } = await import('@/lib/scoring/container-aggregation');
+          await recomputeContainerMetrics(resolvedContainerId!);
+          log.info(`Attached document ${document.id} to container ${resolvedContainerId}`);
+        } catch (joinErr) {
+          log.warn(
+            'Container join attach failed (non-critical): ' +
+              (joinErr instanceof Error ? joinErr.message : String(joinErr))
+          );
+        }
+      })();
     }
 
     // Audit log (fire-and-forget)

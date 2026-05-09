@@ -68,9 +68,30 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               createdAt: true,
             },
           },
-          // DecisionContainer membership lookup ships in Phase 2 of the
-          // refactor (read from Document → DecisionContainerDocument →
-          // DecisionContainer with kind + name + sector + ticketSize).
+          // DecisionContainer membership (Phase 3 P3.4 wiring). Reads
+          // the FIRST container this doc belongs to via the join table;
+          // surfaces kind + name + composite DQI + member count for the
+          // doc-detail container chip + verdict-band conflict-href.
+          containers: {
+            take: 1,
+            orderBy: { addedAt: 'desc' },
+            select: {
+              container: {
+                select: {
+                  id: true,
+                  name: true,
+                  kind: true,
+                  stageId: true,
+                  compositeDqi: true,
+                  compositeGrade: true,
+                  documentCount: true,
+                  analyzedDocCount: true,
+                  sector: true,
+                  ticketSize: true,
+                },
+              },
+            },
+          },
           analyses: {
             orderBy: { createdAt: 'desc' },
             select: {
@@ -160,14 +181,43 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         { status: 500 }
       );
     }
-    // DecisionContainer membership lookup re-lands in Phase 2 of the
-    // refactor (Document → DecisionContainerDocument → DecisionContainer).
-    // Until then the document detail returns without container context;
-    // the doc-detail UI gates its container chips on this field's
-    // presence so the absence degrades gracefully.
+    // Surface the FIRST DecisionContainer this doc belongs to as a
+    // top-level `container` field (Phase 3 P3.4). Normalises the join
+    // shape from `containers[0].container` to a flat object the
+    // doc-detail page reads. Decimal ticketSize → number for the JSON.
+    const containerJoin = (
+      docFields as {
+        containers?: Array<{
+          container: {
+            id: string;
+            name: string;
+            kind: string;
+            stageId: string;
+            compositeDqi: number | null;
+            compositeGrade: string | null;
+            documentCount: number;
+            analyzedDocCount: number;
+            sector: string | null;
+            ticketSize: unknown;
+          };
+        }>;
+      }
+    ).containers?.[0]?.container;
+    const container = containerJoin
+      ? {
+          ...containerJoin,
+          ticketSize: containerJoin.ticketSize != null ? Number(containerJoin.ticketSize) : null,
+        }
+      : null;
     const isOwner = (docFields as { userId?: string }).userId === userId;
+    const { containers: _containersField, ...docRest } = docFields as {
+      containers?: unknown;
+      [key: string]: unknown;
+    };
+    void _containersField;
     return NextResponse.json({
-      ...docFields,
+      ...docRest,
+      container,
       content: decryptedContent,
       isOwner,
     });

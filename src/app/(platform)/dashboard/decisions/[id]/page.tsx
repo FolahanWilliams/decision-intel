@@ -9,18 +9,21 @@
  * checklist) above member-document list with per-doc DQI tiles.
  */
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, FileText, Download, GitCompareArrows } from 'lucide-react';
+import { ChevronLeft, FileText, Download, GitCompareArrows, CheckCircle2 } from 'lucide-react';
 import { useContainer } from '@/hooks/useContainers';
 import { ContainerCompositeHero } from '@/components/containers/ContainerCompositeHero';
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
+import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
+import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { dqiColorFor } from '@/lib/utils/grade';
 
 export default function ContainerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { container, isLoading, error, mutate } = useContainer(id);
+  const [showOutcomeModal, setShowOutcomeModal] = useState(false);
 
   if (isLoading) {
     return <div style={{ padding: 24, color: 'var(--text-muted)' }}>Loading decision…</div>;
@@ -266,38 +269,33 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
             )}
           </div>
 
-          {container.outcome && (
-            <div
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 16,
-              }}
-            >
-              <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 600, marginBottom: 8 }}>
-                Outcome
-              </h2>
-              <p
-                style={{
-                  fontSize: 'var(--fs-sm)',
-                  color: 'var(--text-secondary)',
-                  marginBottom: 12,
-                }}
-              >
-                {container.outcome.summary}
-              </p>
-              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)' }}>
-                Reported {new Date(container.outcome.reportedAt).toLocaleDateString()}
-              </div>
-            </div>
-          )}
+          <ContainerCrossReferenceCard run={container.latestCrossReference} />
+
+          <OutcomeBlock
+            outcome={container.outcome}
+            onCaptureClick={() => setShowOutcomeModal(true)}
+          />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <CommitteeReadinessGate container={container} />
         </div>
       </div>
+
+      {showOutcomeModal && (
+        <ContainerOutcomeCaptureModal
+          containerId={container.id}
+          containerKind={container.kind}
+          containerName={container.name}
+          initialSummary={container.outcome?.summary}
+          initialMetrics={container.outcome?.metrics}
+          onClose={() => setShowOutcomeModal(false)}
+          onSaved={() => {
+            setShowOutcomeModal(false);
+            mutate();
+          }}
+        />
+      )}
 
       <style jsx>{`
         @media (max-width: 900px) {
@@ -307,5 +305,169 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
         }
       `}</style>
     </ErrorBoundary>
+  );
+}
+
+function OutcomeBlock({
+  outcome,
+  onCaptureClick,
+}: {
+  outcome: NonNullable<ReturnType<typeof useContainer>['container']>['outcome'];
+  onCaptureClick: () => void;
+}) {
+  if (!outcome) {
+    return (
+      <div
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 16,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 12,
+          }}
+        >
+          <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 600 }}>Outcome</h2>
+          <button
+            type="button"
+            onClick={onCaptureClick}
+            style={{
+              padding: '6px 10px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent-primary)',
+              border: 'none',
+              color: '#fff',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <CheckCircle2 size={12} />
+            Log outcome
+          </button>
+        </div>
+        <p
+          style={{
+            fontSize: 'var(--fs-sm)',
+            color: 'var(--text-muted)',
+            margin: 0,
+            lineHeight: 1.5,
+          }}
+        >
+          Closing the loop sharpens your DQI calibration AND contributes to the Bias Genome
+          cross-org learning surface. Capture how the decision actually played out vs. the original
+          thesis.
+        </p>
+      </div>
+    );
+  }
+
+  const reportedDate = new Date(outcome.reportedAt).toLocaleDateString();
+  const metricEntries = Object.entries(outcome.metrics).filter(([, v]) => v != null && v !== '');
+
+  return (
+    <div
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)',
+        padding: 16,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 12,
+          gap: 8,
+        }}
+      >
+        <div>
+          <h2 style={{ fontSize: 'var(--fs-md)', fontWeight: 600, marginBottom: 2 }}>Outcome</h2>
+          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+            Reported {reportedDate}
+            {outcome.realisedDqi != null && ` · realised DQI ${Math.round(outcome.realisedDqi)}`}
+            {outcome.brierScore != null && ` · Brier ${outcome.brierScore.toFixed(3)}`}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onCaptureClick}
+          style={{
+            padding: '6px 10px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-primary)',
+            fontSize: 'var(--fs-xs)',
+            cursor: 'pointer',
+          }}
+        >
+          Edit
+        </button>
+      </div>
+      <p
+        style={{
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text-secondary)',
+          marginBottom: metricEntries.length > 0 ? 12 : 0,
+          lineHeight: 1.5,
+        }}
+      >
+        {outcome.summary}
+      </p>
+      {metricEntries.length > 0 && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 8,
+          }}
+        >
+          {metricEntries.map(([key, value]) => (
+            <div
+              key={key}
+              style={{
+                padding: 8,
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-secondary)',
+                fontSize: 'var(--fs-xs)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 2,
+                }}
+              >
+                {key.replace(/_/g, ' ')}
+              </div>
+              <div
+                style={{
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {String(value)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

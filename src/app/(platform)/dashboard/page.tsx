@@ -61,9 +61,7 @@ import { SampleBadge } from '@/components/ui/SampleBadge';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
-// UnifiedDecisionsFeed re-lands in Phase 2 of the DecisionContainer
-// refactor — replaces the legacy deals + packages merger with a single
-// container feed (kind = strategic | investment | acquisition).
+import { ContainersWidget } from '@/components/dashboard/ContainersWidget';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -1213,11 +1211,12 @@ export default function Dashboard() {
         <NudgeWidget />
       </ErrorBoundary>
 
-      {/* Unified decisions feed — re-lands in Phase 2 of the
-         DecisionContainer refactor (locked 2026-05-09 evening). The
-         legacy deals + packages merger is replaced with a single
-         container feed reading kind = strategic | investment |
-         acquisition off the unified DecisionContainer table. */}
+      {/* Container roll-up widget (Phase 3 P3.5 — replaces deleted
+         UnifiedDecisionsFeed). Top-5 most-recently-updated decisions
+         across all modes. */}
+      <ErrorBoundary sectionName="Active decisions">
+        <ContainersWidget />
+      </ErrorBoundary>
 
       <ErrorBoundary sectionName="Journal">
         <JournalWidget />
