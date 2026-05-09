@@ -52,7 +52,9 @@ import {
 import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
   extractSynergyDefensibilityFromContent,
+  summariseSynergyDefensibility,
   type SynergyDefensibilitySummary,
+  type ParsedSynergyModelData,
 } from '@/lib/parsers/synergy-model-parser';
 import {
   computeCalibratedRejection,
@@ -886,15 +888,14 @@ export async function assembleProvenanceRecordData(
             contentHash: true,
             userId: true,
             orgId: true,
-            // Synergy defensibility extraction (locked 2026-05-09, M&A cascade
-            // depth ship). When documentType === 'synergy_model', the upload
-            // route's file-parser embedded the STRUCTURED SYNERGY MODEL block
-            // at the top of content. Read it here so the DPR cover surfaces
-            // the procurement-grade defensibility data without re-parsing the
-            // original .xlsx. content + documentType are needed for the
-            // extractor; both are existing columns (no migration).
+            // Synergy defensibility extraction. Prefer the structured
+            // parsedStructuredData column (locked 2026-05-09 hard-layer
+            // ship — Document.parsedStructuredData JSON field). Falls back
+            // to the inline-marker text extraction from content for legacy
+            // uploads or when the structured field is null.
             content: true,
             documentType: true,
+            parsedStructuredData: true,
           },
         },
       },
@@ -1193,21 +1194,35 @@ export async function assembleProvenanceRecordData(
     summary: analysis.summary,
   });
 
-  // Synergy Defensibility — extracted from the inline STRUCTURED SYNERGY
-  // MODEL block embedded in Document.content by the upload-route file-
-  // parser (locked 2026-05-09, M&A cascade depth ship). Pure function,
-  // deterministic, no LLM. Returns null when the document isn't a
-  // synergy_model OR the parser bailed; the DPR section renders only
-  // when populated.
-  const docContent = (
+  // Synergy Defensibility — preferred source is Document.parsedStructuredData
+  // (locked 2026-05-09 hard-layer ship — first-class Prisma JSON column
+  // populated by the upload route's type-aware structured extraction).
+  // Falls back to the inline STRUCTURED SYNERGY MODEL block in
+  // Document.content for legacy uploads where parsedStructuredData is null
+  // (existed before the migration; or upload was on the old text-only path).
+  // Pure function either way, deterministic, no LLM.
+  const doc = (
     analysis as unknown as {
-      document?: { content?: string | null; documentType?: string | null };
+      document?: {
+        content?: string | null;
+        documentType?: string | null;
+        parsedStructuredData?: unknown;
+      };
     }
   ).document;
-  const synergyDefensibility =
-    docContent?.documentType === 'synergy_model' && docContent?.content
-      ? extractSynergyDefensibilityFromContent(docContent.content) ?? undefined
-      : undefined;
+  let synergyDefensibility: SynergyDefensibilitySummary | undefined = undefined;
+  if (doc?.documentType === 'synergy_model') {
+    // Path 1 (preferred): structured field
+    if (doc.parsedStructuredData) {
+      const parsed = doc.parsedStructuredData as ParsedSynergyModelData | null;
+      synergyDefensibility = summariseSynergyDefensibility(parsed) ?? undefined;
+    }
+    // Path 2 (fallback): inline-marker text extraction for legacy uploads
+    if (!synergyDefensibility && doc.content) {
+      synergyDefensibility =
+        extractSynergyDefensibilityFromContent(doc.content) ?? undefined;
+    }
+  }
 
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render

@@ -381,11 +381,44 @@ export function extractSynergyStructure(workbook: ExcelJSType.Workbook): Synergy
 }
 
 /**
+ * JSON-serialisable wrapper around SynergyStructure for persistence in
+ * Document.parsedStructuredData (locked 2026-05-09, hard-layer ship).
+ * The schema carries a `kind` discriminator so future parsers (qofe,
+ * integration_plan) can use the same column with their own structured
+ * shapes. Read by the DPR assembler, deal-aggregator, and downstream
+ * consumers without re-parsing the original .xlsx.
+ */
+export interface ParsedSynergyModelData {
+  kind: 'synergy_model';
+  /** Schema version for forward-compat; bump when shape changes. */
+  version: 1;
+  structure: SynergyStructure;
+  /** When the parse ran — useful for cache invalidation if parsing logic changes. */
+  parsedAt: string;
+}
+
+/**
+ * Build the JSON-persistable wrapper from a SynergyStructure. Always
+ * returns null when the structure has zero claims so persistence
+ * doesn't fill up with empty rows.
+ */
+export function toParsedStructuredData(
+  structure: SynergyStructure
+): ParsedSynergyModelData | null {
+  if (!structure.detected || structure.claims.length === 0) return null;
+  return {
+    kind: 'synergy_model',
+    version: 1,
+    structure,
+    parsedAt: new Date().toISOString(),
+  };
+}
+
+/**
  * Compact summary surfaced on the DPR cover when a synergy_model is
- * audited. Extracted back out of the inline-block text by
- * `extractSynergyDefensibilityFromContent` so DPR consumers don't need
- * the original ExcelJS workbook — the structured data is recoverable
- * from Document.content alone.
+ * audited. Extracted from Document.parsedStructuredData (preferred)
+ * or from the inline STRUCTURED SYNERGY MODEL block in Document.content
+ * (fallback for legacy uploads or encryption edge cases).
  */
 export interface SynergyDefensibilitySummary {
   /** Whether a synergy block was detected in the content. */
@@ -410,6 +443,51 @@ export interface SynergyDefensibilitySummary {
 
 const BLOCK_START = '=== STRUCTURED SYNERGY MODEL — PARSED PRE-AUDIT ===';
 const BLOCK_END = '=== END STRUCTURED SYNERGY MODEL ===';
+
+/**
+ * Build a SynergyDefensibilitySummary directly from the persisted
+ * ParsedSynergyModelData wrapper (Document.parsedStructuredData).
+ * Preferred over the text-extraction path because the structured field
+ * survives content encryption and doesn't suffer regex-extraction drift.
+ * Returns null when the wrapper is for a different document kind or
+ * has zero claims.
+ */
+export function summariseSynergyDefensibility(
+  parsed: ParsedSynergyModelData | null
+): SynergyDefensibilitySummary | null {
+  if (!parsed || parsed.kind !== 'synergy_model') return null;
+  const { structure } = parsed;
+  if (!structure.detected || structure.claims.length === 0) return null;
+
+  const totalClaims = structure.claims.length;
+  const fullyDefendedPct = structure.portfolio.fullyDefendedPct;
+
+  const severityRank: Record<string, number> = {
+    critical: 0,
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
+  const topClaims = [...structure.claims]
+    .sort((a, b) => severityRank[a.defensibility.severity] - severityRank[b.defensibility.severity])
+    .slice(0, 5)
+    .map(c => ({
+      label: c.label,
+      type: c.type,
+      severity: c.defensibility.severity,
+      score: c.defensibility.score,
+      verdict: c.defensibility.verdict,
+    }));
+
+  return {
+    detected: true,
+    confidence: structure.confidence,
+    totalClaims,
+    fullyDefendedPct,
+    portfolioSummary: structure.portfolio.summary,
+    topClaims,
+  };
+}
 
 /**
  * Extract a SynergyDefensibilitySummary from the inline-marker block

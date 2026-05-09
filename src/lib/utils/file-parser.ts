@@ -8,6 +8,8 @@ import { createLogger } from '@/lib/utils/logger';
 import {
   extractSynergyStructure,
   formatSynergyStructureForAudit,
+  toParsedStructuredData,
+  type ParsedSynergyModelData,
 } from '@/lib/parsers/synergy-model-parser';
 
 const log = createLogger('FileParser');
@@ -227,4 +229,62 @@ export async function parseFile(
 
   // Default to plain text
   return buffer.toString('utf-8');
+}
+
+/**
+ * Type-aware structured-data extractor (locked 2026-05-09, M&A cascade
+ * hard-layer ship). Runs in parallel to parseFile() at upload time and
+ * returns a JSON-serialisable wrapper for persistence in
+ * Document.parsedStructuredData. Replaces the inline-marker text round-
+ * trip pattern in Document.content for downstream DPR / aggregation /
+ * pipeline consumers.
+ *
+ * Today supports: synergy_model + .xlsx via extractSynergyStructure.
+ * Future expansions (qofe + .pdf, integration_plan + .docx) plug into
+ * the same return shape via a `kind` discriminator on the returned
+ * payload.
+ *
+ * Returns null when:
+ *   - documentType doesn't match any structured parser
+ *   - the file extension doesn't match the parser's expected format
+ *   - the parser ran but bailed out (e.g., zero claims detected)
+ *   - any unexpected error during parsing — non-fatal, falls through to
+ *     the legacy text path
+ */
+export async function extractTypeAwareStructuredData(
+  buffer: Buffer,
+  mimeType: string,
+  filename: string,
+  documentType: string | null | undefined
+): Promise<ParsedSynergyModelData | null> {
+  if (!documentType) return null;
+
+  const lowerFilename = filename.toLowerCase();
+  const isXlsx =
+    mimeType ===
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    lowerFilename.endsWith('.xlsx');
+
+  if (documentType === 'synergy_model' && isXlsx) {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await workbook.xlsx.load(buffer as any);
+      const structure = extractSynergyStructure(workbook);
+      const wrapped = toParsedStructuredData(structure);
+      if (wrapped) {
+        log.info(
+          `synergy-model structured-data extraction: ${structure.claims.length} claims · confidence=${structure.confidence}`
+        );
+      }
+      return wrapped;
+    } catch (err) {
+      log.warn(`synergy-model structured-data extraction failed: ${String(err)}`);
+      return null;
+    }
+  }
+
+  // Future parsers (qofe / integration_plan) plug in here with their own
+  // `kind`-discriminated payloads.
+  return null;
 }

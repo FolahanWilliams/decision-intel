@@ -3,7 +3,8 @@ import { after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import path from 'path';
 import { createClient } from '@/utils/supabase/server';
-import { parseFile } from '@/lib/utils/file-parser';
+import { parseFile, extractTypeAwareStructuredData } from '@/lib/utils/file-parser';
+import { Prisma } from '@prisma/client';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
@@ -241,12 +242,26 @@ export async function POST(request: NextRequest) {
 
     // Extract text content
     let content = '';
+    // Type-aware structured-data extraction (locked 2026-05-09 hard-layer
+    // ship). Runs in parallel to text parsing and persists to
+    // Document.parsedStructuredData below. Null when no structured parser
+    // matches the documentType OR extraction bailed — downstream consumers
+    // fall back to the legacy text-content extraction path.
+    let parsedStructuredData: Awaited<
+      ReturnType<typeof extractTypeAwareStructuredData>
+    > = null;
 
     try {
       // Pass documentType to enable synergy_model spreadsheet enrichment
       // (locked 2026-05-09). For other doc types the param is informational —
       // parseFile only uses it for synergy_model + .xlsx today.
       content = await parseFile(buffer, file.type, file.name, documentType ?? undefined);
+      parsedStructuredData = await extractTypeAwareStructuredData(
+        buffer,
+        file.type,
+        file.name,
+        documentType
+      );
     } catch (error) {
       log.error('File Parse Error:', error);
       return NextResponse.json(
@@ -281,6 +296,14 @@ export async function POST(request: NextRequest) {
           contentHash,
           status: 'pending',
           ...(documentType ? { documentType } : {}),
+          // Persist type-aware structured parser output when present
+          // (locked 2026-05-09 hard-layer ship). Replaces the inline-marker
+          // text round-trip for downstream DPR/aggregation consumers. Cast
+          // to Prisma.InputJsonValue per the JSON-field convention in
+          // CLAUDE.md "Prisma JSON fields need explicit casting".
+          ...(parsedStructuredData
+            ? { parsedStructuredData: parsedStructuredData as unknown as Prisma.InputJsonValue }
+            : {}),
           ...(dealId ? { dealId } : {}),
           ...(resolvedParentDocumentId
             ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }
