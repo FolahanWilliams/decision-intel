@@ -55,6 +55,7 @@ import {
   type RegulatoryTabSovereignContext,
 } from '@/components/documents/detail/tabs';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { extractSynergyDefensibilityFromContent } from '@/lib/parsers/synergy-model-parser';
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
@@ -336,6 +337,17 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     [biases, taxonomyIdByType]
   );
 
+  /* ───── Synergy defensibility (synergy_model uploads only) ─────
+     Cascade-depth audit ship #2 lock 2026-05-09 evening. Pure regex over
+     the inline STRUCTURED SYNERGY MODEL block in document.content (no
+     extra round-trip; the data the parser persisted at upload time is
+     already in scope). Memo'd off content so we don't re-parse on
+     unrelated re-renders. Returns null for non-synergy uploads. */
+  const synergyDefensibility = useMemo(() => {
+    if (!document?.content) return null;
+    return extractSynergyDefensibilityFromContent(document.content);
+  }, [document?.content]);
+
   /* ───── linked PDF ↔ findings event bus ───── */
   const handleBiasClick = useCallback((bias: BiasInstance) => {
     setActiveBiasId(prev => (prev === bias.id ? null : bias.id));
@@ -487,6 +499,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
               r2fProtected={r2fProtected}
               r2fSuppressed={r2fSuppressed}
               r2fSummary="Mapped from your memo's flagged passages and structural assumptions."
+              synergyDefensibility={synergyDefensibility}
               activeBiasId={activeBiasId}
               onBiasClick={handleBiasClick}
               taxonomyIdByType={taxonomyIdByType}
