@@ -29,6 +29,7 @@ import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
 import { RiskLandscape } from '@/components/marketing/genome/RiskLandscape';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { GenomeMethodologyViz } from '@/components/marketing/genome/GenomeMethodologyViz';
+import { MnaPatternCoverage } from '@/components/marketing/genome/MnaPatternCoverage';
 import { BiasGenomeClient } from './BiasGenomeClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -404,6 +405,17 @@ export default function BiasGenomePage() {
           </div>
         </div>
       </section>
+
+      {/* M&A WORKFLOW PATTERN COVERAGE — locked 2026-05-09. The three
+          M&A workflow-native toxic combinations get a dedicated section
+          showing every anchor case from the 143-case library tagged
+          with each pattern. Procurement-grade authority signal: a Head
+          of Corp Dev or PE Deal Partner sees "here are 14 deals you've
+          heard of, audited against our 3 M&A patterns." Mounted between
+          Toxic Combinations (general patterns) and Biological-State
+          Signals (additional differentiator) so the M&A reader hits the
+          M&A surface without scrolling past the unrelated content. */}
+      <MnaPatternCoverage />
 
       {/* BIOLOGICAL-STATE SIGNALS — IP claim no other decision-intel
           platform makes. Modeling cortisol/winner-effect language as a
