@@ -1,6 +1,26 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+/**
+ * DecisionLogFeed — chronological feed of journal entries + cognitive
+ * audits. Mounted as the "Log" view on /dashboard/decisions (Phase G
+ * fold 2026-05-10). Previously lived at /dashboard/decision-log as a
+ * standalone sidebar entry; folded into Decisions after the founder
+ * audit — "still too much cognitive load with all the pages — is the
+ * Decision Log really a necessary standalone page, can't we just
+ * incorporate elements from it into the Decisions page".
+ *
+ * Conceptual model: journal entries + cognitive audits + containers are
+ * all decisions, just at different levels of formality. The Decisions
+ * page is now the unified surface — Kanban (workflow-grade containers),
+ * Constellation (cognitive lineage), Log (informal capture + audits).
+ *
+ * Header (h1 + buttons) is supplied by the parent /dashboard/decisions
+ * page when embedded; this component only renders the feed body +
+ * filters + entry/delete modals. The `onLogEntryClick` prop lets the
+ * parent trigger the new-entry modal from its own toolbar button.
+ */
+
+import { useState, useEffect, useCallback, useMemo, useImperativeHandle, forwardRef } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -8,7 +28,6 @@ import {
   Calendar,
   Edit,
   MessageSquare,
-  Plus,
   ArrowRight,
   Loader2,
   CheckCircle,
@@ -16,12 +35,11 @@ import {
   Clock,
   Send,
   AlertTriangle,
-  BrainCircuit,
   BarChart3,
+  BrainCircuit,
   Trash2,
   type LucideIcon,
 } from 'lucide-react';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import { emptyStateCopy } from '@/lib/onboarding/role-empty-states';
@@ -34,7 +52,12 @@ import {
 } from '@/lib/constants/human-audit';
 import { createClientLogger } from '@/lib/utils/logger';
 
-const log = createClientLogger('DecisionLog');
+const log = createClientLogger('DecisionLogFeed');
+
+export interface DecisionLogFeedHandle {
+  /** Open the "Log entry" modal — called from the parent header button. */
+  openNewEntry: () => void;
+}
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -466,208 +489,198 @@ function AuditRow({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────
 
-export default function DecisionLogPage() {
-  const role = useOnboardingRole();
-  const logCopy = emptyStateCopy('decision-log', role);
+export const DecisionLogFeed = forwardRef<DecisionLogFeedHandle>(
+  function DecisionLogFeed(_props, ref) {
+    const role = useOnboardingRole();
+    const logCopy = emptyStateCopy('decision-log', role);
 
-  // Journal state
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
-  const [journalLoading, setJournalLoading] = useState(true);
-  const [converting, setConverting] = useState<string | null>(null);
-
-  // Audit state
-  const { decisions, mutate: mutateAudits, isLoading: auditsLoading } = useHumanDecisions(1, 50);
-
-  // Filters
-  const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-
-  // New entry form
-  const [showNewEntry, setShowNewEntry] = useState(false);
-  const [newEntryTitle, setNewEntryTitle] = useState('');
-  const [newEntryContent, setNewEntryContent] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Delete modal
-  const [deleteModal, setDeleteModal] = useState<{
-    open: boolean;
-    id: string;
-    label: string;
-  }>({ open: false, id: '', label: '' });
-  const [deleting, setDeleting] = useState(false);
-
-  // ─── Fetch journal ──────────────────────────────────────────────────
-
-  const fetchJournal = useCallback(async () => {
-    setJournalLoading(true);
-    try {
-      const res = await fetch('/api/journal?limit=50');
-      if (res.ok) {
-        const data = await res.json();
-        setJournalEntries(data.entries || []);
-      }
-    } catch (err) {
-      log.error('Failed to load journal entries:', err);
-      setError('Failed to load journal entries.');
-    } finally {
-      setJournalLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchJournal();
-  }, [fetchJournal]);
-
-  // ─── Actions ────────────────────────────────────────────────────────
-
-  const handleConvert = useCallback(async (entryId: string) => {
-    setConverting(entryId);
-    try {
-      const res = await fetch(`/api/journal/${entryId}/convert`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
-      if (res.ok) {
-        setJournalEntries(prev =>
-          prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e))
-        );
-      }
-    } catch (err) {
-      log.error('Convert failed:', err);
-      setError('Failed to convert entry.');
-    } finally {
-      setConverting(null);
-    }
-  }, []);
-
-  const handleNewEntry = useCallback(async () => {
-    if (!newEntryTitle.trim() || !newEntryContent.trim()) return;
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/journal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: 'manual',
-          title: newEntryTitle.trim(),
-          content: newEntryContent.trim(),
-        }),
-      });
-      if (res.ok) {
-        setNewEntryTitle('');
-        setNewEntryContent('');
-        setShowNewEntry(false);
-        fetchJournal();
-      }
-    } catch (err) {
-      log.error('New entry submit failed:', err);
-      setError('Failed to save new entry.');
-    } finally {
-      setSubmitting(false);
-    }
-  }, [newEntryTitle, newEntryContent, fetchJournal]);
-
-  const handleDeleteAudit = async () => {
-    if (!deleteModal.id) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/human-decisions/${deleteModal.id}`, { method: 'DELETE' });
-      if (res.ok) {
-        await mutateAudits();
-        setDeleteModal({ open: false, id: '', label: '' });
-      }
-    } catch (err) {
-      log.error('Delete failed:', err);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  // ─── Unified + filtered list ────────────────────────────────────────
-
-  const { visibleRows, journalCount, auditsCount } = useMemo(() => {
-    const journalRows: UnifiedRow[] = journalEntries.map(entry => ({
-      kind: 'journal' as const,
-      createdAt: entry.createdAt,
-      entry,
-    }));
-    const auditRows: UnifiedRow[] = decisions.map(decision => ({
-      kind: 'audit' as const,
-      createdAt: decision.createdAt,
-      decision,
+    // Expose openNewEntry to the parent so the page-level "+ Log entry"
+    // button in the Decisions header can trigger the modal.
+    useImperativeHandle(ref, () => ({
+      openNewEntry: () => setShowNewEntry(true),
     }));
 
-    const bySource =
-      sourceFilter === 'journal'
-        ? journalRows
-        : sourceFilter === 'audits'
-          ? auditRows
-          : [...journalRows, ...auditRows];
+    // Journal state
+    const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+    const [journalLoading, setJournalLoading] = useState(true);
+    const [converting, setConverting] = useState<string | null>(null);
 
-    const byStatus = bySource.filter(row => {
-      if (statusFilter === 'all') return true;
-      if (row.kind === 'journal') {
-        return normalizeJournalStatus(row.entry.status) === statusFilter;
+    // Audit state
+    const { decisions, mutate: mutateAudits, isLoading: auditsLoading } = useHumanDecisions(1, 50);
+
+    // Filters
+    const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+
+    // New entry form
+    const [showNewEntry, setShowNewEntry] = useState(false);
+    const [newEntryTitle, setNewEntryTitle] = useState('');
+    const [newEntryContent, setNewEntryContent] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Delete modal
+    const [deleteModal, setDeleteModal] = useState<{
+      open: boolean;
+      id: string;
+      label: string;
+    }>({ open: false, id: '', label: '' });
+    const [deleting, setDeleting] = useState(false);
+
+    // ─── Fetch journal ──────────────────────────────────────────────────
+
+    const fetchJournal = useCallback(async () => {
+      setJournalLoading(true);
+      try {
+        const res = await fetch('/api/journal?limit=50');
+        if (res.ok) {
+          const data = await res.json();
+          setJournalEntries(data.entries || []);
+        }
+      } catch (err) {
+        log.error('Failed to load journal entries:', err);
+        setError('Failed to load journal entries.');
+      } finally {
+        setJournalLoading(false);
       }
-      return normalizeAuditStatus(row.decision) === statusFilter;
-    });
+    }, []);
 
-    byStatus.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    useEffect(() => {
+      fetchJournal();
+    }, [fetchJournal]);
 
-    return {
-      visibleRows: byStatus,
-      journalCount: journalRows.length,
-      auditsCount: auditRows.length,
+    // ─── Actions ────────────────────────────────────────────────────────
+
+    const handleConvert = useCallback(async (entryId: string) => {
+      setConverting(entryId);
+      try {
+        const res = await fetch(`/api/journal/${entryId}/convert`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        if (res.ok) {
+          setJournalEntries(prev =>
+            prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e))
+          );
+        }
+      } catch (err) {
+        log.error('Convert failed:', err);
+        setError('Failed to convert entry.');
+      } finally {
+        setConverting(null);
+      }
+    }, []);
+
+    const handleNewEntry = useCallback(async () => {
+      if (!newEntryTitle.trim() || !newEntryContent.trim()) return;
+      setSubmitting(true);
+      try {
+        const res = await fetch('/api/journal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            source: 'manual',
+            title: newEntryTitle.trim(),
+            content: newEntryContent.trim(),
+          }),
+        });
+        if (res.ok) {
+          setNewEntryTitle('');
+          setNewEntryContent('');
+          setShowNewEntry(false);
+          fetchJournal();
+        }
+      } catch (err) {
+        log.error('New entry submit failed:', err);
+        setError('Failed to save new entry.');
+      } finally {
+        setSubmitting(false);
+      }
+    }, [newEntryTitle, newEntryContent, fetchJournal]);
+
+    const handleDeleteAudit = async () => {
+      if (!deleteModal.id) return;
+      setDeleting(true);
+      try {
+        const res = await fetch(`/api/human-decisions/${deleteModal.id}`, { method: 'DELETE' });
+        if (res.ok) {
+          await mutateAudits();
+          setDeleteModal({ open: false, id: '', label: '' });
+        }
+      } catch (err) {
+        log.error('Delete failed:', err);
+      } finally {
+        setDeleting(false);
+      }
     };
-  }, [journalEntries, decisions, sourceFilter, statusFilter]);
 
-  const loading = journalLoading && auditsLoading;
-  const totalCount = journalCount + auditsCount;
+    // ─── Unified + filtered list ────────────────────────────────────────
 
-  // ─── Render ─────────────────────────────────────────────────────────
+    const { visibleRows, journalCount, auditsCount } = useMemo(() => {
+      const journalRows: UnifiedRow[] = journalEntries.map(entry => ({
+        kind: 'journal' as const,
+        createdAt: entry.createdAt,
+        entry,
+      }));
+      const auditRows: UnifiedRow[] = decisions.map(decision => ({
+        kind: 'audit' as const,
+        createdAt: decision.createdAt,
+        decision,
+      }));
 
-  return (
-    <ErrorBoundary sectionName="Decision Log">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="page-header">
-          <div>
-            <h1 style={{ margin: 0 }}>
-              <span className="text-gradient">Decision Log</span>
-            </h1>
-            <p className="page-subtitle" style={{ maxWidth: 640 }}>
-              One feed for every decision — journal entries captured from your workflow alongside
-              full cognitive audits. Convert, audit, or drill in from the same place.
-              {totalCount > 0 && (
-                <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>
-                  · {totalCount} total
-                </span>
-              )}
-            </p>
+      const bySource =
+        sourceFilter === 'journal'
+          ? journalRows
+          : sourceFilter === 'audits'
+            ? auditRows
+            : [...journalRows, ...auditRows];
+
+      const byStatus = bySource.filter(row => {
+        if (statusFilter === 'all') return true;
+        if (row.kind === 'journal') {
+          return normalizeJournalStatus(row.entry.status) === statusFilter;
+        }
+        return normalizeAuditStatus(row.decision) === statusFilter;
+      });
+
+      byStatus.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return {
+        visibleRows: byStatus,
+        journalCount: journalRows.length,
+        auditsCount: auditRows.length,
+      };
+    }, [journalEntries, decisions, sourceFilter, statusFilter]);
+
+    const loading = journalLoading && auditsLoading;
+    const totalCount = journalCount + auditsCount;
+
+    // ─── Render ─────────────────────────────────────────────────────────
+    // Header (h1 + buttons) is owned by the parent /dashboard/decisions
+    // page when this component is embedded in the Log view. Total-count
+    // badge surfaces in the filter row below.
+
+    return (
+      <div>
+        {/* Sub-eyebrow — orients the user that this is the chronological
+            feed view (vs Kanban / Constellation siblings). Lightweight,
+            single line, doesn't compete with the page header above. */}
+        {totalCount > 0 && (
+          <div
+            style={{
+              fontSize: 11.5,
+              color: 'var(--text-muted)',
+              marginBottom: 12,
+            }}
+          >
+            <span style={{ fontWeight: 600 }}>{totalCount} entries</span> · journal entries captured
+            from your workflow alongside full cognitive audits. Convert, audit, or drill in from the
+            same place.
           </div>
-          <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setShowNewEntry(true)}
-              className="btn btn-secondary"
-              style={{ gap: 6, fontSize: 13 }}
-            >
-              <Plus size={14} />
-              Log entry
-            </button>
-            <Link
-              href="/dashboard/cognitive-audits/submit"
-              className="btn btn-primary"
-              style={{ gap: 6, fontSize: 13 }}
-            >
-              <BrainCircuit size={14} />
-              Submit audit
-            </Link>
-          </div>
-        </div>
+        )}
 
         {/* Unified filter row — source chips + status segmented in one
             row so the surface stays compact. Phase D refactor 2026-05-09
@@ -1035,6 +1048,6 @@ export default function DecisionLogPage() {
           </div>
         )}
       </div>
-    </ErrorBoundary>
-  );
-}
+    );
+  }
+);

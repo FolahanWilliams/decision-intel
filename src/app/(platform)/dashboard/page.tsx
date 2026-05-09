@@ -1244,10 +1244,10 @@ export default function Dashboard() {
       </ErrorBoundary>
 
       {/* JournalWidget removed Phase C 2026-05-09 evening — redundant
-          with the unified /dashboard/decision-log feed (journal entries
-          + cognitive audits in one surface). Sidebar surfaces the link
-          one click away; the dashboard widget added noise without new
-          signal. */}
+          with the unified journal + audits feed at
+          /dashboard/decisions?view=log (folded in 2026-05-10 Phase G).
+          Sidebar surfaces Decisions one click away; the dashboard widget
+          added noise without new signal. */}
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (

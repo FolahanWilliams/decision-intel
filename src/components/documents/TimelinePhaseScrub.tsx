@@ -342,7 +342,7 @@ export function PhaseDuringPanel({
             {effectiveSummary}
           </p>
           <Link
-            href="/dashboard/decision-log"
+            href="/dashboard/decisions?view=log"
             style={{
               fontSize: 13,
               fontWeight: 600,
@@ -439,7 +439,7 @@ export function PhaseDuringPanel({
             Log this decision <ArrowRight size={13} />
           </Link>
           <Link
-            href="/dashboard/decision-log"
+            href="/dashboard/decisions?view=log"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

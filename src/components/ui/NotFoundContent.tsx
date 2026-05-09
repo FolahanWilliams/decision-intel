@@ -98,7 +98,7 @@ const PLATFORM_BRANCHES: DecisionBranch[] = [
   },
   {
     id: 'decision-log',
-    href: '/dashboard/decision-log',
+    href: '/dashboard/decisions?view=log',
     label: 'Decision Log',
     angle: 320,
     Icon: ClipboardList,

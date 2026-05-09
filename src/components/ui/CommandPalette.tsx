@@ -302,18 +302,21 @@ export function CommandPalette() {
         keywords: ['rooms', 'blind', 'prior', 'voting', 'committee'],
       },
       {
-        id: 'decision-log',
-        label: 'Decision Log',
-        description: 'Journal entries + cognitive audits in one feed',
+        // Decision Log was folded into the Decisions page as a view
+        // 2026-05-10 (Phase G). The palette entry now routes to the
+        // Log view of /dashboard/decisions; same keywords retained so
+        // a user typing "journal" or "audit log" lands here.
+        id: 'decisions-log',
+        label: 'Decisions · Log',
+        description: 'Journal entries + cognitive audits chronologically',
         icon: <FileText size={16} />,
-        action: () => navigate('/dashboard/decision-log'),
+        action: () => navigate('/dashboard/decisions?view=log'),
         keywords: [
           'journal',
           'diary',
           'record',
           'reflect',
-          'audit',
-          'decisions',
+          'audit log',
           'log',
           'feed',
           'human decisions',

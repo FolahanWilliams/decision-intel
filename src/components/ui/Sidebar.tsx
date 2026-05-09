@@ -18,7 +18,6 @@ import {
   Bot,
   Plus,
   ChevronRight as ChevronR,
-  PenLine,
   Briefcase,
   Share2,
   Repeat,
@@ -415,18 +414,13 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-          <NavItem
-            href="/dashboard/decision-log"
-            icon={<PenLine size={18} />}
-            label="Decision Log"
-            description="Journal entries + cognitive audits in one feed"
-            active={
-              pathname === '/dashboard/decision-log' ||
-              pathname.startsWith('/dashboard/cognitive-audits')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
+          {/* Decision Log folded into Decisions as a view 2026-05-10
+              (Phase G). The umbrella sidebar entry was redundant — Log
+              is just one of three views on the Decisions parent
+              alongside Kanban + Constellation. Sub-routes
+              (/cognitive-audits/submit, /cognitive-audits/[id]) stay
+              live as standalone surfaces; only the umbrella entry
+              collapses. */}
 
           {/* Reflect — what the CSO learns from last quarter. Analytics,
               graph, outcome loop. Collapsible — these are the deeper

@@ -90,6 +90,18 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=intelligence',
         permanent: true,
       },
+      // Decision Log folded into Decisions as a view (Phase G fold
+      // 2026-05-10) — "is the Decision Log really a necessary
+      // standalone page, can't we just incorporate elements from it
+      // into the Decisions page" (founder audit). Sub-routes
+      // (/cognitive-audits/[id], /cognitive-audits/submit) stay live
+      // as their own surfaces; only the umbrella /decision-log
+      // collapses.
+      {
+        source: '/dashboard/decision-log',
+        destination: '/dashboard/decisions?view=log',
+        permanent: true,
+      },
       // Decision Alpha page deleted 2026-05-07 — the "Published Q2 2026"
       // claim was a recurring-publication promise without a workflow,
       // and the synthetic SECTOR_INDEX data carried "30+ biases" count

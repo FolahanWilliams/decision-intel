@@ -218,9 +218,8 @@ These two lines are the operational follow-through to the pain framing — the p
 ```text
 ACT
   Dashboard
-  Decisions          (Documents under the cluster header; constellation cross-link)
+  Decisions          (Kanban + Log + Constellation views; Documents under the cluster header)
   AI Copilot         (refactored: composer-first; no slogan header)
-  Decision Log
 
 REFLECT
   Analytics          (Intelligence tab now has Decision DNA as a section)
@@ -236,6 +235,38 @@ TOGETHER
 **Quality gates at Phase A-E ship**: tsc clean (0 errors) · 4 lint gates clean (positioning · silent-catches at baseline 151 · counts at baseline 80 · canonical-imports clean) · slop-scan scorePerKloc 3.05 (under 4.0 trip-wire).
 
 **Forward-looking rule**: when a future audit identifies a sidebar entry as a thin-wrapper-around-a-content-component, the right move is NOT to delete the route silently — it's to fold the component as a SECTION on a sibling page (with a proper redesign that strips its self-page chrome) AND add a 308 redirect from the old URL. The Decision DNA fold is the canonical pattern. When a sidebar entry is a duplicate of per-decision functionality (the Provenance archive vs. per-document/per-container DPR export), delete the route + redirect to the canonical surface; don't fold what doesn't add value.
+
+## Phase G — Decision Log fold into Decisions (locked 2026-05-10 morning)
+
+**The fold**: Decision Log was a standalone sidebar entry at `/dashboard/decision-log` rendering a unified journal + cognitive-audits feed. Founder pushback 2026-05-10 morning — "still too much cognitive load with all the pages — is the Decision Log really a necessary standalone page, can't we just incorporate elements from it into the Decisions page". Conceptually correct: journal entries + cognitive audits + DecisionContainers are all decisions, just at different levels of formality.
+
+**Resulting structure on `/dashboard/decisions`**: three views accessible from one parent page via a `?view` query param + a 3-button view switcher in the page header.
+
+- **Kanban** (default, no query param): workflow-grade containers (investment / acquisition / strategic) — daily-ops triage board.
+- **Log** (`?view=log`): chronological feed of journal entries + cognitive audits. Powered by [DecisionLogFeed](src/components/decisions/DecisionLogFeed.tsx) — extracted from the deleted standalone page; accepts a `forwardRef` handle so the parent's "+ Log entry" button can trigger the modal.
+- **Constellation** (sibling page at `/dashboard/decisions/constellation`): cognitive lineage between containers. Heavy SVG; justifies its own URL.
+
+**Files deleted**: `/dashboard/decision-log/page.tsx` (1,040 lines).
+
+**Redirect added**: `/dashboard/decision-log` → `/dashboard/decisions?view=log` (308 permanent).
+
+**Sidebar (8 entries → 7)**:
+
+```text
+ACT: Dashboard / Decisions / AI Copilot
+REFLECT: Analytics / Decision Graph (sub-nav) / Outcome Flywheel (sub-nav)
+TOGETHER: Meetings & Rooms / Team / Settings
+```
+
+**Cross-references updated**:
+
+- CommandPalette `decision-log` entry → renamed to `decisions-log`, routes to `/dashboard/decisions?view=log`
+- `NotFoundContent.tsx` quick-link href updated
+- `TimelinePhaseScrub.tsx` (2 hrefs) updated
+- `founder-context.ts` Decision Log Unification + Cognitive Audits entries updated
+- `dashboard/page.tsx` JournalWidget-removal comment updated
+
+**Forward-looking rule**: when collapsing a sibling page into a parent's view-switcher pattern, prefer the `?view=X` query-param approach over a child route — it keeps the sibling URLs clean (the parent stays at `/parent`, the view stays at `/parent?view=Y`) and makes the view switcher a single component without route-level branching. Sub-routes (like `/dashboard/cognitive-audits/submit` or `/dashboard/decisions/[id]`) stay live; only the umbrella surface collapses.
 
 ## AccentCard primitive + visual-distinction discipline (locked 2026-05-09 evening — founder audit follow-up)
 
