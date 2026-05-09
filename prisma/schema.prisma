@@ -54,7 +54,18 @@ model Document {
   updatedAt        DateTime            @updatedAt
   contentHash      String?             @unique
   orgId            String?
-  documentType     String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | other
+  documentType     String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | qofe | synergy_model | integration_plan | other
+  /// Type-aware structured parser output (locked 2026-05-09 — M&A cascade
+  /// hard-layer ship). Populated at upload time when the parser detects a
+  /// recognisable structure (today: synergy_model spreadsheets via
+  /// extractSynergyStructure; future: qofe, integration_plan). The field
+  /// holds a JSON-serialisable shape — currently SynergyStructure but the
+  /// schema is intentionally generic so other parsers can use the same
+  /// path without a migration. Null when the document type doesn't have a
+  /// type-aware parser OR when extraction fell through to flat-text only.
+  /// Replaces the inline-marker text round-trip in Document.content for
+  /// downstream consumers (DPR, structured rendering, deal aggregation).
+  parsedStructuredData Json?
   dealId           String?
   source           String?
   sourceRef        String?
@@ -1829,6 +1840,14 @@ model ToxicCombination {
   biasTypes          String[] // e.g., ["confirmation_bias", "anchoring"]
   contextFactors     Json // { monetaryStakes: "high", dissentAbsent: true, timePressure: true }
   toxicScore         Float // compound risk score (0-100)
+  /// Severity band — first-class column for queryable filtering
+  /// (locked 2026-05-09, M&A cascade hard-layer ship). Derived from
+  /// toxicScore + contextFactors at creation time; persisted explicitly
+  /// so server-side queries can filter by severity without re-deriving
+  /// the threshold. Bands: 'critical' (toxicScore ≥ 80) | 'high' (≥ 60)
+  /// | 'medium' (≥ 40) | 'low' (< 40). Optional for legacy-row
+  /// backwards-compat — null is treated as 'derive-from-toxicScore'.
+  severity           String? // 'critical' | 'high' | 'medium' | 'low'
   historicalFailRate Float? // how often this combo led to failures
   sampleSize         Int       @default(0)
   patternLabel       String? // e.g., "The Echo Chamber"

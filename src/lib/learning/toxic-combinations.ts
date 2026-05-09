@@ -46,6 +46,15 @@ export interface ToxicComboResult {
   biasTypes: string[];
   contextFactors: ContextFactors;
   toxicScore: number;
+  /**
+   * Severity band derived from toxicScore (locked 2026-05-09, M&A
+   * cascade hard-layer ship). Persisted as a first-class column on
+   * ToxicCombination so server-side queries can filter without re-
+   * deriving the threshold. Bands: 'critical' (≥80) | 'high' (≥60)
+   * | 'medium' (≥40) | 'low' (<40). Use deriveSeverityFromScore() to
+   * compute consistently across creation sites.
+   */
+  severity: ToxicComboSeverity;
   patternLabel: string | null;
   patternDescription: string | null;
   historicalFailRate: number | null;
@@ -56,6 +65,21 @@ export interface ToxicComboResult {
   estimatedRiskAmount?: number;
   /** The deal's ticket size at time of detection */
   dealTicketSize?: number;
+}
+
+export type ToxicComboSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+/**
+ * Derive the canonical severity band from a toxicScore. The thresholds
+ * mirror the server-side query bands the analytics surfaces use; persist
+ * via ToxicCombination.severity at creation time so queries don't need
+ * to re-derive at read time. Locked 2026-05-09.
+ */
+export function deriveSeverityFromScore(toxicScore: number): ToxicComboSeverity {
+  if (toxicScore >= 80) return 'critical';
+  if (toxicScore >= 60) return 'high';
+  if (toxicScore >= 40) return 'medium';
+  return 'low';
 }
 
 export interface DetectionResult {
@@ -257,6 +281,7 @@ export async function detectToxicCombinations(
         biasTypes: pattern.biasTypes,
         contextFactors: context,
         toxicScore: calibratedScore,
+        severity: deriveSeverityFromScore(calibratedScore),
         patternLabel: pattern.label,
         patternDescription: pattern.description,
         historicalFailRate: null, // populated by learned patterns
@@ -305,6 +330,7 @@ export async function detectToxicCombinations(
         biasTypes: pattern.biasTypes,
         contextFactors: context,
         toxicScore: calibratedScore,
+        severity: deriveSeverityFromScore(calibratedScore),
         patternLabel: pattern.label,
         patternDescription: pattern.description,
         historicalFailRate: pattern.failureRate,
@@ -347,6 +373,7 @@ export async function detectToxicCombinations(
                   biasTypes: [biasA, biasB],
                   contextFactors: context,
                   toxicScore: calibratedScore,
+                  severity: deriveSeverityFromScore(calibratedScore),
                   patternLabel: `${seed.patternLabel} (historical)`,
                   patternDescription: `Historical failure pattern "${seed.patternLabel}" — this bias combination appeared in ${seed.sampleSize} documented failure cases with avg impact ${seed.avgImpactScore}/100.`,
                   historicalFailRate: seed.baseFailureRate,
@@ -377,10 +404,12 @@ export async function detectToxicCombinations(
         const adHocScore = Math.min(100, (severitySum / 60) * 50 * contextMultiplier);
 
         if (adHocScore >= 40) {
+          const calibratedAdHocScore = await calibrateScore(adHocScore, pair, context, orgId);
           combinations.push({
             biasTypes: pair,
             contextFactors: context,
-            toxicScore: await calibrateScore(adHocScore, pair, context, orgId),
+            toxicScore: calibratedAdHocScore,
+            severity: deriveSeverityFromScore(calibratedAdHocScore),
             patternLabel: null,
             patternDescription: null,
             historicalFailRate: null,
@@ -973,6 +1002,11 @@ async function persistToxicCombinations(
         biasTypes: c.biasTypes,
         contextFactors: JSON.parse(JSON.stringify(c.contextFactors)) as Prisma.InputJsonValue,
         toxicScore: c.toxicScore,
+        // Persist severity band as a first-class column (locked 2026-05-09
+        // hard-layer ship). Defensive fallback to deriveSeverityFromScore
+        // covers any caller that constructed ToxicComboResult without
+        // setting severity explicitly.
+        severity: c.severity ?? deriveSeverityFromScore(c.toxicScore),
         historicalFailRate: c.historicalFailRate,
         sampleSize: c.sampleSize,
         patternLabel: c.patternLabel,

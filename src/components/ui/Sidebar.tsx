@@ -396,6 +396,7 @@ export default function Sidebar() {
               onNavigate={closeMobile}
             />
             <NavItem
+              id="onborda-nav-deals"
               href="/dashboard/deals"
               icon={<Briefcase size={18} />}
               label="Projects"

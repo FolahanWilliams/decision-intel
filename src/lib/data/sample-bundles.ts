@@ -506,6 +506,235 @@ Crossfield's top-10 customers represent 38% of ARR. Top-3 represent 19%. We have
 `,
 };
 
+// ─── M&A workflow-native bundles (3, locked 2026-05-09) ────────────
+// Real-anchor specimens for the three new M&A toxic combinations
+// shipped in the 2026-05-09 P1 roadmap. Each memo is authored to fire
+// ONE pattern when audited — the synergy claims, the adjacency
+// rationale, or the auction-dynamic anchoring will trip the named
+// detector. Anchors: AOL-Time Warner (Marlin), Daimler-Chrysler
+// (Helix), WeWork S-1 (Apex). Names + numbers synthetic.
+
+const MA_PROJECT_MARLIN: SampleBundle = {
+  slug: 'ma-project-marlin-synergy-mirage',
+  role: 'ma',
+  title: 'Project Marlin — content-distribution synergy memo',
+  summary:
+    'Distribution platform acquiring a content portfolio with $180M run-rate cross-promotion synergies — see what the audit catches in the synergy model.',
+  hookCopy:
+    'The classic content-distribution synergy thesis. Paste it and watch the Synergy Mirage detector fire on the unbacked claims.',
+  expectedBiases: [
+    'overconfidence_bias',
+    'planning_fallacy',
+    'halo_effect',
+    'confirmation_bias',
+  ],
+  expectedDqi: 48,
+  content: `# Project Marlin — Investment Committee Memo
+
+## Transaction Summary
+
+Marlin Media Holdings (target) — recommended acquisition at $620M cash + stock, structured as 70% cash / 30% rollover equity. We project a five-year IRR of 31% based on combined revenue synergies of $180M run-rate and cost synergies of $45M run-rate. Closing target: Q4 2026.
+
+## Strategic Rationale
+
+Marlin owns a portfolio of three premium content brands with strong consumer affinity in the millennial and Gen-Z segments. Acquisition gives us the content engine our subscription platform has lacked, with immediate access to 28 million highly-engaged subscribers and a content library that complements our distribution scale.
+
+The strategic case rests on bidirectional cross-promotion: our 140 million distribution subscribers gain access to Marlin's premium content as a tier-upgrade, and Marlin's loyal audience is exposed to our ancillary services (commerce, financial services, communications). Internal modeling suggests this drives a step-change in ARPU across both customer bases.
+
+This is the kind of vertical integration the analyst community has been asking us about for two years. The combined entity becomes the only platform with both the distribution scale AND the premium content engine — a structural advantage no individual competitor can match.
+
+## Synergy Model
+
+| Category                          | Year 1  | Year 2  | Run-rate |
+|-----------------------------------|---------|---------|----------|
+| Revenue: cross-promotion uplift   | $42M    | $98M    | $180M    |
+| Revenue: ARPU expansion           | $18M    | $42M    | $75M     |
+| COGS: content licensing leverage  | $8M     | $16M    | $22M     |
+| OpEx: corporate consolidation     | $6M     | $12M    | $18M     |
+| Marketing: shared spend           | $4M     | $8M     | $12M     |
+| Total                             | $78M    | $176M   | $307M    |
+
+The cross-promotion uplift is the primary synergy driver. We estimate 12% of our distribution base upgrades to Marlin's premium content within 24 months, and 8% of Marlin's audience adopts our ancillary services. These figures are consistent with industry benchmarks for content-distribution combinations and reflect the strong brand affinity both customer bases have demonstrated in market research.
+
+## Integration Plan
+
+Integration sequenced over 18 months:
+- **Months 0-6:** Brand alignment, joint marketing campaign launch, technology platform discovery.
+- **Months 6-12:** Cross-promotion mechanism deployed across both customer bases.
+- **Months 12-18:** Full operating-model integration, single-platform user experience.
+
+Integration costs: $40M (one-time). The combined company will be run by our existing CEO, with Marlin's leadership team transitioning into senior content roles. Detailed integration ownership will be assigned in the post-close 100-day plan.
+
+## Comparable Transactions
+
+The combined-distribution-and-content thesis has been validated by recent industry transactions. Several large-platform acquisitions in the past five years have surfaced material cross-promotion uplift in the 24-36 month window. We are not aware of any comparable transaction that failed to deliver synergies at the scale we are projecting.
+
+## Diligence
+
+Financial diligence (Big-4): No material findings. Marlin's growth trajectory, margin profile, and subscriber metrics are consistent with deal-room representations.
+
+Customer research: Brand-affinity scoring confirms strong consumer engagement with both Marlin's content and our distribution platform. Combined entity is expected to score in the top quartile of consumer-platform NPS.
+
+Cultural diligence: Marlin's editorial team and our platform team have a strong shared mission around premium digital experiences. We anticipate cultural alignment.
+
+## Risks Considered
+
+**Cultural integration:** Marlin's content team operates with significant editorial autonomy. We will preserve this autonomy under the new structure.
+
+**Subscriber overlap:** Approximately 18% of Marlin's subscribers are already on our platform. We have modeled a corresponding revenue-synergy adjustment.
+
+**Execution:** Integration of any acquisition this size carries execution risk. Our integration leadership team has run two prior transactions (smaller scale).
+
+## Recommendation
+
+Approve the Project Marlin acquisition at $620M aggregate consideration, closing in Q4 2026. The combined revenue synergies of $180M run-rate, supported by a clear cross-promotion thesis and validating industry comparables, deliver IRR substantially above our 22% threshold.
+`,
+};
+
+const MA_PROJECT_HELIX: SampleBundle = {
+  slug: 'ma-project-helix-conglomerate-fallacy',
+  role: 'ma',
+  title: 'Project Helix — strategic-platform expansion memo',
+  summary:
+    'Industrial-equipment manufacturer acquiring a consumer-electronics target as a "global platform" play — fires the Conglomerate Fallacy detector on the parenting thesis.',
+  hookCopy:
+    'Far-adjacency acquisitions justified by target growth. Paste it and see how the audit handles the missing "why us as parent" question.',
+  expectedBiases: [
+    'illusion_of_validity',
+    'halo_effect',
+    'overconfidence_bias',
+    'bandwagon_effect',
+  ],
+  expectedDqi: 51,
+  content: `# Project Helix — Strategic Acquisition Memo
+
+## Transaction Summary
+
+Helix Innovations (target) — recommended acquisition at $1.4B all-stock, structured as a 0.42-share exchange ratio. The combined entity will operate under a single global brand with two complementary divisions: our existing industrial-equipment business and Helix's consumer-electronics portfolio. Closing target: Q1 2027, subject to regulatory approval in seven jurisdictions.
+
+## Strategic Rationale
+
+Helix is the fastest-growing consumer-electronics company in our addressable region, with a 34% three-year revenue CAGR and an industry-leading consumer brand. The transaction transforms our company from a regional industrial-equipment manufacturer into a global diversified-platform business with leadership positions in two attractive end markets.
+
+The strategic logic rests on three pillars:
+
+1. **Diversification.** Industrial-equipment cycles run counter to consumer-electronics cycles. The combined entity has a more resilient revenue profile across the macro cycle.
+
+2. **Brand halo.** Helix's premium consumer brand creates a halo effect that lifts perceived quality across our industrial-equipment portfolio, supporting both pricing and customer-acquisition economics.
+
+3. **Talent.** Helix has built one of the strongest engineering cultures in consumer hardware. Combined with our manufacturing and supply-chain capabilities, the combined entity becomes a uniquely attractive employer for top engineering talent.
+
+This is the kind of platform-scale combination our largest peer (Competitor A) executed in 2023 with their consumer-products acquisition, and which Competitor B is reportedly pursuing through their current M&A pipeline. The combined Helix-equipment platform reaches global scale faster than either company can achieve standalone.
+
+## Operating Model
+
+The combined entity will retain both Helix's consumer-electronics operations (under existing leadership) and our industrial-equipment operations (under existing leadership), with shared corporate functions consolidated at the parent level. We anticipate $85M in run-rate corporate-overhead savings.
+
+The combined operating model gives both divisions access to the parent company's capital base, supplier relationships, and global distribution. We anticipate this access will accelerate Helix's international expansion (currently 60% North America) and lift our equipment-business margin profile through scale economics.
+
+## Comparable Transactions
+
+The diversified-platform thesis is well-established. Berkshire Hathaway is the canonical multi-segment success story; in our peer set, both Competitor A's 2023 consumer acquisition and the 2021 General Electric refocusing demonstrate that thoughtfully-constructed platforms create value at scale.
+
+We are pricing Helix at 14x EBITDA, in line with consumer-electronics peer multiples. The all-stock structure preserves balance-sheet flexibility for further platform-build acquisitions in adjacent categories.
+
+## Diligence
+
+Financial diligence: Helix's reported growth, margin, and cash-generation trajectory are consistent with deal-room representations. Quality-of-earnings findings within the standard range.
+
+Customer research: Helix's customer base is highly loyal with strong NPS. Brand-equity studies suggest material upside in international markets we are positioned to access.
+
+Cultural assessment: Helix's engineering culture is high-performance with significant autonomy. Our culture is operationally rigorous with strong process discipline. We anticipate cultural complementarity rather than friction.
+
+## Risks Considered
+
+**Operating-model complexity:** Running two distinct businesses requires more sophisticated parent-company governance than running a single business. We will appoint a Group Chief Operating Officer to manage cross-division coordination.
+
+**Cultural divergence:** As above, the cultures are different but complementary.
+
+**Capital allocation:** Allocating capital between two cyclically-different businesses is a non-trivial exercise. Our finance team has the requisite experience.
+
+**Regulatory:** Antitrust risk is low given the businesses operate in different end markets.
+
+## Recommendation
+
+Approve Project Helix at $1.4B all-stock, closing in Q1 2027. The combined entity becomes a global diversified platform with leadership positions in two attractive end markets, executes a strategy validated by peer transactions, and creates the brand and talent halo that both businesses benefit from.
+`,
+};
+
+const MA_PROJECT_APEX: SampleBundle = {
+  slug: 'ma-project-apex-winners-curse',
+  role: 'ma',
+  title: 'Project Apex — competitive-process IC memo',
+  summary:
+    'Auction-process IC memo with strategic-necessity language and a bid 23% above prior-round valuation — fires the Winner\'s Curse detector on the deal-fever signal.',
+  hookCopy:
+    'Auction-process language at the IC stage. Paste it and watch the audit surface the deal-fever pattern beneath the strategic rationale.',
+  expectedBiases: [
+    'anchoring_bias',
+    'overconfidence_bias',
+    'authority_bias',
+    'sunk_cost_fallacy',
+  ],
+  expectedDqi: 46,
+  content: `# Project Apex — Final Investment Committee Memo
+
+## Transaction Summary
+
+Apex Networks (target) — recommended acquisition at $880M cash, representing a 14x forward-revenue multiple. This memo supersedes the preliminary memo of two weeks ago; the bid has been increased from $720M (12x) following the second round of the competitive process. Closing target: Q3 2026.
+
+## Why We Cannot Lose This Asset
+
+Apex is the dominant networking-infrastructure provider in our highest-priority growth vertical. Two factors make this transaction strategically necessary:
+
+First, **Apex is the only acquirable asset in this category.** The two structural alternatives — building organically (4-6 year timeline) or acquiring a smaller peer (none currently available) — do not meet our 2027 strategic-positioning timeline. Letting this asset go to a competitor would set us back materially.
+
+Second, **the buyer pool is consolidating.** Competitor B is reportedly the underbidder in the current auction at $810M. If Competitor B wins this asset, they gain the same structural position we are seeking and our window to lead this category closes for the foreseeable future. This is a fight we have to win.
+
+## Process Background
+
+The Apex sale-process was launched by the seller's bankers in February 2026. We were one of seven invited parties; the field narrowed to three after Round 1 and two after Round 2. The seller has indicated a strong preference for closing speed (sub-90-day diligence-to-close) and certainty of close (cash with no material adverse change carve-outs).
+
+Our Round 1 bid of $720M was based on standalone DCF and a comparable-transactions multiple of 12x forward revenue. Round 2 dynamics required us to increase the bid to $880M (14x) to remain in the process. The bankers have indicated this represents the top of the range; we believe a higher bid is not warranted but the current $880M secures the asset.
+
+## Updated Valuation
+
+At $880M, we are pricing Apex at 14x forward revenue against a peer trading range of 9-12x. The premium is justified by:
+
+- The scarcity premium for the only acquirable asset in this category.
+- The strategic positioning value of denying the asset to Competitor B.
+- The 24-month organic-growth lift we anticipate post-acquisition through cross-sell into our existing customer base.
+
+## Synergy Profile
+
+We are NOT relying on synergies to justify the price. The transaction is justified by Apex's standalone trajectory and the strategic positioning. Any synergies (which we estimate at $40-60M run-rate) are upside to the base case.
+
+## Diligence Status
+
+Diligence has been time-compressed given the process timeline. Financial, legal, and technical diligence are 80%+ complete. No material findings to date. Final diligence reports expected within the next 14 days.
+
+The compressed diligence window is consistent with comparable competitive-process transactions in this category and with the seller's stated process preferences.
+
+## Comparable Transactions
+
+The 14x multiple sits at the upper end of the comparable range but within precedent. Competitor C paid 13x for a smaller asset in this category in 2024, and that transaction is widely viewed as having created value. The peer-set median is 10.5x, but Apex commands a premium for category leadership.
+
+We have modeled the deal at the 14x level and a sensitivity at 12x (the prior-round bid). The 14x case clears our 22% IRR threshold by 280 basis points; the 12x case would clear it by 540 basis points but is no longer available.
+
+## Risks Considered
+
+**Valuation:** The 14x multiple is the principal risk. We have stress-tested against peer-trading-multiple compression and the deal remains accretive.
+
+**Diligence:** Compressed timeline. Our diligence team is highly experienced and the early findings are clean.
+
+**Integration:** Standard for a transaction of this size. Integration team is staffed.
+
+## Recommendation
+
+Approve Project Apex at $880M cash, closing in Q3 2026. The strategic necessity of this asset, the consolidating buyer pool, and the 280bp IRR cushion above our threshold support proceeding at the 14x multiple. We have 72 hours to confirm the bid before the seller proceeds with Competitor B.
+`,
+};
+
 // ─── BizOps bundle (3) ──────────────────────────────────────────────
 
 const BIZOPS_REPLATFORM_BILLING: SampleBundle = {
@@ -954,6 +1183,9 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   MA_PROJECT_ATLAS,
   MA_BANK_DILIGENCE,
   MA_REVERSE_MERGER,
+  MA_PROJECT_MARLIN,
+  MA_PROJECT_HELIX,
+  MA_PROJECT_APEX,
   BIZOPS_REPLATFORM_BILLING,
   BIZOPS_RD_BUDGET,
   BIZOPS_EMEA_SHUTTER,
@@ -966,13 +1198,14 @@ export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> = Ob
 );
 
 export function bundlesForRole(role: SampleRole | null | undefined): SampleBundle[] {
-  if (!role) {
-    // Show one of each so a fresh visitor without role still sees the
-    // breadth.
-    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6], SAMPLE_BUNDLES[9]];
-  }
-  if (role === 'other') {
-    return [SAMPLE_BUNDLES[0], SAMPLE_BUNDLES[3], SAMPLE_BUNDLES[6], SAMPLE_BUNDLES[9]];
+  if (!role || role === 'other') {
+    // Show one of each role so a fresh visitor without a role still sees
+    // the breadth. Filter-based rather than literal indices so adding
+    // new bundles per role can't silently break the no-role branch.
+    const roles: Exclude<SampleRole, 'other'>[] = ['cso', 'ma', 'bizops', 'pe_vc'];
+    return roles
+      .map(r => SAMPLE_BUNDLES.find(b => b.role === r))
+      .filter((b): b is SampleBundle => b !== undefined);
   }
   return SAMPLE_BUNDLES.filter(b => b.role === role);
 }

@@ -153,12 +153,14 @@ function jaccardBiases(a: string[], b: string[]): number {
 }
 
 /** Score a single case against the audit's bias profile + industry +
- *  documentType. Returns a 0-1 similarity. */
+ *  documentType + (optionally) toxic-combinations that fired on the audit.
+ *  Returns a 0-1 similarity (capped at 1.0). */
 function scoreCase(
   c: CaseStudy,
   biasTypes: string[],
   industry: string | null,
-  documentType: string | null
+  documentType: string | null,
+  auditToxicCombinations: string[] = []
 ): { score: number; reason: string } {
   const biasJaccard = jaccardBiases(biasTypes, c.biasesPresent);
   const industryMatch = industry && c.industry === industry ? 1 : 0;
@@ -166,13 +168,42 @@ function scoreCase(
     c.contextFactors.monetaryStakes === 'high' || c.contextFactors.monetaryStakes === 'very_high'
       ? 0.05
       : 0;
-  // Combined: bias overlap dominates (60%), industry binary (25%), stakes bonus (5%),
-  // residual 10% reserved for documentType when the case library carries that signal.
-  // The case library doesn't carry documentType on every entry today — when it lands
-  // we extend the score; for now the documentType match is a small implicit bias-set
-  // signal (ic_memo correlates with M&A biases, etc.) we don't double-count.
-  const score = biasJaccard * 0.6 + industryMatch * 0.25 + stakesBonus;
+  // Toxic-combination overlap (locked 2026-05-09, M&A cascade depth ship). When
+  // the audit fires the same named pattern that's tagged on a case in the 143-
+  // case library, that is a CATEGORICALLY stronger signal than bias overlap
+  // alone — the case isn't just "shows the same biases," it failed in the same
+  // structural failure mode. Additive boost capped at 0.30 so a rich pattern
+  // overlap can elevate even an industry-mismatched analog into the top results
+  // (e.g., a tech-sector M&A memo firing Synergy Mirage should surface AOL-Time
+  // Warner / WorldCom / GE-Alstom even when industries differ). Pure additive,
+  // not rebalanced, so legacy scoring on non-toxic-combo paths is unchanged.
+  let toxicComboOverlap = 0;
+  const matchedPatterns: string[] = [];
+  if (auditToxicCombinations.length > 0 && c.toxicCombinations.length > 0) {
+    for (const pattern of auditToxicCombinations) {
+      if (c.toxicCombinations.includes(pattern)) {
+        matchedPatterns.push(pattern);
+      }
+    }
+    if (matchedPatterns.length > 0) {
+      // 0.15 for the first matched pattern, +0.075 per additional, capped at 0.30
+      toxicComboOverlap = Math.min(0.3, 0.15 + (matchedPatterns.length - 1) * 0.075);
+    }
+  }
+  // Combined: bias overlap (60%) + industry binary (25%) + stakes bonus (5%) +
+  // toxic-combination overlap (up to 30% additive). Cap at 1.0.
+  const rawScore =
+    biasJaccard * 0.6 + industryMatch * 0.25 + stakesBonus + toxicComboOverlap;
+  const score = Math.min(1.0, rawScore);
   const reasonParts: string[] = [];
+  if (matchedPatterns.length > 0) {
+    // Lead with the toxic-combination match — it's the strongest signal.
+    const patternList =
+      matchedPatterns.length === 1
+        ? matchedPatterns[0]
+        : `${matchedPatterns.length} matched patterns (${matchedPatterns.slice(0, 2).join(', ')}${matchedPatterns.length > 2 ? '...' : ''})`;
+    reasonParts.push(`same failure pattern: ${patternList}`);
+  }
   if (biasJaccard > 0) reasonParts.push(`${Math.round(biasJaccard * 100)}% bias overlap`);
   if (industryMatch === 1) reasonParts.push(`industry match (${c.industry})`);
   if (stakesBonus > 0) reasonParts.push('high-stakes context');
@@ -205,14 +236,29 @@ export function getReferenceClassForecast(input: {
   biasTypes: string[];
   industry?: string | null;
   documentType?: string | null;
+  /**
+   * Toxic combinations the audit fired (e.g., ['The Synergy Mirage']). When
+   * supplied, cases tagged with the same pattern in their `toxicCombinations`
+   * field receive a similarity boost — surfacing structurally-analogous
+   * failures (AOL-Time Warner / WorldCom / GE-Alstom for Synergy Mirage)
+   * even when industries differ. Locked 2026-05-09 (M&A cascade depth ship).
+   */
+  toxicCombinations?: string[];
 }): ReferenceClassForecast {
   const { biasTypes } = input;
   const industry = normalizeIndustry(input.industry ?? null);
   const documentType = input.documentType ?? null;
+  const auditToxicCombinations = input.toxicCombinations ?? [];
 
   // Score every case in the library
   const scored = ALL_CASES.map(c => {
-    const { score, reason } = scoreCase(c, biasTypes, industry, documentType);
+    const { score, reason } = scoreCase(
+      c,
+      biasTypes,
+      industry,
+      documentType,
+      auditToxicCombinations
+    );
     return { case: c, score, reason };
   });
 

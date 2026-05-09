@@ -847,7 +847,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'halo_effect',
     ],
     primaryBias: 'overconfidence_bias',
-    toxicCombinations: ['Yes Committee', 'Optimism Trap', 'Golden Child'],
+    toxicCombinations: ['Yes Committee', 'Optimism Trap', 'Golden Child', "Winner's Curse"],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,
@@ -1067,7 +1067,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'halo_effect',
     ],
     primaryBias: 'overconfidence_bias',
-    toxicCombinations: ['Optimism Trap', 'Golden Child'],
+    toxicCombinations: ['Optimism Trap', 'Golden Child', "Winner's Curse"],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,

@@ -33,6 +33,7 @@ import { BiasCollabPanel } from '@/components/analysis/BiasCollabPanel';
 import { MarketContextChip } from '@/components/analysis/MarketContextChip';
 import { RedactionTrailCard } from '@/components/analysis/RedactionTrailCard';
 import { DprPreviewCard } from '@/components/analysis/DprPreviewCard';
+import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
 
 interface ExtendedBiasInstance extends BiasInstance {
   researchInsight: ResearchInsight;
@@ -44,25 +45,12 @@ interface BiasFrequencyData {
   timeline: Array<{ date: string; count: number }>;
 }
 
-interface DQIData {
-  score: number;
-  grade: string;
-  gradeLabel: string;
-  system1Ratio: number | null;
-  components: {
-    biasLoad: { score: number; grade: string };
-    noiseLevel: { score: number; grade: string };
-    evidenceQuality: { score: number; grade: string };
-    processMaturity: { score: number; grade: string };
-    complianceRisk: { score: number; grade: string };
-  };
-  topImprovement: {
-    component: string;
-    currentScore: number;
-    potentialGain: number;
-    suggestion: string;
-  };
-}
+// Full DQIResult shape — the /api/dqi response carries the complete
+// breakdown (including breakdownItems on each component) which the
+// DqiBreakdownPanel reads directly. Importing the type would create a
+// pull on the whole scoring module from a client component, so a
+// structural alias is used instead.
+type DQIData = import('@/lib/scoring/dqi').DQIResult;
 
 interface OverviewTabProps {
   documentContent: string;
@@ -138,6 +126,10 @@ export function OverviewTab({
   );
   // Fetch DQI score for this analysis
   const [dqiData, setDqiData] = useState<DQIData | null>(null);
+  // Click-to-open state for the DQI breakdown panel (locked 2026-05-09 —
+  // DQI explainability ship). When the user clicks the score card, the
+  // panel opens with the full per-component decomposition.
+  const [dqiPanelOpen, setDqiPanelOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -177,10 +169,28 @@ export function OverviewTab({
 
   return (
     <div className="flex flex-col gap-lg">
-      {/* 0. Decision Quality Index — top-level quality score */}
+      {/* 0. Decision Quality Index — top-level quality score.
+          Clickable: opens the DqiBreakdownPanel with the full per-
+          component decomposition (locked 2026-05-09 — DQI
+          explainability ship). The "Click to see how it's computed"
+          hint is visible even before hover so the buyer knows the
+          score is a doorway, not just a number. */}
       {dqiData && (
         <ErrorBoundary sectionName="Decision Quality Index">
-          <div className="card">
+          <button
+            type="button"
+            onClick={() => setDqiPanelOpen(true)}
+            aria-label="Open DQI score breakdown — see how this score was computed"
+            className="card"
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              cursor: 'pointer',
+              padding: 0,
+              border: 'none',
+              background: 'var(--bg-card)',
+            }}
+          >
             <div className="card-body">
               <div className="flex items-start gap-6 flex-wrap">
                 <DQIBadge
@@ -197,6 +207,17 @@ export function OverviewTab({
                     {compoundAdjustments && compoundAdjustments.length > 0 && (
                       <BiologicalRiskBadge adjustments={compoundAdjustments} size="sm" />
                     )}
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: 'var(--accent-primary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                      }}
+                    >
+                      Click to see how it&rsquo;s computed →
+                    </span>
                   </div>
                   <p className="text-sm text-muted mb-3">
                     Decision Quality Index — a composite score across bias load, noise, evidence,
@@ -219,7 +240,12 @@ export function OverviewTab({
                 </div>
               </div>
             </div>
-          </div>
+          </button>
+          <DqiBreakdownPanel
+            dqi={dqiData}
+            open={dqiPanelOpen}
+            onOpenChange={setDqiPanelOpen}
+          />
         </ErrorBoundary>
       )}
 

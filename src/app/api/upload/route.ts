@@ -3,7 +3,8 @@ import { after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import path from 'path';
 import { createClient } from '@/utils/supabase/server';
-import { parseFile } from '@/lib/utils/file-parser';
+import { parseFile, extractTypeAwareStructuredData } from '@/lib/utils/file-parser';
+import { Prisma } from '@prisma/client';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
@@ -12,6 +13,7 @@ import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils
 import { logAudit } from '@/lib/audit';
 import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
 import { prewarmDocumentEmbedding } from '@/lib/rag/embeddings';
+import { INVESTMENT_DOCUMENT_TYPES } from '@/lib/prompts/investment-vertical';
 
 const log = createLogger('UploadRoute');
 
@@ -60,16 +62,15 @@ export async function POST(request: NextRequest) {
      *  link. Plan reference: 2.3 — versioning + delta DQI. */
     const versionOfRaw = formData.get('versionOfDocumentId') as string | null;
 
-    // Validate documentType against known investment document types
-    const VALID_DOC_TYPES = [
-      'ic_memo',
-      'cim',
-      'pitch_deck',
-      'term_sheet',
-      'due_diligence',
-      'lp_report',
-      'other',
-    ];
+    // Validate documentType against canonical INVESTMENT_DOCUMENT_TYPES.
+    // Locked 2026-05-09 (synergy-parser deepening fix): the prior hardcoded
+    // VALID_DOC_TYPES list was 6 entries while INVESTMENT_DOCUMENT_TYPES had
+    // grown to 9 (qofe / synergy_model / integration_plan added in the
+    // 2026-05-09 M&A P1 ship), silently rejecting uploads of those three
+    // M&A-native document types. Deriving from the canonical export
+    // structurally prevents this drift class — any future addition to
+    // INVESTMENT_DOCUMENT_TYPES is accepted by the upload route automatically.
+    const VALID_DOC_TYPES: readonly string[] = [...INVESTMENT_DOCUMENT_TYPES, 'other'];
     if (documentType && !VALID_DOC_TYPES.includes(documentType)) {
       return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
     }
@@ -241,9 +242,26 @@ export async function POST(request: NextRequest) {
 
     // Extract text content
     let content = '';
+    // Type-aware structured-data extraction (locked 2026-05-09 hard-layer
+    // ship). Runs in parallel to text parsing and persists to
+    // Document.parsedStructuredData below. Null when no structured parser
+    // matches the documentType OR extraction bailed — downstream consumers
+    // fall back to the legacy text-content extraction path.
+    let parsedStructuredData: Awaited<
+      ReturnType<typeof extractTypeAwareStructuredData>
+    > = null;
 
     try {
-      content = await parseFile(buffer, file.type, file.name);
+      // Pass documentType to enable synergy_model spreadsheet enrichment
+      // (locked 2026-05-09). For other doc types the param is informational —
+      // parseFile only uses it for synergy_model + .xlsx today.
+      content = await parseFile(buffer, file.type, file.name, documentType ?? undefined);
+      parsedStructuredData = await extractTypeAwareStructuredData(
+        buffer,
+        file.type,
+        file.name,
+        documentType
+      );
     } catch (error) {
       log.error('File Parse Error:', error);
       return NextResponse.json(
@@ -278,6 +296,14 @@ export async function POST(request: NextRequest) {
           contentHash,
           status: 'pending',
           ...(documentType ? { documentType } : {}),
+          // Persist type-aware structured parser output when present
+          // (locked 2026-05-09 hard-layer ship). Replaces the inline-marker
+          // text round-trip for downstream DPR/aggregation consumers. Cast
+          // to Prisma.InputJsonValue per the JSON-field convention in
+          // CLAUDE.md "Prisma JSON fields need explicit casting".
+          ...(parsedStructuredData
+            ? { parsedStructuredData: parsedStructuredData as unknown as Prisma.InputJsonValue }
+            : {}),
           ...(dealId ? { dealId } : {}),
           ...(resolvedParentDocumentId
             ? { parentDocumentId: resolvedParentDocumentId, versionNumber: resolvedVersionNumber }

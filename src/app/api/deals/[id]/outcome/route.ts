@@ -170,6 +170,17 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 // detected anywhere across the deal's analyses.
                 marketContextApplied: true,
                 marketContextOverride: true,
+                // Toxic combinations fed into the namedPatterns aggregation
+                // (locked 2026-05-09 hard-layer ship, Proposal 2). Replaces
+                // client-side detection in IcReadinessGate. severity column
+                // (Proposal 5 ship) is the canonical band.
+                toxicCombinations: {
+                  select: {
+                    patternLabel: true,
+                    severity: true,
+                    toxicScore: true,
+                  },
+                },
               },
             },
           },
@@ -191,6 +202,25 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         const biasArr = Array.isArray(latest.biases)
           ? (latest.biases as Array<{ biasType?: string | null; severity?: string | null }>)
           : [];
+        // Pass toxic combinations through to the aggregator so it can
+        // compute namedPatterns server-side (Proposal 2, locked 2026-05-09).
+        // Schema-drift fallback: when ToxicCombination.severity is null
+        // (legacy rows pre-2026-05-09 migration), pass null and let the
+        // aggregator derive from toxicScore.
+        const toxicCombinationsRaw = (
+          latest as unknown as {
+            toxicCombinations?: Array<{
+              patternLabel: string | null;
+              severity: string | null;
+              toxicScore: number;
+            }>;
+          }
+        ).toxicCombinations;
+        const toxicCombinations = toxicCombinationsRaw?.map(tc => ({
+          patternLabel: tc.patternLabel,
+          severity: tc.severity as 'critical' | 'high' | 'medium' | 'low' | null,
+          toxicScore: tc.toxicScore,
+        }));
         return {
           documentId: d.id,
           analysisId: latest.id,
@@ -199,6 +229,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
             biasType: b?.biasType || 'unknown_bias',
             severity: b?.severity ?? null,
           })),
+          ...(toxicCombinations ? { toxicCombinations } : {}),
         };
       })
       .filter((x): x is NonNullable<typeof x> => x !== null);

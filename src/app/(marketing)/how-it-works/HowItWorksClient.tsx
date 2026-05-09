@@ -447,7 +447,7 @@ export function HowItWorksClient() {
             }}
           >
             <StatPill value="30+" label="cognitive biases" />
-            <StatPill value="20" label="general (DI-B-001–020)" />
+            <StatPill value={String(BIAS_COUNT)} label={`general (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`} />
             <StatPill value="11" label="strategy-specific" />
             <StatPill value="0" label="detections without an excerpt" />
           </div>
@@ -517,6 +517,85 @@ export function HowItWorksClient() {
           />
           <ToxicNetworkGraph patterns={genome.toxicPatterns} />
         </div>
+      </section>
+
+      {/* SECTION 4b — M&A WORKFLOW OVERLAYS — locked 2026-05-09 alongside
+          the marketing-cascade ship. Surfaces the deal-stage overlay
+          model: the patterns the engine catches map onto specific M&A
+          deal stages by document type. PMI marked as roadmap so the
+          claim stays honest (per CLAUDE.md M&A roadmap, deal-stage UI
+          overlays are P3 / acqui-hire window, but the pattern detection
+          ALREADY fires at the appropriate stage based on document
+          type). Lets a Head of Corp Dev / PE Deal Partner see the M&A
+          workflow nativeness without leaving the marketing surface. */}
+      <section style={{ padding: '72px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <SectionHeader
+            eyebrow="M&A workflow coverage · by deal stage"
+            title="Each pattern fires at the deal stage where it's most decision-fatal."
+            body="Document type drives overlay. A CIM gets the seller-halo filter and the strategic-adjacency audit; an IC memo gets the full toxic-combination pass plus the reference-class forecast; a synergy model fires the Synergy Mirage detector hardest. The same 12-node pipeline runs on each, with stage-appropriate prompts layered on top."
+          />
+          <div className="how-it-works-stages">
+            <DealStageCard
+              num="1"
+              stage="Sourcing"
+              docs="CIM · teaser · IM"
+              patterns={['Conglomerate Fallacy']}
+              detail="Strategic Adjacency Audit. Zook core-vs-adjacency framework on the target's distance from the acquirer's core."
+              status="shipped"
+            />
+            <DealStageCard
+              num="2"
+              stage="Diligence"
+              docs="QofE · model · DD pack"
+              patterns={['Synergy Mirage', 'Reference Class Forecast']}
+              detail="Synergy claims pattern-matched against BCG triad (mechanism / owner / 90-day milestone). Reference Class Forecast benchmarks projections against the 143-case base rate."
+              status="shipped"
+            />
+            <DealStageCard
+              num="3"
+              stage="IC Review"
+              docs="IC memo · IC deck"
+              patterns={['Synergy Mirage', "Winner's Curse", 'Yes Committee']}
+              detail="Full toxic-combination pass. Boardroom Decision Twin simulates 5-persona IC vote. Pre-mortem fires prospective hindsight (Klein & Mitchell 1995)."
+              status="shipped"
+            />
+            <DealStageCard
+              num="4"
+              stage="Closing"
+              docs="LOI · final memo · term sheet"
+              patterns={["Winner's Curse", 'Sunk Ship']}
+              detail="Deal Fever Check: scans final documents against original screening memo for escalation language and anchoring drift."
+              status="shipped"
+            />
+            <DealStageCard
+              num="5"
+              stage="Post-Merger Integration"
+              docs="Integration plan · Day-1 ops"
+              patterns={['Synergy Mirage (execution side)']}
+              detail="Cultural divergence + IT-simplicity fallacy + talent-flight retention. Roadmap: deeper PMI overlays land once acquirer-side engineering capacity is in place."
+              status="roadmap"
+            />
+          </div>
+        </div>
+        <style>{`
+          .how-it-works-stages {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-top: 28px;
+          }
+          @media (max-width: 1100px) {
+            .how-it-works-stages {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          @media (max-width: 600px) {
+            .how-it-works-stages {
+              grid-template-columns: 1fr;
+            }
+          }
+        `}</style>
       </section>
 
       {/* SECTION 5 — DQI ────────────────────────────────────────── */}
@@ -1230,6 +1309,117 @@ function SectionHeader({
         {title}
       </h2>
       <div style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6 }}>{body}</div>
+    </div>
+  );
+}
+
+function DealStageCard({
+  num,
+  stage,
+  docs,
+  patterns,
+  detail,
+  status,
+}: {
+  num: string;
+  stage: string;
+  docs: string;
+  patterns: string[];
+  detail: string;
+  status: 'shipped' | 'roadmap';
+}) {
+  const accent = status === 'shipped' ? C.green : C.amber;
+  return (
+    <div
+      style={{
+        background: C.white,
+        border: `1px solid ${C.slate200}`,
+        borderTop: `3px solid ${accent}`,
+        borderRadius: 12,
+        padding: '18px 18px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        minWidth: 0,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: C.slate400,
+            fontFamily: 'var(--font-mono, monospace)',
+            letterSpacing: '0.05em',
+          }}
+        >
+          STAGE {num}
+        </span>
+        <span
+          style={{
+            fontSize: 9.5,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: accent,
+            background: status === 'shipped' ? C.greenLight : 'rgba(245,158,11,0.10)',
+            padding: '2px 7px',
+            borderRadius: 999,
+          }}
+        >
+          {status === 'shipped' ? 'live' : 'roadmap'}
+        </span>
+      </div>
+      <h3
+        style={{
+          fontSize: 17,
+          fontWeight: 700,
+          color: C.slate900,
+          margin: 0,
+          marginBottom: 6,
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {stage}
+      </h3>
+      <div
+        style={{
+          fontSize: 11,
+          color: C.slate500,
+          fontFamily: 'var(--font-mono, monospace)',
+          marginBottom: 10,
+          lineHeight: 1.4,
+        }}
+      >
+        {docs}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10 }}>
+        {patterns.map(p => (
+          <span
+            key={p}
+            style={{
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: C.slate700,
+              background: C.slate100,
+              border: `1px solid ${C.slate200}`,
+              padding: '2px 7px',
+              borderRadius: 4,
+            }}
+          >
+            {p}
+          </span>
+        ))}
+      </div>
+      <p
+        style={{
+          fontSize: 12.5,
+          color: C.slate600,
+          margin: 0,
+          lineHeight: 1.55,
+        }}
+      >
+        {detail}
+      </p>
     </div>
   );
 }

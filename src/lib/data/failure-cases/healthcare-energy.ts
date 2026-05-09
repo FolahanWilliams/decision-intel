@@ -341,7 +341,7 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'planning_fallacy',
     ],
     primaryBias: 'anchoring_bias',
-    toxicCombinations: ['Sunk Ship', 'Optimism Trap'],
+    toxicCombinations: ['Sunk Ship', 'Optimism Trap', 'Synergy Mirage', "Winner's Curse"],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,

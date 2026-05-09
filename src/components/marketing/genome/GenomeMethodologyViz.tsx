@@ -342,9 +342,13 @@ function LegendDot({ color, label }: { color: string; label: string }) {
 
 /** Step 4 — Mitigation. Pattern rows with shield checks. */
 function MitigationViz({ reduced }: { reduced: boolean }) {
+  // Mix of general-decision + M&A workflow-native patterns (per the
+  // 2026-05-09 P1 ship). Synergy Mirage is the load-bearing M&A surface
+  // for Heads of Corp Dev — its presence here signals that the
+  // mitigation engine catches the canonical 70-90% M&A failure mode.
   const rows = [
     { name: 'Echo Chamber', color: C.red },
-    { name: 'Sunk Ship', color: '#EA580C' },
+    { name: 'Synergy Mirage', color: '#8B5CF6' }, // M&A pattern
     { name: 'Yes Committee', color: C.violet },
   ];
   return (

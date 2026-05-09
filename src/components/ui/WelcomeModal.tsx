@@ -78,6 +78,72 @@ const ROLES: Array<{
   },
 ];
 
+/**
+ * Per-role value-prop card content (locked 2026-05-09, Ship B.2). Lands
+ * the buyer-fit signal at the welcome moment: the chosen role surfaces
+ * the moat-relevant capabilities by name, so the M&A user sees the
+ * three toxic combinations the audit catches BEFORE they upload, not
+ * after. The card renders inline between role-pick and the CTAs (only
+ * after a role is selected). Each entry:
+ *   eyebrow: short tag (procurement-grade language)
+ *   headline: 1-line value summary
+ *   bullets: 3 named capabilities relevant to the role
+ *
+ * Forward-looking rule: when a new role lands in ROLES, add a matching
+ * VALUE_PROPS_BY_ROLE entry in the same commit; the type system
+ * enforces this at compile time via the Record<Role, ...> shape.
+ */
+const VALUE_PROPS_BY_ROLE: Record<
+  Role,
+  { eyebrow: string; headline: string; bullets: string[] }
+> = {
+  cso: {
+    eyebrow: 'For corporate strategy',
+    headline: "We audit the reasoning behind your committee's strategic memos.",
+    bullets: [
+      'Bias detection on board recommendations + market-entry memos in 60 seconds',
+      'Hashed, tamper-evident Decision Provenance Record for every audit',
+      'Predicted CEO + audit-committee questions before the room asks them',
+    ],
+  },
+  ma: {
+    eyebrow: 'For M&A and corp dev',
+    headline: 'Built for the M&A workflow — 9 document types, 5 toxic combinations.',
+    bullets: [
+      'Synergy Mirage detector (synergies without mechanism, owner, or 90-day milestone)',
+      "Conglomerate Fallacy + Winner's Curse on far-adjacency and auction-process deals",
+      'IC Readiness Gate scores 5 gates per deal so committee shows up green',
+    ],
+  },
+  bizops: {
+    eyebrow: 'For BizOps and FP&A',
+    headline: 'Audits the planning memos that drive quarterly forecasts.',
+    bullets: [
+      'Anchoring + overconfidence detection on forecasts and buy-vs-build memos',
+      'Outcome Flywheel surfaces calibration once realised quarterly outcomes accumulate',
+      'Decision Packages bundle related decisions for cross-document review',
+    ],
+  },
+  pe_vc: {
+    eyebrow: 'For PE / venture / fund',
+    headline: 'Audits IC memos against a 143-case M&A failure library.',
+    bullets: [
+      'Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting',
+      'Cross-fund DQI calibration once realised IRR / MOIC outcomes accumulate',
+      'LP-grade DPR mapped to NDPR / WAEMU / CMA Kenya for African-LP procurement',
+    ],
+  },
+  other: {
+    eyebrow: 'Get oriented',
+    headline: 'The reasoning audit platform — a 60-second take on any strategic memo.',
+    bullets: [
+      '22-bias taxonomy with academic citations',
+      'Decision Quality Index from A to F, with traceable component scores',
+      'Decision Knowledge Graph compounds quarter over quarter as outcomes accumulate',
+    ],
+  },
+};
+
 export function WelcomeModal({ onClose }: WelcomeModalProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -257,6 +323,61 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             );
           })}
         </div>
+
+        {/* Value-prop card reveals once a role is picked. Lands the
+            buyer-fit signal at the welcome moment: the M&A user sees
+            the three toxic combinations the audit catches BEFORE
+            uploading. (Locked 2026-05-09, Ship B.2.) */}
+        {selectedRole && (
+          <div
+            style={{
+              marginTop: 10,
+              padding: '12px 14px',
+              borderRadius: 10,
+              background: 'rgba(22, 163, 74, 0.05)',
+              border: '1px solid rgba(22, 163, 74, 0.20)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'var(--accent-primary)',
+                marginBottom: 6,
+              }}
+            >
+              {VALUE_PROPS_BY_ROLE[selectedRole].eyebrow}
+            </div>
+            <div
+              style={{
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                lineHeight: 1.4,
+                marginBottom: 8,
+              }}
+            >
+              {VALUE_PROPS_BY_ROLE[selectedRole].headline}
+            </div>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 16,
+                fontSize: 11.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+              }}
+            >
+              {VALUE_PROPS_BY_ROLE[selectedRole].bullets.map(b => (
+                <li key={b} style={{ marginBottom: 2 }}>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* CTAs reveal once a role is picked. Three primary actions on the
             same screen — no second step. Adaeze's audit catch on the

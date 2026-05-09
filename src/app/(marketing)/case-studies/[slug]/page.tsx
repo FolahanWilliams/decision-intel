@@ -174,6 +174,15 @@ const TOXIC_DESCRIPTIONS: Record<string, string> = {
     'Confirmation bias reinforces sunk cost thinking into an escalating commitment loop.',
   'Golden Child':
     'A favored initiative receives uncritical support, with scrutiny reserved for alternatives.',
+  // M&A workflow-native patterns (locked 2026-05-09 alongside the P1
+  // ship). Surfaced on case-study cards when the case is tagged with
+  // these toxicCombinations in the 143-case library.
+  'Synergy Mirage':
+    'Synergy claims without a named operational mechanism, accountable executive, or 90-day milestone — the canonical M&A failure mode (70-90% of acquisitions miss projected synergies).',
+  'Conglomerate Fallacy':
+    'Far-adjacency acquisition justified by target growth and brand halo with no answer to "why us as parent" — Porter parenting-advantage absent.',
+  "Winner's Curse":
+    'Auction-dynamic anchoring drives bids above intrinsic value; "strategic necessity" and "competitive process" language flag the deal-fever pattern.',
 };
 
 function Card({ children, accent }: { children: React.ReactNode; accent?: string }) {

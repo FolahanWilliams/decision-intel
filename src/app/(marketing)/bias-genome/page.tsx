@@ -10,16 +10,26 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import {
   computePlatformCalibrationBaseline,
   formatCalibrationFootnote,
 } from '@/lib/learning/platform-baseline';
+
+// Drift-tolerant derivation — the bias count flexes as DI-B-XXX entries
+// land. Hardcoded "20 / DI-B-001 → DI-B-020" was stale by 2 (DI-B-021 +
+// DI-B-022 added 2026-04-30 in the Kahneman-Klein paper-application
+// sprint; not caught by lint:counts because the value lives in JSX
+// attributes, not template literals matching the count regex).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const TAXONOMY_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { HeadlineStatCard } from '@/components/marketing/genome/HeadlineStatCard';
 import { ToxicComboCard } from '@/components/marketing/genome/ToxicComboCard';
 import { RiskLandscape } from '@/components/marketing/genome/RiskLandscape';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { GenomeMethodologyViz } from '@/components/marketing/genome/GenomeMethodologyViz';
+import { MnaPatternCoverage } from '@/components/marketing/genome/MnaPatternCoverage';
 import { BiasGenomeClient } from './BiasGenomeClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -145,7 +155,7 @@ export default function BiasGenomePage() {
               borderTop: `1px solid ${C.slate200}`,
             }}
           >
-            <Pill label="Named biases" value="20" sublabel="DI-B-001 → DI-B-020" />
+            <Pill label="Named biases" value={String(BIAS_COUNT)} sublabel={TAXONOMY_RANGE} />
             <Pill label="Case studies" value={String(meta.totalCases)} sublabel="hand-curated" />
             <Pill
               label="Industries"
@@ -364,12 +374,16 @@ export default function BiasGenomePage() {
               color: C.slate500,
               margin: 0,
               marginBottom: 28,
-              maxWidth: 680,
+              maxWidth: 760,
             }}
           >
             Named patterns where two biases compound. Detection in live memos is 8x worse than
-            either bias alone. This is the product category our toxic-combination engine was built
-            for.
+            either bias alone. Includes the three M&A workflow-native patterns —{' '}
+            <strong style={{ color: C.slate700 }}>Synergy Mirage</strong>,{' '}
+            <strong style={{ color: C.slate700 }}>Conglomerate Fallacy</strong>, and{' '}
+            <strong style={{ color: C.slate700 }}>Winner&rsquo;s Curse</strong> — that account for
+            the 70-90% of acquisitions that miss projected synergies (McKinsey + KPMG). This is the
+            product category our toxic-combination engine was built for.
           </p>
 
           {/* Network viz first — shows which biases are the hubs */}
@@ -391,6 +405,17 @@ export default function BiasGenomePage() {
           </div>
         </div>
       </section>
+
+      {/* M&A WORKFLOW PATTERN COVERAGE — locked 2026-05-09. The three
+          M&A workflow-native toxic combinations get a dedicated section
+          showing every anchor case from the 143-case library tagged
+          with each pattern. Procurement-grade authority signal: a Head
+          of Corp Dev or PE Deal Partner sees "here are 14 deals you've
+          heard of, audited against our 3 M&A patterns." Mounted between
+          Toxic Combinations (general patterns) and Biological-State
+          Signals (additional differentiator) so the M&A reader hits the
+          M&A surface without scrolling past the unrelated content. */}
+      <MnaPatternCoverage />
 
       {/* BIOLOGICAL-STATE SIGNALS — IP claim no other decision-intel
           platform makes. Modeling cortisol/winner-effect language as a
@@ -601,8 +626,7 @@ export default function BiasGenomePage() {
                 reports, FDA actions, post-mortems, or academic case studies.
               </li>
               <li>
-                Biases are assigned per-case by applying the Decision Intel taxonomy (DI-B-001 →
-                DI-B-020). Every named bias links to peer-reviewed academic sources at{' '}
+                Biases are assigned per-case by applying the Decision Intel taxonomy ({TAXONOMY_RANGE}). Every named bias links to peer-reviewed academic sources at{' '}
                 <Link
                   href="/taxonomy"
                   style={{ color: C.green, textDecoration: 'none', fontWeight: 600 }}

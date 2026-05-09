@@ -53,7 +53,7 @@
  */
 
 import { ALL_CASES, type CaseOutcome, type CaseStudy } from '@/lib/data/case-studies';
-import { WEIGHTS } from '@/lib/scoring/dqi';
+import { SYNTHETIC_WEIGHTS_LEGACY_2_0_0 } from '@/lib/scoring/dqi';
 import {
   computeBrier,
   brierCategory,
@@ -175,22 +175,22 @@ export function computeBrierFairPredictedDqi(c: CaseStudy): number {
   // Compliance Risk (13%) — neutral, same as production.
   const complianceScore = 60;
 
-  // Renormalise weights to sum to 1.0 — historicalAlignment is excluded
-  // (cannot recurse on the corpus we're scoring). Mirrors the production
-  // synthetic's denominator.
-  const denom =
-    WEIGHTS.biasLoad +
-    WEIGHTS.noiseLevel +
-    WEIGHTS.evidenceQuality +
-    WEIGHTS.processMaturity +
-    WEIGHTS.complianceRisk;
+  // Pinned to SYNTHETIC_WEIGHTS_LEGACY_2_0_0 so the platform-baseline
+  // Brier (0.258, methodology 2.0.0-seed) stays stable when live WEIGHTS
+  // rebalance for new methodology versions (e.g., 2.2.0 added compoundRisk
+  // + dropped biasLoad 0.28 → 0.22). The methodology-versioning pattern:
+  // live audits advance, calibration baselines stay fixed at the version
+  // they were computed under. Renormalise to sum to 1.0 over the 5
+  // dimensions present in the synthetic.
+  const W = SYNTHETIC_WEIGHTS_LEGACY_2_0_0;
+  const denom = W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
 
   const predictedDqi =
-    (biasScore * WEIGHTS.biasLoad +
-      noiseScore * WEIGHTS.noiseLevel +
-      evidenceScore * WEIGHTS.evidenceQuality +
-      processScore * WEIGHTS.processMaturity +
-      complianceScore * WEIGHTS.complianceRisk) /
+    (biasScore * W.biasLoad +
+      noiseScore * W.noiseLevel +
+      evidenceScore * W.evidenceQuality +
+      processScore * W.processMaturity +
+      complianceScore * W.complianceRisk) /
     denom;
 
   return Math.round(Math.max(0, Math.min(100, predictedDqi)));

@@ -51,6 +51,12 @@ import {
 } from '@/lib/learning/reference-class-forecast';
 import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
+  extractSynergyDefensibilityFromContent,
+  summariseSynergyDefensibility,
+  type SynergyDefensibilitySummary,
+  type ParsedSynergyModelData,
+} from '@/lib/parsers/synergy-model-parser';
+import {
   computeCalibratedRejection,
   type CalibratedRejection,
 } from '@/lib/learning/calibrated-rejection';
@@ -220,6 +226,16 @@ export interface ProvenanceRecordData {
    * Renders as §4.9 strip on the DPR cover.
    */
   algorithmAversion?: AlgorithmAversion;
+  /**
+   * Synergy Defensibility summary (locked 2026-05-09, M&A cascade depth ship).
+   * Populated only when documentType === 'synergy_model' AND the file-parser
+   * detected a synergy-shaped spreadsheet at upload time. Carries the
+   * portfolio-level summary + top critical/high claims for surfacing on the
+   * DPR cover. Extracted from Document.content's STRUCTURED SYNERGY MODEL
+   * block (no re-parse of the original .xlsx). Null when the audit was on
+   * a non-synergy document type or the parser bailed out.
+   */
+  synergyDefensibility?: SynergyDefensibilitySummary;
   /**
    * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
    * populated — this is the procurement-grade contractual statement of
@@ -856,6 +872,12 @@ export async function assembleProvenanceRecordData(
             confidence: true,
           },
         },
+        // Toxic combinations fed into the RCF pattern-aware boost so
+        // cases tagged with the same patternLabel surface in the top
+        // analogs (M&A cascade depth ship 2026-05-09).
+        toxicCombinations: {
+          select: { patternLabel: true, toxicScore: true },
+        },
         promptVersion: {
           select: { hash: true, name: true, version: true },
         },
@@ -866,6 +888,14 @@ export async function assembleProvenanceRecordData(
             contentHash: true,
             userId: true,
             orgId: true,
+            // Synergy defensibility extraction. Prefer the structured
+            // parsedStructuredData column (locked 2026-05-09 hard-layer
+            // ship — Document.parsedStructuredData JSON field). Falls back
+            // to the inline-marker text extraction from content for legacy
+            // uploads or when the structured field is null.
+            content: true,
+            documentType: true,
+            parsedStructuredData: true,
           },
         },
       },
@@ -1085,11 +1115,21 @@ export async function assembleProvenanceRecordData(
   );
   // Reference-class forecast — pure function, deterministic, runs in
   // <5ms. Computed synchronously after the Promise.all so it can use
-  // the deduplicated biasTypes computed above.
+  // the deduplicated biasTypes computed above. Pass the toxic-combination
+  // patternLabels that fired on this audit so the RCF surfaces structurally-
+  // analogous failures (M&A cascade depth ship 2026-05-09).
+  const auditPatternLabels = (
+    (analysis as unknown as {
+      toxicCombinations?: Array<{ patternLabel: string | null }>;
+    }).toxicCombinations ?? []
+  )
+    .map(t => t.patternLabel)
+    .filter((p): p is string => Boolean(p));
   const referenceClassForecast = getReferenceClassForecast({
     biasTypes,
     industry,
     documentType,
+    toxicCombinations: auditPatternLabels,
   });
   // Validity classification — read the persisted value from
   // judgeOutputs first (set at audit-completion time by /api/analyze/
@@ -1154,6 +1194,36 @@ export async function assembleProvenanceRecordData(
     summary: analysis.summary,
   });
 
+  // Synergy Defensibility — preferred source is Document.parsedStructuredData
+  // (locked 2026-05-09 hard-layer ship — first-class Prisma JSON column
+  // populated by the upload route's type-aware structured extraction).
+  // Falls back to the inline STRUCTURED SYNERGY MODEL block in
+  // Document.content for legacy uploads where parsedStructuredData is null
+  // (existed before the migration; or upload was on the old text-only path).
+  // Pure function either way, deterministic, no LLM.
+  const doc = (
+    analysis as unknown as {
+      document?: {
+        content?: string | null;
+        documentType?: string | null;
+        parsedStructuredData?: unknown;
+      };
+    }
+  ).document;
+  let synergyDefensibility: SynergyDefensibilitySummary | undefined = undefined;
+  if (doc?.documentType === 'synergy_model') {
+    // Path 1 (preferred): structured field
+    if (doc.parsedStructuredData) {
+      const parsed = doc.parsedStructuredData as ParsedSynergyModelData | null;
+      synergyDefensibility = summariseSynergyDefensibility(parsed) ?? undefined;
+    }
+    // Path 2 (fallback): inline-marker text extraction for legacy uploads
+    if (!synergyDefensibility && doc.content) {
+      synergyDefensibility =
+        extractSynergyDefensibilityFromContent(doc.content) ?? undefined;
+    }
+  }
+
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
   // reads this map to populate finding cards with verbatim memo
@@ -1203,6 +1273,7 @@ export async function assembleProvenanceRecordData(
     fractionationOfExpertise,
     decisionRubric,
     algorithmAversion,
+    synergyDefensibility,
     dataLifecycle,
     clientSafe: undefined,
     schemaVersion: 2,
@@ -1349,6 +1420,7 @@ export async function assembleProvenanceRecordDataForPackage(
       fractionationOfExpertise: undefined,
       decisionRubric: undefined,
       algorithmAversion: undefined,
+      synergyDefensibility: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,
@@ -1595,6 +1667,7 @@ export async function assembleProvenanceRecordDataForDeal(
       fractionationOfExpertise: undefined,
       decisionRubric: undefined,
       algorithmAversion: undefined,
+      synergyDefensibility: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,

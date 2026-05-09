@@ -244,6 +244,24 @@ export interface DealAggregationDto {
     totalOccurrences: number;
     topSeverity: 'critical' | 'high' | 'medium' | 'low';
   }>;
+  /**
+   * Named toxic combinations aggregated server-side across the deal's
+   * documents (locked 2026-05-09 hard-layer ship, Proposal 2). Replaces
+   * the prior client-side detection in IcReadinessGate. Sorted by severity
+   * then documentCount. Empty array when no patterns fired or when the
+   * aggregator wasn't supplied toxicCombinations on AnalyzedDocument
+   * (legacy callers).
+   */
+  namedPatterns: Array<{
+    patternLabel: string;
+    documentCount: number;
+    topSeverity: 'critical' | 'high' | 'medium' | 'low';
+    maxToxicScore: number;
+  }>;
+  /** Convenience field — pattern count at critical severity. */
+  criticalPatternCount: number;
+  /** Convenience field — pattern count at high severity. */
+  highPatternCount: number;
 }
 
 export interface DealSummary {

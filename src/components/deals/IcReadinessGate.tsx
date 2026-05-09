@@ -72,6 +72,21 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   board_memo: 'Board memo',
 };
 
+// M&A toxic-combination patterns now read DIRECTLY from server-side
+// aggregation (locked 2026-05-09 hard-layer ship, Proposal 2). The
+// prior client-side detection from individual biases was a stopgap
+// during the cascade-depth audit; now superseded by
+// DealAggregationDto.namedPatterns / criticalPatternCount / highPatternCount
+// computed by aggregateAnalyses() from the actual ToxicCombination rows
+// the audit pipeline persisted. Server-side aggregation is the canonical
+// source — same shape across every consumer (deal kanban, deal page
+// header, IC Readiness Gate, future analytics).
+//
+// Backwards-compat: when the deal-detail API hasn't yet been redeployed
+// or the analyses don't carry toxic combinations (legacy data), the
+// aggregator returns namedPatterns: [] / counts: 0, and Gate 6 silently
+// passes (no false-positive blockers).
+
 function computeGates(deal: DealDetail): Gate[] {
   const documents = deal.documents ?? [];
   const docTypes = new Set(documents.map(d => d.documentType).filter((t): t is string => !!t));
@@ -97,6 +112,20 @@ function computeGates(deal: DealDetail): Gate[] {
 
   // Gate 5: IC date scheduled
   const icDatePassed = !!deal.icDate;
+
+  // Gate 6: no toxic combinations firing at critical severity. Reads
+  // directly from server-side aggregation (locked 2026-05-09 hard-layer
+  // ship, Proposal 2). The aggregator computes namedPatterns +
+  // criticalPatternCount + highPatternCount from actual ToxicCombination
+  // rows the pipeline persisted; same canonical signal across all
+  // consumers. Gate covers ALL named patterns (M&A + cross-domain) at
+  // critical severity, not just the 3 M&A patterns the prior client-
+  // side detection looked for — a critical Echo Chamber should also
+  // block IC readiness, not just Synergy Mirage.
+  const namedPatterns = deal.aggregation?.namedPatterns ?? [];
+  const criticalPatternCount = deal.aggregation?.criticalPatternCount ?? 0;
+  const highPatternCount = deal.aggregation?.highPatternCount ?? 0;
+  const toxicCombosPassed = criticalPatternCount === 0;
 
   return [
     {
@@ -162,6 +191,34 @@ function computeGates(deal: DealDetail): Gate[] {
       remediation: icDatePassed
         ? undefined
         : 'Set an IC review date so the platform can sequence the readiness countdown.',
+    },
+    {
+      id: 'toxic_combinations',
+      label: 'No critical toxic combinations',
+      description: (() => {
+        if (namedPatterns.length === 0) {
+          return 'No toxic combinations (compound bias patterns) detected on the deal';
+        }
+        if (criticalPatternCount > 0) {
+          const criticalLabels = namedPatterns
+            .filter(p => p.topSeverity === 'critical')
+            .map(p => p.patternLabel)
+            .join(', ');
+          return `${criticalPatternCount} pattern(s) at critical: ${criticalLabels}${highPatternCount > 0 ? ` · ${highPatternCount} more at high` : ''}`;
+        }
+        if (highPatternCount > 0) {
+          const highLabels = namedPatterns
+            .filter(p => p.topSeverity === 'high')
+            .map(p => p.patternLabel)
+            .join(', ');
+          return `${highPatternCount} pattern(s) at high severity: ${highLabels}`;
+        }
+        return `${namedPatterns.length} pattern(s) detected at medium/low severity: ${namedPatterns.map(p => p.patternLabel).join(', ')}`;
+      })(),
+      passed: toxicCombosPassed,
+      remediation: toxicCombosPassed
+        ? undefined
+        : 'Apply the named-pattern mitigation playbook (Founder Hub → Closing Lab) before IC. Critical patterns are deal-blocking signals.',
     },
   ];
 }

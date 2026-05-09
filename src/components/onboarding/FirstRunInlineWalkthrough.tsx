@@ -61,7 +61,7 @@ const ROLE_TAG_LABEL: Record<SampleRole, string> = {
 
 const ROLE_PITCH: Record<SampleRole, string> = {
   cso: 'Three role-matched memos: a market-entry recommendation, a board-level product-defer call, and a strategic acquisition with a load-bearing conflict. Pick whichever sits closest to a decision you actually face.',
-  ma: 'Three IC-grade memos: a synergy-and-integration deal, a bank-regulatory diligence note, and a cross-border reverse merger. Pasting any of them and clicking Run produces a procurement-grade audit.',
+  ma: 'Six IC-grade memos: a synergy-and-integration deal, a bank-regulatory diligence note, a cross-border reverse merger, plus three real-anchor specimens authored to fire one named M&A toxic combination each — Synergy Mirage (Project Marlin / AOL-Time Warner shape), Conglomerate Fallacy (Project Helix / Daimler-Chrysler shape), and Winner’s Curse (Project Apex / WeWork S-1 shape). Pasting any of them and clicking Run produces a procurement-grade audit on the document type and pattern most likely to surface in your pipeline.',
   bizops:
     'Three planning-grade memos: a buy-vs-build re-platform, an FY26 R&D budget recommendation, and a regional-hub shutdown call. The biases the audit catches map onto the patterns that produce miss-the-quarter forecasts.',
   pe_vc:
