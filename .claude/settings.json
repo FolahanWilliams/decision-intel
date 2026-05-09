@@ -30,7 +30,8 @@
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]",
-      "/Users/folahan/decision-intel/src/app/(platform)/dashboard/decisions"
+      "/Users/folahan/decision-intel/src/app/(platform)/dashboard/decisions",
+      "/Users/folahan/decision-intel/src/app/api/containers/[id]"
     ]
   }
 }

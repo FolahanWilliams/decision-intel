@@ -255,7 +255,7 @@ function HeaderCell({ label, highlight }: { label: React.ReactNode; highlight?: 
 
 function Cell({
   children,
-  highlight,
+  highlight: _highlight,
   bg,
   diColumn,
 }: {

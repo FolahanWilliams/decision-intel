@@ -17,6 +17,7 @@ import { ContainerCompositeHero } from '@/components/containers/ContainerComposi
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
+import { ContainerLinksPanel } from '@/components/constellation/ContainerLinksPanel';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { dqiColorFor } from '@/lib/utils/grade';
 
@@ -270,6 +271,8 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
           </div>
 
           <ContainerCrossReferenceCard run={container.latestCrossReference} />
+
+          <ContainerLinksPanel containerId={container.id} />
 
           <OutcomeBlock
             outcome={container.outcome}

@@ -83,7 +83,10 @@ export type AuditAction =
   | 'CONTAINER_DOCUMENT_ADDED'
   | 'CONTAINER_DOCUMENT_REMOVED'
   | 'CONTAINER_CROSS_REFERENCE_RUN'
-  | 'CONTAINER_OUTCOME_LOGGED';
+  | 'CONTAINER_OUTCOME_LOGGED'
+  // Decision Pipeline Constellation (Phase 3.5 lock 2026-05-09 evening)
+  | 'CONTAINER_LINK_CREATED'
+  | 'CONTAINER_LINK_DELETED';
 
 export interface AuditLogParams {
   action: AuditAction;

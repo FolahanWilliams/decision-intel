@@ -99,13 +99,19 @@ const SCAN_DIR = join(ROOT, 'src');
 // `res.json().catch(() => null)` body-parse on the toxic-combination
 // trending card fetch in ToxicCombinationTrendingCard — same canonical
 // req.json() body-parse exception class.
-const SILENT_CATCH_BASELINE = 155;
+// 155 → 151: Phase 3.5 ship (Decision Pipeline Constellation, 2026-05-09
+// evening) added 1 canonical body-parse silent catch but the existing
+// codebase had 4 silent catches that have been independently absorbed
+// or the SILENT_CATCH regex no longer flags them. Ratcheted DOWN per
+// the lint script's "reducing is encouraged" rule.
+const SILENT_CATCH_BASELINE = 151;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
 // false / true / 0 / '' / "". Also catches multi-line variants where the
 // arrow body is on the same line.
-const SILENT_CATCH = /\.catch\s*\(\s*(?:\([^)]*\)|[a-zA-Z_$][\w$]*)?\s*=>\s*(?:null|undefined|\{\s*\}|\[\s*\]|false|true|0|''|"")\s*\)/g;
+const SILENT_CATCH =
+  /\.catch\s*\(\s*(?:\([^)]*\)|[a-zA-Z_$][\w$]*)?\s*=>\s*(?:null|undefined|\{\s*\}|\[\s*\]|false|true|0|''|"")\s*\)/g;
 
 const TS_EXT = /\.(?:ts|tsx)$/;
 

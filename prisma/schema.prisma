@@ -337,6 +337,13 @@ model DecisionContainer {
   crossReferences           DecisionContainerCrossReference[]
   auditPurchases            DecisionContainerAuditPurchase[]
 
+  /// Phase 3.5 — Decision Pipeline Constellation. Outbound + inbound
+  /// edges express cognitive lineage between containers (the thesis
+  /// that spawned this deal, the prior decision it depends on, the
+  /// parent strategic frame, etc.). See container-link-types SSOT.
+  outboundLinks             DecisionContainerLink[]           @relation("LinkFromContainer")
+  inboundLinks              DecisionContainerLink[]           @relation("LinkToContainer")
+
   @@index([orgId])
   @@index([ownerUserId])
   @@index([orgId, kind])
@@ -345,6 +352,46 @@ model DecisionContainer {
   @@index([orgId, kind, status])
   @@index([orgId, updatedAt])
   @@index([committeeDate])
+}
+
+/// Phase 3.5 — Decision Pipeline Constellation edges (locked 2026-05-09
+/// evening). Maps COGNITIVE LINEAGE between containers, not data
+/// lineage (Palantir's trap). The four canonical link types per
+/// container-link-types.ts SSOT:
+///
+/// - 'precedes'      — temporal: this decision came before that one;
+///                     used for escalation-of-commitment chains.
+/// - 'spawned_from'  — thesis-anchor: this deal flows from that thesis;
+///                     master Strategic node → portfolio Investment nodes.
+///                     The Cornerstone-magnetic edge per the master KB
+///                     synthesis 2026-05-09.
+/// - 'depends_on'    — structural: this decision rests on that
+///                     assumption (Dalio determinant — debt cycle,
+///                     governance, FX regime). Alert-ripple edge.
+/// - 'parent_of'     — composition: this strategic frame contains
+///                     that sub-decision (e.g. region rollout parent,
+///                     market-by-market children).
+///
+/// `note` is optional free-text the creator adds when the link is
+/// non-obvious (e.g. "depends on Q3 governance regime per Dangote DPR").
+model DecisionContainerLink {
+  id          String            @id @default(cuid())
+  fromId      String
+  toId        String
+  /// One of: precedes | spawned_from | depends_on | parent_of.
+  /// Validated against CONTAINER_LINK_TYPES SSOT at write.
+  linkType    String
+  note        String?           @db.Text
+  createdAt   DateTime          @default(now())
+  createdBy   String?
+
+  from        DecisionContainer @relation("LinkFromContainer", fields: [fromId], references: [id], onDelete: Cascade)
+  to          DecisionContainer @relation("LinkToContainer", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, linkType])
+  @@index([fromId])
+  @@index([toId])
+  @@index([linkType])
 }
 
 /// Join table — Document ↔ DecisionContainer. Carries the per-context

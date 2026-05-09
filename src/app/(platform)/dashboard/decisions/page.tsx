@@ -11,7 +11,8 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Plus, Filter } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Filter, Network } from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
@@ -104,26 +105,49 @@ export default function DecisionsPage() {
             onClick={() => setStatusFilter('archived')}
           />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreateModal(true)}
-          style={{
-            padding: '8px 14px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--accent-primary)',
-            color: '#fff',
-            border: 'none',
-            fontSize: 'var(--fs-sm)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-          }}
-        >
-          <Plus size={14} />
-          New decision
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <Link
+            href="/dashboard/decisions/constellation"
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              background: 'var(--bg-card)',
+              color: 'var(--text-secondary)',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+            title="Open the longitudinal Decision Pipeline Constellation viz"
+          >
+            <Network size={12} />
+            Constellation
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent-primary)',
+              color: '#fff',
+              border: 'none',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Plus size={14} />
+            New decision
+          </button>
+        </div>
       </div>
 
       <ContainerKanban

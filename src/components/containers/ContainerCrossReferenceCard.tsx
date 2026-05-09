@@ -14,6 +14,7 @@
  * existed but didn't render.
  */
 
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { GitCompareArrows, AlertCircle } from 'lucide-react';
 import { severityColor } from '@/lib/utils/severity';
@@ -54,6 +55,19 @@ export function ContainerCrossReferenceCard({
   run,
   documentMap,
 }: ContainerCrossReferenceCardProps) {
+  // Capture mount time once via lazy useState init — Date.now() at render
+  // would violate react-hooks/purity. Minute-level precision is fine for
+  // an "as of Xh ago" label.
+  const [mountTime] = useState(() => Date.now());
+  const findings = useMemo(
+    () =>
+      run
+        ? extractFindings(run.findings)
+            .slice()
+            .sort((a, b) => severityRank(b.severity) - severityRank(a.severity))
+        : [],
+    [run]
+  );
   if (!run) {
     return (
       <div
@@ -77,11 +91,8 @@ export function ContainerCrossReferenceCard({
     );
   }
 
-  const findings = extractFindings(run.findings)
-    .slice()
-    .sort((a, b) => severityRank(b.severity) - severityRank(a.severity));
   const runDate = new Date(run.runAt);
-  const ageHours = Math.round((Date.now() - runDate.getTime()) / (1000 * 60 * 60));
+  const ageHours = Math.round((mountTime - runDate.getTime()) / (1000 * 60 * 60));
   const ageLabel =
     ageHours < 1
       ? 'just now'
