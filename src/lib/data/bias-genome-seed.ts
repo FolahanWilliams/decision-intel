@@ -114,6 +114,27 @@ const TOXIC_PAIR_DEFS: Record<string, { biases: [string, string]; description: s
     biases: ['sunk_cost_fallacy', 'loss_aversion'],
     description: 'Escalating commitment to a losing course to avoid realizing the loss.',
   },
+  // M&A workflow-native patterns (locked 2026-05-09 alongside the P1 ship).
+  // Real-anchor failure modes from the 143-case library — surfaced on
+  // /bias-genome + /how-it-works so a Head of Corp Dev / PE Deal Partner
+  // sees the M&A vocabulary in the marketing surface that explains the
+  // moat. Bias pairs match the canonical NAMED_PATTERNS in
+  // src/lib/learning/toxic-combinations.ts.
+  'Synergy Mirage': {
+    biases: ['overconfidence_bias', 'planning_fallacy'],
+    description:
+      'Synergy claims without a named operational mechanism, accountable executive, or 90-day milestone — the canonical M&A failure mode (70-90% of acquisitions miss projected synergies).',
+  },
+  'Conglomerate Fallacy': {
+    biases: ['illusion_of_validity', 'halo_effect'],
+    description:
+      'Far-adjacency acquisition justified by target growth and brand halo, with no answer to "why us as parent" — Porter parenting-advantage absent.',
+  },
+  "Winner's Curse": {
+    biases: ['anchoring_bias', 'overconfidence_bias'],
+    description:
+      'Auction-dynamic anchoring drives bids above intrinsic value; "strategic necessity" and "competitive process" language flag the deal-fever pattern.',
+  },
 };
 
 // ─── Helpers ───────────────────────────────────────────────────────────────

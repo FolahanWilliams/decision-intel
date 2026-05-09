@@ -32,6 +32,10 @@ const C = {
 };
 
 // One color per pattern to color its edges — recognizable legend.
+// M&A workflow-native patterns (Synergy Mirage / Conglomerate Fallacy /
+// Winner's Curse) added 2026-05-09 alongside the P1 ship. Three new
+// distinct hues so the M&A patterns visually separate from the
+// general-decision patterns on the network graph.
 const PATTERN_COLORS: Record<string, string> = {
   'Echo Chamber': '#DC2626',
   'Sunk Ship': '#EA580C',
@@ -40,6 +44,9 @@ const PATTERN_COLORS: Record<string, string> = {
   'Optimism Trap': '#DB2777',
   'Status Quo Lock': '#0EA5E9',
   'Doubling Down': '#059669',
+  'Synergy Mirage': '#8B5CF6', // violet-500 — M&A pattern
+  'Conglomerate Fallacy': '#0891B2', // cyan-600 — M&A pattern
+  "Winner's Curse": '#BE123C', // rose-700 — M&A pattern (deal-fever signal)
 };
 
 interface ToxicNetworkGraphProps {

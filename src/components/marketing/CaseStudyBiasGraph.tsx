@@ -72,6 +72,21 @@ const TOXIC_PAIRS: Record<string, string[][]> = {
     ['sunk_cost_fallacy', 'overconfidence_bias'],
     ['sunk_cost_fallacy', 'loss_aversion'],
   ],
+  // M&A workflow-native patterns (locked 2026-05-09 alongside the P1
+  // ship). Bias pairs match the canonical NAMED_PATTERNS in
+  // src/lib/learning/toxic-combinations.ts.
+  'Synergy Mirage': [
+    ['overconfidence_bias', 'planning_fallacy'],
+    ['overconfidence_bias', 'halo_effect'],
+  ],
+  'Conglomerate Fallacy': [
+    ['illusion_of_validity', 'halo_effect'],
+    ['illusion_of_validity', 'overconfidence_bias'],
+  ],
+  "Winner's Curse": [
+    ['anchoring_bias', 'overconfidence_bias'],
+    ['anchoring_bias', 'authority_bias'],
+  ],
 };
 
 interface BiasNode {

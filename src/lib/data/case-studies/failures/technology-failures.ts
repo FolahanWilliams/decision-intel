@@ -28,7 +28,7 @@ export const TECHNOLOGY_FAILURE_CASES: CaseStudy[] = [
       'sunk_cost_fallacy',
     ],
     primaryBias: 'confirmation_bias',
-    toxicCombinations: ['Echo Chamber', 'Sunk Ship'],
+    toxicCombinations: ['Echo Chamber', 'Sunk Ship', "Winner's Curse", 'Synergy Mirage'],
     beneficialPatterns: [],
     biasesManaged: [],
     mitigationFactors: [],

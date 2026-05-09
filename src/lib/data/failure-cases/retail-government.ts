@@ -87,7 +87,7 @@ export const RETAIL_CASES: FailureCase[] = [
       'framing_effect',
     ],
     primaryBias: 'overconfidence_bias',
-    toxicCombinations: ['Optimism Trap', 'Echo Chamber'],
+    toxicCombinations: ['Optimism Trap', 'Echo Chamber', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,
@@ -149,7 +149,7 @@ export const RETAIL_CASES: FailureCase[] = [
       'halo_effect',
     ],
     primaryBias: 'anchoring_bias',
-    toxicCombinations: ['Blind Sprint', 'Echo Chamber', 'Golden Child'],
+    toxicCombinations: ['Blind Sprint', 'Echo Chamber', 'Golden Child', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,

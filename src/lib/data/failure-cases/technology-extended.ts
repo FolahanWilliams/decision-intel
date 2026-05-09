@@ -25,7 +25,7 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'framing_effect',
     ],
     primaryBias: 'bandwagon_effect',
-    toxicCombinations: ['Recency Spiral', 'Optimism Trap'],
+    toxicCombinations: ['Recency Spiral', 'Optimism Trap', 'Synergy Mirage', 'Conglomerate Fallacy'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,
@@ -284,7 +284,7 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'planning_fallacy',
     ],
     primaryBias: 'optimism_bias',
-    toxicCombinations: ['Optimism Trap', 'Blind Sprint'],
+    toxicCombinations: ['Optimism Trap', 'Blind Sprint', "Winner's Curse"],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,
