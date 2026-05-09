@@ -2,6 +2,7 @@
 
 import { Presentation, Loader2, Download, Calendar, Lock, Unlock } from 'lucide-react';
 import { formatBiasName } from '@/lib/utils/labels';
+import { gradeFromScore } from '@/lib/utils/grade';
 import { R2FBadge } from '@/components/ui/R2FBadge';
 
 // Keep in sync with src/lib/reports/board-report-generator.ts
@@ -27,14 +28,6 @@ function truncate(text: string | undefined, max: number): string {
   if (!text) return '';
   const clean = text.trim();
   return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
-}
-
-function gradeFromScore(score: number): string {
-  if (score >= 85) return 'A';
-  if (score >= 70) return 'B';
-  if (score >= 55) return 'C';
-  if (score >= 40) return 'D';
-  return 'F';
 }
 
 function interpretGrade(grade: string): string {

@@ -13,6 +13,7 @@ import {
 } from '@/lib/data/case-studies';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
 import { outcomeColor } from '@/lib/data/case-studies/outcome-color';
+import { gradeFromScore, type Grade } from '@/lib/utils/grade';
 import { MarketingNav, BRAND_COLORS as C } from '@/components/marketing/MarketingNav';
 import { CaseStudyCta } from './CaseStudyCta';
 import { CaseStudyGraphSection } from './CaseStudyGraphSection';
@@ -126,12 +127,20 @@ function computeSimulatedDQI(outcome: string, biasCount: number, toxicCount: num
   return Math.max(12, Math.min(96, base + biasMod + toxicMod));
 }
 
+// Local color + label palette is intentional (case-study marketing visual
+// language — different colors than the platform). Letter comes from the
+// canonical gradeFromScore so the boundaries can never drift.
+const DQI_GRADE_PALETTE: Record<Grade, { color: string; label: string }> = {
+  A: { color: '#22c55e', label: 'Excellent' },
+  B: { color: '#84cc16', label: 'Good' },
+  C: { color: '#eab308', label: 'Fair' },
+  D: { color: '#f97316', label: 'Poor' },
+  F: { color: '#ef4444', label: 'Critical' },
+};
+
 function dqiGrade(score: number): { grade: string; color: string; label: string } {
-  if (score >= 85) return { grade: 'A', color: '#22c55e', label: 'Excellent' };
-  if (score >= 70) return { grade: 'B', color: '#84cc16', label: 'Good' };
-  if (score >= 55) return { grade: 'C', color: '#eab308', label: 'Fair' };
-  if (score >= 40) return { grade: 'D', color: '#f97316', label: 'Poor' };
-  return { grade: 'F', color: '#ef4444', label: 'Critical' };
+  const grade = gradeFromScore(score);
+  return { grade, ...DQI_GRADE_PALETTE[grade] };
 }
 
 function guessSeverity(bias: string, isPrimary: boolean): string {

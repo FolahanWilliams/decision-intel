@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import { WEWORK_AUDIT } from '@/lib/data/audits/wework-s1-2019';
+import { gradeFromScore, type Grade } from '@/lib/utils/grade';
 
 /**
  * CounterfactualLiftViz — Interactive demonstration of the WHAT-IF
@@ -50,12 +51,20 @@ const C = {
   red: '#DC2626',
 };
 
+// Local color + label palette is intentional (marketing-surface visual
+// language). Letter comes from the canonical gradeFromScore so the
+// boundaries can never drift from the rest of the platform.
+const GRADE_PALETTE: Record<Grade, { color: string; label: string }> = {
+  A: { color: C.green, label: 'Board-ready' },
+  B: { color: '#10B981', label: 'Strong, minor work' },
+  C: { color: '#FACC15', label: 'Material gaps' },
+  D: { color: C.amber, label: 'Hold' },
+  F: { color: C.red, label: 'Reject as drafted' },
+};
+
 function gradeFor(score: number): { letter: string; color: string; label: string } {
-  if (score >= 85) return { letter: 'A', color: C.green, label: 'Board-ready' };
-  if (score >= 70) return { letter: 'B', color: '#10B981', label: 'Strong, minor work' };
-  if (score >= 55) return { letter: 'C', color: '#FACC15', label: 'Material gaps' };
-  if (score >= 40) return { letter: 'D', color: C.amber, label: 'Hold' };
-  return { letter: 'F', color: C.red, label: 'Reject as drafted' };
+  const letter = gradeFromScore(score);
+  return { letter, ...GRADE_PALETTE[letter] };
 }
 
 export function CounterfactualLiftViz() {
