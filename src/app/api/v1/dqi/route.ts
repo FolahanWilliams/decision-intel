@@ -60,6 +60,12 @@ export async function GET(request: NextRequest) {
         compliance: true,
         simulation: true,
         judgeOutputs: true,
+        // Toxic combinations feed the compoundRisk DQI component (locked
+        // 2026-05-09 hard-layer ship · Proposal 3). Methodology version
+        // bumps to 2.2.0 when supplied.
+        toxicCombinations: {
+          select: { patternLabel: true, severity: true, toxicScore: true },
+        },
         document: {
           select: {
             content: true,
@@ -206,6 +212,33 @@ export async function GET(request: NextRequest) {
         documentType,
         industry: null,
       }).validityClass;
+
+    // Compound patterns (locked 2026-05-09 hard-layer ship · Proposal 3).
+    const toxicCombosV1Raw = (
+      analysis as unknown as {
+        toxicCombinations?: Array<{
+          patternLabel: string | null;
+          severity: string | null;
+          toxicScore: number;
+        }>;
+      }
+    ).toxicCombinations;
+    if (toxicCombosV1Raw) {
+      dqiInput.compoundPatterns = toxicCombosV1Raw
+        .filter((tc): tc is typeof tc & { patternLabel: string } => Boolean(tc.patternLabel))
+        .map(tc => ({
+          patternLabel: tc.patternLabel,
+          severity: ((tc.severity as 'critical' | 'high' | 'medium' | 'low' | null) ??
+            (tc.toxicScore >= 80
+              ? 'critical'
+              : tc.toxicScore >= 60
+                ? 'high'
+                : tc.toxicScore >= 40
+                  ? 'medium'
+                  : 'low')) as 'critical' | 'high' | 'medium' | 'low',
+          toxicScore: tc.toxicScore,
+        }));
+    }
 
     // ── Compute DQI ─────────────────────────────────────────────────────
     const dqi = computeDQI(dqiInput);

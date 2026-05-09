@@ -106,6 +106,28 @@ export async function GET(
             null,
           industry: null,
         }).validityClass,
+      // Compound patterns feed compoundRisk component (locked 2026-05-09
+      // hard-layer ship · Proposal 3). Methodology version bumps to
+      // 2.2.0 when supplied. Maps from analysis.toxicCombinations rows
+      // already fetched at line 42 of this route.
+      compoundPatterns: (analysis.toxicCombinations ?? [])
+        .filter((tc: { patternLabel: string | null }): tc is typeof tc & { patternLabel: string } =>
+          Boolean(tc.patternLabel)
+        )
+        .map(
+          (tc: { patternLabel: string; severity: string | null; toxicScore: number }) => ({
+            patternLabel: tc.patternLabel,
+            severity: ((tc.severity as 'critical' | 'high' | 'medium' | 'low' | null) ??
+              (tc.toxicScore >= 80
+                ? 'critical'
+                : tc.toxicScore >= 60
+                  ? 'high'
+                  : tc.toxicScore >= 40
+                    ? 'medium'
+                    : 'low')) as 'critical' | 'high' | 'medium' | 'low',
+            toxicScore: tc.toxicScore,
+          })
+        ),
     });
 
     // 3. Run counterfactuals and root causes in parallel

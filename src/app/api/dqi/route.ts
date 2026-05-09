@@ -54,6 +54,14 @@ export async function GET(request: NextRequest) {
         compliance: true,
         simulation: true,
         judgeOutputs: true,
+        // Toxic combinations feed the compoundRisk DQI component (locked
+        // 2026-05-09 hard-layer ship · Proposal 3). Methodology version
+        // bumps to 2.2.0 when this field is supplied (even when empty
+        // array — tells the reader the audit went through the 7-component
+        // scoring including compoundRisk).
+        toxicCombinations: {
+          select: { patternLabel: true, severity: true, toxicScore: true },
+        },
         document: {
           select: {
             content: true,
@@ -210,6 +218,37 @@ export async function GET(request: NextRequest) {
         documentType,
         industry: null,
       }).validityClass;
+
+    // Compound patterns feed the 7th DQI component (compoundRisk, locked
+    // 2026-05-09 hard-layer ship · Proposal 3). Methodology version
+    // bumps to 2.2.0 when this field is supplied. Maps directly from the
+    // ToxicCombination rows persisted at audit time, with severity
+    // fallback for legacy null-severity rows.
+    const toxicCombosRaw = (
+      analysis as unknown as {
+        toxicCombinations?: Array<{
+          patternLabel: string | null;
+          severity: string | null;
+          toxicScore: number;
+        }>;
+      }
+    ).toxicCombinations;
+    if (toxicCombosRaw) {
+      dqiInput.compoundPatterns = toxicCombosRaw
+        .filter((tc): tc is typeof tc & { patternLabel: string } => Boolean(tc.patternLabel))
+        .map(tc => ({
+          patternLabel: tc.patternLabel,
+          severity: ((tc.severity as 'critical' | 'high' | 'medium' | 'low' | null) ??
+            (tc.toxicScore >= 80
+              ? 'critical'
+              : tc.toxicScore >= 60
+                ? 'high'
+                : tc.toxicScore >= 40
+                  ? 'medium'
+                  : 'low')) as 'critical' | 'high' | 'medium' | 'low',
+          toxicScore: tc.toxicScore,
+        }));
+    }
 
     // ── Compute DQI ───────────────────────────────────────────────────
     const dqi = computeDQI(dqiInput);

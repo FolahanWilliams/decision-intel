@@ -89,6 +89,22 @@ export interface DQIInput {
    *  See src/lib/learning/validity-classifier.ts for the full
    *  rationale + the band definitions. */
   validityClass?: 'high' | 'medium' | 'low' | 'zero';
+  /**
+   * Optional: named toxic combinations detected on this audit (locked
+   * 2026-05-09, M&A hard-layer ship · Proposal 3). Feeds the new
+   * compoundRisk DQI component. When supplied (even as an empty array),
+   * methodology version bumps to '2.2.0'. Legacy audits without this
+   * field report under the prior methodology version (2.1.0 if validity
+   * supplied, 2.0.0-no-validity otherwise) and the compoundRisk
+   * component renders with a perfect 100 (no penalty) for backwards-
+   * compat — but the methodology stamp tells the procurement reader the
+   * audit didn't go through the compound-risk surface.
+   */
+  compoundPatterns?: Array<{
+    patternLabel: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    toxicScore: number;
+  }>;
 }
 
 export interface DQIResult {
@@ -108,6 +124,14 @@ export interface DQIResult {
     processMaturity: DQIComponent;
     complianceRisk: DQIComponent;
     historicalAlignment: DQIComponent;
+    /**
+     * 7th component (locked 2026-05-09, M&A hard-layer ship · Proposal 3).
+     * Direct penalty for compound named patterns — Synergy Mirage,
+     * Conglomerate Fallacy, Winner's Curse, Echo Chamber, etc. Renders
+     * a perfect 100 for legacy audits / audits without compoundPatterns
+     * supplied (no penalty when no patterns supplied).
+     */
+    compoundRisk: DQIComponent;
   };
   /** Percentile ranking (if benchmark data available) */
   percentile: number | null;
@@ -131,6 +155,22 @@ export interface DQIComponent {
   weighted: number; // score * weight
   grade: string; // A-F
   detail: string; // human-readable explanation
+  /**
+   * Optional structured breakdown of WHAT contributed to the component
+   * score. Designed for the upcoming clickable DQI explainability panel
+   * (founder ask 2026-05-09 — show users how the score is composed and
+   * which document elements influenced each weighted component). Each
+   * item carries: a label (the contributor — bias name, pattern name,
+   * structural assumption, etc.), an impact (positive = score boost,
+   * negative = score penalty, signed delta from base 100), and an
+   * optional evidence string (verbatim excerpt or rule citation).
+   * Components without item-level breakdown leave this undefined.
+   */
+  breakdownItems?: Array<{
+    label: string;
+    impact: number;
+    evidence?: string;
+  }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -143,13 +183,24 @@ export interface DQIComponent {
  * against outcome quality to derive optimal weights. Until then, these are
  * research-informed estimates that can be overridden per-org via computeDQI().
  */
+/**
+ * DQI component weights — sum to 1.0. Locked 2026-05-09 (M&A hard-layer
+ * ship · Proposal 3): added 7th component `compoundRisk` at 0.06 weight,
+ * rebalanced from biasLoad: 0.28 → 0.22. The compoundRisk component
+ * directly penalises named toxic combinations (Synergy Mirage / Conglomerate
+ * Fallacy / Winner's Curse / Echo Chamber / etc.) at the score level
+ * rather than only through the constituent biases. METHODOLOGY_VERSION
+ * bumped 2.1.0 → 2.2.0 to mark the structural shift; legacy audits keep
+ * their original methodology version stamp.
+ */
 export const WEIGHTS = {
-  biasLoad: 0.28,
+  biasLoad: 0.22,
   noiseLevel: 0.18,
   evidenceQuality: 0.18,
   processMaturity: 0.13,
   complianceRisk: 0.13,
   historicalAlignment: 0.1,
+  compoundRisk: 0.06,
 };
 
 /** Compute effective weights by blending org overrides with defaults.
@@ -203,7 +254,20 @@ export const GRADE_THRESHOLDS: Array<{
  *  preserved: when an audit input does not carry `validityClass`, the
  *  engine reports methodology version '2.0.0-no-validity' so the DPR
  *  reader can tell which methodology produced a given DQI. */
-export const METHODOLOGY_VERSION = '2.1.0';
+/** Methodology version stamp on every DQIResult.
+ *  - '2.2.0' — current; emitted when compoundPatterns is supplied to
+ *    computeDQI (even as []), indicating the audit went through the
+ *    7-component scoring including compoundRisk
+ *  - '2.1.0' — emitted when validityClass is supplied but compoundPatterns
+ *    is absent (audit ran 2026-04-30 → 2026-05-09 evening, before P3 ship)
+ *  - '2.0.0-no-validity' — emitted when neither validityClass nor
+ *    compoundPatterns supplied (audits before 2026-04-30)
+ *  Version stamps are persisted on the audit and surfaced on the DPR
+ *  cover so a procurement reader can tell which methodology produced
+ *  any given DQI without recomputing.
+ */
+export const METHODOLOGY_VERSION = '2.2.0';
+export const METHODOLOGY_VERSION_2_1_0 = '2.1.0';
 export const METHODOLOGY_VERSION_LEGACY = '2.0.0-no-validity';
 
 /** Biases associated with fast, heuristic (System 1) processing */
@@ -510,6 +574,89 @@ function scoreHistoricalAlignment(
   };
 }
 
+/**
+ * Score the compoundRisk component (locked 2026-05-09, M&A hard-layer
+ * ship · Proposal 3). Direct penalty for named toxic combinations
+ * detected on the audit. Per-pattern severity penalties:
+ *   - critical: -25
+ *   - high: -12
+ *   - medium: -5
+ *   - low: -1
+ * Base 100, floor at 0. The breakdownItems array carries per-pattern
+ * impact so the upcoming clickable DQI explainability panel can render
+ * exactly which patterns drove the penalty.
+ *
+ * Calibration anchor: a memo with one critical pattern (Synergy Mirage
+ * critical, e.g.) loses 25 points on this component, contributing
+ * -1.5 to the weighted DQI total (25 × 0.06). Two critical patterns
+ * = -3 weighted; three critical = -4.5 weighted. The 6% weight is
+ * intentional — directly visible in the DQI score but not so
+ * dominant that it overrides the bias-load + evidence-quality components.
+ */
+function scoreCompoundRisk(
+  patterns: DQIInput['compoundPatterns']
+): DQIComponent {
+  // No patterns supplied (legacy audits, audits without toxic-combo
+  // detection) → perfect 100, neutral contribution. The methodology
+  // version stamp (METHODOLOGY_VERSION_LEGACY) tells the reader.
+  if (!patterns || patterns.length === 0) {
+    return {
+      name: 'Compound Risk',
+      score: 100,
+      weight: WEIGHTS.compoundRisk,
+      weighted: Math.round(100 * WEIGHTS.compoundRisk * 10) / 10,
+      grade: getComponentGrade(100),
+      detail: 'No compound toxic-combination patterns detected.',
+      breakdownItems: [],
+    };
+  }
+
+  const SEVERITY_PENALTIES: Record<string, number> = {
+    critical: 25,
+    high: 12,
+    medium: 5,
+    low: 1,
+  };
+
+  const breakdownItems: NonNullable<DQIComponent['breakdownItems']> = [];
+  let totalPenalty = 0;
+  for (const p of patterns) {
+    const penalty = SEVERITY_PENALTIES[p.severity] ?? 0;
+    totalPenalty += penalty;
+    breakdownItems.push({
+      label: p.patternLabel,
+      impact: -penalty,
+      evidence: `${p.severity} severity (toxicScore ${Math.round(p.toxicScore)})`,
+    });
+  }
+  const score = Math.max(0, 100 - totalPenalty);
+
+  // Sort breakdown items by impact (most-negative first) so the
+  // explainability panel shows the worst offenders at the top.
+  breakdownItems.sort((a, b) => a.impact - b.impact);
+
+  // Concise per-pattern detail for the DPR component bar caption.
+  const criticalCount = patterns.filter(p => p.severity === 'critical').length;
+  const highCount = patterns.filter(p => p.severity === 'high').length;
+  const detailParts: string[] = [];
+  if (criticalCount > 0) detailParts.push(`${criticalCount} critical`);
+  if (highCount > 0) detailParts.push(`${highCount} high`);
+  if (criticalCount === 0 && highCount === 0) {
+    detailParts.push(`${patterns.length} pattern(s) at medium/low severity`);
+  }
+  const detail = `${patterns.length} compound pattern(s) detected · ${detailParts.join(', ')}.`;
+
+  return {
+    name: 'Compound Risk',
+    score: Math.round(score),
+    weight: WEIGHTS.compoundRisk,
+    weighted: Math.round(score * WEIGHTS.compoundRisk * 10) / 10,
+    grade: getComponentGrade(score),
+    detail,
+    breakdownItems,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -565,6 +712,13 @@ function findTopImprovement(components: DQIResult['components']): DQIResult['top
       suggestion:
         'Your decision pattern matches historical failures. Review case study parallels, encourage dissent, bring in external advisors, and iterate before committing.',
     },
+    {
+      component: 'Compound Risk',
+      score: components.compoundRisk.score,
+      weight: components.compoundRisk.weight,
+      suggestion:
+        'Apply the named-pattern mitigation playbooks (toxic-mitigation.ts) for the patterns flagged on this audit. Critical patterns (Synergy Mirage, Yes Committee, etc.) are deal-blocking signals.',
+    },
   ];
 
   // Find the component with the most potential weighted improvement
@@ -594,6 +748,26 @@ function findTopImprovement(components: DQIResult['components']): DQIResult['top
  * Compute a synthetic DQI score for a historical case study.
  * Maps the case's characteristics to approximate DQI dimensions.
  */
+/**
+ * Legacy weight values for synthetic DQI computation (locked 2026-05-09).
+ * computeSyntheticDQI + computeBrierFairPredictedDqi are pinned to
+ * methodology 2.0.0-seed weights so the platform-baseline Brier (0.258)
+ * stays stable under WEIGHTS rebalancing. Live audit DQI follows the
+ * current WEIGHTS (which include compoundRisk + reduced biasLoad as of
+ * methodology 2.2.0); the synthetic + baseline stay at their original
+ * calibration state. The methodology-versioning pattern: live audits
+ * advance, calibration baselines stay fixed at the version they were
+ * computed under.
+ */
+export const SYNTHETIC_WEIGHTS_LEGACY_2_0_0 = {
+  biasLoad: 0.28,
+  noiseLevel: 0.18,
+  evidenceQuality: 0.18,
+  processMaturity: 0.13,
+  complianceRisk: 0.13,
+  historicalAlignment: 0.1,
+} as const;
+
 export function computeSyntheticDQI(c: CaseStudy): number {
   // Bias Load (30%): more biases and higher impact → lower score
   const biasPenalty = c.biasesPresent.length * 8;
@@ -615,22 +789,19 @@ export function computeSyntheticDQI(c: CaseStudy): number {
   // Compliance (15%): neutral estimate
   const complianceScore = 60;
 
-  // Synthetic DQI re-uses the canonical WEIGHTS constant so historical
-  // percentiles stay calibrated against the same methodology as live scores.
-  // historicalAlignment is excluded (can't recurse), so the remaining five
-  // weights are renormalised to sum to 1.0.
-  const denom =
-    WEIGHTS.biasLoad +
-    WEIGHTS.noiseLevel +
-    WEIGHTS.evidenceQuality +
-    WEIGHTS.processMaturity +
-    WEIGHTS.complianceRisk;
+  // Pinned to SYNTHETIC_WEIGHTS_LEGACY_2_0_0 so the synthetic stays
+  // stable when WEIGHTS rebalances for new methodology versions
+  // (2026-05-09 — added compoundRisk, dropped biasLoad 0.28 → 0.22 in
+  // live methodology 2.2.0). historicalAlignment excluded (can't
+  // recurse); five remaining weights renormalised to sum to 1.0.
+  const W = SYNTHETIC_WEIGHTS_LEGACY_2_0_0;
+  const denom = W.biasLoad + W.noiseLevel + W.evidenceQuality + W.processMaturity + W.complianceRisk;
   const syntheticDQI =
-    (biasScore * WEIGHTS.biasLoad +
-      noiseScore * WEIGHTS.noiseLevel +
-      evidenceScore * WEIGHTS.evidenceQuality +
-      processScore * WEIGHTS.processMaturity +
-      complianceScore * WEIGHTS.complianceRisk) /
+    (biasScore * W.biasLoad +
+      noiseScore * W.noiseLevel +
+      evidenceScore * W.evidenceQuality +
+      processScore * W.processMaturity +
+      complianceScore * W.complianceRisk) /
     denom;
 
   return Math.round(Math.max(0, Math.min(100, syntheticDQI)));
@@ -736,6 +907,7 @@ export function computeDQI(
   const processMaturity = scoreProcessMaturity(input.process);
   const complianceRisk = scoreComplianceRisk(input.compliance);
   const historicalAlignment = scoreHistoricalAlignment(input.historicalAlignment, input.biases);
+  const compoundRisk = scoreCompoundRisk(input.compoundPatterns);
 
   const components = {
     biasLoad,
@@ -744,6 +916,7 @@ export function computeDQI(
     processMaturity,
     complianceRisk,
     historicalAlignment,
+    compoundRisk,
   };
 
   // Compute weighted total using effective weights (org-blended if overrides provided
@@ -768,7 +941,8 @@ export function computeDQI(
     evidenceQuality.score * ew.evidenceQuality +
     processMaturity.score * ew.processMaturity +
     complianceRisk.score * ew.complianceRisk +
-    historicalAlignment.score * ew.historicalAlignment;
+    historicalAlignment.score * ew.historicalAlignment +
+    compoundRisk.score * ew.compoundRisk;
 
   // If compound score is available, blend it in (10% influence)
   let finalScore = rawScore;
@@ -786,6 +960,17 @@ export function computeDQI(
   // Find top improvement
   const topImprovement = findTopImprovement(components);
 
+  // Methodology version stamp:
+  //   compoundPatterns supplied → 2.2.0 (new default, post-2026-05-09)
+  //   only validityClass supplied → 2.1.0 (audits during 2026-04-30 → 2026-05-09)
+  //   neither → 2.0.0-no-validity (legacy)
+  const methodologyVersion =
+    input.compoundPatterns !== undefined
+      ? METHODOLOGY_VERSION
+      : input.validityClass
+        ? METHODOLOGY_VERSION_2_1_0
+        : METHODOLOGY_VERSION_LEGACY;
+
   const result: DQIResult = {
     score: Math.round(finalScore),
     grade: gradeInfo.grade,
@@ -795,7 +980,7 @@ export function computeDQI(
     percentile: computeHistoricalPercentile(finalScore),
     topImprovement,
     system1Ratio: input.process.system1Ratio ?? null,
-    methodologyVersion: input.validityClass ? METHODOLOGY_VERSION : METHODOLOGY_VERSION_LEGACY,
+    methodologyVersion,
   };
 
   logger.info('DQI computed', {
@@ -808,6 +993,7 @@ export function computeDQI(
       processMaturity: processMaturity.score,
       complianceRisk: complianceRisk.score,
       historicalAlignment: historicalAlignment.score,
+      compoundRisk: compoundRisk.score,
     },
   });
 

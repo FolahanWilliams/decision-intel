@@ -101,7 +101,7 @@ describe('SYSTEM1_BIASES', () => {
 // ---------------------------------------------------------------------------
 
 describe('computeDQI', () => {
-  it('baseline input returns score 0-100 with all 6 components and a grade', () => {
+  it('baseline input returns score 0-100 with all 7 components and a grade', () => {
     const result = computeDQI(makeInput());
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
@@ -495,5 +495,135 @@ describe('computeHistoricalPercentile', () => {
   it('score of 100 returns high percentile', () => {
     const percentile = computeHistoricalPercentile(100);
     expect(percentile).toBeGreaterThanOrEqual(80);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeDQI · compoundRisk component (Proposal 3, locked 2026-05-09)
+// ---------------------------------------------------------------------------
+
+describe('computeDQI · compoundRisk component', () => {
+  it('compoundRisk component renders for every audit', () => {
+    const result = computeDQI(makeInput());
+    expect(result.components.compoundRisk).toBeDefined();
+    expect(result.components.compoundRisk.score).toBe(100); // no patterns supplied
+  });
+
+  it('legacy audits without compoundPatterns get methodology 2.1.0 (validity present)', () => {
+    const result = computeDQI({ ...makeInput(), validityClass: 'medium' });
+    expect(result.methodologyVersion).toBe('2.1.0');
+    // compoundRisk renders neutral (100) in legacy mode
+    expect(result.components.compoundRisk.score).toBe(100);
+  });
+
+  it('audits with empty compoundPatterns array stamp methodology 2.2.0', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      validityClass: 'medium',
+      compoundPatterns: [],
+    });
+    expect(result.methodologyVersion).toBe('2.2.0');
+    expect(result.components.compoundRisk.score).toBe(100);
+  });
+
+  it('one critical pattern penalises compoundRisk score by 25', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      compoundPatterns: [
+        { patternLabel: 'The Synergy Mirage', severity: 'critical', toxicScore: 90 },
+      ],
+    });
+    expect(result.components.compoundRisk.score).toBe(75); // 100 - 25
+    expect(result.components.compoundRisk.breakdownItems).toHaveLength(1);
+    expect(result.components.compoundRisk.breakdownItems?.[0].label).toBe('The Synergy Mirage');
+    expect(result.components.compoundRisk.breakdownItems?.[0].impact).toBe(-25);
+  });
+
+  it('per-severity penalties: critical=25 · high=12 · medium=5 · low=1', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      compoundPatterns: [
+        { patternLabel: 'A', severity: 'critical', toxicScore: 85 },
+        { patternLabel: 'B', severity: 'high', toxicScore: 65 },
+        { patternLabel: 'C', severity: 'medium', toxicScore: 45 },
+        { patternLabel: 'D', severity: 'low', toxicScore: 20 },
+      ],
+    });
+    // 100 - (25 + 12 + 5 + 1) = 57
+    expect(result.components.compoundRisk.score).toBe(57);
+  });
+
+  it('penalty floors at 0 (cannot go negative)', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      compoundPatterns: Array.from({ length: 10 }, (_, i) => ({
+        patternLabel: `Pattern ${i}`,
+        severity: 'critical' as const,
+        toxicScore: 90,
+      })),
+    });
+    expect(result.components.compoundRisk.score).toBe(0);
+  });
+
+  it('breakdownItems sorted by impact (worst first) for explainability panel', () => {
+    const result = computeDQI({
+      ...makeInput(),
+      compoundPatterns: [
+        { patternLabel: 'low one', severity: 'low', toxicScore: 20 },
+        { patternLabel: 'critical one', severity: 'critical', toxicScore: 90 },
+        { patternLabel: 'high one', severity: 'high', toxicScore: 65 },
+      ],
+    });
+    const items = result.components.compoundRisk.breakdownItems!;
+    expect(items[0].label).toBe('critical one');
+    expect(items[0].impact).toBe(-25);
+    expect(items[1].label).toBe('high one');
+    expect(items[1].impact).toBe(-12);
+    expect(items[2].label).toBe('low one');
+    expect(items[2].impact).toBe(-1);
+  });
+
+  it('compoundRisk weight is 6% (0.06) — visible in DQI but not dominant', () => {
+    const result = computeDQI(makeInput());
+    expect(result.components.compoundRisk.weight).toBe(0.06);
+  });
+
+  it('biasLoad weight rebalanced from 0.28 → 0.22 (made room for compoundRisk)', () => {
+    const result = computeDQI(makeInput());
+    expect(result.components.biasLoad.weight).toBe(0.22);
+  });
+
+  it('three critical patterns drop overall DQI by ~4.5 vs no patterns', () => {
+    const baseInput = makeInput();
+    const noPatterns = computeDQI({ ...baseInput, compoundPatterns: [] });
+    const threeCritical = computeDQI({
+      ...baseInput,
+      compoundPatterns: [
+        { patternLabel: 'A', severity: 'critical', toxicScore: 85 },
+        { patternLabel: 'B', severity: 'critical', toxicScore: 90 },
+        { patternLabel: 'C', severity: 'critical', toxicScore: 88 },
+      ],
+    });
+    // compoundRisk drops from 100 → 25 (3 × 25 penalty)
+    // weighted impact: 75 × 0.06 = 4.5 points lower
+    const drop = noPatterns.score - threeCritical.score;
+    expect(drop).toBeGreaterThanOrEqual(4);
+    expect(drop).toBeLessThanOrEqual(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SYNTHETIC_WEIGHTS_LEGACY_2_0_0 — pinned for platform-baseline stability
+// ---------------------------------------------------------------------------
+
+describe('SYNTHETIC_WEIGHTS_LEGACY_2_0_0', () => {
+  it('preserves the original 2.0.0-seed weight values', async () => {
+    const { SYNTHETIC_WEIGHTS_LEGACY_2_0_0 } = await import('./dqi');
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.biasLoad).toBe(0.28);
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.noiseLevel).toBe(0.18);
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.evidenceQuality).toBe(0.18);
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.processMaturity).toBe(0.13);
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.complianceRisk).toBe(0.13);
+    expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.historicalAlignment).toBe(0.1);
   });
 });
