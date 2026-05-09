@@ -238,6 +238,13 @@ const LrqaTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const CornerstoneBriefTab = dynamic(
+  () =>
+    import('@/components/founder-hub/cornerstone/CornerstoneBriefTab').then(m => ({
+      default: m.CornerstoneBriefTab,
+    })),
+  { loading: tabLoader }
+);
 const PathToHundredMillionTab = dynamic(
   () =>
     import('@/components/founder-hub/PathToHundredMillionTab').then(m => ({
@@ -299,6 +306,7 @@ type TabId =
   | 'unicorn_roadmap'
   | 'meetings_log'
   | 'lrqa'
+  | 'cornerstone'
   | 'path_to_100m'
   | 'voice_activity'
   | 'metrics'
@@ -410,6 +418,15 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     // doesn't need the proper noun. Tab id stays 'lrqa' for backward-compat
     // with deeplinks + saved progress; only the visible label changes.
     label: 'Assurance Firm · Warm Intro',
+    icon: <Handshake size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    // Role-neutral label per CLAUDE.md no-named-prospects rule. The
+    // tab id stays 'cornerstone' for founder-recall and stable
+    // bookmarks; the visible label says nothing about the firm.
+    id: 'cornerstone',
+    label: 'Pre-Seed VC · Warm Intro',
     icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
@@ -1604,6 +1621,13 @@ function renderTab(
       // ErrorBoundary sectionName scrubbed 2026-05-02 of named prospect.
       <ErrorBoundary sectionName="Assurance firm warm-intro brief">
         <LrqaTab />
+      </ErrorBoundary>
+    ),
+    cornerstone: (
+      // Phase 2 lock 2026-05-09 — sectionName + tab label scrubbed of
+      // named prospect per CLAUDE.md no-named-prospects rule.
+      <ErrorBoundary sectionName="Pre-seed VC warm-intro brief">
+        <CornerstoneBriefTab />
       </ErrorBoundary>
     ),
     content: (

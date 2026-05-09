@@ -73,8 +73,17 @@ export type AuditAction =
   | 'CLAIM_DEMO_ANALYSIS' // D9 — visitor claims a /demo audit into their new account
   | 'GRAPH_SHARE_CREATED' // A2 — Decision Knowledge Graph share link created
   | 'GRAPH_SHARE_REVOKED' // A2 — graph share link revoked
-  // Deal lifecycle (2026-05-06)
-  | 'ARCHIVE_DEAL'; // POST /api/deals/[id]/archive — soft-archive deal + cascade-soft-delete docs
+  // Deal lifecycle (2026-05-06; legacy — replaced by CONTAINER_* below)
+  | 'ARCHIVE_DEAL'
+  // DecisionContainer unified model (Phase 2 lock 2026-05-09 evening)
+  | 'CONTAINER_CREATED'
+  | 'CONTAINER_UPDATED'
+  | 'CONTAINER_DELETED'
+  | 'CONTAINER_ARCHIVED'
+  | 'CONTAINER_DOCUMENT_ADDED'
+  | 'CONTAINER_DOCUMENT_REMOVED'
+  | 'CONTAINER_CROSS_REFERENCE_RUN'
+  | 'CONTAINER_OUTCOME_LOGGED';
 
 export interface AuditLogParams {
   action: AuditAction;

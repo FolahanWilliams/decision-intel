@@ -885,15 +885,132 @@ export async function POST(request: NextRequest) {
             })().catch(() => null);
           }
 
-          // Container-aware cross-reference auto-trigger re-lands in
-          // Phase 2 of the DecisionContainer refactor — replaces the
-          // legacy deal + package auto-fire blocks with a single
-          // container-scoped lookup (kind = strategic | investment |
-          // acquisition) that mirrors the prior 30-minute cooldown +
-          // ≥2-analyzed-docs gate. Manual cross-reference triggers
-          // are exposed on the unified surface via /api/containers
-          // (Phase 2). Bias-detective + structural-assumptions
-          // auto-runs above continue to fire unchanged.
+          // Container-aware cross-reference auto-trigger (Phase 2 lock
+          // 2026-05-09 evening). Replaces the legacy deal + package
+          // auto-fire blocks with a single container-scoped lookup
+          // (kind = strategic | investment | acquisition). For every
+          // container this doc belongs to: recompute composite metrics,
+          // then if the container has ≥2 analyzed docs AND no run in
+          // the last 30min, auto-fire the cross-reference agent.
+          // Mirrors the manual button on the container detail page;
+          // never blocks the SSE pipeline.
+          (async () => {
+            try {
+              const memberships = await prisma.decisionContainerDocument
+                .findMany({
+                  where: { documentId },
+                  select: { containerId: true },
+                })
+                .catch(() => [] as Array<{ containerId: string }>);
+              if (memberships.length === 0) return;
+
+              const { recomputeContainerMetrics } =
+                await import('@/lib/scoring/container-aggregation');
+              const { runCrossReferenceAgent } = await import('@/lib/agents/cross-reference');
+              const { getDocumentContent: decryptDoc } = await import('@/lib/utils/encryption');
+
+              const RECENT_RUN_MS = 30 * 60 * 1000;
+              for (const m of memberships) {
+                await recomputeContainerMetrics(m.containerId);
+
+                const analyzedCount = await prisma.decisionContainerDocument.count({
+                  where: {
+                    containerId: m.containerId,
+                    document: { deletedAt: null, analyses: { some: {} } },
+                  },
+                });
+                if (analyzedCount < 2) continue;
+
+                const recent = await prisma.decisionContainerCrossReference
+                  .findFirst({
+                    where: { containerId: m.containerId },
+                    orderBy: { runAt: 'desc' },
+                    select: { runAt: true },
+                  })
+                  .catch(() => null);
+                if (recent && Date.now() - recent.runAt.getTime() < RECENT_RUN_MS) continue;
+
+                const memberDocs = await prisma.decisionContainerDocument.findMany({
+                  where: {
+                    containerId: m.containerId,
+                    document: { deletedAt: null },
+                  },
+                  select: {
+                    document: {
+                      select: {
+                        id: true,
+                        filename: true,
+                        content: true,
+                        contentEncrypted: true,
+                        contentIv: true,
+                        contentTag: true,
+                        contentKeyVersion: true,
+                        analyses: {
+                          orderBy: { createdAt: 'desc' },
+                          take: 1,
+                          select: {
+                            id: true,
+                            overallScore: true,
+                            biases: {
+                              select: { biasType: true, severity: true },
+                              take: 5,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                });
+
+                const inputs = memberDocs
+                  .map(row => {
+                    const a = row.document.analyses[0];
+                    if (!a) return null;
+                    const content = decryptDoc(row.document as Parameters<typeof decryptDoc>[0]);
+                    if (!content || content.trim().length < 200) return null;
+                    return {
+                      documentId: row.document.id,
+                      documentName: row.document.filename,
+                      analysisId: a.id,
+                      overallScore: a.overallScore,
+                      content,
+                      topBiases: a.biases.map(b => ({
+                        biasType: b.biasType,
+                        severity: b.severity ?? null,
+                      })),
+                    };
+                  })
+                  .filter((x): x is NonNullable<typeof x> => x !== null);
+                if (inputs.length < 2) continue;
+
+                const output = await runCrossReferenceAgent(inputs);
+                const conflictCount = output.findings.length;
+                const highSeverityCount = output.findings.filter(
+                  f => f.severity === 'critical' || f.severity === 'high'
+                ).length;
+
+                await prisma.decisionContainerCrossReference.create({
+                  data: {
+                    containerId: m.containerId,
+                    documentSnapshot: output.documentSnapshot as unknown as Prisma.InputJsonValue,
+                    findings: output as unknown as Prisma.InputJsonValue,
+                    conflictCount,
+                    highSeverityCount,
+                    status: 'complete',
+                  },
+                });
+                await recomputeContainerMetrics(m.containerId);
+                log.info(
+                  `Auto cross-reference for container ${m.containerId}: ${conflictCount} conflicts, ${highSeverityCount} high-severity`
+                );
+              }
+            } catch (err) {
+              log.warn(
+                'Auto container cross-reference failed (non-critical): ' +
+                  (err instanceof Error ? err.message : String(err))
+              );
+            }
+          })().catch(() => null);
 
           // Store embedding (fire and forget)
           try {

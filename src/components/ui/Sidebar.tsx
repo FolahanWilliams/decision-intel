@@ -24,7 +24,6 @@ import {
   Share2,
   Repeat,
   ShieldCheck,
-  Package,
   Brain,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
@@ -396,20 +395,11 @@ export default function Sidebar() {
               onNavigate={closeMobile}
             />
             <NavItem
-              id="onborda-nav-deals"
-              href="/dashboard/deals"
-              icon={<Briefcase size={18} />}
-              label="Projects"
-              description="M&A pipeline — deal kanban + IC readiness"
-              active={pathname.startsWith('/dashboard/deals')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
+              id="onborda-nav-decisions"
               href="/dashboard/decisions"
-              icon={<Package size={18} />}
-              label="Packages"
-              description="Multi-doc decision packages — composite DQI"
+              icon={<Briefcase size={18} />}
+              label="Decisions"
+              description="Investments, acquisitions, strategic decisions — committee gate audits"
               active={pathname.startsWith('/dashboard/decisions')}
               collapsed={collapsed}
               onNavigate={closeMobile}

@@ -32,7 +32,6 @@ import {
   Target,
   Presentation,
   Compass,
-  Package,
   Plus,
   Briefcase,
 } from 'lucide-react';
@@ -142,20 +141,26 @@ export function CommandPalette() {
         keywords: ['files', 'uploads', 'documents', 'memos', 'audits', 'standalone'],
       },
       {
-        id: 'deals',
-        label: 'Decisions · Projects',
-        description: 'M&A pipeline — deal kanban + IC readiness',
+        id: 'decisions',
+        label: 'Decisions',
+        description: 'Investments, acquisitions, strategic decisions — committee gate audits',
         icon: <Briefcase size={16} />,
-        action: () => navigate('/dashboard/deals'),
+        action: () => navigate('/dashboard/decisions'),
         keywords: [
+          'decisions',
           'deals',
           'projects',
+          'investments',
+          'acquisitions',
+          'strategic',
           'm&a',
           'mna',
           'pipeline',
           'kanban',
           'ic',
           'investment committee',
+          'board',
+          'committee',
           'fund',
         ],
       },
@@ -308,42 +313,26 @@ export function CommandPalette() {
         action: () => navigate('/dashboard/decision-graph'),
         keywords: ['graph', 'network', 'knowledge', 'edges', 'nodes'],
       },
-      // Decision Packages — the composite-DQI feature is the most
-      // differentiated 4.4 ship and was previously reachable only by
-      // expanding the Reflect cluster + clicking Decisions. Surfacing
-      // it here means a CSO who has collapsed Reflect can still find
-      // it instantly via ⌘K. (B-#1, 2026-04-26.)
+      // New decision shortcut — the unified DecisionContainer create
+      // flow (Phase 2 lock 2026-05-09). Replaces the legacy "New
+      // Decision Package" entry; the container kind picker on the
+      // create form covers investment / acquisition / strategic.
       {
-        id: 'decision-packages',
-        label: 'Decisions · Packages',
-        description: 'Multi-doc decision packages — composite DQI + cross-doc audit',
-        icon: <Package size={16} />,
-        action: () => navigate('/dashboard/decisions'),
-        keywords: [
-          'package',
-          'packages',
-          'composite',
-          'cross-doc',
-          'cross document',
-          'bundle',
-          'recommendation',
-          'board pack',
-          'rfp',
-          'multi-document',
-        ],
-      },
-      {
-        id: 'decision-packages-new',
-        label: 'New Decision Package',
-        description: 'Bundle related documents into a single decision-quality view',
+        id: 'decisions-new',
+        label: 'New Decision',
+        description: 'Investment, acquisition, or strategic decision — pick the mode on create',
         icon: <Plus size={16} />,
         action: () => navigate('/dashboard/decisions/new'),
         keywords: [
-          'new decision package',
-          'create package',
-          'bundle documents',
+          'new decision',
+          'new deal',
+          'new investment',
+          'new acquisition',
+          'new package',
+          'create decision',
           'compose',
           'composite dqi',
+          'committee gate',
         ],
       },
       {

@@ -128,6 +128,39 @@ This rule was added because pre-shrinking suboptimised the founder's leverage. T
 
 These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
+## DecisionContainer Phase 2 ship (locked 2026-05-09 evening — unified UI + API + Cornerstone brief)
+
+**Phase 2 lands the consumer surface on top of the Phase 1 foundation.** The unified container model now has a complete API + UI tree; the legacy deal/package shells are fully replaced.
+
+**Files shipped:**
+
+1. **`src/types/containers.ts`** — type surface (ContainerSummary / ContainerDetail / ContainerCrossReferenceFinding + filter / outcome / update payloads). Replaces deleted types/deals.ts.
+2. **`src/lib/scoring/container-aggregation.ts`** — mode-agnostic `aggregateAnalyses(documents)` + `recomputeContainerMetrics(containerId)`. Mirrors deleted deal-aggregation. Compute composite DQI + bias signature + named-pattern aggregation across the latest analysis on every member doc; persists cached columns to DecisionContainer.
+3. **`src/hooks/useContainers.ts`** — SWR `useContainers(filters, page, limit)` + `useContainer(id)` + `defaultContainerKindForRole(role)`. Replaces deleted useDeals.
+4. **`/api/containers/*`** — list + create (`route.ts`); read + update + delete (`[id]/route.ts`); outcome (`[id]/outcome/route.ts`) with mode-aware metrics validation; cross-reference (`[id]/cross-reference/route.ts`) with manual run + history; provenance-record (`[id]/provenance-record/route.ts`) lead-doc forwarding strategy; audit-status (`[id]/audit-status/route.ts`) for per-container Stripe-purchase gating.
+5. **Cross-reference auto-trigger restored** on `/api/analyze/stream` — container-scoped lookup (kind = strategic | investment | acquisition) with 30-min cooldown + ≥2-analyzed-docs gate. Mirrors the manual button on the container detail page.
+6. **`src/components/containers/{ContainerKanban,CommitteeReadinessGate,ContainerCompositeHero,ContainerFormModal}.tsx`** — mode-aware UI components. Kanban columns reflect SSOT stages when `kind` is set; cross-mode rolls up to universal `pre_committee / committee_gate / post_committee` phases. Gate has 5 advisory checks (required docs / all analyzed / DQI ≥ 55 / no critical patterns / cross-ref clean). Composite hero shows DQI + grade + recurring biases + named patterns + cross-doc conflicts.
+7. **`/dashboard/decisions/{page,[id]/page,new/page}.tsx`** — unified dashboard tree with persona-aware default kind via useOnboardingRole. Hero subtitle adapts: "Pre-IC memo audits before Monday partner meeting" (investment) / "Synergy thesis stress-test before the board approves" (acquisition) / "Strategic memo gates before the steering committee" (strategic).
+8. **Sidebar + CommandPalette + Onboarding tour** — unified "Decisions" label (replaces "Projects" + "Packages"). Onborda anchor renamed `onborda-nav-decisions`. CommandPalette palette consolidates `deals` + `decision-packages` + `decision-packages-new` into single `decisions` + `decisions-new` entries.
+9. **Cornerstone brief surface** — `src/components/founder-hub/cornerstone/{cornerstone-brief-data.ts,CornerstoneBriefTab.tsx}`. Founder-hub tab id `cornerstone` with role-neutral label "Pre-Seed VC · Warm Intro" per the no-named-prospects rule. Six sections: profile + senior-direct framing / 5 integration paths / 3-tier ask hierarchy / meeting prep board / 6 internship goals + measures / follow-up templates. Anchored on the Grok-pushback senior-direct corp dev framing — "I built and validated the audit layer for committee-stage decisions while embedded in a fund," NOT analyst-track tooling. Defensive against Grok's "decision hygiene" leak (banned vocab) + analyst-track contracting.
+
+**Persona-aware kanban defaults** (locked from the Grok-pushback discussion):
+
+- Small-fund GP / fractional CSO → `kind = investment`
+- Mid-market corp dev head → `kind = acquisition`
+- PE-backed founder / bizops → `kind = strategic`
+- "Other" / unknown → no filter (cross-mode roll-up)
+
+**Quality gates at Phase 2 ship**: tsc clean (0 errors); 36/36 SSOT + 8/8 conviction + all existing tests pass; 4 lint gates clean (positioning / silent-catches 150 below baseline 155 / counts at baseline 80 / canonical-imports clean); slop-scan scorePerKloc 2.99 (down from 3.04 pre-Phase-1; 53 fewer files = less drift surface).
+
+**Deferred from Phase 2** (no longer load-bearing):
+
+- Marketing parity (`/how-it-works` Section 4b + `/bias-genome` MnaPatternCoverage read from CONTAINER_MODES SSOT) — pure polish; the surfaces still render correctly with the legacy hardcoded data. Ship when next touching marketing.
+- Container-aware DPR assembler with mode-specific lifecycle strip — current Phase 2 forwards to lead-doc DPR. The mode-specific strip is a follow-up.
+- ContainerDqiBreakdownPanel — the document-detail DQI panel still renders against per-doc analyses; the composite-DQI breakdown for containers is a follow-up.
+
+**Forward-looking rule**: when adding a new container surface (a new sub-route, a new card, a new dashboard widget), the SSOT in `decision-container-modes.ts` + the existing components are the canonical building blocks. Same drift-class lock as `NAMED_PATTERNS` + `INVESTMENT_DOCUMENT_TYPES` + `getAllRegisteredFrameworks`.
+
 ## DecisionContainer unified model (Phase 1 lock 2026-05-09 evening — architecture refactor)
 
 **The architectural pivot (locked 2026-05-09 evening):** the prior split between `Deal` (M&A-coded model with dealType/IRR/MOIC) and `DecisionPackage` (generic-coded model with decisionFrame/status) is replaced with one unified `DecisionContainer` Prisma model + three workflow modes via a `kind` discriminator: `'investment' | 'acquisition' | 'strategic'`. Eight legacy models retired in one migration (`20260509230000_decision_container_unified_model`): Deal, DealOutcome, DealCrossReference, DealAuditPurchase, DecisionPackage, DecisionPackageDocument, DecisionPackageOutcome, DecisionPackageCrossReference.

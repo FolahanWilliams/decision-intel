@@ -69,13 +69,13 @@ const SHARED_STOP_ANALYTICS: Omit<Step, 'content' | 'icon' | 'title'> = {
   pointerRadius: 10,
 };
 
-// M&A-specific stop on the Deals nav item (locked 2026-05-09, Ship B.1).
-// Anchored on Sidebar.tsx Projects NavItem (id="onborda-nav-deals") —
-// only used by the ma tour. The deal-as-atomic-decision-unit framing
-// is the load-bearing concept for an M&A reader; pointing the tour at
-// the Deals nav lets that framing land at the moment of orientation.
-const SHARED_STOP_DEALS: Omit<Step, 'content' | 'icon' | 'title'> = {
-  selector: '#onborda-nav-deals',
+// Decisions stop — anchored on Sidebar.tsx Decisions NavItem
+// (id="onborda-nav-decisions"). Phase 2 of the DecisionContainer
+// refactor unified deals + packages into one Decisions surface; per-
+// persona copy lives at the consumer site so every HXC role gets
+// "the moment that matters MOST to YOU" framing.
+const SHARED_STOP_DECISIONS: Omit<Step, 'content' | 'icon' | 'title'> = {
+  selector: '#onborda-nav-decisions',
   side: 'right',
   showControls: true,
   pointerPadding: 6,
@@ -138,15 +138,16 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       ),
     },
     {
-      ...SHARED_STOP_DEALS,
+      ...SHARED_STOP_DECISIONS,
       icon: <Briefcase size={18} />,
-      title: 'Each Project is the atomic decision unit',
+      title: 'Synergy thesis stress-test before the board approves',
       content: (
         <>
-          A deal is the unit of work: CIM + QofE + synergy model + integration plan + counsel review
-          + IC deck. Composite Deal DQI lives on the Project page along with the IC Readiness Gate
-          (required docs, all analyzed, DQI ≥ 55, cross-ref clean, IC date set). Walk into committee
-          with the Gate showing green, not with a stack of separately-audited PDFs.
+          Each acquisition is the atomic decision unit: CIM + QofE + synergy model + integration
+          plan + counsel review + IC deck. Composite DQI lives on the decision page along with the
+          Committee Readiness Gate (required docs, all analyzed, DQI ≥ 55, cross-ref clean, no
+          critical compound failure patterns). Walk into committee with the Gate green, not with a
+          stack of separately-audited PDFs.
         </>
       ),
     },
