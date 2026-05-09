@@ -130,10 +130,10 @@ export function computeVersionDelta(
   };
 }
 
-/** Format a bias type identifier ("sunk_cost_fallacy") into "Sunk Cost Fallacy". */
-export function formatBiasName(s: string): string {
-  return s
-    .split('_')
-    .map(w => (w.length === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)))
-    .join(' ');
-}
+/**
+ * Format a bias type identifier ("sunk_cost_fallacy") into "Sunk Cost
+ * Fallacy". Re-exported from the canonical labels module to keep version-
+ * delta consumers stable while routing through the same display catalog
+ * the rest of the platform uses.
+ */
+export { formatBiasName } from './labels';

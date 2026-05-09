@@ -7,6 +7,7 @@
  */
 
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // ─── Types (inlined to avoid importing from causal-learning.ts which pulls in Prisma) ──
 
@@ -27,9 +28,6 @@ export interface CausalInsight {
   dataPoints: number;
 }
 
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function getCausalInsights(weights: CausalWeight[], totalOutcomes: number): CausalInsight[] {
   if (weights.length === 0 || totalOutcomes === 0) {

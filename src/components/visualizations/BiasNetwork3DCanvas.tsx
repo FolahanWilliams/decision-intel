@@ -21,6 +21,7 @@ import {
   SelectedGlow,
   useCanvasFitOnVisible,
 } from './reagraph-helpers';
+import { formatBiasNameCompact as formatBiasLabel } from '@/lib/utils/labels';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: '#EF4444',
@@ -38,12 +39,6 @@ interface BiasInput {
   id?: string;
 }
 
-function formatBiasLabel(type: string): string {
-  return type
-    .replace(/_bias$/, '')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function buildKeywords(type: string): string[] {
   return type.replace(/_bias$/, '').split('_');

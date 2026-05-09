@@ -56,6 +56,7 @@ import {
 } from '@/components/documents/detail/tabs';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { extractSynergyDefensibilityFromContent } from '@/lib/parsers/synergy-model-parser';
+import { formatBiasNameCompact as formatBiasLabel } from '@/lib/utils/labels';
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
 import { LivePredictedQuestions } from '@/components/analysis/LivePredictedQuestions';
 import { StructuralAssumptionsPanel } from '@/components/analysis/StructuralAssumptionsPanel';
@@ -1319,12 +1320,6 @@ function deriveSuppressedItems(biases: BiasInstance[], taxonomyIdByType: Record<
   }));
 }
 
-function formatBiasLabel(biasType: string): string {
-  return biasType
-    .replace(/_bias$/, '')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function deriveRegulatoryTriggers(
   compliance: ComplianceResult | undefined

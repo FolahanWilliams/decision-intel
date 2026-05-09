@@ -1,6 +1,7 @@
 'use client';
 
 import { Activity, GitBranch, TrendingUp, TrendingDown, Shield, Zap } from 'lucide-react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface CompoundScoringData {
   calibratedScore: number;
@@ -39,9 +40,6 @@ interface ScoringBreakdownProps {
   overallScore: number;
 }
 
-function formatBiasName(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function MultiplierBadge({ value }: { value: number }) {
   const isAmplifying = value > 1.05;

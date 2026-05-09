@@ -13,6 +13,7 @@ import {
   Clock,
   DollarSign,
 } from 'lucide-react';
+import { formatBiasName as formatBiasType } from '@/lib/utils/labels';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -62,10 +63,6 @@ interface ToxicCombinationCardProps {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-function formatBiasType(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function getSeverityColor(score: number): {
   bg: string;

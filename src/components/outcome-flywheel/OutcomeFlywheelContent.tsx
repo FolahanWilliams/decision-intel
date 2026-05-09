@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface FlywheelData {
   successDecisions: Array<{
@@ -62,9 +63,6 @@ interface FlywheelData {
   };
 }
 
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function formatCurrency(value: number, currency: string): string {
   try {

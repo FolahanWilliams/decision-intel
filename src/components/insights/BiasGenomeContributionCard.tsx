@@ -3,6 +3,7 @@
 import useSWR from 'swr';
 import Link from 'next/link';
 import { Network, ArrowUpRight, Award, Users } from 'lucide-react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // Bias Genome contribution card (A3 deep, locked 2026-04-27).
 //
@@ -66,10 +67,6 @@ const fetcher = (url: string) =>
     if (!r.ok) throw new Error('Failed to fetch contribution');
     return r.json();
   });
-
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function ordinal(n: number): string {
   const s = ['th', 'st', 'nd', 'rd'];

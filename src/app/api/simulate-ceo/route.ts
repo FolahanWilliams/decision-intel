@@ -6,6 +6,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { parseJSON } from '@/lib/utils/json';
+import { extractIp } from '@/lib/utils/request';
 import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
 
 const log = createLogger('SimulateCeo');
@@ -22,14 +23,6 @@ const log = createLogger('SimulateCeo');
 
 const MAX_MEMO_LENGTH = 8000;
 const MAX_PROFILE_LENGTH = 400;
-
-function extractIp(req: NextRequest): string {
-  const fwd = req.headers.get('x-forwarded-for');
-  if (fwd) return fwd.split(',')[0].trim();
-  const real = req.headers.get('x-real-ip');
-  if (real) return real;
-  return '0.0.0.0';
-}
 
 const SYSTEM_PROMPT = `You are simulating the most likely questions a specific
 CEO will ask about a strategic memo. You will be given the memo and a one-line

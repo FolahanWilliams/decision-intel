@@ -19,6 +19,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import { formatBiasName as formatBiasLabel } from '@/lib/utils/labels';
 
 interface SharedBias {
   biasType: string;
@@ -92,9 +93,6 @@ const SEV_META: Record<string, { bg: string; fg: string; border: string; label: 
   low: { bg: '#F1F5F9', fg: '#475569', border: '#E2E8F0', label: 'Low' },
 };
 
-function formatBiasLabel(key: string): string {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function extractPreviewText(data: unknown, maxLength = 200): string {
   if (!data) return '';

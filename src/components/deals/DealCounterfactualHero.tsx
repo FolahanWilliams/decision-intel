@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GitBranch, Loader2, TrendingUp } from 'lucide-react';
 import { confidenceColor as getConfidenceColor } from '@/lib/utils/confidence';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface DealCounterfactualScenario {
   biasRemoved: string;
@@ -48,9 +49,6 @@ interface DealCounterfactualResponse {
   dataAsOf: string;
 }
 
-function formatBiasName(s: string): string {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function currencySymbol(c: string): string {
   if (c === 'GBP') return '£';

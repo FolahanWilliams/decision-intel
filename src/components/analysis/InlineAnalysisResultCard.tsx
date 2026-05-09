@@ -10,6 +10,7 @@ import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph'
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
+import { formatBiasName } from '@/lib/utils/labels';
 // Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
 // sync with the canonical DQIResult shape without forcing the dqi module
 // onto the post-upload reveal critical path.
@@ -54,11 +55,6 @@ interface Props {
    * render immediately rather than flashing in 200–300ms late.
    */
   preResolvedAnalysisId?: string | null;
-}
-
-function humanizeBias(type: string): string {
-  const words = type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  return /bias$/i.test(words) ? words : `${words} Bias`;
 }
 
 const SEVERITY_ORDER: Record<string, number> = {
@@ -584,7 +580,7 @@ export function InlineAnalysisResultCard({
                       >
                         #{i + 1}
                       </span>
-                      <span style={{ fontWeight: 600 }}>{humanizeBias(b.type)}</span>
+                      <span style={{ fontWeight: 600 }}>{formatBiasName(b.type)}</span>
                       {b.severity && b.severity !== 'unknown' && (
                         <span
                           style={{
@@ -1205,7 +1201,7 @@ function InlineCoEditPanel({ originalBiasCount }: { originalBiasCount: number })
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {humanizeBias(b.type)}
+                      {formatBiasName(b.type)}
                     </span>
                     {b.evidence && (
                       <div

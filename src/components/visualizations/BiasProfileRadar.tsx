@@ -2,6 +2,7 @@
 
 import { ResponsiveRadar } from '@nivo/radar';
 import type { BiasInstance } from '@/types';
+import { formatBiasNameCompact as formatBiasLabel } from '@/lib/utils/labels';
 
 interface BiasProfileRadarProps {
   biases: BiasInstance[];
@@ -20,13 +21,6 @@ const SEVERITY_COLOR: Record<string, string> = {
   medium: '#EAB308',
   low: '#84CC16',
 };
-
-function formatBiasLabel(type: string): string {
-  return type
-    .replace(/_bias$/, '')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function getDominantSeverity(biases: BiasInstance[]): string {
   const counts: Record<string, number> = {};
