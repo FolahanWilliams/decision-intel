@@ -152,7 +152,11 @@ NAMED M&A TOXIC COMBINATIONS to flag explicitly:
   // ─── M&A workflow extensions (2026-05-09 P1 lock) ──────────────────────────
 
   qofe: `DOCUMENT TYPE: QUALITY OF EARNINGS (QofE) REPORT
-This is a Quality of Earnings report — typically prepared by a Big-4 (Deloitte / KPMG / EY / PwC) or boutique transaction-advisory firm to normalize the target's reported earnings before the acquirer commits capital. The QofE is the primary diligence artefact for ADJUSTED-EBITDA defensibility. Evaluate:
+This is a Quality of Earnings report — typically prepared by a Big-4 (Deloitte / KPMG / EY / PwC) or boutique transaction-advisory firm to normalize the target's reported earnings before the acquirer commits capital. The QofE is the primary diligence artefact for ADJUSTED-EBITDA defensibility.
+
+PARSED-PRE-AUDIT BLOCK: when the upload was a QofE-shaped .pdf, the file-parser has already run the deterministic QofE-defensibility scorer over the extracted text and embedded a structured "STRUCTURED QOFE — PARSED PRE-AUDIT" block ABOVE the flattened narrative. The block carries: portfolio summary line + adjusted-EBITDA language density + commissioned-by signal (sell_side / buy_side / unknown) + per-flag verdict for each detected red flag (recurring "one-time" / owner-comp full add-back / speculative run-rate / cherry-picked WC peg / customer-concentration undisclosed / sell-side commission signal). USE THAT BLOCK AS YOUR PRIMARY EVIDENCE — do not re-derive defensibility from the flattened text when the structured block is present. Quote the per-flag verdicts in your bias-detective excerpts where the flagged adjustment sits.
+
+Evaluate (using the structured block + your own narrative reading):
 - Are "non-recurring" / "one-time" items truly non-recurring, or do they recur every year (recurring "one-time" items inflate adjusted EBITDA)?
 - Are owner-related expenses (above-market compensation, personal-use allocations, related-party transactions) being added back appropriately or aggressively?
 - Are the run-rate adjustments (cost-savings already implemented, customer wins post-period) defensible with documented evidence, or are they speculative?
@@ -160,10 +164,13 @@ This is a Quality of Earnings report — typically prepared by a Big-4 (Deloitte
 - Is the customer-concentration analysis disclosed — does losing the top-1 / top-5 customers materially change the multiple?
 - Are the synergy adjustments INSIDE the QofE (e.g., "post-acquisition cost synergies of $X") flagged as buyer-side projections, not target-historicals?
 
-CRITICAL: a QofE that the SELL-SIDE commissioned is structurally biased toward higher adjusted EBITDA. A buy-side QofE is more defensible but still subject to confirmation bias when the buyer wants the deal to close.
+CRITICAL: a QofE that the SELL-SIDE commissioned is structurally biased toward higher adjusted EBITDA. A buy-side QofE is more defensible but still subject to confirmation bias when the buyer wants the deal to close. EXPLICIT SEVERITY-FLAGGING RULES:
+- Any structured-block flag at critical severity → fire Synergy Mirage / Sunk Ship at Critical with the verbatim verdict.
+- Sell-side commissioned + 2+ flags → fire Synergy Mirage at High citing the Seller-Halo Filter.
+- Customer-concentration undisclosed → fire authority_bias / disposition_effect at Medium with the disclosure-gap verdict.
 
 NAMED M&A TOXIC COMBINATIONS to flag explicitly:
-- "The Synergy Mirage" — when the QofE includes synergy add-backs without owner + mechanism + milestone documentation.
+- "The Synergy Mirage" — when the QofE includes synergy add-backs without owner + mechanism + milestone documentation, or when adjusted-EBITDA inflation signal is high (saturated > 30%).
 - "The Sunk Ship" — when QofE adjustments are made AFTER significant deal spend, with the implicit pressure to reach a target adjusted-EBITDA number that justifies the deal price.`,
 
   synergy_model: `DOCUMENT TYPE: SYNERGY MODEL / SYNERGY PROJECTION SPREADSHEET

@@ -2005,17 +2005,62 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       rawContent: state.structuredContent || undefined,
     };
 
+    // Pipeline activation of firedPatternLabels (locked 2026-05-09 evening,
+    // M&A cascade follow-through). Pure-function pattern matcher runs the
+    // NAMED_PATTERNS catalogue against in-flight detected biases + context
+    // BEFORE compound-engine fires, so PATTERN_PAIR_OVERRIDES amplifications
+    // (Synergy Mirage 1.75× / Winner's Curse 1.55× / Conglomerate Fallacy
+    // 1.65× / Sunk Ship 1.55× / Yes Committee 1.55×) actually fire on live
+    // audits. Previously the engine had the override map but no caller was
+    // passing firedPatternLabels — the M&A signal flowed through to the
+    // compoundRisk DQI component (-25/-12/-5/-1 per severity) but bias-pair
+    // amplification was dormant. Now both paths are armed.
+    //
+    // Context shape derived from the pipeline-side compoundContext above:
+    //   - monetaryStakes: same value (high/very_high for deal contexts)
+    //   - dissentAbsent: !hasDissent (cognitiveAnalysis.blindSpotGap signal)
+    //   - timePressure / unanimousConsensus: not derivable from the pipeline
+    //     today — left undefined so patterns requiring them won't false-fire.
+    //     The persisted detector in toxic-combinations.ts has access to
+    //     decision-room data + frame timeline; the in-flight matcher does
+    //     not, by design (we deliberately under-fire rather than fabricate).
+    const { matchNamedPatterns } = await import('@/lib/learning/named-patterns');
+    const firedPatternLabels = matchNamedPatterns({
+      biasTypes: detectedBiases.map(b => b.type),
+      context: {
+        monetaryStakes,
+        dissentAbsent: !hasDissent,
+        // Other ContextFactors fields stay undefined — the matcher reads
+        // conservatively (any required-field that isn't in the input fails
+        // the match), so context-gated patterns like Yes Committee that
+        // require unanimousConsensus won't fire here. They're still detected
+        // post-audit by toxic-combinations.ts:detectToxicCombinations which
+        // has the full Prisma context.
+      },
+    });
+    if (firedPatternLabels.length > 0) {
+      log.info(
+        `Named patterns fired in-pipeline: ${firedPatternLabels.join(', ')} — passing to compound-engine for amplification.`
+      );
+    }
+
     compoundScoreResult = computeCompoundScore(100, detectedBiases, compoundContext, {
       orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
+      firedPatternLabels: firedPatternLabels.length > 0 ? firedPatternLabels : undefined,
     });
 
     // M10: compute the baseline (industry default) score alongside, so the
     // UI can render a delta that shows how much this org's calibration has
     // shifted the assessment. Only actually differs when orgCalibration is
     // present — otherwise the two results are identical and delta = 0.
+    // Note: staticCompoundResult also receives firedPatternLabels — pattern
+    // amplification is part of the methodology, not org calibration, so
+    // both the calibrated + baseline tracks see the same amplification.
     staticCompoundResult =
       Object.keys(orgCalibration).length > 0
-        ? computeCompoundScore(100, detectedBiases, compoundContext, {})
+        ? computeCompoundScore(100, detectedBiases, compoundContext, {
+            firedPatternLabels: firedPatternLabels.length > 0 ? firedPatternLabels : undefined,
+          })
         : compoundScoreResult;
 
     // Use compound-adjusted deduction (difference between raw and calibrated)

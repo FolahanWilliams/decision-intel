@@ -11,6 +11,11 @@ import {
   toParsedStructuredData,
   type ParsedSynergyModelData,
 } from '@/lib/parsers/synergy-model-parser';
+import {
+  extractQofeStructure,
+  formatQofeAssessmentForAudit,
+  type ParsedQofeData,
+} from '@/lib/parsers/qofe-parser';
 
 const log = createLogger('FileParser');
 
@@ -55,7 +60,31 @@ export async function parseFile(
   if (isPdf) {
     try {
       const { text } = await extractText(new Uint8Array(buffer));
-      return Array.isArray(text) ? text.join('\n') : text;
+      const flattenedText = Array.isArray(text) ? text.join('\n') : text;
+
+      // QofE enrichment (locked 2026-05-09 evening — qofe parser ship).
+      // When the upload was explicitly typed as qofe, run the QofE
+      // defensibility scorer over the extracted PDF text and prepend a
+      // procurement-grade structured block above the flattened content.
+      // Mirrors the synergy_model XLSX enrichment pattern below — the
+      // structured block is human-readable, no JSON markers in the audit
+      // path. Failure is non-fatal; we fall through to flat text only.
+      if (documentType === 'qofe') {
+        try {
+          const parsed = extractQofeStructure(flattenedText);
+          if (parsed) {
+            const block = formatQofeAssessmentForAudit(parsed);
+            log.info(
+              `qofe enrichment: ${parsed.assessment.redFlags.length} red flag(s) · severity=${parsed.assessment.portfolioSeverity} · commission=${parsed.assessment.commissionedBy ?? 'unknown'}`
+            );
+            return `${block}\n\n${flattenedText}`;
+          }
+          log.info(`qofe enrichment: text too short / no signal, falling through to flat text`);
+        } catch (err) {
+          log.warn(`qofe enrichment failed (using flat text): ${String(err)}`);
+        }
+      }
+      return flattenedText;
     } catch (error) {
       throw new Error(
         `Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`
@@ -256,7 +285,7 @@ export async function extractTypeAwareStructuredData(
   mimeType: string,
   filename: string,
   documentType: string | null | undefined
-): Promise<ParsedSynergyModelData | null> {
+): Promise<ParsedSynergyModelData | ParsedQofeData | null> {
   if (!documentType) return null;
 
   const lowerFilename = filename.toLowerCase();
@@ -264,6 +293,7 @@ export async function extractTypeAwareStructuredData(
     mimeType ===
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
     lowerFilename.endsWith('.xlsx');
+  const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
 
   if (documentType === 'synergy_model' && isXlsx) {
     try {
@@ -284,7 +314,30 @@ export async function extractTypeAwareStructuredData(
     }
   }
 
-  // Future parsers (qofe / integration_plan) plug in here with their own
+  // QofE structured-data extraction (locked 2026-05-09 evening — qofe
+  // parser ship). PDF deliverables only — Big-4 / boutique transaction-
+  // advisory firms ship QofE as PDF reports. Returns ParsedQofeData with
+  // detected red flags, portfolio severity, and commissioned-by signal.
+  // Persists to Document.parsedStructuredData via the same generic JSONB
+  // column the synergy_model parser uses.
+  if (documentType === 'qofe' && isPdf) {
+    try {
+      const { text } = await extractText(new Uint8Array(buffer));
+      const flattened = Array.isArray(text) ? text.join('\n') : text;
+      const parsed = extractQofeStructure(flattened);
+      if (parsed) {
+        log.info(
+          `qofe structured-data extraction: ${parsed.assessment.redFlags.length} red flags · severity=${parsed.assessment.portfolioSeverity} · commission=${parsed.assessment.commissionedBy ?? 'unknown'}`
+        );
+      }
+      return parsed;
+    } catch (err) {
+      log.warn(`qofe structured-data extraction failed: ${String(err)}`);
+      return null;
+    }
+  }
+
+  // Future parsers (integration_plan + .docx) plug in here with their own
   // `kind`-discriminated payloads.
   return null;
 }

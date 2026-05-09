@@ -147,3 +147,85 @@ export const NAMED_PATTERNS: NamedPattern[] = [
     baseScore: 78,
   },
 ];
+
+// ─── Pure-function pattern matcher (locked 2026-05-09 evening) ─────────────
+//
+// Used by the riskScorerNode to compute `firedPatternLabels` IN-PIPELINE so
+// the compound-engine's PATTERN_PAIR_OVERRIDES amplifications (Synergy Mirage
+// 1.75× / Winner's Curse 1.55× / Conglomerate Fallacy 1.65× / Sunk Ship 1.55×
+// / Yes Committee 1.55×) fire on live audits rather than only on retroactive
+// toxic-combination detection persistence.
+//
+// Mirrors the `matchesContext` + biasTypes-subset logic in
+// `toxic-combinations.ts:detectToxicCombinations` but pure-function — no
+// Prisma calls, no I/O, no DB persistence. Same input → same output.
+//
+// The detection engine in `toxic-combinations.ts` STILL runs after the
+// audit completes for analytics + persistence to the ToxicCombination table.
+// This function is the in-flight signal-extraction path used by the live
+// pipeline.
+
+interface PatternMatchInput {
+  /** Detected bias type keys, lowercased + snake_case (matches NAMED_PATTERNS biasTypes). */
+  biasTypes: string[];
+  /** Best-effort ContextFactors from in-flight audit state. Fields not derivable from
+   *  pipeline state default to neutral values (timePressure: false, etc.) — the matcher
+   *  reads conservatively (null/false favours non-match). */
+  context: Partial<ContextFactors>;
+}
+
+/**
+ * Match a context object against a pattern's `contextRequired` partial.
+ * Returns true when EVERY required key in `required` is satisfied by `context`.
+ * Mirrors `toxic-combinations.ts:matchesContext` semantics.
+ */
+function matchesContext(
+  required: Partial<ContextFactors>,
+  context: Partial<ContextFactors>
+): boolean {
+  for (const [key, requiredValue] of Object.entries(required)) {
+    if (requiredValue === undefined) continue;
+    const actual = (context as Record<string, unknown>)[key];
+    // Tolerant equality — for monetaryStakes the matcher accepts the
+    // required value OR a stricter band ('high' required → 'very_high'
+    // also matches; same upgrade direction the persisted detector uses).
+    if (key === 'monetaryStakes') {
+      const ladder = ['unknown', 'low', 'medium', 'high', 'very_high'];
+      const reqIdx = ladder.indexOf(String(requiredValue));
+      const actIdx = ladder.indexOf(String(actual));
+      if (actIdx < reqIdx || reqIdx === -1 || actIdx === -1) return false;
+      continue;
+    }
+    if (actual !== requiredValue) return false;
+  }
+  return true;
+}
+
+/**
+ * Pure-function pattern matcher. Returns the labels of all named patterns
+ * whose biasTypes are fully present AND whose contextRequired is satisfied.
+ *
+ * Deterministic — same input → same output.
+ *
+ * Used in:
+ * - src/lib/agents/nodes.ts:riskScorerNode (live pipeline, before
+ *   computeCompoundScore is invoked) — feeds `firedPatternLabels` into
+ *   the compound engine so PATTERN_PAIR_OVERRIDES amplifications fire on
+ *   real audits.
+ * - Future: any caller that needs in-flight named-pattern detection
+ *   without a Prisma round-trip (DPR rendering shortcuts, simulate-ceo
+ *   pre-flight, etc.).
+ */
+export function matchNamedPatterns(input: PatternMatchInput): string[] {
+  const biasSet = new Set(input.biasTypes.map(t => t.toLowerCase()));
+  const matched: string[] = [];
+  for (const pattern of NAMED_PATTERNS) {
+    // ALL required biases must be present.
+    const allBiasesPresent = pattern.biasTypes.every(bt => biasSet.has(bt.toLowerCase()));
+    if (!allBiasesPresent) continue;
+    // Context must satisfy contextRequired.
+    if (!matchesContext(pattern.contextRequired, input.context)) continue;
+    matched.push(pattern.label);
+  }
+  return matched;
+}
