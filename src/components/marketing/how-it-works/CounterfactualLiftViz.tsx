@@ -62,6 +62,7 @@ const GRADE_PALETTE: Record<Grade, { color: string; label: string }> = {
   F: { color: C.red, label: 'Reject as drafted' },
 };
 
+// canonical-exception — wraps gradeFromScore with the marketing how-it-works palette.
 function gradeFor(score: number): { letter: string; color: string; label: string } {
   const letter = gradeFromScore(score);
   return { letter, ...GRADE_PALETTE[letter] };

@@ -92,6 +92,7 @@ export function getBiasArray<T = { severity: string; biasType: string }>(
  * Format a date string into a locale-independent format safe for SSR.
  * Avoids hydration mismatches from new Date().toLocaleString() in JSX.
  */
+// canonical-exception — accepts an `includeTime` flag; canonical formatDate is date-only.
 export function formatDate(dateStr: string | undefined | null, includeTime = false): string {
   if (!dateStr) return '';
   const d = new Date(dateStr);

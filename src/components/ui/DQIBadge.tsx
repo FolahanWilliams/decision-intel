@@ -35,6 +35,7 @@ const GRADE_COLORS: Record<Grade, string> = {
   F: '#ef4444',
 };
 
+// canonical-exception — clamps + rounds the score before applying canonical thresholds; the rounding is load-bearing for the badge display.
 function getGrade(score: number): Grade {
   const clamped = Math.max(0, Math.min(100, Math.round(score)));
   for (const { min, grade } of GRADE_THRESHOLDS) {

@@ -101,6 +101,7 @@ const SOURCE_LABEL: Record<string, string> = {
 
 const SEVERITY_RANK: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
 
+// canonical-exception — returns the full GRADE_THRESHOLDS entry (label/color/grade), not just the letter.
 function gradeFor(score: number) {
   return (
     GRADE_THRESHOLDS.find(g => score >= g.min) ?? GRADE_THRESHOLDS[GRADE_THRESHOLDS.length - 1]

@@ -23,6 +23,7 @@
     "lint:positioning": "node scripts/lint-positioning.mjs",
     "lint:silent-catches": "node scripts/lint-silent-catches.mjs",
     "lint:counts": "node scripts/lint-counts.mjs",
+    "lint:canonical-imports": "node scripts/lint-canonical-imports.mjs",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "test:gateway": "tsx ./scripts/test-ai-gateway.ts",
     "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",

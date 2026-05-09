@@ -77,6 +77,7 @@ const GRADE_META: Array<{ min: number; grade: string; ring: string; label: strin
   { min: 0, grade: 'F', ring: '#ef4444', label: 'Critical' },
 ];
 
+// canonical-exception — returns the full GRADE_META entry (label/color/grade) for the public share viewer.
 function gradeFor(score: number) {
   for (const t of GRADE_META) if (score >= t.min) return t;
   return GRADE_META[GRADE_META.length - 1];

@@ -138,6 +138,7 @@ const DQI_GRADE_PALETTE: Record<Grade, { color: string; label: string }> = {
   F: { color: '#ef4444', label: 'Critical' },
 };
 
+// canonical-exception — wraps gradeFromScore with the case-study marketing palette.
 function dqiGrade(score: number): { grade: string; color: string; label: string } {
   const grade = gradeFromScore(score);
   return { grade, ...DQI_GRADE_PALETTE[grade] };

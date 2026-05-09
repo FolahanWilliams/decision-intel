@@ -12,6 +12,7 @@ const GRADE_THRESHOLDS: Array<{ min: number; grade: string; color: string }> = [
   { min: 0, grade: 'F', color: '#f87171' },
 ];
 
+// canonical-exception — wraps score-to-grade with the ScoreReveal local color palette tuned for the spring animation.
 function getGrade(score: number): { grade: string; color: string } {
   for (const t of GRADE_THRESHOLDS) {
     if (score >= t.min) return { grade: t.grade, color: t.color };
