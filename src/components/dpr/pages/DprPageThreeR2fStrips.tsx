@@ -51,6 +51,7 @@ import type { DecisionRubric } from '@/lib/learning/decision-rubric';
 import { decisionRubricVerdictLabel } from '@/lib/learning/decision-rubric';
 import type { AlgorithmAversion } from '@/lib/learning/algorithm-aversion';
 import { algorithmAversionVerdictLabel } from '@/lib/learning/algorithm-aversion';
+import type { SynergyDefensibilitySummary } from '@/lib/parsers/synergy-model-parser';
 
 export interface DprPageThreeR2fStripsProps {
   data: ProvenanceRecordData;
@@ -80,7 +81,8 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
     data.counterfactualImpact ||
     data.fractionationOfExpertise ||
     data.decisionRubric ||
-    data.algorithmAversion;
+    data.algorithmAversion ||
+    data.synergyDefensibility;
 
   return (
     <DprPageShell
@@ -124,6 +126,10 @@ export function DprPageThreeR2fStrips(props: DprPageThreeR2fStripsProps) {
         {data.decisionRubric && <DecisionRubricStrip rubric={data.decisionRubric} />}
 
         {data.algorithmAversion && <AlgorithmAversionStrip aversion={data.algorithmAversion} />}
+
+        {data.synergyDefensibility && (
+          <SynergyDefensibilityStrip sd={data.synergyDefensibility} />
+        )}
       </DprSection>
 
       <DprNotice mark="On vocabulary">
@@ -577,6 +583,69 @@ function DecisionRubricStrip({ rubric }: { rubric: DecisionRubric }) {
       The most reliable memos identify decision criteria, weight them, and evaluate options
       systematically; the least reliable argue narrative coherence for a foregone conclusion.
     </DprRiskStrip>
+  );
+}
+
+function SynergyDefensibilityStrip({ sd }: { sd: SynergyDefensibilitySummary }) {
+  // Locked 2026-05-09 (M&A cascade depth ship). Surfaces the synergy-model
+  // parser output on the DPR cover when documentType === 'synergy_model'.
+  // Severity is driven by the fully-defended percentage and the count of
+  // critical claims in the portfolio:
+  //   - any claim at critical severity → critical
+  //   - fullyDefendedPct < 50% → high
+  //   - fullyDefendedPct < 70% → medium
+  //   - fullyDefendedPct >= 70% → low
+  const criticalCount = sd.topClaims.filter(c => c.severity === 'critical').length;
+  const highCount = sd.topClaims.filter(c => c.severity === 'high').length;
+  let severity: DprSeverity;
+  if (criticalCount > 0) severity = 'critical';
+  else if (sd.fullyDefendedPct < 50) severity = 'high';
+  else if (sd.fullyDefendedPct < 70) severity = 'medium';
+  else severity = 'low';
+
+  const band =
+    severity === 'critical'
+      ? 'Synergy Mirage critical'
+      : severity === 'high'
+        ? 'Under-defended'
+        : severity === 'medium'
+          ? 'Partially defended'
+          : 'Well defended';
+
+  const headline =
+    sd.totalClaims === 0
+      ? 'No synergy claims extracted from the spreadsheet — synergy model may be narrative-only or the parser bailed out.'
+      : criticalCount > 0
+        ? `${criticalCount} synergy claim(s) at critical severity — Synergy Mirage fires on the portfolio. ${highCount} additional claims at high severity.`
+        : sd.fullyDefendedPct < 50
+          ? `${100 - sd.fullyDefendedPct}% of claims under-defended — synergy model has structural Synergy Mirage exposure across the portfolio.`
+          : sd.fullyDefendedPct < 70
+            ? `Mixed defensibility — ${sd.fullyDefendedPct}% of claims fully defended; the under-defended share carries Synergy Mirage risk.`
+            : `${sd.fullyDefendedPct}% of claims fully defended (mechanism + owner + milestone). Apply BCG/McKinsey base-rate realisation discount before underwriting.`;
+
+  // Surface up to 2 top critical/high claims so the strip is procurement-grade
+  // specific — names the labels the reviewer should attack.
+  const topClaimsLine =
+    sd.topClaims.length > 0
+      ? sd.topClaims
+          .slice(0, 2)
+          .map(c => `${c.label} (${c.severity})`)
+          .join(' · ')
+      : 'no claims surfaced';
+
+  return (
+    <DprRiskStrip
+      label="§4.10 · Synergy defensibility"
+      band={band}
+      severity={severity}
+      headline={headline}
+      footRows={[
+        { k: 'Claims extracted', v: String(sd.totalClaims) },
+        { k: 'Fully defended', v: `${sd.fullyDefendedPct}%` },
+        { k: 'Confidence', v: sd.confidence },
+        { k: 'Top claims', v: topClaimsLine },
+      ]}
+    />
   );
 }
 

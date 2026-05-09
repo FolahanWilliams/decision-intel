@@ -381,6 +381,120 @@ export function extractSynergyStructure(workbook: ExcelJSType.Workbook): Synergy
 }
 
 /**
+ * Compact summary surfaced on the DPR cover when a synergy_model is
+ * audited. Extracted back out of the inline-block text by
+ * `extractSynergyDefensibilityFromContent` so DPR consumers don't need
+ * the original ExcelJS workbook — the structured data is recoverable
+ * from Document.content alone.
+ */
+export interface SynergyDefensibilitySummary {
+  /** Whether a synergy block was detected in the content. */
+  detected: boolean;
+  /** Detection confidence per the parser's heuristic. */
+  confidence: 'high' | 'medium' | 'low' | 'none';
+  /** Total claim count. */
+  totalClaims: number;
+  /** % of claims with all three defensibility elements (mechanism + owner + milestone). */
+  fullyDefendedPct: number;
+  /** One-line procurement-grade portfolio summary. */
+  portfolioSummary: string;
+  /** Top claims sorted critical → low for DPR cover surfacing. Capped at 5. */
+  topClaims: Array<{
+    label: string;
+    type: SynergyClaimType;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    score: number;
+    verdict: string;
+  }>;
+}
+
+const BLOCK_START = '=== STRUCTURED SYNERGY MODEL — PARSED PRE-AUDIT ===';
+const BLOCK_END = '=== END STRUCTURED SYNERGY MODEL ===';
+
+/**
+ * Extract a SynergyDefensibilitySummary from the inline-marker block
+ * embedded in `Document.content` by `formatSynergyStructureForAudit`.
+ * Returns null when no block is detected (the document wasn't a
+ * synergy_model upload, or the parser bailed out). Pure function,
+ * deterministic, no I/O.
+ *
+ * Used by DPR assembly (provenance-record-data.ts) so synergy
+ * defensibility surfaces on the DPR cover for synergy_model uploads
+ * without re-parsing the original .xlsx.
+ */
+export function extractSynergyDefensibilityFromContent(
+  content: string
+): SynergyDefensibilitySummary | null {
+  const startIdx = content.indexOf(BLOCK_START);
+  if (startIdx === -1) return null;
+  const endIdx = content.indexOf(BLOCK_END, startIdx);
+  if (endIdx === -1) return null;
+  const block = content.slice(startIdx, endIdx + BLOCK_END.length);
+
+  const confidenceMatch = block.match(/Detection confidence:\s*(high|medium|low|none)/);
+  const confidence = (confidenceMatch?.[1] as SynergyDefensibilitySummary['confidence']) ?? 'low';
+
+  const summaryMatch = block.match(/PORTFOLIO DEFENSIBILITY:\s*(.+)/);
+  const portfolioSummary = summaryMatch?.[1]?.trim() ?? '';
+
+  // Extract per-claim lines + their verdicts. The format is:
+  //   [N] {label} · type={type} · {amts} · severity={severity} · score={score}/3
+  //       Mechanism: ... · Owner: ... · Milestone: ...
+  //       Verdict: ...
+  const claimRegex =
+    /\[(\d+)\]\s+([^·\n]+?)\s+·\s+type=(\w+)\s+·\s+[^·\n]*·\s+severity=(\w+)\s+·\s+score=(\d+)\/3/g;
+  const verdictRegex = /Verdict:\s+(.+)/g;
+  const claims: Array<{
+    label: string;
+    type: SynergyClaimType;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    score: number;
+    verdict: string;
+  }> = [];
+
+  const claimMatches = Array.from(block.matchAll(claimRegex));
+  const verdictMatches = Array.from(block.matchAll(verdictRegex));
+  for (let i = 0; i < claimMatches.length; i += 1) {
+    const m = claimMatches[i];
+    const v = verdictMatches[i];
+    const severity = m[4] as 'critical' | 'high' | 'medium' | 'low';
+    if (!['critical', 'high', 'medium', 'low'].includes(severity)) continue;
+    claims.push({
+      label: m[2].trim(),
+      type: m[3] as SynergyClaimType,
+      severity,
+      score: parseInt(m[5], 10),
+      verdict: v?.[1]?.trim() ?? '',
+    });
+  }
+
+  const totalClaims = claims.length;
+  const fullyDefended = claims.filter(c => c.score === 3).length;
+  const fullyDefendedPct =
+    totalClaims === 0 ? 0 : Math.round((fullyDefended / totalClaims) * 100);
+
+  // Sort by severity (critical first) for the top-5 DPR surface.
+  const severityRank: Record<string, number> = {
+    critical: 0,
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
+  const topClaims = [...claims]
+    .sort((a, b) => severityRank[a.severity] - severityRank[b.severity])
+    .slice(0, 5);
+
+  return {
+    detected: true,
+    confidence,
+    totalClaims,
+    fullyDefendedPct,
+    portfolioSummary,
+    topClaims,
+  };
+}
+
+/**
  * Serialise a SynergyStructure as a procurement-grade text block to embed
  * inline in the audit's text content. Downstream nodes (structurer,
  * biasDetective, noiseJudge) read this as plain text but get the per-

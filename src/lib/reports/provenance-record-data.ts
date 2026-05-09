@@ -51,6 +51,10 @@ import {
 } from '@/lib/learning/reference-class-forecast';
 import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
 import {
+  extractSynergyDefensibilityFromContent,
+  type SynergyDefensibilitySummary,
+} from '@/lib/parsers/synergy-model-parser';
+import {
   computeCalibratedRejection,
   type CalibratedRejection,
 } from '@/lib/learning/calibrated-rejection';
@@ -220,6 +224,16 @@ export interface ProvenanceRecordData {
    * Renders as §4.9 strip on the DPR cover.
    */
   algorithmAversion?: AlgorithmAversion;
+  /**
+   * Synergy Defensibility summary (locked 2026-05-09, M&A cascade depth ship).
+   * Populated only when documentType === 'synergy_model' AND the file-parser
+   * detected a synergy-shaped spreadsheet at upload time. Carries the
+   * portfolio-level summary + top critical/high claims for surfacing on the
+   * DPR cover. Extracted from Document.content's STRUCTURED SYNERGY MODEL
+   * block (no re-parse of the original .xlsx). Null when the audit was on
+   * a non-synergy document type or the parser bailed out.
+   */
+  synergyDefensibility?: SynergyDefensibilitySummary;
   /**
    * Data lifecycle / retention policy footer (DPR v2, P2 #4). Always
    * populated — this is the procurement-grade contractual statement of
@@ -872,6 +886,15 @@ export async function assembleProvenanceRecordData(
             contentHash: true,
             userId: true,
             orgId: true,
+            // Synergy defensibility extraction (locked 2026-05-09, M&A cascade
+            // depth ship). When documentType === 'synergy_model', the upload
+            // route's file-parser embedded the STRUCTURED SYNERGY MODEL block
+            // at the top of content. Read it here so the DPR cover surfaces
+            // the procurement-grade defensibility data without re-parsing the
+            // original .xlsx. content + documentType are needed for the
+            // extractor; both are existing columns (no migration).
+            content: true,
+            documentType: true,
           },
         },
       },
@@ -1170,6 +1193,22 @@ export async function assembleProvenanceRecordData(
     summary: analysis.summary,
   });
 
+  // Synergy Defensibility — extracted from the inline STRUCTURED SYNERGY
+  // MODEL block embedded in Document.content by the upload-route file-
+  // parser (locked 2026-05-09, M&A cascade depth ship). Pure function,
+  // deterministic, no LLM. Returns null when the document isn't a
+  // synergy_model OR the parser bailed; the DPR section renders only
+  // when populated.
+  const docContent = (
+    analysis as unknown as {
+      document?: { content?: string | null; documentType?: string | null };
+    }
+  ).document;
+  const synergyDefensibility =
+    docContent?.documentType === 'synergy_model' && docContent?.content
+      ? extractSynergyDefensibilityFromContent(docContent.content) ?? undefined
+      : undefined;
+
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
   // reads this map to populate finding cards with verbatim memo
@@ -1219,6 +1258,7 @@ export async function assembleProvenanceRecordData(
     fractionationOfExpertise,
     decisionRubric,
     algorithmAversion,
+    synergyDefensibility,
     dataLifecycle,
     clientSafe: undefined,
     schemaVersion: 2,
@@ -1365,6 +1405,7 @@ export async function assembleProvenanceRecordDataForPackage(
       fractionationOfExpertise: undefined,
       decisionRubric: undefined,
       algorithmAversion: undefined,
+      synergyDefensibility: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,
@@ -1611,6 +1652,7 @@ export async function assembleProvenanceRecordDataForDeal(
       fractionationOfExpertise: undefined,
       decisionRubric: undefined,
       algorithmAversion: undefined,
+      synergyDefensibility: undefined,
       dataLifecycle: await buildDataLifecycle('', null),
       clientSafe: undefined,
       schemaVersion: 2,
