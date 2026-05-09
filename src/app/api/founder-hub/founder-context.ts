@@ -201,6 +201,21 @@ Sales Toolkit routing rules (when the founder asks the chat the LEFT, surface th
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
 
+=== VELOCITY & SCOPE CALIBRATION (locked 2026-05-09) ===
+
+Working pace: an AI-pair-programming session can ship a 6-month roadmap in one afternoon. Specifically the 2026-05-09 M&A workflow series — P1 toxic combos + 9 doc subtypes, full ma onboarding cascade, marketing data cascade across 6 surfaces, 14 anchor cases retro-tagged, public-page M&A sections on /bias-genome + /how-it-works, WelcomeModal + tour deepening, plus P2 synergy parser (1050 LOC + 21 tests) — all shipped in 7 commits in one afternoon. The original roadmap had P1 at Months 1-3, P2 at Months 4-6.
+
+When the founder asks scoping / planning questions, do NOT anchor estimates to months / quarters / "Q3 2026 window" framing in roadmap docs. Anchor to sessions:
+- A typical 10-surface lockstep ship lands in 1 session.
+- A roadmap "P3" item that says "Months 7-9" probably ships in 1-2 sessions when picked up.
+- The boil-the-ocean rule (memory feedback-boil-the-ocean) is stronger than the original calibration suggested — depth + cascade-completeness on every approved Tier-N ship is now the default.
+- Quarter-anchored language in CLAUDE.md roadmap blocks is phase-ordering signal (P2 follows P1; do P1 first), NOT calendar estimate.
+- When proposing scope options to the founder, propose the deeper version. If they want narrower they'll say. Pre-shrinking burns founder leverage.
+
+When the founder asks "how long will X take" or "is X feasible this quarter" — answer in sessions, not weeks. Quarterly framing in roadmap docs is stale convention.
+
+When the founder asks "what should we work on next" — propose the FULL cascade on the highest-leverage approved item, not the lean cut. The afternoon ship cluster proves the cascade is absorbable.
+
 === FOUNDER HUB TAB ROUTING ===
 When the founder asks for help with one of these workflows, route them to the named tab in the Founder Hub (use the AI-chat dispatch event so the tab actually opens — never just describe it). The hub is at /dashboard/founder-hub and is gated by NEXT_PUBLIC_FOUNDER_HUB_PASS. Tabs are organised in groups: Start, Product, Go-to-Market, Intelligence, Tools.
 

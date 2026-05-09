@@ -44,6 +44,34 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 **Anti-scope-creep vs boil-the-ocean — resolution rule (locked 2026-04-27).** This file's "push back on scope creep" instruction and the user-memory `feedback-boil-the-ocean` ("do the whole thing right on non-trivial builds; no workarounds, no dangling threads") both apply. The decision rule when they collide: **was the work explicitly approved as planned/Tier-N execution?** If yes (founder said "proceed with Tier 1," "ship the deep version," "implement this list," etc.) — boil-the-ocean wins. Default to the category-grade enterprise version of every approved item; never the lean cut. If the work is an unsolicited polish opportunity, a side-quest discovered mid-task, or an "I noticed we could also…" — anti-scope-creep wins; flag it, don't ship it. Test for category-grade-on-planned-work: before declaring done, sit in the buyer's seat (CSO / fund partner / GC / IC reviewer) and answer (a) "what's the next question I'd ask on this surface?" (b) "what action would I take from here?" (c) "what claim looks weak from a procurement reader's perspective?" If any of those reveal a gap, deepen before shipping. Time estimates on planned work are depth signals ("this much depth is the target"), NOT time budgets ("come in under this if you can").
 
+**Velocity & Scope Discipline — session-level estimation (locked 2026-05-09 after 7 commits in one afternoon collapsed a 6-month roadmap).** A calibration anchor for every future planning conversation:
+
+The M&A roadmap was originally written with month-anchored phases — P1 Months 1-3, P2 Months 4-6, P3 Months 7-9, Backlog post-acqui-hire. **Actual elapsed time for P1 + P2's load-bearing portion + 5 adjacent ships: one afternoon.** Specifically (2026-05-09):
+
+1. `cfdffdbc` — P1: 13 named toxic combinations + 9 M&A document subtypes + cascade across BIAS_DETECTIVE_PROMPT + Education Room + chat + CLAUDE.md
+2. `15faa00` — Onboarding `ma` cascade: 3 new sample bundles + 4-stop tour + 4-surface empty states
+3. `f39eea7` — Marketing data cascade across 6 surfaces + first 7 anchor cases retro-tagged
+4. `07b7c5f` — Deeper 7-case retro-tagging (14 total) + bias-count drift fix + count-discipline lockstep
+5. `2c7524e` — `/bias-genome` M&A Pattern Coverage section + `/how-it-works` deal-stage overlays Section 4b
+6. `8719c09` — WelcomeModal `VALUE_PROPS_BY_ROLE` + tour 3→4 stops + dashboard subtitle + first-run pitch
+7. `9eddb2c` — P2 synergy parser (1050 LOC structured spreadsheet parsing + per-claim defensibility scoring + 21 vitest tests + critical upload-validation bug fix)
+
+The pre-AI-pair-programming velocity model is dead. Forward-looking rules:
+
+(1) **Anchor estimates to sessions, not months.** When proposing scope, the right question is "ships in N sessions" not "fits in Q3 2026." A roadmap item that says "Months 7-9" probably ships in 1-2 sessions when picked up.
+
+(2) **Default to the deeper version when the founder says proceed.** The boil-the-ocean rule is stronger than initially calibrated. When the founder approves planned/Tier-N work, ship the full cascade — every surface, every test, every CLAUDE.md update — not the lean cut. The afternoon ship cluster above proves the cascade is absorbable in one go.
+
+(3) **The cascade discipline scales.** A 10-surface lockstep ship (4 internal pipeline + 6 marketing data structures + ≥1 case-tagging) is the M&A example; the same shape applies to bias taxonomy (10+ surfaces) + onboarding (5 surfaces per role) + DPR vocabulary (16+ surfaces). When a lock changes, propagate the FULL cascade in the same commit — the gates catch nothing if 1 of 10 surfaces drifts, but the buyer sees the gap immediately.
+
+(4) **Don't pre-shrink the proposal.** When laying out options for the founder's choice, propose the depth that's actually shippable in the session, not the lean version anchored to a stale velocity model. If the founder wants narrower, they'll say. Pre-shrinking burns the founder's time and forces a re-prompt to expand.
+
+(5) **Quarter-anchored language in roadmap docs is stale convention, not real scheduling.** When you read "Months 4-6, during Sankore window" in CLAUDE.md, treat it as a phase ordering signal (P2 follows P1; do P1 first), not a literal calendar estimate.
+
+(6) **Calibration check before declaring scope:** if the proposed scope feels like it can ship in this session AND the founder asked for thorough work, the scope is too small — deepen until it's session-bounded but cascade-complete.
+
+This rule was added because pre-shrinking suboptimised the founder's leverage. The founder pays per session; the unit economics favour depth over caution. When in doubt, ship the deep version.
+
 ## One-liner (RE-LOCKED 2026-05-04 — CATEGORY-CLAIM PIVOT)
 
 **Primary H1 (landing + pitch-deck slide 1 + LinkedIn headline):**
@@ -126,12 +154,12 @@ Plus M&A-specific framing layered into existing **Sunk Ship** (deal-escalation l
 
 **M&A onboarding surfaces (locked 2026-05-09 alongside the P1 ship):** the `ma` role across the four onboarding surfaces names the new patterns + document types directly so a Head of Corp Dev / PE Deal Partner sees the M&A-workflow-native depth the moment they sign up. (i) `src/lib/data/sample-bundles.ts` — three new real-anchor specimens authored to fire ONE toxic combo each: `MA_PROJECT_MARLIN` (Synergy Mirage / AOL-Time Warner content-distribution shape), `MA_PROJECT_HELIX` (Conglomerate Fallacy / Daimler-Chrysler diversified-platform shape), `MA_PROJECT_APEX` (Winner's Curse / WeWork S-1 competitive-process shape). The `bundlesForRole(null|'other')` no-role branch refactored from literal indices to filter-based (find first per role) so adding new bundles can never silently break the breadth view. (ii) `src/components/onboarding/OnboardingTour.tsx` `TOUR_STEPS_BY_ROLE.ma` — three stops sharpened to name 9 supported document types (IC memo, CIM, QofE, synergy model, integration plan, term sheet, model, due diligence, counsel review) + Synergy Mirage / Conglomerate Fallacy / Winner's Curse by name in the upload stop, IC Readiness Gate (5 gates) named in the cross-doc stop. (iii) `src/lib/onboarding/role-empty-states.ts` `ma` copy across 4 surfaces (dashboard / deals / decision-log / analytics) updated to name the toxic combinations + the deal-as-atomic-decision-unit composition (CIM + QofE + synergy model + integration plan + counsel review + IC deck). **Forward-looking rule**: when extending the M&A patterns or document types, the four `ma` onboarding surfaces should be updated in lockstep with `NAMED_PATTERNS` + `INVESTMENT_DOCUMENT_TYPES` — same commit. The cold-start moment is where buyer-fit signal lands.
 
-**The build roadmap** (per the 2026-05-09 NotebookLM operational-positioning synthesis):
+**The build roadmap** (originally written 2026-05-09 against a pre-AI-pair-programming quarterly cadence; actual velocity recalibrated 2026-05-09 evening — see "Velocity & Scope Discipline" section below):
 
-- **P1 (Months 1-3, locked 2026-05-09):** IC Memo / CIM parser type-recognition + 5 first-class M&A toxic combinations. SHIPPED in this commit.
-- **P2 (Months 4-6, during Sankore window):** Synergy Validation Overlay (deeper than the synergy_model overlay — surface a "Synergy Defensibility Score" benchmarking projected vs historical realized rates from the 143-case library) + Boardroom Decision Twin REFINEMENT (the simulator already exists; sharpen for IC vote-prediction specifically).
-- **P3 (Months 7-9, acqui-hire conversation window):** Deal-stage UI overlays (Sourcing → Diligence → IC Review → Closing visible in the product chrome — pure demo polish for acqui-hire conversations).
-- **Backlog (post-acqui-hire):** PMI overlays — feedback loop is 12-24 months, too slow for solo founder. Wait until inside the acquirer with an engineering team.
+- **P1 — IC Memo / CIM parser type-recognition + 5 first-class M&A toxic combinations.** SHIPPED 2026-05-09 (commit `cfdffdbc`).
+- **P2 — Synergy Validation Overlay + Boardroom Decision Twin REFINEMENT.** Synergy Validation Overlay SHIPPED 2026-05-09 evening (commit `9eddb2c`) as a structured ExcelJS parser + per-claim defensibility scorer + base-rate realisation bands per BCG/McKinsey. Boardroom Decision Twin refinement (sharpening for IC vote-prediction specifically) deferred — not blocking and the existing simulator already runs the boardroom flow.
+- **P3 — Deal-stage UI overlays (Sourcing → Diligence → IC Review → Closing visible in the product chrome).** Pure demo polish for acqui-hire conversations. Estimated 1-2 sessions to ship the full cascade.
+- **Backlog (post-acqui-hire) — PMI overlays.** Feedback loop is 12-24 months, too slow for solo founder. Wait until inside the acquirer with an engineering team.
 
 **Forward-looking rule**: when adding M&A-specific overlays, prefer ENHANCING existing biases / patterns / document types over creating new ones. The 22-bias taxonomy is the structural moat; M&A specificity comes from compound-pattern detection + document-type overlay prompts, not from 30+ M&A-specific biases that would dilute the taxonomy. The named M&A patterns earn their first-class status by appearing in the 143-case library at materially higher frequency than non-M&A patterns.
 
