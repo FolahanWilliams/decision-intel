@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
+import { formatDate } from '@/lib/utils/format-date';
 import {
   Users,
   Target,
@@ -51,10 +52,6 @@ function formatDecisionType(type: string): string {
   return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 
 type FilterTab = 'all' | 'open' | 'closed' | 'archived';
 

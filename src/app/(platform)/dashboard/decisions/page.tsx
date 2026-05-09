@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { buildPackageAccessFilter } from '@/lib/utils/decision-package-access';
 import { CreatePackageButton } from '@/components/decisions/CreatePackageButton';
+import { formatDate } from '@/lib/utils/format-date';
 
 const STATUS_LABEL: Record<string, string> = {
   drafting: 'Drafting',
@@ -20,9 +21,6 @@ const STATUS_TINT: Record<string, string> = {
   superseded: '#94a3b8',
 };
 
-function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
 
 function dqiTint(score: number | null): string {
   if (score == null) return 'var(--text-muted)';

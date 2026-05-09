@@ -18,6 +18,7 @@ import { motion, useInView } from 'framer-motion';
 import { useReducedMotion } from './useReducedMotion';
 import { PIPELINE_NODES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
 import { PipelineNodeGlyph } from './PipelineNodeGlyph';
+import { truncate } from '@/lib/utils/string';
 
 const C = {
   white: '#FFFFFF',
@@ -423,9 +424,6 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
   );
 }
 
-function truncate(text: string, max: number): string {
-  return text.length <= max ? text : text.slice(0, max - 1).trimEnd() + '…';
-}
 
 function ZoneBand({
   x,

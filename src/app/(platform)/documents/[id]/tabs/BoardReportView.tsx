@@ -3,6 +3,7 @@
 import { Presentation, Loader2, Download, Calendar, Lock, Unlock } from 'lucide-react';
 import { formatBiasName } from '@/lib/utils/labels';
 import { gradeFromScore } from '@/lib/utils/grade';
+import { truncate } from '@/lib/utils/string';
 import { R2FBadge } from '@/components/ui/R2FBadge';
 
 // Keep in sync with src/lib/reports/board-report-generator.ts
@@ -23,12 +24,6 @@ const SEVERITY_COLOR: Record<string, string> = {
   medium: 'var(--warning)',
   low: 'var(--info, #3b82f6)',
 };
-
-function truncate(text: string | undefined, max: number): string {
-  if (!text) return '';
-  const clean = text.trim();
-  return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
-}
 
 function interpretGrade(grade: string): string {
   switch (grade) {

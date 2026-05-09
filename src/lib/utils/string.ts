@@ -7,9 +7,12 @@
  */
 
 /** Truncate a string to `max` characters, trimming whitespace and
- *  appending an ellipsis when truncation occurs. Empty input returns
- *  empty string. Non-truncated input is returned trimmed. */
-export function truncate(text: string, max: number): string {
+ *  appending an ellipsis when truncation occurs. Empty / null /
+ *  undefined input returns empty string. Non-truncated input is
+ *  returned trimmed. Signature widened to `string | null | undefined`
+ *  2026-05-09 to absorb the BoardReportView truncate variant during
+ *  the Tier 1.4 hygiene cascade. */
+export function truncate(text: string | null | undefined, max: number): string {
   if (!text) return '';
   const clean = text.trim();
   return clean.length > max ? clean.slice(0, max - 1).trimEnd() + '…' : clean;
