@@ -51,12 +51,15 @@ import {
   Layers,
   Coins,
   Activity,
+  ShieldCheck,
 } from 'lucide-react';
 import { NorthStarHero } from './path-to-100m/NorthStarHero';
 import { MarketRealityCheck } from './path-to-100m/MarketRealityCheck';
 import { SimplifiedThirtyDayFunnel } from './path-to-100m/SimplifiedThirtyDayFunnel';
 import { StrengthsWeaknessesMatrix } from './path-to-100m/StrengthsWeaknessesMatrix';
 import { R2FDeepDive } from './path-to-100m/R2FDeepDive';
+import { ThreeLayerModel } from './path-to-100m/ThreeLayerModel';
+import { AiNativeMatrix } from './path-to-100m/AiNativeMatrix';
 import { CategoryAndPitchLibrary } from './path-to-100m/CategoryAndPitchLibrary';
 import { RoleOutreachPlaybooks } from './path-to-100m/RoleOutreachPlaybooks';
 import { KillerResponsesPlaybook } from './path-to-100m/KillerResponsesPlaybook';
@@ -165,6 +168,24 @@ export function PathToHundredMillionTab() {
         accent="#7C3AED"
       >
         <R2FDeepDive />
+      </Section>
+
+      <Section
+        icon={<Layers size={16} />}
+        title="3-Layer Architectural Frame · Snowflake → Salesforce → DI"
+        subtitle="Lifted from the 2026-05-09 Gemini-pushback validation pass — the cleanest architectural slot for DI. Snowflake owns data integrity, Salesforce owns execution discipline, Decision Intel owns the reasoning layer between them. Use as the opening line for cold investor calls + senior-direct corp dev applications + pitch-deck slide 2. EARNED vocabulary — never the H1."
+        accent="#16A34A"
+      >
+        <ThreeLayerModel />
+      </Section>
+
+      <Section
+        icon={<ShieldCheck size={16} />}
+        title="AI Commodification Defense Matrix · why GPT-N+1 doesn't kill DI"
+        subtitle="Sharpened version of the Gemini matrix — every cell names DI's specific citable moat (R²F · 22-bias taxonomy · 143-case library · 19-framework regulatory map · Brier 0.258 · agentic-shift defense · Pan-African coverage · per-org Brier accumulation). Use when an investor or partner asks 'won't the next foundation model just do this?'"
+        accent="#0EA5E9"
+      >
+        <AiNativeMatrix />
       </Section>
 
       <Section

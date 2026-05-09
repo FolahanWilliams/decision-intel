@@ -128,6 +128,31 @@ This rule was added because pre-shrinking suboptimised the founder's leverage. T
 
 These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
+## 3-Layer Positioning Frame (locked 2026-05-09 evening — Gemini-pushback validation)
+
+**Architectural vocabulary** for cold investor conversations + pitch-deck slide 2 + senior-direct corp dev applications. Lifted from the 2026-05-09 Gemini-pushback validation pass; sharper than the prior CLAUDE.md positioning frame because it gives the reader a clean architectural slot for DI:
+
+> **Snowflake owns data integrity. Salesforce owns execution discipline. Decision Intel owns the reasoning layer between them — the audit moment before capital is committed.**
+
+Three layers, three primary questions, three categories of incumbent:
+
+1. **Data integrity** (Snowflake / Databricks / BigQuery) — _"Is the data we feed into the call correct?"_ Mature category, multi-billion-dollar incumbents.
+2. **Reasoning quality** (Decision Intel) — _"Was the call defensible at the moment of commit?"_ The audit moment before capital is committed. R²F + 22-bias taxonomy + 143-case library + 19-framework regulatory map + Brier 0.258. **The wedge.**
+3. **Execution discipline** (Salesforce / Workday / NetSuite) — _"Did the decision actually get implemented?"_ Mature category, dominant incumbents.
+
+**Use rules:**
+
+- **The 3-layer frame is the OPENING LINE for cold investor calls + cold corp-dev applications.** Then bridge to the locked H1: _"The reasoning audit platform — R²F over a 22-bias taxonomy, scored as a Decision Quality Index."_ The 3-layer frame earns the reader's attention; the H1 is the category claim once they're listening.
+- **Never the H1.** Per CLAUDE.md vocabulary lock the H1 stays _"Decision Intel is the reasoning audit platform."_ The 3-layer frame is supporting architectural vocabulary, not a replacement.
+- **Never use the broader "system of record where core data is stored"** framing. That competes with Notion / Confluence / Drive (`company knowledge base` is in `BANNED_VOCABULARY` for this exact reason). The locked narrowing is _"system of record for DECISIONS specifically."_ The 3-layer frame is compatible with this — DI's "reasoning layer" is the decisions-specific narrowing.
+
+**Where this lives in the codebase:**
+
+- `src/components/founder-hub/path-to-100m/ThreeLayerModel.tsx` — interactive 3-layer visualization on the Path to $100M ARR tab. The opening-line copy is rendered there for the founder's recall.
+- `src/components/founder-hub/path-to-100m/AiNativeMatrix.tsx` — Fragile Wrapper vs DI matrix with DI's specific moats in every cell (R²F + 22-bias + 143-case + 19-framework + Brier 0.258 + agentic-shift defense + Pan-African coverage + per-org Brier accumulation). Use when an investor or partner asks _"won't GPT-N+1 just do this?"_ The columns are the answer.
+
+**Forward-looking rule:** when a moat changes (new framework added · new bias shipped · methodology version bump · new HXC persona), update the matching cell in `AiNativeMatrix.tsx` in lockstep. The matrix is procurement-grade differentiation only as long as every cell stays citable to a CLAUDE.md lock.
+
 ## DecisionContainer Phase 2 ship (locked 2026-05-09 evening — unified UI + API + Cornerstone brief)
 
 **Phase 2 lands the consumer surface on top of the Phase 1 foundation.** The unified container model now has a complete API + UI tree; the legacy deal/package shells are fully replaced.
