@@ -6,6 +6,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { parseJSON } from '@/lib/utils/json';
+import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
 
 const log = createLogger('SimulateCeo');
 
@@ -80,6 +81,15 @@ export async function POST(req: NextRequest) {
     const body = (await req.json().catch(() => null)) as {
       memo?: string;
       ceoProfile?: string;
+      // Optional: caller-supplied list of named patterns already detected
+      // on this memo (e.g. ['The Synergy Mirage', "The Winner's Curse"]).
+      // When present, the CEO simulation biases its questions toward
+      // exposing the named failure modes — turning the teaser from a
+      // generic memo audit into a deal-specific one. Authenticated
+      // callers (e.g. the SimulateCeoTab on /documents/[id]) can pass
+      // analysis.toxicCombinations.map(tc => tc.patternLabel) to enrich.
+      // Locked 2026-05-09 evening — cascade-depth audit ship #6.
+      firedPatterns?: string[];
     } | null;
     if (!body?.memo || typeof body.memo !== 'string') {
       return apiError({ error: 'memo (string) is required', status: 400 });
@@ -112,11 +122,39 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // When the caller passes detected patterns, look them up in the
+    // canonical NAMED_PATTERNS catalogue and inject the descriptions
+    // into the prompt. Skips silently if no patterns match (defensive
+    // against typos / stale labels).
+    const firedPatternLabels = Array.isArray(body.firedPatterns)
+      ? body.firedPatterns.filter((s): s is string => typeof s === 'string')
+      : [];
+    const matchedPatterns = firedPatternLabels
+      .map(label => NAMED_PATTERNS.find(p => p.label === label))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p))
+      .slice(0, 5);
+
+    const patternBlock =
+      matchedPatterns.length > 0
+        ? `
+
+DETECTED FAILURE PATTERNS:
+The audit pipeline already flagged the following named compound failure patterns
+on this memo. Bias your questions toward exposing the specific gaps these
+patterns name — the CEO is more likely to ask about a documented failure mode
+than a generic concern.
+
+${matchedPatterns
+  .map(p => `- ${p.label}: ${p.description}`)
+  .join('\n')}
+`
+        : '';
+
     const prompt = `${SYSTEM_PROMPT}
 
 CEO PROFILE:
 ${profile}
-
+${patternBlock}
 MEMO:
 <memo>
 ${memo}
@@ -166,11 +204,17 @@ Three questions, JSON only.`;
       ipHash,
       questionCount: questions.length,
       memoLength: memo.length,
+      patternsApplied: matchedPatterns.length,
     });
 
     return apiSuccess({
       data: {
         questions,
+        // Surface which patterns shaped the prompt so a caller can show
+        // "biased toward [Synergy Mirage, Winner's Curse]" attribution
+        // in the UI. Empty array when no firedPatterns supplied OR when
+        // none of the supplied labels matched the catalogue.
+        patternsApplied: matchedPatterns.map(p => p.label),
         disclaimer:
           'CEO simulation is a single-persona teaser. The full 12-node pipeline runs five primed boardroom personas (CEO, CFO, GC, domain lead, dissenting director) and attaches the evidence to a Decision Provenance Record.',
       },

@@ -93,7 +93,7 @@ export interface DetectionResult {
 
 // ─── Named Toxic Patterns (Built-In) ───────────────────────────────────────
 
-interface NamedPattern {
+export interface NamedPattern {
   label: string;
   description: string;
   biasTypes: string[]; // all must be present
@@ -101,7 +101,19 @@ interface NamedPattern {
   baseScore: number; // 0-100 starting score before calibration
 }
 
-const NAMED_PATTERNS: NamedPattern[] = [
+/**
+ * The canonical named-pattern catalogue. 13 patterns as of 2026-05-09 evening
+ * (10 cross-domain + 3 M&A-specific: Synergy Mirage, Conglomerate Fallacy,
+ * Winner's Curse). Exported so surfaces outside the detection pipeline
+ * (BiasDetailModal participates-in chips, InsightsPageContent trending,
+ * /api/toxic-combinations/patterns endpoint, /api/simulate-ceo context)
+ * can render the same labels + descriptions + bias-pair vocabulary
+ * without re-deriving. When adding a new pattern, the cascade discipline
+ * is locked in CLAUDE.md "M&A Workflow Native" — update NAMED_PATTERNS
+ * here AND BIAS_DETECTIVE_PROMPT TOXIC COMBINATIONS section AND any
+ * required-bias entries in BIAS_EDUCATION + Education Room flashcard.
+ */
+export const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Echo Chamber',
     description:

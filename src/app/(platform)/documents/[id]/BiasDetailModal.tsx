@@ -16,6 +16,8 @@ import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
 import { getBiasEducation, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
 import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
+import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
+import { normalizeBiasType } from '@/lib/utils/bias-normalize';
 
 const log = createClientLogger('BiasDetailModal');
 
@@ -365,6 +367,107 @@ export function BiasDetailModal({
               </div>
             </div>
           </div>
+
+          {/* Participates-in section — names the toxic-combination patterns
+              this bias is part of (e.g. anchoring_bias participates in The
+              Sunk Ship + Winner's Curse + Status Quo Lock). Sourced from
+              the canonical NAMED_PATTERNS export — single source of truth
+              with the detection engine + InsightsPageContent trending +
+              the patterns endpoint. Cascade-depth audit ship #4 lock
+              2026-05-09 evening. */}
+          {(() => {
+            const normalized = normalizeBiasType(bias.biasType);
+            const participatesIn = NAMED_PATTERNS.filter(p =>
+              p.biasTypes.includes(normalized)
+            );
+            if (participatesIn.length === 0) return null;
+            return (
+              <div
+                style={{
+                  borderTop: '1px solid var(--border-color)',
+                  padding: 'var(--spacing-lg)',
+                  background: 'rgba(217, 119, 6, 0.04)',
+                }}
+              >
+                <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
+                  <Link2 size={14} /> Compound failure patterns this bias drives
+                </h4>
+                <p
+                  style={{
+                    fontSize: 12.5,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.55,
+                    marginBottom: 12,
+                  }}
+                >
+                  When this bias co-occurs with the partner biases below, it forms a named
+                  failure pattern that historically destroys more value than the bias alone.
+                  Open the audit&rsquo;s toxic-combinations panel to see whether the pattern
+                  fired on this document.
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 8,
+                  }}
+                >
+                  {participatesIn.map(p => {
+                    const partners = p.biasTypes.filter(b => b !== normalized);
+                    const formattedPartners = partners
+                      .map(b =>
+                        b.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                      )
+                      .join(' + ');
+                    return (
+                      <div
+                        key={p.label}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: 'var(--radius-md, 8px)',
+                          border: '1px solid var(--border-color)',
+                          borderLeft: '3px solid var(--warning, #d97706)',
+                          background: 'var(--bg-card)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                            marginBottom: 2,
+                          }}
+                        >
+                          {p.label}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: 'var(--text-muted)',
+                            marginBottom: 6,
+                            fontWeight: 600,
+                          }}
+                        >
+                          With: {formattedPartners}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {p.description.length > 220
+                            ? `${p.description.slice(0, 220)}…`
+                            : p.description}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Education Section */}
           {(() => {

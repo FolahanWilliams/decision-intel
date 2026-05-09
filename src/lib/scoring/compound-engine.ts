@@ -273,6 +273,87 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
 };
 
 // ---------------------------------------------------------------------------
+// Pattern-specific interaction overrides (cascade-depth audit ship #1)
+// ---------------------------------------------------------------------------
+//
+// When a NAMED PATTERN fires on an audit (e.g. "The Synergy Mirage"
+// matched and its required context held), the constituent bias pair
+// gets amplified MORE than the generic ontology weight would imply.
+// The override map below anchors the multiplier in the empirical base
+// rate of the failure mode:
+//
+//   - Synergy Mirage (overconfidence + planning_fallacy):
+//     McKinsey + KPMG meta-analyses show 70-90% of acquisitions miss
+//     projected synergies. Default weight 1.6× → pattern weight 1.75×.
+//   - Winner's Curse (anchoring + overconfidence):
+//     Capen 1971 + Bazerman & Samuelson 1983 — auction winners
+//     systematically overpay by 60-90% of intrinsic value. Default
+//     weight 1.2-1.3× → pattern weight 1.55×.
+//   - Conglomerate Fallacy (illusion_of_validity + halo_effect):
+//     Lang & Stulz 1994 J Finance — diversification discount in
+//     conglomerates of 50-65% market cap. Default 1.3× → 1.65×.
+//   - The Yes Committee (groupthink + authority_bias):
+//     Microsoft-Nokia ($249B evaporation) + Daimler-Chrysler are the
+//     canonical anchors. Default 1.4× → 1.55×.
+//   - The Sunk Ship (sunk_cost_fallacy + anchoring_bias):
+//     Lockheed Martin reach-forward losses. Currently no default
+//     interaction weight for this pair → pattern weight 1.55×.
+//
+// The override applies ONLY when the pattern actually fired on this
+// audit (caller passes firedPatternLabels). For audits where the
+// pattern didn't fire, the existing default chain runs unchanged —
+// non-M&A docs see no DQI shift, so the platform-baseline calibration
+// stays stable.
+
+const PATTERN_PAIR_OVERRIDES: Record<
+  string,
+  { biases: [string, string]; weight: number }
+> = {
+  'The Synergy Mirage': {
+    biases: ['overconfidence_bias', 'planning_fallacy'],
+    weight: 1.75,
+  },
+  "The Winner's Curse": {
+    biases: ['anchoring_bias', 'overconfidence_bias'],
+    weight: 1.55,
+  },
+  'The Conglomerate Fallacy': {
+    biases: ['illusion_of_validity', 'halo_effect'],
+    weight: 1.65,
+  },
+  'The Yes Committee': {
+    biases: ['groupthink', 'authority_bias'],
+    weight: 1.55,
+  },
+  'The Sunk Ship': {
+    biases: ['sunk_cost_fallacy', 'anchoring_bias'],
+    weight: 1.55,
+  },
+};
+
+/**
+ * Look up pattern-specific override weight for a bias pair given the
+ * fired pattern labels. Returns undefined when no fired pattern names
+ * a matching pair — the caller should then fall through to the
+ * default priority chain.
+ */
+function getPatternOverrideWeight(
+  biasA: string,
+  biasB: string,
+  firedPatternLabels: string[] | undefined
+): number | undefined {
+  if (!firedPatternLabels || firedPatternLabels.length === 0) return undefined;
+  for (const label of firedPatternLabels) {
+    const override = PATTERN_PAIR_OVERRIDES[label];
+    if (!override) continue;
+    const [pa, pb] = override.biases;
+    const isMatch = (biasA === pa && biasB === pb) || (biasA === pb && biasB === pa);
+    if (isMatch) return override.weight;
+  }
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
 // Core scoring functions
 // ---------------------------------------------------------------------------
 
@@ -281,13 +362,15 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
  *
  * Priority chain:
  * 1. Caller-supplied weights (e.g. org-calibrated)
- * 2. Full 20×20 ontology interaction matrix (interaction-matrix.ts)
- * 3. Hardcoded DEFAULT_INTERACTION_WEIGHTS (fallback)
+ * 2. Pattern-specific overrides (when the named pattern fired on this audit)
+ * 3. Full 20×20 ontology interaction matrix (interaction-matrix.ts)
+ * 4. Hardcoded DEFAULT_INTERACTION_WEIGHTS (fallback)
  */
 function getInteractionWeight(
   biasA: string,
   biasB: string,
-  interactionWeights?: Record<string, number>
+  interactionWeights?: Record<string, number>,
+  firedPatternLabels?: string[]
 ): number {
   // 1. Caller-supplied overrides take priority
   if (interactionWeights) {
@@ -297,11 +380,15 @@ function getInteractionWeight(
     if (callerWeight !== undefined) return callerWeight;
   }
 
-  // 2. Full ontology matrix (256 cells, research-backed)
+  // 2. Pattern-specific overrides — only when the named pattern fired
+  const patternWeight = getPatternOverrideWeight(biasA, biasB, firedPatternLabels);
+  if (patternWeight !== undefined) return patternWeight;
+
+  // 3. Full ontology matrix (256 cells, research-backed)
   const matrixWeight = getMatrixWeight(biasA, biasB);
   if (matrixWeight !== 1.0) return matrixWeight;
 
-  // 3. Hardcoded defaults
+  // 4. Hardcoded defaults
   const keyAB = `${biasA}::${biasB}`;
   const keyBA = `${biasB}::${biasA}`;
   return DEFAULT_INTERACTION_WEIGHTS[keyAB] ?? DEFAULT_INTERACTION_WEIGHTS[keyBA] ?? 1.0;
@@ -315,7 +402,8 @@ function computeBiasCompoundSeverity(
   bias: DetectedBias,
   allBiases: DetectedBias[],
   interactionWeights?: Record<string, number>,
-  biologicalSignals?: { winnerEffect: boolean; stressSignals: boolean }
+  biologicalSignals?: { winnerEffect: boolean; stressSignals: boolean },
+  firedPatternLabels?: string[]
 ): BiasCompoundScore {
   let rawSeverity = SEVERITY_NUMERIC[bias.severity] ?? 8;
 
@@ -332,7 +420,12 @@ function computeBiasCompoundSeverity(
 
   for (const other of allBiases) {
     if (other.type === bias.type) continue;
-    const weight = getInteractionWeight(bias.type, other.type, interactionWeights);
+    const weight = getInteractionWeight(
+      bias.type,
+      other.type,
+      interactionWeights,
+      firedPatternLabels
+    );
     if (weight > 1.05 || weight < 0.95) {
       // Non-trivial interaction — apply confidence-weighted adjustment
       const effectiveWeight = 1.0 + (weight - 1.0) * other.confidence;
@@ -486,6 +579,17 @@ export function computeCompoundScore(
   options?: {
     interactionWeights?: Record<string, number>;
     orgCalibration?: Record<string, number>; // per-bias-type calibrated weights
+    /**
+     * Named patterns that fired on this audit (e.g. ["The Synergy Mirage",
+     * "The Winner's Curse"]). When present, the constituent bias-pair
+     * interaction weights get amplified per PATTERN_PAIR_OVERRIDES — the
+     * empirical base rate of each named failure mode is higher than the
+     * generic ontology pair weight, so the compound severity for fired
+     * patterns lifts proportionally. When absent (every legacy caller),
+     * the existing default chain runs unchanged. Cascade-depth audit
+     * ship #1 — locked 2026-05-09 evening.
+     */
+    firedPatternLabels?: string[];
   }
 ): CompoundScore {
   const adjustments: ScoreAdjustment[] = [];
@@ -500,7 +604,13 @@ export function computeCompoundScore(
 
   // 2. Compute compound severity for each bias
   const biasScores = detectedBiases.map(b =>
-    computeBiasCompoundSeverity(b, detectedBiases, options?.interactionWeights, biologicalSignals)
+    computeBiasCompoundSeverity(
+      b,
+      detectedBiases,
+      options?.interactionWeights,
+      biologicalSignals,
+      options?.firedPatternLabels
+    )
   );
 
   // 3. Compute total compound penalty
@@ -513,6 +623,31 @@ export function computeCompoundScore(
     description: `${biasScores.filter(b => b.interactionMultiplier > 1.05).length} amplifying bias interactions`,
     delta: -(totalCompoundPenalty - totalRawPenalty) * 0.3, // scaled impact
   });
+
+  // Surface fired named-pattern amplifications as their own adjustment
+  // line so the audit log + DPR cover meta strip can name the pattern
+  // that drove the compound penalty rather than burying it in a generic
+  // "amplifying interactions" count. Cascade-depth audit ship #1 lock
+  // 2026-05-09 evening.
+  if (options?.firedPatternLabels && options.firedPatternLabels.length > 0) {
+    const detectedTypes = new Set(detectedBiases.map(b => b.type));
+    const matchedPatterns = options.firedPatternLabels.filter(label => {
+      const override = PATTERN_PAIR_OVERRIDES[label];
+      if (!override) return false;
+      const [pa, pb] = override.biases;
+      return detectedTypes.has(pa) && detectedTypes.has(pb);
+    });
+    if (matchedPatterns.length > 0) {
+      adjustments.push({
+        source: 'named_pattern_amplification',
+        description: `${matchedPatterns.length} named pattern(s) fired with calibrated amplification: ${matchedPatterns.join(', ')}`,
+        // Amplification effect is already baked into compoundMultiplier
+        // via getInteractionWeight; this line is informational, not a
+        // separate delta.
+        delta: 0,
+      });
+    }
+  }
 
   // 4. Apply org-specific calibration if available
   if (options?.orgCalibration) {

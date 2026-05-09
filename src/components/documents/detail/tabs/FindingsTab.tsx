@@ -46,6 +46,30 @@ export interface FindingsTabToxicCombination {
   edges: ToxicCombinationEdge[];
 }
 
+/**
+ * Synergy defensibility summary — supplied by the parent when the
+ * uploaded document is a synergy_model and the parser extracted
+ * structured data (or the inline text marker survives in
+ * Document.content). Surface (cascade-depth audit ship #2 lock
+ * 2026-05-09 evening) shows per-claim verdicts + portfolio summary
+ * with the BCG/McKinsey base-rate framing the DPR cover already
+ * carries on §4.10.
+ */
+export interface FindingsTabSynergyDefensibility {
+  detected: boolean;
+  confidence: 'high' | 'medium' | 'low' | 'none';
+  totalClaims: number;
+  fullyDefendedPct: number;
+  portfolioSummary: string;
+  topClaims: Array<{
+    label: string;
+    type: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    score: number;
+    verdict: string;
+  }>;
+}
+
 export interface FindingsTabProps {
   biases: BiasInstance[];
   /** R²F protected pillar items (mapped per-document). */
@@ -56,6 +80,13 @@ export interface FindingsTabProps {
   r2fSummary?: string;
   /** Detected toxic combinations (fires when reinforcing biases cluster). */
   toxicCombinations?: FindingsTabToxicCombination[];
+  /**
+   * Synergy defensibility summary (synergy_model uploads only). Renders a
+   * dedicated section between toxic combinations and the bias catalogue
+   * with the per-claim verdicts the DPR cover carries on §4.10. Omit
+   * (or pass null) on non-synergy_model audits.
+   */
+  synergyDefensibility?: FindingsTabSynergyDefensibility | null;
   /** Active bias id from the linked-PDF event bus — drives selected state. */
   activeBiasId?: string | null;
   /** Click handler — when a bias card is clicked, parent jumps the PDF to it. */
@@ -71,6 +102,7 @@ export function FindingsTab(props: FindingsTabProps) {
     r2fSuppressed,
     r2fSummary,
     toxicCombinations = [],
+    synergyDefensibility,
     activeBiasId,
     onBiasClick,
     taxonomyIdByType,
@@ -126,6 +158,14 @@ export function FindingsTab(props: FindingsTabProps) {
             />
           ))}
         </div>
+      )}
+
+      {/* Synergy defensibility — synergy_model uploads only. Mirrors the
+          DPR cover §4.10 strip but adds the per-claim verdicts (the cover
+          can only fit a top-N summary). Cascade-depth audit ship #2 lock
+          2026-05-09 evening. */}
+      {synergyDefensibility?.detected && synergyDefensibility.totalClaims > 0 && (
+        <SynergyDefensibilityPanel summary={synergyDefensibility} />
       )}
 
       {/* Per-bias catalogue */}
@@ -381,6 +421,202 @@ function SectionEyebrow({ label }: { label: string }) {
           background: 'var(--border-color)',
         }}
       />
+    </div>
+  );
+}
+
+// ─── Synergy Defensibility Panel ──────────────────────────────────────────────
+// Cascade-depth audit ship #2 (locked 2026-05-09 evening). Renders for
+// synergy_model uploads only — the parent decides whether to pass the
+// summary based on documentType. Mirrors the DPR cover §4.10 vocabulary
+// but adds the per-claim breakdown (the cover can only fit a top-N
+// summary; the doc-detail page has the room).
+
+const SYNERGY_SEVERITY_HEX: Record<'critical' | 'high' | 'medium' | 'low', string> = {
+  critical: 'var(--severity-critical, #7F1D1D)',
+  high: 'var(--severity-high, #DC2626)',
+  medium: 'var(--warning, #D97706)',
+  low: 'var(--info, #2563EB)',
+};
+
+function SynergyDefensibilityPanel({ summary }: { summary: FindingsTabSynergyDefensibility }) {
+  const criticalCount = summary.topClaims.filter(c => c.severity === 'critical').length;
+  const highCount = summary.topClaims.filter(c => c.severity === 'high').length;
+  let portfolioBand: 'critical' | 'high' | 'medium' | 'low';
+  if (criticalCount > 0) portfolioBand = 'critical';
+  else if (summary.fullyDefendedPct < 50) portfolioBand = 'high';
+  else if (summary.fullyDefendedPct < 70) portfolioBand = 'medium';
+  else portfolioBand = 'low';
+  const accent = SYNERGY_SEVERITY_HEX[portfolioBand];
+
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <SectionEyebrow label="Synergy defensibility" />
+      <div
+        style={{
+          padding: '14px 16px',
+          borderRadius: 'var(--radius-md, 8px)',
+          border: '1px solid var(--border-color)',
+          borderLeft: `3px solid ${accent}`,
+          background: 'var(--bg-card)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'baseline',
+            gap: 12,
+            marginBottom: 8,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: accent,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
+            }}
+          >
+            {summary.fullyDefendedPct}%
+          </div>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+                marginBottom: 2,
+              }}
+            >
+              Portfolio defensibility — {summary.totalClaims} claim
+              {summary.totalClaims === 1 ? '' : 's'} extracted
+            </div>
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+              }}
+            >
+              {summary.portfolioSummary}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            lineHeight: 1.55,
+            padding: '8px 10px',
+            background: 'var(--bg-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          Per BCG / McKinsey integration-best-practices, every synergy claim should carry a
+          named operational mechanism, an accountable executive, and a measurable 90-day
+          milestone. Revenue synergies historically realise at 30-50% of projection; cost
+          synergies at 60-80%. Apply the appropriate base-rate discount to under-defended
+          claims before underwriting.
+        </div>
+      </div>
+
+      {summary.topClaims.length > 0 && (
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}
+        >
+          {summary.topClaims.slice(0, 8).map((c, i) => (
+            <li
+              key={i}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: '1px solid var(--border-color)',
+                borderLeft: `3px solid ${SYNERGY_SEVERITY_HEX[c.severity]}`,
+                background: 'var(--bg-card)',
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: 12,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {c.label}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                  {c.type} · {c.verdict}
+                </div>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 8,
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  {c.score}/3
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    color: SYNERGY_SEVERITY_HEX[c.severity],
+                  }}
+                >
+                  {c.severity}
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {(criticalCount > 0 || highCount > 0) && (
+        <div
+          style={{
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            padding: '8px 12px',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-md, 8px)',
+          }}
+        >
+          <strong style={{ color: 'var(--text-secondary)' }}>What to do:</strong>{' '}
+          {criticalCount > 0
+            ? `Synergy Mirage fires on ${criticalCount} critical claim${criticalCount === 1 ? '' : 's'}. Flag to the deal committee before next IC; require a named owner + 90-day milestone for each.`
+            : `${highCount} claim${highCount === 1 ? '' : 's'} at high severity. Tighten before IC: name the operational mechanism that delivers each synergy.`}
+        </div>
+      )}
     </div>
   );
 }

@@ -95,7 +95,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // `res.json().catch(() => null)` body-parse on the lazy DQI fetch in
 // InlineAnalysisResultCard — the canonical req.json() body-parse
 // exception class CLAUDE.md explicitly lists as legitimate.
-const SILENT_CATCH_BASELINE = 154;
+// 154 → 155: Cascade-depth audit ship #5 (2026-05-09 evening) added a
+// `res.json().catch(() => null)` body-parse on the toxic-combination
+// trending card fetch in ToxicCombinationTrendingCard — same canonical
+// req.json() body-parse exception class.
+const SILENT_CATCH_BASELINE = 155;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
