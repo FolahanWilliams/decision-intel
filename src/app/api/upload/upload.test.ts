@@ -51,8 +51,16 @@ vi.mock('@/lib/utils/plan-limits', () => ({
 }));
 
 const mockParseFile = vi.fn();
+const mockExtractTypeAwareStructuredData = vi.fn();
 vi.mock('@/lib/utils/file-parser', () => ({
   parseFile: (...args: unknown[]) => mockParseFile(...args),
+  // Type-aware structured-data extraction was added to the upload route
+  // in the 2026-05-09 synergy-parser ship. The test mock factory replaces
+  // the whole module, so the export must be stubbed here too — otherwise
+  // the call site throws and every upload test 400s. Default returns
+  // null (no structured parser matched / not applicable).
+  extractTypeAwareStructuredData: (...args: unknown[]) =>
+    mockExtractTypeAwareStructuredData(...args),
 }));
 
 const mockDocCreate = vi.fn();
@@ -119,6 +127,9 @@ beforeEach(() => {
   });
   mockDocFindFirst.mockResolvedValue(null); // no cache hit
   mockSupabaseUpload.mockResolvedValue({ error: null });
+  // Default: no structured-data extraction matched (covers every test
+  // except the synergy-model upload path, which can override per-test).
+  mockExtractTypeAwareStructuredData.mockResolvedValue(null);
   mockHeaders.clear();
   mockHeaders.set('x-forwarded-for', '127.0.0.1');
 });
