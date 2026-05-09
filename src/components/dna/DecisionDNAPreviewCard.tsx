@@ -236,7 +236,7 @@ export function DecisionDNAPreviewCard() {
             </span>
             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
             <Link
-              href="/dashboard/decision-dna"
+              href="/dashboard/analytics?view=intelligence#dna"
               style={{
                 marginLeft: 'auto',
                 fontSize: 11,
@@ -326,7 +326,7 @@ export function DecisionDNAPreviewCard() {
           </span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>· personal calibration</span>
           <Link
-            href="/dashboard/decision-dna"
+            href="/dashboard/analytics?view=intelligence#dna"
             style={{
               marginLeft: 'auto',
               fontSize: 12,

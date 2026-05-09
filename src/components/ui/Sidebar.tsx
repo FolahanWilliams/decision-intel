@@ -20,11 +20,8 @@ import {
   ChevronRight as ChevronR,
   PenLine,
   Briefcase,
-  BookTemplate,
   Share2,
   Repeat,
-  ShieldCheck,
-  Brain,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -432,8 +429,8 @@ export default function Sidebar() {
           />
 
           {/* Reflect — what the CSO learns from last quarter. Analytics,
-              graph, outcome loop, playbooks. Collapsible — these are the
-              deeper surfaces you dive into, not the daily rituals. */}
+              graph, outcome loop. Collapsible — these are the deeper
+              surfaces you dive into, not the daily rituals. */}
           <CollapsibleSection
             label="Reflect"
             icon={<ReflectGlyph />}
@@ -478,38 +475,13 @@ export default function Sidebar() {
                   />
                 </>
               )}
-            {/* Note: "Decisions" (packages) lived here historically;
-               moved to the Decisions cluster above 2026-05-06 alongside
-               Documents + Projects (deals) so all three list surfaces
-               share one parent. Decision DNA stays here — it's the
-               personal-calibration surface, not a list of decisions. */}
-            <NavItem
-              href="/dashboard/decision-dna"
-              icon={<Brain size={18} />}
-              label="Decision DNA"
-              description="Your personal calibration — biases, agents, outcomes over time"
-              active={pathname.startsWith('/dashboard/decision-dna')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
-              href="/dashboard/playbooks"
-              icon={<BookTemplate size={18} />}
-              label="Playbooks"
-              description="Pre-configured analysis templates"
-              active={pathname.startsWith('/dashboard/playbooks')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
-              href="/dashboard/provenance"
-              icon={<ShieldCheck size={18} />}
-              label="Provenance"
-              description="Archive of hashed, tamper-evident Decision Provenance Records"
-              active={pathname.startsWith('/dashboard/provenance')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
+            {/* Phase A consolidation 2026-05-09 evening — Decision DNA folded
+               into Analytics → Intelligence (it's a personal-calibration
+               surface, structurally identical to Bias Genome / Explainability
+               / Structural Exposure already living there). Playbooks deleted
+               (orphaned: DecisionScorecard + ActOnThisPanel were never
+               mounted in any production surface). Provenance deleted
+               (DPR archive duplicate of per-document export). */}
           </CollapsibleSection>
 
           {/* Together — how the team operates. Meetings, decision rooms,

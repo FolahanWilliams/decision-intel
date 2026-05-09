@@ -161,13 +161,6 @@ export function AuditsPageContent() {
           </div>
           <div className="flex items-center gap-sm">
             <Link
-              href="/dashboard/cognitive-audits/effectiveness"
-              className="btn btn-secondary"
-              style={{ fontSize: '13px' }}
-            >
-              Effectiveness
-            </Link>
-            <Link
               href="/dashboard/cognitive-audits/submit"
               className="btn btn-primary"
               style={{ fontSize: '13px' }}

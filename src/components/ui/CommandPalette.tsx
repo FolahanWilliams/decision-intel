@@ -241,7 +241,7 @@ export function CommandPalette() {
         label: 'Decision DNA',
         description: 'Personal calibration — biases, agents, outcomes over time',
         icon: <BrainCircuit size={16} />,
-        action: () => navigate('/dashboard/decision-dna'),
+        action: () => navigate('/dashboard/analytics?view=intelligence#dna'),
         keywords: [
           'dna',
           'calibration',
@@ -300,14 +300,6 @@ export function CommandPalette() {
         icon: <Users size={16} />,
         action: () => navigate('/dashboard/meetings?tab=rooms'),
         keywords: ['rooms', 'blind', 'prior', 'voting', 'committee'],
-      },
-      {
-        id: 'playbooks',
-        label: 'Playbooks',
-        description: 'Pre-configured analysis templates',
-        icon: <BookOpen size={16} />,
-        action: () => navigate('/dashboard/playbooks'),
-        keywords: ['templates', 'playbook', 'framework'],
       },
       {
         id: 'decision-log',

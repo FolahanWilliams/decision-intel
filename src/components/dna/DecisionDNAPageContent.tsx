@@ -172,10 +172,7 @@ function StatCard({
 
 function LoadingSkeleton() {
   return (
-    <div
-      className="container"
-      style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}
-    >
+    <div>
       <div
         style={{
           marginBottom: 'var(--spacing-xl)',
@@ -262,9 +259,7 @@ export function DecisionDNAPageContent() {
   if (error) {
     return (
       <div
-        className="container"
         style={{
-          paddingTop: 'var(--spacing-2xl)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -284,11 +279,7 @@ export function DecisionDNAPageContent() {
   // Empty state
   if (dna.totals.totalDecisions === 0 && !dna.decisionStyle) {
     return (
-      <div
-        className="container"
-        style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}
-      >
-        {/* Breadcrumbs handled by parent */}
+      <div>
         <div
           className="card card-glow animate-slide-up"
           style={{
@@ -438,12 +429,13 @@ export function DecisionDNAPageContent() {
 
   const AREA_COLORS = ['#3b82f6', '#ef4444', '#8b5cf6', '#22c55e', '#f59e0b'];
 
+  // Folded into Analytics → Intelligence (Phase B 2026-05-09 evening).
+  // Component is now a SECTION-style content block, not a self-contained
+  // page — caller provides container styling + section heading. The
+  // standalone H1 + page-container styling have been removed; the
+  // outcome-gate progress banner stays since it's content-level.
   return (
-    <div
-      className="container"
-      style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}
-    >
-      {/* Breadcrumbs handled by parent */}
+    <div>
       <BackToTop />
 
       {/* v3.2 Outcome-Gated Unlock Progress Banner (locked 2026-04-30 GTM Plan v3.2 Round 3).
@@ -513,33 +505,15 @@ export function DecisionDNAPageContent() {
         </div>
       )}
 
-      {/* Header */}
+      {/* Refresh affordance — H1 + description live on the Analytics
+          Intelligence section heading now (Phase B 2026-05-09 evening). */}
       <div
-        className="animate-slide-up"
         style={{
-          marginBottom: 'var(--spacing-xl)',
-          paddingBottom: 'var(--spacing-md)',
-          borderBottom: '1px solid var(--border-color)',
+          marginBottom: 'var(--spacing-md)',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          justifyContent: 'flex-end',
         }}
       >
-        <div>
-          <h1
-            style={{
-              fontSize: '22px',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              marginBottom: 4,
-            }}
-          >
-            Decision DNA
-          </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-            Your unique decision profile — how you decide, where you excel, and what to watch.
-          </p>
-        </div>
         <button
           onClick={handleRefresh}
           disabled={isRefreshing}

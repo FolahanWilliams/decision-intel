@@ -58,7 +58,6 @@ import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { SampleDataBanner } from '@/components/ui/SampleDataBanner';
 import { SampleBadge } from '@/components/ui/SampleBadge';
-import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
 import { ContainersWidget } from '@/components/dashboard/ContainersWidget';
@@ -1121,7 +1120,8 @@ export default function Dashboard() {
       {/* Decision DNA preview — surfaces the personal-calibration moat as
           a 3-stat row (top-triggered bias / belief delta / follow-success).
           Renders a discovery card when the user has no data yet. The full
-          surface lives at /dashboard/decision-dna. */}
+          surface lives at /dashboard/analytics?view=intelligence#dna
+          (folded in Phase B 2026-05-09 evening). */}
       <DecisionDNAPreviewCard />
 
       {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
@@ -1218,9 +1218,11 @@ export default function Dashboard() {
         <ContainersWidget />
       </ErrorBoundary>
 
-      <ErrorBoundary sectionName="Journal">
-        <JournalWidget />
-      </ErrorBoundary>
+      {/* JournalWidget removed Phase C 2026-05-09 evening — redundant
+          with the unified /dashboard/decision-log feed (journal entries
+          + cognitive audits in one surface). Sidebar surfaces the link
+          one click away; the dashboard widget added noise without new
+          signal. */}
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (

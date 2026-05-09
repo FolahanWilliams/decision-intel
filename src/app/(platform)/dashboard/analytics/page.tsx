@@ -13,6 +13,7 @@ import {
   BookOpen,
   FlaskConical,
   Layers,
+  Brain,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -67,6 +68,15 @@ const CalibrationContent = lazy(() =>
 const ExperimentsContent = lazy(() =>
   import('@/components/experiments/ExperimentsContent').then(m => ({
     default: m.ExperimentsContent,
+  }))
+);
+// Phase B 2026-05-09 evening — Decision DNA folded from a standalone
+// /dashboard/decision-dna route into Analytics → Intelligence as a
+// section. The standalone route now 308-redirects to
+// /dashboard/analytics?view=intelligence#dna.
+const DecisionDNAPageContent = lazy(() =>
+  import('@/components/dna/DecisionDNAPageContent').then(m => ({
+    default: m.DecisionDNAPageContent,
   }))
 );
 
@@ -345,13 +355,25 @@ function AnalyticsInner() {
             )}
             {view === 'intelligence' && (
               <>
+                {/* Decision DNA — your personal calibration. Folded from
+                    the deleted /dashboard/decision-dna route into
+                    Intelligence (Phase B 2026-05-09 evening) because
+                    it's structurally a personal-calibration surface,
+                    same family as Bias Genome contribution + Decision
+                    Intelligence + Explainability. Lives at the top so
+                    a returning CSO sees their own pattern first, then
+                    the cross-org genome below. */}
+                <section id="dna" style={{ scrollMarginTop: 80 }}>
+                  <SectionHeading icon={<Brain size={13} />}>
+                    Decision DNA · Personal Calibration
+                  </SectionHeading>
+                  <DecisionDNAPageContent />
+                </section>
+
                 {/* Bias Genome contribution surfaces the cross-org data
                     network effect to the contributor (A3 deep, locked
                     2026-04-27). Without this, the genome's compounding
-                    is invisible to the team funding it. Lives at the
-                    top of /intelligence so it's the first thing a CSO
-                    sees when she wants to know "is this getting smarter
-                    for us?" */}
+                    is invisible to the team funding it. */}
                 <section>
                   <SectionHeading icon={<Network size={13} />}>
                     Bias Genome · Your Contribution

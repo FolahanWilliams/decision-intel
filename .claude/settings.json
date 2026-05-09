@@ -25,7 +25,11 @@
       "Bash(break)",
       "Bash(pdfimages -list public/dpr-sample-wework.pdf)",
       "Bash(bash .husky/pre-push)",
-      "Bash(xxd)"
+      "Bash(xxd)",
+      "Bash(rm /Users/folahan/decision-intel/src/app/api/playbooks/invoke/\\\\[id\\\\]/route.ts)",
+      "Bash(rmdir \"/Users/folahan/decision-intel/src/app/api/playbooks/invoke/[id]\")",
+      "Bash(rm /Users/folahan/decision-intel/src/app/api/playbooks/\\\\[id\\\\]/route.ts)",
+      "Bash(rmdir \"/Users/folahan/decision-intel/src/app/api/playbooks/[id]\")"
     ],
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",

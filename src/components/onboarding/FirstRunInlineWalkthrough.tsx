@@ -29,7 +29,6 @@ import {
   Loader2,
   X,
   Play,
-  ShieldCheck,
 } from 'lucide-react';
 import { bundlesForRole, type SampleBundle, type SampleRole } from '@/lib/data/sample-bundles';
 
@@ -356,22 +355,6 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
         >
           Explore the full case-study library
           <ArrowRight size={11} />
-        </Link>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>·</span>
-        <Link
-          href="/dashboard/provenance"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            color: 'var(--text-secondary)',
-            fontSize: 12,
-            fontWeight: 600,
-            textDecoration: 'none',
-          }}
-        >
-          <ShieldCheck size={11} />
-          Where Decision Provenance Records (hashed + tamper-evident) land
         </Link>
       </div>
     </div>

@@ -8,7 +8,7 @@ import {
   Clock,
   Trash2,
   Loader2,
-  ChevronRight,
+  ArrowUp,
   Brain,
   CheckCircle2,
   Menu,
@@ -68,37 +68,20 @@ const STARTER_DECISION_PROMPTS: Record<EmptyStateRole, string[]> = {
   ],
 };
 
-const STARTER_DECISION_QUESTIONS: Record<EmptyStateRole, string[]> = {
-  cso: [
-    'Should we pivot the strategic plan based on Q3 outcomes?',
-    'Is this market-entry recommendation IC-ready?',
-    'How should we handle the dissent on the capital-allocation decision?',
-    'Should we expand into the new market or defer another quarter?',
-  ],
-  ma: [
-    'Should we proceed to LOI on Project Phoenix given the diligence findings?',
-    'Is the FX risk on this deal tolerable for our fund mandate?',
-    'How should we structure the earn-out given the seller’s revenue concentration?',
-    'Should we pass on this deal or surface conditions to the IC?',
-  ],
-  pe_vc: [
-    'Should we lead the round or wait for a co-investor signal?',
-    'Is the founder-CEO transition risk priced into our entry valuation?',
-    'How should we structure governance rights given the syndicate composition?',
-    'Should we approve at this price or counter with structured terms?',
-  ],
-  bizops: [
-    'Should we recommit to the OKR or pivot the team?',
-    'Is the vendor risk acceptable given the SLA carve-outs?',
-    'How should we sequence the migration to keep operational risk bounded?',
-    'Should we approve the budget reallocation or defer to next quarter?',
-  ],
-  other: [
-    'Should we pivot our product strategy?',
-    'How should we handle this key hire decision?',
-    'Is this partnership worth pursuing?',
-    'Should we expand to a new market now?',
-  ],
+// STARTER_DECISION_QUESTIONS removed Phase E 2026-05-09 evening — was
+// only consumed by the now-deleted prompt-input intermediate mode.
+// Composer-first flow uses STARTER_DECISION_PROMPTS only.
+
+const kbdStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '1px 5px',
+  fontSize: 10,
+  fontFamily: 'inherit',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderRadius: 4,
+  color: 'var(--text-secondary)',
+  margin: '0 1px',
 };
 
 interface SessionSummary {
@@ -113,8 +96,7 @@ interface SessionSummary {
 export function CopilotPageContent() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
-  const [showPromptInput, setShowPromptInput] = useState(false);
-  const [promptInput, setPromptInput] = useState('');
+  const [composerInput, setComposerInput] = useState('');
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
 
@@ -207,18 +189,31 @@ export function CopilotPageContent() {
     }
   }, [initialDocumentId, analyzedDocs, setPinnedDocumentId, searchParams, router]);
 
+  // Phase E refactor 2026-05-09 evening — composer-first flow.
+  // Typing into the composer + pressing Enter (or clicking the arrow)
+  // IS the start-a-session action. No intermediate "What decision are
+  // you working on?" mode. Sidebar's "+ New Decision" clears the active
+  // session so the composer surfaces ready for the next prompt.
   const handleNewDecision = () => {
-    setShowPromptInput(true);
-    setPromptInput('');
+    clearMessages();
+    setComposerInput('');
   };
 
-  const handleStartSession = () => {
-    if (promptInput.trim()) {
-      startNewSession(promptInput.trim());
-      setShowPromptInput(false);
-      // Send the decision prompt as the first message too
-      sendMessage(promptInput.trim());
+  const handleSubmitComposer = () => {
+    const text = composerInput.trim();
+    if (!text) return;
+    if (!sessionId) {
+      startNewSession(text);
     }
+    sendMessage(text);
+    setComposerInput('');
+  };
+
+  const handleStarterClick = (prompt: string) => {
+    if (!sessionId) {
+      startNewSession(prompt);
+    }
+    sendMessage(prompt);
   };
 
   const handleDeleteSession = async (id: string) => {
@@ -246,7 +241,7 @@ export function CopilotPageContent() {
     return result;
   };
 
-  const hasActiveSession = messages.length > 0 || showPromptInput;
+  const hasActiveSession = messages.length > 0;
   const currentSession = sessions.find(s => s.id === sessionId);
   const canResolve = sessionId && messages.length > 0 && currentSession?.status !== 'resolved';
 
@@ -428,98 +423,9 @@ export function CopilotPageContent() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {showPromptInput ? (
-          /* New Decision Prompt Input */
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-2xl space-y-6">
-              <div className="text-center space-y-2">
-                <div
-                  className="mx-auto w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{
-                    background: 'rgba(22, 163, 74, 0.10)',
-                    border: '1px solid rgba(22, 163, 74, 0.22)',
-                  }}
-                >
-                  <Sparkles className="h-6 w-6" style={{ color: 'var(--accent-primary)' }} />
-                </div>
-                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  What decision are you working on?
-                </h2>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Describe the decision, question, or problem you&apos;re thinking through. Your
-                  copilot agents will help you structure, challenge, and refine it.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <textarea
-                  value={promptInput}
-                  onChange={e => setPromptInput(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleStartSession();
-                    }
-                  }}
-                  placeholder="e.g., Should we proceed with the acquisition at the proposed $200M valuation, or push for a lower price given the integration risks?"
-                  rows={4}
-                  className="ask-input w-full rounded-lg border px-4 py-3 text-sm focus:outline-none"
-                  style={{
-                    background: 'var(--bg-card)',
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-primary)',
-                  }}
-                  onFocus={e => {
-                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.15)';
-                  }}
-                  onBlur={e => {
-                    e.currentTarget.style.borderColor = 'var(--border-color)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                  autoFocus
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setShowPromptInput(false)}
-                    className="rounded-lg px-4 py-2 text-sm transition-colors"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleStartSession}
-                    disabled={!promptInput.trim()}
-                    className="btn btn-primary"
-                    style={{ gap: 8 }}
-                  >
-                    Start Session
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {STARTER_DECISION_QUESTIONS[effectiveRole].map(example => (
-                  <button
-                    key={example}
-                    onClick={() => setPromptInput(example)}
-                    className="rounded-lg border p-3 text-left text-xs transition-colors ask-card"
-                    style={{
-                      background: 'var(--bg-card)',
-                      borderColor: 'var(--border-color)',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    {example}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : hasActiveSession ? (
-          /* Active Copilot Chat */
+      <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
+        {hasActiveSession ? (
+          /* Active Copilot Chat — composer lives inside CopilotChat */
           <CopilotChat
             messages={messages}
             isStreaming={isStreaming}
@@ -535,65 +441,203 @@ export function CopilotPageContent() {
             onUnpinDoc={() => setPinnedDocumentId(null)}
           />
         ) : (
-          /* Empty State with starter questions */
-          <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 overflow-y-auto">
-            <div className="w-full max-w-lg space-y-5">
-              <div className="text-center space-y-3">
-                <div
-                  className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{
-                    background: 'rgba(22, 163, 74, 0.10)',
-                    border: '1px solid rgba(22, 163, 74, 0.22)',
-                  }}
-                >
-                  <Sparkles className="h-6 w-6" style={{ color: 'var(--accent-primary)' }} />
-                </div>
-                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Your AI Advisory Team
-                </h2>
-                <p
-                  className="text-sm leading-relaxed mx-auto"
-                  style={{ color: 'var(--text-muted)', maxWidth: 380 }}
-                >
-                  Start a structured decision session, or ask a question about your documents. Pin a
-                  document in the sidebar for focused Q&amp;A with source citations.
-                </p>
-              </div>
-
-              <div className="flex justify-center">
-                <button onClick={handleNewDecision} className="btn btn-primary" style={{ gap: 8 }}>
-                  <Plus className="h-4 w-4" />
-                  New Decision Session
-                </button>
-              </div>
-
-              {/* Starter questions */}
+          // Empty State — composer-first, single column. Phase E refactor
+          // 2026-05-09 evening: dropped the dual-CTA pattern (separate
+          // "+ New Decision Session" hero button + "Or try asking"
+          // starters + dangling document chips) and the intermediate
+          // prompt-input mode. Now the composer is the single starting
+          // point — type, press Enter, session opens with that prompt
+          // as the first turn. Starter chips are a quick-fire alt.
+          <div
+            className="flex-1 flex flex-col items-center justify-center"
+            style={{
+              padding: '24px 24px 40px',
+              overflowY: 'auto',
+            }}
+          >
+            <div className="w-full" style={{ maxWidth: 720 }}>
+              {/* Compact welcome row — single line, not a hero */}
               <div
-                className="rounded-xl border p-4 space-y-3"
                 style={{
-                  background: 'var(--bg-card)',
-                  borderColor: 'var(--border-color)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 20,
+                  paddingBottom: 16,
+                  borderBottom: '1px solid var(--border-color)',
                 }}
               >
-                <p
-                  className="text-[10px] uppercase tracking-wider font-semibold text-center"
-                  style={{ color: 'var(--text-muted)' }}
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(22, 163, 74, 0.10)',
+                    border: '1px solid rgba(22, 163, 74, 0.22)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
                 >
-                  Or try asking
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Sparkles size={16} style={{ color: 'var(--accent-primary)' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h2
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      margin: 0,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    Ask, audit, or stress-test a decision.
+                  </h2>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: 'var(--text-muted)',
+                      margin: '2px 0 0 0',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    Structured decisions, document Q&amp;A with citations, cross-portfolio pattern
+                    recall.
+                    {pinnedDoc && (
+                      <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+                        {' '}
+                        · Pinned: {pinnedDoc.filename}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Composer — the primary entry point */}
+              <div
+                style={{
+                  position: 'relative',
+                  marginBottom: 20,
+                }}
+              >
+                <textarea
+                  value={composerInput}
+                  onChange={e => setComposerInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmitComposer();
+                    }
+                  }}
+                  placeholder={
+                    pinnedDoc
+                      ? `Ask anything about ${pinnedDoc.filename}, or pose a fresh decision…`
+                      : 'Pose a decision, paste a memo passage, or ask about a flagged bias…'
+                  }
+                  rows={3}
+                  autoFocus
+                  className="ask-input"
+                  style={{
+                    width: '100%',
+                    padding: '14px 56px 14px 16px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-lg)',
+                    color: 'var(--text-primary)',
+                    fontSize: 14,
+                    fontFamily: 'inherit',
+                    lineHeight: 1.5,
+                    resize: 'none',
+                    outline: 'none',
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
+                  }}
+                  onFocus={e => {
+                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.12)';
+                  }}
+                  onBlur={e => {
+                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                />
+                <button
+                  onClick={handleSubmitComposer}
+                  disabled={!composerInput.trim()}
+                  aria-label="Start session"
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    bottom: 10,
+                    width: 32,
+                    height: 32,
+                    borderRadius: 'var(--radius-md)',
+                    background: composerInput.trim()
+                      ? 'var(--accent-primary)'
+                      : 'var(--bg-elevated)',
+                    border: 'none',
+                    color: composerInput.trim() ? '#fff' : 'var(--text-muted)',
+                    cursor: composerInput.trim() ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.15s',
+                  }}
+                >
+                  <ArrowUp size={16} />
+                </button>
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 16,
+                    bottom: -22,
+                    fontSize: 10.5,
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Press <kbd style={kbdStyle}>↵</kbd> to start · <kbd style={kbdStyle}>Shift</kbd>+
+                  <kbd style={kbdStyle}>↵</kbd> for newline
+                </div>
+              </div>
+
+              {/* Starter chips — 4 role-tuned prompts. Click fires a
+                  session immediately, no intermediate confirmation. */}
+              <div style={{ marginTop: 32 }}>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    letterSpacing: '0.10em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                    marginBottom: 10,
+                  }}
+                >
+                  Quick starters · {effectiveRole === 'other' ? 'general' : effectiveRole}
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: 8,
+                  }}
+                >
                   {STARTER_DECISION_PROMPTS[effectiveRole].map(q => (
                     <button
                       key={q}
-                      onClick={() => {
-                        startNewSession(q);
-                        sendMessage(q);
-                      }}
-                      className="rounded-lg border p-3 text-left text-xs transition-colors ask-card"
+                      onClick={() => handleStarterClick(q)}
+                      className="ask-card"
                       style={{
-                        background: 'var(--bg-secondary)',
-                        borderColor: 'var(--border-color)',
+                        textAlign: 'left',
+                        padding: '12px 14px',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
                         color: 'var(--text-secondary)',
+                        fontSize: 12.5,
+                        lineHeight: 1.45,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s',
                       }}
                     >
                       {q}
@@ -602,32 +646,53 @@ export function CopilotPageContent() {
                 </div>
               </div>
 
-              {/* Analyzed document chips */}
-              {analyzedDocs.length > 0 && (
-                <div className="text-center">
-                  <p
-                    className="text-[10px] uppercase tracking-wider font-semibold mb-2"
-                    style={{ color: 'var(--text-muted)' }}
+              {/* Pinned-document hint when ZERO docs pinned but analyzed
+                  docs exist — quick-pin chips inline, not as a dangling
+                  bottom strip. */}
+              {!pinnedDoc && analyzedDocs.length > 0 && (
+                <div style={{ marginTop: 24 }}>
+                  <div
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      letterSpacing: '0.10em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted)',
+                      marginBottom: 8,
+                    }}
                   >
-                    Your documents
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    Pin a document for grounded Q&amp;A
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {analyzedDocs.slice(0, 6).map(d => (
                       <button
                         key={d.id}
-                        onClick={() => {
-                          setPinnedDocumentId(d.id);
-                          handleNewDecision();
-                        }}
-                        className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ask-card"
+                        onClick={() => setPinnedDocumentId(d.id)}
                         style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '6px 10px',
                           background: 'var(--bg-card)',
-                          borderColor: 'var(--border-color)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-full)',
                           color: 'var(--text-secondary)',
+                          fontSize: 11.5,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
                         }}
                       >
-                        <FileText className="h-3 w-3" />
-                        <span className="truncate max-w-[120px]">{d.filename}</span>
+                        <Pin size={10} />
+                        <span
+                          style={{
+                            maxWidth: 140,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {d.filename}
+                        </span>
                       </button>
                     ))}
                   </div>

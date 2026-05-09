@@ -50,6 +50,46 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=library',
         permanent: false,
       },
+      // Phase A consolidation (2026-05-09 evening) — three sidebar surfaces
+      // deleted as part of the platform-page refactor:
+      //   - /dashboard/playbooks: orphaned feature, zero integration with
+      //     the analyze pipeline (DecisionScorecard + ActOnThisPanel were
+      //     never mounted anywhere in production). DPR archive scope is
+      //     covered by per-document export on /documents/[id] + per-
+      //     container export on /dashboard/decisions/[id].
+      //   - /dashboard/provenance: read-only DPR archive duplicate of the
+      //     per-document + per-container export buttons. No new insights.
+      //   - /dashboard/cognitive-audits/effectiveness: nudge-effectiveness
+      //     metrics duplicated /decision-log summary cards + Analytics
+      //     Performance tab. Folded into Analytics → Performance.
+      // 308 (permanent) so external links + bookmarks resolve to the
+      // closest semantic neighbour.
+      {
+        source: '/dashboard/playbooks',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
+      {
+        source: '/dashboard/playbooks/:path*',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
+      {
+        source: '/dashboard/provenance',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
+      {
+        source: '/dashboard/cognitive-audits/effectiveness',
+        destination: '/dashboard/analytics?view=performance',
+        permanent: true,
+      },
+      // Decision DNA folded into Analytics → Intelligence (Phase B).
+      {
+        source: '/dashboard/decision-dna',
+        destination: '/dashboard/analytics?view=intelligence',
+        permanent: true,
+      },
       // Decision Alpha page deleted 2026-05-07 — the "Published Q2 2026"
       // claim was a recurring-publication promise without a workflow,
       // and the synthetic SECTOR_INDEX data carried "30+ biases" count

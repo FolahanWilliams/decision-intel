@@ -195,6 +195,48 @@ These two lines are the operational follow-through to the pain framing — the p
 
 **Forward-looking rule**: when adding a 5th link type, every consumer (`CONTAINER_LINK_TYPES` array · `CONTAINER_LINK_TYPE_META` map · viz legend · CreateLinkModal picker · API validation in `isValidLinkType`) updates in lockstep. Same drift-class discipline as `NAMED_PATTERNS` + `CONTAINER_MODES`. When adding a new node-state signal (e.g. cohort-comparison risk), extend `computeRiskBand` in [constellation-layout.ts](src/components/constellation/constellation-layout.ts) and the chip cluster in [ContainerNodeDetailPopup.tsx](src/components/constellation/ContainerNodeDetailPopup.tsx) in the same commit. The constellation reads from existing per-container signals — never invents new schema for risk display.
 
+## Platform-page consolidation sweep (locked 2026-05-09 evening — Phases A through E)
+
+**The cleanup**: 14 sidebar entries → 9. Three orphaned routes deleted. One thin-wrapper route folded into a sibling tab as a properly redesigned section. Two heavy pages (decision-log + AI Copilot) refactored, not just resurfaced. The pre-sweep state had drift accumulated from rapid feature shipping; this is the refinement-mode discipline catching up.
+
+**Phase A — kill dead surfaces** (3 routes deleted + 308 redirects in [next.config.ts](next.config.ts)):
+
+- **/dashboard/playbooks** (735 lines) — orphaned. The CRUD UI for "pre-configured analysis templates" was never wired into the analyze pipeline; the `DecisionScorecard` + `ActOnThisPanel` components that referenced playbooks were not mounted in any production surface. Deleted the page route, the `/api/playbooks/*` route tree, the `src/lib/playbooks/{suggest,templates}.ts` library, and both orphan components. 308 redirect to `/dashboard/decisions`.
+- **/dashboard/provenance** (315 lines) — duplicate. Read-only DPR archive duplicated the per-document export button on `/documents/[id]` + the per-container export on `/dashboard/decisions/[id]`. No new insights surfaced. Deleted the page + the orphaned `/api/provenance/route.ts`. 308 redirect to `/dashboard/decisions`.
+- **/dashboard/cognitive-audits/effectiveness** (512 lines) — duplicate metrics. Avg quality + nudge feedback + quality trend already render on Analytics → Performance + summary cards on /decision-log. Deleted; 308 redirect to `/dashboard/analytics?view=performance`.
+
+**Phase B — fold Decision DNA into Analytics → Intelligence with proper redesign**. The /dashboard/decision-dna route was a thin 26-line wrapper around `DecisionDNAPageContent`. Conceptually it's a personal-calibration surface, structurally identical to Bias Genome contribution / Decision Intelligence / Explainability already living on the Intelligence tab. **Refactor moves**: (a) `DecisionDNAPageContent` lost its self-styled `<h1>` + page-container styling — it's now a content component, not a page; the Analytics section heading provides the H1. (b) Three early-return branches (loading skeleton / error / empty state) all stripped of `className="container"` so they render cleanly inside Analytics. (c) Refresh button kept (right-aligned in a slim row) so the user can still re-fetch their calibration. (d) Section anchor `id="dna"` with `scrollMarginTop: 80` so /dashboard/analytics?view=intelligence#dna lands directly on the section. (e) Standalone /dashboard/decision-dna route + loading.tsx deleted; 308 redirect; sidebar entry removed; CommandPalette entry redirected; DecisionDNAPreviewCard deep-links updated.
+
+**Phase D — refactor /decision-log** ([page.tsx](<src/app/(platform)/dashboard/decision-log/page.tsx>)). Was 1,086 lines with three structural problems: (1) duplicate 4-stat AuditSummaryCards rendering metrics already on Analytics, (2) inline collapsible "New Entry" form stealing real estate above the filter strip, (3) two stacked filter UIs (source chips row + status segmented control row). **Refactor moves**: (a) `AuditSummaryCards` deleted entirely. (b) New entry form lifted to a proper modal triggered by "+ Log entry" button — composer-grade input experience, doesn't push the feed down when opened. (c) Source filter chips + status segmented control collapsed into one filter row using `justifyContent: 'space-between'` + flex-wrap (~40px tall vs the prior ~80px). (d) Active source chip restyled with accent-primary border (was muted gray; now matches the rest of the platform palette). (e) Header buttons relabeled "Log entry" + "Submit audit" (action-first, sentence case). (f) Removed unused `motion` / `AnimatePresence` imports. The link to /effectiveness was dropped in Phase A. Now 1,040 lines; UX impact is much larger than the line-count delta.
+
+**Phase E — refactor AI Copilot** (the founder-flagged miss). The /dashboard/ask page had a slogan-style "Your AI advisory team" hero that didn't communicate what the surface DOES, plus a confusing 3-state flow (empty → prompt-input intermediate → chat) with dual CTAs ("+ New Decision" sidebar button + "+ New Decision Session" hero button) that meant the same thing. **Refactor moves**: (a) Page-level header chrome removed — the [page.tsx](<src/app/(platform)/dashboard/ask/page.tsx>) is now a thin shell, header lives inside CopilotPageContent. (b) Intermediate prompt-input mode REMOVED (the "What decision are you working on?" detour). (c) Single composer-first empty state: small Sparkles eyebrow + "Ask, audit, or stress-test a decision." H1 + 3-line description + autofocus textarea with placeholder + ↵ to start hint + 4 role-tuned starter chips below. (d) Composer ALWAYS visible — typing + Enter IS the start-a-session action; ChatGPT/Claude.ai pattern. (e) Pinned-document chips moved from a dangling bottom strip into a contextual "Pin a document for grounded Q&A" row that only appears when no doc is pinned. (f) Sidebar's "+ New Decision" button now clears the active session so the composer surfaces ready for the next prompt (was previously routing to the redundant prompt-input mode). (g) `STARTER_DECISION_QUESTIONS` constant removed (only consumed by the deleted prompt-input mode). (h) `kbdStyle` const added for the keyboard-shortcut hints in the composer.
+
+**Phase C — surgical /dashboard home cleanup**. Dropped `JournalWidget` mount + import — redundant with the unified `/dashboard/decision-log` feed (which already merges journal entries + cognitive audits into one surface). The dashboard widget added noise without new signal; the sidebar surfaces /decision-log one click away. The remaining widget stack (DecisionTriageWidget / NudgeWidget / ContainersWidget / OnboardingGuide) carries distinct action-driving signals.
+
+**Resulting sidebar (14 → 9 entries)**:
+
+```text
+ACT
+  Dashboard
+  Decisions          (Documents under the cluster header; constellation cross-link)
+  AI Copilot         (refactored: composer-first; no slogan header)
+  Decision Log
+
+REFLECT
+  Analytics          (Intelligence tab now has Decision DNA as a section)
+  Decision Graph     (sub-nav under Analytics)
+  Outcome Flywheel   (sub-nav under Analytics)
+
+TOGETHER
+  Meetings & Rooms   (team-plan only)
+  Team
+  Settings
+```
+
+**Quality gates at Phase A-E ship**: tsc clean (0 errors) · 4 lint gates clean (positioning · silent-catches at baseline 151 · counts at baseline 80 · canonical-imports clean) · slop-scan scorePerKloc 3.05 (under 4.0 trip-wire).
+
+**Forward-looking rule**: when a future audit identifies a sidebar entry as a thin-wrapper-around-a-content-component, the right move is NOT to delete the route silently — it's to fold the component as a SECTION on a sibling page (with a proper redesign that strips its self-page chrome) AND add a 308 redirect from the old URL. The Decision DNA fold is the canonical pattern. When a sidebar entry is a duplicate of per-decision functionality (the Provenance archive vs. per-document/per-container DPR export), delete the route + redirect to the canonical surface; don't fold what doesn't add value.
+
 ## 3-Layer Positioning Frame (locked 2026-05-09 evening — Gemini-pushback validation)
 
 **Architectural vocabulary** for cold investor conversations + pitch-deck slide 2 + senior-direct corp dev applications. Lifted from the 2026-05-09 Gemini-pushback validation pass; sharper than the prior CLAUDE.md positioning frame because it gives the reader a clean architectural slot for DI:

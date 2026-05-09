@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
   Mail,
@@ -18,7 +17,6 @@ import {
   Send,
   AlertTriangle,
   BrainCircuit,
-  TrendingUp,
   BarChart3,
   Trash2,
   type LucideIcon,
@@ -136,70 +134,10 @@ function formatFullDate(dateStr: string) {
   });
 }
 
-// ─── Summary Cards (from AuditsPageContent, simplified) ────────────────────
-
-function AuditSummaryCards({ decisions }: { decisions: HumanDecisionSummary[] }) {
-  const audited = decisions.filter(d => d.cognitiveAudit !== null);
-  if (audited.length === 0) return null;
-
-  let totalScore = 0;
-  let highRisk = 0;
-  let totalBiases = 0;
-  audited.forEach(d => {
-    const audit = d.cognitiveAudit;
-    if (!audit) return;
-    totalScore += audit.decisionQualityScore;
-    if (audit.decisionQualityScore < 40) highRisk++;
-    totalBiases += getBiasArray(audit.biasFindings).length;
-  });
-  const avgQuality = Math.round(totalScore / audited.length);
-
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-lg">
-      <div className="card">
-        <div className="card-body text-center p-md">
-          <div className="text-xs text-muted mb-sm font-medium">Total Audited</div>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
-            {audited.length}
-          </div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="card-body text-center p-md">
-          <div className="text-xs text-muted mb-sm font-medium">Avg Quality</div>
-          <div
-            style={{
-              fontSize: '2rem',
-              fontWeight: 800,
-              color:
-                avgQuality >= 70
-                  ? 'var(--success)'
-                  : avgQuality >= 40
-                    ? 'var(--warning)'
-                    : 'var(--error)',
-            }}
-          >
-            {avgQuality}
-          </div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="card-body text-center p-md">
-          <div className="text-xs text-muted mb-sm font-medium">High Risk</div>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--error)' }}>{highRisk}</div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="card-body text-center p-md">
-          <div className="text-xs text-muted mb-sm font-medium">Biases Detected</div>
-          <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--warning)' }}>
-            {totalBiases}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// AuditSummaryCards REMOVED 2026-05-09 evening (Phase D): the 4-stat
+// card row duplicated metrics already rendered on Analytics →
+// Performance. Decision Log is now a focused feed surface; aggregate
+// metrics live one click away on Analytics.
 
 // ─── Journal Row ──────────────────────────────────────────────────────────
 
@@ -713,194 +651,104 @@ export default function DecisionLogPage() {
           </div>
           <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
             <button
-              onClick={() => setShowNewEntry(s => !s)}
-              className={showNewEntry ? 'btn btn-secondary' : 'btn btn-primary'}
-              style={{ gap: 6, fontSize: 13 }}
-            >
-              <Plus size={14} />
-              New Entry
-            </button>
-            <Link
-              href="/dashboard/cognitive-audits/submit"
+              onClick={() => setShowNewEntry(true)}
               className="btn btn-secondary"
               style={{ gap: 6, fontSize: 13 }}
             >
-              <BrainCircuit size={14} />
-              Submit Audit
-            </Link>
+              <Plus size={14} />
+              Log entry
+            </button>
             <Link
-              href="/dashboard/cognitive-audits/effectiveness"
-              className="btn btn-ghost"
+              href="/dashboard/cognitive-audits/submit"
+              className="btn btn-primary"
               style={{ gap: 6, fontSize: 13 }}
             >
-              <TrendingUp size={14} />
-              Effectiveness
+              <BrainCircuit size={14} />
+              Submit audit
             </Link>
           </div>
         </div>
 
-        {/* New Entry Form */}
-        <AnimatePresence>
-          {showNewEntry && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              style={{ overflow: 'hidden', marginBottom: 20 }}
-            >
-              <div
-                className="card"
-                style={{
-                  borderLeft: '3px solid var(--warning)',
-                }}
-              >
-                <div className="card-body">
-                  <div className="flex items-center gap-sm" style={{ marginBottom: 12 }}>
-                    <Edit size={14} style={{ color: 'var(--warning)' }} />
-                    <span className="section-heading" style={{ marginBottom: 0 }}>
-                      Manual Journal Entry
-                    </span>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Entry title…"
-                    value={newEntryTitle}
-                    onChange={e => setNewEntryTitle(e.target.value)}
-                    style={{
-                      width: '100%',
-                      marginBottom: 8,
-                      padding: '10px 12px',
-                      background: 'var(--bg-card-hover)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      color: 'var(--text-primary)',
-                      fontSize: 13,
-                      outline: 'none',
-                    }}
-                  />
-                  <textarea
-                    placeholder="Describe the decision, meeting, or reasoning context…"
-                    value={newEntryContent}
-                    onChange={e => setNewEntryContent(e.target.value)}
-                    rows={3}
-                    style={{
-                      width: '100%',
-                      marginBottom: 12,
-                      padding: '10px 12px',
-                      background: 'var(--bg-card-hover)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      color: 'var(--text-primary)',
-                      fontSize: 13,
-                      outline: 'none',
-                      resize: 'vertical',
-                    }}
-                  />
-                  <div className="flex items-center justify-end gap-sm">
-                    <button
-                      onClick={() => setShowNewEntry(false)}
-                      className="btn btn-ghost"
-                      style={{ fontSize: 12 }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleNewEntry}
-                      disabled={submitting || !newEntryTitle.trim() || !newEntryContent.trim()}
-                      className="btn btn-primary"
-                      style={{
-                        fontSize: 12,
-                        gap: 6,
-                        opacity:
-                          submitting || !newEntryTitle.trim() || !newEntryContent.trim() ? 0.5 : 1,
-                      }}
-                    >
-                      {submitting ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <Send size={12} />
-                      )}
-                      {submitting ? 'Saving…' : 'Save Entry'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Source filter chips */}
-        <div className="flex items-center gap-sm" style={{ marginBottom: 12, flexWrap: 'wrap' }}>
-          {SOURCE_FILTERS.map(f => {
-            const count =
-              f.key === 'all' ? totalCount : f.key === 'journal' ? journalCount : auditsCount;
-            const active = sourceFilter === f.key;
-            return (
-              <button
-                key={f.key}
-                onClick={() => setSourceFilter(f.key)}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: 'var(--radius-full)',
-                  background: active ? 'var(--border-color)' : 'var(--bg-card)',
-                  border: `1px solid ${active ? 'var(--border-hover)' : 'var(--border-color)'}`,
-                  color: active ? 'var(--text-primary)' : 'var(--text-muted)',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {f.label}
-                <span
-                  style={{
-                    marginLeft: 6,
-                    color: active ? 'var(--text-secondary)' : 'var(--text-tertiary)',
-                    fontWeight: 500,
-                  }}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Status segmented control */}
+        {/* Unified filter row — source chips + status segmented in one
+            row so the surface stays compact. Phase D refactor 2026-05-09
+            evening: was previously two stacked filter strips taking 80px
+            of vertical real estate; now one row at 38px. */}
         <div
           className="flex items-center mb-lg"
           style={{
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-md)',
-            width: 'fit-content',
-            overflow: 'hidden',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 12,
           }}
         >
-          {STATUS_TABS.map((t, idx) => {
-            const active = statusFilter === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setStatusFilter(t.key)}
-                style={{
-                  padding: '7px 14px',
-                  fontSize: 12,
-                  fontWeight: active ? 600 : 500,
-                  background: active ? 'var(--bg-active)' : 'transparent',
-                  color: active ? 'var(--text-primary)' : 'var(--text-muted)',
-                  border: 'none',
-                  borderLeft: idx !== 0 ? '1px solid var(--border-color)' : 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+          <div className="flex items-center" style={{ gap: 4, flexWrap: 'wrap' }}>
+            {SOURCE_FILTERS.map(f => {
+              const count =
+                f.key === 'all' ? totalCount : f.key === 'journal' ? journalCount : auditsCount;
+              const active = sourceFilter === f.key;
+              return (
+                <button
+                  key={f.key}
+                  onClick={() => setSourceFilter(f.key)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-full)',
+                    background: active ? 'rgba(22, 163, 74, 0.08)' : 'transparent',
+                    border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                    color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+                    fontSize: 12,
+                    fontWeight: active ? 600 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {f.label}
+                  <span
+                    style={{
+                      marginLeft: 6,
+                      color: 'inherit',
+                      opacity: 0.6,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Audit summary cards when Audits filter active */}
-        {sourceFilter === 'audits' && <AuditSummaryCards decisions={decisions} />}
+          <div
+            className="flex items-center"
+            style={{
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              overflow: 'hidden',
+            }}
+          >
+            {STATUS_TABS.map((t, idx) => {
+              const active = statusFilter === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setStatusFilter(t.key)}
+                  style={{
+                    padding: '7px 12px',
+                    fontSize: 12,
+                    fontWeight: active ? 600 : 500,
+                    background: active ? 'var(--bg-elevated)' : 'transparent',
+                    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+                    border: 'none',
+                    borderLeft: idx !== 0 ? '1px solid var(--border-color)' : 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Error banner */}
         {error && (
@@ -1029,6 +877,112 @@ export default function DecisionLogPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* New Entry Modal — Phase D refactor 2026-05-09 evening:
+            previously a collapsible card stealing real estate above the
+            filters. Now a proper modal triggered by "+ New Entry" so the
+            feed stays the focal point. */}
+        {showNewEntry && (
+          <div className="modal-backdrop" style={{ zIndex: 1000 }}>
+            <div className="card" style={{ maxWidth: 520, width: '90%' }}>
+              <div
+                className="card-header"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <h3 className="flex items-center gap-sm">
+                  <Edit size={16} style={{ color: 'var(--warning)' }} />
+                  Log a journal entry
+                </h3>
+                <button
+                  onClick={() => setShowNewEntry(false)}
+                  className="btn btn-ghost"
+                  style={{ fontSize: 16, padding: 4, lineHeight: 1 }}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="card-body">
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                    marginBottom: 12,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Capture a decision, meeting, or reasoning context. Comes back as a journal row in
+                  the feed; convert to a full audit any time.
+                </p>
+                <input
+                  type="text"
+                  placeholder="Entry title…"
+                  value={newEntryTitle}
+                  onChange={e => setNewEntryTitle(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    marginBottom: 8,
+                    padding: '10px 12px',
+                    background: 'var(--bg-card-hover)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--text-primary)',
+                    fontSize: 13,
+                    outline: 'none',
+                  }}
+                />
+                <textarea
+                  placeholder="Describe the decision, meeting, or reasoning context…"
+                  value={newEntryContent}
+                  onChange={e => setNewEntryContent(e.target.value)}
+                  rows={4}
+                  style={{
+                    width: '100%',
+                    marginBottom: 12,
+                    padding: '10px 12px',
+                    background: 'var(--bg-card-hover)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--text-primary)',
+                    fontSize: 13,
+                    outline: 'none',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                  }}
+                />
+                <div className="flex items-center justify-end gap-sm">
+                  <button
+                    onClick={() => setShowNewEntry(false)}
+                    className="btn btn-ghost"
+                    disabled={submitting}
+                    style={{ fontSize: 12 }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleNewEntry}
+                    disabled={submitting || !newEntryTitle.trim() || !newEntryContent.trim()}
+                    className="btn btn-primary"
+                    style={{
+                      fontSize: 12,
+                      gap: 6,
+                      opacity:
+                        submitting || !newEntryTitle.trim() || !newEntryContent.trim() ? 0.5 : 1,
+                    }}
+                  >
+                    {submitting ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Send size={12} />
+                    )}
+                    {submitting ? 'Saving…' : 'Save Entry'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

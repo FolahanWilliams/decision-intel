@@ -233,7 +233,7 @@ export function generateEnterpriseQuote(input: EnterpriseQuoteInput): Enterprise
   doc.setFontSize(9.5);
   doc.setTextColor(40, 40, 40);
   const artefactLines = doc.splitTextToSize(
-    'Every audit run under any executed engagement produces a hashed, tamper-evident Decision Provenance Record (DPR) covering: input-document SHA-256 hash, prompt fingerprint, model lineage, judge variance, regulatory mapping (EU AI Act Art. 14, Basel III ICAAP, SEC AI Disclosure, GDPR Art. 22, plus eight Africa-anchored regulators), pipeline lineage. DPR archive lives at /dashboard/provenance for the full retention window. See appendix on page 2 for the operative Enterprise terms.',
+    'Every audit run under any executed engagement produces a hashed, tamper-evident Decision Provenance Record (DPR) covering: input-document SHA-256 hash, prompt fingerprint, model lineage, judge variance, regulatory mapping (EU AI Act Art. 14, Basel III ICAAP, SEC AI Disclosure, GDPR Art. 22, plus eight Africa-anchored regulators), pipeline lineage. The DPR is exportable from every audited document and decision container for the full retention window. See appendix on page 2 for the operative Enterprise terms.',
     TEXT_W
   );
   doc.text(artefactLines, MARGIN_L, y);
