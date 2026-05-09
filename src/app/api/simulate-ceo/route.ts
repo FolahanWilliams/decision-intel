@@ -7,7 +7,7 @@ import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { parseJSON } from '@/lib/utils/json';
 import { extractIp } from '@/lib/utils/request';
-import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
+import { NAMED_PATTERNS } from '@/lib/learning/named-patterns';
 
 const log = createLogger('SimulateCeo');
 

@@ -20,7 +20,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { NAMED_PATTERNS } from '@/lib/learning/toxic-combinations';
+import { NAMED_PATTERNS } from '@/lib/learning/named-patterns';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('ToxicCombinationsPatternsAPI');
