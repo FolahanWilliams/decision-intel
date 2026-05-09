@@ -101,6 +101,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     judgeOutputs: unknown;
     summary: string | null;
     biases: Array<{ biasType: string; severity: string; excerpt: string | null }>;
+    toxicCombinations: Array<{ patternLabel: string | null; toxicScore: number }>;
     document: {
       userId: string;
       documentType: string | null;
@@ -115,6 +116,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         summary: true,
         biases: {
           select: { biasType: true, severity: true, excerpt: true },
+        },
+        // Toxic combinations fed into the RCF pattern-aware boost (locked
+        // 2026-05-09, M&A cascade depth ship). Cases tagged with the same
+        // patternLabel get a similarity boost so structurally-analogous
+        // failures surface in the top analogs even when industries differ.
+        toxicCombinations: {
+          select: { patternLabel: true, toxicScore: true },
         },
         document: {
           select: {
@@ -147,11 +155,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   const validitySource: 'persisted' | 'live' = persistedValidity ? 'persisted' : 'live';
 
-  // Reference-class forecast — pure function, deterministic
+  // Reference-class forecast — pure function, deterministic. Pass the
+  // patternLabels that fired on this audit so cases tagged with the same
+  // pattern receive a similarity boost (M&A cascade depth ship 2026-05-09).
+  const auditPatternLabels = analysis.toxicCombinations
+    .map(t => t.patternLabel)
+    .filter((p): p is string => Boolean(p));
   const referenceClassForecast = getReferenceClassForecast({
     biasTypes,
     industry: null,
     documentType,
+    toxicCombinations: auditPatternLabels,
   });
 
   // Feedback adequacy — uses the document owner's user id, not the requesting user

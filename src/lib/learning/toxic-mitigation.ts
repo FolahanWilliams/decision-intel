@@ -380,6 +380,158 @@ const PATTERN_PLAYBOOKS: Record<string, Omit<MitigationPlaybook, 'patternLabel'>
     researchBasis:
       'Zeigarnik (1927) on task completion pressure; Buehler et al. (1994) on planning fallacy.',
   },
+
+  // M&A workflow-native playbooks (locked 2026-05-09 alongside the
+  // P1+P2 cascade depth ship). Each playbook anchors on the specific
+  // failure mode the pattern represents and the BCG / McKinsey base-
+  // rate realisation evidence the audit committee should require
+  // before signing off.
+  'The Synergy Mirage': {
+    summary:
+      'Strip every synergy line item back to its three structural anchors — named operational mechanism, named accountable executive, measurable 90-day milestone — before letting the model drive valuation.',
+    steps: [
+      {
+        title: 'Require a NAMED OPERATIONAL MECHANISM per synergy line',
+        description:
+          'For each line in the synergy model, demand a one-sentence mechanism that a sceptical operator could attack: "consolidate two AWS accounts" not "IT efficiencies"; "shift 40% of marketing spend from print to programmatic" not "marketing leverage". Mechanisms that survive the operator-attack test are the only ones worth underwriting.',
+        owner: 'analyst',
+        timing: 'before_next_meeting',
+        priority: 'critical',
+      },
+      {
+        title: 'Assign a NAMED ACCOUNTABLE EXECUTIVE per synergy line',
+        description:
+          'Per BCG integration best-practices: every synergy claim must have a single named executive (not a function, not a team) who owns delivery and whose performance review will reflect realisation. "Finance ownership" is a deferral; "VP Procurement Sarah Chen" is a commitment.',
+        owner: 'team_lead',
+        timing: 'before_next_meeting',
+        priority: 'critical',
+      },
+      {
+        title: 'Lock a MEASURABLE 90-DAY MILESTONE per synergy line',
+        description:
+          'Per McKinsey 2019 "Where mergers go wrong": synergies that lack a Day-90 measurable proof point realise at 30-40% of projection vs 70-80% for milestoned synergies. Require a quantitative metric verifiable on Day 90 (e.g., "two ERP systems consolidated into one GL by Day 90" not "integration progress on track").',
+        owner: 'team_lead',
+        timing: 'before_next_meeting',
+        priority: 'critical',
+      },
+      {
+        title: 'Apply BCG/McKinsey realisation discount before underwriting',
+        description:
+          'Revenue synergies realise at 30-50% of projection; cost-COGS synergies at 60-80%; cost-OpEx at 50-70%. Discount each line item by the relevant base-rate band BEFORE the synergy total feeds the valuation model. If the deal does not clear hurdle rate at the discounted total, the deal is being sold to the IC, not earned.',
+        owner: 'analyst',
+        timing: 'immediate',
+        priority: 'high',
+      },
+      {
+        title: 'Track synergy realisation against projection at quarterly reviews',
+        description:
+          'Build a simple realisation tracker: for each synergy line item, record monthly actual vs projected. Roll up to a portfolio realisation rate. Surface to the IC as part of the standard post-close review. This is the only feedback loop that prevents the next Synergy Mirage on the next deal.',
+        owner: 'team_lead',
+        timing: 'ongoing',
+        priority: 'high',
+      },
+    ],
+    researchBasis:
+      'BCG (2017-2024) integration best-practices; McKinsey (2019) "Where mergers go wrong"; KPMG (2020) global M&A outlook on synergy realisation rates; Christensen et al. (2011) HBR "The Big Idea: The New M&A Playbook".',
+  },
+
+  'The Conglomerate Fallacy': {
+    summary:
+      'Force the deal team to answer Porter\'s "why us as the best parent" before letting target growth or brand halo drive the rationale.',
+    steps: [
+      {
+        title: 'Require the Porter parenting-advantage answer in writing',
+        description:
+          'The IC memo must explicitly answer: "Why are we the BEST parent for this asset, vs every other plausible acquirer?" If the answer is "we have capital" or "we want to diversify," the parenting advantage is absent — the deal is acquiring growth, not creating value. Per Porter (1987) "From Competitive Advantage to Corporate Strategy".',
+        owner: 'team_lead',
+        timing: 'before_next_meeting',
+        priority: 'critical',
+      },
+      {
+        title: 'Apply the Zook core-vs-adjacency test',
+        description:
+          'Score the target on Chris Zook\'s adjacency framework: same customers (yes/no), same channels (yes/no), same business model (yes/no), same product/service technology (yes/no). Three or more "no" answers means this is a far-adjacency play and the burden of proof on the parenting thesis is much higher.',
+        owner: 'analyst',
+        timing: 'before_next_meeting',
+        priority: 'critical',
+      },
+      {
+        title: 'Stress-test the brand-halo assumption',
+        description:
+          'If the rationale leans on brand halo ("their consumer brand will lift our industrial business"), require explicit named carrier mechanisms: which customer touchpoints carry the halo? Which marketing channels share spend? If the answer is "implicit" or "synergistic over time," the halo is rhetorical, not operational.',
+        owner: 'analyst',
+        timing: 'before_next_meeting',
+        priority: 'high',
+      },
+      {
+        title: 'Require a "kill the platform" pre-mortem',
+        description:
+          'Ask: "Imagine it\'s 36 months post-close and the board is unwinding this combination. Why did the platform thesis fail?" The most-likely answers (capital allocation between two cyclically-different businesses, cultural divergence on operating tempo, parent-company governance overhead) are exactly the failure modes Daimler-Chrysler / AOL-Time Warner / GE-financial-conglomerate exhibited.',
+        owner: 'all_participants',
+        timing: 'before_next_meeting',
+        priority: 'high',
+      },
+      {
+        title: 'Lock minimum-viable parenting deliverables for Year 1',
+        description:
+          'If the deal proceeds, lock 3-5 specific operational deliverables that PROVE parenting advantage by Year 1 (e.g., "shared procurement saves $X by Q2", "joint product roadmap delivers Y by Q4"). Failure to deliver triggers a board-level revisit.',
+        owner: 'team_lead',
+        timing: 'before_next_meeting',
+        priority: 'medium',
+      },
+    ],
+    researchBasis:
+      'Porter (1987) "From Competitive Advantage to Corporate Strategy"; Zook & Allen (2003) "Profit from the Core"; Christensen et al. (2011) HBR "The New M&A Playbook"; canonical failures: Daimler-Chrysler (1998), AOL-Time Warner (2000), Bed Bath & Beyond + Container Store (2012), GE financial-conglomerate (2008-2018).',
+  },
+
+  "The Winner's Curse": {
+    summary:
+      'Insert a structural cooling-off period and re-run BATNA analysis with a competitive-dynamics discount before letting auction pressure drive the bid.',
+    steps: [
+      {
+        title: 'Mandate a 48-hour cooling-off before any bid increase above prior-round',
+        description:
+          'When the deal team proposes raising the bid above the prior-round ceiling, require a minimum 48-hour pause before submitting. Use the time to re-run intrinsic-value analysis and BATNA without the auction-process anchor. Most "we have to bid by Thursday" deadlines are seller-bank pressure, not real competitive timing.',
+        owner: 'team_lead',
+        timing: 'immediate',
+        priority: 'critical',
+      },
+      {
+        title: 'Re-run intrinsic-value DCF without competitive-process language',
+        description:
+          'Strip "preempting competitor B" and "strategic necessity" from the model. Run the DCF on standalone fundamentals only. If the deal does not clear hurdle rate at the standalone valuation, the bid is being justified by deal-fever, not by economics.',
+        owner: 'analyst',
+        timing: 'immediate',
+        priority: 'critical',
+      },
+      {
+        title: 'Apply the Kahneman-Lovallo competitive-dynamics discount',
+        description:
+          'Per Kahneman & Lovallo (2003) "Delusions of Success": when the inside view dominates ("we cannot let X get this asset"), apply a 15-25% discount to projected value before bidding. The discount captures the systematic optimism that competitive processes inject into bidder valuations.',
+        owner: 'analyst',
+        timing: 'immediate',
+        priority: 'high',
+      },
+      {
+        title: 'Document the BATNA at every bid round',
+        description:
+          'For each round, write the BATNA explicitly: "If we lose this asset, what is our next-best deployment of $X capital?" If the BATNA is "deploy in our existing pipeline at hurdle rate" and the marginal bid increase puts the deal below hurdle rate, walk. WeWork S-1 / Quibi / post-2010 SPAC-wave failures all share this missed BATNA discipline.',
+        owner: 'team_lead',
+        timing: 'before_next_meeting',
+        priority: 'high',
+      },
+      {
+        title: 'Pre-commit to a walk-away ceiling in writing',
+        description:
+          'Before the auction process starts, the IC commits to a maximum bid in writing. The deal team cannot exceed it without a fresh IC vote. This is the only structural defence against Winner\'s Curse — the discipline of writing the ceiling down BEFORE the process anchors the bid upward.',
+        owner: 'team_lead',
+        timing: 'immediate',
+        priority: 'critical',
+      },
+    ],
+    researchBasis:
+      'Kahneman & Lovallo (2003) HBR "Delusions of Success"; Capen, Clapp & Campbell (1971) "Competitive Bidding in High-Risk Situations"; Thaler (1988) "The Winner\'s Curse"; canonical anchors: WeWork S-1 (2019), Quibi (2020), HP-Autonomy (2011), GE-Alstom (2015), post-2010 SPAC wave.',
+  },
 };
 
 // ─── Context-Aware Step Augmentation ───────────────────────────────────────

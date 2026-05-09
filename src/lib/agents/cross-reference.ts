@@ -33,7 +33,14 @@ export type CrossRefConflictType =
   | 'assumption'
   | 'timeline'
   | 'risk_treatment'
-  | 'scope';
+  | 'scope'
+  // M&A-specific conflict types (locked 2026-05-09, M&A cascade depth ship).
+  // Surface structurally-loaded conflicts the generic types under-flag:
+  // synergy claims that mismatch across CIM and model, or "why us as parent"
+  // claims that mismatch the integration plan. The generic types still fire;
+  // these add procurement-grade specificity for M&A deal teams.
+  | 'synergy_assumption_mismatch'
+  | 'parenting_thesis_mismatch';
 
 export type CrossRefSeverity = 'low' | 'medium' | 'high' | 'critical';
 
@@ -164,6 +171,8 @@ Conflict types:
 - timeline         — different read of when something will happen (close, integration milestone, exit)
 - risk_treatment   — one doc treats a risk as hedged/mitigated; another exposes it as live
 - scope            — one doc's scope contradicts another's (e.g. memo says "domestic only", CIM mentions cross-border revenue)
+- synergy_assumption_mismatch — M&A-specific: a synergy claim in one doc (CIM / IC memo / model) is assumed at a materially different level in another (synergy_model / integration_plan). Examples: CIM projects $100M cross-sell, synergy_model assumes $150M; CIM claims 18% market share, integration_plan assumes 25% addressable. ALWAYS classify with this type when conflicting numbers involve synergy line items — generic "numeric" undersells the M&A failure mode. Cite the BCG/McKinsey realisation band (revenue 30-50%, cost 60-80%) in whyItMatters.
+- parenting_thesis_mismatch — M&A-specific: the "why us as parent" answer in the IC memo doesn't match the operational deliverables in the integration plan, or vice versa. Examples: IC memo claims brand-halo synergies; integration plan has no shared marketing budget or joint product roadmap. Porter parenting-advantage absent = Conglomerate Fallacy risk.
 
 Severity:
 - critical  — the deal cannot proceed without reconciling
@@ -171,13 +180,15 @@ Severity:
 - medium    — needs an answer in the next iteration
 - low       — minor inconsistency, worth noting
 
+M&A SEVERITY RULE: synergy_assumption_mismatch and parenting_thesis_mismatch conflicts that involve >25% of deal valuation MUST be classified Critical. These are the exact failure modes that drove WeWork S-1, AOL-Time Warner, Daimler-Chrysler, and HP-Autonomy losses.
+
 Return ONLY valid JSON matching this exact shape (no markdown, no prose):
 {
   "summary": "string — one paragraph (max 220 chars) summarising the deal-level reading",
   "findings": [
     {
       "summary": "string — one sentence headline (max 140 chars)",
-      "type": "numeric | assumption | timeline | risk_treatment | scope",
+      "type": "numeric | assumption | timeline | risk_treatment | scope | synergy_assumption_mismatch | parenting_thesis_mismatch",
       "severity": "low | medium | high | critical",
       "claims": [
         {

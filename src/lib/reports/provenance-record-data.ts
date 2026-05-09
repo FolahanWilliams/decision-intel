@@ -856,6 +856,12 @@ export async function assembleProvenanceRecordData(
             confidence: true,
           },
         },
+        // Toxic combinations fed into the RCF pattern-aware boost so
+        // cases tagged with the same patternLabel surface in the top
+        // analogs (M&A cascade depth ship 2026-05-09).
+        toxicCombinations: {
+          select: { patternLabel: true, toxicScore: true },
+        },
         promptVersion: {
           select: { hash: true, name: true, version: true },
         },
@@ -1085,11 +1091,21 @@ export async function assembleProvenanceRecordData(
   );
   // Reference-class forecast — pure function, deterministic, runs in
   // <5ms. Computed synchronously after the Promise.all so it can use
-  // the deduplicated biasTypes computed above.
+  // the deduplicated biasTypes computed above. Pass the toxic-combination
+  // patternLabels that fired on this audit so the RCF surfaces structurally-
+  // analogous failures (M&A cascade depth ship 2026-05-09).
+  const auditPatternLabels = (
+    (analysis as unknown as {
+      toxicCombinations?: Array<{ patternLabel: string | null }>;
+    }).toxicCombinations ?? []
+  )
+    .map(t => t.patternLabel)
+    .filter((p): p is string => Boolean(p));
   const referenceClassForecast = getReferenceClassForecast({
     biasTypes,
     industry,
     documentType,
+    toxicCombinations: auditPatternLabels,
   });
   // Validity classification — read the persisted value from
   // judgeOutputs first (set at audit-completion time by /api/analyze/
