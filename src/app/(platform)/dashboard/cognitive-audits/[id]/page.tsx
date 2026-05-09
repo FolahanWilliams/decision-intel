@@ -9,7 +9,7 @@ import { SectionMiniNav } from '@/components/ui/SectionMiniNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { GRADE_THRESHOLDS } from '@/lib/scoring/dqi';
 import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
-import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
+import { severityColor } from '@/lib/utils/severity';
 
 /**
  * Cognitive Audit detail page.
@@ -111,10 +111,6 @@ function colorMix(varOrHex: string, alpha: string): string {
   return `color-mix(in srgb, ${varOrHex} ${alpha}, transparent)`;
 }
 
-function severityColor(severity: string | undefined): string {
-  if (!severity) return 'var(--text-muted)';
-  return SEVERITY_COLORS[severity] ?? 'var(--text-muted)';
-}
 
 export default async function CognitiveAuditDetailPage({ params }: PageProps) {
   const { id } = await params;

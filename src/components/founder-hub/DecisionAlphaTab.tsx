@@ -90,6 +90,11 @@ function gradeBadge(grade: string, score: number): React.ReactNode {
   );
 }
 
+// Local hex-output severityColor — DecisionAlphaTab uses `${color}25`
+// hex-alpha concatenation in border/background styles which CSS vars
+// don't support (you can't append to a var() expression). Migration
+// to the canonical helper requires the `severityTint` color-mix
+// pattern from CLAUDE.md SEVERITY_COLORS lock 2026-05-01 — deferred.
 function severityColor(severity: string): string {
   switch (severity) {
     case 'critical':

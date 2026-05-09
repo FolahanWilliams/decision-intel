@@ -11,6 +11,7 @@ import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
 import { formatBiasName } from '@/lib/utils/labels';
+import { severityColor } from '@/lib/utils/severity';
 // Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
 // sync with the canonical DQIResult shape without forcing the dqi module
 // onto the post-upload reveal critical path.
@@ -64,18 +65,6 @@ const SEVERITY_ORDER: Record<string, number> = {
   low: 1,
   unknown: 0,
 };
-
-function severityColor(severity: string | undefined): string {
-  switch (severity) {
-    case 'critical':
-    case 'high':
-      return 'var(--severity-high, #ef4444)';
-    case 'medium':
-      return 'var(--warning, #eab308)';
-    default:
-      return 'var(--text-muted)';
-  }
-}
 
 export function InlineAnalysisResultCard({
   analysis,
