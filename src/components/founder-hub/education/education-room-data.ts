@@ -1274,6 +1274,48 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     source: 'src/lib/learning/calibrated-rejection.ts + Kahneman & Klein 2009',
     tag: 'kahneman_klein',
   },
+  {
+    id: 'mna_synergy_mirage',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the Synergy Mirage toxic combination, and what's the structural test that determines whether a synergy claim survives or fails?",
+    canonicalAnswer:
+      "The Synergy Mirage is the canonical M&A failure mode (NAMED_PATTERNS in toxic-combinations.ts, locked 2026-05-09): Overconfidence in Projections + Planning Fallacy with high monetary stakes. McKinsey + KPMG research finds 70-90% of acquisitions fail to realize projected synergies. The structural test (per BCG integration-best-practices): every synergy line item must have (a) a NAMED OPERATIONAL MECHANISM — 'consolidate two AWS accounts → $X savings' not 'IT efficiencies → $X savings'; (b) a NAMED ACCOUNTABLE EXECUTIVE who will own delivery; (c) a MEASURABLE 90-DAY MILESTONE that proves the synergy is on track. If any element is missing, the synergy is a Mirage. Revenue synergies (cross-sell, channel expansion, pricing) are flagged HARDER than cost synergies because their realization rate is 30-50% vs cost synergies at 60-80%. Severity: Critical when synergies drive >25% of deal valuation; High when 10-25%; Medium when <10%. Fires hardest on synergy_model + integration_plan document types.",
+    difficulty: 'advanced',
+    applicationContext:
+      "When pitching a Head of Corp Dev: 'Show me your last synergy model. I'll run the Mirage detector — every line item without mechanism + owner + 90-day milestone gets flagged. The IC needs to know which 30-40% of the projected synergies are structurally not going to land.'",
+    source:
+      'src/lib/learning/toxic-combinations.ts NAMED_PATTERNS + BCG Post-Merger Integration framework + McKinsey + KPMG synergy-realization research',
+    tag: 'mna_pattern',
+  },
+  {
+    id: 'mna_conglomerate_fallacy',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the Conglomerate Fallacy toxic combination, and what's the 'why us as parent' question that exposes it?",
+    canonicalAnswer:
+      "The Conglomerate Fallacy (NAMED_PATTERNS in toxic-combinations.ts, locked 2026-05-09): Illusion of Validity + Halo Effect. A far-adjacency acquisition justified primarily by the target's growth or brand momentum rather than by core operational overlap or a defensible 'why us as parent' thesis. The narrative coherence of the target's success story produces high acquirer-side confidence (illusion of validity, DI-B-021), while one impressive feature — usually growth rate or management pedigree — supplies the halo that lets the team dismiss the operational-fit gap. The exposing question is Porter's parenting advantage: what specifically does THIS acquirer add to the target that another acquirer would not? Anchor failures: Bed Bath & Beyond + The Container Store (no operational overlap, $560M write-down), AOL + Time Warner ($165B → ~$0 within a decade), Daimler + Chrysler ($36B premium destroyed). Fires hardest when ic_memo or cim presents the target's growth as the rationale without addressing 'why us.'",
+    difficulty: 'advanced',
+    applicationContext:
+      "Reviewing an IC memo that opens with 'the target is growing 40% YoY' as the primary acquisition rationale — the Conglomerate Fallacy detector flags it. The right question for the deal sponsor: 'why does growing 40% under us produce a different outcome than growing 40% under a different parent?'",
+    source:
+      'src/lib/learning/toxic-combinations.ts NAMED_PATTERNS + Porter "From Competitive Advantage to Corporate Strategy" (1987) + 143-case library Conglomerate Fallacy anchors',
+    tag: 'mna_pattern',
+  },
+  {
+    id: 'mna_winners_curse',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is the Winner's Curse toxic combination, and what auction-dynamic language signals should fire it?",
+    canonicalAnswer:
+      "The Winner's Curse (NAMED_PATTERNS in toxic-combinations.ts, locked 2026-05-09): Anchoring Bias + Overconfidence with auction-dynamic language. The bid is driven by fear of losing the deal rather than by intrinsic value. The acquirer who wins is statistically the acquirer who most overpaid — which is why competitive-process M&A has materially worse post-close outcomes than non-competitive deals. The detector fires on phrases that signal competitive dynamics, not fundamentals, are driving valuation: 'preempting competitor B,' 'strategic necessity,' 'competitive process,' 'we cannot let X get this asset,' 'this is a once-in-a-decade window.' Severity: Critical in time-pressured competitive auctions; High when one named competitor is mentioned; Medium when 'competitive dynamics' appears generically. Anchor cases: WeWork S-1 (Softbank-led valuation auction), Quibi ($1.75B raised at peak FOMO), the post-2010 SPAC wave. Required context: monetaryStakes='high' AND timePressure=true (auction process compresses decision-making).",
+    difficulty: 'advanced',
+    applicationContext:
+      "On a live competitive M&A diligence call: when the deal sponsor says 'we have to move on this — Apollo is in the data room' — flag the Winner's Curse pattern in the IC memo BEFORE the IC vote. The discipline question: 'what does this asset look like at our walk-away price, not the price needed to win?'",
+    source:
+      'src/lib/learning/toxic-combinations.ts NAMED_PATTERNS + Capen, Clapp & Campbell (1971) original Winner\'s Curse paper + 143-case library WeWork / Quibi anchors',
+    tag: 'mna_pattern',
+  },
 ];
 
 // ─── Cards: 12-Node Pipeline (representative 6) ──────────────────

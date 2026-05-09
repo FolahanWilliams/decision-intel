@@ -2,10 +2,19 @@
  * Investment Vertical — Specialized Prompts for Corporate Strategy & M&A Teams
  *
  * When the system detects investment-related document types (ic_memo, cim,
- * pitch_deck, term_sheet, due_diligence, lp_report) or deal types (buyout,
- * growth_equity, venture, etc.), these specialized system prompts are
- * injected into the bias detective, noise judge, and simulation nodes
- * to improve detection accuracy for corporate M&A and strategic decision contexts.
+ * pitch_deck, term_sheet, due_diligence, lp_report, qofe, synergy_model,
+ * integration_plan) or deal types (buyout, growth_equity, venture, etc.),
+ * these specialized system prompts are injected into the bias detective,
+ * noise judge, and simulation nodes to improve detection accuracy for
+ * corporate M&A and strategic decision contexts.
+ *
+ * 2026-05-09 M&A workflow extension (P1 lock): added qofe, synergy_model,
+ * integration_plan to extend coverage across the full deal lifecycle
+ * (sourcing → screening → due diligence → IC review → closing → post-merger
+ * integration). Each carries its own DOC_TYPE_OVERLAY surfacing the
+ * M&A-specific named toxic combinations from the `toxic-combinations.ts`
+ * NAMED_PATTERNS array (Synergy Mirage, Conglomerate Fallacy, Winner's
+ * Curse, plus the M&A-enhanced Sunk Ship + Yes Committee).
  */
 
 // ─── Document Types ──────────────────────────────────────────────────────────
@@ -17,6 +26,10 @@ export const INVESTMENT_DOCUMENT_TYPES = [
   'term_sheet',
   'due_diligence',
   'lp_report',
+  // M&A workflow extensions (2026-05-09 P1 lock)
+  'qofe', // Quality of Earnings — typically prepared by Big-4 / boutique transaction-advisory firms
+  'synergy_model', // Synergy projection spreadsheet — revenue + cost synergies broken down by initiative
+  'integration_plan', // Post-merger integration plan — Day-1 operating model, IT, talent, customer
 ] as const;
 
 export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
@@ -104,21 +117,83 @@ Flag if the retrospective is not being used as a genuine learning exercise.`,
 // ─── Document-Type-Specific Analysis Focus ───────────────────────────────────
 
 export const DOC_TYPE_OVERLAYS: Record<string, string> = {
-  ic_memo: `DOCUMENT TYPE: STRATEGY / DECISION MEMO
-This is a strategy or decision memo arguing for or against a strategic action. This is the most critical document in the corporate decision process. Scrutinize with maximum rigor:
+  ic_memo: `DOCUMENT TYPE: INVESTMENT COMMITTEE MEMO / DECISION MEMO
+This is the most critical document in the M&A or capital-allocation decision process — the load-bearing artefact the IC votes on. Scrutinize with maximum rigor:
 - Is the recommendation supported by the evidence, or does the narrative outrun the data?
 - Are downside scenarios given equal analytical depth as the upside case?
-- Are the key assumptions (growth rate, synergies, margins, payback period) justified with evidence?
-- Is there a clear "reasons to decline" section that is taken seriously?
-- Are risks presented as manageable without evidence of mitigation plans?`,
+- Are the key assumptions (growth rate, synergies, margins, payback period, integration costs) justified with evidence + named owner + measurable milestone?
+- Is there a clear "reasons to decline" section, with specific named risks (not generic "execution risk"), that is taken seriously rather than waved off?
+- Are risks presented as manageable without evidence of mitigation plans?
+- Is the "why us as parent" question answered? (Porter parenting advantage — what specifically does THIS acquirer add to the target that another acquirer would not?)
+- Is the "why now?" question answered with hard reasons rather than soft urgency ("competitive process," "preempting competitor B")?
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly when the underlying biases co-occur:
+- "The Synergy Mirage" — Overconfidence + Planning Fallacy: synergy claims without mechanism + owner + milestone (per BCG integration-best-practices).
+- "The Conglomerate Fallacy" — Illusion of Validity + Halo Effect: far-adjacency acquisition justified by target's growth without operational overlap or "why us as parent" thesis.
+- "The Winner's Curse" — Anchoring + Overconfidence: auction-dynamic language driving bids above intrinsic value ("preempting competitor B," "strategic necessity").
+- "The Sunk Ship" — Sunk Cost + Anchoring: deal-escalation language ("we have already spent $X on diligence") justifying continued bidding past intrinsic value.
+- "The Yes Committee" — Authority + Groupthink + Unanimous Consensus: rubber-stamp justification of CEO/sponsor's pet acquisition with zero documented dissent.`,
 
   cim: `DOCUMENT TYPE: CONFIDENTIAL INFORMATION MEMORANDUM (CIM) / TARGET PROFILE
-This is a sell-side CIM or target profile prepared by the target company or their advisors. It is inherently biased toward presenting the company favorably. Evaluate with skepticism:
-- Are management's projections anchored to best-case assumptions?
-- Is the competitive landscape presented favorably or incompletely?
+This is a sell-side CIM or target profile prepared by the target company or their advisors (typically investment banks running the sell-side process). It is INHERENTLY BIASED toward presenting the company favorably — apply the Seller-Halo Filter throughout. Evaluate with maximum skepticism:
+- Are management's projections anchored to best-case assumptions? Flag projections that exceed historical industry-adjusted growth without specific named drivers.
+- Is the competitive landscape presented favorably or incompletely? Flag missing competitor names + missing competitive-threat analysis.
 - Are customer concentration risks, key-person dependencies, or market headwinds downplayed?
-- Are "adjusted" EBITDA or non-GAAP metrics inflating true profitability?
-- Is the company narrative using SURVIVORSHIP BIAS by only highlighting successful case studies?`,
+- Are "adjusted" EBITDA or non-GAAP metrics inflating true profitability? Flag aggressive add-backs (one-time items that recur, optimistic synergy run-rate).
+- Is the company narrative using SURVIVORSHIP BIAS by only highlighting successful case studies / customer wins / pilot programs?
+- Are TAM / SAM / SOM figures top-down with no realistic adoption-friction analysis?
+
+CRITICAL: a CIM is a marketing document, not an objective baseline. The DQI for a CIM-derived audit must reflect that the document is structurally biased toward acquisition. Adjust validity-aware scoring downward in low-validity domains (cross-border M&A, market entry, novel-market expansion) where the seller-halo + buyer's inside-view are most dangerous.
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly:
+- "The Conglomerate Fallacy" — when the CIM presents the target as a strategic fit without operational overlap with the typical acquirer's core.
+- "The Synergy Mirage" — when synergy projections appear in the CIM without named operational mechanism + owner + milestone (rare in CIM but does happen in seller-prepared synergy models attached to CIM).`,
+
+  // ─── M&A workflow extensions (2026-05-09 P1 lock) ──────────────────────────
+
+  qofe: `DOCUMENT TYPE: QUALITY OF EARNINGS (QofE) REPORT
+This is a Quality of Earnings report — typically prepared by a Big-4 (Deloitte / KPMG / EY / PwC) or boutique transaction-advisory firm to normalize the target's reported earnings before the acquirer commits capital. The QofE is the primary diligence artefact for ADJUSTED-EBITDA defensibility. Evaluate:
+- Are "non-recurring" / "one-time" items truly non-recurring, or do they recur every year (recurring "one-time" items inflate adjusted EBITDA)?
+- Are owner-related expenses (above-market compensation, personal-use allocations, related-party transactions) being added back appropriately or aggressively?
+- Are the run-rate adjustments (cost-savings already implemented, customer wins post-period) defensible with documented evidence, or are they speculative?
+- Is the working-capital normalization realistic, or is it cherry-picked to a favourable period?
+- Is the customer-concentration analysis disclosed — does losing the top-1 / top-5 customers materially change the multiple?
+- Are the synergy adjustments INSIDE the QofE (e.g., "post-acquisition cost synergies of $X") flagged as buyer-side projections, not target-historicals?
+
+CRITICAL: a QofE that the SELL-SIDE commissioned is structurally biased toward higher adjusted EBITDA. A buy-side QofE is more defensible but still subject to confirmation bias when the buyer wants the deal to close.
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly:
+- "The Synergy Mirage" — when the QofE includes synergy add-backs without owner + mechanism + milestone documentation.
+- "The Sunk Ship" — when QofE adjustments are made AFTER significant deal spend, with the implicit pressure to reach a target adjusted-EBITDA number that justifies the deal price.`,
+
+  synergy_model: `DOCUMENT TYPE: SYNERGY MODEL / SYNERGY PROJECTION SPREADSHEET
+This is a synergy projection model — typically a spreadsheet (Excel / Google Sheets) breaking down expected revenue and cost synergies by initiative. The single most-mistrusted artefact in M&A: 70-90% of acquisitions fail to realize projected synergies (per McKinsey + KPMG). Evaluate with maximum rigor:
+- Does each synergy line item have a NAMED OPERATIONAL MECHANISM (e.g., "consolidate two AWS accounts → $X savings" not "IT efficiencies → $X savings")?
+- Does each synergy line item have a NAMED ACCOUNTABLE EXECUTIVE who will own delivery?
+- Does each synergy line item have a MEASURABLE 90-DAY MILESTONE that proves the synergy is on track?
+- Are revenue synergies (cross-sell, channel expansion, pricing power) flagged HARDER than cost synergies — revenue synergies have a 30-50% realization rate vs cost synergies at 60-80%, and the model should reflect that base-rate gap?
+- Are integration costs (one-time T&E, severance, system migration, customer-retention discounts) realistically modeled, or is the synergy net-of-cost figure inflated by under-counted integration spend?
+- Is there a base-case / bear-case / bull-case scenario, or only the bull case?
+- Are achieved synergies tracked against projected synergies in any comparable past deal by this acquirer? If not, this is a base-rate-blind model.
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly:
+- "The Synergy Mirage" — fires HARDEST on this document type. If any synergy line item lacks mechanism + owner + milestone, flag this combination as Critical severity.
+- "The Conglomerate Fallacy" — fires when the synergy model assumes operational integration that the acquirer's core capabilities cannot deliver (e.g., a financial buyer modeling "operational synergies" they cannot operationally deliver).`,
+
+  integration_plan: `DOCUMENT TYPE: POST-MERGER INTEGRATION (PMI) PLAN
+This is a post-merger integration plan describing the Day-1 operating model, IT integration, talent retention, customer continuity, and cultural alignment plan for a closed or about-to-close acquisition. Most M&A value is destroyed in INTEGRATION, not in diligence — make this artefact the primary risk surface. Evaluate:
+- CULTURAL DIVERGENCE BLIND SPOTS: does the plan assess the target vs acquirer operating-model fit? Top-down rules-based vs autonomous principles-based cultures cannot be merged without explicit budget for change management. Flag if the plan assumes cultural integration "just happens."
+- IT-SIMPLICITY FALLACY: BCG mandates that acquirers select a single core IT stack early in integration. Flag if the plan assumes a complex hybrid IT integration without aggressive cost buffers — IT integration costs are systematically under-budgeted by 30-100%.
+- TALENT-FLIGHT RISK: are explicit retention programs in place for the top 2 layers of target management? Are reporting lines for those layers defined for Day-1 not "post-close TBD"? Flag if retention is left undefined or under-budgeted.
+- CUSTOMER-CONCENTRATION RISK: does the plan address how top customers will be communicated to + retained? Customer churn at 6-12 months post-close is the canonical PMI failure mode.
+- SYNERGY-OWNERSHIP: does the integration plan assign the synergies from the synergy model to specific Day-1 owners with 90-day milestones? Or are synergies assumed to "emerge from integration"?
+- DAY-1 OPERATING MODEL: is the operating model explicit (combined org chart, decision-rights matrix, P&L ownership) or vague?
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly:
+- "The Synergy Mirage" — fires when the integration plan assumes synergies from the synergy model without naming Day-1 owners + 90-day milestones.
+- "The Conglomerate Fallacy" — fires when the integration plan assumes operational fit that the cultural-divergence section of the plan itself contradicts.
+
+NOTE: the PMI overlay is the deepest M&A use case but the value-realization feedback loop is 12-24 months. Use the PMI overlay primarily as a leading indicator, not a backward-looking grade.`,
 
   pitch_deck: `DOCUMENT TYPE: MANAGEMENT / STRATEGY PITCH DECK
 This is a pitch deck from a management team or strategic partner seeking approval or investment. Watch for:

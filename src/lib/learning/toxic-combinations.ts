@@ -81,7 +81,7 @@ const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Echo Chamber',
     description:
-      'Groupthink + confirmation bias with no dissenting voices creates a self-reinforcing belief loop where challenging evidence is dismissed.',
+      'Groupthink + confirmation bias with no dissenting voices creates a self-reinforcing belief loop where challenging evidence is dismissed. In M&A specifically: an IC where the deal team converged before the CIM landed and is now rationalising every diligence finding into the original thesis.',
     biasTypes: ['groupthink', 'confirmation_bias'],
     contextRequired: { dissentAbsent: true },
     baseScore: 85,
@@ -89,7 +89,7 @@ const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Sunk Ship',
     description:
-      'Sunk cost fallacy + anchoring bias with high monetary stakes leads to doubling down on failing strategies because of prior investment.',
+      'Sunk cost fallacy + anchoring bias with high monetary stakes leads to doubling down on failing strategies because of prior investment. In M&A specifically: deal-escalation language ("we have already spent $X on diligence and advisor fees") justifies continued bidding past intrinsic value, or rationalises proceeding despite material negative diligence findings. Lockheed Martin reach-forward losses are the canonical anchor.',
     biasTypes: ['sunk_cost_fallacy', 'anchoring_bias'],
     contextRequired: { monetaryStakes: 'high' },
     baseScore: 80,
@@ -105,7 +105,7 @@ const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Yes Committee',
     description:
-      'Authority bias + groupthink with unanimous consensus means the most senior voice dominates and no one challenges the decision.',
+      'Authority bias + groupthink with unanimous consensus means the most senior voice dominates and no one challenges the decision. In M&A specifically: an IC memo that reads as a rubber-stamp justification of a CEO or sponsor\'s pet acquisition with zero documented dissent — the committee acted as a ratifying body rather than an adversarial audit. Microsoft-Nokia is the canonical \\$249B-evaporation anchor.',
     biasTypes: ['groupthink', 'authority_bias'],
     contextRequired: { unanimousConsensus: true },
     baseScore: 82,
@@ -117,6 +117,38 @@ const NAMED_PATTERNS: NamedPattern[] = [
     biasTypes: ['overconfidence_bias', 'confirmation_bias'],
     contextRequired: { monetaryStakes: 'high' },
     baseScore: 78,
+  },
+  // ─── M&A-specific named patterns (locked 2026-05-09) ───────────────────────
+  // The 3 patterns below are first-class M&A failure modes. They harden the
+  // existing 22-bias taxonomy into the most-cited M&A-specific failure shapes
+  // (per the 2026-05-08 NotebookLM corporate-strategy synthesis + the
+  // 143-case library frequency ranking). Pair with the M&A document-type
+  // overlays in `src/lib/prompts/investment-vertical.ts` so that uploads
+  // classified as ic_memo / cim / qofe / synergy_model / integration_plan
+  // automatically surface these patterns when the underlying biases co-occur.
+  {
+    label: 'The Synergy Mirage',
+    description:
+      'Overconfidence in projections + planning fallacy: revenue or cost synergy claims projected with hockey-stick precision but lacking a named operational mechanism, named accountable executive, or measurable 90-day milestone. The canonical M&A failure mode — McKinsey + KPMG research finds 70-90% of acquisitions fail to realise projected synergies. Fires when synergy figures appear in the memo without the BCG integration-best-practices triad of (mechanism, owner, milestone). Benchmark against historical realized-synergy rates from the case library.',
+    biasTypes: ['overconfidence_bias', 'planning_fallacy'],
+    contextRequired: { monetaryStakes: 'high' },
+    baseScore: 88,
+  },
+  {
+    label: 'The Conglomerate Fallacy',
+    description:
+      'Illusion of validity + halo effect: a far-adjacency acquisition justified primarily by the target\'s growth or brand momentum rather than by core operational overlap or a defensible "why us as parent" thesis (Porter parenting advantage). The narrative coherence of the target\'s success story produces high acquirer-side confidence, while the lack of operational fit is rationalised away. Bed Bath & Beyond + Container Store, AOL + Time Warner, Daimler + Chrysler are the canonical anchors.',
+    biasTypes: ['illusion_of_validity', 'halo_effect'],
+    contextRequired: {},
+    baseScore: 84,
+  },
+  {
+    label: "The Winner's Curse",
+    description:
+      'Anchoring bias + overconfidence with auction-dynamic language: the bid is driven by fear of losing the deal rather than intrinsic value. Fires on phrases like "preempting competitor B," "strategic necessity," "competitive process," "we cannot let X get this asset" — these signal that competitive dynamics, not fundamentals, are driving valuation. The acquirer who wins is statistically the acquirer who most overpaid. WeWork S-1, Quibi, the post-2010 SPAC wave are anchor cases.',
+    biasTypes: ['anchoring_bias', 'overconfidence_bias'],
+    contextRequired: { monetaryStakes: 'high', timePressure: true },
+    baseScore: 86,
   },
   {
     label: 'The Status Quo Lock',

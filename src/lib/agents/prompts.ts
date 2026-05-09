@@ -56,10 +56,13 @@ COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its a
 • Inside-View Dominance + Confirmation Bias (1.3x) — Selectively-gathered evidence reinforces the inside-view narrative; together they make the reference class invisible
 
 TOXIC COMBINATIONS to flag explicitly:
-• "Echo Chamber" — Groupthink + Confirmation Bias present together
-• "Sunk Ship" — Sunk Cost Fallacy + Anchoring Bias
-• "Yes Committee" — Authority Bias + Groupthink
+• "Echo Chamber" — Groupthink + Confirmation Bias present together. M&A: an IC where the deal team converged before the CIM landed and is now rationalising every diligence finding into the original thesis.
+• "Sunk Ship" — Sunk Cost Fallacy + Anchoring Bias. M&A: deal-escalation language ("we have already spent $X on diligence and advisor fees") justifying continued bidding past intrinsic value, or rationalising proceeding despite material negative diligence findings.
+• "Yes Committee" — Authority Bias + Groupthink. M&A: an IC memo that reads as a rubber-stamp justification of a CEO or sponsor's pet acquisition with zero documented dissent.
 • "Optimism Trap" — Overconfidence + Confirmation Bias
+• "Synergy Mirage" — Overconfidence in Projections + Planning Fallacy. The canonical M&A failure mode (70-90% of acquisitions fail to realize projected synergies per McKinsey + KPMG). Fires when revenue or cost synergy claims appear in the memo without (a) a NAMED OPERATIONAL MECHANISM (e.g., "consolidate two AWS accounts" not "IT efficiencies"), (b) a NAMED ACCOUNTABLE EXECUTIVE who will own delivery, or (c) a MEASURABLE 90-DAY MILESTONE. Hardest on revenue synergies (30-50% realization rate vs cost synergies at 60-80%). Severity: Critical when synergies drive >25% of deal valuation; High when 10-25%; Medium when <10%.
+• "Conglomerate Fallacy" — Illusion of Validity + Halo Effect. A far-adjacency acquisition justified primarily by the target's growth or brand momentum rather than by core operational overlap or a defensible "why us as parent" thesis (Porter parenting advantage). Anchor cases: Bed Bath & Beyond + Container Store, AOL + Time Warner, Daimler + Chrysler. Fires when the memo presents target growth as the rationale without addressing what THIS acquirer adds operationally.
+• "Winner's Curse" — Anchoring Bias + Overconfidence with auction-dynamic language. The bid is driven by fear of losing the deal rather than intrinsic value. Fires on phrases: "preempting competitor B," "strategic necessity," "competitive process," "we cannot let X get this asset." Severity: Critical in time-pressured competitive auctions; High when one named competitor is mentioned; Medium when "competitive dynamics" appears generically.
 • "Status Quo Lock" — Status Quo Bias + Anchoring Bias or Loss Aversion
 • "Golden Child" — Halo Effect + Confirmation Bias + Authority Bias (prestige blinds scrutiny)
 • "Doubling Down" — Gambler's Fallacy + Sunk Cost Fallacy (belief in reversal justifies continued investment)

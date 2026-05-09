@@ -98,6 +98,33 @@ Decision Intel is a decision intelligence platform for corporate strategy teams.
 
 These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
+## M&A Workflow Native (P1 lock 2026-05-09 — capability sharpening, NOT positioning narrowing)
+
+**The hybrid pivot direction (locked 2026-05-09 after the 2026-05-08 NotebookLM hybrid-path synthesis):** keep DI broad-positioning (4 HXC personas including fractional CSO; H1 stays "Decision Intel is the reasoning audit platform"), but harden the product into M&A-workflow-native shape. Three of four HXC personas are M&A-primary (mid-market corp dev / smaller-fund GP / PE-backed founder); the deepest product capability + the strongest career-credential overlap with M&A workflow specifically. The hybrid lets DI serve all 4 HXC personas without abandoning the broad positioning AND positions the founder for senior-direct corp dev hiring (per the 2026-05-09 NotebookLM senior-direct-path synthesis: technical-strategist track at Lazard / KKR Capstone / Vista Operating Group / Databricks / Snowflake via acqui-hire-structured deal terms, not analyst-track entry).
+
+**13 named toxic patterns** (was 10) in `src/lib/learning/toxic-combinations.ts` `NAMED_PATTERNS`. The 3 M&A-specific patterns added 2026-05-09:
+
+- **The Synergy Mirage** (overconfidence_bias + planning_fallacy with high monetary stakes) — the canonical M&A failure mode (70-90% of acquisitions fail to realize projected synergies per McKinsey + KPMG). Fires when synergy claims lack a NAMED OPERATIONAL MECHANISM + NAMED ACCOUNTABLE EXECUTIVE + MEASURABLE 90-DAY MILESTONE per BCG integration-best-practices. Severity Critical when synergies drive >25% of deal valuation; High when 10-25%; Medium when <10%. Revenue synergies flagged harder than cost synergies (30-50% vs 60-80% realization rates).
+- **The Conglomerate Fallacy** (illusion_of_validity + halo_effect) — far-adjacency acquisition justified primarily by target's growth or brand momentum rather than core operational overlap or "why us as parent" thesis (Porter parenting advantage). Anchor failures: Bed Bath & Beyond + Container Store, AOL + Time Warner, Daimler + Chrysler.
+- **The Winner's Curse** (anchoring_bias + overconfidence_bias) — auction-dynamic language driving bids above intrinsic value. Fires on "preempting competitor B" / "strategic necessity" / "competitive process" / "we cannot let X get this asset." Required context: monetaryStakes='high' AND timePressure=true. WeWork S-1, Quibi, post-2010 SPAC wave anchors.
+
+Plus M&A-specific framing layered into existing **Sunk Ship** (deal-escalation language: "we have already spent $X on diligence and advisor fees"; Lockheed Martin reach-forward losses anchor) + **Yes Committee** (rubber-stamp justification of CEO/sponsor's pet acquisition with zero documented dissent; Microsoft-Nokia $249B-evaporation anchor).
+
+**3 new M&A document subtypes** in `src/lib/prompts/investment-vertical.ts` `INVESTMENT_DOCUMENT_TYPES` (was 6, now 9): `qofe` (Quality of Earnings — flag for adjusted-EBITDA inflation + run-rate normalization + customer-concentration disclosure), `synergy_model` (synergy projection spreadsheet — fires Synergy Mirage hardest), `integration_plan` (post-merger integration plan — cultural divergence + IT-simplicity fallacy + talent-flight + customer-concentration + synergy ownership + Day-1 operating model). Plus `ic_memo` + `cim` `DOC_TYPE_OVERLAYS` sharpened with the 5 named M&A toxic combinations + Porter "why us as parent" question + Seller-Halo Filter framing.
+
+**Cascade discipline when adding new toxic combinations:** (a) `NAMED_PATTERNS` array in `src/lib/learning/toxic-combinations.ts`, (b) `BIAS_DETECTIVE_PROMPT` TOXIC COMBINATIONS section in `src/lib/agents/prompts.ts`, (c) all required bias keys must exist in `BIAS_EDUCATION` (verify before adding), (d) Education Room flashcard in `src/components/founder-hub/education/education-room-data.ts` cognitive_biases deck. The 4-part cascade is the same shape as adding a new bias to the 22-bias taxonomy.
+
+**Cascade discipline when adding new document subtypes:** (a) `INVESTMENT_DOCUMENT_TYPES` array, (b) entry in `DOC_TYPE_OVERLAYS` dict, (c) optional entry in `STAGE_BIAS_OVERLAYS` if stage-specific risks exist. The Document.documentType field is free-text in Prisma — no schema migration needed.
+
+**The build roadmap** (per the 2026-05-09 NotebookLM operational-positioning synthesis):
+
+- **P1 (Months 1-3, locked 2026-05-09):** IC Memo / CIM parser type-recognition + 5 first-class M&A toxic combinations. SHIPPED in this commit.
+- **P2 (Months 4-6, during Sankore window):** Synergy Validation Overlay (deeper than the synergy_model overlay — surface a "Synergy Defensibility Score" benchmarking projected vs historical realized rates from the 143-case library) + Boardroom Decision Twin REFINEMENT (the simulator already exists; sharpen for IC vote-prediction specifically).
+- **P3 (Months 7-9, acqui-hire conversation window):** Deal-stage UI overlays (Sourcing → Diligence → IC Review → Closing visible in the product chrome — pure demo polish for acqui-hire conversations).
+- **Backlog (post-acqui-hire):** PMI overlays — feedback loop is 12-24 months, too slow for solo founder. Wait until inside the acquirer with an engineering team.
+
+**Forward-looking rule**: when adding M&A-specific overlays, prefer ENHANCING existing biases / patterns / document types over creating new ones. The 22-bias taxonomy is the structural moat; M&A specificity comes from compound-pattern detection + document-type overlay prompts, not from 30+ M&A-specific biases that would dilute the taxonomy. The named M&A patterns earn their first-class status by appearing in the 143-case library at materially higher frequency than non-M&A patterns.
+
 ## Positioning & Vocabulary (locked 2026-04-13)
 
 **Core value proposition:** "The Four Moments We Catch What Others Miss" — a Decision Knowledge Graph as the foundation, with (1) the Graph itself, (2) predicting CEO/steering-committee questions, (3) auditing reasoning, and (4) closing the outcome loop via DQI.
