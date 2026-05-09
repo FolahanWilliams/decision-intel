@@ -19,6 +19,7 @@ import {
   PenLine,
   Package,
   Vote,
+  FileText,
 } from 'lucide-react';
 
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
@@ -62,6 +63,19 @@ const SHARED_STOP_USAGE: Omit<Step, 'content' | 'icon' | 'title'> = {
 
 const SHARED_STOP_ANALYTICS: Omit<Step, 'content' | 'icon' | 'title'> = {
   selector: '#onborda-nav-analytics',
+  side: 'right',
+  showControls: true,
+  pointerPadding: 6,
+  pointerRadius: 10,
+};
+
+// M&A-specific stop on the Deals nav item (locked 2026-05-09, Ship B.1).
+// Anchored on Sidebar.tsx Projects NavItem (id="onborda-nav-deals") —
+// only used by the ma tour. The deal-as-atomic-decision-unit framing
+// is the load-bearing concept for an M&A reader; pointing the tour at
+// the Deals nav lets that framing land at the moment of orientation.
+const SHARED_STOP_DEALS: Omit<Step, 'content' | 'icon' | 'title'> = {
+  selector: '#onborda-nav-deals',
   side: 'right',
   showControls: true,
   pointerPadding: 6,
@@ -124,8 +138,22 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       ),
     },
     {
-      ...SHARED_STOP_USAGE,
+      ...SHARED_STOP_DEALS,
       icon: <Briefcase size={18} />,
+      title: 'Each Project is the atomic decision unit',
+      content: (
+        <>
+          A deal is the unit of work: CIM + QofE + synergy model + integration plan + counsel
+          review + IC deck. Composite Deal DQI lives on the Project page along with the IC
+          Readiness Gate (required docs, all analyzed, DQI ≥ 55, cross-ref clean, IC date set).
+          Walk into committee with the Gate showing green, not with a stack of separately-audited
+          PDFs.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <FileText size={18} />,
       title: 'Your audit budget per deal',
       content: (
         <>
@@ -138,14 +166,14 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
     {
       ...SHARED_STOP_ANALYTICS,
       icon: <GitCompare size={18} />,
-      title: 'Cross-document review + Deal DQI',
+      title: 'Cross-document review + IRR/MOIC calibration',
       content: (
         <>
-          When you upload more than one doc per deal, the cross-reference agent flags conflicts
-          (&ldquo;CIM says 40% growth, model assumes 15%&rdquo;) and a composite Deal DQI lives on
-          the Deals page. The IC Readiness Gate scores five gates (required docs, all analyzed,
-          DQI ≥ 55, cross-ref clean, IC date set) so you walk into committee knowing what&rsquo;s
-          shaky.
+          The cross-reference agent flags conflicts across deal documents (&ldquo;CIM says 40%
+          growth, model assumes 15%&rdquo;). Analytics aggregates the M&A toxic combinations
+          recurring at IC across your full pipeline. Once realised IRR / MOIC outcomes accumulate
+          12-24 months after close, the Outcome Flywheel surfaces calibration &mdash; were the
+          high-confidence committee votes actually the better deals?
         </>
       ),
     },

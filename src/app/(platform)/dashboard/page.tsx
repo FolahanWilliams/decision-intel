@@ -142,7 +142,7 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
 
 const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
   cso: 'Strategic memos, audited before the board sees them',
-  ma: 'Pre-IC bias detection across every active thesis',
+  ma: "Pre-IC audit on every memo — Synergy Mirage, Conglomerate Fallacy, Winner's Curse",
   bizops: 'Quality gates on every recurring strategic recommendation',
   pe_vc: 'IC memos and portfolio reviews, audited live',
   other: 'Decision intelligence overview',
