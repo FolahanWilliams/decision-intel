@@ -215,33 +215,58 @@ export function ContainerConstellation() {
           {visibleLinks.map(l => {
             const meta = CONTAINER_LINK_TYPE_META[l.linkType];
             const isHovered = hoveredLinkId === l.id;
-            const baseOpacity = l.isHotEdge ? 0.85 : isHovered ? 0.9 : 0.45;
+            // Alert-ripple edges (depends_on with critical assumption)
+            // jump to red + thicker stroke + animated dash-flow regardless
+            // of the meta default. The visual conduit between a critical
+            // assumption and its dependents.
+            const strokeColor = l.isAlertEdge ? 'var(--severity-critical)' : meta.edgeColor;
+            const strokeWidth = l.isAlertEdge ? 2.2 : l.isHotEdge ? 1.6 : 1;
+            const baseOpacity = l.isAlertEdge
+              ? 0.95
+              : l.isHotEdge
+                ? 0.85
+                : isHovered
+                  ? 0.9
+                  : 0.45;
+            const dashArray =
+              meta.edgeStyle === 'dashed'
+                ? '4 3'
+                : meta.edgeStyle === 'dotted'
+                  ? '1 3'
+                  : undefined;
             return (
               <g key={l.id}>
                 <path
                   d={curvedPath(l.fromX, l.fromY, l.toX, l.toY)}
                   fill="none"
-                  stroke={meta.edgeColor}
-                  strokeWidth={l.isHotEdge ? 1.6 : 1}
-                  strokeDasharray={
-                    meta.edgeStyle === 'dashed'
-                      ? '4 3'
-                      : meta.edgeStyle === 'dotted'
-                        ? '1 3'
-                        : undefined
-                  }
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={dashArray}
                   strokeOpacity={baseOpacity}
                   style={{ transition: 'stroke-opacity 200ms, stroke-width 200ms' }}
                   onMouseEnter={() => setHoveredLinkId(l.id)}
                   onMouseLeave={() => setHoveredLinkId(null)}
-                />
+                >
+                  {l.isAlertEdge && (
+                    // Animated dash-flow so the alert edge reads as a live
+                    // ripple from the critical assumption toward each
+                    // dependent. The negative offset moves from B → A.
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      from="0"
+                      to="-14"
+                      dur="1.2s"
+                      repeatCount="indefinite"
+                    />
+                  )}
+                </path>
                 {/* Arrowhead */}
                 <ArrowHead
                   toX={l.toX}
                   toY={l.toY}
                   fromX={l.fromX}
                   fromY={l.fromY}
-                  color={meta.edgeColor}
+                  color={strokeColor}
                   opacity={baseOpacity}
                 />
                 {isHovered && l.note && (
@@ -300,14 +325,47 @@ function ConstellationNode({
 }) {
   const color = riskBandColor(node.riskBand);
   const opacity = node.isQuiet ? 0.18 : selected ? 1 : 0.95;
+  const hasAlertRipple = node.alertRippleSources != null && node.alertRippleSources.length > 0;
 
   return (
     <g
       onClick={onClick}
       style={{ cursor: 'pointer' }}
       role="button"
-      aria-label={`${CONTAINER_MODES[node.kind].label}: ${node.name}`}
+      aria-label={`${CONTAINER_MODES[node.kind].label}: ${node.name}${hasAlertRipple ? ` — depends on a critical assumption` : ''}`}
     >
+      {/* Alert-ripple ring (critical-assumption dependent). Renders OUTSIDE
+          the standard pulse ring at a wider radius + faster animation so
+          a dependent rippling-red is unmistakable from a self-critical
+          node. Even when the dependent's own riskBand is not critical,
+          this ring fires — that's the WHOLE point: the assumption broke
+          and now its dependents are at risk.
+      */}
+      {hasAlertRipple && !node.isQuiet && (
+        <circle
+          cx={node.x}
+          cy={node.y}
+          r={node.r + 10}
+          fill="none"
+          stroke="var(--severity-critical)"
+          strokeWidth={1.5}
+          opacity={0.55}
+        >
+          <animate
+            attributeName="r"
+            values={`${node.r + 6};${node.r + 18};${node.r + 6}`}
+            dur="1.6s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="opacity"
+            values="0.7;0.05;0.7"
+            dur="1.6s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      )}
+
       {/* Pulse ring for critical / near-committee */}
       {node.shouldPulse && !node.isQuiet && (
         <circle
@@ -677,6 +735,27 @@ function Legend() {
       <LegendDot color="var(--warning)" label="Medium risk" />
       <LegendDot color="var(--success)" label="Low risk · audited" />
       <LegendDot color="var(--text-muted)" label="Quiet · no flagged signal" />
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          color: 'var(--severity-critical)',
+          fontWeight: 600,
+        }}
+      >
+        <span
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            border: '1.5px solid var(--severity-critical)',
+            background: 'transparent',
+            display: 'inline-block',
+          }}
+        />
+        Alert ripple · depends on a critical assumption
+      </span>
       <span style={{ marginLeft: 'auto', fontStyle: 'italic' }}>
         x: time created · y: mode · size: ticket · pulse: T-7d or critical
       </span>

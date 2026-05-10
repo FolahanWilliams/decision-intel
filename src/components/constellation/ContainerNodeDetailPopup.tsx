@@ -11,7 +11,7 @@
  */
 
 import Link from 'next/link';
-import { ChevronRight, AlertCircle, Calendar, FileText } from 'lucide-react';
+import { ChevronRight, AlertCircle, AlertTriangle, Calendar, FileText } from 'lucide-react';
 import { CONTAINER_MODES } from '@/lib/data/decision-container-modes';
 import { riskBandColor, severityTint, type PositionedNode } from './constellation-layout';
 import { dqiColorFor } from '@/lib/utils/grade';
@@ -188,6 +188,79 @@ export function ContainerNodeDetailPopup({
           />
         )}
       </div>
+
+      {/* Alert-ripple callout — fires when this node depends on at least
+          one critical assumption. The Cornerstone-magnetic moment: a fund
+          partner sees four portfolio commits ripple red simultaneously
+          when the macro WAEMU debt-cycle assumption flipped. The callout
+          names the assumption(s) so the buyer goes from "why is this
+          flagged" to "the assumption it rests on broke" in one read. */}
+      {node.alertRippleSources && node.alertRippleSources.length > 0 && (
+        <div
+          style={{
+            marginBottom: 12,
+            padding: '10px 12px',
+            borderRadius: 'var(--radius-md)',
+            background: 'color-mix(in srgb, var(--severity-critical) 8%, transparent)',
+            border: '1px solid var(--severity-critical)',
+            borderLeft: '3px solid var(--severity-critical)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 'var(--fs-2xs)',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--severity-critical)',
+              marginBottom: 4,
+            }}
+          >
+            <AlertTriangle size={11} />
+            Alert ripple
+          </div>
+          <p
+            style={{
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--text-primary)',
+              margin: 0,
+              lineHeight: 1.5,
+            }}
+          >
+            This decision rests on{' '}
+            {node.alertRippleSources.length === 1
+              ? 'a critical assumption'
+              : `${node.alertRippleSources.length} critical assumptions`}{' '}
+            that just flipped:
+          </p>
+          <ul
+            style={{
+              margin: '6px 0 0',
+              paddingLeft: 16,
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.45,
+            }}
+          >
+            {node.alertRippleSources.slice(0, 3).map(name => (
+              <li key={name}>{name}</li>
+            ))}
+            {node.alertRippleSources.length > 3 && (
+              <li
+                style={{
+                  fontStyle: 'italic',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                +{node.alertRippleSources.length - 3} more
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
 
       {/* Decision frame */}
       {node.decisionFrame && (

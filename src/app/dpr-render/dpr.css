@@ -1280,3 +1280,89 @@
     display: none !important;
   }
 }
+
+/* ─── Engagement appendix (fractional CSO persona, page 7) ──────────── */
+
+.dpr-document-root .dpr-engagement-bias-table,
+.dpr-document-root .dpr-engagement-cohort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--dpr-type-sm);
+  margin-top: var(--dpr-space-5);
+}
+
+.dpr-document-root .dpr-engagement-bias-table th,
+.dpr-document-root .dpr-engagement-cohort-table th {
+  text-align: left;
+  font-size: var(--dpr-type-xxs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dpr-grey-600);
+  padding: var(--dpr-space-2) var(--dpr-space-3);
+  border-bottom: 1px solid var(--dpr-rule-strong);
+  background: var(--dpr-grey-50);
+}
+
+.dpr-document-root .dpr-engagement-bias-table td,
+.dpr-document-root .dpr-engagement-cohort-table td {
+  padding: var(--dpr-space-2) var(--dpr-space-3);
+  border-bottom: 1px solid var(--dpr-rule);
+  vertical-align: middle;
+}
+
+.dpr-document-root .dpr-engagement-bias-table-name {
+  font-weight: 600;
+  color: var(--dpr-grey-900);
+}
+
+.dpr-document-root .dpr-engagement-bias-table-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: white;
+  font-size: var(--dpr-type-xxs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dpr-document-root .dpr-engagement-cohort-self {
+  background: var(--dpr-grey-50);
+}
+
+.dpr-document-root .dpr-engagement-cohort-self-name {
+  color: var(--dpr-grey-600);
+  font-weight: 500;
+}
+
+.dpr-document-root .dpr-engagement-cohort-empty {
+  margin: var(--dpr-space-5) 0 0;
+  padding: var(--dpr-space-4);
+  background: var(--dpr-grey-50);
+  border-left: 3px solid var(--dpr-rule-strong);
+  font-size: var(--dpr-type-sm);
+  color: var(--dpr-grey-700);
+  line-height: 1.55;
+}
+
+.dpr-document-root .dpr-engagement-footnote {
+  margin: var(--dpr-space-5) 0 0;
+  padding-top: var(--dpr-space-3);
+  border-top: 1px solid var(--dpr-rule);
+  font-size: var(--dpr-type-xxs);
+  color: var(--dpr-grey-600);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.dpr-document-root .dpr-engagement-footnote code {
+  font-family:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    monospace;
+  font-size: var(--dpr-type-xxs);
+  font-style: normal;
+  padding: 1px 4px;
+  background: var(--dpr-grey-100);
+  border-radius: 3px;
+}

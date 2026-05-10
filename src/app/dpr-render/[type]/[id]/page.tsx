@@ -49,6 +49,7 @@ import {
   type DprStructuralAssumption,
 } from '@/components/dpr/pages/DprPageStructuralAssumptions';
 import { DprPageRegulatoryCrosswalk } from '@/components/dpr/pages/DprPageRegulatoryCrosswalk';
+import { DprPageEngagementAppendix } from '@/components/dpr/pages/DprPageEngagementAppendix';
 import { deriveDprFindings } from '@/lib/reports/dpr-findings';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
@@ -106,7 +107,20 @@ export default async function DprRenderPage({
         ? await loadStructuralAssumptionsForDpr(id)
         : [];
 
-  const totalPages = 6;
+  // Engagement appendix surfaces only for Phase 1 HXC fractional CSOs
+  // when their audit is on a container with a non-null targetCompany.
+  // The data assembler does the persona + data gating; here we just check
+  // whether the field is populated.
+  const renderEngagementAppendix = data.engagementAppendix != null;
+
+  // Total physical pages: 6 baseline (cover, methodology, R²F strips,
+  // findings, structural assumptions when present, regulatory crosswalk),
+  // plus 1 when the engagement appendix renders. The Structural
+  // Assumptions page is conditional but counted in baseline because
+  // specimens always include it; per-document audits skip it silently
+  // when StructuralAssumption rows are absent. Conditional page count
+  // matches what the cover declares.
+  const totalPages = 6 + (renderEngagementAppendix ? 1 : 0);
 
   return (
     <>
@@ -165,6 +179,15 @@ export default async function DprRenderPage({
         classification={classification}
         auditTimestamp={auditTimestamp}
       />
+      {renderEngagementAppendix && data.engagementAppendix && (
+        <DprPageEngagementAppendix
+          appendix={data.engagementAppendix}
+          pageNumber={7}
+          totalPages={totalPages}
+          classification={classification}
+          auditTimestamp={auditTimestamp}
+        />
+      )}
     </>
   );
 }

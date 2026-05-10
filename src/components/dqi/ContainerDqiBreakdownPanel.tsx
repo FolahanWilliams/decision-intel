@@ -39,8 +39,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { ArrowRight, FileText, Loader2 } from 'lucide-react';
+import { ArrowRight, FileText, GitCompareArrows, Loader2 } from 'lucide-react';
 import { dqiColorFor } from '@/lib/utils/grade';
+import { formatBiasName } from '@/lib/utils/labels';
 import type { DQIResult } from '@/lib/scoring/dqi';
 import type { ContainerDetail } from '@/types/containers';
 
@@ -482,6 +483,16 @@ export function ContainerDqiBreakdownPanel({
           )}
         </section>
 
+        {/* ── Section A.5: Cross-document signal ─────────────────────
+         * Recurring biases + named patterns + cross-doc conflicts that
+         * fire ACROSS documents in this container. Component drag (Section
+         * A) shows AVERAGED scores; this section surfaces the underlying
+         * pattern signals — which the per-doc panel only sees one doc at
+         * a time. The whole point of the container surface is cross-doc
+         * coherence: this section makes it visible inside the breakdown.
+         */}
+        <CrossDocSignalSection container={container} />
+
         {/* ── Section B: Per-doc rows worst-first ──────────────────── */}
         <section style={{ marginTop: 18 }}>
           <header style={{ marginBottom: 8 }}>
@@ -628,4 +639,294 @@ export function ContainerDqiBreakdownPanel({
       </DialogContent>
     </Dialog>
   );
+}
+
+// ─── Cross-doc signal section (Section A.5) ─────────────────────────────
+
+/**
+ * Surfaces what's repeating across documents in the container — the
+ * cross-doc coherence signal that's the whole point of the container
+ * surface. Reads from container.aggregation (recurring biases + named
+ * patterns aggregated across member docs) and the cross-ref summary
+ * counts on the container summary itself.
+ *
+ * Top-N caps: 5 recurring biases (more than 5 is noise; the buyer wants
+ * the strongest signals). All named patterns rendered (max 5 in practice
+ * given the 13 NAMED_PATTERNS catalogue).
+ *
+ * Severity-coded chips per row mirror the per-doc panel severity colour
+ * discipline. Recurring biases sort by document occurrence count desc;
+ * named patterns sort by severity (critical → low) then doc count desc.
+ */
+function CrossDocSignalSection({ container }: { container: ContainerDetail }) {
+  const recurringBiases = (container.aggregation?.allBiases ?? [])
+    .slice()
+    .sort((a, b) => {
+      if (b.documentIds.length !== a.documentIds.length) {
+        return b.documentIds.length - a.documentIds.length;
+      }
+      return b.count - a.count;
+    })
+    .slice(0, 5);
+
+  const namedPatterns = (container.aggregation?.namedPatterns ?? [])
+    .slice()
+    .sort((a, b) => {
+      const sevRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+      const sa = sevRank[a.severity] ?? 0;
+      const sb = sevRank[b.severity] ?? 0;
+      if (sb !== sa) return sb - sa;
+      return b.documentCount - a.documentCount;
+    });
+
+  const crossRefConflicts = container.crossRefConflictCount ?? 0;
+  const crossRefHighSeverity = container.crossRefHighSeverityCount ?? 0;
+
+  // Hide the section when nothing fires — keep the panel terse on
+  // small/clean containers where there's no cross-doc signal to report.
+  if (recurringBiases.length === 0 && namedPatterns.length === 0 && crossRefConflicts === 0) {
+    return null;
+  }
+
+  return (
+    <section style={{ marginTop: 18 }}>
+      <header style={{ marginBottom: 8 }}>
+        <h3
+          style={{
+            fontSize: 'var(--fs-md)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            margin: 0,
+          }}
+        >
+          What&rsquo;s repeating across documents
+        </h3>
+        <p
+          style={{
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--text-secondary)',
+            margin: '4px 0 0',
+            lineHeight: 1.5,
+          }}
+        >
+          The cross-doc signal the per-document panel can&rsquo;t see — biases that fire in more
+          than one memo, named failure patterns the audit caught at the deal level, conflicts where
+          two documents say different things.
+        </p>
+      </header>
+
+      {namedPatterns.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 'var(--fs-3xs)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              fontWeight: 600,
+              marginBottom: 6,
+            }}
+          >
+            Named failure patterns
+          </div>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
+            {namedPatterns.map(p => {
+              const sev = severityColorForPatternBand(p.severity);
+              return (
+                <li
+                  key={p.patternLabel}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderLeft: `3px solid ${sev.bar}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {p.patternLabel}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-2xs)',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      Fired in {p.documentCount}{' '}
+                      {p.documentCount === 1 ? 'document' : 'documents'}
+                      {p.maxToxicScore != null
+                        ? ` · max toxic score ${Math.round(p.maxToxicScore)}`
+                        : ''}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 'var(--fs-2xs)',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      padding: '2px 8px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: sev.bg,
+                      color: sev.text,
+                    }}
+                  >
+                    {p.severity}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {recurringBiases.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 'var(--fs-3xs)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              fontWeight: 600,
+              marginBottom: 6,
+            }}
+          >
+            Recurring biases
+          </div>
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 6,
+            }}
+          >
+            {recurringBiases.map(b => {
+              const sev = severityColorForPatternBand(
+                (b.severity as 'critical' | 'high' | 'medium' | 'low') ?? 'medium'
+              );
+              const docCount = b.documentIds.length;
+              return (
+                <li
+                  key={b.biasType}
+                  title={`${formatBiasName(b.biasType)} fired in ${docCount} ${docCount === 1 ? 'document' : 'documents'} (${b.count} total occurrences) at ${b.severity} severity`}
+                  style={{
+                    padding: '6px 10px',
+                    borderRadius: 'var(--radius-md)',
+                    background: sev.bg,
+                    border: `1px solid ${sev.bar}`,
+                    fontSize: 'var(--fs-2xs)',
+                    fontWeight: 600,
+                    color: sev.text,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span>{formatBiasName(b.biasType)}</span>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      padding: '1px 5px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: 'var(--bg-card)',
+                      color: 'var(--text-muted)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {docCount} doc{docCount === 1 ? '' : 's'}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {crossRefConflicts > 0 && (
+        <div
+          style={{
+            padding: '10px 12px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderLeft: `3px solid ${crossRefHighSeverity > 0 ? 'var(--severity-high)' : 'var(--warning)'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <GitCompareArrows
+              size={14}
+              style={{
+                color: crossRefHighSeverity > 0 ? 'var(--severity-high)' : 'var(--warning)',
+              }}
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                Cross-document conflicts
+              </div>
+              <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+                {crossRefConflicts} flagged
+                {crossRefHighSeverity > 0 ? ` · ${crossRefHighSeverity} at high severity` : ''}
+                {' · '}two documents say different things on the same claim
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
+ * Severity-band → palette mapping for pattern + bias chips. Mirrors the
+ * platform severity tokens; centralised here to avoid drift with the
+ * per-component score colour helper above.
+ */
+function severityColorForPatternBand(band: 'critical' | 'high' | 'medium' | 'low'): {
+  bar: string;
+  bg: string;
+  text: string;
+} {
+  switch (band) {
+    case 'critical':
+      return {
+        bar: 'var(--severity-critical)',
+        bg: 'rgba(220,38,38,0.08)',
+        text: 'var(--severity-critical)',
+      };
+    case 'high':
+      return {
+        bar: 'var(--severity-high)',
+        bg: 'rgba(249,115,22,0.08)',
+        text: 'var(--severity-high)',
+      };
+    case 'medium':
+      return { bar: 'var(--warning)', bg: 'rgba(245,158,11,0.08)', text: 'var(--warning)' };
+    case 'low':
+      return { bar: 'var(--success)', bg: 'rgba(22,163,74,0.08)', text: 'var(--success)' };
+  }
 }

@@ -228,6 +228,23 @@ export interface ProvenanceRecordData {
    */
   algorithmAversion?: AlgorithmAversion;
   /**
+   * Fractional CSO engagement appendix (locked 2026-05-10, Item 3 of the
+   * 2,3,4 wedge ship). When the audit's user is a Phase 1 HXC fractional
+   * CSO running 3-5 client engagements, the DPR carries an appendix that
+   * answers what the per-document DPR can't: (a) how does THIS audit fit
+   * into the engagement with this client (decision count, average DQI
+   * across the engagement, recurring biases on this account specifically),
+   * and (b) how does this client's account compare to the CSO's other
+   * engagements (anonymized cohort).
+   *
+   * Persona-gated: only fires when User.phase1Persona === 'fractional_cso'
+   * (or legacy onboardingRole === 'fractional_cso') AND the audit's
+   * document belongs to a container with a non-null targetCompany. Null
+   * for every other audit shape — the appendix is the fractional CSO
+   * persona's specific procurement-grade ask, not generic content.
+   */
+  engagementAppendix?: EngagementAppendix;
+  /**
    * Synergy Defensibility summary (locked 2026-05-09, M&A cascade depth ship).
    * Populated only when documentType === 'synergy_model' AND the file-parser
    * detected a synergy-shaped spreadsheet at upload time. Carries the
@@ -605,6 +622,66 @@ export interface ClientSafeExportMeta {
   scrubAppliedAt: string;
 }
 
+// ─── Engagement appendix (fractional CSO persona) ─────────────────────
+//
+// The Phase 1 HXC fractional CSO persona runs 3-5 client engagements.
+// Each engagement is a virtual grouping of containers sharing the same
+// targetCompany on the Container row (no schema change — targetCompany
+// is the canonical engagement key for this persona). The appendix
+// surfaces (a) per-engagement aggregates so the CSO presents the audit
+// in the context of THE CLIENT, not just the document, and (b) an
+// anonymized cohort comparison so the CSO sees how this client's
+// account stacks against their other engagements.
+
+export interface EngagementAppendix {
+  /** The engagement key (typically Container.targetCompany — the client). */
+  engagementName: string;
+  /** Total decisions in this engagement. */
+  decisionCount: number;
+  /** Decisions with at least one analyzed document (subset of decisionCount). */
+  analyzedDecisionCount: number;
+  /** Average composite DQI across analyzed decisions in this engagement. */
+  averageDqi: number | null;
+  /** Letter band derived from averageDqi via canonical thresholds. */
+  averageDqiBand: 'A' | 'B' | 'C' | 'D' | 'F' | null;
+  /** Days from earliest to latest decision in the engagement. */
+  timespanDays: number | null;
+  /** Top 5 recurring biases across the engagement's analyses. */
+  recurringBiases: Array<{
+    biasType: string;
+    biasLabel: string;
+    /** Distinct documents in this engagement that fired this bias. */
+    documentCount: number;
+    /** Total occurrences (one bias can fire multiple times across the engagement). */
+    occurrenceCount: number;
+    /** Highest severity observed across occurrences. */
+    severity: 'critical' | 'high' | 'medium' | 'low';
+  }>;
+  /** Cross-engagement cohort — anonymized peer engagement aggregates. */
+  cohortComparison: {
+    /** Other engagements (distinct targetCompanies on this user's containers). */
+    otherEngagementCount: number;
+    /** Average composite DQI across all the user's other engagements. */
+    averageDqiAcrossOtherEngagements: number | null;
+    /** Plain-language label vs the cohort. */
+    benchmarkLabel: 'above' | 'in_line' | 'below' | 'cannot_assess';
+    /**
+     * Top 3 anonymized peer engagements for context (labels are
+     * "Engagement A / B / C" so the appendix can travel to the client
+     * without leaking the CSO's other client identities).
+     */
+    anonymizedTopOthers: Array<{
+      label: string;
+      decisionCount: number;
+      averageDqi: number | null;
+    }>;
+  };
+  /** Why the appendix surfaced — provenance for procurement readers. */
+  generatedFor: 'fractional_cso';
+  /** ISO timestamp of computation (matches generatedAt). */
+  generatedAt: string;
+}
+
 // ─── Model-lineage constant ──────────────────────────────────────────
 // Reflects the cost-tier routing documented in CLAUDE.md (Apr 2026).
 // Bump the note when routing changes so the record declares the
@@ -832,6 +909,259 @@ async function buildDataLifecycle(
       'EU-region production residency (Enterprise SLA on request)',
     ],
   };
+}
+
+// ─── Engagement appendix builder (fractional CSO persona) ────────────
+
+/**
+ * Builds the EngagementAppendix when the audit's user is a Phase 1 HXC
+ * fractional CSO AND the document belongs to a container with a
+ * non-null targetCompany. Persona-gated AND data-gated — every other
+ * audit shape returns undefined, so the appendix lives in the per-
+ * analysis assembler without polluting the every-DPR cover.
+ *
+ * Schema-drift tolerant: every Prisma call wraps in try-catch with a
+ * conservative fallback (return undefined). The DPR generator skips
+ * the appendix page when the field is undefined; honest absence is the
+ * right behaviour when the data path can't deliver.
+ *
+ * Why targetCompany as the engagement key: the fractional CSO's
+ * containers naturally bear the client name in targetCompany (the
+ * existing free-text field). No schema migration required.
+ */
+async function buildEngagementAppendix(
+  userId: string,
+  documentId: string
+): Promise<EngagementAppendix | undefined> {
+  try {
+    // 1. Persona gate. Reads phase1Persona from UserSettings — that's
+    //    the canonical Phase 1 HXC persona signal. The legacy
+    //    onboardingRole enum (cso / ma / bizops / pe_vc / other) does
+    //    NOT distinguish F500 CSO from fractional CSO, so it can't
+    //    safely gate the appendix; phase1Persona is the explicit signal.
+    //    (No Prisma User model exists; identity lives in Supabase auth,
+    //    persona settings live in UserSettings.)
+    const settings = await prisma.userSettings.findUnique({
+      where: { userId },
+      select: { phase1Persona: true },
+    });
+    if (settings?.phase1Persona !== 'fractional_cso') return undefined;
+
+    // 2. Find the document's first container link (a doc can belong to
+    //    multiple containers; the FIRST link establishes the engagement
+    //    context for this DPR).
+    const containerLink = await prisma.decisionContainerDocument.findFirst({
+      where: { documentId },
+      select: {
+        container: {
+          select: { id: true, targetCompany: true, ownerUserId: true },
+        },
+      },
+    });
+    const targetCompany = containerLink?.container?.targetCompany ?? null;
+    if (!targetCompany) return undefined;
+
+    // 3. Find all containers owned by this user with this targetCompany.
+    //    These ARE the engagement.
+    const engagementContainers = await prisma.decisionContainer.findMany({
+      where: { ownerUserId: userId, targetCompany },
+      select: {
+        id: true,
+        targetCompany: true,
+        compositeDqi: true,
+        compositeGrade: true,
+        analyzedDocCount: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (engagementContainers.length === 0) return undefined;
+
+    // 4. Find OTHER engagements (different targetCompany, owned by this
+    //    user). Used for the cohort comparison.
+    const otherEngagementContainers = await prisma.decisionContainer.findMany({
+      where: {
+        ownerUserId: userId,
+        targetCompany: { not: null },
+        NOT: { targetCompany },
+      },
+      select: {
+        targetCompany: true,
+        compositeDqi: true,
+      },
+    });
+
+    // 5. Aggregate engagement DQI from compositeDqi cached column.
+    const dqiValues = engagementContainers
+      .map(c => c.compositeDqi)
+      .filter((d): d is number => typeof d === 'number');
+    const averageDqi =
+      dqiValues.length > 0 ? dqiValues.reduce((a, b) => a + b, 0) / dqiValues.length : null;
+    const averageDqiBand: EngagementAppendix['averageDqiBand'] =
+      averageDqi == null
+        ? null
+        : averageDqi >= 85
+          ? 'A'
+          : averageDqi >= 70
+            ? 'B'
+            : averageDqi >= 55
+              ? 'C'
+              : averageDqi >= 40
+                ? 'D'
+                : 'F';
+
+    // 6. Timespan from oldest → newest container in the engagement.
+    const earliest = engagementContainers[0]?.createdAt;
+    const latest = engagementContainers[engagementContainers.length - 1]?.createdAt;
+    const timespanDays =
+      earliest && latest
+        ? Math.max(
+            0,
+            Math.round((latest.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24))
+          )
+        : null;
+
+    // 7. Aggregate recurring biases. Walk container → docs → analyses →
+    //    biases. One-shot query with a join chain, severity-normalised.
+    const containerIds = engagementContainers.map(c => c.id);
+    const docLinks = await prisma.decisionContainerDocument.findMany({
+      where: { containerId: { in: containerIds } },
+      select: { documentId: true },
+    });
+    const documentIds = Array.from(new Set(docLinks.map(l => l.documentId)));
+    const analyses =
+      documentIds.length === 0
+        ? []
+        : await prisma.analysis.findMany({
+            where: { documentId: { in: documentIds } },
+            select: {
+              documentId: true,
+              biases: { select: { biasType: true, severity: true } },
+            },
+          });
+
+    const biasMap = new Map<
+      string,
+      {
+        documentSet: Set<string>;
+        occurrenceCount: number;
+        topSeverity: 'critical' | 'high' | 'medium' | 'low';
+      }
+    >();
+    const SEVERITY_RANK_MAP: Record<string, number> = {
+      critical: 4,
+      high: 3,
+      medium: 2,
+      low: 1,
+    };
+    for (const a of analyses) {
+      for (const bias of a.biases ?? []) {
+        const biasType = bias.biasType;
+        const sev = (
+          ['critical', 'high', 'medium', 'low'].includes(
+            (bias.severity ?? '').toLowerCase()
+          )
+            ? bias.severity!.toLowerCase()
+            : 'medium'
+        ) as 'critical' | 'high' | 'medium' | 'low';
+        const existing = biasMap.get(biasType) ?? {
+          documentSet: new Set<string>(),
+          occurrenceCount: 0,
+          topSeverity: 'low' as 'critical' | 'high' | 'medium' | 'low',
+        };
+        existing.documentSet.add(a.documentId);
+        existing.occurrenceCount += 1;
+        if (
+          (SEVERITY_RANK_MAP[sev] ?? 0) > (SEVERITY_RANK_MAP[existing.topSeverity] ?? 0)
+        ) {
+          existing.topSeverity = sev;
+        }
+        biasMap.set(biasType, existing);
+      }
+    }
+    const recurringBiases = Array.from(biasMap.entries())
+      .map(([biasType, { documentSet, occurrenceCount, topSeverity }]) => ({
+        biasType,
+        biasLabel: formatBiasLabel(biasType),
+        documentCount: documentSet.size,
+        occurrenceCount,
+        severity: topSeverity,
+      }))
+      .sort((a, b) => {
+        if (b.documentCount !== a.documentCount) return b.documentCount - a.documentCount;
+        return b.occurrenceCount - a.occurrenceCount;
+      })
+      .slice(0, 5);
+
+    // 8. Cohort comparison. Group OTHER engagements by targetCompany,
+    //    compute average DQI per group, label them anonymously.
+    const cohortMap = new Map<string, number[]>();
+    for (const c of otherEngagementContainers) {
+      if (!c.targetCompany || typeof c.compositeDqi !== 'number') continue;
+      const existing = cohortMap.get(c.targetCompany) ?? [];
+      existing.push(c.compositeDqi);
+      cohortMap.set(c.targetCompany, existing);
+    }
+    const cohortGroups = Array.from(cohortMap.entries()).map(([_name, dqis]) => ({
+      decisionCount: dqis.length,
+      averageDqi: dqis.length > 0 ? dqis.reduce((a, b) => a + b, 0) / dqis.length : null,
+    }));
+    const cohortDqiValues = cohortGroups
+      .map(g => g.averageDqi)
+      .filter((d): d is number => typeof d === 'number');
+    const averageDqiAcrossOtherEngagements =
+      cohortDqiValues.length > 0
+        ? cohortDqiValues.reduce((a, b) => a + b, 0) / cohortDqiValues.length
+        : null;
+
+    let benchmarkLabel: EngagementAppendix['cohortComparison']['benchmarkLabel'];
+    if (averageDqi == null || averageDqiAcrossOtherEngagements == null) {
+      benchmarkLabel = 'cannot_assess';
+    } else if (averageDqi >= averageDqiAcrossOtherEngagements + 5) {
+      benchmarkLabel = 'above';
+    } else if (averageDqi <= averageDqiAcrossOtherEngagements - 5) {
+      benchmarkLabel = 'below';
+    } else {
+      benchmarkLabel = 'in_line';
+    }
+
+    const anonymizedTopOthers = cohortGroups
+      .sort((a, b) => (b.averageDqi ?? -Infinity) - (a.averageDqi ?? -Infinity))
+      .slice(0, 3)
+      .map((g, i) => ({
+        label: `Engagement ${String.fromCharCode(65 + i)}`,
+        decisionCount: g.decisionCount,
+        averageDqi: g.averageDqi,
+      }));
+
+    const analyzedDecisionCount = engagementContainers.filter(
+      c => c.analyzedDocCount > 0
+    ).length;
+
+    return {
+      engagementName: targetCompany,
+      decisionCount: engagementContainers.length,
+      analyzedDecisionCount,
+      averageDqi,
+      averageDqiBand,
+      timespanDays,
+      recurringBiases,
+      cohortComparison: {
+        otherEngagementCount: cohortMap.size,
+        averageDqiAcrossOtherEngagements,
+        benchmarkLabel,
+        anonymizedTopOthers,
+      },
+      generatedFor: 'fractional_cso',
+      generatedAt: new Date().toISOString(),
+    };
+  } catch (err) {
+    log.warn(
+      `buildEngagementAppendix(${userId}, ${documentId}) failed (non-fatal):`,
+      err instanceof Error ? err.message : String(err)
+    );
+    return undefined;
+  }
 }
 
 // ─── Main assembler ──────────────────────────────────────────────────
@@ -1197,6 +1527,12 @@ export async function assembleProvenanceRecordData(
     summary: analysis.summary,
   });
 
+  // Engagement appendix — Phase 1 HXC fractional CSO persona only
+  // (locked 2026-05-10). Persona-gated AND data-gated; returns undefined
+  // for every other audit shape so the appendix lives only where it
+  // adds procurement-grade signal.
+  const engagementAppendix = await buildEngagementAppendix(userId, analysis.document.id);
+
   // Synergy Defensibility — preferred source is Document.parsedStructuredData
   // (locked 2026-05-09 hard-layer ship — first-class Prisma JSON column
   // populated by the upload route's type-aware structured extraction).
@@ -1275,6 +1611,7 @@ export async function assembleProvenanceRecordData(
     fractionationOfExpertise,
     decisionRubric,
     algorithmAversion,
+    engagementAppendix,
     synergyDefensibility,
     dataLifecycle,
     clientSafe: undefined,

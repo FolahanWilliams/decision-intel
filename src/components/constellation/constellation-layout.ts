@@ -38,6 +38,15 @@ export interface PositionedNode extends ConstellationNode {
   shouldPulse: boolean;
   /** True when the node should fade to background (no risk + no near committee). */
   isQuiet: boolean;
+  /**
+   * Names of critical assumptions this node `depends_on` (alert-ripple).
+   * Non-null when the dependent rests on at least one assumption whose
+   * own riskBand has flipped to 'critical'. Drives the outer red
+   * rippling ring + the popup callout. The Cornerstone-magnetic moment:
+   * a small-fund GP sees four portfolio commits ripple red simultaneously
+   * because the macro WAEMU debt-cycle assumption flipped.
+   */
+  alertRippleSources: string[] | null;
 }
 
 export interface PositionedLink extends ConstellationLink {
@@ -47,6 +56,13 @@ export interface PositionedLink extends ConstellationLink {
   toY: number;
   /** True when EITHER endpoint is in critical/high band — link inherits. */
   isHotEdge: boolean;
+  /**
+   * True when this is a `depends_on` edge AND the assumption (toId) has
+   * flipped to riskBand=critical. Renders thicker stroke + animated
+   * dash-flow + red color override. Pairs with PositionedNode.alertRippleSources
+   * for a complete visual ripple chain (assumption → edge → dependent).
+   */
+  isAlertEdge: boolean;
 }
 
 export interface LayoutDimensions {
@@ -147,8 +163,9 @@ export function layoutConstellation(
 
   // Ticket-size derived radius. Strategic mode often has null ticket;
   // fall back to documentCount-derived radius so those nodes stay
-  // visible.
-  const positioned: PositionedNode[] = filteredNodes.map(n => {
+  // visible. First pass: positioned without alertRippleSources (filled
+  // in the second pass after we know which assumptions are critical).
+  const positionedDraft: Omit<PositionedNode, 'alertRippleSources'>[] = filteredNodes.map(n => {
     const ts = new Date(n.createdAt).getTime();
     const x = dims.padX + ((ts - minTs) / timeRange) * innerWidth;
     const bandIndex = KIND_BAND_ORDER.indexOf(n.kind as DecisionContainerKind);
@@ -181,6 +198,32 @@ export function layoutConstellation(
     };
   });
 
+  // ─── Alert-ripple computation ─────────────────────────────────────
+  //
+  // For every depends_on link where the ASSUMPTION (toId) has flipped to
+  // riskBand=critical, every DEPENDENT (fromId) inherits an alert-ripple
+  // visual. Build a map of dependentId → critical assumption names
+  // (could be multiple — a node depending on TWO critical assumptions
+  // shows both names in the popup).
+  const draftMap = new Map(positionedDraft.map(p => [p.id, p]));
+  const rippleSourcesByDependent = new Map<string, string[]>();
+  for (const l of links) {
+    if (l.linkType !== 'depends_on') continue;
+    const dependent = draftMap.get(l.fromId);
+    const assumption = draftMap.get(l.toId);
+    if (!dependent || !assumption) continue;
+    if (assumption.riskBand !== 'critical') continue;
+    const existing = rippleSourcesByDependent.get(l.fromId) ?? [];
+    existing.push(assumption.name);
+    rippleSourcesByDependent.set(l.fromId, existing);
+  }
+
+  // Second pass: enrich draft with alertRippleSources.
+  const positioned: PositionedNode[] = positionedDraft.map(p => ({
+    ...p,
+    alertRippleSources: rippleSourcesByDependent.get(p.id) ?? null,
+  }));
+
   // Build link list filtered to nodes that survived the filter.
   const nodeMap = new Map(positioned.map(p => [p.id, p]));
   const positionedLinks: PositionedLink[] = links
@@ -193,6 +236,10 @@ export function layoutConstellation(
         from.riskBand === 'high' ||
         to.riskBand === 'critical' ||
         to.riskBand === 'high';
+      // Alert edge: depends_on link whose assumption (toId) is critical.
+      // The edge becomes the visual conduit between a critical assumption
+      // and its dependents — thicker stroke + animated dash-flow.
+      const isAlert = l.linkType === 'depends_on' && to.riskBand === 'critical';
       return {
         ...l,
         fromX: from.x,
@@ -200,6 +247,7 @@ export function layoutConstellation(
         toX: to.x,
         toY: to.y,
         isHotEdge: isHot,
+        isAlertEdge: isAlert,
       };
     })
     .filter((l): l is PositionedLink => l !== null);
