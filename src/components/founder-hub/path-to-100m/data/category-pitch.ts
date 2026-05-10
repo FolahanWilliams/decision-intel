@@ -223,5 +223,91 @@ export const LANGUAGE_PATTERNS: LanguagePattern[] = [
 ];
 
 // =========================================================================
+// SECTION 8B · "WHY NOW" HISTORICAL ANCHORS — locked 2026-05-10
+//
+// Paper #2 Ch 9: two domains successfully crossed from "decision-quality
+// exercise" to "continuous practice" — Aviation Crew Resource Management
+// (CRM) and Surgical Morbidity & Mortality (M&M) conferences. Both
+// transitions required three inflection conditions. Corporate M&A
+// currently lacks these conditions, and naming the gap is the strongest
+// "Why Now" anchor in pitch slide 3.
+//
+// Use when: pitch slide 3 (Why Now) · cold-investor email mid-section ·
+// senior-direct corp-dev application context · journalist briefings on
+// "is this just another decision-intelligence vendor."
+//
+// Discipline: when adding a fourth historical analog, extend the
+// `domains` array AND ensure each domain provides evidence on all three
+// inflection conditions (liability shift / procedural integration /
+// status reframing). Asymmetric examples weaken the argument.
+// =========================================================================
+
+export type InflectionCondition = 'liability_shift' | 'procedural_integration' | 'status_reframing';
+
+export type HistoricalAnchorDomain = {
+  domain: string;
+  inflectionYearOrPeriod: string;
+  liabilityShift: string;
+  proceduralIntegration: string;
+  statusReframing: string;
+  primarySource: string;
+};
+
+export type WhyNowHistoricalAnchor = {
+  oneLineClaim: string;
+  domains: HistoricalAnchorDomain[];
+  corporateMnaCurrentState: {
+    liabilityShift: string;
+    proceduralIntegration: string;
+    statusReframing: string;
+    diagnosis: string;
+  };
+  whyNow: string;
+};
+
+export const WHY_NOW_HISTORICAL_ANCHORS: WhyNowHistoricalAnchor = {
+  oneLineClaim:
+    'Decision-quality interventions cross from "exercise" to "continuous practice" only when liability shifts, procedural integration becomes mandatory, and the dissenter\'s status is reframed. Aviation and surgery already crossed. Corporate M&A is one liability-shift event away.',
+  domains: [
+    {
+      domain: 'Aviation Crew Resource Management (CRM)',
+      inflectionYearOrPeriod: '1990 — FAA Advanced Qualification Program (AQP)',
+      liabilityShift:
+        'NTSB accident reports + FAA mandates made un-CRM-trained crews a regulatory non-starter. The cost of NOT doing CRM became prohibitive.',
+      proceduralIntegration:
+        'CRM behaviours embedded directly into mandatory pre-flight checklists and technical workflows — no separate "CRM session" required. AQP proceduralised the practice.',
+      statusReframing:
+        'Co-pilots empowered to question captains; pre-AQP "psycho-babble" framing was replaced with measurable behavioural standards. Status of the questioner shifted from "obstructionist" to "professionally required."',
+      primarySource:
+        'Helmreich, R.L. & Merritt, A.C. (1998) — *Culture at Work in Aviation and Medicine*. NTSB accident reports 1972-1989. FAA Advisory Circular 120-51E.',
+    },
+    {
+      domain: 'Surgical Morbidity & Mortality (M&M) Conferences',
+      inflectionYearOrPeriod: 'Mid-1980s through 2000s — formalised post-Bosk + Gawande critiques',
+      liabilityShift:
+        'Malpractice liability exposure + patient-safety initiatives (Joint Commission accreditation requirements) made systematic post-mortem review a hospital licensing prerequisite.',
+      proceduralIntegration:
+        'Weekly mandatory M&M conferences embedded into hospital schedules. Cases reviewed are NOT optional — every adverse outcome surfaces.',
+      statusReframing:
+        'Bosk\'s 1979 *Forgive and Remember* + Gawande\'s 2002 *Complications* reframed surgical errors from "personal moral failure" to "systemic friction point." Surgeons are not blamed; the system is examined.',
+      primarySource:
+        'Bosk, C.L. (1979) *Forgive and Remember*; Gawande, A. (2002) *Complications*; Joint Commission accreditation standards on M&M conferences (1990s onward).',
+    },
+  ],
+  corporateMnaCurrentState: {
+    liabilityShift:
+      'Largely absent. Fiduciary duty rarely prosecutes poor M&A decisions absent obvious conflict-of-interest. EU AI Act Art 14 (enforceable Aug 2026) + Basel III ICAAP + SEC AI disclosure rulemaking are the three liability-shift events in motion.',
+    proceduralIntegration:
+      "Voluntary intermittent exercises only — pre-mortems, ad-hoc red teams, devil's advocates. No continuous-practice integration into the deal workflow. First-generation tooling (Cloverpop / Foundry / Aera) failed to embed because they required a separate destination, not ambient operation.",
+    statusReframing:
+      '"Killing your own deal" remains a severe status tax for the corp dev professional. Per paper #2 Ch 10, the political/ego cost of dissent is unsustainable in high-velocity sponsor-driven environments. Until the dissent role is shifted from human to system, status doesn\'t reframe.',
+    diagnosis:
+      'Corporate M&A has not yet crossed from "exercise" to "continuous practice." All three inflection conditions are weak today. But the liability-shift condition is in motion (EU AI Act enforceable Aug 2026), and AI-enabled friction collapse + sub-cent audit cost have just unlocked the procedural-integration condition. Generational change is the third lever — and the data-native cohort entering senior decision roles is what completes the crossing.',
+  },
+  whyNow:
+    'Three conditions converging in 2026: (1) EU AI Act Art 14 enforceable Aug 2026 + Basel III ICAAP live + SEC rulemaking on AI disclosure — the liability-shift trigger. (2) Sub-cent per-audit cost via gateway-routed LLMs + ambient capture from existing tools — the procedural-integration unlock. (3) Generational change as the founder cohort (16-year-old solo founder building Decision Intel is the data-native anchor — see Path-to-100M Generational Change card) enters senior decision roles, normalising algorithmic decision support not as an insult to expertise but as the foundational safety mechanism. CRM took 17 years (1972 NTSB → 1990 AQP). Corporate M&A is at the equivalent of 1985 — past the awareness phase, pre-procedural-integration, with the liability-shift trigger in calendar.',
+};
+
+// =========================================================================
 // SECTION 9 · 17 INVESTOR METRICS TRACKER
 // =========================================================================

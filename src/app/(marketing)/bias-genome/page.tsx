@@ -113,9 +113,9 @@ export default function BiasGenomePage() {
               maxWidth: 960,
             }}
           >
-            Which cognitive biases predict
+            What the audit catches
             <br />
-            which kinds of strategic failure
+            before the deal sponsor can hide it
             <span style={{ color: C.green }}>.</span>
           </h1>
           <p
@@ -128,10 +128,10 @@ export default function BiasGenomePage() {
               marginBottom: 10,
             }}
           >
-            A public map drawn from {meta.totalCases} real strategic decisions: {meta.failureCases}{' '}
-            failures and {meta.successCases} successes, across {meta.industriesCovered.length}{' '}
-            industries. Methodology open. Data cite-able. Refreshed as consenting customer orgs opt
-            in.
+            The constraints that fire while the deal sponsor is still drafting the thesis &mdash;
+            not after the IC memo lands. Drawn from {meta.totalCases} real strategic decisions:{' '}
+            {meta.failureCases} failures and {meta.successCases} successes across{' '}
+            {meta.industriesCovered.length} industries. Methodology open. Data cite-able.
           </p>
           <p
             style={{

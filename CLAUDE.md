@@ -221,6 +221,56 @@ These two lines are the operational follow-through to the pain framing — the p
 
 5. **Multi-persona DPR variants** (paper Ch 6 — same audit, four artefact classes for GC / LP / PE-CSO / Corp Dev) are **DEFERRED** to their own session. The persona framing SSOT exists; wiring it through the DPR rendering chrome is a substantial separate ship.
 
+## Paper-grounded findings + Tier plan (locked 2026-05-10 evening — second Deep Research paper)
+
+**Source**: 2026-05-10 Deep Research paper _"Structural Failure Analysis of Decision-Quality Interventions in Corporate Development and Mergers and Acquisitions"_ (150+ sources). Anchored on Kyle Price (Roblox, NOT YouTube) verbatim quotes from M&A Science podcast — indexed in NotebookLM master KB `809f5104` as source #23 (`1322d9ac-28f...`). Mirror: [docs/paper-grounded-tier-plan-2026-05-10.md](docs/paper-grounded-tier-plan-2026-05-10.md) carries the full session-handoff plan including DQI-weight-adjustability implementation sketch + PMI strategic question.
+
+**Four counter-intuitive findings** that demolished or sharpened parts of the existing positioning:
+
+1. **Awareness does not reduce bias** (Boomerang Effect, Pronin et al. 2002) — educating practitioners on biases paradoxically _increases_ their overconfidence + vulnerability. **Implication**: bias-education-heavy first impressions on `/bias-genome` + `/how-it-works` are a structural liability. Reframe to _"what the audit caught"_ not _"learn the biases."_ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers want to see the framework backbone); demote it from first-impression position. NEVER delete `/bias-genome` / `/taxonomy` / Education Room — they're the IP moat. Reposition them as second-impression methodology exhibits, not first-impression marketing claims.
+
+2. **Red teams fail to scale because they're structurally antagonistic** (Ch 2 of paper). Political/ego cost is unsustainable in high-velocity sponsor-driven environments — they degrade into performative _"list-the-risks"_ exercises. **Implication**: the _"always-on red team"_ category-claim framing fails the paper's test — we'd inherit red teams' bad properties. Sharper claim: _"the antagonist that costs you no political capital"_ + _"the audit that fires before the IC memo can hide it."_ Banned from cold-context on-ramps as of 2026-05-10: any phrasing that positions DI as a digitised red team. The DI's intelligent-antagonist pattern absorbs the political cost of dissent; the human user becomes a facilitator, not an antagonist (Ch 10 finding).
+
+3. **The "false precision" objection is mostly ego-defense, not strategic wisdom** (Meehl 1954, Dawes 1979, Grove et al. 2000 — mechanical models outperform clinical intuition even with uniform/improper weights). Algorithm Aversion (Dietvorst, Simmons & Massey 2015 _J. Exp. Psychol. General_, doi:10.1037/xge0000033) names the failure mode. **Dietvorst's 2016 follow-up fix**: people will use imperfect algorithms IF allowed to slightly modify the inputs or weights. **Implication for product**: DQI weights must become user-adjustable. Highest-leverage Tier 2 ship; founder-approved 2026-05-10. Pipeline change — needs methodology version bump 2.2.0 → 2.3.0 + regression-test plan + held-out-sample DQI distribution check before/after per CLAUDE.md "modifying the pipeline" rule. Implementation sketch in [docs/paper-grounded-tier-plan-2026-05-10.md](docs/paper-grounded-tier-plan-2026-05-10.md) §T2.1.
+
+4. **First-generation tooling failed because it optimised for data integration, not cognitive debiasing** (Ch 5). Cloverpop required secondary interface (rapid dis-adoption — system-of-record fallacy); Foundry conflated data integration with decision intelligence (avg $2M+ deployment cost); Aera/Peak.ai automated tasks instead of augmenting judgment. **Implication**: ambient capture from email/Slack/VDR is the unlock. Currently we have Drive integration but not deep ambient parsing. Founder-approved 2026-05-10 as Tier 2 ship; substantial — own session.
+
+**Wedge customer empirically grounded** (Ch 7): _"The wedge customer is not the CEO executing a once-in-a-decade platform merger; it is the programmatic operator like Kyle Price."_ Tech tuck-ins are repeat-game high-validity environments where Meehl/Dawes mechanical-model evidence dominates. Platform M&A is low-validity single-N. **Our wedge is the validity class where the algorithmic edge is mathematically largest, not the validity class where headline failure rates are most dramatic.** GTM v3.5 already names mid-market corp dev head as Phase 1 HXC; this paper _upgrades_ that from "founder hypothesis" to "literature-supported structural reasoning." Pitch slide 3 (Why Now) and the wedge brief at [SparringRoomTab](src/components/founder-hub/SparringRoomTab.tsx) `phase1_hxc` tier should both lead with the validity-class argument, not the headline 70-90% number.
+
+**Five conditions for unlock** (Ch 12 — terminal answer):
+
+1. **AI-enabled friction collapse** — ambient operation, no separate destination.
+2. **Tooling-cost asymmetry crossover** — sub-cent per render via deepseek-v4-flash. Already shipped 2026-05-10 morning.
+3. **Offloading the political tax of dissent** — system absorbs antagonist role; user becomes facilitator. Constellation IntelligentAntagonistPrompt is the canonical surface.
+4. **Procurement-grade evidence + liability shift** — DPR + EU AI Act Art 14 + Basel III + AI Verify alignment make the artefact compulsory not optional. Ship liability-shift framing on /security + /trust + pitch slide 3.
+5. **Generational change in practitioner norms** — the founder being 16 is the strongest evidence for this condition. NOT a weakness; the generational anchor the paper says is needed. Reframe in fundraise materials per [docs/paper-grounded-tier-plan-2026-05-10.md](docs/paper-grounded-tier-plan-2026-05-10.md) §T3.2.
+
+**Aviation CRM + Surgical M&M historical analog** (Ch 9): both crossed from "exercise" to "continuous practice" via three inflection conditions — liability shift, procedural integration, status reframing. Aviation CRM's 1990 FAA Advanced Qualification Program was the inflection moment. Pitch slide 3 (Why Now) gets a procurement-grade 50-year-old historical analog showing this kind of transition has happened before. New SSOT exhibit at [src/components/founder-hub/path-to-100m/data/category-pitch.ts](src/components/founder-hub/path-to-100m/data/category-pitch.ts) `WHY_NOW_HISTORICAL_ANCHORS`.
+
+**Tier 1 (shipping 2026-05-10 evening)** — paper-grounded surface changes that operationalise the four findings without touching pipeline:
+
+- IntelligentAntagonistPrompt copy reframe (political-capital savings line added).
+- persona-framing.ts `ma` voice shifted from imperative to facilitator ("Surface this to the deal sponsor — the audit log carries the provenance" not "Resolve before IC").
+- /bias-genome + /how-it-works first paragraphs reframed from "learn the biases" to "what the audit caught."
+- Validity-class argument added to wedge brief in role-playbooks.ts (mid-market corp dev + smaller-fund GP).
+- CRM + M&M historical anchor exhibit added to category-pitch.ts (3-condition table for Aviation CRM, Surgical M&M, Corporate M&A current state).
+
+**Tier 2 (founder-approved 2026-05-10; own sessions)**:
+
+- T2.1 — User-adjustable DQI weights (Dietvorst 2016 algorithm-aversion fix). Pipeline-modification — methodology bump + regression test required.
+- T2.2 — Ambient capture from email + Slack threads (Ch 12 condition #1 friction collapse + Ch 6 ex-ante).
+- T2.3 — Earlier-than-DecisionFrame priors capture (extend PriorsCaptureCard surface to /dashboard + /dashboard/decisions/new).
+
+**Tier 3 (founder-approved 2026-05-10; positioning + fundraise)**:
+
+- T3.1 — Refine category claim away from "always-on red team" (banned vocab as of 2026-05-10) toward _"the antagonist that costs you no political capital — fires before the IC memo can hide what the deal sponsor doesn't want to see."_
+- T3.2 — Generational-change narrative for fundraise (founder being 16 is evidence, not obstacle).
+- T3.3 — Liability-shift compulsion framing promoted to primary axis on Why Now slide.
+
+**PMI strategic question (open — founder decision pending)**: should DI expand to Post-Merger Integration tooling? Recommendation in handoff doc: Path B + thin Path C — extend the Outcome Gate intermediate-proxy predictions to consume PMI signals (synergy realisation, talent attrition, integration cost vs forecast); add a PMI Tracker tab on `acquisition`-mode container detail post-close. Don't compete with M&A Worx / Midaxo / DealRoom on integration project management — that's execution-heavy, not reasoning-heavy. Treat PMI as the _target_ of the audit (does the deal deliver what the IC memo claimed?), not a _new domain_ DI sells into. Sequencing: queue Path B for AFTER T2.1 + T2.2.
+
+**Forward-looking rule**: when a third Deep Research paper lands, mirror it in NotebookLM master KB `809f5104` AND surface its findings in this section as a separate locked sub-block (don't overwrite the 2026-05-10 findings). The trajectory matters: each paper sharpens the next session's positioning, and the founder + Claude need to see how the empirical foundation evolved.
+
 ## DecisionContainer Phase 3.5 — Decision Pipeline Constellation (locked 2026-05-09 evening)
 
 **The longitudinal/relational viz that converts the kanban from a daily-ops triage board into a strategic narrative surface.** Cornerstone-magnetic, Margaret-class CSO ready, demo-deck-grade. The kanban shows _what's on your plate today_; the constellation shows _how every decision rests on every other_ — temporal decay, escalation chains, thesis-anchor cascades, structural-assumption ripple.

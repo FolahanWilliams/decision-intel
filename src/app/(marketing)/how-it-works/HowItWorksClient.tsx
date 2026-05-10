@@ -301,10 +301,12 @@ export function HowItWorksClient() {
                   maxWidth: 560,
                 }}
               >
-                The engine behind the reasoning audit platform. Twelve specialized agents, thirty
-                cognitive biases, and a ten-pattern interaction model grounded in Kahneman, Klein,
-                and Tetlock. Every memo audited in under sixty seconds, so the reasoning lives in
-                one surface instead of four.
+                The audit fires the constraint while the deal sponsor is still drafting &mdash; not
+                after the IC memo lands. Twelve specialized agents grounded in Kahneman, Klein, and
+                Tetlock. The audit log carries the provenance, so the corp dev lead routes the
+                flagged signal to the sponsor without spending personal political capital on the
+                challenge. The methodology backbone (taxonomy, frameworks, regulatory map) lives
+                further down the page for procurement readers.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 560 }}>
                 This is a general-but-detailed walk-through of our methodology. It omits proprietary

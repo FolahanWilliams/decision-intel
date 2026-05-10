@@ -138,7 +138,8 @@ export function IntelligentAntagonistPrompt({
       >
         Naming your priority before seeing the algorithm&rsquo;s output is the discipline that
         protects you from automation bias. The gap between your read and the system&rsquo;s read is
-        the recommendation&rsquo;s actual value.
+        the recommendation&rsquo;s actual value &mdash; and the audit log shifts the political cost
+        of dissent off you and onto the system.
       </p>
       <textarea
         ref={textareaRef}

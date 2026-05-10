@@ -115,58 +115,64 @@ export const PERSONA_FRAMING: Record<
   },
 
   // ──────────────────────────────────────────────────────────────────
-  // Mid-market corp dev / M&A. Per paper Ch 6: operational synergy
-  // retrospective framing — PMI lessons, procurement reviews of
-  // seller projections, integration-plan completeness.
+  // Mid-market corp dev / M&A. Per paper #2 Ch 10: corp dev
+  // professional needs "air cover" to challenge a powerful product
+  // sponsor without expending personal political capital. Voice
+  // shifted 2026-05-10 from imperative ("Resolve before IC") to
+  // facilitator ("Surface this to the deal sponsor — the audit log
+  // carries the provenance"). The system absorbs the antagonist
+  // role; the human user becomes a facilitator routing flagged
+  // signal to the sponsor with provenance, not a dissenter taxed by
+  // the political cost of killing the deal.
   // ──────────────────────────────────────────────────────────────────
   ma: {
     committee_gate_pressure: {
-      tight: '{name} · IC in {tNDays}d · {patternLabel} unresolved',
+      tight: '{name} · IC in {tNDays}d · {patternLabel} flagged',
       regular:
-        "{name} hits IC review in {tNDays} days with {patternLabel} unresolved. The deal team can't defend the synergy thesis as currently authored.",
+        '{name} hits IC review in {tNDays} days with {patternLabel} flagged. The audit log carries the provenance — surface the gap to the deal sponsor before the IC pre-read.',
       detailed:
-        "{name} reaches IC review in {tNDays} days. {patternLabel} fired at high severity and remains unresolved on the synergy claims. Per the BCG/McKinsey post-merger integration literature, deals that pass IC with unresolved synergy conflicts realize 30-50% of revenue synergies and 60-80% of cost synergies — already below the threshold needed to clear the deal's purchase premium.",
-      ctaVerb: 'Resolve',
+        '{name} reaches IC review in {tNDays} days. The audit detected {patternLabel} at high severity on the synergy claims and stamped the provenance to the DPR cover. Per the BCG/McKinsey post-merger integration literature, deals that pass IC with this pattern unresolved realize 30-50% of revenue synergies and 60-80% of cost synergies. Route the audit-log entry to the sponsor as the basis for the IC pre-read; the system flagged it, not you.',
+      ctaVerb: 'Surface to sponsor',
     },
     quality_gate_violation: {
-      tight: '{name} · DQI {dqi} ({grade}) · synergy thesis weak',
+      tight: '{name} · DQI {dqi} ({grade}) · audit flagged synergy thesis',
       regular:
-        "{name} carries a DQI of {dqi} ({grade}) with {patternLabel}. The synergy thesis won't survive QofE scrutiny.",
+        '{name} carries a DQI of {dqi} ({grade}) with {patternLabel} flagged. The audit log is QofE-defensible — share the provenance with the sponsor before authoring the next memo draft.',
       detailed:
-        "{name}'s composite DQI of {dqi} ({grade}) sits below the procurement-defensible threshold for an acquisition memo. {patternLabel} is the primary failure pattern. Per the canonical M&A failure literature (HP-Autonomy, Daimler-Chrysler, AOL-Time Warner anchors), deals that ship to IC with this pattern unaddressed track to the 70-90% failure tail. Strengthen the synergy thesis or kill before IC.",
-      ctaVerb: 'Strengthen',
+        "{name}'s composite DQI of {dqi} ({grade}) sits below the procurement-defensible threshold. {patternLabel} fired at high+ severity. Per the canonical M&A failure literature (HP-Autonomy, Daimler-Chrysler, AOL-Time Warner anchors), deals that ship to IC with this pattern track to the 70-90% failure tail. The audit-log provenance gives the sponsor a structural reason to strengthen the thesis or kill the deal — without the corp dev professional having to spend personal political capital to argue the case.",
+      ctaVerb: 'Share with sponsor',
     },
     missing_required_artefact: {
-      tight: '{name} needs {patternLabel} before IC',
+      tight: '{name} needs {patternLabel} · audit-flagged gap',
       regular:
-        '{name} is missing a {patternLabel}. The IC will defer rather than approve incomplete diligence.',
+        '{name} is missing a {patternLabel}. The audit flagged the SSOT gap; route to the sponsor with the DPR-shape requirement attached so they can task the right diligence resource.',
       detailed:
-        "{name}'s deal file lacks a {patternLabel}, which the deal-mode SSOT marks as required for the IC gate. Per Big-4 M&A diligence-review guidance, ICs that approve without complete diligence carry materially higher post-close write-down risk. Upload before the meeting or formally request a deferral.",
-      ctaVerb: 'Upload',
+        "{name}'s deal file lacks a {patternLabel}, which the deal-mode SSOT marks as required for the IC gate. Per Big-4 M&A diligence-review guidance, ICs that approve without complete diligence carry materially higher post-close write-down risk. The audit log carries the SSOT requirement and the missing-artefact provenance — surface to the sponsor as a structural requirement, not a personal blocker.",
+      ctaVerb: 'Surface gap',
     },
     outcome_closure: {
-      tight: '{name} closed · log integration outcome',
+      tight: '{name} closed · share PMI outcome capture',
       regular:
-        '{name} closed more than 30 days ago with no PMI outcome logged. Closing the loop tightens future synergy realization forecasts.',
+        '{name} closed more than 30 days ago with no PMI outcome logged. Tightens future synergy-realization forecasts on every subsequent deal — share the capture with the integration owner.',
       detailed:
-        "{name} closed more than 30 days ago. Logging the actual integration outcome — synergy realization vs forecast, integration cost vs forecast, customer-churn vs forecast — updates your firm's per-deal Brier-scored calibration. The next deal's synergy claims become more defensible because they're anchored against your own track record, not the industry baseline.",
-      ctaVerb: 'Log outcome',
+        "{name} closed more than 30 days ago. Logging the actual integration outcome — synergy realization vs forecast, integration cost vs forecast, customer-churn vs forecast — updates the firm's per-deal Brier-scored calibration. Per paper #2 Ch 11, ex-post outcome capture only disciplines ex-ante decisions when the audit-log provenance closes the loop automatically; the corp dev lead surfaces the capture to the integration owner, the system handles the calibration update.",
+      ctaVerb: 'Share capture',
     },
     cross_decision_pattern: {
-      tight: '{linkedCount} active deals share an assumption',
+      tight: '{linkedCount} active deals share an assumption · audit-flagged',
       regular:
-        '{linkedCount} of your active deals share the assumption: "{assumptionLabel}". If that assumption fails, multiple closes go red.',
+        '{linkedCount} of your active deals share the assumption: "{assumptionLabel}". The audit-log provenance routes to the LP letter or the platform-deal sponsor — surface as a structural correlated risk, not a personal challenge.',
       detailed:
-        'Cross-deal pattern detected: {linkedCount} active acquisition containers all rest on the assumption "{assumptionLabel}". This is the platform-bolt-on contagion the paper Ch 5 flags as the highest-leverage portfolio failure mode. Per the canonical roll-up failure literature, an unaudited assumption in the platform deal infects every subsequent bolt-on. Stress-test the foundational thesis before the next IC or document the correlated portfolio risk in the LP letter.',
-      ctaVerb: 'Stress-test',
+        'Cross-deal pattern detected: {linkedCount} active acquisition containers all rest on the assumption "{assumptionLabel}". This is the platform-bolt-on contagion paper #1 Ch 5 flags as the highest-leverage portfolio failure mode. The audit-log entry is sponsor-routable + LP-letter-routable; the corp dev professional surfaces the structural correlation rather than personally arguing each individual deal — system absorbs the antagonist role, human becomes facilitator.',
+      ctaVerb: 'Surface correlation',
     },
     lineage_drift: {
       tight: '{name} depends on {assumptionLabel} · upstream resolved differently',
       regular:
-        "{name}'s synergy thesis depends on {assumptionLabel}, which resolved differently than forecast. Re-baseline before the next IC.",
+        "{name}'s synergy thesis depends on {assumptionLabel}, which resolved differently than forecast. The audit-log re-baseline trigger routes to the sponsor before the next IC.",
       detailed:
-        "{name} carries a depends_on edge to a prior decision whose outcome diverges from the forecast. Dependent acquisition theses must be re-baselined when upstream assumptions falsify — per Big-4 PMI guidance, this is the canonical cause of the integration-phase value destruction that drives the 70-90% M&A failure rate. Re-frame {name}'s synergy model before the next IC.",
-      ctaVerb: 'Re-baseline',
+        '{name} carries a depends_on edge to a prior decision whose outcome diverges from the forecast. Per Big-4 PMI guidance, dependent acquisition theses must be re-baselined when upstream assumptions falsify — this is the canonical cause of the integration-phase value destruction that drives the 70-90% M&A failure rate. The audit-log re-baseline trigger surfaces the structural requirement; the corp dev lead routes to the sponsor as a system-flagged necessity, not a personal critique of the original thesis.',
+      ctaVerb: 'Trigger re-baseline',
     },
   },
 

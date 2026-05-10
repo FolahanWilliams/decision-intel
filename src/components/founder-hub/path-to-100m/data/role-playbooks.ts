@@ -16,6 +16,57 @@ import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 
 const FW = getAllRegisteredFrameworks().length;
 
+/**
+ * Wedge structural argument — locked 2026-05-10 evening per the second
+ * Deep Research paper Ch 7. The wedge customer is the programmatic
+ * operator (mid-market corp dev head + smaller-fund GP + fractional
+ * CSO + PE-backed founder), NOT the platform-acquirer running a
+ * once-in-a-decade mega-deal. The structural reason is validity-class
+ * theory: tech tuck-ins are repeat-game high-validity environments
+ * where Meehl/Dawes/Grove mechanical-model evidence dominates.
+ * Platform M&A is low-validity single-N where intuition can plausibly
+ * win.
+ *
+ * This argument upgrades the wedge thesis from "founder hypothesis" to
+ * "literature-supported structural reasoning" and is what Phase 1 HXC
+ * conversations should LEAD WITH — not the headline 70-90% failure
+ * rate (which is platform-M&A skewed and doesn't apply to the wedge
+ * personas anyway).
+ *
+ * Cite Kyle Price (Roblox) verbatim: 12 deals over 3 years, all "tech
+ * tuck-ins" for "people and technology" / "road map acceleration" —
+ * exactly the high-validity repeat-game environment where mechanical
+ * decision support generates the most edge.
+ *
+ * When pitching wedge personas, route the conversation through this
+ * argument before the headline failure rate or the bias-taxonomy
+ * sales beat.
+ */
+export const WEDGE_STRUCTURAL_ARGUMENT = {
+  oneLineClaim:
+    'The wedge is the validity class where the algorithmic edge is mathematically largest, not the validity class where headline failure rates are most dramatic.',
+  whyTuckInsAreTheWedge: [
+    'Tech tuck-ins / programmatic acquisitions are repeat-game environments — same evaluation metrics across deals, stable underlying economics, fast feedback loops on integration outcomes.',
+    'Per Meehl 1954 + Dawes 1979 + Grove et al. 2000, mechanical decision-rule models consistently outperform clinical intuition in high-validity repeat-game environments — even when the models use uniform / improper weights.',
+    'Platform M&A is the opposite: low-validity, single-N, novel-paradigm. Intuition can plausibly outperform mechanical models there because there is no reference class.',
+    'Programmatic acquirers (per McKinsey + BCG longitudinal studies) generate superior excess TSR vs episodic large-scale acquirers — and they fail in the exact failure modes our audit catches: silent talent attrition, delayed roadmaps, sponsor escalation of commitment.',
+    'The wedge customer is therefore Kyle-Price-class: 12 deals over 3 years, "people and technology" / "road map acceleration", "not super big and complex" — exactly where the audit produces measurable per-deal calibration improvement quarter-over-quarter.',
+  ],
+  paperAnchor:
+    '2026-05-10 Deep Research paper Ch 7 "Tech Tuck-In Bias Profile vs. Platform M&A" — anchored on Kyle Price verbatim quotes from M&A Science podcast (NotebookLM master KB 809f5104).',
+  whatNotToLeadWith: [
+    "The headline 70-90% M&A failure rate (platform-M&A skewed; doesn't apply to the wedge personas).",
+    'The 22-bias taxonomy as marketing claim (Boomerang Effect — paper Ch 1 — educating practitioners on biases paradoxically increases their overconfidence).',
+    'The "always-on red team" framing (paper Ch 2 — red teams have structurally bad properties we\'d inherit by claiming the category).',
+  ],
+  whatToLeadWith: [
+    'Validity-class argument: this is the decision class where mechanical models mathematically dominate.',
+    'Political-capital savings: the audit log absorbs the antagonist role; the corp dev lead becomes a facilitator routing flagged signal to the sponsor with provenance.',
+    'Sub-cent per audit + ambient capture: the cost of running the audit is now lower than the cost of NOT running it. (Paper Ch 12 condition #2: tooling-cost asymmetry crossover.)',
+    'Liability-shift in motion: EU AI Act Art 14 enforceable Aug 2026; Basel III ICAAP live; SEC AI disclosure rulemaking. (Paper Ch 12 condition #4.)',
+  ],
+} as const;
+
 export type RolePlaybook = {
   id: string;
   role: string;

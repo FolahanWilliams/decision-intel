@@ -29,7 +29,40 @@
       "Bash(rm /Users/folahan/decision-intel/src/app/api/playbooks/invoke/\\\\[id\\\\]/route.ts)",
       "Bash(rmdir \"/Users/folahan/decision-intel/src/app/api/playbooks/invoke/[id]\")",
       "Bash(rm /Users/folahan/decision-intel/src/app/api/playbooks/\\\\[id\\\\]/route.ts)",
-      "Bash(rmdir \"/Users/folahan/decision-intel/src/app/api/playbooks/[id]\")"
+      "Bash(rmdir \"/Users/folahan/decision-intel/src/app/api/playbooks/[id]\")",
+
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git stash list:*)",
+
+      "Bash(npx tsc --noEmit:*)",
+      "Bash(NODE_OPTIONS=* npx tsc --noEmit:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run lint\\:positioning:*)",
+      "Bash(npm run lint\\:silent-catches:*)",
+      "Bash(npm run lint\\:counts:*)",
+      "Bash(npm run lint\\:canonical-imports:*)",
+      "Bash(npm run lint\\:doc-sync:*)",
+      "Bash(npx prettier --check:*)",
+      "Bash(npx prettier --write:*)",
+      "Bash(npm run slop-scan:*)",
+
+      "Bash(npx vitest run:*)",
+      "Bash(npm test:*)",
+      "Bash(command npx vitest run:*)",
+
+      "Bash(command npx prisma format:*)",
+      "Bash(command npx prisma generate:*)",
+      "Bash(command npx prisma validate:*)",
+      "Bash(command npx prisma:*)",
+      "Bash(command npx vitest:*)",
+      "Bash(command find:*)",
+      "Bash(command ls:*)"
     ],
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",
