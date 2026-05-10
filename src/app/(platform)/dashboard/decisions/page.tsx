@@ -41,7 +41,6 @@ import {
   type DecisionContainerKind,
 } from '@/lib/data/decision-container-modes';
 import { ContainerKanban } from '@/components/containers/ContainerKanban';
-import { ContainerFormModal } from '@/components/containers/ContainerFormModal';
 import {
   DecisionLogFeed,
   type DecisionLogFeedHandle,
@@ -60,7 +59,6 @@ export default function DecisionsPage() {
   const view: DecisionsView = rawView === 'log' ? 'log' : 'kanban';
 
   const [kindFilter, setKindFilter] = useState<DecisionContainerKind | 'all'>(defaultKind ?? 'all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'active' | 'archived'>('active');
   const logFeedRef = useRef<DecisionLogFeedHandle>(null);
 
@@ -72,7 +70,7 @@ export default function DecisionsPage() {
     [kindFilter, statusFilter]
   );
 
-  const { containers, isLoading, mutate } = useContainers(filters, 1, 100);
+  const { containers, isLoading } = useContainers(filters, 1, 100);
 
   const heroSubtitle = useMemo(() => {
     if (view === 'log') {
@@ -176,23 +174,11 @@ export default function DecisionsPage() {
           containers={containers}
           isLoading={isLoading}
           defaultKind={defaultKind}
-          onNewDecision={() => setShowCreateModal(true)}
         />
       )}
 
       {view === 'log' && (
         <LogView onLogEntry={() => logFeedRef.current?.openNewEntry()} feedRef={logFeedRef} />
-      )}
-
-      {showCreateModal && (
-        <ContainerFormModal
-          defaultKind={kindFilter === 'all' ? defaultKind : kindFilter}
-          onClose={() => setShowCreateModal(false)}
-          onCreated={() => {
-            setShowCreateModal(false);
-            mutate();
-          }}
-        />
       )}
     </ErrorBoundary>
   );
@@ -208,7 +194,6 @@ function KanbanView({
   containers,
   isLoading,
   defaultKind: _defaultKind,
-  onNewDecision,
 }: {
   kindFilter: DecisionContainerKind | 'all';
   setKindFilter: (k: DecisionContainerKind | 'all') => void;
@@ -217,7 +202,6 @@ function KanbanView({
   containers: ReturnType<typeof useContainers>['containers'];
   isLoading: boolean;
   defaultKind: DecisionContainerKind | null | undefined;
-  onNewDecision: () => void;
 }) {
   return (
     <>
@@ -264,9 +248,14 @@ function KanbanView({
             onClick={() => setStatusFilter('archived')}
           />
         </div>
-        <button
-          type="button"
-          onClick={onNewDecision}
+        {/* New decision routes to the canonical hybrid create surface
+            at /dashboard/decisions/new — same destination ContainerKanban
+            empty-state, ContainersWidget, and CommandPalette already use.
+            Previously opened ContainerFormModal directly, which created a
+            divergent flow (3 modals + 1 page = 4 different "new decision"
+            entry shapes). Locked 2026-05-10 streamlining batch. */}
+        <Link
+          href="/dashboard/decisions/new"
           style={{
             padding: '8px 14px',
             borderRadius: 'var(--radius-md)',
@@ -279,11 +268,12 @@ function KanbanView({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
+            textDecoration: 'none',
           }}
         >
           <Plus size={14} />
           New decision
-        </button>
+        </Link>
       </div>
 
       <ContainerKanban

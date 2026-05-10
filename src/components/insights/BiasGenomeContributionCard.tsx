@@ -189,7 +189,7 @@ export function BiasGenomeContributionCard() {
             <PlatformBaselineCallout baseline={data.platformBaseline} />
           ) : null}
           <Link
-            href="/dashboard/outcome-flywheel"
+            href="/dashboard/analytics?view=intelligence#flywheel"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -307,7 +307,7 @@ export function BiasGenomeContributionCard() {
             <PlatformBaselineCallout baseline={data.platformBaseline} />
           ) : null}
           <Link
-            href="/dashboard/outcome-flywheel"
+            href="/dashboard/analytics?view=intelligence#flywheel"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

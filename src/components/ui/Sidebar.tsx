@@ -20,7 +20,6 @@ import {
   ChevronRight as ChevronR,
   Briefcase,
   Share2,
-  Repeat,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -379,11 +378,12 @@ export default function Sidebar() {
             onToggle={() => toggleSection('Decisions')}
           >
             <NavItem
-              href="/dashboard?view=browse"
+              href="/dashboard/documents"
               icon={<FileText size={18} />}
               label="Documents"
               description="Standalone strategic memos + audits"
               active={
+                pathname.startsWith('/dashboard/documents') ||
                 pathname.startsWith('/documents') ||
                 (pathname === '/dashboard' && viewParam === 'browse')
               }
@@ -440,7 +440,6 @@ export default function Sidebar() {
               description="Trends, quality, outcomes & decision graph"
               active={
                 pathname.startsWith('/dashboard/analytics') ||
-                pathname.startsWith('/dashboard/outcome-flywheel') ||
                 pathname.startsWith('/dashboard/decision-graph') ||
                 pathname.startsWith('/dashboard/decision-quality')
               }
@@ -449,7 +448,6 @@ export default function Sidebar() {
             />
             {!collapsed &&
               (pathname.startsWith('/dashboard/analytics') ||
-                pathname.startsWith('/dashboard/outcome-flywheel') ||
                 pathname.startsWith('/dashboard/decision-graph') ||
                 pathname.startsWith('/dashboard/decision-quality')) && (
                 <>
@@ -458,13 +456,6 @@ export default function Sidebar() {
                     icon={<Share2 size={14} />}
                     label="Decision Graph"
                     active={pathname.startsWith('/dashboard/decision-graph')}
-                    onNavigate={closeMobile}
-                  />
-                  <SubNavItem
-                    href="/dashboard/outcome-flywheel"
-                    icon={<Repeat size={14} />}
-                    label="Outcome Flywheel"
-                    active={pathname.startsWith('/dashboard/outcome-flywheel')}
                     onNavigate={closeMobile}
                   />
                 </>

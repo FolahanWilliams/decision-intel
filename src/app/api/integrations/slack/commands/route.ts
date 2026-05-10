@@ -443,7 +443,7 @@ async function handleBriefCommand(params: { userId: string; teamId: string }) {
           {
             type: 'button',
             text: { type: 'plain_text', text: 'Outcome Flywheel' },
-            url: `${appUrl}/dashboard/outcome-flywheel`,
+            url: `${appUrl}/dashboard/analytics?view=intelligence#flywheel`,
           },
         ],
       }
@@ -1048,7 +1048,7 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
       statusActions.push({
         type: 'button',
         text: { type: 'plain_text', text: `Record Outcome (${pendingCount} pending)` },
-        url: `${appUrl}/dashboard/outcome-flywheel`,
+        url: `${appUrl}/dashboard/analytics?view=intelligence#flywheel`,
       });
     }
 

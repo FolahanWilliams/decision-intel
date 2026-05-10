@@ -233,7 +233,7 @@ export function CommandPalette() {
         label: 'Outcome Attribution Flywheel',
         description: "See which decisions paid off and which didn't",
         icon: <TrendingUp size={16} />,
-        action: () => navigate('/dashboard/outcome-flywheel'),
+        action: () => navigate('/dashboard/analytics?view=intelligence#flywheel'),
         keywords: ['outcome', 'flywheel', 'attribution', 'roi', 'impact'],
       },
       {
@@ -414,7 +414,7 @@ export function CommandPalette() {
         label: 'Report an Outcome',
         description: 'Close the loop on a prior decision',
         icon: <Target size={16} />,
-        action: () => navigate('/dashboard/outcome-flywheel'),
+        action: () => navigate('/dashboard/analytics?view=intelligence#flywheel'),
         keywords: ['outcome', 'result', 'follow up', 'flywheel'],
       },
       {

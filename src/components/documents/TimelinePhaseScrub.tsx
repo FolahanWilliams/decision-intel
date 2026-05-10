@@ -748,13 +748,13 @@ export function PhaseAfterPanel({
           }}
         >
           <Link
-            href={`/dashboard/outcome-flywheel${
+            href={`/dashboard/analytics?view=intelligence${
               analysisId
-                ? `?analysisId=${analysisId}`
+                ? `&analysisId=${analysisId}`
                 : documentId
-                  ? `?documentId=${documentId}`
+                  ? `&documentId=${documentId}`
                   : ''
-            }`}
+            }#flywheel`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -771,7 +771,7 @@ export function PhaseAfterPanel({
             Report outcome <ArrowRight size={13} />
           </Link>
           <Link
-            href="/dashboard/outcome-flywheel"
+            href="/dashboard/analytics?view=intelligence#flywheel"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

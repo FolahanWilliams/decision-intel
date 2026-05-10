@@ -108,6 +108,17 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/decisions?view=log',
         permanent: true,
       },
+      // Outcome Flywheel folded into Analytics → Intelligence as a section
+      // 2026-05-10 streamlining batch (founder ask: "wouldn't it just be
+      // best to almost merge or incorporate some elements from that into
+      // the intelligence page?"). The flywheel IS decision intelligence —
+      // which calls paid off, which didn't, how detection accuracy
+      // improves. Standalone route + sub-nav entry retired.
+      {
+        source: '/dashboard/outcome-flywheel',
+        destination: '/dashboard/analytics?view=intelligence#flywheel',
+        permanent: true,
+      },
       // Decision Alpha page deleted 2026-05-07 — the "Published Q2 2026"
       // claim was a recurring-publication promise without a workflow,
       // and the synthetic SECTOR_INDEX data carried "30+ biases" count

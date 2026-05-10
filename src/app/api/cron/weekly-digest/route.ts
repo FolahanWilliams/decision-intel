@@ -315,7 +315,7 @@ export async function GET(req: NextRequest) {
                 {
                   type: 'button',
                   text: { type: 'plain_text', text: 'Outcome Flywheel' },
-                  url: `${appUrl}/dashboard/outcome-flywheel`,
+                  url: `${appUrl}/dashboard/analytics?view=intelligence#flywheel`,
                 },
               ],
             },

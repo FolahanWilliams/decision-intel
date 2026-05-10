@@ -240,6 +240,11 @@ export default function Dashboard() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [selectedDocType, setSelectedDocType] = useState<string>('');
   const [selectedDealId, setSelectedDealId] = useState<string>('');
+  // Bulk upload queue — populated when the user drops or selects 2+ files
+  // on the main upload zone. Locked 2026-05-10 streamlining batch — the
+  // separate always-visible BulkUploadPanel was killed; the main upload
+  // zone is now the single entry point and forwards multi-file drops here.
+  const [bulkFiles, setBulkFiles] = useState<File[] | null>(null);
 
   // Container list (replaces legacy useDeals) re-lands in Phase 2 of
   // the DecisionContainer refactor. Until then the upload deal-selector
@@ -459,8 +464,13 @@ export default function Dashboard() {
       e.preventDefault();
       globalDragCounter.current = 0;
       setGlobalDrag(false);
-      if (e.dataTransfer?.files.length && !uploading) {
-        setPendingFile(e.dataTransfer.files[0]);
+      if (!e.dataTransfer?.files.length || uploading) return;
+      const files = Array.from(e.dataTransfer.files);
+      // Mirror the upload-zone behaviour: 1 → confirm modal, 2+ → bulk queue.
+      if (files.length === 1) {
+        setPendingFile(files[0]);
+      } else {
+        setBulkFiles(files);
       }
     };
 
@@ -844,15 +854,27 @@ export default function Dashboard() {
     setIsDragOver(false);
 
     const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
+    if (files.length === 0) return;
+    // Single-file → existing confirm-modal flow. Multi-file → bulk queue.
+    // Both routes go through the same upload zone — the founder's
+    // streamlining ask: "merge bulk upload into the main upload box."
+    if (files.length === 1) {
       setPendingFile(files[0]);
+    } else {
+      setBulkFiles(files);
     }
   }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) {
+      e.target.value = '';
+      return;
+    }
+    if (files.length === 1) {
       setPendingFile(files[0]);
+    } else {
+      setBulkFiles(files);
     }
     // Reset so the same file can be re-selected (otherwise onChange won't fire)
     e.target.value = '';
@@ -1627,6 +1649,7 @@ export default function Dashboard() {
                     type="file"
                     id="file-input"
                     hidden
+                    multiple
                     accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
                     disabled={uploading}
                     onChange={handleFileSelect}
@@ -1690,7 +1713,7 @@ export default function Dashboard() {
                       >
                         {isDragOver
                           ? 'Drop to upload'
-                          : 'Drop your strategic memo, or click to browse'}
+                          : 'Drop your strategic memo (or up to 10), or click to browse'}
                       </p>
                       <p
                         style={{
@@ -1905,12 +1928,22 @@ export default function Dashboard() {
             ) : null}
           </ErrorBoundary>
 
-          {/* Bulk Upload — direct sibling under the stack-xl fragment
-              so the stack gap governs spacing between upload zone and
-              bulk upload card. No explicit mt/mb needed. */}
-          <ErrorBoundary sectionName="Bulk Upload">
-            <BulkUploadPanel onComplete={() => mutateDocs?.()} />
-          </ErrorBoundary>
+          {/* Bulk Upload — locked 2026-05-10 streamlining batch.
+              Previously rendered as an always-visible separate card
+              below the main upload zone (two upload boxes). Now mounts
+              ONLY when the user drops/selects 2+ files on the main
+              upload zone, with the dropped files pre-populated in the
+              queue. Single upload box, dual-mode (single-file confirm
+              modal vs bulk queue) — the founder's ask. */}
+          {bulkFiles && bulkFiles.length > 0 && (
+            <ErrorBoundary sectionName="Bulk Upload">
+              <BulkUploadPanel
+                initialFiles={bulkFiles}
+                onComplete={() => mutateDocs?.()}
+                onDismiss={() => setBulkFiles(null)}
+              />
+            </ErrorBoundary>
+          )}
 
           {/* Currently Analyzing Section */}
           <ErrorBoundary sectionName="Documents">

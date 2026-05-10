@@ -113,7 +113,7 @@ export function FlywheelChips({ variant = 'compact' }: FlywheelChipsProps) {
     >
       {brier && (
         <Link
-          href="/dashboard/outcome-flywheel"
+          href="/dashboard/analytics?view=intelligence#flywheel"
           title={`Rolling ${brier.windowDays}-day Brier · ${brier.sampleSize} outcomes · lower is better calibrated`}
           style={{
             display: 'inline-flex',
@@ -149,7 +149,7 @@ export function FlywheelChips({ variant = 'compact' }: FlywheelChipsProps) {
       )}
       {pending && (pending.pending > 0 || pending.overdue > 0) && (
         <Link
-          href="/dashboard/outcome-flywheel"
+          href="/dashboard/analytics?view=intelligence#flywheel"
           title={
             pending.overdue > 0
               ? `${pending.overdue} audit${pending.overdue === 1 ? '' : 's'} overdue · ${pending.pending} pending`

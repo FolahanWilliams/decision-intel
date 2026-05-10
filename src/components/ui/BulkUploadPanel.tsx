@@ -36,13 +36,64 @@ function formatSize(bytes: number): string {
 
 interface BulkUploadPanelProps {
   onComplete?: () => void;
+  /**
+   * Pre-populate the queue with files (e.g. when the main dashboard
+   * upload zone receives a multi-file drop and forwards them here).
+   * Locked 2026-05-10 streamlining batch — main upload zone became the
+   * single entry point for both single + bulk uploads.
+   */
+  initialFiles?: File[] | null;
+  /** Called when the user dismisses the panel (e.g. via the close X). */
+  onDismiss?: () => void;
 }
 
-export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
-  const [files, setFiles] = useState<FileEntry[]>([]);
+/**
+ * Builds the initial queue + overflow-error state from a pre-populated
+ * file drop (panel mounted with initialFiles from the parent dashboard
+ * upload zone). Pure function — no side effects, called from the lazy
+ * useState initializer so we never call setState inside useEffect (per
+ * react-hooks/set-state-in-effect lint rule).
+ */
+function seedFromInitialFiles(initial: File[] | null | undefined): {
+  files: FileEntry[];
+  error: string | null;
+} {
+  if (!initial || initial.length === 0) return { files: [], error: null };
+  const toAdd: FileEntry[] = [];
+  for (const file of initial.slice(0, MAX_FILES)) {
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    const acceptedExt = ACCEPTED_EXTENSIONS.includes(ext);
+    const acceptedType = ACCEPTED_TYPES.includes(file.type);
+    if (!acceptedExt && !acceptedType) {
+      toAdd.push({ file, status: 'failed', error: `Unsupported file type: ${ext}` });
+    } else if (file.size > MAX_SIZE) {
+      toAdd.push({
+        file,
+        status: 'failed',
+        error: `File too large (${formatSize(file.size)}, max ${formatSize(MAX_SIZE)})`,
+      });
+    } else {
+      toAdd.push({ file, status: 'queued' });
+    }
+  }
+  const error =
+    initial.length > MAX_FILES
+      ? `Only the first ${MAX_FILES} files are queued — the rest were dropped.`
+      : null;
+  return { files: toAdd, error };
+}
+
+export function BulkUploadPanel({ onComplete, initialFiles, onDismiss }: BulkUploadPanelProps) {
+  // Lazy useState initializers seed the queue + overflow-error from the
+  // parent's pre-populated drop ONCE at mount. Calling seedFromInitialFiles
+  // in two initializers is fine — it's a pure function and React only
+  // calls each initializer once.
+  const [files, setFiles] = useState<FileEntry[]>(() => seedFromInitialFiles(initialFiles).files);
   const [uploading, setUploading] = useState(false);
   const [batch, setBatch] = useState<BatchStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    () => seedFromInitialFiles(initialFiles).error
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -201,6 +252,24 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
           Bulk Upload
           <span className="text-xs text-muted font-normal">Up to {MAX_FILES} files</span>
         </h3>
+        {onDismiss && !uploading && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            aria-label="Close bulk upload"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              padding: 4,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
       <div className="card-body">
         {error && (

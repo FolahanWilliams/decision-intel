@@ -163,7 +163,7 @@ export function CsoDashboardRail() {
                 : 'awaiting report'
             }
             value={outcomesTotal}
-            href="/dashboard/outcome-flywheel"
+            href="/dashboard/analytics?view=intelligence#flywheel"
             cta="Open flywheel"
             tone={outcomesOverdue > 0 ? 'warning' : 'accent'}
           />

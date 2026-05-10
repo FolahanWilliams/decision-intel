@@ -9,9 +9,7 @@ import {
   TrendingUp,
   Activity,
   Lightbulb,
-  Gauge,
   BookOpen,
-  FlaskConical,
   Layers,
   Brain,
 } from 'lucide-react';
@@ -36,9 +34,19 @@ const ExplainabilityContent = lazy(() =>
     default: m.ExplainabilityContent,
   }))
 );
-const DecisionIntelligenceContent = lazy(() =>
-  import('@/components/analytics/DecisionIntelligenceContent').then(m => ({
-    default: m.DecisionIntelligenceContent,
+// DecisionIntelligenceContent removed 2026-05-10 streamlining batch.
+// Its "Personal" view rendered DecisionDNAPageContent — already its own
+// dedicated section above on this tab (duplicate). The unique team-view
+// cards (BiasGenomeBenchmark + TopCounterfactualsCard) are mounted
+// directly below as their own sections.
+const TopCounterfactualsCard = lazy(() =>
+  import('@/components/analytics/TopCounterfactualsCard').then(m => ({
+    default: m.TopCounterfactualsCard,
+  }))
+);
+const BiasGenomeBenchmark = lazy(() =>
+  import('@/components/analytics/BiasGenomeBenchmark').then(m => ({
+    default: m.BiasGenomeBenchmark,
   }))
 );
 const BiasLibraryContent = lazy(() =>
@@ -65,9 +73,13 @@ const CalibrationContent = lazy(() =>
     default: m.CalibrationContent,
   }))
 );
-const ExperimentsContent = lazy(() =>
-  import('@/components/experiments/ExperimentsContent').then(m => ({
-    default: m.ExperimentsContent,
+// Outcome Flywheel folded into Intelligence tab 2026-05-10 streamlining
+// batch — was previously a standalone /dashboard/outcome-flywheel route +
+// thin link card on Performance + sidebar sub-nav entry. Per founder
+// "incorporate elements into the intelligence page."
+const OutcomeFlywheelContent = lazy(() =>
+  import('@/components/outcome-flywheel/OutcomeFlywheelContent').then(m => ({
+    default: m.OutcomeFlywheelContent,
   }))
 );
 // Phase B 2026-05-09 evening — Decision DNA folded from a standalone
@@ -80,22 +92,22 @@ const DecisionDNAPageContent = lazy(() =>
   }))
 );
 
-// Consolidated from 7 → 3 tabs. Each tab now rolls up its previous
-// siblings into one surface: Performance = DQI trends + outcome loop +
-// decision signals (audits/nudges merged) + calibration; Intelligence =
-// fingerprint + explainability + taxonomy; Graph = the Decision Knowledge
-// Graph (own page for the full visualization, linked via NAV_TABS).
+// 2 tabs (locked 2026-05-10 streamlining batch). The standalone Decision
+// Knowledge Graph at /dashboard/decision-graph is the canonical graph
+// surface (richer data, full-screen viz, sidebar sub-nav entry); having
+// it ALSO appear as an Analytics tab was duplicate navigation. Performance
+// now also folds in Outcome Flywheel as a section (was a thin link card +
+// duplicate sidebar sub-nav entry — same streamlining principle).
 const TABS = [
   { key: 'performance', label: 'Performance', icon: <BarChart3 size={15} /> },
   { key: 'intelligence', label: 'Intelligence', icon: <BrainCircuit size={15} /> },
-  { key: 'graph', label: 'Decision Graph', icon: <Network size={15} /> },
 ];
 
-const VALID_VIEWS = new Set(['performance', 'intelligence', 'graph']);
+const VALID_VIEWS = new Set(['performance', 'intelligence']);
 
-// Legacy keys (from the previous 7-tab taxonomy + DNA/fingerprint) are
-// remapped to the new 3-tab taxonomy so Slack deep links, bookmarks, and
-// older emails keep resolving to the right surface.
+// Legacy keys (from the previous 7-tab taxonomy + DNA/fingerprint + the
+// short-lived 3-tab taxonomy with a Graph tab) are remapped so Slack deep
+// links, bookmarks, and older emails keep resolving to the right surface.
 const LEGACY_VIEW_MAP: Record<string, string> = {
   trends: 'performance',
   quality: 'performance',
@@ -111,11 +123,9 @@ const LEGACY_VIEW_MAP: Record<string, string> = {
   nudges: 'performance',
   calibration: 'performance',
   experiments: 'performance',
-};
-
-// Heavy visualizations navigate to separate pages instead of rendering inline
-const NAV_TABS: Record<string, string> = {
-  graph: '/dashboard/decision-graph',
+  // 2026-05-10 streamlining — Decision Graph tab killed; standalone route
+  // is the canonical graph surface.
+  graph: 'performance',
 };
 
 function SectionHeading({ icon, children }: { icon?: React.ReactNode; children: React.ReactNode }) {
@@ -152,62 +162,6 @@ function SectionHeading({ icon, children }: { icon?: React.ReactNode; children: 
       )}
       <span>{children}</span>
     </h2>
-  );
-}
-
-// Thin link card that replaces the old embedded OutcomeFlywheelContent.
-// Dedupe with /dashboard/outcome-flywheel (cron writes there; sidebar
-// FlywheelChips already surface pending + Brier globally).
-function OutcomeFlywheelLinkCard() {
-  return (
-    <div
-      className="card"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        padding: '18px 22px',
-        borderLeft: '3px solid var(--accent-primary)',
-        flexWrap: 'wrap',
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 220 }}>
-        <div
-          style={{
-            fontSize: 10.5,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: 'var(--text-muted)',
-            marginBottom: 2,
-          }}
-        >
-          Flywheel · Standalone surface
-        </div>
-        <div
-          style={{
-            fontSize: 15,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            marginBottom: 2,
-          }}
-        >
-          Outcome Flywheel — recalibrated DQI, Brier trend, lessons learned.
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          Pending + Brier signals are always visible in the sidebar. The full timeline + per-audit
-          recalibration lives on its own page.
-        </div>
-      </div>
-      <a
-        href="/dashboard/outcome-flywheel"
-        className="btn btn-primary btn-sm flex items-center gap-2"
-        style={{ whiteSpace: 'nowrap' }}
-      >
-        Open Outcome Flywheel
-        <span aria-hidden>→</span>
-      </a>
-    </div>
   );
 }
 
@@ -292,11 +246,7 @@ function AnalyticsInner() {
             tabs={TABS}
             activeTab={view}
             onTabChange={key => {
-              if (NAV_TABS[key]) {
-                router.push(NAV_TABS[key]);
-              } else {
-                router.replace(`/dashboard/analytics?view=${key}`, { scroll: false });
-              }
+              router.replace(`/dashboard/analytics?view=${key}`, { scroll: false });
             }}
           />
         )}
@@ -326,30 +276,18 @@ function AnalyticsInner() {
                   <InsightsPageContent />
                 </section>
 
-                {/* Outcome Flywheel lives on its own page — the cron
-                    writes there, the sidebar chip (FlywheelChips) surfaces
-                    pending + Brier globally, and the standalone surface
-                    has room for the full timeline / recalibration view.
-                    We show a thin summary-card link here instead of
-                    embedding the full content (2026-04-23 dedupe). */}
-                <section>
-                  <SectionHeading icon={<TrendingUp size={13} />}>Outcome Flywheel</SectionHeading>
-                  <OutcomeFlywheelLinkCard />
-                </section>
-
                 <section>
                   <SectionHeading icon={<Activity size={13} />}>Decision Signals</SectionHeading>
                   <DecisionSignals />
                 </section>
 
+                {/* Calibration moved here from a standalone section heading
+                    + Experiments cut entirely 2026-05-10 streamlining batch.
+                    CalibrationTrackerChip in the page header carries the
+                    headline number; full surface lives below. */}
                 <section>
-                  <SectionHeading icon={<Gauge size={13} />}>Calibration</SectionHeading>
+                  <SectionHeading icon={<Activity size={13} />}>Calibration</SectionHeading>
                   <CalibrationContent />
-                </section>
-
-                <section>
-                  <SectionHeading icon={<FlaskConical size={13} />}>Experiments</SectionHeading>
-                  <ExperimentsContent />
                 </section>
               </>
             )}
@@ -357,12 +295,7 @@ function AnalyticsInner() {
               <>
                 {/* Decision DNA — your personal calibration. Folded from
                     the deleted /dashboard/decision-dna route into
-                    Intelligence (Phase B 2026-05-09 evening) because
-                    it's structurally a personal-calibration surface,
-                    same family as Bias Genome contribution + Decision
-                    Intelligence + Explainability. Lives at the top so
-                    a returning CSO sees their own pattern first, then
-                    the cross-org genome below. */}
+                    Intelligence (Phase B 2026-05-09 evening). */}
                 <section id="dna" style={{ scrollMarginTop: 80 }}>
                   <SectionHeading icon={<Brain size={13} />}>
                     Decision DNA · Personal Calibration
@@ -370,10 +303,25 @@ function AnalyticsInner() {
                   <DecisionDNAPageContent />
                 </section>
 
+                {/* Outcome Flywheel — folded from the deleted standalone
+                    /dashboard/outcome-flywheel route into Intelligence
+                    2026-05-10 streamlining batch (founder ask:
+                    "wouldn't it just be best to almost merge or
+                    incorporate some elements from that into the
+                    intelligence page?"). The flywheel IS decision
+                    intelligence — which calls paid off, which didn't,
+                    how detection accuracy improves. Same family as
+                    Decision DNA (personal calibration) + Bias Genome
+                    contribution (cross-org calibration). */}
+                <section id="flywheel" style={{ scrollMarginTop: 80 }}>
+                  <SectionHeading icon={<TrendingUp size={13} />}>
+                    Outcome Flywheel
+                  </SectionHeading>
+                  <OutcomeFlywheelContent />
+                </section>
+
                 {/* Bias Genome contribution surfaces the cross-org data
-                    network effect to the contributor (A3 deep, locked
-                    2026-04-27). Without this, the genome's compounding
-                    is invisible to the team funding it. */}
+                    network effect to the contributor. */}
                 <section>
                   <SectionHeading icon={<Network size={13} />}>
                     Bias Genome · Your Contribution
@@ -383,9 +331,16 @@ function AnalyticsInner() {
 
                 <section>
                   <SectionHeading icon={<BrainCircuit size={13} />}>
-                    Decision Intelligence
+                    Top Counterfactuals
                   </SectionHeading>
-                  <DecisionIntelligenceContent />
+                  <TopCounterfactualsCard />
+                </section>
+
+                <section>
+                  <SectionHeading icon={<BrainCircuit size={13} />}>
+                    Bias Genome Benchmark
+                  </SectionHeading>
+                  <BiasGenomeBenchmark />
                 </section>
 
                 <section>
