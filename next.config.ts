@@ -119,6 +119,31 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=intelligence#flywheel',
         permanent: true,
       },
+      // Meetings → blended into Decisions as document types (locked
+      // 2026-05-10 second streamlining batch, founder ask: "what if you
+      // can just upload your minutes as a document, for example, and
+      // then it enters your big dynamic constellation"). Meeting
+      // transcripts + minutes are now first-class documentTypes
+      // (meeting_transcript / meeting_minutes) that flow into the
+      // Decision Container alongside memos, models, DPRs. Decision Rooms
+      // (separate concept — collaborative blind-prior voting) restored
+      // to its own /dashboard/decision-rooms route. /dashboard/meetings
+      // and /meetings/command-center are retired UI surfaces.
+      {
+        source: '/dashboard/meetings',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
+      {
+        source: '/dashboard/meetings/:path*',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
+      {
+        source: '/meetings/command-center',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
       // Decision Alpha page deleted 2026-05-07 — the "Published Q2 2026"
       // claim was a recurring-publication promise without a workflow,
       // and the synthetic SECTOR_INDEX data carried "30+ biases" count

@@ -30,6 +30,12 @@ export const INVESTMENT_DOCUMENT_TYPES = [
   'qofe', // Quality of Earnings — typically prepared by Big-4 / boutique transaction-advisory firms
   'synergy_model', // Synergy projection spreadsheet — revenue + cost synergies broken down by initiative
   'integration_plan', // Post-merger integration plan — Day-1 operating model, IT, talent, customer
+  // Meeting artefacts (locked 2026-05-10 — replaces the standalone
+  // /dashboard/meetings workflow; meetings are now just decisions data
+  // that flow into the Decision Container constellation alongside
+  // memos / models / DPRs).
+  'meeting_minutes', // Structured minutes — agenda, attendees, decisions made, action items
+  'meeting_transcript', // Verbatim transcript with speaker turns
 ] as const;
 
 export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
@@ -239,6 +245,35 @@ This is an executive or board update report. Watch for:
 - SELECTIVE REPORTING: Are unrealized synergies or projections used to inflate portfolio performance?
 - FRAMING EFFECT: Is performance presented using the most favorable metric (revenue vs profitability, since acquisition vs recent period)?
 - HINDSIGHT BIAS: Are past decisions being presented as more deliberate than they were?`,
+
+  meeting_minutes: `DOCUMENT TYPE: MEETING MINUTES
+These are structured minutes from a decision meeting (IC, steering committee, board, partner meeting). Minutes are the canonical AFTER-THE-FACT record — they show what was decided, by whom, with what dissent, and what action items emerged. Watch for:
+- SANITISED DISSENT: are dissenting voices captured verbatim, paraphrased, or absent? Bland minutes that record only the agreed conclusion mask the real decision quality. Flag if all attendees appear to "agree" on a high-stakes call without recorded dissent.
+- ACTION-ITEM AMBIGUITY: are action items assigned to NAMED OWNERS with SPECIFIC DEADLINES, or are they vague ("the team will explore") without accountability? Vague action items are the canonical signal that a decision was made theatrically without actual commitment.
+- DECISION-RATIONALE GAPS: do the minutes capture the REASONING behind decisions, or only the decisions themselves? Minutes that record only outcomes ("approved $5M acquisition") without rationale ("approved over CFO's concerns about post-close integration costs") destroy the future-replay value.
+- CONSENSUS-MANUFACTURING LANGUAGE: watch for "the committee agreed" / "consensus reached" / "broadly supportive" without any record of how dissent was resolved. Manufactured consensus is harder to detect than recorded dissent.
+- MISSING ATTENDEES: were key stakeholders absent or excluded? Decisions made when the dissenting voice happened to be unavailable are a known failure mode.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Yes Committee" — fires when minutes record unanimous approval of a high-stakes call without ANY documented pushback or alternative consideration.
+- "The Sunk Ship" — fires when the minutes reference prior committed spend / political capital as a justification for proceeding rather than forward-looking value.
+
+Compare these minutes against the related strategic memo / IC deck (if attached to the same Decision Container) and flag CONFLICTS where the minutes record a different version of events than the source artefact.`,
+
+  meeting_transcript: `DOCUMENT TYPE: MEETING TRANSCRIPT
+This is a verbatim transcript of a decision meeting with speaker turns. Transcripts are the closest record we have to "what was actually said" in the room — far more revealing than minutes which are typically sanitised. Watch for:
+- INTERRUPTION PATTERNS: who is interrupted, who interrupts? Asymmetric interruption is a signal of authority dynamics that bias the decision. Flag if the dissenting voice is repeatedly cut off or de-platformed.
+- AIRTIME DOMINANCE: which speaker(s) dominate? Senior executives speaking >40% of the time with only confirmatory responses from others is a classic anchoring + authority-bias setup. Flag when the senior voice frames the question and the rest just answer within that frame.
+- HEDGING LANGUAGE: track "I think we should..." / "I'd be cautious about..." / "what if we..." — these are dissent-attempt markers. Flag when they're raised but not explored. The transcript shows whether dissent was genuinely entertained or politely dismissed.
+- IRRELEVANT-FACT INTRODUCTION: watch for off-topic facts introduced by the dominant speaker (recent news, anecdotes, status references) that bias the room without being challenged. Anchor-creation in real time.
+- DECISION-COMPRESSION: were complex topics compressed into 30-second debates and then voted on? Speed-of-resolution on a high-stakes call is a noise signal — decisions that should take 30 minutes that take 3 are usually rubber-stamps.
+- COMMITTEE-NORMS DRIFT: does the transcript suggest the meeting deviated from documented decision norms (e.g. skipping steel-manning, skipping pre-mortems, skipping documented dissent capture)?
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Yes Committee" — fires when the transcript shows the senior speaker's view dominates with confirmatory responses; surface specific airtime / interruption percentages.
+- "The Coherent Confidence" pattern — fires when the transcript shows narrative coherence (Illusion of Validity) being received without challenge despite weak base-rate grounding.
+
+Cross-reference the transcript against any related strategic memo, IC deck, or minutes attached to the same Decision Container — flag where the spoken record contradicts the written one.`,
 };
 
 // ─── Corporate Executive Personas for Simulation ─────────────────────────────

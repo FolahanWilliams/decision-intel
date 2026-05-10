@@ -13,7 +13,7 @@ import {
   ArrowRight,
   Plus,
   MessageSquare,
-  Video,
+  // Video icon retired 2026-05-10 (meetings → document type cascade).
   Bell,
   GitCompareArrows,
   Lightbulb,
@@ -158,19 +158,24 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
       },
     ],
   },
+  // Meetings empty-state retired 2026-05-10 — meetings → document type
+  // cascade. Transcripts + minutes upload as documents now via the
+  // standard /dashboard upload flow. Kept the key for back-compat with
+  // upstream type unions; redirects users to the canonical upload entry.
   meetings: {
-    icon: <Video className="w-12 h-12" />,
-    title: 'No meeting recordings',
-    description: 'Upload meeting recordings or transcripts to analyze group decision dynamics.',
+    icon: <Upload className="w-12 h-12" />,
+    title: 'No meeting transcripts yet',
+    description:
+      'Upload meeting transcripts or minutes as documents. They flow into the Decision Container alongside memos, models, and DPRs.',
     suggestions: [
-      'Support for video and audio files',
-      'Automatic transcription available',
-      'Identify groupthink and discussion biases',
+      'Paste a transcript from Otter, Fireflies, or AssemblyAI',
+      'Upload .txt or .docx with speaker turns',
+      'Tag the document type as Meeting Transcript or Meeting Minutes',
     ],
     actions: [
       {
-        label: 'Upload Recording',
-        href: '/dashboard/meetings',
+        label: 'Upload Transcript',
+        href: '/dashboard',
         variant: 'primary',
         icon: <Upload className="w-4 h-4" />,
       },

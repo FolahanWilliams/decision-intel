@@ -30,7 +30,7 @@ function NotFoundShell({
     >
       <div>
         <Link
-          href="/dashboard/meetings?tab=rooms"
+          href="/dashboard/decision-rooms"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -82,7 +82,7 @@ function NotFoundShell({
           </p>
           <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
             <Link
-              href="/dashboard/meetings?tab=rooms"
+              href="/dashboard/decision-rooms"
               className="btn btn-primary flex items-center gap-sm"
               style={{ fontSize: 13, padding: '8px 14px' }}
             >

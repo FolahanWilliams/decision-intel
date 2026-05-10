@@ -224,7 +224,7 @@ export function DecisionRoomDetailClient({ roomId, initialRoom }: Props) {
     <div style={{ padding: 'var(--spacing-xl)', maxWidth: 1240, margin: '0 auto' }}>
       <div style={{ marginBottom: 'var(--spacing-md)' }}>
         <Link
-          href="/dashboard/meetings?tab=rooms"
+          href="/dashboard/decision-rooms"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

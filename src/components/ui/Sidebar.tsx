@@ -13,7 +13,7 @@ import {
   Search,
   ChevronLeft,
   LogOut as LogOutIcon,
-  Video,
+  Vote,
   Users,
   Bot,
   Plus,
@@ -480,11 +480,11 @@ export default function Sidebar() {
           >
             {isTeamPlan && (
               <NavItem
-                href="/dashboard/meetings"
-                icon={<Video size={18} />}
-                label="Meetings & Rooms"
-                description="Recordings, transcripts & decision rooms"
-                active={pathname.startsWith('/dashboard/meetings')}
+                href="/dashboard/decision-rooms"
+                icon={<Vote size={18} />}
+                label="Decision Rooms"
+                description="Blind-prior voting — capture team priors before the IC vote"
+                active={pathname.startsWith('/dashboard/decision-rooms')}
                 collapsed={collapsed}
                 onNavigate={closeMobile}
               />

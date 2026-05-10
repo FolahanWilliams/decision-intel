@@ -16,7 +16,7 @@ import {
   BookOpen,
   BrainCircuit,
   Bell,
-  Video,
+  // Video icon retired 2026-05-10 — meetings are documents now.
   Zap,
   CheckCircle,
   AlertTriangle,
@@ -269,14 +269,9 @@ export function CommandPalette() {
         action: () => navigate('/dashboard/analytics?view=performance'),
         keywords: ['human', 'audit', 'quality', 'decision', 'performance'],
       },
-      {
-        id: 'meetings',
-        label: 'Meetings',
-        description: 'Meeting recordings & transcripts',
-        icon: <Video size={16} />,
-        action: () => navigate('/dashboard/meetings'),
-        keywords: ['recording', 'transcript'],
-      },
+      // Meetings palette entry retired 2026-05-10 — meetings are now
+      // uploaded as documents (meeting_transcript / meeting_minutes
+      // types) via the standard upload flow on /dashboard.
       {
         id: 'analytics-nudges',
         label: 'Analytics — Behavioural Nudges',
@@ -298,7 +293,7 @@ export function CommandPalette() {
         label: 'Decision Rooms',
         description: 'Collaborative decision spaces with blind priors',
         icon: <Users size={16} />,
-        action: () => navigate('/dashboard/meetings?tab=rooms'),
+        action: () => navigate('/dashboard/decision-rooms'),
         keywords: ['rooms', 'blind', 'prior', 'voting', 'committee'],
       },
       {
@@ -406,7 +401,7 @@ export function CommandPalette() {
         label: 'Start a Decision Room',
         description: 'Collaborative space with blind priors',
         icon: <Users size={16} />,
-        action: () => navigate('/dashboard/meetings?tab=rooms'),
+        action: () => navigate('/dashboard/decision-rooms'),
         keywords: ['room', 'decision room', 'committee', 'blind', 'prior'],
       },
       {

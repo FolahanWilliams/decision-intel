@@ -145,7 +145,14 @@ export default function SubmitDecisionPage() {
         });
 
         const data = await uploadPromise;
-        router.push(`/dashboard/meetings/${data.id}`);
+        // Meetings → document type cascade 2026-05-10. The /dashboard/meetings
+        // detail surface was retired; meeting-recording uploads still flow
+        // through /api/meetings/upload (kept for the audio/video pipeline)
+        // but the user lands on the dashboard where the upload lives in the
+        // documents browse. The data.id from the upload is preserved on
+        // the recording row for any future detail surface.
+        void data; // recording id retained server-side
+        router.push('/dashboard?view=browse');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Upload failed');
       } finally {

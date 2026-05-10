@@ -172,7 +172,7 @@ export function CsoDashboardRail() {
             label="Rooms"
             sublabel="active, you participate"
             value={roomsActive}
-            href="/dashboard/meetings?tab=rooms"
+            href="/dashboard/decision-rooms"
             cta="Open rooms"
             tone="neutral"
           />

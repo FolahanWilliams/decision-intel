@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Upload, Bot, BrainCircuit, Video } from 'lucide-react';
+import { X, Upload, Bot, BrainCircuit } from 'lucide-react';
 
 const OPTIONS = [
   {
@@ -26,13 +26,12 @@ const OPTIONS = [
     description: 'Submit a human decision for cognitive auditing',
     href: '/dashboard/cognitive-audits/submit',
   },
-  {
-    key: 'meeting',
-    icon: Video,
-    title: 'Upload a Meeting',
-    description: 'Analyze a meeting recording or transcript',
-    href: '/dashboard/meetings',
-  },
+  // Meeting entry retired 2026-05-10 — meetings are now uploaded as
+  // documents (meeting_transcript / meeting_minutes types) via the
+  // standard /dashboard upload flow. The Decision Container picks them
+  // up like any other document; the constellation viz blends them with
+  // memos / models / DPRs. Founder ask: "what if you can just upload
+  // your minutes as a document" — done.
 ];
 
 export function NewDecisionModal() {

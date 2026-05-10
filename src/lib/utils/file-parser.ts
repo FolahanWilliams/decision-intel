@@ -16,6 +16,12 @@ import {
   formatQofeAssessmentForAudit,
   type ParsedQofeData,
 } from '@/lib/parsers/qofe-parser';
+import {
+  scoreMeetingTranscript,
+  toParsedMeetingTranscriptData,
+  formatMeetingTranscriptForAudit,
+  type ParsedMeetingTranscriptData,
+} from '@/lib/parsers/meeting-transcript-parser';
 
 const log = createLogger('FileParser');
 
@@ -100,6 +106,31 @@ export async function parseFile(
           `DOCX parsing yielded empty text for ${filename}. Messages: ${JSON.stringify(result.messages)}`
         );
       }
+
+      // Meeting transcript enrichment (locked 2026-05-10 — meetings →
+      // document type cascade). When the upload was explicitly typed as
+      // meeting_transcript / meeting_minutes AND we have speaker turns,
+      // run the transcript parser and prepend the structured block.
+      // Mirrors the qofe + synergy_model enrichment pattern.
+      if (documentType === 'meeting_transcript' || documentType === 'meeting_minutes') {
+        try {
+          const assessment = scoreMeetingTranscript(result.value);
+          if (assessment.hasSpeakerMarkers) {
+            const wrapped = toParsedMeetingTranscriptData(assessment, result.value.length);
+            const block = formatMeetingTranscriptForAudit(wrapped);
+            log.info(
+              `meeting-transcript enrichment: ${assessment.totalTurns} turns · ${assessment.speakers.length} speakers · dominance=${assessment.dominanceFlag} · ${assessment.hedgingHits.length} hedging hits`
+            );
+            return `${block}\n\n${result.value}`;
+          }
+          log.info(
+            `meeting-transcript enrichment: no speaker markers detected, falling through to flat text`
+          );
+        } catch (err) {
+          log.warn(`meeting-transcript enrichment failed (using flat text): ${String(err)}`);
+        }
+      }
+
       return result.value;
     } catch (error) {
       throw new Error(
@@ -256,8 +287,30 @@ export async function parseFile(
     );
   }
 
-  // Default to plain text
-  return buffer.toString('utf-8');
+  // Default to plain text — with meeting-transcript enrichment when the
+  // upload is typed as a meeting transcript / minutes (locked 2026-05-10).
+  // Transcripts are most commonly pasted as plain text from upstream
+  // transcription tools (Otter, Fireflies, AssemblyAI export, etc.).
+  const plainText = buffer.toString('utf-8');
+  if (documentType === 'meeting_transcript' || documentType === 'meeting_minutes') {
+    try {
+      const assessment = scoreMeetingTranscript(plainText);
+      if (assessment.hasSpeakerMarkers) {
+        const wrapped = toParsedMeetingTranscriptData(assessment, plainText.length);
+        const block = formatMeetingTranscriptForAudit(wrapped);
+        log.info(
+          `meeting-transcript enrichment (text): ${assessment.totalTurns} turns · ${assessment.speakers.length} speakers · dominance=${assessment.dominanceFlag} · ${assessment.hedgingHits.length} hedging hits`
+        );
+        return `${block}\n\n${plainText}`;
+      }
+      log.info(
+        `meeting-transcript enrichment (text): no speaker markers detected, falling through to flat text`
+      );
+    } catch (err) {
+      log.warn(`meeting-transcript enrichment (text) failed (using flat text): ${String(err)}`);
+    }
+  }
+  return plainText;
 }
 
 /**
@@ -285,7 +338,7 @@ export async function extractTypeAwareStructuredData(
   mimeType: string,
   filename: string,
   documentType: string | null | undefined
-): Promise<ParsedSynergyModelData | ParsedQofeData | null> {
+): Promise<ParsedSynergyModelData | ParsedQofeData | ParsedMeetingTranscriptData | null> {
   if (!documentType) return null;
 
   const lowerFilename = filename.toLowerCase();
@@ -293,6 +346,14 @@ export async function extractTypeAwareStructuredData(
     mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
     lowerFilename.endsWith('.xlsx');
   const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
+  const isDocx =
+    mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    lowerFilename.endsWith('.docx');
+  const isPlainText =
+    mimeType === 'text/plain' ||
+    mimeType === 'text/markdown' ||
+    lowerFilename.endsWith('.txt') ||
+    lowerFilename.endsWith('.md');
 
   if (documentType === 'synergy_model' && isXlsx) {
     try {
@@ -332,6 +393,41 @@ export async function extractTypeAwareStructuredData(
       return parsed;
     } catch (err) {
       log.warn(`qofe structured-data extraction failed: ${String(err)}`);
+      return null;
+    }
+  }
+
+  // Meeting transcript / minutes structured extraction (locked 2026-05-10
+  // — meetings → document type cascade). Accepts plain text + DOCX.
+  // Returns ParsedMeetingTranscriptData with per-speaker airtime,
+  // dominance verdict, and dissent-attempt hits. Persists to
+  // Document.parsedStructuredData via the same generic JSONB column.
+  if (
+    (documentType === 'meeting_transcript' || documentType === 'meeting_minutes') &&
+    (isDocx || isPlainText)
+  ) {
+    try {
+      let text: string;
+      if (isDocx) {
+        const result = await mammoth.extractRawText({ buffer });
+        text = result.value;
+      } else {
+        text = buffer.toString('utf-8');
+      }
+      const assessment = scoreMeetingTranscript(text);
+      if (assessment.hasSpeakerMarkers) {
+        const wrapped = toParsedMeetingTranscriptData(assessment, text.length);
+        log.info(
+          `meeting-transcript structured-data extraction: ${assessment.totalTurns} turns · ${assessment.speakers.length} speakers · dominance=${assessment.dominanceFlag}`
+        );
+        return wrapped;
+      }
+      log.info(
+        `meeting-transcript structured-data extraction: no speaker markers detected, returning null`
+      );
+      return null;
+    } catch (err) {
+      log.warn(`meeting-transcript structured-data extraction failed: ${String(err)}`);
       return null;
     }
   }
