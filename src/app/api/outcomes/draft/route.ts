@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
+import { prisma } from '@/lib/prisma';
 import {
   getPendingDraftOutcomes,
   confirmDraftOutcome,
@@ -60,6 +61,17 @@ export async function PATCH(req: NextRequest) {
         { error: 'draftId and action (confirm|dismiss) are required' },
         { status: 400 }
       );
+    }
+
+    const draft = await prisma.draftOutcome.findUnique({
+      where: { id: draftId },
+      include: { analysis: { select: { document: { select: { userId: true } } } } },
+    });
+    if (!draft) {
+      return NextResponse.json({ error: 'Draft not found' }, { status: 404 });
+    }
+    if (draft.analysis.document.userId !== user.id) {
+      return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
     }
 
     if (action === 'confirm') {

@@ -12,6 +12,7 @@ const log = createLogger('DocumentsRoute');
 // Separated so the schema-drift fallback can retry with core fields only.
 const ANALYSIS_SELECT_DETAILED = {
   overallScore: true,
+  outcomeStatus: true,
   noiseScore: true,
   biases: {
     select: { severity: true, biasType: true },
@@ -21,6 +22,7 @@ const ANALYSIS_SELECT_DETAILED = {
 
 const ANALYSIS_SELECT_CORE = {
   overallScore: true,
+  outcomeStatus: true,
 } as const;
 
 // GET /api/documents - List all documents for the current user
@@ -131,6 +133,7 @@ export async function GET(request: Request) {
       parentDocumentId?: string | null;
       analyses: Array<{
         overallScore: number | null;
+        outcomeStatus?: string | null;
         noiseScore?: number | null;
         biases?: Array<{ severity: string; biasType: string }>;
         factCheck?: unknown;
@@ -149,6 +152,7 @@ export async function GET(request: Request) {
         versionNumber: doc.versionNumber ?? 1,
         parentDocumentId: doc.parentDocumentId ?? null,
         score: latestAnalysis?.overallScore ?? undefined,
+        outcomeStatus: latestAnalysis?.outcomeStatus ?? undefined,
         // Include details if requested and available
         ...(detailed &&
           latestAnalysis &&

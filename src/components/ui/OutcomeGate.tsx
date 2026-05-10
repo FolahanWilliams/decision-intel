@@ -311,14 +311,15 @@ function WhyThisMattersBlock() {
  * gate state, dashboard renders this modal as a blocking surface until
  * the user logs an outcome.
  *
- * Phase 3 wiring (locked 2026-04-27): on mount the modal fetches
- * /api/outcomes/draft and pre-fills the outcome value when the selected
- * analysis has an auto-detected draft. The submit button switches between
- * "Confirm draft outcome" (PATCH /api/outcomes/draft action='confirm' —
- * one API call, server handles outcome creation + recalibration) and the
- * legacy "Submit & Unlock Analysis" (POST /api/outcomes) when the user
- * overrides the auto-detected value. Override path also dismisses the
- * stale draft fire-and-forget so it doesn't keep nagging.
+ * Multi-select (locked 2026-05-10): the modal now supports selecting
+ * multiple pending analyses and applying ONE outcome value to all of
+ * them in a single Promise.all batch against POST /api/outcomes. Drafts
+ * are still surfaced inline as a "Draft ready" pill on each row (and
+ * the row tooltip names the source + confidence) so the user can see
+ * which analyses already have an auto-detected outcome — but pre-fill +
+ * confirm-draft path was retired with the move to multi-select since the
+ * UX of "pre-fill from row A's draft, apply to rows A/B/C" was confusing.
+ * Drafts get cleaned up server-side when the matching outcome lands.
  */
 export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: OutcomeGateModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -344,7 +345,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
+  const [selectedAnalyses, setSelectedAnalyses] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
   const [outcome, setOutcome] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
@@ -356,17 +357,10 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
   // refreshes immediately rather than waiting for its refresh interval.
   const { mutate: globalSwrMutate } = useSWRConfig();
 
-  // The 4 outcome values OutcomeGateModal can submit. Drafts may carry
-  // values outside this set (e.g. 'inconclusive' from outcome-inference);
-  // if so we surface a hint so the user knows the draft exists but needs
-  // a manual choice — never silently mismatch.
-  const VALID_OUTCOME_VALUES = useMemo(
-    () => new Set(['success', 'partial_success', 'failure', 'too_early']),
-    []
-  );
-
-  // Phase 3: fetch auto-detected drafts so we can pre-fill the outcome
-  // value when the user picks an analysis. Single fetch on mount; no deps.
+  // Fetch auto-detected drafts so we can render a "Draft ready" pill on
+  // any pending row that has one (informational only — the multi-select
+  // submit path applies a single user-chosen outcome to all selected
+  // analyses regardless of per-row drafts).
   useEffect(() => {
     let cancelled = false;
     fetch('/api/outcomes/draft')
@@ -393,98 +387,36 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     return map;
   }, [drafts]);
 
-  const matchingDraft = selectedAnalysis
-    ? (draftsByAnalysisId.get(selectedAnalysis) ?? null)
-    : null;
-  // Validation: only pre-fill when the draft's outcome is one of the 4 button
-  // values. Outcome-inference can emit 'inconclusive' or other states the
-  // modal doesn't render — surface those as a hint instead of silently
-  // mismatching (caught in the 2026-04-27 category-grade depth audit).
-  const draftOutcomeIsValid = !!matchingDraft && VALID_OUTCOME_VALUES.has(matchingDraft.outcome);
-  // Confirm-path engages when the user picks an analysis WITH a draft, the
-  // draft's outcome is in the valid set, and they haven't overridden the
-  // auto-detected value. Any other state routes to manual /api/outcomes POST.
-  const onConfirmPath = !!matchingDraft && draftOutcomeIsValid && outcome === matchingDraft.outcome;
-
-  // When the user picks an analysis that has a matching draft with a VALID
-  // outcome, pre-fill. If the draft has an invalid outcome (e.g.
-  // 'inconclusive'), don't pre-fill — the user picks manually and we surface
-  // a hint above the buttons. Re-runs whenever selectedAnalysis changes.
-  useEffect(() => {
-    if (selectedAnalysis && matchingDraft && draftOutcomeIsValid) {
-      setOutcome(matchingDraft.outcome);
-    } else {
-      setOutcome('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAnalysis]);
-
   const handleQuickSubmit = useCallback(async () => {
-    if (!selectedAnalysis || !outcome) return;
+    if (selectedAnalyses.size === 0 || !outcome) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      let ok = false;
-      if (onConfirmPath && matchingDraft) {
-        // Confirm-path: server creates the DecisionOutcome, marks the
-        // analysis status, and triggers recalibration in one transaction.
-        const res = await fetch('/api/outcomes/draft', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ draftId: matchingDraft.id, action: 'confirm' }),
-        });
-        ok = res.ok;
-      } else {
-        // Override path: manual POST. If a draft existed for this analysis
-        // but the user changed the outcome, dismiss the stale draft so it
-        // stops appearing in the DraftOutcomeBanner.
-        const res = await fetch('/api/outcomes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            analysisId: selectedAnalysis,
-            outcome,
-          }),
-        });
-        ok = res.ok;
-        if (ok && matchingDraft) {
-          // Fire-and-forget; never block the success path on draft cleanup.
-          fetch('/api/outcomes/draft', {
-            method: 'PATCH',
+      const results = await Promise.all(
+        Array.from(selectedAnalyses).map(analysisId =>
+          fetch('/api/outcomes', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ draftId: matchingDraft.id, action: 'dismiss' }),
-          }).catch(() => {
-            /* draft dismissal failure is non-critical */
-          });
-        }
-      }
-      if (ok) {
+            body: JSON.stringify({ analysisId, outcome }),
+          }).then(res => res.ok)
+        )
+      );
+      const allOk = results.every(Boolean);
+      if (allOk) {
         setSubmitted(true);
         onOutcomeSubmitted?.();
-        // Optimistic SWR refresh: any DraftOutcomeBanner / Draft consumer
-        // using SWR keyed off /api/outcomes/draft picks up the change
-        // immediately rather than waiting for the next refresh interval.
-        // Same applies to /api/decision-dna which derives from outcomes.
         globalSwrMutate('/api/outcomes/draft');
         globalSwrMutate('/api/decision-dna');
-        // Also refresh outcomes listing for any other consumer.
         globalSwrMutate('/api/outcomes');
       } else {
-        setSubmitError('Failed to submit outcome. Please try again.');
+        setSubmitError('One or more outcomes failed to submit. Please try again.');
       }
     } catch {
-      setSubmitError('Failed to submit outcome. Please try again.');
+      setSubmitError('Failed to submit outcomes. Please try again.');
     } finally {
       setSubmitting(false);
     }
-  }, [
-    selectedAnalysis,
-    outcome,
-    onConfirmPath,
-    matchingDraft,
-    onOutcomeSubmitted,
-    globalSwrMutate,
-  ]);
+  }, [selectedAnalyses, outcome, onOutcomeSubmitted, globalSwrMutate]);
 
   const OUTCOME_OPTIONS = [
     { value: 'success', label: 'Success', color: '#22c55e', icon: CheckCircle },
@@ -673,21 +605,50 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
 
               {/* Quick outcome report */}
               <div style={{ marginBottom: '16px' }}>
-                <label
+                <div
                   style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    display: 'block',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     marginBottom: '8px',
                   }}
                 >
-                  Select an analysis to report
-                </label>
+                  <label
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    Select analyses to report ({gateInfo.pendingAnalysisIds.length} pending)
+                  </label>
+                  <button
+                    onClick={() => {
+                      if (selectedAnalyses.size === gateInfo.pendingAnalysisIds.length) {
+                        setSelectedAnalyses(new Set());
+                      } else {
+                        setSelectedAnalyses(new Set(gateInfo.pendingAnalysisIds));
+                      }
+                    }}
+                    style={{
+                      fontSize: '11px',
+                      color: 'var(--accent-primary)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px 4px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {selectedAnalyses.size === gateInfo.pendingAnalysisIds.length
+                      ? 'Deselect all'
+                      : 'Select all'}
+                  </button>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {gateInfo.pendingAnalysisIds.slice(0, 5).map((id, i) => {
+                  {gateInfo.pendingAnalysisIds.map((id, i) => {
                     const draft = draftsByAnalysisId.get(id);
                     // Rich pending-analysis metadata when /api/analyze/stream
                     // returns it. Falls back to "Analysis #N" + the draft's
@@ -698,15 +659,22 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                     const subtitle =
                       richInfo?.decisionStatement ?? draft?.decisionStatement ?? null;
                     const documentId = richInfo?.documentId;
+                    const isSelected = selectedAnalyses.has(id);
                     return (
                       <button
                         key={id}
-                        onClick={() => setSelectedAnalysis(id)}
+                        onClick={() => {
+                          setSelectedAnalyses(prev => {
+                            const next = new Set(prev);
+                            if (next.has(id)) next.delete(id);
+                            else next.add(id);
+                            return next;
+                          });
+                        }}
                         style={{
                           padding: '10px 14px',
-                          background:
-                            selectedAnalysis === id ? 'var(--bg-card-hover)' : 'var(--bg-card)',
-                          border: `1px solid ${selectedAnalysis === id ? 'var(--border-hover)' : 'var(--bg-card-hover)'}`,
+                          background: isSelected ? 'var(--bg-card-hover)' : 'var(--bg-card)',
+                          border: `1px solid ${isSelected ? 'var(--border-hover)' : 'var(--bg-card-hover)'}`,
                           borderRadius: '8px',
                           cursor: 'pointer',
                           display: 'flex',
@@ -828,7 +796,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
 
               {/* Outcome selection */}
               <AnimatePresence>
-                {selectedAnalysis && (
+                {selectedAnalyses.size > 0 && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -846,72 +814,11 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                         marginBottom: '8px',
                       }}
                     >
-                      What was the outcome?
+                      What was the outcome?{' '}
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                        (applies to all {selectedAnalyses.size} selected)
+                      </span>
                     </label>
-                    {matchingDraft && (
-                      <div
-                        role="status"
-                        style={{
-                          marginBottom: 10,
-                          padding: '8px 12px',
-                          borderRadius: 8,
-                          background: draftOutcomeIsValid
-                            ? 'rgba(99, 102, 241, 0.08)'
-                            : 'rgba(245, 158, 11, 0.08)',
-                          border: `1px solid ${draftOutcomeIsValid ? 'rgba(99, 102, 241, 0.2)' : 'rgba(245, 158, 11, 0.25)'}`,
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: 8,
-                          fontSize: 11,
-                          color: 'var(--text-secondary)',
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        <Lightbulb
-                          size={13}
-                          style={{
-                            color: draftOutcomeIsValid ? '#a5b4fc' : '#fbbf24',
-                            flexShrink: 0,
-                            marginTop: 1,
-                          }}
-                        />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                            Auto-detected from {formatDraftSource(matchingDraft.source)}
-                          </span>
-                          <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>
-                            ({(matchingDraft.confidence * 100).toFixed(0)}% confidence)
-                          </span>
-                          {matchingDraft.evidence.length > 0 && (
-                            <div
-                              style={{
-                                marginTop: 4,
-                                fontStyle: 'italic',
-                                color: 'var(--text-muted)',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                              title={matchingDraft.evidence[0]}
-                            >
-                              &ldquo;{matchingDraft.evidence[0].slice(0, 90)}
-                              {matchingDraft.evidence[0].length > 90 ? '…' : ''}&rdquo;
-                            </div>
-                          )}
-                          <div
-                            style={{
-                              color: draftOutcomeIsValid ? 'var(--text-muted)' : '#fbbf24',
-                              marginTop: 4,
-                              fontSize: 10,
-                            }}
-                          >
-                            {draftOutcomeIsValid
-                              ? 'Pre-filled below — confirm to log, or change to override.'
-                              : `Detected outcome was "${matchingDraft.outcome.replace(/_/g, ' ')}" which doesn't match the four categories below. Pick one manually; the draft will be dismissed when you submit.`}
-                          </div>
-                        </div>
-                      </div>
-                    )}
                     <div
                       className="outcome-gate-options-grid"
                       style={{
@@ -985,7 +892,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                         ) : (
                           <CheckCircle size={14} />
                         )}
-                        {onConfirmPath ? 'Confirm draft outcome' : 'Submit & Unlock Analysis'}
+                        {`Submit ${selectedAnalyses.size} Outcome${selectedAnalyses.size === 1 ? '' : 's'}`}
                       </button>
                     )}
                   </motion.div>

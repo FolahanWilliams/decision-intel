@@ -11,6 +11,7 @@ interface UploadedDoc {
   filename: string;
   status: string;
   score?: number;
+  outcomeStatus?: string;
   uploadedAt: string;
   isSample?: boolean;
 }

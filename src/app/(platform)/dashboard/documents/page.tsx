@@ -305,8 +305,7 @@ export default function DocumentsListPage() {
               disabled={selectedDocs.size > 3}
               style={{
                 padding: '6px 12px',
-                background:
-                  selectedDocs.size > 3 ? 'var(--bg-elevated)' : 'var(--accent-primary)',
+                background: selectedDocs.size > 3 ? 'var(--bg-elevated)' : 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--fs-sm)',
@@ -476,8 +475,7 @@ export default function DocumentsListPage() {
                       background: 'transparent',
                       border: '1px solid var(--border-color)',
                       borderRadius: 'var(--radius-md)',
-                      color:
-                        page <= 1 ? 'var(--text-muted)' : 'var(--text-secondary)',
+                      color: page <= 1 ? 'var(--text-muted)' : 'var(--text-secondary)',
                       cursor: page <= 1 ? 'not-allowed' : 'pointer',
                     }}
                   >
@@ -493,10 +491,7 @@ export default function DocumentsListPage() {
                       background: 'transparent',
                       border: '1px solid var(--border-color)',
                       borderRadius: 'var(--radius-md)',
-                      color:
-                        page >= totalPages
-                          ? 'var(--text-muted)'
-                          : 'var(--text-secondary)',
+                      color: page >= totalPages ? 'var(--text-muted)' : 'var(--text-secondary)',
                       cursor: page >= totalPages ? 'not-allowed' : 'pointer',
                     }}
                   >
@@ -520,6 +515,7 @@ interface DocumentRowProps {
     filename: string;
     status: string;
     score?: number;
+    outcomeStatus?: string;
     uploadedAt: string;
   };
   selected: boolean;
@@ -548,7 +544,7 @@ function DocumentRow({ doc, selected, onToggleSelect }: DocumentRowProps) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto',
+          gridTemplateColumns: 'auto 1fr auto auto auto auto',
           alignItems: 'center',
           gap: 14,
           padding: '12px 16px',
@@ -607,6 +603,51 @@ function DocumentRow({ doc, selected, onToggleSelect }: DocumentRowProps) {
         >
           {formatRelativeDate(doc.uploadedAt)}
         </span>
+        {doc.outcomeStatus === 'outcome_logged' ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 'var(--fs-2xs)',
+              color: 'var(--success)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <CheckCircle size={13} />
+            Outcome
+          </span>
+        ) : doc.outcomeStatus === 'outcome_overdue' ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 'var(--fs-2xs)',
+              color: 'var(--error)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Clock size={13} />
+            Overdue
+          </span>
+        ) : doc.outcomeStatus === 'pending_outcome' ? (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 'var(--fs-2xs)',
+              color: 'var(--warning)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Clock size={13} />
+            Pending
+          </span>
+        ) : (
+          <span />
+        )}
         <span
           style={{
             display: 'inline-flex',
