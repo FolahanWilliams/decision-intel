@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Brain, Users, Sparkles, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Brain, Users, Sparkles, Clock, CheckCircle2 } from 'lucide-react';
 import type { AnalysisResult, BiasDetectionResult, DecisionTwin } from '@/types';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { trackEvent } from '@/lib/analytics/track';
+import { buildSaveAuditHref } from '@/lib/utils/demo-claim-url';
 
 const C = {
   white: '#FFFFFF',
@@ -64,11 +65,10 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
   // who close the tab and come back later beyond 24h fall through to the
   // existing deepDiveHref path (which 403s on a demo-owned doc, but the
   // /onboarding/claim error UI handles the "no longer claimable" case).
-  const claimQuery = new URLSearchParams();
-  if (analysisId) claimQuery.set('demoAnalysisId', analysisId);
-  if (documentId) claimQuery.set('demoDocumentId', documentId);
-  const claimPath = `/onboarding/claim?${claimQuery.toString()}`;
-  const saveAuditHref = `/login?mode=signup&redirect=${encodeURIComponent(claimPath)}`;
+  // URL-builder extracted to lib/utils/demo-claim-url 2026-05-10 (first-
+  // impression audit) — pure function with vitest coverage so a typo
+  // can't silently orphan a Strategy World prospect's demo audit.
+  const saveAuditHref = buildSaveAuditHref({ analysisId, documentId });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -195,10 +195,18 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
         </div>
 
         {/* Inline Save CTA — anchored to the score-reveal moment so a cold
-            reader sees the conversion path the instant the wow lands, before
-            scrolling past. The fuller pitch CTA below stays for readers who
-            scroll through. (B3 lock 2026-04-28.) */}
+            reader sees the conversion path the instant the wow lands.
+            Strengthened 2026-05-10 first-impression audit:
+              · Loss-aversion framing ("expires in 24h" is the actual
+                window the demo audit lives under DEMO_USER_ID before
+                the orphan rule kicks in — naming it converts harder
+                than passive "save your audit").
+              · Stacks on mobile (≤520px) so the CTA never crushes.
+              · Bigger button + Clock icon makes the urgency unmissable.
+            B3 base shipped 2026-04-28; founder asked for first-impression
+            polish before Strategy World London T-30. */}
         <div
+          className="paste-audit-save-cta"
           style={{
             marginTop: 18,
             paddingTop: 16,
@@ -206,19 +214,56 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: 12,
+            gap: 14,
             flexWrap: 'wrap',
           }}
         >
           <div
             style={{
-              fontSize: 13,
-              color: C.slate600,
-              lineHeight: 1.5,
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 10,
+              minWidth: 0,
+              flex: '1 1 240px',
             }}
           >
-            <Lock size={12} style={{ display: 'inline', marginRight: 6, color: C.slate500 }} />
-            Save this audit to your account &mdash; free, no card.
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                background: '#FEF3C7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <Clock size={14} style={{ color: C.amber }} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  color: C.slate900,
+                  lineHeight: 1.4,
+                  marginBottom: 2,
+                }}
+              >
+                This audit expires in 24 hours
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: C.slate500,
+                  lineHeight: 1.5,
+                }}
+              >
+                Free account keeps the audit, lets you re-edit passages, and unlocks the full
+                12-node breakdown.
+              </div>
+            </div>
           </div>
           <Link
             href={saveAuditHref}
@@ -233,18 +278,20 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6,
-              fontSize: 13,
+              gap: 7,
+              fontSize: 14,
               fontWeight: 700,
               color: C.white,
               background: C.green,
-              padding: '8px 16px',
-              borderRadius: 8,
+              padding: '11px 20px',
+              borderRadius: 10,
               textDecoration: 'none',
               whiteSpace: 'nowrap',
+              boxShadow: '0 4px 14px rgba(22,163,74,0.28)',
+              flexShrink: 0,
             }}
           >
-            Save audit <ArrowRight size={13} />
+            Save audit <ArrowRight size={14} />
           </Link>
         </div>
       </motion.div>
@@ -609,7 +656,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             letterSpacing: '0.14em',
           }}
         >
-          <Lock size={12} /> Save this audit
+          <Sparkles size={12} /> Save this audit
         </div>
         <h3
           style={{
@@ -696,6 +743,22 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
           )}
         </div>
       </motion.section>
+
+      {/* Mobile stack — CTA row collapses cleanly below 520px so the
+          Save Audit button never crushes the loss-aversion copy. Locked
+          2026-05-10 first-impression audit. */}
+      <style jsx>{`
+        @media (max-width: 520px) {
+          :global(.paste-audit-save-cta) {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          :global(.paste-audit-save-cta a) {
+            justify-content: center !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
