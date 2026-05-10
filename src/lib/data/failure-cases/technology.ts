@@ -434,7 +434,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       ],
       flaggableBiases: ['status_quo_bias', 'anchoring_bias', 'confirmation_bias', 'overconfidence'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have identified the extreme concentration risk of 90% physical-store revenue and flagged the dismissal of online rental as a dangerous status quo bias given broadband adoption trajectories. The $800 million late-fee dependency would have been surfaced as a strategic vulnerability rather than a strength, since it created a direct incentive for customers to switch to any subscription-based competitor. The platform would have recommended scenario modeling for digital disruption and highlighted the $50 million acquisition cost as asymmetrically low relative to the downside risk of inaction.',
+        'A reasoning audit platform would have identified the extreme concentration risk of 90% physical-store revenue and flagged the dismissal of online rental as a dangerous status quo bias given broadband adoption trajectories. The $800 million late-fee dependency would have been surfaced as a strategic vulnerability rather than a strength, since it created a direct incentive for customers to switch to any subscription-based competitor. The platform would have recommended scenario modeling for digital disruption and highlighted the $50 million acquisition cost as asymmetrically low relative to the downside risk of inaction.',
     },
     keyQuotes: [
       {
@@ -664,7 +664,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       ],
       flaggableBiases: ['halo_effect', 'authority_bias', 'confirmation_bias', 'overconfidence'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have flagged the complete absence of peer-reviewed evidence for a medical device claiming 200+ test capabilities as a critical validation gap. The board composition—heavy on political authority figures, devoid of diagnostics expertise—matches the halo effect and authority bias pattern where prestige substitutes for domain competence. The platform would have recommended independent third-party testing as a mandatory prerequisite before any partnership or investment commitment.',
+        'A reasoning audit platform would have flagged the complete absence of peer-reviewed evidence for a medical device claiming 200+ test capabilities as a critical validation gap. The board composition—heavy on political authority figures, devoid of diagnostics expertise—matches the halo effect and authority bias pattern where prestige substitutes for domain competence. The platform would have recommended independent third-party testing as a mandatory prerequisite before any partnership or investment commitment.',
     },
     keyQuotes: [
       {
@@ -874,7 +874,7 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       ],
       flaggableBiases: ['framing_effect', 'overconfidence', 'anchoring_bias', 'narrative_fallacy'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have immediately flagged "Community Adjusted EBITDA" as a framing effect designed to redefine profitability by excluding the majority of actual operating costs. The $47 billion valuation anchored to SoftBank\'s last private round would have been challenged against comparable public real estate companies trading at a fraction of that multiple. The concentration of voting power and related-party self-dealing would have triggered governance risk alerts incompatible with public market standards.',
+        'A reasoning audit platform would have immediately flagged "Community Adjusted EBITDA" as a framing effect designed to redefine profitability by excluding the majority of actual operating costs. The $47 billion valuation anchored to SoftBank\'s last private round would have been challenged against comparable public real estate companies trading at a fraction of that multiple. The concentration of voting power and related-party self-dealing would have triggered governance risk alerts incompatible with public market standards.',
     },
     keyQuotes: [
       {

@@ -50,6 +50,9 @@ import {
   INDEMNIFICATION_LABEL,
   INDEMNIFICATION_VALUE,
   INDEMNIFICATION_BODY,
+  INSURANCE_GAP_LABEL,
+  INSURANCE_GAP_VALUE,
+  INSURANCE_GAP_BODY,
   AUDIT_LOG_RETENTION_LABEL,
   AUDIT_LOG_RETENTION_TIERS,
   AUDIT_LOG_RETENTION_BODY,
@@ -471,27 +474,78 @@ export default function TrustPage() {
       >
         <div
           style={{
-            background: C.white,
-            border: `1px solid ${C.slate200}`,
-            borderLeft: `3px solid ${C.green}`,
-            borderRadius: 10,
-            padding: '14px 16px',
+            display: 'grid',
+            gap: 12,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           }}
         >
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: C.green,
-              marginBottom: 4,
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderLeft: `3px solid ${C.green}`,
+              borderRadius: 10,
+              padding: '14px 16px',
             }}
           >
-            Standard cap
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: C.green,
+                marginBottom: 4,
+              }}
+            >
+              Standard cap
+            </div>
+            <div style={{ fontSize: 14, color: C.slate900, fontWeight: 600, lineHeight: 1.5 }}>
+              {INDEMNIFICATION_VALUE}
+            </div>
           </div>
-          <div style={{ fontSize: 14, color: C.slate900, fontWeight: 600, lineHeight: 1.5 }}>
-            {INDEMNIFICATION_VALUE}
+
+          {/* Insurance gap disclosure — extracted from INDEMNIFICATION_BODY
+              so the disclosure is procurement-readable on first scan
+              (locked 2026-05-10 batch 2 #3, James persona blocker:
+              "performative gaps survive vendor-risk review; hidden
+              gaps do not"). Amber accent so the gap reads as a known
+              roadmap item, not a hidden risk. */}
+          <div
+            style={{
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderLeft: '3px solid #D97706',
+              borderRadius: 10,
+              padding: '14px 16px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#D97706',
+                marginBottom: 4,
+              }}
+            >
+              {INSURANCE_GAP_LABEL}
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                color: C.slate900,
+                fontWeight: 600,
+                lineHeight: 1.5,
+                marginBottom: 8,
+              }}
+            >
+              {INSURANCE_GAP_VALUE}
+            </div>
+            <div style={{ fontSize: 12.5, color: C.slate600, lineHeight: 1.55 }}>
+              {INSURANCE_GAP_BODY}
+            </div>
           </div>
         </div>
       </Section>

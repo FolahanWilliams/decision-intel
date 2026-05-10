@@ -46,8 +46,36 @@ export function R2FDeepDive() {
         }}
       >
         {/* drift-tolerant — pillar + node count refers to the R²F-specific subset (3 paper-anchored pillars across 7 named pipeline nodes), not the full 12-node pipeline. */}
-        Current state · 3 pillars · 7 pipeline nodes
+        Current state · 3 pillars · 7 pipeline nodes · Sprint COMPLETE (10 of 10 paper applications)
       </div>
+
+      {/* Kahneman & Klein 2009 sprint completion anchor (locked 2026-05-10
+          batch 2 #2). Investor-facing accuracy: every detector named in
+          R2F_CURRENT[2].pipelineNodes has shipped to production with an
+          academic citation + DOI on the DPR cover. Live mapping at
+          /r2f-standard#detector-atlas — never quote "in flight" or "5 of
+          10" in investor calls now that the sprint closed. */}
+      <a
+        href="/r2f-standard#detector-atlas"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '4px 10px',
+          marginBottom: 14,
+          fontSize: 11,
+          fontWeight: 600,
+          color: '#16A34A',
+          background: 'rgba(22, 163, 74, 0.08)',
+          border: '1px solid rgba(22, 163, 74, 0.25)',
+          borderRadius: 'var(--radius-sm)',
+          textDecoration: 'none',
+        }}
+      >
+        See the 10-detector atlas (5 academic anchors with DOIs) →
+      </a>
 
       <div className="r2f-grid">
         {R2F_CURRENT.map(p => {
@@ -166,7 +194,7 @@ export function R2FDeepDive() {
           marginBottom: 10,
         }}
       >
-        5 levers to deepen the moat (NotebookLM 2026-04-27 synthesis)
+        {R2F_MOAT_LEVERS.length} levers to deepen the moat (NotebookLM 2026-04-27 synthesis)
       </div>
 
       {R2F_MOAT_LEVERS.map(l => {

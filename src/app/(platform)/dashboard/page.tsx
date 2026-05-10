@@ -52,6 +52,7 @@ import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { AccentCard } from '@/components/ui/AccentCard';
 import { usePlanLabels } from '@/hooks/usePlanLabels';
 import { KGMergeConsentModal } from '@/components/pricing/KGMergeConsentModal';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
@@ -2083,10 +2084,17 @@ export default function Dashboard() {
             )}
           </ErrorBoundary>
 
-          {/* Empty state - only show when no documents */}
+          {/* Empty state - cold-prospect first impression after sign-up.
+              Migrated to AccentCard 2026-05-10 (audit batch 2 #4): this
+              is the conversion-driving CTA card for new HXC users; per
+              the AccentCard discipline lock the lead/hero card on a tab
+              gets `accent='primary'` for visual hierarchy. The
+              retrospective callout below uses `accent='info'` (data /
+              alternative-path surface) so the two stacked cards render
+              with semantic top-stripe distinction. */}
           {uploadedDocs.length === 0 && !loadingDocs && (
             <>
-              <div className="card">
+              <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
                 <EnhancedEmptyState
                   type="documents"
                   title={`Start your ${knowledgeGraphLabel}`}
@@ -2105,16 +2113,11 @@ export default function Dashboard() {
                     },
                   ]}
                 />
-              </div>
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: '16px 20px',
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-lg)',
-                  textAlign: 'center',
-                }}
+              </AccentCard>
+              <AccentCard
+                accent="info"
+                style={{ marginTop: 12 }}
+                bodyStyle={{ padding: '16px 20px', textAlign: 'center' }}
               >
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>
                   Or start with a retrospective
@@ -2123,7 +2126,7 @@ export default function Dashboard() {
                   Upload a past strategic memo to close the loop your team never closed. Post-mortem
                   audit in 60 seconds.
                 </p>
-              </div>
+              </AccentCard>
             </>
           )}
         </>

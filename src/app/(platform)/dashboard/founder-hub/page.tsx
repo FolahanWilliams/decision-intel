@@ -160,33 +160,22 @@ const CronControlsTab = dynamic(
     })),
   { loading: tabLoader }
 );
-const PositioningCopilotTab = dynamic(
+// Positioning consolidation (locked 2026-05-10 batch 2 #5): PositioningCopilotTab
+// + CompetitivePositioningTab + CategoryPositionTab now mount inside
+// PositioningHubTab as Practise / Reference / Map sections. Legacy tab
+// slugs route here via LEGACY_TAB_REDIRECTS so chat-driven nav and
+// bookmarks keep working unchanged.
+const PositioningHubTab = dynamic(
   () =>
-    import('@/components/founder-hub/PositioningCopilotTab').then(m => ({
-      default: m.PositioningCopilotTab,
+    import('@/components/founder-hub/PositioningHubTab').then(m => ({
+      default: m.PositioningHubTab,
     })),
   { loading: tabLoader }
 );
-const CompetitivePositioningTab = dynamic(
-  () =>
-    import('@/components/founder-hub/CompetitivePositioningTab').then(m => ({
-      default: m.CompetitivePositioningTab,
-    })),
-  { loading: tabLoader }
-);
-// OutreachCommandCenterTab now imported through OutreachHubTab above
-// (A2 consolidation 2026-04-28).
 const ForecastRoadmapTab = dynamic(
   () =>
     import('@/components/founder-hub/ForecastRoadmapTab').then(m => ({
       default: m.ForecastRoadmapTab,
-    })),
-  { loading: tabLoader }
-);
-const CategoryPositionTab = dynamic(
-  () =>
-    import('@/components/founder-hub/CategoryPositionTab').then(m => ({
-      default: m.CategoryPositionTab,
     })),
   { loading: tabLoader }
 );
@@ -269,7 +258,6 @@ import {
   Terminal,
   Compass,
   Map,
-  Radar,
   Target,
   CheckSquare,
   Presentation,
@@ -288,8 +276,7 @@ type TabId =
   | 'overview'
   | 'product_deep'
   | 'research'
-  | 'positioning_copilot'
-  | 'positioning'
+  | 'positioning_hub'
   | 'sales'
   | 'outreach_hub'
   | 'closing_lab'
@@ -302,7 +289,6 @@ type TabId =
   | 'founder_school'
   | 'cron_controls'
   | 'forecast'
-  | 'category_position'
   | 'unicorn_roadmap'
   | 'meetings_log'
   | 'lrqa'
@@ -323,8 +309,15 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
   dqi_methodology: 'product_deep',
   methodologies: 'research',
   playbook: 'research',
-  strategy: 'positioning',
-  investor_defense: 'positioning',
+  // Positioning consolidation (locked 2026-05-10 batch 2 #5): three tabs
+  // collapsed into PositioningHubTab with Practise / Reference / Map
+  // sections. Legacy slugs route to the consolidated tab; section
+  // deep-link handled by URL `&section=` param.
+  strategy: 'positioning_hub',
+  investor_defense: 'positioning_hub',
+  positioning: 'positioning_hub',
+  positioning_copilot: 'positioning_hub',
+  category_position: 'positioning_hub',
   integrations: 'data_ecosystem',
   stats: 'data_ecosystem',
   case_studies: 'case_library',
@@ -367,16 +360,14 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     group: 'Product',
   },
   // Go-to-Market
+  // Positioning Hub (locked 2026-05-10 batch 2 #5) — consolidates
+  // Positioning Copilot (Practise) + Competitive Positioning (Reference)
+  // + Category Position (Map). Section deep-link via `&section=`. Tab
+  // count: 33 → 31.
   {
-    id: 'positioning_copilot',
-    label: 'Positioning Copilot',
+    id: 'positioning_hub',
+    label: 'Positioning Hub',
     icon: <Compass size={16} />,
-    group: 'Go-to-Market',
-  },
-  {
-    id: 'positioning',
-    label: 'Competitive Positioning',
-    icon: <Shield size={16} />,
     group: 'Go-to-Market',
   },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} />, group: 'Go-to-Market' },
@@ -402,12 +393,6 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'outreach_hub',
     label: 'Outreach Hub',
     icon: <Zap size={16} />,
-    group: 'Go-to-Market',
-  },
-  {
-    id: 'category_position',
-    label: 'Category Position',
-    icon: <Radar size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -529,21 +514,21 @@ const SEARCH_INDEX: SearchEntry[] = [
       'overview narrative moat four moments elevator pitch positioning compounding decision knowledge graph dqi',
   },
   {
-    tabId: 'positioning_copilot',
+    tabId: 'positioning_hub',
     section: 'Positioning Copilot',
     preview: 'Brand spine, market thesis, compass, pitch deck, coach — rehearse before outreach.',
     keywords:
       'positioning copilot brand spine sharp 8 steps market thesis strategic compass pitch deck coach outreach rehearsal cheat sheet pdf export visual knowledge graph',
   },
   {
-    tabId: 'positioning_copilot',
+    tabId: 'positioning_hub',
     section: 'Brand Spine (Sharp 8 steps)',
     preview: 'Category, buyer, problem, position, assets, memory, consistency, availability.',
     keywords:
       'sharp brand byron spine category buyer problem position assets memory consistency availability',
   },
   {
-    tabId: 'positioning_copilot',
+    tabId: 'positioning_hub',
     section: 'Pitch Deck Roadmap',
     preview: '16 slides from hook to ask, each pre-filled with the line you actually say.',
     keywords:
@@ -642,14 +627,14 @@ const SEARCH_INDEX: SearchEntry[] = [
     keywords: 'sales positioning persona hook pitch close strategy m&a risk board buyer',
   },
   {
-    tabId: 'positioning',
+    tabId: 'positioning_hub',
     section: 'External Story',
     preview: 'Moat narrative, market sizing, "why now" hook.',
     keywords:
       'positioning external story moat narrative market sizing why now pitch fundraise tam sam som',
   },
   {
-    tabId: 'positioning',
+    tabId: 'positioning_hub',
     section: 'Investor Defense',
     preview: 'Kill-shot objections, Q&A, competitive responses.',
     keywords:
@@ -869,7 +854,7 @@ const SEARCH_INDEX: SearchEntry[] = [
       'forecast roadmap timeline bootstrap vc raise yc ycombinator accelerator pre-seed seed angel operator advisor dilution valuation runway discovery calls design partners pattern validation 12 month plan strategy',
   },
   {
-    tabId: 'category_position',
+    tabId: 'positioning_hub',
     section: 'Category Position',
     preview:
       'DI landscape map, three market gaps with shipped-file evidence, 18-month category path.',
@@ -1542,13 +1527,24 @@ function renderTab(
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
     start: (
       <ErrorBoundary sectionName="Start Here">
-        <StartHereTab onNavigateToTab={id => setActiveTab(id as TabId)} />
+        {/* Apply LEGACY_TAB_REDIRECTS at the map-nav entry point so the
+            StartHere map (which still names retired slugs like
+            'positioning_copilot' / 'category_position' as separate
+            visual nodes) routes to the consolidated tab. The map nodes
+            stay as conceptual sub-flow visualisations; clicks land on
+            the canonical tab. */}
+        <StartHereTab
+          onNavigateToTab={id => {
+            const target = (LEGACY_TAB_REDIRECTS[id] ?? id) as TabId;
+            setActiveTab(target);
+          }}
+        />
       </ErrorBoundary>
     ),
     overview: <ProductOverviewTab />,
-    positioning_copilot: (
-      <ErrorBoundary sectionName="Positioning Copilot">
-        <PositioningCopilotTab founderPass={FOUNDER_PASS} />
+    positioning_hub: (
+      <ErrorBoundary sectionName="Positioning Hub">
+        <PositioningHubTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
     product_deep: (
@@ -1585,11 +1581,6 @@ function renderTab(
     research: (
       <ErrorBoundary sectionName="Research & Foundations">
         <ResearchFoundationsTab />
-      </ErrorBoundary>
-    ),
-    positioning: (
-      <ErrorBoundary sectionName="Competitive Positioning">
-        <CompetitivePositioningTab />
       </ErrorBoundary>
     ),
     sales: (
@@ -1700,11 +1691,6 @@ function renderTab(
     forecast: (
       <ErrorBoundary sectionName="12-Month Forecast">
         <ForecastRoadmapTab />
-      </ErrorBoundary>
-    ),
-    category_position: (
-      <ErrorBoundary sectionName="Category Position">
-        <CategoryPositionTab />
       </ErrorBoundary>
     ),
     unicorn_roadmap: (

@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { safeCompare } from './safe-compare';
 
 export interface VoiceWorkerAuthOk {
   ok: true;
@@ -43,7 +44,7 @@ export function verifyVoiceWorkerAuth(req: NextRequest): VoiceWorkerAuthResult {
   }
   const authHeader = req.headers.get('authorization') || '';
   const presented = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-  if (!presented || presented !== expected) {
+  if (!presented || !safeCompare(presented, expected)) {
     return {
       ok: false,
       response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),

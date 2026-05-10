@@ -18,6 +18,7 @@ import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadine
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
 import { ContainerLinksPanel } from '@/components/constellation/ContainerLinksPanel';
+import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { dqiColorFor } from '@/lib/utils/grade';
 
@@ -127,6 +128,50 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <ContainerCompositeHero container={container} />
+
+          {/* Anatomy-of-a-Call brand anchor (locked 2026-05-10 batch 2 #1).
+              Quiet 5-layer constellation tying this decision to the same
+              R²F surface the buyer saw on the landing / how-it-works
+              pages. Per CLAUDE.md anatomy-of-a-call lock: 'one visual,
+              five surfaces, one brand moment.' Container detail is the
+              6th surface where it belongs. Stage=5 (fully composed) +
+              size=72 keeps it as a quiet anchor, not a hero. */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '10px 14px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+            }}
+          >
+            <AnatomyOfACallGraph stage={5} size={72} captionOverride={null} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+              <span
+                style={{
+                  fontSize: 'var(--fs-3xs)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  fontWeight: 700,
+                }}
+              >
+                Audited · 5 layers
+              </span>
+              <span
+                style={{
+                  fontSize: 'var(--fs-xs)',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Knowledge graph · Boardroom · Reasoning audit · What-if · Outcome loop — every angle
+                of this decision, in one record.
+              </span>
+            </div>
+          </div>
 
           <div
             style={{

@@ -211,7 +211,26 @@ export const SOC2_RECEIPTS: Soc2Receipt[] = [
 export const INDEMNIFICATION_LABEL = 'Indemnification cap';
 export const INDEMNIFICATION_VALUE = 'Standard 12 months’ fees · custom mutual on request';
 export const INDEMNIFICATION_BODY =
-  'Standard subscription contracts cap each party’s aggregate liability at 12 months of fees paid by Controller in the 12 months immediately before the claim, excluding (a) breach of confidentiality, (b) wilful misconduct, (c) third-party IP indemnities, and (d) sub-processor data-protection failures where Decision Intel is the engaging Processor. Enterprise customers may negotiate a mutual indemnification cap and an uncapped third-party-IP indemnity at signature. Cyber-liability + errors-and-omissions insurance carriage is on the Q1 2027 roadmap; until live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it.';
+  'Standard subscription contracts cap each party’s aggregate liability at 12 months of fees paid by Controller in the 12 months immediately before the claim, excluding (a) breach of confidentiality, (b) wilful misconduct, (c) third-party IP indemnities, and (d) sub-processor data-protection failures where Decision Intel is the engaging Processor. Enterprise customers may negotiate a mutual indemnification cap and an uncapped third-party-IP indemnity at signature.';
+
+/**
+ * Cyber-liability + E&O insurance gap disclosure — extracted 2026-05-10
+ * (audit batch 2 #3, James persona blocker). The gap was previously
+ * inlined in the last sentence of INDEMNIFICATION_BODY, but a F500 GC
+ * scanning /trust top-to-bottom would either skim past it or have to
+ * search to find it. Procurement-grade transparency is PERFORMATIVE —
+ * show it, don't bury it. Now rendered as its own visible callout next
+ * to the standard-cap card so the disclosure cannot be missed.
+ *
+ * Update HERE when (a) carriage actually lands (flip from gap → carry
+ * disclosure with policy limits + carrier name), (b) the substitute
+ * commitments shift (e.g. uncapped breach-of-confidentiality changes
+ * shape), (c) the roadmap timeline slips beyond Q1 2027.
+ */
+export const INSURANCE_GAP_LABEL = 'Insurance carriage · honest gap disclosure';
+export const INSURANCE_GAP_VALUE = 'Cyber-liability + E&O · Q1 2027 roadmap';
+export const INSURANCE_GAP_BODY =
+  'Cyber-liability + errors-and-omissions insurance carriage is on the Q1 2027 roadmap. Until carriage is live, Enterprise customers receive a written disclosure of the insurance gap and the contractual commitments that substitute for it: uncapped breach-of-confidentiality, mutual indemnification, and an escrowed remediation budget on request. We surface this gap explicitly rather than burying it because procurement-grade transparency is the procurement signal — performative gaps survive vendor-risk register review; hidden gaps do not.';
 
 /**
  * Bias Genome data ownership — locked 2026-05-01 (Margaret persona

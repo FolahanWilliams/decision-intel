@@ -23,6 +23,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
+import { safeCompare } from '@/lib/utils/safe-compare';
 import {
   buildVoiceModeAddendum,
   getThinkingPartner,
@@ -61,7 +62,7 @@ const FOUNDER_CONTEXT_SECTIONS = splitFounderContextSections(FOUNDER_CONTEXT);
 const VOICE_FOUNDER_IDENTITY_CORE = `
 You're talking with Folahan, the 16-year-old solo founder of Decision Intel.
 
-Decision Intel is a decision intelligence platform for corporate strategy
+Decision Intel is the reasoning audit platform for corporate strategy
 teams. It runs a 60-second audit on strategic memos and board decks that
 scores cognitive biases (22-bias R²F taxonomy, Kahneman + Klein), predicts
 steering-committee objections, and produces a tamper-evident Decision
@@ -100,7 +101,7 @@ export async function GET(req: NextRequest) {
   }
   const authHeader = req.headers.get('authorization') || '';
   const presented = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-  if (!presented || presented !== expected) {
+  if (!presented || !safeCompare(presented, expected)) {
     log.warn('voice-context: unauthorized worker request');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
