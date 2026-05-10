@@ -415,11 +415,20 @@ export default function LandingPage() {
                   HBR &middot; KPMG
                 </p>
               </div>
-              {/* PATTERN — amber. The bridge card: names the four bias
-                  families that drive most deal failures, framing the
-                  audit as the cheap fix for a known mechanism. Uses the
-                  Search icon to suggest "we identify what others miss"
-                  rather than the warning iconography of the PROBLEM card. */}
+              {/* PATTERN — amber. The bridge card: surfaces the three
+                  canonical M&A toxic combinations DI catches by name
+                  (Synergy Mirage / Conglomerate Fallacy / Winner's
+                  Curse) — the patterns a Damien-class mid-market corp
+                  dev head or PE-backed founder recognises in a 5-second
+                  scan. Locked 2026-05-10 (audit follow-through, item 2).
+                  Static — no rotator/animation per DESIGN.md motion
+                  budget. Pattern names + descriptions sourced canonically
+                  from src/lib/data/bias-genome-seed.ts TOXIC_PAIR_DEFS.
+                  Generic 4-bias framing was the prior copy; loses the
+                  M&A-buyer recognition moment cold prospects need before
+                  they'll keep reading. Uses the Search icon to suggest
+                  "we identify what others miss" rather than the warning
+                  iconography of the PROBLEM card. */}
               <div
                 className="hero-mini-card"
                 style={{
@@ -453,24 +462,68 @@ export default function LandingPage() {
                     fontSize: 22,
                     fontWeight: 800,
                     color: C.slate900,
-                    margin: '0 0 8px',
+                    margin: '0 0 10px',
                     lineHeight: 1.05,
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  Same four biases
+                  Three named failure modes
                 </p>
-                <p
+                <ul
                   style={{
-                    fontSize: 12,
-                    color: C.slate700,
-                    lineHeight: 1.5,
-                    margin: 0,
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: '0 0 10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
                   }}
                 >
-                  Confirmation, anchoring, sunk cost, narrative coherence — the most common patterns
-                  behind deal failures. Hard to spot from inside the document; easy to surface from
-                  outside.
+                  <li
+                    style={{
+                      fontSize: 12,
+                      color: C.slate700,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong>{' '}
+                    — projections without named owner, mechanism, or 90-day milestone.
+                  </li>
+                  <li
+                    style={{
+                      fontSize: 12,
+                      color: C.slate700,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <strong style={{ color: C.slate900, fontWeight: 700 }}>
+                      Conglomerate Fallacy
+                    </strong>{' '}
+                    — far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
+                  </li>
+                  <li
+                    style={{
+                      fontSize: 12,
+                      color: C.slate700,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <strong style={{ color: C.slate900, fontWeight: 700 }}>
+                      Winner&rsquo;s Curse
+                    </strong>{' '}
+                    — auction-dynamic anchoring above intrinsic value.
+                  </li>
+                </ul>
+                <p
+                  style={{
+                    fontSize: 11,
+                    color: C.slate500,
+                    lineHeight: 1.4,
+                    margin: 0,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Hard to spot from inside the deal; easy to surface from outside.
                 </p>
               </div>
               {/* SOLUTION — green */}

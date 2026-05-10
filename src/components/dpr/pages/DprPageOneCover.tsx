@@ -53,6 +53,16 @@ export interface DprPageOneCoverProps {
   schemaVersion: string;
   /** Pipeline version (e.g. `di-pipeline@v12.3.1`). */
   pipelineVersion: string;
+  /**
+   * DQI methodology version stamp (e.g. `2.2.0`). Surfaced adjacent to
+   * the SHA-256 strip per the James (F500 GC) persona ask 2026-05-10:
+   * a procurement reviewer reads top-to-bottom and wants to know
+   * "when was this audit's scoring engine published" without scrolling
+   * to the methodology footer. Canonical source: METHODOLOGY_VERSION
+   * in src/lib/scoring/dqi.ts. When omitted the row is suppressed
+   * (legacy records that pre-date methodology stamping).
+   */
+  methodologyVersion?: string;
   /** Where to verify this record online. */
   verifyUrl: string;
   /** Document classification — drives the header band flag. */
@@ -79,6 +89,7 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
     promptFingerprint,
     schemaVersion,
     pipelineVersion,
+    methodologyVersion,
     verifyUrl,
     classification = 'confidential',
     totalPages,
@@ -102,6 +113,16 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
       v: pipelineVersion,
       mono: true,
     },
+    ...(methodologyVersion
+      ? [
+          {
+            k: 'DQI methodology',
+            v: `v${methodologyVersion}`,
+            mono: true,
+            mark: { kind: 'info' as const, label: 'Scoring engine' },
+          },
+        ]
+      : []),
     {
       k: 'Input document hash',
       v: <ShortenedHash value={inputHash} />,

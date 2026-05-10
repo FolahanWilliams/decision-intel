@@ -84,10 +84,16 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=performance',
         permanent: true,
       },
-      // Decision DNA folded into Analytics → Intelligence (Phase B).
+      // Decision DNA folded into Analytics → Intelligence (Phase B). The
+      // `#dna` fragment is load-bearing — section anchor in
+      // src/app/(platform)/dashboard/analytics/page.tsx (id="dna",
+      // scrollMarginTop: 80) so a returning user with the old bookmark
+      // lands directly on the DNA section, not the top of the Intelligence
+      // tab. CommandPalette + DecisionDNAPreviewCard already deep-link
+      // with the fragment; this redirect now matches.
       {
         source: '/dashboard/decision-dna',
-        destination: '/dashboard/analytics?view=intelligence',
+        destination: '/dashboard/analytics?view=intelligence#dna',
         permanent: true,
       },
       // Decision Log folded into Decisions as a view (Phase G fold

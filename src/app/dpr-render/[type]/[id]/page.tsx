@@ -38,6 +38,7 @@ import {
   DANGOTE_FINDINGS_AUGMENT,
 } from '@/lib/reports/sample-dpr';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
 import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
 import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
@@ -118,6 +119,7 @@ export default async function DprRenderPage({
         promptFingerprint={data.promptFingerprint}
         schemaVersion={`${data.schemaVersion}.1.0`}
         pipelineVersion={pipelineVersionFromLineage(data)}
+        methodologyVersion={METHODOLOGY_VERSION}
         verifyUrl={verifyUrl}
         classification={classification}
         totalPages={totalPages}

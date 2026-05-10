@@ -13,6 +13,7 @@ import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
+import { checkVohraEligibility, createPendingSurvey } from '@/lib/learning/vohra-pmf';
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { classifyValidity } from '@/lib/learning/validity-classifier';
@@ -1267,6 +1268,34 @@ export async function POST(request: NextRequest) {
           } catch (err) {
             // Webhook emission failed — surfaced as warn (delivery path) per CLAUDE.md fire-and-forget discipline.
             log.warn('webhook emit (analysis.completed) failed:', err);
+          }
+
+          // Vohra PMF auto-trigger — fire post-audit at the moment of value
+          // realisation (per Vohra/Superhuman methodology: highest survey
+          // response rate occurs immediately after the user has experienced
+          // the value, not days later via a cron back-fill).
+          //
+          // Fire-and-forget: never block the SSE close on the survey
+          // creation. checkVohraEligibility encodes the trigger gate (≥2
+          // audits in 14d, no recent completion, no pending) so we can
+          // call it on every audit completion without spamming. The
+          // existing cron at /api/cron/vohra-pmf-trigger remains as a
+          // belt-and-braces back-fill for any user who somehow becomes
+          // eligible without firing this path (e.g. cross-account audits,
+          // manual analysis seeding).
+          //
+          // Locked 2026-05-10 (audit follow-through, item 5).
+          if (userId) {
+            (async () => {
+              try {
+                const eligibility = await checkVohraEligibility(userId);
+                if (eligibility.eligible) {
+                  await createPendingSurvey(userId, 'auto_post_audit_immediate');
+                }
+              } catch (err) {
+                log.warn('Vohra auto-trigger failed:', err);
+              }
+            })();
           }
 
           // Clean up checkpoint cache on completion (in-memory eviction; silent per CLAUDE.md fire-and-forget exceptions).

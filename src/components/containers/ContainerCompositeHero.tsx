@@ -12,6 +12,11 @@ import { ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
 import { dqiColorFor } from '@/lib/utils/grade';
 import { getContainerMode, type DecisionContainerKind } from '@/lib/data/decision-container-modes';
 import type { ContainerDetail } from '@/types/containers';
+import {
+  ContainerDqiBreakdownPanel,
+  fetchPerDocBreakdowns,
+} from '@/components/dqi/ContainerDqiBreakdownPanel';
+import type { PerDocBreakdown } from '@/components/dqi/ContainerDqiBreakdownPanel';
 
 interface ContainerCompositeHeroProps {
   container: ContainerDetail;
@@ -28,7 +33,26 @@ function formatTicket(ticketSize: number | null, currency: string): string | nul
 
 export function ContainerCompositeHero({ container }: ContainerCompositeHeroProps) {
   const [biasesExpanded, setBiasesExpanded] = useState(false);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [perDoc, setPerDoc] = useState<PerDocBreakdown[]>([]);
+  const [breakdownLoading, setBreakdownLoading] = useState(false);
+  const [breakdownError, setBreakdownError] = useState<string | null>(null);
   const mode = getContainerMode(container.kind as DecisionContainerKind);
+
+  // Open the composite-DQI breakdown panel + lazy-fetch per-doc DQI on
+  // first open. Driven by the click handler (event-handler pattern) to
+  // satisfy react-hooks/set-state-in-effect — useEffect-driven fetches
+  // are forbidden for user-action-triggered side effects.
+  const openBreakdown = () => {
+    setBreakdownOpen(true);
+    if (perDoc.length > 0) return; // already cached
+    setBreakdownLoading(true);
+    setBreakdownError(null);
+    fetchPerDocBreakdowns(container)
+      .then(rows => setPerDoc(rows))
+      .catch(err => setBreakdownError(err instanceof Error ? err.message : String(err)))
+      .finally(() => setBreakdownLoading(false));
+  };
   const stage = mode.stages.find(s => s.id === container.stageId);
   const dqiColor =
     container.compositeDqi != null ? dqiColorFor(container.compositeDqi) : 'var(--text-muted)';
@@ -144,13 +168,28 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
           alignItems: 'center',
         }}
       >
-        <div
+        <button
+          type="button"
+          onClick={openBreakdown}
+          disabled={container.compositeDqi == null}
+          aria-label="See composite DQI breakdown"
           style={{
             background: 'var(--bg-secondary)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-md)',
             padding: '14px 18px',
             textAlign: 'center',
+            cursor: container.compositeDqi != null ? 'pointer' : 'default',
+            transition: 'border-color 0.15s, transform 0.15s',
+            font: 'inherit',
+            color: 'inherit',
+          }}
+          onMouseEnter={e => {
+            if (container.compositeDqi != null)
+              (e.currentTarget as HTMLButtonElement).style.borderColor = dqiColor;
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-color)';
           }}
         >
           <div
@@ -184,7 +223,20 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
           >
             Grade {container.compositeGrade ?? '—'}
           </div>
-        </div>
+          {container.compositeDqi != null && (
+            <div
+              style={{
+                fontSize: 10,
+                color: 'var(--text-muted)',
+                marginTop: 6,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
+              See breakdown →
+            </div>
+          )}
+        </button>
 
         <div
           style={{
@@ -319,6 +371,15 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
           </span>
         </div>
       )}
+
+      <ContainerDqiBreakdownPanel
+        open={breakdownOpen}
+        onOpenChange={setBreakdownOpen}
+        container={container}
+        perDoc={perDoc}
+        loading={breakdownLoading}
+        fetchError={breakdownError}
+      />
     </div>
   );
 }

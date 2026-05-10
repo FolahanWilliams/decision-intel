@@ -108,7 +108,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // `uploadRes.json().catch(() => null)` body-parse on the response
 // error path (canonical req.json() body-parse exception class
 // CLAUDE.md explicitly lists as legitimate fire-and-forget).
-const SILENT_CATCH_BASELINE = 152;
+// 152 → 153: Audit follow-through item 4 (2026-05-10) —
+// ContainerDqiBreakdownPanel per-doc DQI lazy-fetch error path uses
+// `errBody = await res.json().catch(() => null)` to parse the API
+// error body before throwing (so the panel surfaces the real
+// diagnostic, not a generic "Failed to fetch DQI"). Same canonical
+// req.json() body-parse exception class.
+const SILENT_CATCH_BASELINE = 153;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

@@ -85,76 +85,140 @@ export interface PersonaArchetype {
 }
 
 /**
- * Canonical persona set — five archetypes, MUTUALLY EXCLUSIVE buyer
- * orgs. The 2026-04-29 v1 audit had 3 personas inside the same fund;
- * v2 caps each archetype at one voice. If a finding emerges from
- * multiple personas, the auditor consolidates to the strongest voice
- * and notes "Also surfaced by {other persona name}" in the body.
+ * Canonical persona set — MUTUALLY EXCLUSIVE buyer orgs. The 2026-04-29
+ * v1 audit had 3 personas inside the same fund; v2 caps each archetype
+ * at one voice. If a finding emerges from multiple personas, the auditor
+ * consolidates to the strongest voice and notes "Also surfaced by
+ * {other persona name}" in the body.
+ *
+ * Roster updated 2026-05-10 to align with the GTM v3.5 ratified-2026-05-04
+ * Phase 1 HXC wedge lock: junior-analyst tier is auto-redirected by sign-up
+ * persona gating, so `corp_dev_analyst` is DEPRECATED (kept here for
+ * historical compatibility, NEVER pick for a live audit). The four Phase 1
+ * HXC personas (fractional CSO / mid-market corp dev head / smaller-fund GP
+ * / PE-backed founder) are the wedge cohort. F500 CSO + GC stay as [CEILING]
+ * audit anchors. Pan-African fund partner stays as [INFRA] differentiator
+ * (NOT wedge — moat layer per CLAUDE.md v3.2/v3.5 lock).
+ *
+ * When picking 2-3 personas per audit run, mix Phase 1 HXC + a [CEILING]
+ * anchor + the [INFRA] differentiator across runs so coverage spans both
+ * wedge and moat motions.
  */
 export const PERSONA_ARCHETYPES: PersonaArchetype[] = [
+  // ── Phase 1 HXC wedge personas (the four buyer-class-continuous roles) ──
+  {
+    name: 'Fractional CSO / strategy consultant',
+    archetype: 'fractional_cso',
+    dailyVerbs: ['draft_memo', 'review_client_strategy', 'present_to_client', 'invoice'],
+    uniqueAngle:
+      'Solo strategy operator running 3-5 client engagements with regular memo flow. Pays £249/mo personally. Deeply concrete, time-pressured, needs the audit to compress 3hr of memo review into 60 seconds. Phase 1 HXC wedge persona per GTM v3.5.',
+  },
+  {
+    name: 'Mid-market Head of Corp Dev / M&A',
+    archetype: 'midmarket_corpdev_head',
+    dailyVerbs: ['screen', 'diligence', 'synergy_check', 'present_to_board', 'close'],
+    uniqueAngle:
+      'Runs the deal pipeline at a $50M-$500M revenue scale-up. Pays £249/mo personally pre-team-budget. The most common buyer at the IC-readiness gate. Phase 1 HXC wedge persona per GTM v3.5.',
+  },
+  {
+    name: 'Smaller-fund GP / VC partner',
+    archetype: 'smallfund_gp',
+    dailyVerbs: ['screen_deal', 'read_ic_memo', 'thesis_anchor', 'lp_governance', 'commit'],
+    uniqueAngle:
+      'GP or principal at a £5M-£100M AUM fund with active deal flow OR LP governance pressure. Reads IC memos in the back of an Uber. The Cornerstone-magnetic persona — cares about thesis-anchor + structural-assumption ripple. Phase 1 HXC wedge per GTM v3.5.',
+  },
+  {
+    name: 'PE-backed founder / CEO',
+    archetype: 'pebacked_founder',
+    dailyVerbs: ['prep_board_deck', 'sign_off_strategic_memo', 'brief_sponsor', 'authorise'],
+    uniqueAngle:
+      '$80M-revenue PE-backed CEO with personal-decisive budget. The synergy-mirage detector is the highest-leverage signal for this persona. Phase 1 HXC wedge per GTM v3.5.',
+  },
+  // ── [CEILING] expansion personas (revisit at Phase 3+) ─────────────────
   {
     name: 'F500 Chief Strategy Officer',
     archetype: 'corp_strategy_lead',
     dailyVerbs: ['frame', 'review', 'present', 'delegate', 'track'],
     uniqueAngle:
-      'Reports to a board. Owns 6+ divisions worth of strategic memos. Proxy for the F500 CEILING ICP.',
-  },
-  {
-    name: 'Mid-market PE Head of M&A',
-    archetype: 'pe_ma_head',
-    dailyVerbs: ['screen', 'diligence', 'memo', 'present_to_ic', 'close'],
-    uniqueAngle:
-      'Runs 6-8 live deals at any time. IC every Thursday. Speed + structured output matter most.',
-  },
-  {
-    name: 'Pan-African fund partner',
-    archetype: 'em_fund_partner',
-    dailyVerbs: ['screen', 'structure', 'navigate_regulation', 'present_to_lp'],
-    uniqueAngle:
-      'Multi-currency exposure. African regulatory complexity (CBN, FCCPC, SARB). Cross-border deal structuring. Proxy for the GTM WEDGE ICP.',
-  },
-  {
-    name: 'Senior corporate-development analyst',
-    archetype: 'corp_dev_analyst',
-    dailyVerbs: ['research', 'model', 'compare', 'pitch_internally'],
-    uniqueAngle:
-      'Two-hat role: writes the memo + manages the data room. Tool fatigue is real — must save time, not add another login.',
+      'Reports to a board. Owns 6+ divisions worth of strategic memos. Proxy for the F500 [CEILING] ICP. Audit now to prevent drift; revisit at months 12-24.',
   },
   {
     name: 'F500 General Counsel / audit-committee chair',
     archetype: 'gc_audit_chair',
     dailyVerbs: ['review', 'sign_off', 'document', 'audit_trail', 'cite_regulator'],
     uniqueAngle:
-      'Procurement-grade lens. Cares about DPR shape, regulatory citations, audit log, signed artifacts. The buyer who unlocks the F500 contract.',
+      'Procurement-grade lens. Cares about DPR shape, regulatory citations, audit log, signed artifacts. The [CEILING] buyer who unlocks the F500 contract.',
+  },
+  // ── [INFRA] differentiation persona (Phase 4 wedge, [INFRA] moat now) ──
+  {
+    name: 'Pan-African fund partner',
+    archetype: 'em_fund_partner',
+    dailyVerbs: ['screen', 'structure', 'navigate_regulation', 'present_to_lp'],
+    uniqueAngle:
+      'Multi-currency exposure. African regulatory complexity (NDPR, CBN, WAEMU, PoPIA). Cross-border deal structuring. Proxy for the [INFRA] differentiator (NOT the Phase 1 wedge per GTM v3.2/v3.5 — moat layer for cross-border M&A; revisit at Phase 4).',
+  },
+  // ── DEPRECATED 2026-05-10: junior tier auto-redirected by v3.5 sign-up ─
+  {
+    name: 'Senior corporate-development analyst',
+    archetype: 'corp_dev_analyst',
+    dailyVerbs: ['research', 'model', 'compare', 'pitch_internally'],
+    uniqueAngle:
+      'DEPRECATED per GTM v3.5 sign-up persona gating (2026-05-04): junior-tier corp-dev analysts auto-redirect to the friendly waitlist on the sign-up form because they have no graduation path to F500 procurement. Do NOT pick this persona for a live audit. Kept for historical comparison only.',
   },
 ];
+
+/**
+ * Build the live persona roster block — derived from PERSONA_ARCHETYPES so
+ * the prompt body never drifts from the canonical array. When v3.5 sign-up
+ * gating evolved 2026-05-10 the array updated; the prompt body would have
+ * stayed stale without this derivation pattern (canonical-derivation
+ * discipline per CLAUDE.md count-drift rule, applied to persona names).
+ *
+ * Active personas only — the deprecated corp_dev_analyst entry is excluded
+ * from the prompt body (kept in the array for historical comparison) so a
+ * live audit cannot accidentally pick a persona that was retired by v3.5
+ * sign-up gating.
+ */
+const ACTIVE_ARCHETYPES = PERSONA_ARCHETYPES.filter(
+  p => !p.uniqueAngle.startsWith('DEPRECATED')
+);
+
+const PERSONA_ROSTER_BLOCK = ACTIVE_ARCHETYPES.map(
+  (p, i) => `${i + 1}. ${p.name} — ${p.uniqueAngle}`
+).join('\n');
 
 /**
  * The improved audit prompt — copy-paste into the next audit task. The
  * markdown blocks below mirror the disciplines codified above; the
  * auditor returns findings shaped as PersonaAuditFinding[].
+ *
+ * Persona roster is interpolated from PERSONA_ARCHETYPES (active subset)
+ * so the prompt body cannot drift from the canonical array — same
+ * canonical-derivation discipline as the count-drift / framework-count /
+ * bias-count rules per CLAUDE.md.
  */
 export const PERSONA_AUDIT_PROMPT_V2 = `
 You are running a pre-emptive customer-exploration audit on Decision Intel
 (decision-intel.com / /Users/folahan/decision-intel — Next.js 16 + Prisma 7
 + Supabase + Vercel). Your job: surface the highest-leverage holes from
-the perspective of five mutually-exclusive buyer archetypes, with rigorous
-verification discipline so the founder doesn't waste a single hour
-chasing false positives.
+the perspective of mutually-exclusive buyer archetypes (Phase 1 HXC wedge +
+[CEILING] anchor + [INFRA] differentiator), with rigorous verification
+discipline so the founder doesn't waste a single hour chasing false
+positives.
 
-# THE FIVE ARCHETYPES (one persona per archetype, ZERO buyer-org overlap)
+# THE ARCHETYPES (one persona per archetype, ZERO buyer-org overlap; pick 2-3 per audit run)
 
-1. F500 Chief Strategy Officer — F500 industrial conglomerate, 6+ divisions
-2. Mid-market PE Head of M&A — $1-3B AUM US/UK fund, 6-8 live deals
-3. Pan-African fund partner — $200M-2B AUM Africa-focused, multi-currency
-4. Senior corp-dev analyst — F500 corp-dev team, day-to-day operator
-5. F500 General Counsel / audit-committee chair — procurement-grade lens
+${PERSONA_ROSTER_BLOCK}
+
+Mix Phase 1 HXC + a [CEILING] anchor + the [INFRA] differentiator across
+runs so the audit covers both wedge and moat motions. Rotate which subset
+you pick across audit runs — don't run the same triple twice in a row.
 
 DO NOT split a single buyer org into multiple personas (in v1 we put
 Sankore's partner + analyst + junior all in the audit; that weighted one
-voice 3× and produced redundant findings). If the analyst persona surfaces
-the same finding the partner did, consolidate to one entry and note
-"Also surfaced by {other persona}" in the body.
+voice 3× and produced redundant findings). If two personas surface the
+same finding, consolidate to one entry and note "Also surfaced by
+{other persona}" in the body.
 
 # THE FOUR DISCIPLINES (every finding must comply)
 
