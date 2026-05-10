@@ -53,6 +53,7 @@ import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
 import { VohraHxcPmfTile } from './start-here/VohraHxcPmfTile';
+import { ThreeLayerModel } from './path-to-100m/ThreeLayerModel';
 import { JOURNEYS, NODES, type Journey, type TabId } from './start-here/founder-hub-map-data';
 
 // Persistence keys — visited reuses the prior 2-day-plan key so progress
@@ -203,6 +204,15 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           2026-05-04 with all the underlying data. */}
       <VohraHxcPmfTile onNavigateToMetrics={() => onNavigateToTab('metrics')} />
       {renderPositioningAnchor()}
+      {/* 3-Layer architectural frame — promoted to Start Here 2026-05-10
+          (founder ask: "add the three layer frame to my founder's hub.
+          It's quite powerful"). The frame was previously buried inside
+          the Path-to-100M tab; surfacing it here makes it the second
+          fact a founder reads each morning, right after the Positioning
+          Anchor. Use as the LEAD opener for cold investor conversations
+          and pitch-deck slide 2. Architectural vocabulary that earns
+          attention; never replaces the locked H1. */}
+      <ThreeLayerModel />
       {renderCalibrationCard(onNavigateToTab)}
       {renderInvestorAnswerCard()}
       <TrustEvidencePackPointer variant="default" />

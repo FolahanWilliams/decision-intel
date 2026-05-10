@@ -5,7 +5,6 @@ import useSWR from 'swr';
 import {
   MessageSquare,
   Webhook,
-  Key,
   Mail,
   CreditCard,
   ExternalLink,
@@ -22,39 +21,59 @@ import {
   Save,
   HardDrive,
   FolderOpen,
+  Inbox,
+  Clock,
 } from 'lucide-react';
 import { WebhookManager } from './WebhookManager';
 import type { SlackInstallationStatus } from '@/types/human-audit';
 
+/**
+ * Integration sequencing locked 2026-05-10 (founder strategic decision):
+ *
+ *   - Email Forwarding (per-user inbox) is the LEAD integration — no
+ *     OAuth verification required, ships day-one to every user. Forward
+ *     a memo from Gmail and the audit runs.
+ *   - Slack is DESIGN-PARTNER ONLY until the Slack App Directory review
+ *     clears. Private/internal install works for verified design
+ *     partners; public distribution is gated behind the review.
+ *   - Google Drive is DEFERRED to Phase 4 (Outcome Gate auto-detection
+ *     window) — the OAuth verification timeline doesn't fit the wedge
+ *     motion's individual-buyer focus. Re-evaluate post-design-partner.
+ *   - Webhooks + Stripe + Email Notifications stay available (no
+ *     verification gates).
+ *   - API Keys retired entirely 2026-05-10 streamlining batch.
+ *   - Teams stays Coming Soon (Microsoft App Source review even longer).
+ *
+ * Status taxonomy:
+ *   - 'available'      — works today, no gates
+ *   - 'design_partner' — works via private install for design partners;
+ *                        public distribution pending verification
+ *   - 'deferred'       — built but parked until clearer demand or
+ *                        Phase 4 (Outcome Gate auto-detection)
+ *   - 'coming_soon'    — not built yet
+ */
 const INTEGRATIONS = [
+  {
+    id: 'email_forwarding',
+    name: 'Email Forwarding · per-user inbox',
+    description:
+      'Forward a memo from Gmail or any email client to your unique Decision Intel address. Attachments auto-analyzed; body falls back as text. No OAuth, no verification — works the moment your account is created.',
+    icon: Inbox,
+    color: '#16A34A',
+    category: 'Inbound',
+    status: 'available' as const,
+    leadIntegration: true,
+  },
   {
     id: 'slack',
     name: 'Slack',
     description:
-      'Real-time decision capture, bias detection nudges, and outcome tracking via Slack channels.',
+      'Real-time decision capture, bias detection nudges, and outcome tracking via Slack channels. Available to design partners via private install while the Slack App Directory review is in flight.',
     icon: MessageSquare,
     color: '#4A154B',
     category: 'Collaboration',
-    status: 'available' as const,
-  },
-  {
-    id: 'google_drive',
-    name: 'Google Drive',
-    description:
-      'Auto-analyze documents from Google Drive. Connect your Drive, select folders to watch, and new documents are analyzed automatically.',
-    icon: HardDrive,
-    color: '#4285F4',
-    category: 'Data Sources',
-    status: 'available' as const,
-  },
-  {
-    id: 'teams',
-    name: 'Microsoft Teams',
-    description: 'Decision capture and nudge delivery via Microsoft Teams channels and chats.',
-    icon: MessageSquare,
-    color: '#6264A7',
-    category: 'Collaboration',
-    status: 'coming_soon' as const,
+    status: 'design_partner' as const,
+    leadIntegration: false,
   },
   {
     id: 'webhooks',
@@ -65,15 +84,7 @@ const INTEGRATIONS = [
     color: '#22c55e',
     category: 'Developer',
     status: 'available' as const,
-  },
-  {
-    id: 'api_keys',
-    name: 'API Keys',
-    description: 'Programmatic access to Decision Intel via REST API with scoped permissions.',
-    icon: Key,
-    color: '#eab308',
-    category: 'Developer',
-    status: 'available' as const,
+    leadIntegration: false,
   },
   {
     id: 'email',
@@ -83,6 +94,7 @@ const INTEGRATIONS = [
     color: '#3b82f6',
     category: 'Notifications',
     status: 'available' as const,
+    leadIntegration: false,
   },
   {
     id: 'stripe',
@@ -92,6 +104,28 @@ const INTEGRATIONS = [
     color: '#635BFF',
     category: 'Billing',
     status: 'available' as const,
+    leadIntegration: false,
+  },
+  {
+    id: 'google_drive',
+    name: 'Google Drive',
+    description:
+      'Auto-analyze documents from Google Drive. Deferred until Phase 4 (Outcome Gate auto-detection window) — Google OAuth verification doesn\'t fit the current wedge motion. Forward documents from Gmail in the meantime.',
+    icon: HardDrive,
+    color: '#4285F4',
+    category: 'Data Sources',
+    status: 'deferred' as const,
+    leadIntegration: false,
+  },
+  {
+    id: 'teams',
+    name: 'Microsoft Teams',
+    description: 'Decision capture and nudge delivery via Microsoft Teams channels and chats.',
+    icon: MessageSquare,
+    color: '#6264A7',
+    category: 'Collaboration',
+    status: 'coming_soon' as const,
+    leadIntegration: false,
   },
 ];
 
@@ -920,6 +954,56 @@ function GoogleDriveDetailSection({
       {/* Disconnected state */}
       {!isConnected && !driveLoading && (
         <div style={{ marginBottom: '20px' }}>
+          {/* Status callout — locked 2026-05-10 integration sequencing
+              decision. Drive is built but deferred to Phase 4 (Outcome
+              Gate auto-detection window). The OAuth verification timeline
+              doesn't fit the wedge motion's individual-buyer focus.
+              The connect button is preserved for design-partner orgs
+              that want to opt in early; the callout sets the expectation. */}
+          <div
+            style={{
+              padding: '12px 14px',
+              marginBottom: '14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--bg-elevated)',
+              borderLeft: '3px solid var(--text-muted)',
+              display: 'flex',
+              gap: 10,
+              alignItems: 'flex-start',
+            }}
+          >
+            <Clock
+              size={14}
+              style={{ color: 'var(--text-muted)', marginTop: 2, flexShrink: 0 }}
+            />
+            <div>
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 4,
+                }}
+              >
+                Deferred · Phase 4
+              </div>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.55,
+                  margin: 0,
+                }}
+              >
+                Drive auto-sync is parked until the Outcome Gate auto-detection window
+                (Phase 4). Google OAuth verification timeline doesn&rsquo;t fit the current
+                wedge motion. <strong>Use email forwarding instead</strong> — forward any
+                document to your unique inbox address and it auto-analyzes.
+              </p>
+            </div>
+          </div>
           <p
             style={{
               fontSize: '13px',
@@ -928,8 +1012,8 @@ function GoogleDriveDetailSection({
               marginBottom: '14px',
             }}
           >
-            Connect your Google Drive to automatically analyze new documents added to selected
-            folders.
+            Design partners can opt in early; everyone else should use email forwarding
+            until Phase 4.
           </p>
           <a
             href="/api/integrations/google/oauth"
@@ -948,7 +1032,7 @@ function GoogleDriveDetailSection({
               textDecoration: 'none',
             }}
           >
-            Connect Google Drive <ExternalLink size={13} />
+            Connect Google Drive (early access) <ExternalLink size={13} />
           </a>
         </div>
       )}
@@ -1291,6 +1375,58 @@ function SlackDetailSection({
         {/* Disconnected / expired state - show connect button */}
         {(!isConnected || isTokenExpired) && !slackLoading && (
           <div style={{ marginBottom: '20px' }}>
+            {/* Status callout — locked 2026-05-10 integration sequencing
+                decision. Slack is design-partner-only until the Slack
+                App Directory review clears. The connect button is
+                preserved for verified design partners (the OAuth flow
+                works once the workspace owner approves the private
+                install); the callout explains why the public listing
+                isn't yet live. */}
+            {!isTokenExpired && (
+              <div
+                style={{
+                  padding: '12px 14px',
+                  marginBottom: '14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(245,158,11,0.06)',
+                  borderLeft: '3px solid var(--warning)',
+                  display: 'flex',
+                  gap: 10,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <AlertTriangle
+                  size={14}
+                  style={{ color: 'var(--warning)', marginTop: 2, flexShrink: 0 }}
+                />
+                <div>
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      color: 'var(--warning)',
+                      marginBottom: 4,
+                    }}
+                  >
+                    Design partners only
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.55,
+                      margin: 0,
+                    }}
+                  >
+                    Slack App Directory review is in flight. Verified design partners can
+                    install via the private OAuth flow below; public distribution unlocks
+                    when the review clears.
+                  </p>
+                </div>
+              </div>
+            )}
             <p
               style={{
                 fontSize: '13px',
@@ -1499,8 +1635,23 @@ export function IntegrationMarketplace() {
     }
   }, [slackStatus?.teamId]);
 
-  // Filter out Slack and Google Drive from the grid cards since they get their own detail sections
-  const otherIntegrations = INTEGRATIONS.filter(i => i.id !== 'slack' && i.id !== 'google_drive');
+  // Filter out Slack and Google Drive from the grid cards since they get their own detail sections.
+  // Sort the remainder so the lead integration (email_forwarding) is first
+  // and deferred / coming_soon land at the bottom — matches the founder's
+  // sequencing: Gmail forwarding now, everything else later.
+  const STATUS_ORDER: Record<string, number> = {
+    available: 0,
+    design_partner: 1,
+    deferred: 2,
+    coming_soon: 3,
+  };
+  const otherIntegrations = INTEGRATIONS.filter(
+    i => i.id !== 'slack' && i.id !== 'google_drive'
+  ).sort((a, b) => {
+    if (a.leadIntegration && !b.leadIntegration) return -1;
+    if (!a.leadIntegration && b.leadIntegration) return 1;
+    return (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9);
+  });
 
   return (
     <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1100px', margin: '0 auto' }}>
@@ -1588,6 +1739,9 @@ export function IntegrationMarketplace() {
             {otherIntegrations.map(integration => {
               const Icon = integration.icon;
               const isComingSoon = integration.status === 'coming_soon';
+              const isDeferred = integration.status === 'deferred';
+              const isLead = integration.leadIntegration === true;
+              const dimmed = isComingSoon || isDeferred;
 
               return (
                 <div
@@ -1595,10 +1749,14 @@ export function IntegrationMarketplace() {
                   style={{
                     padding: '20px',
                     background: 'var(--liquid-tint)',
-                    border: '1px solid var(--liquid-border)',
+                    border: '1px solid',
+                    borderColor: isLead ? 'var(--accent-primary)' : 'var(--liquid-border)',
+                    borderTop: isLead
+                      ? '3px solid var(--accent-primary)'
+                      : '1px solid var(--liquid-border)',
                     borderRadius: 'var(--radius-lg)',
                     backdropFilter: 'blur(var(--liquid-blur))',
-                    opacity: isComingSoon ? 0.6 : 1,
+                    opacity: dimmed ? 0.65 : 1,
                   }}
                 >
                   <div
@@ -1634,6 +1792,58 @@ export function IntegrationMarketplace() {
                         >
                           {integration.name}
                         </h3>
+                        {isLead && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--accent-primary)',
+                              background: 'rgba(22,163,74,0.10)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            Lead · Available
+                          </span>
+                        )}
+                        {integration.status === 'design_partner' && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--warning)',
+                              background: 'rgba(245,158,11,0.10)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            Design partners only
+                          </span>
+                        )}
+                        {isDeferred && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              color: 'var(--text-muted)',
+                              background: 'var(--bg-elevated)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.06em',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                            }}
+                          >
+                            <Clock size={10} />
+                            Deferred · Phase 4
+                          </span>
+                        )}
                         {isComingSoon && (
                           <span
                             style={{
@@ -1672,8 +1882,17 @@ export function IntegrationMarketplace() {
                     {integration.description}
                   </p>
 
-                  {!isComingSoon && (
+                  {!isComingSoon && !isDeferred && (
                     <div style={{ display: 'flex', gap: '8px' }}>
+                      {integration.id === 'email_forwarding' && (
+                        <a
+                          href="/dashboard/settings"
+                          className="btn btn-primary btn-sm"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          View your inbox address
+                        </a>
+                      )}
                       {integration.id === 'webhooks' && (
                         <button
                           onClick={() => setActiveTab('webhooks')}
@@ -1681,15 +1900,6 @@ export function IntegrationMarketplace() {
                         >
                           Manage Webhooks
                         </button>
-                      )}
-                      {integration.id === 'api_keys' && (
-                        <a
-                          href="/dashboard/settings"
-                          className="btn btn-secondary btn-sm"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          Manage Keys
-                        </a>
                       )}
                       {integration.id === 'email' && (
                         <a
