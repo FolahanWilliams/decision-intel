@@ -904,200 +904,224 @@ export default function Dashboard() {
     <ModalStackProvider>
       <div className="stack-xl">
         {/* Welcome modal for first-time users */}
-      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+        {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
-      {/* Header — persona-grade hero (locked 2026-05-02). Display serif
+        {/* Header — persona-grade hero (locked 2026-05-02). Display serif
           H1 matches the DiscoveryHookView aesthetic on doc-detail so the
           entry-point feels continuous with where uploads land. The
           eyebrow + subtitle hierarchy is identical to the Discovery hook
           for visual coherence. Globals.css rule against display serif on
           platform surfaces is intentionally extended here — the dashboard
           IS the entry-point deliverable surface, not an analyst panel. */}
-      <div className="page-header" style={{ marginBottom: 0 }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 'var(--fs-3xs)',
-              fontWeight: 600,
-              color: 'var(--text-muted)',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              marginBottom: 8,
-            }}
-          >
-            Dashboard
+        <div className="page-header" style={{ marginBottom: 0 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: 'var(--fs-3xs)',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                marginBottom: 8,
+              }}
+            >
+              Dashboard
+            </div>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display, "Instrument Serif", Georgia, serif)',
+                fontSize: 'clamp(28px, 3.4vw, 44px)',
+                lineHeight: 1.1,
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}
+              dangerouslySetInnerHTML={{ __html: dashboardHeadline }}
+            />
+            <p
+              className="page-subtitle"
+              style={{ marginTop: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}
+            >
+              {dashboardSubtitle}
+            </p>
           </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display, "Instrument Serif", Georgia, serif)',
-              fontSize: 'clamp(28px, 3.4vw, 44px)',
-              lineHeight: 1.1,
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              color: 'var(--text-primary)',
-              margin: 0,
-            }}
-            dangerouslySetInnerHTML={{ __html: dashboardHeadline }}
-          />
-          <p
-            className="page-subtitle"
-            style={{ marginTop: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}
-          >
-            {dashboardSubtitle}
-          </p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            onClick={() => setQuickScanOpen(true)}
-            className="btn btn-secondary btn-sm"
-            style={{ gap: 6 }}
-          >
-            <Zap size={14} style={{ color: 'var(--accent-primary)' }} />
-            Quick Bias Check
-          </button>
-        </div>
-        {/* View switcher — always rendered so the layout is stable from
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              onClick={() => setQuickScanOpen(true)}
+              className="btn btn-secondary btn-sm"
+              style={{ gap: 6 }}
+            >
+              <Zap size={14} style={{ color: 'var(--accent-primary)' }} />
+              Quick Bias Check
+            </button>
+          </div>
+          {/* View switcher — always rendered so the layout is stable from
             first paint (prevents a content shift when the SWR docs list
             resolves). Buttons remain functional for empty state too;
             Browse just shows its own empty state when there are no docs. */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2px',
-            background: 'var(--bg-card-hover)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-full)',
-            padding: '3px',
-          }}
-        >
-          <button
-            onClick={() => switchView('upload')}
+          <div
             style={{
-              padding: '6px 16px',
-              fontSize: '13px',
-              fontWeight: activeView === 'upload' ? 600 : 400,
-              borderRadius: 'var(--radius-full)',
-              border: 'none',
-              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s',
-              background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
-              color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
-            }}
-          >
-            <Upload size={14} />
-            Upload &amp; Monitor
-          </button>
-          <button
-            onClick={() => switchView('browse')}
-            style={{
-              padding: '6px 16px',
-              fontSize: '13px',
-              fontWeight: activeView === 'browse' ? 600 : 400,
+              gap: '2px',
+              background: 'var(--bg-card-hover)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-full)',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s',
-              background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
-              color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              padding: '3px',
             }}
           >
-            <Search size={14} />
-            Browse &amp; Analyze
-          </button>
+            <button
+              onClick={() => switchView('upload')}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                fontWeight: activeView === 'upload' ? 600 : 400,
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s',
+                background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
+                color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              }}
+            >
+              <Upload size={14} />
+              Upload &amp; Monitor
+            </button>
+            <button
+              onClick={() => switchView('browse')}
+              style={{
+                padding: '6px 16px',
+                fontSize: '13px',
+                fontWeight: activeView === 'browse' ? 600 : 400,
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s',
+                background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
+                color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
+              }}
+            >
+              <Search size={14} />
+              Browse &amp; Analyze
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* CSO pipeline rail — Strategy+ tier only, collapsible. Shows
+        {/* CSO pipeline rail — Strategy+ tier only, collapsible. Shows
           in-flight audits / outcomes awaiting report / active decision
           rooms. Self-hides on Free + Pro via /api/cso-rail plan gate. */}
-      <CsoDashboardRail />
+        <CsoDashboardRail />
 
-      {/* Hero KPI Cards — always rendered so first paint matches the
+        {/* Hero KPI Cards — always rendered so first paint matches the
           post-load layout (prevents the content-shift flash when SWR
           resolves). Empty / zero values are handled by the —/0 fallbacks. */}
-      <>
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.08 } },
-          }}
-        >
-          {/* KPI grid — 4 cards. Each gets a 2px top accent stripe so
+        <>
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-md sm:gap-lg"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.08 } },
+            }}
+          >
+            {/* KPI grid — 4 cards. Each gets a 2px top accent stripe so
               the eye reads semantic role at a glance (Phase F follow-up
               2026-05-09 evening — solves the all-same-card flatness on
               the dashboard hero). Avg Quality's accent dynamically
               tracks the grade band so a returning CSO sees red instantly
               when their average drops below D. */}
-          {[
-            {
-              label: 'Total Documents',
-              value: totalDocs,
-              numericValue: totalDocs,
-              icon: <FileText size={18} />,
-              iconBg: 'var(--bg-card-hover)',
-              iconColor: 'var(--text-secondary)',
-              sparkColor: 'var(--text-muted)',
-              accentColor: 'var(--accent-secondary, #6366f1)', // info / data
-            },
-            {
-              label: 'Analyzed',
-              value: uploadedDocs.filter(d => d.status === 'complete').length,
-              numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
-              icon: <CheckCircle size={18} />,
-              iconBg: 'rgba(22, 163, 74, 0.10)',
-              iconColor: 'var(--success)',
-              sparkColor: 'var(--text-muted)',
-              accentColor: 'var(--success)', // completion / verified
-            },
-            {
-              label: 'Avg Quality',
-              value: riskSummary.avg,
-              numericValue: riskSummary.avg,
-              suffix: '%',
-              icon: <TrendingUp size={18} />,
-              iconBg: 'var(--bg-card-hover)',
-              iconColor: 'var(--text-secondary)',
-              sparkColor: 'var(--text-muted)',
-              showSparkline: true,
-              // Dynamically grade-coded — A/B → green, C → amber, D/F → red
-              accentColor:
-                riskSummary.avg >= 70
-                  ? 'var(--success)'
-                  : riskSummary.avg >= 55
-                    ? 'var(--warning)'
-                    : riskSummary.avg >= 40
-                      ? 'var(--severity-high)'
-                      : riskSummary.avg > 0
-                        ? 'var(--severity-critical)'
-                        : 'var(--text-muted)',
-            },
-            {
-              label: 'Decision IQ',
-              value: -1, // Sentinel: replaced by custom component
-              numericValue: -1,
-              icon: <Brain size={18} />,
-              iconBg: 'rgba(22, 163, 74, 0.10)',
-              iconColor: 'var(--accent-primary)',
-              sparkColor: 'var(--text-muted)',
-              isCustom: true,
-              accentColor: 'var(--accent-primary)', // primary / proprietary metric
-            },
-          ].map(stat => {
-            // Decision IQ uses its own self-contained component
-            if ((stat as Record<string, unknown>).isCustom) {
+            {[
+              {
+                label: 'Total Documents',
+                value: totalDocs,
+                numericValue: totalDocs,
+                icon: <FileText size={18} />,
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
+                accentColor: 'var(--accent-secondary, #6366f1)', // info / data
+              },
+              {
+                label: 'Analyzed',
+                value: uploadedDocs.filter(d => d.status === 'complete').length,
+                numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
+                icon: <CheckCircle size={18} />,
+                iconBg: 'rgba(22, 163, 74, 0.10)',
+                iconColor: 'var(--success)',
+                sparkColor: 'var(--text-muted)',
+                accentColor: 'var(--success)', // completion / verified
+              },
+              {
+                label: 'Avg Quality',
+                value: riskSummary.avg,
+                numericValue: riskSummary.avg,
+                suffix: '%',
+                icon: <TrendingUp size={18} />,
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
+                showSparkline: true,
+                // Dynamically grade-coded — A/B → green, C → amber, D/F → red
+                accentColor:
+                  riskSummary.avg >= 70
+                    ? 'var(--success)'
+                    : riskSummary.avg >= 55
+                      ? 'var(--warning)'
+                      : riskSummary.avg >= 40
+                        ? 'var(--severity-high)'
+                        : riskSummary.avg > 0
+                          ? 'var(--severity-critical)'
+                          : 'var(--text-muted)',
+              },
+              {
+                label: 'Decision IQ',
+                value: -1, // Sentinel: replaced by custom component
+                numericValue: -1,
+                icon: <Brain size={18} />,
+                iconBg: 'rgba(22, 163, 74, 0.10)',
+                iconColor: 'var(--accent-primary)',
+                sparkColor: 'var(--text-muted)',
+                isCustom: true,
+                accentColor: 'var(--accent-primary)', // primary / proprietary metric
+              },
+            ].map(stat => {
+              // Decision IQ uses its own self-contained component
+              if ((stat as Record<string, unknown>).isCustom) {
+                return (
+                  <motion.div
+                    key={stat.label}
+                    variants={{
+                      hidden: { opacity: 0, y: 20, scale: 0.97 },
+                      visible: { opacity: 1, y: 0, scale: 1 },
+                    }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    whileHover={{
+                      y: -4,
+                      boxShadow:
+                        '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                    }}
+                    style={{
+                      borderTop: `2px solid ${stat.accentColor}`,
+                      borderRadius: 'var(--radius-lg)',
+                    }}
+                  >
+                    <DecisionIQCard />
+                  </motion.div>
+                );
+              }
+
               return (
                 <motion.div
                   key={stat.label}
+                  className="stat-card liquid-glass-premium"
                   variants={{
                     hidden: { opacity: 0, y: 20, scale: 0.97 },
                     visible: { opacity: 1, y: 0, scale: 1 },
@@ -1107,478 +1131,455 @@ export default function Dashboard() {
                     y: -4,
                     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
                   }}
-                  style={{
-                    borderTop: `2px solid ${stat.accentColor}`,
-                    borderRadius: 'var(--radius-lg)',
-                  }}
-                >
-                  <DecisionIQCard />
-                </motion.div>
-              );
-            }
-
-            return (
-              <motion.div
-                key={stat.label}
-                className="stat-card liquid-glass-premium"
-                variants={{
-                  hidden: { opacity: 0, y: 20, scale: 0.97 },
-                  visible: { opacity: 1, y: 0, scale: 1 },
-                }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{
-                  y: -4,
-                  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
-                }}
-                style={{ borderTop: `2px solid ${stat.accentColor}` }}
-              >
-                <div
-                  className="flex items-center justify-between"
-                  style={{ marginBottom: 'var(--spacing-md)' }}
+                  style={{ borderTop: `2px solid ${stat.accentColor}` }}
                 >
                   <div
-                    className="stat-card-icon"
-                    style={{
-                      background: stat.iconBg,
-                      color: stat.iconColor,
-                      marginBottom: 0,
-                    }}
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: 'var(--spacing-md)' }}
                   >
-                    {stat.icon}
+                    <div
+                      className="stat-card-icon"
+                      style={{
+                        background: stat.iconBg,
+                        color: stat.iconColor,
+                        marginBottom: 0,
+                      }}
+                    >
+                      {stat.icon}
+                    </div>
+                    {stat.showSparkline && sparklineData.length >= 2 && (
+                      <SparklineChart
+                        data={sparklineData}
+                        color={stat.sparkColor}
+                        width={72}
+                        height={28}
+                      />
+                    )}
                   </div>
-                  {stat.showSparkline && sparklineData.length >= 2 && (
-                    <SparklineChart
-                      data={sparklineData}
-                      color={stat.sparkColor}
-                      width={72}
-                      height={28}
-                    />
-                  )}
-                </div>
-                <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
-                  {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
-                    <AnimatedNumber
-                      value={stat.numericValue}
-                      suffix={stat.suffix || ''}
-                      duration={900}
-                    />
-                  ) : (
-                    '—'
-                  )}
-                </div>
-                <div className="stat-card-label">{stat.label}</div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </>
+                  <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
+                    {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                      <AnimatedNumber
+                        value={stat.numericValue}
+                        suffix={stat.suffix || ''}
+                        duration={900}
+                      />
+                    ) : (
+                      '—'
+                    )}
+                  </div>
+                  <div className="stat-card-label">{stat.label}</div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </>
 
-      {/* Decision DNA preview — surfaces the personal-calibration moat as
+        {/* Decision DNA preview — surfaces the personal-calibration moat as
           a 3-stat row (top-triggered bias / belief delta / follow-success).
           Renders a discovery card when the user has no data yet. The full
           surface lives at /dashboard/analytics?view=intelligence#dna
           (folded in Phase B 2026-05-09 evening). */}
-      <DecisionDNAPreviewCard />
+        <DecisionDNAPreviewCard />
 
-      {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
+        {/* Banners / widgets — rendered bare (no mb-lg wrapper divs) so null
           returns don't create empty flex items that inflate stack-xl's
           gap. AnimatePresence contributes no DOM when empty; each child
           component self-conditionally returns null. */}
-      <AnimatePresence>
-        {streamTimedOut && !uploading && (
-          <motion.div
-            className="p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <AlertTriangle size={18} className="text-warning shrink-0" />
-            <span className="text-warning text-sm">
-              Analysis is taking longer than expected. The server may still be processing — refresh
-              the page or try again.
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            className="p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            <AlertTriangle size={18} className="text-error shrink-0" />
-            <span className="text-error text-sm">{error}</span>
-            <button
-              onClick={() => setError(null)}
-              className="ml-auto text-error/60 hover:text-error"
-              aria-label="Dismiss error"
+        <AnimatePresence>
+          {streamTimedOut && !uploading && (
+            <motion.div
+              className="p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
             >
-              <X size={16} />
-            </button>
-          </motion.div>
+              <AlertTriangle size={18} className="text-warning shrink-0" />
+              <span className="text-warning text-sm">
+                Analysis is taking longer than expected. The server may still be processing —
+                refresh the page or try again.
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              className="p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <AlertTriangle size={18} className="text-error shrink-0" />
+              <span className="text-error text-sm">{error}</span>
+              <button
+                onClick={() => setError(null)}
+                className="ml-auto text-error/60 hover:text-error"
+                aria-label="Dismiss error"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {outcomeReminder && (
+          <OutcomeGateBanner
+            pendingCount={outcomeReminder.pendingCount}
+            pendingAnalysisIds={outcomeReminder.analysisIds}
+            onDismiss={() => setOutcomeReminder(null)}
+          />
         )}
-      </AnimatePresence>
 
-      {outcomeReminder && (
-        <OutcomeGateBanner
-          pendingCount={outcomeReminder.pendingCount}
-          pendingAnalysisIds={outcomeReminder.analysisIds}
-          onDismiss={() => setOutcomeReminder(null)}
-        />
-      )}
+        <SampleDataBanner />
+        <DraftOutcomeBanner />
 
-      <SampleDataBanner />
-      <DraftOutcomeBanner />
+        {hardGateInfo && hardGateInfo.level === 'hard' ? (
+          // Hard-blocking modal: the upload was actually rejected by the API
+          // (Organization.enforceOutcomeGate=true + 5+ pending outcomes past
+          // 30 days). User must log an outcome before they can proceed —
+          // not dismissible. Phase 2 of Outcome Gate Enforcement (locked
+          // 2026-04-26).
+          <OutcomeGateModal
+            gateInfo={hardGateInfo}
+            onClose={() => setHardGateInfo(null)}
+            onOutcomeSubmitted={() => {
+              // Outcome logged — clear gate state so user can re-attempt
+              // the upload. The next /api/analyze/stream call will pass
+              // the gate (assuming pending count dropped below threshold).
+              setHardGateInfo(null);
+            }}
+          />
+        ) : hardGateInfo ? (
+          // Soft / legacy reminder: dismissible banner.
+          <OutcomeGateBanner
+            pendingCount={hardGateInfo.pendingCount}
+            pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
+            level="hard"
+            onDismiss={() => setHardGateInfo(null)}
+          />
+        ) : null}
 
-      {hardGateInfo && hardGateInfo.level === 'hard' ? (
-        // Hard-blocking modal: the upload was actually rejected by the API
-        // (Organization.enforceOutcomeGate=true + 5+ pending outcomes past
-        // 30 days). User must log an outcome before they can proceed —
-        // not dismissible. Phase 2 of Outcome Gate Enforcement (locked
-        // 2026-04-26).
-        <OutcomeGateModal
-          gateInfo={hardGateInfo}
-          onClose={() => setHardGateInfo(null)}
-          onOutcomeSubmitted={() => {
-            // Outcome logged — clear gate state so user can re-attempt
-            // the upload. The next /api/analyze/stream call will pass
-            // the gate (assuming pending count dropped below threshold).
-            setHardGateInfo(null);
-          }}
-        />
-      ) : hardGateInfo ? (
-        // Soft / legacy reminder: dismissible banner.
-        <OutcomeGateBanner
-          pendingCount={hardGateInfo.pendingCount}
-          pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
-          level="hard"
-          onDismiss={() => setHardGateInfo(null)}
-        />
-      ) : null}
+        <OnboardingGuide documentCount={totalDocs ?? 0} />
+        <DecisionTriageWidget />
+        <ErrorBoundary sectionName="Nudges">
+          <NudgeWidget />
+        </ErrorBoundary>
 
-      <OnboardingGuide documentCount={totalDocs ?? 0} />
-      <DecisionTriageWidget />
-      <ErrorBoundary sectionName="Nudges">
-        <NudgeWidget />
-      </ErrorBoundary>
-
-      {/* Container roll-up widget (Phase 3 P3.5 — replaces deleted
+        {/* Container roll-up widget (Phase 3 P3.5 — replaces deleted
          UnifiedDecisionsFeed). Top-5 most-recently-updated decisions
          across all modes. */}
-      <ErrorBoundary sectionName="Active decisions">
-        <ContainersWidget />
-      </ErrorBoundary>
+        <ErrorBoundary sectionName="Active decisions">
+          <ContainersWidget />
+        </ErrorBoundary>
 
-      {/* JournalWidget removed Phase C 2026-05-09 evening — redundant
+        {/* JournalWidget removed Phase C 2026-05-09 evening — redundant
           with the unified journal + audits feed at
           /dashboard/decisions?view=log (folded in 2026-05-10 Phase G).
           Sidebar surfaces Decisions one click away; the dashboard widget
           added noise without new signal. */}
 
-      {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
-      {activeView === 'upload' && (
-        <>
-          {/* Upload Confirmation Dialog */}
-          <Dialog
-            open={!!pendingFile && !uploading}
-            onOpenChange={(isOpen: boolean) => {
-              if (!isOpen) {
-                setPendingFile(null);
-                setSelectedDocType('');
-                setSelectedDealId('');
-              }
-            }}
-          >
-            <DialogContent className="sm:max-w-md" showCloseButton>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-base">
-                  <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
-                  Ready to Analyze
-                </DialogTitle>
-                <DialogDescription>
-                  Review file details and optionally tag before analysis.
-                </DialogDescription>
-              </DialogHeader>
-
-              {pendingFile && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {/* File preview */}
-                  <div
-                    className="flex items-center gap-md"
-                    style={{
-                      padding: 'var(--spacing-md)',
-                      background: 'var(--bg-card)',
-                      borderRadius: 8,
-                      border: '1px solid var(--border-color)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 44,
-                        height: 44,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--bg-tertiary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: 8,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <FileText size={22} className="text-accent-primary" />
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <p
-                        className="font-medium text-sm"
-                        style={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {pendingFile.name}
-                      </p>
-                      <p className="text-xs text-muted">
-                        {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
-                        {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {(() => {
-                    const preview = getBiasPreview(pendingFile.name, selectedDocType);
-                    return (
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: 'var(--text-muted)',
-                          lineHeight: 1.5,
-                          padding: '8px 12px',
-                          background: 'rgba(22, 163, 74, 0.06)',
-                          border: '1px solid rgba(22, 163, 74, 0.18)',
-                          borderRadius: 8,
-                        }}
-                      >
-                        Looks like a {preview.docTypeLabel} — we&apos;ll check for{' '}
-                        {preview.biasLabels.map((b, idx) => (
-                          <span key={b}>
-                            <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
-                              {b}
-                            </span>
-                            {idx < preview.biasLabels.length - 1 ? ' + ' : ''}
-                          </span>
-                        ))}{' '}
-                        first.
-                      </div>
-                    );
-                  })()}
-
-                  {/* Document type + Deal selectors — stacked for clarity */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    <div>
-                      <label
-                        className="text-xs text-muted font-medium"
-                        style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
-                      >
-                        Document Type <span className="text-muted">(optional)</span>
-                      </label>
-                      <select
-                        value={selectedDocType}
-                        onChange={e => setSelectedDocType(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '8px 10px',
-                          background: 'rgba(255, 255, 255, 0.06)',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          borderRadius: 8,
-                          color: 'var(--text-primary)',
-                          fontSize: 13,
-                          outline: 'none',
-                        }}
-                      >
-                        <option value="">Select type...</option>
-                        {DOCUMENT_TYPES.map(t => (
-                          <option key={t.value} value={t.value}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        className="text-xs text-muted font-medium"
-                        style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
-                      >
-                        Link to Deal <span className="text-muted">(optional)</span>
-                      </label>
-                      <select
-                        value={selectedDealId}
-                        onChange={e => setSelectedDealId(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '8px 10px',
-                          background: 'rgba(255, 255, 255, 0.06)',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          borderRadius: 8,
-                          color: 'var(--text-primary)',
-                          fontSize: 13,
-                          outline: 'none',
-                        }}
-                      >
-                        <option value="">Select deal...</option>
-                        {(() => {
-                          // Sort by updatedAt desc (proxy for "recently used");
-                          // pin top 3 at the top under a "Recent" optgroup, render
-                          // the rest alphabetically below so a CSO with 40+ deals
-                          // still finds the one they touched yesterday in one click.
-                          const byRecency = [...dealsList].sort((a, b) => {
-                            const aT = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-                            const bT = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-                            return bT - aT;
-                          });
-                          const recent = byRecency.slice(0, 3);
-                          const recentIds = new Set(recent.map(d => d.id));
-                          const rest = [...dealsList]
-                            .filter(d => !recentIds.has(d.id))
-                            .sort((a, b) => a.name.localeCompare(b.name));
-                          return (
-                            <>
-                              {recent.length > 0 && (
-                                <optgroup label="Recent">
-                                  {recent.map(d => (
-                                    <option key={d.id} value={d.id}>
-                                      {d.name}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              )}
-                              {rest.length > 0 && (
-                                <optgroup label={recent.length > 0 ? 'All deals' : undefined}>
-                                  {rest.map(d => (
-                                    <option key={d.id} value={d.id}>
-                                      {d.name}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <DialogFooter>
-                    <button
-                      onClick={() => {
-                        setPendingFile(null);
-                        setSelectedDocType('');
-                        setSelectedDealId('');
-                      }}
-                      className="btn btn-ghost text-sm"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmUpload}
-                      className="btn btn-primary flex items-center gap-sm"
-                    >
-                      <Brain size={16} />
-                      Start Analysis
-                    </button>
-                  </DialogFooter>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-
-          {/* Decision Frame Context Banner */}
-          {activeFrameStatement && (
-            <div
-              className="card mb-md animate-fade-in"
-              style={{
-                padding: 'var(--spacing-md)',
-                background: 'rgba(22, 163, 74, 0.08)',
-                border: '1px solid rgba(22, 163, 74, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--spacing-sm)',
+        {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
+        {activeView === 'upload' && (
+          <>
+            {/* Upload Confirmation Dialog */}
+            <Dialog
+              open={!!pendingFile && !uploading}
+              onOpenChange={(isOpen: boolean) => {
+                if (!isOpen) {
+                  setPendingFile(null);
+                  setSelectedDocType('');
+                  setSelectedDealId('');
+                }
               }}
             >
-              <FileText size={16} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: '11px',
-                    color: 'var(--accent-primary)',
-                    fontWeight: 600,
-                    marginBottom: '2px',
-                  }}
-                >
-                  Decision Frame Active
-                </div>
-                <div
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--text-primary)',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {activeFrameStatement}
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setActiveFrameId(null);
-                  setActiveFrameStatement(null);
-                }}
+              <DialogContent className="sm:max-w-md" showCloseButton>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2 text-base">
+                    <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
+                    Ready to Analyze
+                  </DialogTitle>
+                  <DialogDescription>
+                    Review file details and optionally tag before analysis.
+                  </DialogDescription>
+                </DialogHeader>
+
+                {pendingFile && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {/* File preview */}
+                    <div
+                      className="flex items-center gap-md"
+                      style={{
+                        padding: 'var(--spacing-md)',
+                        background: 'var(--bg-card)',
+                        borderRadius: 8,
+                        border: '1px solid var(--border-color)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 44,
+                          height: 44,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'var(--bg-tertiary)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 8,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <FileText size={22} className="text-accent-primary" />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p
+                          className="font-medium text-sm"
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {pendingFile.name}
+                        </p>
+                        <p className="text-xs text-muted">
+                          {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
+                          {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {(() => {
+                      const preview = getBiasPreview(pendingFile.name, selectedDocType);
+                      return (
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: 'var(--text-muted)',
+                            lineHeight: 1.5,
+                            padding: '8px 12px',
+                            background: 'rgba(22, 163, 74, 0.06)',
+                            border: '1px solid rgba(22, 163, 74, 0.18)',
+                            borderRadius: 8,
+                          }}
+                        >
+                          Looks like a {preview.docTypeLabel} — we&apos;ll check for{' '}
+                          {preview.biasLabels.map((b, idx) => (
+                            <span key={b}>
+                              <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+                                {b}
+                              </span>
+                              {idx < preview.biasLabels.length - 1 ? ' + ' : ''}
+                            </span>
+                          ))}{' '}
+                          first.
+                        </div>
+                      );
+                    })()}
+
+                    {/* Document type + Deal selectors — stacked for clarity */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div>
+                        <label
+                          className="text-xs text-muted font-medium"
+                          style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
+                        >
+                          Document Type <span className="text-muted">(optional)</span>
+                        </label>
+                        <select
+                          value={selectedDocType}
+                          onChange={e => setSelectedDocType(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '8px 10px',
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            borderRadius: 8,
+                            color: 'var(--text-primary)',
+                            fontSize: 13,
+                            outline: 'none',
+                          }}
+                        >
+                          <option value="">Select type...</option>
+                          {DOCUMENT_TYPES.map(t => (
+                            <option key={t.value} value={t.value}>
+                              {t.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className="text-xs text-muted font-medium"
+                          style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
+                        >
+                          Link to Deal <span className="text-muted">(optional)</span>
+                        </label>
+                        <select
+                          value={selectedDealId}
+                          onChange={e => setSelectedDealId(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '8px 10px',
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            borderRadius: 8,
+                            color: 'var(--text-primary)',
+                            fontSize: 13,
+                            outline: 'none',
+                          }}
+                        >
+                          <option value="">Select deal...</option>
+                          {(() => {
+                            // Sort by updatedAt desc (proxy for "recently used");
+                            // pin top 3 at the top under a "Recent" optgroup, render
+                            // the rest alphabetically below so a CSO with 40+ deals
+                            // still finds the one they touched yesterday in one click.
+                            const byRecency = [...dealsList].sort((a, b) => {
+                              const aT = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+                              const bT = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+                              return bT - aT;
+                            });
+                            const recent = byRecency.slice(0, 3);
+                            const recentIds = new Set(recent.map(d => d.id));
+                            const rest = [...dealsList]
+                              .filter(d => !recentIds.has(d.id))
+                              .sort((a, b) => a.name.localeCompare(b.name));
+                            return (
+                              <>
+                                {recent.length > 0 && (
+                                  <optgroup label="Recent">
+                                    {recent.map(d => (
+                                      <option key={d.id} value={d.id}>
+                                        {d.name}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                                {rest.length > 0 && (
+                                  <optgroup label={recent.length > 0 ? 'All deals' : undefined}>
+                                    {rest.map(d => (
+                                      <option key={d.id} value={d.id}>
+                                        {d.name}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <DialogFooter>
+                      <button
+                        onClick={() => {
+                          setPendingFile(null);
+                          setSelectedDocType('');
+                          setSelectedDealId('');
+                        }}
+                        className="btn btn-ghost text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={confirmUpload}
+                        className="btn btn-primary flex items-center gap-sm"
+                      >
+                        <Brain size={16} />
+                        Start Analysis
+                      </button>
+                    </DialogFooter>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+
+            {/* Decision Frame Context Banner */}
+            {activeFrameStatement && (
+              <div
+                className="card mb-md animate-fade-in"
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--text-muted)',
-                  padding: '4px',
+                  padding: 'var(--spacing-md)',
+                  background: 'rgba(22, 163, 74, 0.08)',
+                  border: '1px solid rgba(22, 163, 74, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-sm)',
                 }}
               >
-                <X size={14} />
-              </button>
-            </div>
-          )}
-
-          {/* 4.2 deep — first-run walkthrough renders only when the org
-              has zero analyses, no upload in flight, and no paste session
-              already open. Dismissible per-org via localStorage. */}
-          {uploadedDocs.length === 0 &&
-            !uploading &&
-            !pendingFile &&
-            !lastCompletedAnalysis &&
-            inlineMode === 'none' && (
-              <FirstRunInlineWalkthrough
-                visible
-                onLoadAndRun={bundle => {
-                  setPasteSeed({ content: bundle.content, autoSubmit: true });
-                  setInlineMode('paste');
-                }}
-                onLoadOnly={bundle => {
-                  setPasteSeed({ content: bundle.content, autoSubmit: false });
-                  setInlineMode('paste');
-                }}
-              />
+                <FileText size={16} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: '11px',
+                      color: 'var(--accent-primary)',
+                      fontWeight: 600,
+                      marginBottom: '2px',
+                    }}
+                  >
+                    Decision Frame Active
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '13px',
+                      color: 'var(--text-primary)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {activeFrameStatement}
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setActiveFrameId(null);
+                    setActiveFrameStatement(null);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text-muted)',
+                    padding: '4px',
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
             )}
 
-          {/* Upload Zone - Enhanced with drag feedback */}
-          <ErrorBoundary sectionName="Upload">
-            {!uploading && !pendingFile && lastCompletedAnalysis ? (
-              <>
-                {/* Empathic-mode Discovery card for cold users (first 3
+            {/* 4.2 deep — first-run walkthrough renders only when the org
+              has zero analyses, no upload in flight, and no paste session
+              already open. Dismissible per-org via localStorage. */}
+            {uploadedDocs.length === 0 &&
+              !uploading &&
+              !pendingFile &&
+              !lastCompletedAnalysis &&
+              inlineMode === 'none' && (
+                <FirstRunInlineWalkthrough
+                  visible
+                  onLoadAndRun={bundle => {
+                    setPasteSeed({ content: bundle.content, autoSubmit: true });
+                    setInlineMode('paste');
+                  }}
+                  onLoadOnly={bundle => {
+                    setPasteSeed({ content: bundle.content, autoSubmit: false });
+                    setInlineMode('paste');
+                  }}
+                />
+              )}
+
+            {/* Upload Zone - Enhanced with drag feedback */}
+            <ErrorBoundary sectionName="Upload">
+              {!uploading && !pendingFile && lastCompletedAnalysis ? (
+                <>
+                  {/* Empathic-mode Discovery card for cold users (first 3
                     audits). totalDocs already counts the just-completed
                     audit, so `<= 3` matches the founder's "first three
                     audits" cold-context window. The discovery card sets
@@ -1590,542 +1591,547 @@ export default function Dashboard() {
                     artefactLabel + topBiasLabel from the just-completed
                     analysis so the framing reads "your decision" not
                     "a generic sample". (C4 lock 2026-04-28.) */}
-                {(totalDocs ?? 0) <= 3 && lastCompletedAnalysis.detectedBiases.length > 0 && (
-                  <div style={{ marginBottom: 'var(--spacing-md)' }}>
-                    <DiscoveryGradeImpactCard
-                      variant="post-upload"
-                      anchor={
-                        {
-                          ...STATIC_DEMO_ANCHOR,
-                          contextLabel: 'Your audit',
-                          artefactLabel: lastCompletedAnalysis.filename,
-                          topBiasLabel: lastCompletedAnalysis.detectedBiases[0]?.type
-                            ? lastCompletedAnalysis.detectedBiases[0].type
-                                .replace(/_/g, ' ')
-                                .replace(/\b\w/g, (c: string) => c.toUpperCase())
-                            : STATIC_DEMO_ANCHOR.topBiasLabel,
-                        } satisfies DiscoveryGradeAnchor
-                      }
-                      ctaLabel="See what your audit found ↓"
-                      ctaHref="#inline-analysis-result"
+                  {(totalDocs ?? 0) <= 3 && lastCompletedAnalysis.detectedBiases.length > 0 && (
+                    <div style={{ marginBottom: 'var(--spacing-md)' }}>
+                      <DiscoveryGradeImpactCard
+                        variant="post-upload"
+                        anchor={
+                          {
+                            ...STATIC_DEMO_ANCHOR,
+                            contextLabel: 'Your audit',
+                            artefactLabel: lastCompletedAnalysis.filename,
+                            topBiasLabel: lastCompletedAnalysis.detectedBiases[0]?.type
+                              ? lastCompletedAnalysis.detectedBiases[0].type
+                                  .replace(/_/g, ' ')
+                                  .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                              : STATIC_DEMO_ANCHOR.topBiasLabel,
+                          } satisfies DiscoveryGradeAnchor
+                        }
+                        ctaLabel="See what your audit found ↓"
+                        ctaHref="#inline-analysis-result"
+                      />
+                    </div>
+                  )}
+                  <div id="inline-analysis-result">
+                    <InlineAnalysisResultCard
+                      analysis={lastCompletedAnalysis}
+                      onDismiss={() => setLastCompletedAnalysis(null)}
+                      preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
                     />
                   </div>
-                )}
-                <div id="inline-analysis-result">
-                  <InlineAnalysisResultCard
-                    analysis={lastCompletedAnalysis}
-                    onDismiss={() => setLastCompletedAnalysis(null)}
-                    preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
-                  />
-                </div>
-              </>
-            ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
-              <InlinePasteMemoCard
-                onClose={() => {
-                  setInlineMode('none');
-                  setPasteSeed(null);
-                }}
-                initialContent={pasteSeed?.content}
-                autoSubmit={pasteSeed?.autoSubmit ?? false}
-              />
-            ) : !uploading && !pendingFile ? (
-              <>
-                <div
-                  id="onborda-upload"
-                  className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => document.getElementById('file-input')?.click()}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Upload document. Drop a file or click to browse."
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ')
-                      document.getElementById('file-input')?.click();
+                </>
+              ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
+                <InlinePasteMemoCard
+                  onClose={() => {
+                    setInlineMode('none');
+                    setPasteSeed(null);
                   }}
-                >
-                  <input
-                    type="file"
-                    id="file-input"
-                    hidden
-                    multiple
-                    accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
-                    disabled={uploading}
-                    onChange={handleFileSelect}
-                  />
+                  initialContent={pasteSeed?.content}
+                  autoSubmit={pasteSeed?.autoSubmit ?? false}
+                />
+              ) : !uploading && !pendingFile ? (
+                <>
                   <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 18,
-                      textAlign: 'center',
-                      padding: '12px 0',
+                    id="onborda-upload"
+                    className={`upload-zone liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById('file-input')?.click()}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Upload document. Drop a file or click to browse."
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ')
+                        document.getElementById('file-input')?.click();
                     }}
                   >
+                    <input
+                      type="file"
+                      id="file-input"
+                      hidden
+                      multiple
+                      accept=".pdf,.txt,.md,.docx,.pptx,.xlsx,.csv,.html,.htm"
+                      disabled={uploading}
+                      onChange={handleFileSelect}
+                    />
                     <div
                       style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.14em',
-                        color: 'var(--accent-primary)',
-                      }}
-                    >
-                      Upload · 60-second audit
-                    </div>
-                    <div
-                      style={{
-                        width: 84,
-                        height: 84,
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 'var(--radius-xl)',
-                        background: isDragOver
-                          ? 'rgba(22, 163, 74, 0.18)'
-                          : 'linear-gradient(135deg, rgba(22,163,74,0.14) 0%, rgba(22,163,74,0.06) 100%)',
-                        border: `2px solid rgba(22, 163, 74, ${isDragOver ? 0.5 : 0.24})`,
-                        transition: 'all 0.2s ease',
-                        transform: isDragOver ? 'scale(1.08)' : 'scale(1)',
-                        boxShadow: isDragOver
-                          ? '0 10px 30px rgba(22, 163, 74, 0.24)'
-                          : '0 4px 18px rgba(22, 163, 74, 0.08)',
+                        gap: 18,
+                        textAlign: 'center',
+                        padding: '12px 0',
                       }}
                     >
-                      {isDragOver ? (
-                        <CloudUpload size={36} style={{ color: 'var(--accent-primary)' }} />
-                      ) : (
-                        <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
-                      )}
-                    </div>
-                    <div style={{ maxWidth: 480 }}>
-                      <p
+                      <div
                         style={{
-                          fontSize: 'clamp(18px, 2.2vw, 22px)',
+                          fontSize: 11,
                           fontWeight: 700,
-                          color: 'var(--text-primary)',
-                          letterSpacing: '-0.01em',
-                          lineHeight: 1.25,
-                          margin: 0,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.14em',
+                          color: 'var(--accent-primary)',
                         }}
                       >
-                        {isDragOver
-                          ? 'Drop to upload'
-                          : 'Drop your strategic memo (or up to 10), or click to browse'}
-                      </p>
-                      <p
+                        Upload · 60-second audit
+                      </div>
+                      <div
                         style={{
-                          fontSize: 14,
-                          color: 'var(--text-secondary)',
-                          marginTop: 8,
-                          lineHeight: 1.55,
+                          width: 84,
+                          height: 84,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 'var(--radius-xl)',
+                          background: isDragOver
+                            ? 'rgba(22, 163, 74, 0.18)'
+                            : 'linear-gradient(135deg, rgba(22,163,74,0.14) 0%, rgba(22,163,74,0.06) 100%)',
+                          border: `2px solid rgba(22, 163, 74, ${isDragOver ? 0.5 : 0.24})`,
+                          transition: 'all 0.2s ease',
+                          transform: isDragOver ? 'scale(1.08)' : 'scale(1)',
+                          boxShadow: isDragOver
+                            ? '0 10px 30px rgba(22, 163, 74, 0.24)'
+                            : '0 4px 18px rgba(22, 163, 74, 0.08)',
                         }}
                       >
-                        Board decks, market-entry recommendations, M&amp;A memos, investment theses.
-                        You&apos;ll have a full DQI grade, flagged biases, and predicted CEO
-                        questions before your next meeting.
-                      </p>
-                      <p className="text-xs text-muted" style={{ marginTop: 10 }}>
-                        PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
-                      </p>
-                      {billingData && billingData.limits.analysesPerMonth > 0 && (
-                        <p className="text-xs text-muted" style={{ marginTop: 6 }}>
-                          {billingData.usage.analysesThisMonth}/
-                          {billingData.limits.analysesPerMonth} analyses used this month (
-                          {billingData.planName})
-                        </p>
-                      )}
-                      {billingData &&
-                        billingData.limits.analysesPerMonth > 0 &&
-                        billingData.plan === 'free' &&
-                        billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >=
-                          0.8 && (
-                          <Link
-                            href="/dashboard/settings"
-                            className="text-xs"
-                            style={{
-                              marginTop: '6px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              color: 'var(--warning, #eab308)',
-                              fontWeight: 600,
-                            }}
-                          >
-                            <AlertTriangle size={12} />
-                            {billingData.usage.analysesThisMonth >=
-                            billingData.limits.analysesPerMonth
-                              ? 'Limit reached — upgrade to continue analyzing'
-                              : 'Approaching limit — upgrade for more analyses'}
-                          </Link>
+                        {isDragOver ? (
+                          <CloudUpload size={36} style={{ color: 'var(--accent-primary)' }} />
+                        ) : (
+                          <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
                         )}
+                      </div>
+                      <div style={{ maxWidth: 480 }}>
+                        <p
+                          style={{
+                            fontSize: 'clamp(18px, 2.2vw, 22px)',
+                            fontWeight: 700,
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.01em',
+                            lineHeight: 1.25,
+                            margin: 0,
+                          }}
+                        >
+                          {isDragOver
+                            ? 'Drop to upload'
+                            : 'Drop your strategic memo (or up to 10), or click to browse'}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 14,
+                            color: 'var(--text-secondary)',
+                            marginTop: 8,
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          Board decks, market-entry recommendations, M&amp;A memos, investment
+                          theses. You&apos;ll have a full DQI grade, flagged biases, and predicted
+                          CEO questions before your next meeting.
+                        </p>
+                        <p className="text-xs text-muted" style={{ marginTop: 10 }}>
+                          PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
+                        </p>
+                        {billingData && billingData.limits.analysesPerMonth > 0 && (
+                          <p className="text-xs text-muted" style={{ marginTop: 6 }}>
+                            {billingData.usage.analysesThisMonth}/
+                            {billingData.limits.analysesPerMonth} analyses used this month (
+                            {billingData.planName})
+                          </p>
+                        )}
+                        {billingData &&
+                          billingData.limits.analysesPerMonth > 0 &&
+                          billingData.plan === 'free' &&
+                          billingData.usage.analysesThisMonth /
+                            billingData.limits.analysesPerMonth >=
+                            0.8 && (
+                            <Link
+                              href="/dashboard/settings"
+                              className="text-xs"
+                              style={{
+                                marginTop: '6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                color: 'var(--warning, #eab308)',
+                                fontWeight: 600,
+                              }}
+                            >
+                              <AlertTriangle size={12} />
+                              {billingData.usage.analysesThisMonth >=
+                              billingData.limits.analysesPerMonth
+                                ? 'Limit reached — upgrade to continue analyzing'
+                                : 'Approaching limit — upgrade for more analyses'}
+                            </Link>
+                          )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Reassurance chip strip — calms first-time anxiety. Shows only
+                  {/* Reassurance chip strip — calms first-time anxiety. Shows only
                   on the empty dropzone state (not during upload / analyzing
                   so we don't duplicate feedback). */}
-                {!uploading && !pendingFile && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      gap: 8,
-                      flexWrap: 'wrap',
-                      marginTop: 14,
-                    }}
-                  >
-                    {[
-                      { label: 'Under 60 seconds', icon: <Zap size={12} /> },
-                      { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
-                      { label: 'Never used for training', icon: <LockIcon size={12} /> },
-                      ...(billingData?.plan === 'free' && billingData?.limits?.analysesPerMonth > 0
-                        ? [
-                            {
-                              label: `${billingData.limits.analysesPerMonth} free this month`,
-                              icon: <Sparkles size={12} />,
-                            },
-                          ]
-                        : []),
-                    ].map(chip => (
-                      <span
-                        key={chip.label}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          fontSize: 11.5,
-                          fontWeight: 600,
-                          color: 'var(--text-secondary)',
-                          background: 'var(--bg-card)',
-                          border: '1px solid var(--border-color)',
-                          padding: '6px 12px',
-                          borderRadius: 999,
-                        }}
-                      >
-                        <span style={{ color: 'var(--accent-primary)', display: 'inline-flex' }}>
-                          {chip.icon}
+                  {!uploading && !pendingFile && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginTop: 14,
+                      }}
+                    >
+                      {[
+                        { label: 'Under 60 seconds', icon: <Zap size={12} /> },
+                        { label: 'SOC 2-ready · AES-256', icon: <Shield size={12} /> },
+                        { label: 'Never used for training', icon: <LockIcon size={12} /> },
+                        ...(billingData?.plan === 'free' &&
+                        billingData?.limits?.analysesPerMonth > 0
+                          ? [
+                              {
+                                label: `${billingData.limits.analysesPerMonth} free this month`,
+                                icon: <Sparkles size={12} />,
+                              },
+                            ]
+                          : []),
+                      ].map(chip => (
+                        <span
+                          key={chip.label}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            color: 'var(--text-secondary)',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-color)',
+                            padding: '6px 12px',
+                            borderRadius: 999,
+                          }}
+                        >
+                          <span style={{ color: 'var(--accent-primary)', display: 'inline-flex' }}>
+                            {chip.icon}
+                          </span>
+                          {chip.label}
                         </span>
-                        {chip.label}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {/* Four doors row — every ingestion mode on one surface.
+                      ))}
+                    </div>
+                  )}
+                  {/* Four doors row — every ingestion mode on one surface.
                     File upload is the default (the dropzone above); the
                     three alternative modes route to their dedicated pages
                     without forcing a trip through the sidebar. Consolidates
                     the "same pipeline, different door" UX so cognitive-
                     audits/submit, meetings/new, and the email inbound
                     setup are all one click from /dashboard. */}
-                {!uploading && !pendingFile && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      gap: 10,
-                      flexWrap: 'wrap',
-                      marginTop: 18,
-                      fontSize: 12,
-                    }}
-                  >
-                    <span style={{ color: 'var(--text-muted)' }}>Not uploading a file?</span>
-                    <button
-                      type="button"
-                      onClick={() => setInlineMode('paste')}
+                  {!uploading && !pendingFile && (
+                    <div
                       style={{
-                        display: 'inline-flex',
+                        display: 'flex',
+                        justifyContent: 'center',
                         alignItems: 'center',
-                        gap: 5,
-                        fontWeight: 600,
-                        color: 'var(--accent-primary)',
-                        background: 'transparent',
-                        border: 'none',
-                        padding: 0,
-                        cursor: 'pointer',
-                        fontSize: 'inherit',
+                        gap: 10,
+                        flexWrap: 'wrap',
+                        marginTop: 18,
+                        fontSize: 12,
                       }}
                     >
-                      <BrainCircuit size={13} />
-                      Paste text
-                    </button>
-                    <span style={{ color: 'var(--border-color)' }}>·</span>
-                    <Link
-                      href="/dashboard/cognitive-audits/submit?source=meeting_recording"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        fontWeight: 600,
-                        color: 'var(--accent-primary)',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <Video size={13} />
-                      Submit a meeting
-                    </Link>
-                    <span style={{ color: 'var(--border-color)' }}>·</span>
-                    <Link
-                      href="/dashboard/settings/integrations"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        fontWeight: 600,
-                        color: 'var(--accent-primary)',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <Mail size={13} />
-                      Email inbox
-                    </Link>
-                  </div>
-                )}
-              </>
-            ) : uploading ? (
-              uploadPhase === 'uploading' ? (
-                // While the file is still transferring, show a compact
-                // upload-progress bar. The unified AnalysisShell takes over
-                // once the server has accepted the upload and streaming begins.
-                <div className="card">
-                  <div className="card-body">
-                    <div className="flex items-center justify-between mb-md">
-                      <div className="flex items-center gap-sm">
-                        <CloudUpload size={16} className="text-accent-primary" />
-                        <span className="text-sm font-medium">Uploading document…</span>
-                      </div>
-                      <span
-                        className="text-sm font-semibold"
-                        style={{ color: 'var(--text-highlight)' }}
+                      <span style={{ color: 'var(--text-muted)' }}>Not uploading a file?</span>
+                      <button
+                        type="button"
+                        onClick={() => setInlineMode('paste')}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          fontWeight: 600,
+                          color: 'var(--accent-primary)',
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          fontSize: 'inherit',
+                        }}
                       >
-                        {uploadProgress}%
-                      </span>
+                        <BrainCircuit size={13} />
+                        Paste text
+                      </button>
+                      <span style={{ color: 'var(--border-color)' }}>·</span>
+                      <Link
+                        href="/dashboard/cognitive-audits/submit?source=meeting_recording"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          fontWeight: 600,
+                          color: 'var(--accent-primary)',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <Video size={13} />
+                        Submit a meeting
+                      </Link>
+                      <span style={{ color: 'var(--border-color)' }}>·</span>
+                      <Link
+                        href="/dashboard/settings/integrations"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          fontWeight: 600,
+                          color: 'var(--accent-primary)',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <Mail size={13} />
+                        Email inbox
+                      </Link>
                     </div>
-                    <div className="progress-bar">
-                      <div
-                        className="progress-bar-fill"
-                        style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease' }}
-                      />
+                  )}
+                </>
+              ) : uploading ? (
+                uploadPhase === 'uploading' ? (
+                  // While the file is still transferring, show a compact
+                  // upload-progress bar. The unified AnalysisShell takes over
+                  // once the server has accepted the upload and streaming begins.
+                  <div className="card">
+                    <div className="card-body">
+                      <div className="flex items-center justify-between mb-md">
+                        <div className="flex items-center gap-sm">
+                          <CloudUpload size={16} className="text-accent-primary" />
+                          <span className="text-sm font-medium">Uploading document…</span>
+                        </div>
+                        <span
+                          className="text-sm font-semibold"
+                          style={{ color: 'var(--text-highlight)' }}
+                        >
+                          {uploadProgress}%
+                        </span>
+                      </div>
+                      <div className="progress-bar">
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease' }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <AnalysisShell
-                  filename={pendingFile?.name ?? 'Strategic memo'}
-                  currentProgress={currentProgress}
-                  steps={analysisSteps}
-                  biasCount={biasCountRef.current}
-                  onCancel={() => {
-                    cancelAnalysis();
-                    setUploading(false);
-                  }}
-                />
-              )
-            ) : null}
-          </ErrorBoundary>
+                ) : (
+                  <AnalysisShell
+                    filename={pendingFile?.name ?? 'Strategic memo'}
+                    currentProgress={currentProgress}
+                    steps={analysisSteps}
+                    biasCount={biasCountRef.current}
+                    onCancel={() => {
+                      cancelAnalysis();
+                      setUploading(false);
+                    }}
+                  />
+                )
+              ) : null}
+            </ErrorBoundary>
 
-          {/* Bulk Upload — locked 2026-05-10 streamlining batch.
+            {/* Bulk Upload — locked 2026-05-10 streamlining batch.
               Previously rendered as an always-visible separate card
               below the main upload zone (two upload boxes). Now mounts
               ONLY when the user drops/selects 2+ files on the main
               upload zone, with the dropped files pre-populated in the
               queue. Single upload box, dual-mode (single-file confirm
               modal vs bulk queue) — the founder's ask. */}
-          {bulkFiles && bulkFiles.length > 0 && (
-            <ErrorBoundary sectionName="Bulk Upload">
-              <BulkUploadPanel
-                initialFiles={bulkFiles}
-                onComplete={() => mutateDocs?.()}
-                onDismiss={() => setBulkFiles(null)}
-              />
-            </ErrorBoundary>
-          )}
-
-          {/* Currently Analyzing Section */}
-          <ErrorBoundary sectionName="Documents">
-            {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
-              <div className="section">
-                <h2 className="section-header flex items-center gap-2">
-                  <Loader2 size={18} className="animate-spin text-accent-primary" />
-                  Currently Analyzing
-                </h2>
-                <div className="space-y-3">
-                  {uploadedDocs
-                    .filter(d => d.status === 'analyzing')
-                    .map(doc => (
-                      <div
-                        key={doc.id}
-                        className="card"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.06)',
-                          borderColor: 'rgba(255, 255, 255, 0.15)',
-                        }}
-                      >
-                        <div className="card-body flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div
-                              style={{
-                                width: 36,
-                                height: 36,
-                                borderRadius: 'var(--radius-md)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'rgba(255, 255, 255, 0.06)',
-                              }}
-                            >
-                              <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
-                            </div>
-                            <div>
-                              <span className="font-medium text-sm inline-flex items-center gap-2">
-                                {doc.filename}
-                                {doc.isSample && <SampleBadge size="xs" />}
-                              </span>
-                              <p className="text-xs text-muted mt-0.5">
-                                Analysis in progress — results will appear when complete
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="progress-bar" style={{ width: 80 }}>
-                              <div
-                                className="progress-bar-fill animate-pulse"
-                                style={{ width: '60%' }}
-                              />
-                            </div>
-                            <Loader2
-                              size={16}
-                              className="animate-spin text-accent-primary shrink-0"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
+            {bulkFiles && bulkFiles.length > 0 && (
+              <ErrorBoundary sectionName="Bulk Upload">
+                <BulkUploadPanel
+                  initialFiles={bulkFiles}
+                  onComplete={() => mutateDocs?.()}
+                  onDismiss={() => setBulkFiles(null)}
+                />
+              </ErrorBoundary>
             )}
 
-            {/* Recent Analyses Section */}
-            {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
-              <div className="section">
-                <div
-                  className="flex items-center justify-between"
-                  style={{ marginBottom: 'var(--spacing-md)' }}
-                >
-                  <h2
-                    className="section-header flex items-center gap-2"
-                    style={{ marginBottom: 0 }}
-                  >
-                    <CheckCircle size={18} className="text-green-500" />
-                    Recent Analyses
+            {/* Currently Analyzing Section */}
+            <ErrorBoundary sectionName="Documents">
+              {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
+                <div className="section">
+                  <h2 className="section-header flex items-center gap-2">
+                    <Loader2 size={18} className="animate-spin text-accent-primary" />
+                    Currently Analyzing
                   </h2>
-                  <button
-                    onClick={() => setActiveView('browse')}
-                    className="text-sm text-secondary hover:text-primary hover:underline flex items-center gap-1"
-                  >
-                    View All <ChevronRight size={14} />
-                  </button>
-                </div>
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{
-                    hidden: {},
-                    visible: { transition: { staggerChildren: 0.06 } },
-                  }}
-                >
-                  {uploadedDocs
-                    .filter(d => d.status === 'complete')
-                    .slice(0, 6)
-                    .map(doc => (
-                      <motion.div
-                        key={doc.id}
-                        variants={{
-                          hidden: { opacity: 0, y: 16 },
-                          visible: { opacity: 1, y: 0 },
-                        }}
-                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                      >
-                        <Link
-                          href={`/documents/${doc.id}`}
-                          className="card group hover:border-[var(--border-hover)] transition-all"
-                          style={{ textDecoration: 'none', display: 'block' }}
+                  <div className="space-y-3">
+                    {uploadedDocs
+                      .filter(d => d.status === 'analyzing')
+                      .map(doc => (
+                        <div
+                          key={doc.id}
+                          className="card"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                          }}
                         >
-                          <div className="card-body">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <div
-                                  style={{
-                                    width: 32,
-                                    height: 32,
-                                    flexShrink: 0,
-                                    borderRadius: 'var(--radius-md)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    background: 'rgba(255, 255, 255, 0.06)',
-                                  }}
-                                >
-                                  <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
-                                </div>
-                                <span className="font-medium text-sm truncate max-w-[130px]">
-                                  {doc.filename}
-                                </span>
+                          <div className="card-body flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  borderRadius: 'var(--radius-md)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                }}
+                              >
+                                <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
                               </div>
-                              {doc.score !== undefined && (
-                                <span
-                                  className="text-sm font-bold shrink-0 ml-2"
-                                  style={{
-                                    color:
-                                      doc.score >= 70
-                                        ? 'var(--success)'
-                                        : doc.score >= 40
-                                          ? 'var(--warning)'
-                                          : 'var(--error)',
-                                  }}
-                                >
-                                  {Math.round(doc.score)}%
+                              <div>
+                                <span className="font-medium text-sm inline-flex items-center gap-2">
+                                  {doc.filename}
+                                  {doc.isSample && <SampleBadge size="xs" />}
                                 </span>
-                              )}
+                                <p className="text-xs text-muted mt-0.5">
+                                  Analysis in progress — results will appear when complete
+                                </p>
+                              </div>
                             </div>
-                            {doc.score !== undefined && (
-                              <div className="progress-bar mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="progress-bar" style={{ width: 80 }}>
                                 <div
-                                  className="progress-bar-fill"
-                                  style={{
-                                    width: `${doc.score}%`,
-                                    background:
-                                      doc.score >= 70
-                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                        : doc.score >= 40
-                                          ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                          : 'linear-gradient(90deg, #ef4444, #dc2626)',
-                                  }}
+                                  className="progress-bar-fill animate-pulse"
+                                  style={{ width: '60%' }}
                                 />
                               </div>
-                            )}
-                            <div className="flex items-center justify-between text-xs text-muted">
-                              <span>{formatDate(doc.uploadedAt)}</span>
-                              <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
-                                View Analysis <ArrowRight size={12} />
-                              </span>
+                              <Loader2
+                                size={16}
+                                className="animate-spin text-accent-primary shrink-0"
+                              />
                             </div>
                           </div>
-                        </Link>
-                      </motion.div>
-                    ))}
-                </motion.div>
-              </div>
-            )}
-          </ErrorBoundary>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
 
-          {/* Empty state - cold-prospect first impression after sign-up.
+              {/* Recent Analyses Section */}
+              {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
+                <div className="section">
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: 'var(--spacing-md)' }}
+                  >
+                    <h2
+                      className="section-header flex items-center gap-2"
+                      style={{ marginBottom: 0 }}
+                    >
+                      <CheckCircle size={18} className="text-green-500" />
+                      Recent Analyses
+                    </h2>
+                    <button
+                      onClick={() => setActiveView('browse')}
+                      className="text-sm text-secondary hover:text-primary hover:underline flex items-center gap-1"
+                    >
+                      View All <ChevronRight size={14} />
+                    </button>
+                  </div>
+                  <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: {},
+                      visible: { transition: { staggerChildren: 0.06 } },
+                    }}
+                  >
+                    {uploadedDocs
+                      .filter(d => d.status === 'complete')
+                      .slice(0, 6)
+                      .map(doc => (
+                        <motion.div
+                          key={doc.id}
+                          variants={{
+                            hidden: { opacity: 0, y: 16 },
+                            visible: { opacity: 1, y: 0 },
+                          }}
+                          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                        >
+                          <Link
+                            href={`/documents/${doc.id}`}
+                            className="card group hover:border-[var(--border-hover)] transition-all"
+                            style={{ textDecoration: 'none', display: 'block' }}
+                          >
+                            <div className="card-body">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div
+                                    style={{
+                                      width: 32,
+                                      height: 32,
+                                      flexShrink: 0,
+                                      borderRadius: 'var(--radius-md)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      background: 'rgba(255, 255, 255, 0.06)',
+                                    }}
+                                  >
+                                    <FileText
+                                      size={16}
+                                      style={{ color: 'var(--text-secondary)' }}
+                                    />
+                                  </div>
+                                  <span className="font-medium text-sm truncate max-w-[130px]">
+                                    {doc.filename}
+                                  </span>
+                                </div>
+                                {doc.score !== undefined && (
+                                  <span
+                                    className="text-sm font-bold shrink-0 ml-2"
+                                    style={{
+                                      color:
+                                        doc.score >= 70
+                                          ? 'var(--success)'
+                                          : doc.score >= 40
+                                            ? 'var(--warning)'
+                                            : 'var(--error)',
+                                    }}
+                                  >
+                                    {Math.round(doc.score)}%
+                                  </span>
+                                )}
+                              </div>
+                              {doc.score !== undefined && (
+                                <div className="progress-bar mb-2">
+                                  <div
+                                    className="progress-bar-fill"
+                                    style={{
+                                      width: `${doc.score}%`,
+                                      background:
+                                        doc.score >= 70
+                                          ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                          : doc.score >= 40
+                                            ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                            : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between text-xs text-muted">
+                                <span>{formatDate(doc.uploadedAt)}</span>
+                                <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
+                                  View Analysis <ArrowRight size={12} />
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                  </motion.div>
+                </div>
+              )}
+            </ErrorBoundary>
+
+            {/* Empty state - cold-prospect first impression after sign-up.
               Migrated to AccentCard 2026-05-10 (audit batch 2 #4): this
               is the conversion-driving CTA card for new HXC users; per
               the AccentCard discipline lock the lead/hero card on a tab
@@ -2133,87 +2139,89 @@ export default function Dashboard() {
               retrospective callout below uses `accent='info'` (data /
               alternative-path surface) so the two stacked cards render
               with semantic top-stripe distinction. */}
-          {uploadedDocs.length === 0 && !loadingDocs && (
-            <>
-              <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
-                <EnhancedEmptyState
-                  type="documents"
-                  title={`Start your ${knowledgeGraphLabel}`}
-                  description={
-                    isTeamPlan
-                      ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your org’s reasoning layer — bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
-                      : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your reasoning layer — bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
-                  }
-                  showBrief
-                  briefContext="documents"
-                  actions={[
-                    {
-                      label: 'Choose a File',
-                      onClick: () => document.getElementById('file-input')?.click(),
-                      variant: 'primary' as const,
-                    },
-                  ]}
-                />
-              </AccentCard>
-              <AccentCard
-                accent="info"
-                style={{ marginTop: 12 }}
-                bodyStyle={{ padding: '16px 20px', textAlign: 'center' }}
-              >
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Or start with a retrospective
-                </p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}>
-                  Upload a past strategic memo to close the loop your team never closed. Post-mortem
-                  audit in 60 seconds.
-                </p>
-              </AccentCard>
-            </>
-          )}
-        </>
-      )}
-
-      {/* ═══════ BROWSE & ANALYZE VIEW ═══════ */}
-      {activeView === 'browse' && (
-        <>
-          {/* Activity Feed - Collapsible */}
-          <div className="card">
-            <button
-              onClick={() => setShowActivityFeed(prev => !prev)}
-              className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
-              aria-expanded={showActivityFeed}
-            >
-              <h3 className="flex items-center gap-2 text-base">
-                <Clock size={18} style={{ color: 'var(--text-secondary)' }} />
-                Recent Activity
-                {activities.length > 0 && (
-                  <span className="text-xs text-muted font-normal">
-                    ({activities.length} events)
-                  </span>
-                )}
-              </h3>
-              <ChevronRight
-                size={18}
-                className={`text-muted transition-transform ${showActivityFeed ? 'rotate-90' : ''}`}
-              />
-            </button>
-            {showActivityFeed && (
-              <div className="card-body">
-                <ErrorBoundary sectionName="Activity Feed">
-                  <ActivityFeed
-                    activities={activities}
-                    isLoading={feedLoading}
-                    hasMore={feedHasMore}
-                    onLoadMore={feedLoadMore}
+            {uploadedDocs.length === 0 && !loadingDocs && (
+              <>
+                <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
+                  <EnhancedEmptyState
+                    type="documents"
+                    title={`Start your ${knowledgeGraphLabel}`}
+                    description={
+                      isTeamPlan
+                        ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your org’s reasoning layer — bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
+                        : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your reasoning layer — bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
+                    }
+                    showBrief
+                    briefContext="documents"
+                    actions={[
+                      {
+                        label: 'Choose a File',
+                        onClick: () => document.getElementById('file-input')?.click(),
+                        variant: 'primary' as const,
+                      },
+                    ]}
                   />
-                </ErrorBoundary>
-              </div>
+                </AccentCard>
+                <AccentCard
+                  accent="info"
+                  style={{ marginTop: 12 }}
+                  bodyStyle={{ padding: '16px 20px', textAlign: 'center' }}
+                >
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>
+                    Or start with a retrospective
+                  </p>
+                  <p
+                    style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}
+                  >
+                    Upload a past strategic memo to close the loop your team never closed.
+                    Post-mortem audit in 60 seconds.
+                  </p>
+                </AccentCard>
+              </>
             )}
-          </div>
+          </>
+        )}
 
-          {/* Documents List */}
-          <style>
-            {`
+        {/* ═══════ BROWSE & ANALYZE VIEW ═══════ */}
+        {activeView === 'browse' && (
+          <>
+            {/* Activity Feed - Collapsible */}
+            <div className="card">
+              <button
+                onClick={() => setShowActivityFeed(prev => !prev)}
+                className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
+                aria-expanded={showActivityFeed}
+              >
+                <h3 className="flex items-center gap-2 text-base">
+                  <Clock size={18} style={{ color: 'var(--text-secondary)' }} />
+                  Recent Activity
+                  {activities.length > 0 && (
+                    <span className="text-xs text-muted font-normal">
+                      ({activities.length} events)
+                    </span>
+                  )}
+                </h3>
+                <ChevronRight
+                  size={18}
+                  className={`text-muted transition-transform ${showActivityFeed ? 'rotate-90' : ''}`}
+                />
+              </button>
+              {showActivityFeed && (
+                <div className="card-body">
+                  <ErrorBoundary sectionName="Activity Feed">
+                    <ActivityFeed
+                      activities={activities}
+                      isLoading={feedLoading}
+                      hasMore={feedHasMore}
+                      onLoadMore={feedLoadMore}
+                    />
+                  </ErrorBoundary>
+                </div>
+              )}
+            </div>
+
+            {/* Documents List */}
+            <style>
+              {`
               .docrow {
                 position: relative;
               }
@@ -2228,597 +2236,603 @@ export default function Dashboard() {
                 transition: transform 0.18s ease;
               }
             `}
-          </style>
-          <div id="documents" className="card">
-            <div className="card-header flex items-center justify-between">
-              <div className="flex items-center gap-md">
-                <h3 className="text-base">Documents</h3>
-                {totalDocs > 0 && (
-                  <span className="text-xs text-muted">
-                    {sortedDocs.length} shown · {totalDocs} total
-                  </span>
-                )}
-              </div>
+            </style>
+            <div id="documents" className="card">
+              <div className="card-header flex items-center justify-between">
+                <div className="flex items-center gap-md">
+                  <h3 className="text-base">Documents</h3>
+                  {totalDocs > 0 && (
+                    <span className="text-xs text-muted">
+                      {sortedDocs.length} shown · {totalDocs} total
+                    </span>
+                  )}
+                </div>
 
-              {/* Compact Search & Filter */}
-              <div className="flex items-center gap-sm">
-                <div className="relative">
-                  <Search
-                    size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    aria-label="Search documents"
-                    value={searchInput}
+                {/* Compact Search & Filter */}
+                <div className="flex items-center gap-sm">
+                  <div className="relative">
+                    <Search
+                      size={14}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search..."
+                      aria-label="Search documents"
+                      value={searchInput}
+                      onChange={e => {
+                        setSearchInput(e.target.value);
+                        setDocsPage(1);
+                      }}
+                      className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
+                    />
+                    {searchInput && (
+                      <button
+                        onClick={() => {
+                          setSearchInput('');
+                          setSearchQuery('');
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                        aria-label="Clear search"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+
+                  <select
+                    value={statusFilter}
+                    aria-label="Filter by status"
                     onChange={e => {
-                      setSearchInput(e.target.value);
+                      setStatusFilter(
+                        e.target.value as 'all' | 'complete' | 'analyzing' | 'pending'
+                      );
                       setDocsPage(1);
                     }}
-                    className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
+                    className="px-3 py-1.5 text-sm bg-primary border border-border"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="complete">Complete</option>
+                    <option value="analyzing">Analyzing</option>
+                    <option value="pending">Pending</option>
+                  </select>
+
+                  <select
+                    value={sortBy}
+                    aria-label="Sort documents"
+                    onChange={e => setSortBy(e.target.value as typeof sortBy)}
+                    className="px-3 py-1.5 text-sm bg-primary border border-border"
+                  >
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="scoreHigh">Score: High→Low</option>
+                    <option value="scoreLow">Score: Low→High</option>
+                    <option value="name">Name A-Z</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="card-body p-0">
+                {loadingDocs ? (
+                  <div className="divide-y divide-border">
+                    {[0, 1, 2, 3].map(i => (
+                      <div key={i} className="flex items-center justify-between p-md animate-pulse">
+                        <div className="flex items-center gap-md">
+                          <div className="w-5 h-5 skeleton-shimmer" />
+                          <div className="h-4 w-48 skeleton-shimmer" />
+                        </div>
+                        <div className="flex items-center gap-md">
+                          <div className="h-3 w-20 skeleton-shimmer" />
+                          <div className="h-7 w-24 skeleton-shimmer" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : uploadedDocs.length === 0 ? (
+                  <EnhancedEmptyState
+                    type="documents"
+                    showBrief
+                    briefContext="documents"
+                    actions={[
+                      {
+                        label: 'Go to Upload',
+                        onClick: () => setActiveView('upload'),
+                        variant: 'primary',
+                        icon: <Upload className="w-4 h-4" />,
+                      },
+                    ]}
                   />
-                  {searchInput && (
+                ) : sortedDocs.length === 0 ? (
+                  <div className="flex flex-col items-center gap-sm p-xl text-center">
+                    <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
+                    <p className="text-sm text-muted">No matches found</p>
                     <button
                       onClick={() => {
                         setSearchInput('');
                         setSearchQuery('');
+                        setStatusFilter('all');
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
-                      aria-label="Clear search"
+                      className="btn btn-ghost text-sm"
                     >
-                      <X size={14} />
+                      Clear filters
                     </button>
-                  )}
-                </div>
-
-                <select
-                  value={statusFilter}
-                  aria-label="Filter by status"
-                  onChange={e => {
-                    setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending');
-                    setDocsPage(1);
-                  }}
-                  className="px-3 py-1.5 text-sm bg-primary border border-border"
-                >
-                  <option value="all">All Status</option>
-                  <option value="complete">Complete</option>
-                  <option value="analyzing">Analyzing</option>
-                  <option value="pending">Pending</option>
-                </select>
-
-                <select
-                  value={sortBy}
-                  aria-label="Sort documents"
-                  onChange={e => setSortBy(e.target.value as typeof sortBy)}
-                  className="px-3 py-1.5 text-sm bg-primary border border-border"
-                >
-                  <option value="newest">Newest first</option>
-                  <option value="oldest">Oldest first</option>
-                  <option value="scoreHigh">Score: High→Low</option>
-                  <option value="scoreLow">Score: Low→High</option>
-                  <option value="name">Name A-Z</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="card-body p-0">
-              {loadingDocs ? (
-                <div className="divide-y divide-border">
-                  {[0, 1, 2, 3].map(i => (
-                    <div key={i} className="flex items-center justify-between p-md animate-pulse">
-                      <div className="flex items-center gap-md">
-                        <div className="w-5 h-5 skeleton-shimmer" />
-                        <div className="h-4 w-48 skeleton-shimmer" />
-                      </div>
-                      <div className="flex items-center gap-md">
-                        <div className="h-3 w-20 skeleton-shimmer" />
-                        <div className="h-7 w-24 skeleton-shimmer" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : uploadedDocs.length === 0 ? (
-                <EnhancedEmptyState
-                  type="documents"
-                  showBrief
-                  briefContext="documents"
-                  actions={[
-                    {
-                      label: 'Go to Upload',
-                      onClick: () => setActiveView('upload'),
-                      variant: 'primary',
-                      icon: <Upload className="w-4 h-4" />,
-                    },
-                  ]}
-                />
-              ) : sortedDocs.length === 0 ? (
-                <div className="flex flex-col items-center gap-sm p-xl text-center">
-                  <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
-                  <p className="text-sm text-muted">No matches found</p>
-                  <button
-                    onClick={() => {
-                      setSearchInput('');
-                      setSearchQuery('');
-                      setStatusFilter('all');
-                    }}
-                    className="btn btn-ghost text-sm"
-                  >
-                    Clear filters
-                  </button>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {/* Select all header + compare entry point */}
-                  <div
-                    className="flex items-center gap-md p-md"
-                    style={{
-                      background: 'var(--bg-secondary)',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div className="flex items-center gap-md">
-                      <input
-                        type="checkbox"
-                        aria-label="Select all documents"
-                        checked={selectedDocs.size === sortedDocs.length && sortedDocs.length > 0}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            setSelectedDocs(new Set(sortedDocs.map(d => d.id)));
-                          } else {
-                            setSelectedDocs(new Set());
-                          }
-                        }}
-                        style={{
-                          width: 14,
-                          height: 14,
-                          accentColor: 'var(--accent-primary)',
-                          cursor: 'pointer',
-                        }}
-                      />
-                      <span className="text-xs text-muted">
-                        {selectedDocs.size > 0
-                          ? `${selectedDocs.size} selected`
-                          : `${sortedDocs.length} documents`}
-                      </span>
-                    </div>
-                    {/* Compare empty-state hint — Item C lock 2026-05-07.
-                        Users with exactly 1 audit see no Compare affordance
-                        because the chip below requires sortedDocs.length >= 2.
-                        This single-line hint surfaces the feature so the
-                        user knows Compare exists + unlocks on the next
-                        upload. Renders only at length === 1 so it never
-                        competes with the active chip below. */}
-                    {sortedDocs.length === 1 && (
-                      <span
-                        className="flex items-center gap-xs text-xs"
-                        style={{
-                          color: 'var(--text-muted)',
-                          padding: '4px 10px',
-                          borderRadius: 'var(--radius-full)',
-                          background: 'var(--bg-tertiary)',
-                          border: '1px solid var(--border-color)',
-                          fontStyle: 'italic',
-                          whiteSpace: 'nowrap',
-                        }}
-                        title="Side-by-side compare unlocks at 2+ audited memos"
-                      >
-                        <GitCompareArrows size={12} />
-                        Compare unlocks on your next audit
-                      </span>
-                    )}
-                    {sortedDocs.length >= 2 &&
-                      (() => {
-                        // One verb, one chip, four progressive states.
-                        // Collapses the prior split between the header
-                        // "Compare memos" discovery chip and the batch-bar
-                        // "Compare Selected" action button.
-                        const count = selectedDocs.size;
-                        const canCompare = count >= 2 && count <= 3;
-                        const href = canCompare
-                          ? `/dashboard/compare?doc=${Array.from(selectedDocs).slice(0, 3).join(',')}`
-                          : '/dashboard/compare';
-                        const label =
-                          count === 0
-                            ? 'Compare memos'
-                            : count === 1
-                              ? 'Select 1 more to compare'
-                              : count > 3
-                                ? 'Select 2–3 to compare'
-                                : `Compare ${count}`;
-                        const active = count === 0 || canCompare;
-                        const title = canCompare
-                          ? `Compare ${count} selected memos`
-                          : count > 3
-                            ? 'Compare accepts up to 3 memos at a time'
-                            : 'Compare 2–3 memos side-by-side';
-                        const style: React.CSSProperties = {
-                          color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
-                          padding: '4px 10px',
-                          borderRadius: 'var(--radius-full)',
-                          background: active ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-tertiary)',
-                          border: `1px solid ${
-                            active ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'
-                          }`,
-                          textDecoration: 'none',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                          cursor: active ? 'pointer' : 'default',
-                          pointerEvents: active ? 'auto' : 'none',
-                        };
-                        return (
-                          <Link
-                            href={href}
-                            className="flex items-center gap-xs text-xs"
-                            title={title}
-                            aria-disabled={!active}
-                            style={style}
-                          >
-                            <GitCompareArrows size={12} />
-                            {label}
-                          </Link>
-                        );
-                      })()}
                   </div>
-                  {sortedDocs.map((doc, idx) => (
+                ) : (
+                  <div className="divide-y divide-border">
+                    {/* Select all header + compare entry point */}
                     <div
-                      key={doc.id}
-                      className="docrow flex items-center justify-between p-md transition-all animate-fade-in"
+                      className="flex items-center gap-md p-md"
                       style={{
-                        animationDelay: `${idx * 0.03}s`,
-                        borderLeft: '3px solid transparent',
+                        background: 'var(--bg-secondary)',
+                        justifyContent: 'space-between',
                       }}
                     >
-                      <div className="flex items-center gap-md min-w-0">
+                      <div className="flex items-center gap-md">
                         <input
                           type="checkbox"
-                          aria-label={`Select ${doc.filename}`}
-                          checked={selectedDocs.has(doc.id)}
+                          aria-label="Select all documents"
+                          checked={selectedDocs.size === sortedDocs.length && sortedDocs.length > 0}
                           onChange={e => {
-                            setSelectedDocs(prev => {
-                              const next = new Set(prev);
-                              if (e.target.checked) next.add(doc.id);
-                              else next.delete(doc.id);
-                              return next;
-                            });
+                            if (e.target.checked) {
+                              setSelectedDocs(new Set(sortedDocs.map(d => d.id)));
+                            } else {
+                              setSelectedDocs(new Set());
+                            }
                           }}
                           style={{
                             width: 14,
                             height: 14,
                             accentColor: 'var(--accent-primary)',
                             cursor: 'pointer',
-                            flexShrink: 0,
                           }}
                         />
-                        <div
-                          className="docrow-fileicon"
-                          style={{
-                            width: 36,
-                            height: 36,
-                            flexShrink: 0,
-                            borderRadius: 'var(--radius-md)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: doc.isSample
-                              ? 'rgba(22, 163, 74, 0.08)'
-                              : 'var(--bg-secondary)',
-                            border: doc.isSample
-                              ? '1px solid rgba(22, 163, 74, 0.18)'
-                              : '1px solid var(--border-color)',
-                          }}
-                        >
-                          <FileText
-                            size={16}
-                            style={{
-                              color: doc.isSample
-                                ? 'var(--accent-primary)'
-                                : 'var(--text-secondary)',
-                            }}
-                          />
-                        </div>
-                        <span className="truncate text-sm font-medium inline-flex items-center gap-2">
-                          {doc.filename}
-                          {doc.isSample && <SampleBadge size="xs" />}
+                        <span className="text-xs text-muted">
+                          {selectedDocs.size > 0
+                            ? `${selectedDocs.size} selected`
+                            : `${sortedDocs.length} documents`}
                         </span>
                       </div>
-
-                      <div className="flex items-center gap-md shrink-0">
-                        {doc.status === 'analyzing' && (
-                          <span className="flex items-center gap-sm text-xs text-muted">
-                            <Loader2 size={12} className="animate-spin" />
-                            Analyzing
-                          </span>
-                        )}
-
-                        {(doc.status === 'error' || doc.status === 'pending') && (
-                          <div className="flex items-center gap-sm">
-                            {doc.status === 'error' && (
-                              <span className="badge badge-critical">Failed</span>
-                            )}
-                            {doc.status === 'pending' && (
-                              <span className="text-xs text-muted">Pending</span>
-                            )}
-                            <button
-                              onClick={() => retryAnalysis(doc.id)}
-                              disabled={uploading}
-                              className="btn btn-ghost btn-sm flex items-center gap-1 text-xs"
+                      {/* Compare empty-state hint — Item C lock 2026-05-07.
+                        Users with exactly 1 audit see no Compare affordance
+                        because the chip below requires sortedDocs.length >= 2.
+                        This single-line hint surfaces the feature so the
+                        user knows Compare exists + unlocks on the next
+                        upload. Renders only at length === 1 so it never
+                        competes with the active chip below. */}
+                      {sortedDocs.length === 1 && (
+                        <span
+                          className="flex items-center gap-xs text-xs"
+                          style={{
+                            color: 'var(--text-muted)',
+                            padding: '4px 10px',
+                            borderRadius: 'var(--radius-full)',
+                            background: 'var(--bg-tertiary)',
+                            border: '1px solid var(--border-color)',
+                            fontStyle: 'italic',
+                            whiteSpace: 'nowrap',
+                          }}
+                          title="Side-by-side compare unlocks at 2+ audited memos"
+                        >
+                          <GitCompareArrows size={12} />
+                          Compare unlocks on your next audit
+                        </span>
+                      )}
+                      {sortedDocs.length >= 2 &&
+                        (() => {
+                          // One verb, one chip, four progressive states.
+                          // Collapses the prior split between the header
+                          // "Compare memos" discovery chip and the batch-bar
+                          // "Compare Selected" action button.
+                          const count = selectedDocs.size;
+                          const canCompare = count >= 2 && count <= 3;
+                          const href = canCompare
+                            ? `/dashboard/compare?doc=${Array.from(selectedDocs).slice(0, 3).join(',')}`
+                            : '/dashboard/compare';
+                          const label =
+                            count === 0
+                              ? 'Compare memos'
+                              : count === 1
+                                ? 'Select 1 more to compare'
+                                : count > 3
+                                  ? 'Select 2–3 to compare'
+                                  : `Compare ${count}`;
+                          const active = count === 0 || canCompare;
+                          const title = canCompare
+                            ? `Compare ${count} selected memos`
+                            : count > 3
+                              ? 'Compare accepts up to 3 memos at a time'
+                              : 'Compare 2–3 memos side-by-side';
+                          const style: React.CSSProperties = {
+                            color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+                            padding: '4px 10px',
+                            borderRadius: 'var(--radius-full)',
+                            background: active ? 'rgba(22, 163, 74, 0.08)' : 'var(--bg-tertiary)',
+                            border: `1px solid ${
+                              active ? 'rgba(22, 163, 74, 0.22)' : 'var(--border-color)'
+                            }`,
+                            textDecoration: 'none',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                            cursor: active ? 'pointer' : 'default',
+                            pointerEvents: active ? 'auto' : 'none',
+                          };
+                          return (
+                            <Link
+                              href={href}
+                              className="flex items-center gap-xs text-xs"
+                              title={title}
+                              aria-disabled={!active}
+                              style={style}
                             >
-                              <RefreshCw size={12} />
-                              {doc.status === 'error' ? 'Retry' : 'Analyze'}
-                            </button>
+                              <GitCompareArrows size={12} />
+                              {label}
+                            </Link>
+                          );
+                        })()}
+                    </div>
+                    {sortedDocs.map((doc, idx) => (
+                      <div
+                        key={doc.id}
+                        className="docrow flex items-center justify-between p-md transition-all animate-fade-in"
+                        style={{
+                          animationDelay: `${idx * 0.03}s`,
+                          borderLeft: '3px solid transparent',
+                        }}
+                      >
+                        <div className="flex items-center gap-md min-w-0">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${doc.filename}`}
+                            checked={selectedDocs.has(doc.id)}
+                            onChange={e => {
+                              setSelectedDocs(prev => {
+                                const next = new Set(prev);
+                                if (e.target.checked) next.add(doc.id);
+                                else next.delete(doc.id);
+                                return next;
+                              });
+                            }}
+                            style={{
+                              width: 14,
+                              height: 14,
+                              accentColor: 'var(--accent-primary)',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div
+                            className="docrow-fileicon"
+                            style={{
+                              width: 36,
+                              height: 36,
+                              flexShrink: 0,
+                              borderRadius: 'var(--radius-md)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              background: doc.isSample
+                                ? 'rgba(22, 163, 74, 0.08)'
+                                : 'var(--bg-secondary)',
+                              border: doc.isSample
+                                ? '1px solid rgba(22, 163, 74, 0.18)'
+                                : '1px solid var(--border-color)',
+                            }}
+                          >
+                            <FileText
+                              size={16}
+                              style={{
+                                color: doc.isSample
+                                  ? 'var(--accent-primary)'
+                                  : 'var(--text-secondary)',
+                              }}
+                            />
                           </div>
-                        )}
+                          <span className="truncate text-sm font-medium inline-flex items-center gap-2">
+                            {doc.filename}
+                            {doc.isSample && <SampleBadge size="xs" />}
+                          </span>
+                        </div>
 
-                        {/* Fallback: doc has a status that didn't match analyzing/error/pending/complete
+                        <div className="flex items-center gap-md shrink-0">
+                          {doc.status === 'analyzing' && (
+                            <span className="flex items-center gap-sm text-xs text-muted">
+                              <Loader2 size={12} className="animate-spin" />
+                              Analyzing
+                            </span>
+                          )}
+
+                          {(doc.status === 'error' || doc.status === 'pending') && (
+                            <div className="flex items-center gap-sm">
+                              {doc.status === 'error' && (
+                                <span className="badge badge-critical">Failed</span>
+                              )}
+                              {doc.status === 'pending' && (
+                                <span className="text-xs text-muted">Pending</span>
+                              )}
+                              <button
+                                onClick={() => retryAnalysis(doc.id)}
+                                disabled={uploading}
+                                className="btn btn-ghost btn-sm flex items-center gap-1 text-xs"
+                              >
+                                <RefreshCw size={12} />
+                                {doc.status === 'error' ? 'Retry' : 'Analyze'}
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Fallback: doc has a status that didn't match analyzing/error/pending/complete
                             (e.g. legacy 'queued', sample memos with status='ready', etc.). Without this
                             block the row would render empty on the right side — the visible bug on the
                             documents browse where sample docs sat with no action. */}
-                        {doc.status !== 'analyzing' &&
-                          doc.status !== 'error' &&
-                          doc.status !== 'pending' &&
-                          doc.status !== 'complete' && (
-                            <Link
-                              href={`/documents/${doc.id}`}
-                              className="btn btn-ghost btn-sm flex items-center gap-2"
-                              title="Open document"
-                            >
-                              <ArrowRight size={14} />
-                              Open
-                            </Link>
+                          {doc.status !== 'analyzing' &&
+                            doc.status !== 'error' &&
+                            doc.status !== 'pending' &&
+                            doc.status !== 'complete' && (
+                              <Link
+                                href={`/documents/${doc.id}`}
+                                className="btn btn-ghost btn-sm flex items-center gap-2"
+                                title="Open document"
+                              >
+                                <ArrowRight size={14} />
+                                Open
+                              </Link>
+                            )}
+
+                          {doc.status === 'complete' && (
+                            <>
+                              {doc.score !== undefined && (
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+                                    style={{
+                                      color:
+                                        doc.score < 40
+                                          ? 'var(--error)'
+                                          : doc.score < 70
+                                            ? 'var(--warning)'
+                                            : 'var(--success)',
+                                      background:
+                                        doc.score < 40
+                                          ? 'rgba(239, 68, 68, 0.1)'
+                                          : doc.score < 70
+                                            ? 'rgba(245, 158, 11, 0.1)'
+                                            : 'rgba(34, 197, 94, 0.1)',
+                                    }}
+                                  >
+                                    {doc.score < 40
+                                      ? 'HIGH RISK'
+                                      : doc.score < 70
+                                        ? 'MEDIUM'
+                                        : 'LOW RISK'}
+                                  </span>
+                                  <div className="progress-bar" style={{ width: 64 }}>
+                                    <div
+                                      className="progress-bar-fill"
+                                      style={{
+                                        width: `${doc.score}%`,
+                                        background:
+                                          doc.score >= 70
+                                            ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                            : doc.score >= 40
+                                              ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                              : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                      }}
+                                    />
+                                  </div>
+                                  <span
+                                    className="text-sm font-bold min-w-[36px]"
+                                    style={{
+                                      color:
+                                        doc.score >= 70
+                                          ? 'var(--success)'
+                                          : doc.score >= 40
+                                            ? 'var(--warning)'
+                                            : 'var(--error)',
+                                    }}
+                                  >
+                                    {Math.round(doc.score)}%
+                                  </span>
+                                </div>
+                              )}
+                              <Link
+                                href={`/documents/${doc.id}`}
+                                className="btn btn-primary btn-sm flex items-center gap-2"
+                              >
+                                <BarChart3 size={14} />
+                                View Analysis
+                              </Link>
+                              <a
+                                href={`/api/documents/${doc.id}/provenance-record?format=pdf`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-ghost btn-sm flex items-center gap-1"
+                                title="Download Decision Provenance Record · hashed + tamper-evident PDF"
+                                aria-label="Download Decision Provenance Record"
+                                style={{ whiteSpace: 'nowrap' }}
+                              >
+                                <ShieldCheck size={14} />
+                                DPR
+                              </a>
+                            </>
                           )}
 
-                        {doc.status === 'complete' && (
-                          <>
-                            {doc.score !== undefined && (
-                              <div className="flex items-center gap-2">
-                                <span
-                                  className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
-                                  style={{
-                                    color:
-                                      doc.score < 40
-                                        ? 'var(--error)'
-                                        : doc.score < 70
-                                          ? 'var(--warning)'
-                                          : 'var(--success)',
-                                    background:
-                                      doc.score < 40
-                                        ? 'rgba(239, 68, 68, 0.1)'
-                                        : doc.score < 70
-                                          ? 'rgba(245, 158, 11, 0.1)'
-                                          : 'rgba(34, 197, 94, 0.1)',
-                                  }}
-                                >
-                                  {doc.score < 40
-                                    ? 'HIGH RISK'
-                                    : doc.score < 70
-                                      ? 'MEDIUM'
-                                      : 'LOW RISK'}
-                                </span>
-                                <div className="progress-bar" style={{ width: 64 }}>
-                                  <div
-                                    className="progress-bar-fill"
-                                    style={{
-                                      width: `${doc.score}%`,
-                                      background:
-                                        doc.score >= 70
-                                          ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                          : doc.score >= 40
-                                            ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                            : 'linear-gradient(90deg, #ef4444, #dc2626)',
-                                    }}
-                                  />
-                                </div>
-                                <span
-                                  className="text-sm font-bold min-w-[36px]"
-                                  style={{
-                                    color:
-                                      doc.score >= 70
-                                        ? 'var(--success)'
-                                        : doc.score >= 40
-                                          ? 'var(--warning)'
-                                          : 'var(--error)',
-                                  }}
-                                >
-                                  {Math.round(doc.score)}%
-                                </span>
-                              </div>
-                            )}
-                            <Link
-                              href={`/documents/${doc.id}`}
-                              className="btn btn-primary btn-sm flex items-center gap-2"
-                            >
-                              <BarChart3 size={14} />
-                              View Analysis
-                            </Link>
-                            <a
-                              href={`/api/documents/${doc.id}/provenance-record?format=pdf`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="btn btn-ghost btn-sm flex items-center gap-1"
-                              title="Download Decision Provenance Record · hashed + tamper-evident PDF"
-                              aria-label="Download Decision Provenance Record"
-                              style={{ whiteSpace: 'nowrap' }}
-                            >
-                              <ShieldCheck size={14} />
-                              DPR
-                            </a>
-                          </>
-                        )}
-
-                        {deleteModal.open && deleteModal.docId === doc.id ? (
-                          <div className="flex items-center gap-xs">
-                            <span className="text-xs text-muted">Delete?</span>
-                            <button
-                              onClick={handleDelete}
-                              disabled={deleting}
-                              className="px-2 py-0.5 text-xs rounded"
-                              style={{
-                                background: 'rgba(239,68,68,0.15)',
-                                color: 'var(--error)',
-                                border: '1px solid rgba(239,68,68,0.3)',
-                              }}
-                            >
-                              {deleting ? <Loader2 size={10} className="animate-spin" /> : 'Yes'}
-                            </button>
+                          {deleteModal.open && deleteModal.docId === doc.id ? (
+                            <div className="flex items-center gap-xs">
+                              <span className="text-xs text-muted">Delete?</span>
+                              <button
+                                onClick={handleDelete}
+                                disabled={deleting}
+                                className="px-2 py-0.5 text-xs rounded"
+                                style={{
+                                  background: 'rgba(239,68,68,0.15)',
+                                  color: 'var(--error)',
+                                  border: '1px solid rgba(239,68,68,0.3)',
+                                }}
+                              >
+                                {deleting ? <Loader2 size={10} className="animate-spin" /> : 'Yes'}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setDeleteModal({ open: false, docId: '', filename: '' })
+                                }
+                                disabled={deleting}
+                                className="px-2 py-0.5 text-xs text-muted rounded"
+                                style={{ border: '1px solid var(--border-color)' }}
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
                             <button
                               onClick={() =>
-                                setDeleteModal({ open: false, docId: '', filename: '' })
+                                setDeleteModal({
+                                  open: true,
+                                  docId: doc.id,
+                                  filename: doc.filename,
+                                })
                               }
-                              disabled={deleting}
-                              className="px-2 py-0.5 text-xs text-muted rounded"
-                              style={{ border: '1px solid var(--border-color)' }}
+                              className="p-1.5 text-muted hover:text-error transition-colors rounded"
+                              title="Delete"
+                              aria-label={`Delete ${doc.filename}`}
                             >
-                              No
+                              <Trash2 size={16} />
                             </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })
-                            }
-                            className="p-1.5 text-muted hover:text-error transition-colors rounded"
-                            title="Delete"
-                            aria-label={`Delete ${doc.filename}`}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Batch action bar */}
-          {selectedDocs.size > 0 && (
-            <div
-              className="flex items-center justify-between p-sm mt-sm"
-              style={{
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-              }}
-            >
-              <span className="text-sm font-medium">
-                {selectedDocs.size} document{selectedDocs.size > 1 ? 's' : ''} selected
-              </span>
-              <div className="flex items-center gap-sm">
-                <button
-                  onClick={() => setSelectedDocs(new Set())}
-                  className="btn btn-ghost text-sm"
-                >
-                  Clear
-                </button>
-                <button
-                  onClick={handleBatchDelete}
-                  disabled={batchDeleting}
-                  className="btn btn-sm flex items-center gap-xs text-sm"
-                  style={{
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                    color: 'var(--error)',
-                  }}
-                >
-                  {batchDeleting ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Trash2 size={12} />
-                  )}
-                  Delete Selected
-                </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Documents Paginator */}
-          {docsTotalPages > 1 && (
-            <div className="flex items-center justify-center gap-sm mt-md">
-              <button
-                onClick={() => setDocsPage(p => Math.max(1, p - 1))}
-                disabled={docsPage <= 1}
-                className="btn btn-ghost text-sm"
+            {/* Batch action bar */}
+            {selectedDocs.size > 0 && (
+              <div
+                className="flex items-center justify-between p-sm mt-sm"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                }}
               >
-                Previous
-              </button>
-              <span className="text-sm text-muted">
-                Page {docsPage} of {docsTotalPages}
-              </span>
-              <button
-                onClick={() => setDocsPage(p => Math.min(docsTotalPages, p + 1))}
-                disabled={docsPage >= docsTotalPages}
-                className="btn btn-ghost text-sm"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
-      )}
+                <span className="text-sm font-medium">
+                  {selectedDocs.size} document{selectedDocs.size > 1 ? 's' : ''} selected
+                </span>
+                <div className="flex items-center gap-sm">
+                  <button
+                    onClick={() => setSelectedDocs(new Set())}
+                    className="btn btn-ghost text-sm"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={handleBatchDelete}
+                    disabled={batchDeleting}
+                    className="btn btn-sm flex items-center gap-xs text-sm"
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: 'var(--error)',
+                    }}
+                  >
+                    {batchDeleting ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={12} />
+                    )}
+                    Delete Selected
+                  </button>
+                </div>
+              </div>
+            )}
 
-      {/* Delete Confirmation Modal */}
-      {/* Global drag overlay — appears when dragging files anywhere on the page */}
-      {globalDrag && !uploading && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0, 0, 0, 0.70)',
-            backdropFilter: 'blur(20px) saturate(150%)',
-          }}
-        >
+            {/* Documents Paginator */}
+            {docsTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-sm mt-md">
+                <button
+                  onClick={() => setDocsPage(p => Math.max(1, p - 1))}
+                  disabled={docsPage <= 1}
+                  className="btn btn-ghost text-sm"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-muted">
+                  Page {docsPage} of {docsTotalPages}
+                </span>
+                <button
+                  onClick={() => setDocsPage(p => Math.min(docsTotalPages, p + 1))}
+                  disabled={docsPage >= docsTotalPages}
+                  className="btn btn-ghost text-sm"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {/* Global drag overlay — appears when dragging files anywhere on the page */}
+        {globalDrag && !uploading && (
           <div
-            className="animate-fade-in"
             style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 40,
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              gap: 'var(--spacing-lg)',
-              padding: 'var(--spacing-2xl)',
-              border: '2px dashed var(--border-hover)',
-              borderRadius: 'var(--radius-xl)',
-              background: 'var(--bg-card-hover)',
-              backdropFilter: 'blur(24px) saturate(160%)',
-              boxShadow: 'var(--shadow-lg)',
+              justifyContent: 'center',
+              background: 'rgba(0, 0, 0, 0.70)',
+              backdropFilter: 'blur(20px) saturate(150%)',
             }}
           >
-            <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
-            <div className="text-center">
-              <p className="font-semibold text-lg">Drop your document here</p>
-              <p className="text-sm text-muted mt-1">
-                PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
-              </p>
-              {billingData && billingData.limits.analysesPerMonth > 0 && (
-                <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
-                  {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
-                  analyses used this month ({billingData.planName})
+            <div
+              className="animate-fade-in"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 'var(--spacing-lg)',
+                padding: 'var(--spacing-2xl)',
+                border: '2px dashed var(--border-hover)',
+                borderRadius: 'var(--radius-xl)',
+                background: 'var(--bg-card-hover)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            >
+              <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
+              <div className="text-center">
+                <p className="font-semibold text-lg">Drop your document here</p>
+                <p className="text-sm text-muted mt-1">
+                  PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
                 </p>
-              )}
+                {billingData && billingData.limits.analysesPerMonth > 0 && (
+                  <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
+                    {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
+                    analyses used this month ({billingData.planName})
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Quick Scan Panel */}
-      <QuickScanModal open={quickScanOpen} onClose={() => setQuickScanOpen(false)} />
+        {/* Quick Scan Panel */}
+        <QuickScanModal open={quickScanOpen} onClose={() => setQuickScanOpen(false)} />
 
-      {/* Knowledge Graph merge consent (shown when a Pro user's org
+        {/* Knowledge Graph merge consent (shown when a Pro user's org
           upgraded to Strategy and they have personal memos to decide on) */}
-      <KGMergeConsentModal
-        open={kgConsent?.status === 'pending'}
-        memoCount={kgConsent?.memoCount ?? 0}
-        onDecision={decision =>
-          setKgConsent(prev =>
-            prev ? { ...prev, status: decision === 'merged' ? 'merged' : 'private' } : prev
-          )
-        }
-      />
+        <KGMergeConsentModal
+          open={kgConsent?.status === 'pending'}
+          memoCount={kgConsent?.memoCount ?? 0}
+          onDecision={decision =>
+            setKgConsent(prev =>
+              prev ? { ...prev, status: decision === 'merged' ? 'merged' : 'private' } : prev
+            )
+          }
+        />
       </div>
     </ModalStackProvider>
   );

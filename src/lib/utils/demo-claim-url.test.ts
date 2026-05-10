@@ -13,9 +13,7 @@ describe('buildClaimPath', () => {
       analysisId: 'analysis-123',
       documentId: 'doc-456',
     });
-    expect(path).toBe(
-      '/onboarding/claim?demoAnalysisId=analysis-123&demoDocumentId=doc-456'
-    );
+    expect(path).toBe('/onboarding/claim?demoAnalysisId=analysis-123&demoDocumentId=doc-456');
   });
 
   it('omits analysisId when null (partial pipeline case)', () => {
@@ -32,9 +30,7 @@ describe('buildClaimPath', () => {
       analysisId: 'a&b=c',
       documentId: 'd/e',
     });
-    expect(path).toBe(
-      '/onboarding/claim?demoAnalysisId=a%26b%3Dc&demoDocumentId=d%2Fe'
-    );
+    expect(path).toBe('/onboarding/claim?demoAnalysisId=a%26b%3Dc&demoDocumentId=d%2Fe');
   });
 
   it('always returns a path (never includes origin)', () => {

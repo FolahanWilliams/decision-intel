@@ -38,8 +38,8 @@ export default function DecisionRoomsPage() {
                     margin: '4px 0 0',
                   }}
                 >
-                  Blind-prior voting before the committee meets — capture team priors anonymously
-                  so the IC vote isn&rsquo;t anchored on the loudest voice.
+                  Blind-prior voting before the committee meets — capture team priors anonymously so
+                  the IC vote isn&rsquo;t anchored on the loudest voice.
                 </p>
               </div>
             </div>

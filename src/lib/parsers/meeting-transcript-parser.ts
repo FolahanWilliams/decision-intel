@@ -97,7 +97,8 @@ const HEDGING_PATTERNS = [
 /** Pattern for a "Name:" line marker. Allows 1-4 word names + optional
  *  trailing tags like "(CFO)" or "[CTO]". Hard cap on name length so
  *  paragraph text doesn't accidentally match. */
-const SPEAKER_MARKER = /^\s*([A-Z][\w'.-]+(?:\s+[A-Z][\w'.-]+){0,3})(?:\s*[(\[][^)\]]+[)\]])?\s*:\s*/;
+const SPEAKER_MARKER =
+  /^\s*([A-Z][\w'.-]+(?:\s+[A-Z][\w'.-]+){0,3})(?:\s*[(\[][^)\]]+[)\]])?\s*:\s*/;
 
 interface RawTurn {
   speaker: string;
@@ -250,9 +251,7 @@ export function toParsedMeetingTranscriptData(
  * the per-speaker airtime + dominance verdict + dissent signals so the
  * detective doesn't have to rederive them from raw transcript scanning.
  */
-export function formatMeetingTranscriptForAudit(
-  parsed: ParsedMeetingTranscriptData
-): string {
+export function formatMeetingTranscriptForAudit(parsed: ParsedMeetingTranscriptData): string {
   const { assessment } = parsed;
   if (!assessment.hasSpeakerMarkers) {
     return '';

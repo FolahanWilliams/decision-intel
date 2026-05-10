@@ -110,7 +110,7 @@ const INTEGRATIONS = [
     id: 'google_drive',
     name: 'Google Drive',
     description:
-      'Auto-analyze documents from Google Drive. Deferred until Phase 4 (Outcome Gate auto-detection window) — Google OAuth verification doesn\'t fit the current wedge motion. Forward documents from Gmail in the meantime.',
+      "Auto-analyze documents from Google Drive. Deferred until Phase 4 (Outcome Gate auto-detection window) — Google OAuth verification doesn't fit the current wedge motion. Forward documents from Gmail in the meantime.",
     icon: HardDrive,
     color: '#4285F4',
     category: 'Data Sources',
@@ -972,10 +972,7 @@ function GoogleDriveDetailSection({
               alignItems: 'flex-start',
             }}
           >
-            <Clock
-              size={14}
-              style={{ color: 'var(--text-muted)', marginTop: 2, flexShrink: 0 }}
-            />
+            <Clock size={14} style={{ color: 'var(--text-muted)', marginTop: 2, flexShrink: 0 }} />
             <div>
               <div
                 style={{
@@ -997,10 +994,10 @@ function GoogleDriveDetailSection({
                   margin: 0,
                 }}
               >
-                Drive auto-sync is parked until the Outcome Gate auto-detection window
-                (Phase 4). Google OAuth verification timeline doesn&rsquo;t fit the current
-                wedge motion. <strong>Use email forwarding instead</strong> — forward any
-                document to your unique inbox address and it auto-analyzes.
+                Drive auto-sync is parked until the Outcome Gate auto-detection window (Phase 4).
+                Google OAuth verification timeline doesn&rsquo;t fit the current wedge motion.{' '}
+                <strong>Use email forwarding instead</strong> — forward any document to your unique
+                inbox address and it auto-analyzes.
               </p>
             </div>
           </div>
@@ -1012,8 +1009,8 @@ function GoogleDriveDetailSection({
               marginBottom: '14px',
             }}
           >
-            Design partners can opt in early; everyone else should use email forwarding
-            until Phase 4.
+            Design partners can opt in early; everyone else should use email forwarding until Phase
+            4.
           </p>
           <a
             href="/api/integrations/google/oauth"
@@ -1420,9 +1417,9 @@ function SlackDetailSection({
                       margin: 0,
                     }}
                   >
-                    Slack App Directory review is in flight. Verified design partners can
-                    install via the private OAuth flow below; public distribution unlocks
-                    when the review clears.
+                    Slack App Directory review is in flight. Verified design partners can install
+                    via the private OAuth flow below; public distribution unlocks when the review
+                    clears.
                   </p>
                 </div>
               </div>

@@ -1015,10 +1015,7 @@ async function buildEngagementAppendix(
     const latest = engagementContainers[engagementContainers.length - 1]?.createdAt;
     const timespanDays =
       earliest && latest
-        ? Math.max(
-            0,
-            Math.round((latest.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24))
-          )
+        ? Math.max(0, Math.round((latest.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24)))
         : null;
 
     // 7. Aggregate recurring biases. Walk container → docs → analyses →
@@ -1058,9 +1055,7 @@ async function buildEngagementAppendix(
       for (const bias of a.biases ?? []) {
         const biasType = bias.biasType;
         const sev = (
-          ['critical', 'high', 'medium', 'low'].includes(
-            (bias.severity ?? '').toLowerCase()
-          )
+          ['critical', 'high', 'medium', 'low'].includes((bias.severity ?? '').toLowerCase())
             ? bias.severity!.toLowerCase()
             : 'medium'
         ) as 'critical' | 'high' | 'medium' | 'low';
@@ -1071,9 +1066,7 @@ async function buildEngagementAppendix(
         };
         existing.documentSet.add(a.documentId);
         existing.occurrenceCount += 1;
-        if (
-          (SEVERITY_RANK_MAP[sev] ?? 0) > (SEVERITY_RANK_MAP[existing.topSeverity] ?? 0)
-        ) {
+        if ((SEVERITY_RANK_MAP[sev] ?? 0) > (SEVERITY_RANK_MAP[existing.topSeverity] ?? 0)) {
           existing.topSeverity = sev;
         }
         biasMap.set(biasType, existing);
@@ -1134,9 +1127,7 @@ async function buildEngagementAppendix(
         averageDqi: g.averageDqi,
       }));
 
-    const analyzedDecisionCount = engagementContainers.filter(
-      c => c.analyzedDocCount > 0
-    ).length;
+    const analyzedDecisionCount = engagementContainers.filter(c => c.analyzedDocCount > 0).length;
 
     return {
       engagementName: targetCompany,

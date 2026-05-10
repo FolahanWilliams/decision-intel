@@ -25,11 +25,7 @@ import {
   gradeFromRecallScore,
   type RecallGradeResult,
 } from '@/components/founder-hub/education/education-room-data';
-import {
-  BANNED_VOCABULARY,
-  PROTECTED_VOCABULARY,
-  CATEGORY_CLAIM,
-} from '@/lib/constants/icp';
+import { BANNED_VOCABULARY, PROTECTED_VOCABULARY, CATEGORY_CLAIM } from '@/lib/constants/icp';
 
 const log = createLogger('EducationGradeRecall');
 

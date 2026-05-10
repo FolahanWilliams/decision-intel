@@ -91,9 +91,7 @@ export function BulkUploadPanel({ onComplete, initialFiles, onDismiss }: BulkUpl
   const [files, setFiles] = useState<FileEntry[]>(() => seedFromInitialFiles(initialFiles).files);
   const [uploading, setUploading] = useState(false);
   const [batch, setBatch] = useState<BatchStatus | null>(null);
-  const [error, setError] = useState<string | null>(
-    () => seedFromInitialFiles(initialFiles).error
-  );
+  const [error, setError] = useState<string | null>(() => seedFromInitialFiles(initialFiles).error);
   const inputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 

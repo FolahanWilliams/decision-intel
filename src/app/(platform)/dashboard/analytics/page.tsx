@@ -314,9 +314,7 @@ function AnalyticsInner() {
                     Decision DNA (personal calibration) + Bias Genome
                     contribution (cross-org calibration). */}
                 <section id="flywheel" style={{ scrollMarginTop: 80 }}>
-                  <SectionHeading icon={<TrendingUp size={13} />}>
-                    Outcome Flywheel
-                  </SectionHeading>
+                  <SectionHeading icon={<TrendingUp size={13} />}>Outcome Flywheel</SectionHeading>
                   <OutcomeFlywheelContent />
                 </section>
 

@@ -283,10 +283,7 @@ export function ContainerTopFixesCard({ container }: Props) {
                       </>
                     ) : (
                       <>
-                        <Brain
-                          size={10}
-                          style={{ verticalAlign: 'middle', marginRight: 3 }}
-                        />
+                        <Brain size={10} style={{ verticalAlign: 'middle', marginRight: 3 }} />
                         recurring bias
                       </>
                     )}

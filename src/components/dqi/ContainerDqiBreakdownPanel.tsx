@@ -67,7 +67,8 @@ const COMPONENT_META: ComponentMeta[] = [
   {
     key: 'evidenceQuality',
     displayName: 'Evidence quality',
-    description: "Whether claims are backed by verifiable evidence — or contradicted by the record.",
+    description:
+      'Whether claims are backed by verifiable evidence — or contradicted by the record.',
   },
   {
     key: 'processMaturity',
@@ -234,8 +235,7 @@ export function ContainerDqiBreakdownPanel({
   const docsWorstFirst = [...perDoc].sort((a, b) => a.overallScore - b.overallScore);
 
   const compositeScore = container.compositeDqi;
-  const compositeColor =
-    compositeScore != null ? dqiColorFor(compositeScore) : 'var(--text-muted)';
+  const compositeColor = compositeScore != null ? dqiColorFor(compositeScore) : 'var(--text-muted)';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -471,8 +471,7 @@ export function ContainerDqiBreakdownPanel({
                           >
                             {d.documentName}
                           </a>{' '}
-                          ({Math.round(d.score)})
-                          {i < drag.worstDocs.length - 1 ? ', ' : ''}
+                          ({Math.round(d.score)}){i < drag.worstDocs.length - 1 ? ', ' : ''}
                         </span>
                       ))}
                     </div>
@@ -669,15 +668,13 @@ function CrossDocSignalSection({ container }: { container: ContainerDetail }) {
     })
     .slice(0, 5);
 
-  const namedPatterns = (container.aggregation?.namedPatterns ?? [])
-    .slice()
-    .sort((a, b) => {
-      const sevRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
-      const sa = sevRank[a.severity] ?? 0;
-      const sb = sevRank[b.severity] ?? 0;
-      if (sb !== sa) return sb - sa;
-      return b.documentCount - a.documentCount;
-    });
+  const namedPatterns = (container.aggregation?.namedPatterns ?? []).slice().sort((a, b) => {
+    const sevRank: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+    const sa = sevRank[a.severity] ?? 0;
+    const sb = sevRank[b.severity] ?? 0;
+    if (sb !== sa) return sb - sa;
+    return b.documentCount - a.documentCount;
+  });
 
   const crossRefConflicts = container.crossRefConflictCount ?? 0;
   const crossRefHighSeverity = container.crossRefHighSeverityCount ?? 0;
@@ -763,8 +760,7 @@ function CrossDocSignalSection({ container }: { container: ContainerDetail }) {
                         color: 'var(--text-muted)',
                       }}
                     >
-                      Fired in {p.documentCount}{' '}
-                      {p.documentCount === 1 ? 'document' : 'documents'}
+                      Fired in {p.documentCount} {p.documentCount === 1 ? 'document' : 'documents'}
                       {p.maxToxicScore != null
                         ? ` · max toxic score ${Math.round(p.maxToxicScore)}`
                         : ''}

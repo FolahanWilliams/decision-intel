@@ -486,8 +486,8 @@ export default function LandingPage() {
                       lineHeight: 1.45,
                     }}
                   >
-                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong>{' '}
-                    — projections without named owner, mechanism, or 90-day milestone.
+                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong> —
+                    projections without named owner, mechanism, or 90-day milestone.
                   </li>
                   <li
                     style={{

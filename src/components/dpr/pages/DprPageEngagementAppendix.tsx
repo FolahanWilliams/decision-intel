@@ -88,8 +88,7 @@ export function DprPageEngagementAppendix(props: DprPageEngagementAppendixProps)
     footerTitle = 'Decision Provenance Record',
   } = props;
 
-  const dqiDisplay =
-    appendix.averageDqi != null ? Math.round(appendix.averageDqi).toString() : '—';
+  const dqiDisplay = appendix.averageDqi != null ? Math.round(appendix.averageDqi).toString() : '—';
   const dqiBandDisplay = appendix.averageDqiBand ?? '—';
   const cohortDqiDisplay =
     appendix.cohortComparison.averageDqiAcrossOtherEngagements != null
@@ -237,9 +236,9 @@ export function DprPageEngagementAppendix(props: DprPageEngagementAppendixProps)
 
       <p className="dpr-engagement-footnote">
         Generated for: fractional Chief Strategy Officer (Phase 1 HXC persona). Cohort labels
-        anonymized so this appendix can travel to the client without disclosing the identity of
-        your other engagements. Engagement key: <code>Container.targetCompany</code>. Audit
-        timestamp: {auditTimestamp.slice(0, 19).replace('T', ' ')} UTC.
+        anonymized so this appendix can travel to the client without disclosing the identity of your
+        other engagements. Engagement key: <code>Container.targetCompany</code>. Audit timestamp:{' '}
+        {auditTimestamp.slice(0, 19).replace('T', ' ')} UTC.
       </p>
     </DprPageShell>
   );

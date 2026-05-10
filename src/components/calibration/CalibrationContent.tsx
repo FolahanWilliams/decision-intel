@@ -17,10 +17,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { formatBiasName } from '@/lib/utils/labels';
 
 function TrendIcon({ trend }: { trend: 'increasing' | 'decreasing' | 'stable' }) {
-  if (trend === 'decreasing')
-    return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
-  if (trend === 'increasing')
-    return <TrendingUp size={12} style={{ color: 'var(--error)' }} />;
+  if (trend === 'decreasing') return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
+  if (trend === 'increasing') return <TrendingUp size={12} style={{ color: 'var(--error)' }} />;
   return <Minus size={12} style={{ color: 'var(--text-muted)' }} />;
 }
 
@@ -355,7 +353,8 @@ export function CalibrationContent() {
                       className="p-3"
                       style={{
                         background: 'color-mix(in srgb, var(--severity-high) 6%, transparent)',
-                        border: '1px solid color-mix(in srgb, var(--severity-high) 25%, transparent)',
+                        border:
+                          '1px solid color-mix(in srgb, var(--severity-high) 25%, transparent)',
                         borderRadius: 'var(--radius-sm)',
                       }}
                     >

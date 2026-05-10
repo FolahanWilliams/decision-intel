@@ -221,19 +221,9 @@ export function ContainerConstellation() {
             // assumption and its dependents.
             const strokeColor = l.isAlertEdge ? 'var(--severity-critical)' : meta.edgeColor;
             const strokeWidth = l.isAlertEdge ? 2.2 : l.isHotEdge ? 1.6 : 1;
-            const baseOpacity = l.isAlertEdge
-              ? 0.95
-              : l.isHotEdge
-                ? 0.85
-                : isHovered
-                  ? 0.9
-                  : 0.45;
+            const baseOpacity = l.isAlertEdge ? 0.95 : l.isHotEdge ? 0.85 : isHovered ? 0.9 : 0.45;
             const dashArray =
-              meta.edgeStyle === 'dashed'
-                ? '4 3'
-                : meta.edgeStyle === 'dotted'
-                  ? '1 3'
-                  : undefined;
+              meta.edgeStyle === 'dashed' ? '4 3' : meta.edgeStyle === 'dotted' ? '1 3' : undefined;
             return (
               <g key={l.id}>
                 <path

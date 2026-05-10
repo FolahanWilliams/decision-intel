@@ -24,15 +24,7 @@
 import { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import {
-  Plus,
-  Filter,
-  Network,
-  Layout,
-  BookOpen,
-  BrainCircuit,
-  ArrowUpRight,
-} from 'lucide-react';
+import { Plus, Filter, Network, Layout, BookOpen, BrainCircuit, ArrowUpRight } from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {

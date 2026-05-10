@@ -179,9 +179,7 @@ export const PERSONA_ARCHETYPES: PersonaArchetype[] = [
  * live audit cannot accidentally pick a persona that was retired by v3.5
  * sign-up gating.
  */
-const ACTIVE_ARCHETYPES = PERSONA_ARCHETYPES.filter(
-  p => !p.uniqueAngle.startsWith('DEPRECATED')
-);
+const ACTIVE_ARCHETYPES = PERSONA_ARCHETYPES.filter(p => !p.uniqueAngle.startsWith('DEPRECATED'));
 
 const PERSONA_ROSTER_BLOCK = ACTIVE_ARCHETYPES.map(
   (p, i) => `${i + 1}. ${p.name} — ${p.uniqueAngle}`

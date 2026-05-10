@@ -132,11 +132,7 @@ export function SampleDataBanner() {
   const wouldRenderMode1 = !loading && !!status && status.shouldOfferSeed && !seedDismissed;
   const wouldRenderMode3 = !loading && !!status && status.canClear && !clearDismissed;
   const wouldRender = wouldRenderMode1 || wouldRenderMode3;
-  const shouldRender = useModalSlot(
-    'sample_data',
-    MODAL_STACK_PRIORITY.sample_data,
-    wouldRender
-  );
+  const shouldRender = useModalSlot('sample_data', MODAL_STACK_PRIORITY.sample_data, wouldRender);
   if (!shouldRender) return null;
   if (loading || !status) return null;
 
