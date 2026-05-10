@@ -270,6 +270,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     log.error('POST /api/containers failed:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    // Surface the actual error message in development so the founder can
+    // diagnose in the browser console without tailing dev-server logs.
+    // In production we collapse to the generic "Internal error" so we
+    // don't leak Prisma error shapes / SQL fragments to end users.
+    const message =
+      process.env.NODE_ENV === 'production'
+        ? 'Internal error'
+        : `Internal error: ${error instanceof Error ? error.message : String(error)}`;
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

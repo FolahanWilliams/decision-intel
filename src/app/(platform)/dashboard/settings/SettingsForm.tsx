@@ -118,9 +118,27 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         body: JSON.stringify({ onboardingCompleted: false, onboardingTourSeen: false }),
       });
       if (!res.ok) throw new Error('Failed to reset onboarding');
+
+      // Clear the client-side completed flag so the WelcomeModal
+      // re-shows on /dashboard. (Server flag was reset above; the
+      // localStorage flag is what gates the modal's render — without
+      // clearing it the modal silently closes itself on mount.)
+      localStorage.removeItem('decision-intel-onboarding-completed');
+      localStorage.removeItem('decision-intel-checklist-dismissed');
       localStorage.setItem('decision-intel-launch-tour', 'pending');
+
       showToast('Starting onboarding — redirecting to dashboard', 'success');
       router.push('/dashboard');
+
+      // The OnboardingTour TourLauncher is mounted in the platform
+      // layout and reads localStorage in a useEffect that runs once on
+      // mount. Since we're navigating WITHIN the platform layout (not
+      // remounting it), the useEffect won't re-run. Dispatch the
+      // di:launch-tour custom event the launcher also listens for so
+      // the tour fires after the route change settles.
+      setTimeout(() => {
+        window.dispatchEvent(new Event('di:launch-tour'));
+      }, 600);
     } catch (err) {
       log.error('Failed to replay onboarding:', err);
       showToast('Failed to replay onboarding', 'error');

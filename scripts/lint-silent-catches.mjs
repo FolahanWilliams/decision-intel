@@ -104,7 +104,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // codebase had 4 silent catches that have been independently absorbed
 // or the SILENT_CATCH regex no longer flags them. Ratcheted DOWN per
 // the lint script's "reducing is encouraged" rule.
-const SILENT_CATCH_BASELINE = 151;
+// 151 → 152: Hybrid /decisions/new ship 2026-05-10 — added a
+// `uploadRes.json().catch(() => null)` body-parse on the response
+// error path (canonical req.json() body-parse exception class
+// CLAUDE.md explicitly lists as legitimate fire-and-forget).
+const SILENT_CATCH_BASELINE = 152;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
