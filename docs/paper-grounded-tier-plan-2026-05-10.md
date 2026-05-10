@@ -266,15 +266,55 @@ PMI is where the largest pool of M&A value destruction actually fires (Daimler-C
 
 ---
 
-# Session-handoff: what to do first when reopening
+## Session-handoff: refined plan for 2026-05-11 (REWRITTEN POST-TIER-2)
 
-1. Read this doc top to bottom.
-2. Confirm the PMI Path B + thin Path C recommendation, or push back.
-3. Confirm T3.1 category-claim reframe (option 1 + 2 layered) or pick a different shape.
-4. Decide whether to ship T2.1 (DQI weight adjustability) or T2.2 (ambient capture) first. My recommendation: T2.1 — single-session, lower regression risk, higher per-customer behaviour-change. T2.2 is the bigger ship.
-5. Run `npm run lint:positioning && npm run lint:silent-catches && npm run lint:counts && npm run lint:canonical-imports && npm run lint:doc-sync && NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit && npm run slop-scan` to confirm baseline state matches the post-shipping-Tier-1 state in commit `[hash to fill in after Tier 1 ship]`.
-6. Pull from origin/main (`git fetch origin main && git rebase origin/main`) before any work.
-7. Re-read CLAUDE.md "Constellation Next Move + Paper-Grounded Reasoning Surfaces" lock for the v1 architecture; the new session needs that context.
+Tier 1 + Tier 2.1 + Tier 2.2 + Tier 2.3 + PMI Path B/C all shipped 2026-05-10 evening (commit `c2e6c1fb`). Plan refined with NotebookLM master-KB synthesis (notebook `809f5104`, conversation `9a90e1e8`).
+
+### Top 4 deferred items, ranked by ROI for Strategy World London T-30d (June 9-10 BAFTA)
+
+The single objective of the next 30 days is converting a 20-minute coffee with a Margaret-class CSO or Damien-class corp dev head into a £249/mo wedge pilot. Backend plumbing without buyer-conversion impact is explicitly deferred.
+
+**P1 — T3.1: Refine category claim away from "always-on red team".** Paper anchor: Mercier & Sperber argumentative theory (humans evolved reasoning for social justification → red-team framing triggers ego threat). Replace with _"the antagonist that costs you no political capital — fires before the IC memo can hide what the deal sponsor doesn't want to see"_ as the contrast sub-head; H1 stays unchanged. Wedge personas served: fractional CSO + mid-market corp dev head. **Cost: low (copy + icp.ts BANNED_VOCABULARY).** Files: [src/lib/constants/icp.ts](../src/lib/constants/icp.ts) (POSITIONING_CONTRAST_SUBHEAD + extend BANNED_VOCABULARY with `always-on red team`), landing-page first-impression copy, /how-it-works first paragraph, COLD_CONTEXT_ONRAMPS, CLAUDE.md Positioning & Vocabulary section, founder-context.ts chat preamble. **Lowest-cost-highest-payoff move; ship first.**
+
+**P2 — DPR cover weight-set surface.** Data flows already (`DQIResult.effectiveWeights` + `weightsHash` + `weightsSource` all returned by `computeDQI`). The cover-page renderer doesn't yet pull from them. When a GP sees the printed DPR with `Weights: hash d4a8c2e9b3f1 · user-adjusted (Δ 0.07 vs canonical)` stamped on page 1, it proves the engine is calibrated to their domain, not generic. Paper anchor: Kahneman & Klein 2009 first-condition + Dietvorst 2016 trust-via-adjustability. **Cost: medium ([src/app/dpr-render/dpr.css](../src/app/dpr-render/dpr.css) + [src/app/dpr-render/[type]/[id]/page.tsx](<../src/app/dpr-render/[type]/[id]/page.tsx>) + provenance-record-data assembler reads `analysis.judgeOutputs.weightsHash` if persisted, falls back to live compute).** Persist the hash on `Analysis.judgeOutputs.weightsResolution = { source, hash, methodologyVersion }` in [/api/analyze/stream](../src/app/api/analyze/stream/route.ts) at audit-completion time so the DPR can read the band the audit was originally scored against.
+
+**P3 — T3.3: Liability-shift compulsion framing on Why Now slide.** Promote EU AI Act Art 14 (Aug 2026 enforceable) + Basel III ICAAP from accessory to primary axis. Pitch deck slide 3 restructured around the three inflection conditions from Paper #2 Ch 9 (liability shift in motion + friction collapse unlocked + status reframing). Wedge personas: mid-market corp dev head via their GC; PE-backed founder via legal-risk avoidance. **Cost: low (trust-copy.ts liability-shift block + /security + /trust + pitch deck slide 3 restructure).**
+
+**P4 — Held-out-sample DQI distribution check.** Required process step before methodology 2.3.0 enables production. Run 5 sample memos × 4 weight configs (canonical + 3 persona-tuned), document distribution shift, verify no overrides produce DQI > 100 / < 0 / inverted grade-band ordering. **Cost: small script + founder-driven review.** Required for procurement defensibility when a GP asks "how do I know your score is accurate?" — the answer needs to point at a documented regression test, not just the test suite.
+
+### 2 new high-leverage moves NotebookLM surfaced (not on prior list)
+
+**N1 — Kyle-Price-overlay "Deal Fever" Boardroom Twin demo.** Kyle Price (Roblox Head of Corp Dev; master KB source #23, the canonical Paper #2 anchor quote) said on the M&A Science podcast that there is "no cure" for Deal Fever; the only effective countermeasure is "a red team exercise — somebody pitches the case for why this is a horrible idea." That's exactly the antagonist pattern T3.1 reframes politically. Ship: when a user uploads a CIM, the existing simulate-ceo route auto-fires a 1-click Deal-Fever pre-mortem with 3 brutal questions targeted at Deal Fever / Winner's Curse / Synergy Mirage. Wedge persona: mid-market corp dev head (Kyle's exact role). **Cost: medium — extend [/api/simulate-ceo](../src/app/api/simulate-ceo/route.ts) with a `mode: 'deal_fever_premortem'` flag + hardcoded prompt overlay; auto-trigger on CIM upload via the analyze/stream completion event; surface result as a header chip on the container detail page.**
+
+**N2 — Deepen the Synergy Mirage filter to BCG procurement-grade.** The synergy_model parser already exists ([src/lib/parsers/synergy-model-parser.ts](../src/lib/parsers/synergy-model-parser.ts)) and Synergy Mirage already fires on the bias-detective. What's missing: explicit BCG-mandated check — every synergy claim must name (a) the operational mechanism, (b) the accountable executive owner, (c) the measurable 90-day milestone. If any are missing, the audit fires "Synergy Mirage · BCG-mandate failure" with verbatim citation. This proves to a PE-backed founder that the tool enforces elite operational hygiene, not just psychology. **Cost: low (extend [synergy-defensibility.ts](../src/lib/parsers/synergy-defensibility.ts) scorer with the 3-checks + extend `DOC_TYPE_OVERLAYS.synergy_model` in [investment-vertical.ts](../src/lib/prompts/investment-vertical.ts) to instruct the bias detective to flag missing mechanism/owner/milestone).**
+
+### Items deferred from Strategy World prep — post-event polish
+
+- **T3.2 generational-change narrative for fundraise** — post-seed-conversation positioning, not pre-pilot conversion. Ship when seed conversations open (per Mr. Gabe customers-before-investors rule).
+- **Drive file-body classification** (T2.2 v1 is metadata-only). Retention feature, not conversion.
+- **Post-upload priors variant on /dashboard**. Document-level priors are a different shape than container-level; not blocking the wedge motion.
+- **Outcome-inference pipeline integration of `inferOutcomeFromPmiSignals`.** Helper is built + tested; wiring into the 1111-line outcome-inference module is post-pilot retention.
+- **IC-memo PMI auto-extraction via deepseek-v4-flash.** Reduces friction post-purchase; pre-purchase, manual entry on the PMI Tracker is fine.
+
+### NotebookLM caveat (founder action required before citing publicly)
+
+The NotebookLM synthesis included a _"Fortis Advisors LLC v. Krafton Inc. (2026 Delaware Chancery)"_ case as an anti-provenance horror story for the liability-shift slide. Inspection of the citation chunks shows the cited sources are unrelated Definely-revenue snippets, NOT actual legal-case sources. **Treat this case as unverified — do NOT cite in pitch decks or public surfaces without independent confirmation.** Real Delaware Chancery decisions involving AI provenance / earnout disputes are public-record; verify before use. The general liability-shift argument stays valid via EU AI Act Art 14 + Basel III ICAAP (both independently verified). This is the "hallucinated case" failure mode CLAUDE.md positioning rule was written to catch — every citation on a marketing surface must trace to a real primary source.
+
+### First-session-of-2026-05-11 checklist
+
+1. `git fetch origin main && git rebase origin/main` before any work.
+2. `NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit && npm run lint:positioning && npm run lint:silent-catches && npm run lint:counts && npm run lint:canonical-imports && npm run lint:doc-sync && npm run slop-scan` to confirm baseline matches `c2e6c1fb` (post Tier-2 + PMI ship).
+3. `npx prisma migrate deploy` against production for migration `20260510230000_tier2_dqi_weights_ambient_pmi` if not yet deployed (DqiWeightOverride + AmbientThesisSignal tables + DecisionContainerOutcome.pmiSignals column + SlackInstallation/GoogleDriveInstallation consent flags).
+4. Verify the consent toggles in Settings → Integrations render correctly for the founder's own Slack / Drive installations.
+5. Ship P1 (T3.1 category claim) first — 20-minute editorial change with immediate compounding effect on every cold-context surface.
+6. Then ship P2 (DPR cover weight-set surface) — needed to make the methodology 2.3.0 audit actually visible to procurement readers, otherwise the engine work shipped tonight is invisible on the leave-behind artefact.
+7. Schedule P4 (held-out-sample DQI distribution check) for the same day as P2 — both need to land before any GP-facing demo with the new 2.3.0 methodology.
+8. Then attack N1 (Kyle-Price Deal-Fever demo) — the highest-leverage NEW move for the Strategy World corp-dev-head conversation.
+9. Re-read CLAUDE.md "Tier 2 + PMI Path B/C ship (locked 2026-05-10 evening)" lock for the v1 architecture context.
+
+### Open strategic question for the founder
+
+The plan above assumes the founder is attending Strategy World London June 9-10. If not — or if the 4 HXC personas in the founder's pre-booked 1:1 calendar shift — the ROI ranking flips. **P1 (category claim) is load-bearing regardless** — it's pure cold-context vocabulary discipline that compounds on every surface. P2 + N1 + N2 are most valuable when the founder has a CIM upload in front of a corp-dev-head buyer AT THE EVENT. P3 (liability shift) is the slide-3 move for the post-event follow-up email + the seed-conversation deck six months out. **Founder decision needed**: confirm Strategy World attendance + 1:1 calendar, OR redirect the plan toward the next-highest-signal channel.
 
 # Files this doc references
 
