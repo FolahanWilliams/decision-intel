@@ -28,7 +28,7 @@ import { createClientLogger } from '@/lib/utils/logger';
 import type { SlackInstallationStatus } from '@/types/human-audit';
 import { PersonaManager } from './PersonaManager';
 import { BillingSection } from '@/components/ui/BillingSection';
-import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
+// ApiKeysSection cut 2026-05-10 streamlining batch (see SettingsForm body comment).
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AccentCard } from '@/components/ui/AccentCard';
 
@@ -786,8 +786,12 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               </div>
             </AccentCard>
 
-            {/* API Keys */}
-            <ApiKeysSection />
+            {/* API Keys removed 2026-05-10 streamlining batch (founder ask:
+                "cut API key functionality... ruthlessly good at a few
+                things"). The /api/v1/* endpoints + ApiKeysSection
+                component + /api/v1/keys route + /docs/api page all cut
+                in the same ship — programmatic API access is deferred
+                until there's clear customer demand. */}
 
             {/* Full integration marketplace (connect, disconnect, manage scopes) */}
             <IntegrationsTabContent />

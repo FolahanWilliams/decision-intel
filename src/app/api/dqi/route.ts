@@ -2,8 +2,10 @@
  * Internal API — GET /api/dqi?analysisId=xxx
  *
  * Returns the Decision Quality Index (DQI) for a given analysis.
- * Uses Supabase session auth (for frontend use).
- * For external/API-key access, use /api/v1/dqi.
+ * Uses Supabase session auth (for frontend use). The /api/v1/dqi
+ * external API-key endpoint was retired 2026-05-10 streamlining batch
+ * along with the rest of the /api/v1/* surface — this internal route
+ * is the canonical DQI endpoint.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

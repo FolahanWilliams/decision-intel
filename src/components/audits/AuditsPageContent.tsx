@@ -96,10 +96,7 @@ export function AuditsPageContent() {
 
   if (isInitialLoad) {
     return (
-      <div
-        className="container"
-        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
-      >
+      <div>
         <div className="grid grid-4 mb-xl gap-md">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
@@ -149,30 +146,21 @@ export function AuditsPageContent() {
   }
 
   return (
-    <div
-      className="container"
-      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
-    >
-      <header className="mb-xl">
-        <div className="flex items-center justify-between mb-sm">
-          <div className="flex items-center gap-md">
-            <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
-            <h1>Cognitive Audits</h1>
-          </div>
-          <div className="flex items-center gap-sm">
-            <Link
-              href="/dashboard/cognitive-audits/submit"
-              className="btn btn-primary"
-              style={{ fontSize: '13px' }}
-            >
-              + Submit Decision
-            </Link>
-          </div>
-        </div>
-        <p className="text-muted">
-          Human decision quality analysis — bias detection, noise measurement, and behavioral nudges
-        </p>
-      </header>
+    // Chrome stripped 2026-05-10 streamlining batch — was rendering its
+    // own page-header inside the Analytics → Decision Signals section,
+    // which double-headed the surface (parent SectionHeading +
+    // component's own H1). Component is content-only now; the parent
+    // section heading is the source of truth.
+    <div>
+      <div className="mb-md flex items-center justify-end">
+        <Link
+          href="/dashboard/cognitive-audits/submit"
+          className="btn btn-secondary"
+          style={{ fontSize: '13px' }}
+        >
+          + Submit decision for audit
+        </Link>
+      </div>
 
       {/* Summary Cards */}
       <ErrorBoundary sectionName="Audit Summary">

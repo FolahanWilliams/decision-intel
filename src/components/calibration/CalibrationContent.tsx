@@ -17,10 +17,23 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { formatBiasName } from '@/lib/utils/labels';
 
 function TrendIcon({ trend }: { trend: 'increasing' | 'decreasing' | 'stable' }) {
-  if (trend === 'decreasing') return <TrendingDown size={12} className="text-emerald-400" />;
-  if (trend === 'increasing') return <TrendingUp size={12} className="text-red-400" />;
-  return <Minus size={12} className="text-zinc-400" />;
+  if (trend === 'decreasing')
+    return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
+  if (trend === 'increasing')
+    return <TrendingUp size={12} style={{ color: 'var(--error)' }} />;
+  return <Minus size={12} style={{ color: 'var(--text-muted)' }} />;
 }
+
+// Light-theme color helpers — migrated from dark-theme Tailwind utility
+// classes (text-emerald-400 / text-red-400 / text-amber-400 / etc.) which
+// rendered as muted greys against the platform's light surfaces 2026-05-10
+// streamlining batch. Per CLAUDE.md "Use CSS variables, not hardcoded
+// hex" — every severity / state colour now flows through canonical tokens.
+const COLOR_SUCCESS = 'var(--success)';
+const COLOR_WARNING = 'var(--warning)';
+const COLOR_ERROR = 'var(--error)';
+const COLOR_INFO = 'var(--info)';
+const COLOR_HIGH = 'var(--severity-high)';
 
 export function CalibrationContent() {
   const [profile, setProfile] = useState<CalibrationProfile | null>(null);
@@ -54,9 +67,11 @@ export function CalibrationContent() {
 
   if (error) {
     return (
-      <div className="card border-l-4 border-l-red-500">
+      <div className="card" style={{ borderLeft: '4px solid var(--error)' }}>
         <div className="card-body">
-          <p className="text-sm text-red-400">{error}</p>
+          <p className="text-sm" style={{ color: 'var(--error)' }}>
+            {error}
+          </p>
         </div>
       </div>
     );
@@ -82,10 +97,11 @@ export function CalibrationContent() {
 
   const scoreColor =
     profile.calibrationScore >= 70
-      ? 'text-emerald-400'
+      ? COLOR_SUCCESS
       : profile.calibrationScore >= 40
-        ? 'text-amber-400'
-        : 'text-red-400';
+        ? COLOR_WARNING
+        : COLOR_ERROR;
+  const scoreBarColor = scoreColor; // bar fill matches text colour
 
   const totalOutcomes =
     profile.outcomeRate.success + profile.outcomeRate.failure + profile.outcomeRate.mixed;
@@ -98,10 +114,12 @@ export function CalibrationContent() {
           <div className="card">
             <div className="card-header flex flex-row items-center justify-between pb-2">
               <h4 className="text-sm font-medium">Calibration Score</h4>
-              <Target size={16} className={scoreColor} />
+              <Target size={16} style={{ color: scoreColor }} />
             </div>
             <div className="card-body">
-              <div className={`text-3xl font-bold ${scoreColor}`}>{profile.calibrationScore}</div>
+              <div className="text-3xl font-bold" style={{ color: scoreColor }}>
+                {profile.calibrationScore}
+              </div>
               <p className="text-xs text-muted">
                 {profile.calibrationScore >= 70
                   ? 'Well-calibrated'
@@ -109,16 +127,16 @@ export function CalibrationContent() {
                     ? 'Developing'
                     : 'Needs attention'}
               </p>
-              <div className="mt-2 h-2 bg-muted/20 overflow-hidden">
+              <div
+                className="mt-2 h-2 overflow-hidden"
+                style={{ background: 'var(--bg-elevated)', borderRadius: 'var(--radius-sm)' }}
+              >
                 <div
-                  className={`h-full transition-all duration-700 ${
-                    profile.calibrationScore >= 70
-                      ? 'bg-emerald-500'
-                      : profile.calibrationScore >= 40
-                        ? 'bg-amber-500'
-                        : 'bg-red-500'
-                  }`}
-                  style={{ width: `${profile.calibrationScore}%` }}
+                  className="h-full transition-all duration-700"
+                  style={{
+                    width: `${profile.calibrationScore}%`,
+                    background: scoreBarColor,
+                  }}
                 />
               </div>
             </div>
@@ -128,10 +146,12 @@ export function CalibrationContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Total Decisions</h4>
-            <Brain size={16} className="text-blue-400" />
+            <Brain size={16} style={{ color: COLOR_INFO }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-blue-400">{profile.totalDecisions}</div>
+            <div className="text-3xl font-bold" style={{ color: COLOR_INFO }}>
+              {profile.totalDecisions}
+            </div>
             <p className="text-xs text-muted">Analyses performed</p>
           </div>
         </div>
@@ -139,10 +159,12 @@ export function CalibrationContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Outcomes Reported</h4>
-            <CheckCircle size={16} className="text-emerald-400" />
+            <CheckCircle size={16} style={{ color: COLOR_SUCCESS }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-emerald-400">{totalOutcomes}</div>
+            <div className="text-3xl font-bold" style={{ color: COLOR_SUCCESS }}>
+              {totalOutcomes}
+            </div>
             <p className="text-xs text-muted">
               {totalOutcomes > 0
                 ? `${Math.round((profile.outcomeRate.success / totalOutcomes) * 100)}% success rate`
@@ -154,10 +176,10 @@ export function CalibrationContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Blind Spots</h4>
-            <AlertTriangle size={16} className="text-orange-400" />
+            <AlertTriangle size={16} style={{ color: COLOR_HIGH }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-orange-400">
+            <div className="text-3xl font-bold" style={{ color: COLOR_HIGH }}>
               {profile.patternBlindSpots.length}
             </div>
             <p className="text-xs text-muted">Persistent patterns to watch</p>
@@ -197,13 +219,15 @@ export function CalibrationContent() {
                         <div className="flex items-center gap-1">
                           <TrendIcon trend={bias.trend} />
                           <span
-                            className={`text-[10px] ${
-                              bias.trend === 'decreasing'
-                                ? 'text-emerald-400'
-                                : bias.trend === 'increasing'
-                                  ? 'text-red-400'
-                                  : 'text-zinc-400'
-                            }`}
+                            className="text-[10px]"
+                            style={{
+                              color:
+                                bias.trend === 'decreasing'
+                                  ? COLOR_SUCCESS
+                                  : bias.trend === 'increasing'
+                                    ? COLOR_ERROR
+                                    : 'var(--text-muted)',
+                            }}
                           >
                             {bias.trend}
                           </span>
@@ -235,48 +259,45 @@ export function CalibrationContent() {
               ) : (
                 <div className="space-y-4">
                   {/* Visual bar */}
-                  <div className="h-8 flex overflow-hidden">
+                  <div
+                    className="h-8 flex overflow-hidden"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
+                  >
                     {profile.outcomeRate.success > 0 && (
                       <div
-                        className="bg-emerald-500 flex items-center justify-center"
+                        className="flex items-center justify-center"
                         style={{
                           width: `${(profile.outcomeRate.success / totalOutcomes) * 100}%`,
+                          background: COLOR_SUCCESS,
                         }}
                       >
-                        <span
-                          className="text-[10px] font-bold"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
+                        <span className="text-[10px] font-bold" style={{ color: '#fff' }}>
                           {profile.outcomeRate.success}
                         </span>
                       </div>
                     )}
                     {profile.outcomeRate.mixed > 0 && (
                       <div
-                        className="bg-amber-500 flex items-center justify-center"
+                        className="flex items-center justify-center"
                         style={{
                           width: `${(profile.outcomeRate.mixed / totalOutcomes) * 100}%`,
+                          background: COLOR_WARNING,
                         }}
                       >
-                        <span
-                          className="text-[10px] font-bold"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
+                        <span className="text-[10px] font-bold" style={{ color: '#fff' }}>
                           {profile.outcomeRate.mixed}
                         </span>
                       </div>
                     )}
                     {profile.outcomeRate.failure > 0 && (
                       <div
-                        className="bg-red-500 flex items-center justify-center"
+                        className="flex items-center justify-center"
                         style={{
                           width: `${(profile.outcomeRate.failure / totalOutcomes) * 100}%`,
+                          background: COLOR_ERROR,
                         }}
                       >
-                        <span
-                          className="text-[10px] font-bold"
-                          style={{ color: 'var(--text-primary)' }}
-                        >
+                        <span className="text-[10px] font-bold" style={{ color: '#fff' }}>
                           {profile.outcomeRate.failure}
                         </span>
                       </div>
@@ -285,19 +306,19 @@ export function CalibrationContent() {
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-center">
-                      <div className="text-lg font-bold text-emerald-400">
+                      <div className="text-lg font-bold" style={{ color: COLOR_SUCCESS }}>
                         {profile.outcomeRate.success}
                       </div>
                       <span className="text-[10px] text-muted">Success</span>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-amber-400">
+                      <div className="text-lg font-bold" style={{ color: COLOR_WARNING }}>
                         {profile.outcomeRate.mixed}
                       </div>
                       <span className="text-[10px] text-muted">Mixed</span>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-red-400">
+                      <div className="text-lg font-bold" style={{ color: COLOR_ERROR }}>
                         {profile.outcomeRate.failure}
                       </div>
                       <span className="text-[10px] text-muted">Failure</span>
@@ -314,7 +335,7 @@ export function CalibrationContent() {
           <div className="card">
             <div className="card-header">
               <h4 className="flex items-center gap-2 text-sm font-semibold">
-                <AlertTriangle size={14} className="text-orange-400" />
+                <AlertTriangle size={14} style={{ color: COLOR_HIGH }} />
                 Pattern Blind Spots
               </h4>
               <p className="text-xs text-muted mt-1">
@@ -329,8 +350,21 @@ export function CalibrationContent() {
               ) : (
                 <div className="space-y-2">
                   {profile.patternBlindSpots.map((spot, i) => (
-                    <div key={i} className="p-3 bg-orange-500/5 border border-orange-500/20">
-                      <span className="text-xs font-medium text-orange-400 capitalize">{spot}</span>
+                    <div
+                      key={i}
+                      className="p-3"
+                      style={{
+                        background: 'color-mix(in srgb, var(--severity-high) 6%, transparent)',
+                        border: '1px solid color-mix(in srgb, var(--severity-high) 25%, transparent)',
+                        borderRadius: 'var(--radius-sm)',
+                      }}
+                    >
+                      <span
+                        className="text-xs font-medium capitalize"
+                        style={{ color: COLOR_HIGH }}
+                      >
+                        {spot}
+                      </span>
                       <p className="text-[10px] text-muted mt-1">
                         This bias appears frequently in your analyses and is not trending downward.
                       </p>
@@ -347,7 +381,7 @@ export function CalibrationContent() {
           <div className="card">
             <div className="card-header">
               <h4 className="flex items-center gap-2 text-sm font-semibold">
-                <CheckCircle size={14} className="text-emerald-400" />
+                <CheckCircle size={14} style={{ color: COLOR_SUCCESS }} />
                 Strength Patterns
               </h4>
               <p className="text-xs text-muted mt-1">
@@ -362,8 +396,19 @@ export function CalibrationContent() {
               ) : (
                 <div className="space-y-2">
                   {profile.strengthPatterns.map((strength, i) => (
-                    <div key={i} className="p-3 bg-emerald-500/5 border border-emerald-500/20">
-                      <span className="text-xs font-medium text-emerald-400 capitalize">
+                    <div
+                      key={i}
+                      className="p-3"
+                      style={{
+                        background: 'color-mix(in srgb, var(--success) 6%, transparent)',
+                        border: '1px solid color-mix(in srgb, var(--success) 25%, transparent)',
+                        borderRadius: 'var(--radius-sm)',
+                      }}
+                    >
+                      <span
+                        className="text-xs font-medium capitalize"
+                        style={{ color: COLOR_SUCCESS }}
+                      >
                         {strength}
                       </span>
                     </div>

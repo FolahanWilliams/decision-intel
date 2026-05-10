@@ -245,7 +245,15 @@ export function CopilotPageContent() {
   const canResolve = sessionId && messages.length > 0 && currentSession?.status !== 'resolved';
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+    // Height: full parent (the AskPage wrapper sets the calc(100vh - 44px)
+    // bound with the page header carved off). Locked 2026-05-10
+    // streamlining batch — the prior inline 'h-[calc(100vh-4rem)]' didn't
+    // match the parent's 'calc(100vh - 44px)' frame, which made the
+    // session rail + chat overflow vertically (founder report: "left
+    // sidepanel is half missing"). Inheriting parent height fixes both
+    // ends — the rail stops being clipped at the bottom AND the chat
+    // composer pins to the visible bottom.
+    <div className="flex h-full overflow-hidden">
       {/* Mobile sidebar toggle */}
       <button
         onClick={() => setShowSidebar(!showSidebar)}

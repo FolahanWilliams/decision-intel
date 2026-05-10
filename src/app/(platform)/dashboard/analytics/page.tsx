@@ -29,11 +29,11 @@ const InsightsPageContent = lazy(() =>
     default: m.InsightsPageContent,
   }))
 );
-const ExplainabilityContent = lazy(() =>
-  import('@/components/explainability/ExplainabilityContent').then(m => ({
-    default: m.ExplainabilityContent,
-  }))
-);
+// ExplainabilityContent removed 2026-05-10 streamlining batch.
+// Was broken AND duplicated DqiBreakdownPanel (the per-audit clickable
+// component-by-component breakdown shipped in the DQI explainability
+// surface ship). Per-audit breakdown is the right surface for
+// explainability — Analytics tab is the wrong altitude.
 // DecisionIntelligenceContent removed 2026-05-10 streamlining batch.
 // Its "Personal" view rendered DecisionDNAPageContent — already its own
 // dedicated section above on this tab (duplicate). The unique team-view
@@ -341,11 +341,6 @@ function AnalyticsInner() {
                     Bias Genome Benchmark
                   </SectionHeading>
                   <BiasGenomeBenchmark />
-                </section>
-
-                <section>
-                  <SectionHeading icon={<Lightbulb size={13} />}>Explainability</SectionHeading>
-                  <ExplainabilityContent />
                 </section>
 
                 <section>
