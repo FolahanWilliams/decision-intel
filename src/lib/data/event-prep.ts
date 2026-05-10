@@ -66,8 +66,8 @@ export interface PrepEvent {
 
 export type WedgePersonaId =
   | 'fractional_cso'
-  | 'mid_market_corp_dev'
-  | 'small_fund_gp'
+  | 'midmarket_corp_dev'
+  | 'smaller_fund_gp'
   | 'pe_backed_founder';
 
 export interface WedgePersona {
@@ -137,7 +137,7 @@ export const EVENTS: PrepEvent[] = [
     endDate: '2026-06-10',
     venue: 'BAFTA, 195 Piccadilly',
     priority: 'highest',
-    primaryPersonas: ['fractional_cso', 'mid_market_corp_dev'],
+    primaryPersonas: ['fractional_cso', 'midmarket_corp_dev'],
     prepArcWeeks: 6,
     rationale:
       'v3.5 §2 lock: the single highest-signal CSO event. Pre-book 5+ 1:1 coffees with target-persona attendees, NOT booth + waiting. Each conversation = 20-min audit on a real strategic memo.',
@@ -161,7 +161,7 @@ export const EVENTS: PrepEvent[] = [
     endDate: '2026-06-23',
     venue: 'London (TBC)',
     priority: 'high',
-    primaryPersonas: ['fractional_cso', 'mid_market_corp_dev'],
+    primaryPersonas: ['fractional_cso', 'midmarket_corp_dev'],
     prepArcWeeks: 4,
     rationale:
       'Regulatory tailwinds audience (EU AI Act Aug 2026 enforcement). Discovery-FIRST motion; pivot to "audit committee evidence record" framing if the conversation surfaces a procurement-stage prospect.',
@@ -173,7 +173,7 @@ export const EVENTS: PrepEvent[] = [
     endDate: '2026-06-30',
     venue: 'London (TBC)',
     priority: 'high',
-    primaryPersonas: ['mid_market_corp_dev', 'small_fund_gp'],
+    primaryPersonas: ['midmarket_corp_dev', 'smaller_fund_gp'],
     prepArcWeeks: 4,
     rationale: 'M&A + fund partner density. Lead with the cross-border regulatory mapping pitch.',
   },
@@ -184,7 +184,7 @@ export const EVENTS: PrepEvent[] = [
     endDate: '2026-06-11',
     venue: 'ExCeL London, E16',
     priority: 'medium',
-    primaryPersonas: ['mid_market_corp_dev', 'pe_backed_founder'],
+    primaryPersonas: ['midmarket_corp_dev', 'pe_backed_founder'],
     prepArcWeeks: 4,
     rationale:
       'Lower signal-per-conversation than Strategy World London (overlapping date) but high volume. Use only if you can run BOTH events without breaking the 1-1-1 traffic-source discipline.',
@@ -224,7 +224,7 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
     ],
   },
   {
-    id: 'mid_market_corp_dev',
+    id: 'midmarket_corp_dev',
     label: 'Head of Corporate Development / M&A (mid-market)',
     band: '$50M-$500M revenue scale-up · personal-decisive budget',
     industries: ['technology', 'financial_services', 'manufacturing', 'healthcare'],
@@ -251,7 +251,7 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
     ],
   },
   {
-    id: 'small_fund_gp',
+    id: 'smaller_fund_gp',
     label: 'GP / principal at smaller fund',
     band: '£5M-£100M AUM · active deal flow OR LP-governance pressure',
     industries: ['technology', 'financial_services', 'healthcare', 'retail'],
@@ -325,7 +325,7 @@ export const DM_TEMPLATES: DmTemplate[] = [
       'Hi {introducer} — quick note that {prospect} and I had a great 20-min on {date}. Came out of it with {one-specific-insight}. Genuinely useful for both sides. Will keep you posted as the conversation develops; if {prospect} mentions us back to you, the framing they responded to was {framing}. Thanks again for the bridge.',
   },
   {
-    personaId: 'mid_market_corp_dev',
+    personaId: 'midmarket_corp_dev',
     opener:
       "Hi {name} — congrats on the {recent-deal-or-thread}. Quick reason for the DM: I've been auditing IC memos for the bias patterns that killed WeWork's IPO and the Daimler-Chrysler merger — narrative coherence that doesn't survive the CFO's first counterfactual, inside-view projections that ignore reference-class base rates. Happy to run a 60-second audit on your next IC memo (free, no slides, no pitch). Paste it at decision-intel.com; you'll get back the questions IC will ask first, before they catch them.",
     curiosityReply:
@@ -336,7 +336,7 @@ export const DM_TEMPLATES: DmTemplate[] = [
       "Hi {introducer} — wanted to close the loop: {prospect} and I had a substantive 20-min on {date}. The audit lands hardest for them around {pain-they-articulated}. Sending them the {WeWork or Dangote} DPR specimen as the next artefact. Will keep you posted on whether they pilot. If you have one more name in the {industry} space who's running into the same memo-quality friction, I'd value the intro.",
   },
   {
-    personaId: 'small_fund_gp',
+    personaId: 'smaller_fund_gp',
     opener:
       "Hi {name} — saw your {recent-LP-letter or deal-thread}. Quick context: the bias patterns that killed Theranos and FTX investor decisions — halo effect, authority bias from Tier-1 backer presence — are detectable at draft time, not just in retrospect. I've been auditing IC memos for them for a few months. Happy to run a 60-second audit on your next memo, free, no slides, no pitch. The framing isn't 'here's a tool' — it's 'here's what your LPs will ask first when something goes sideways, before they ask.'",
     curiosityReply:

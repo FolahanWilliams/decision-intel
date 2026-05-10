@@ -99,6 +99,30 @@ if [ $CANONICAL_LINT_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "📐 Running doc-sync lint (CLAUDE.md prose vs canonical const drift)..."
+echo ""
+
+npm run lint:doc-sync
+DOC_SYNC_EXIT_CODE=$?
+
+if [ $DOC_SYNC_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: doc-sync lint failed                     ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  CLAUDE.md prose drifted from the canonical const value of  ║"
+    echo "║  a ratchet baseline by more than tolerance (±2). Update the ║"
+    echo "║  prose in CLAUDE.md to match the const, then re-commit.     ║"
+    echo "║                                                              ║"
+    echo "║  See CLAUDE.md silent-catch ratchet — every baseline bump   ║"
+    echo "║  updates (i) the const, (ii) the trajectory comment, AND    ║"
+    echo "║  (iii) the CLAUDE.md prose in lockstep.                     ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
 echo "🧹 Running ESLint --fix (auto-fix what we can, fail on remaining errors)..."
 echo ""
 

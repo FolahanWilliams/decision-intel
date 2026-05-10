@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useModalSlot, MODAL_STACK_PRIORITY } from '@/components/ui/ModalStackContext';
 import {
   Lightbulb,
   Check,
@@ -131,7 +132,17 @@ export function DraftOutcomeBanner() {
     }
   };
 
-  if (loading || drafts.length === 0) return null;
+  // Modal-stack participation — only render when we're the top-priority
+  // visible claimant on /dashboard (locked 2026-05-10 batch 4 #1). When
+  // OutcomeGate (hard) is rendering, this banner suppresses; the user
+  // sees the harder surface first.
+  const wouldRender = !loading && drafts.length > 0;
+  const shouldRender = useModalSlot(
+    'draft_outcome',
+    MODAL_STACK_PRIORITY.draft_outcome,
+    wouldRender
+  );
+  if (!shouldRender) return null;
 
   return (
     <div role="status" className="rounded-lg border border-primary/30 bg-primary/5 p-4">

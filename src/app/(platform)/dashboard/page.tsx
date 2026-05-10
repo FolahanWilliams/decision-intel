@@ -57,6 +57,7 @@ import { usePlanLabels } from '@/hooks/usePlanLabels';
 import { KGMergeConsentModal } from '@/components/pricing/KGMergeConsentModal';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
+import { ModalStackProvider } from '@/components/ui/ModalStackContext';
 import { SampleDataBanner } from '@/components/ui/SampleDataBanner';
 import { SampleBadge } from '@/components/ui/SampleBadge';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
@@ -872,8 +873,15 @@ export default function Dashboard() {
     // → widgets → view content). Replaces the fragile margin-based
     // approach that was silently crunching when empty AnimatePresence
     // containers sat between siblings.
-    <div className="stack-xl">
-      {/* Welcome modal for first-time users */}
+    //
+    // ModalStackProvider locked 2026-05-10 (audit batch 4 #1) — priority-
+    // ordered banner queue so cold-prospect first-load renders at most
+    // ONE banner. Priority ladder: outcome_gate_hard > kg_consent >
+    // outcome_gate_soft > draft_outcome > sample_data. New banners pick
+    // a tier from MODAL_STACK_PRIORITY in @/components/ui/ModalStackContext.
+    <ModalStackProvider>
+      <div className="stack-xl">
+        {/* Welcome modal for first-time users */}
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
       {/* Header — persona-grade hero (locked 2026-05-02). Display serif
@@ -2778,6 +2786,7 @@ export default function Dashboard() {
           )
         }
       />
-    </div>
+      </div>
+    </ModalStackProvider>
   );
 }

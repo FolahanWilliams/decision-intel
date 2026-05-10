@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Trash2, Loader2, X } from 'lucide-react';
+import { useModalSlot, MODAL_STACK_PRIORITY } from '@/components/ui/ModalStackContext';
 
 /**
  * Dashboard banner for the Cold-Start Fix (M4).
@@ -125,6 +126,18 @@ export function SampleDataBanner() {
     }
   };
 
+  // Compute whether this banner WOULD render (any of mode-1 / mode-3
+  // conditions match). Drives the ModalStackContext claim so only one
+  // banner renders at a time across the dashboard.
+  const wouldRenderMode1 = !loading && !!status && status.shouldOfferSeed && !seedDismissed;
+  const wouldRenderMode3 = !loading && !!status && status.canClear && !clearDismissed;
+  const wouldRender = wouldRenderMode1 || wouldRenderMode3;
+  const shouldRender = useModalSlot(
+    'sample_data',
+    MODAL_STACK_PRIORITY.sample_data,
+    wouldRender
+  );
+  if (!shouldRender) return null;
   if (loading || !status) return null;
 
   // ── Mode 1: Fresh workspace — offer to populate ──────────────────────────

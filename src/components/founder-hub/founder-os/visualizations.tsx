@@ -17,6 +17,7 @@
 
 import { useMemo } from 'react';
 import { TrendingUp, Flame, BookOpen, Activity, Brain, Shield, Target, Cpu } from 'lucide-react';
+import { AccentCard } from '@/components/ui/AccentCard';
 
 export interface CheckinRecord {
   date: string; // YYYY-MM-DD
@@ -113,7 +114,7 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="card" style={{ borderLeft: '3px solid var(--accent-primary)' }}>
+    <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Flame size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -251,7 +252,7 @@ export function StreakHeatmap({ checkins }: StreakHeatmapProps) {
           </span>
         </div>
       </div>
-    </div>
+    </AccentCard>
   );
 }
 
@@ -310,7 +311,7 @@ export function CognitiveTrendChart({ checkins }: CognitiveTrendChartProps) {
     .join(' ');
 
   return (
-    <div className="card">
+    <AccentCard accent="info" bodyStyle={{ padding: 0 }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <TrendingUp size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -432,7 +433,7 @@ export function CognitiveTrendChart({ checkins }: CognitiveTrendChartProps) {
           </svg>
         </div>
       </div>
-    </div>
+    </AccentCard>
   );
 }
 
@@ -509,7 +510,7 @@ export function PillarAdherenceRadar({
   const overallAdherence = axes.reduce((s, a) => s + a.value, 0) / numAxes;
 
   return (
-    <div className="card">
+    <AccentCard accent="info" bodyStyle={{ padding: 0 }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Activity size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -637,7 +638,7 @@ export function PillarAdherenceRadar({
           ))}
         </div>
       </div>
-    </div>
+    </AccentCard>
   );
 }
 
@@ -668,14 +669,7 @@ export function CompoundMathCallout({
   const totalReadingHours = Math.round(totalReadingMinutes / 60);
 
   return (
-    <div
-      className="card"
-      style={{
-        background:
-          'linear-gradient(135deg, color-mix(in srgb, var(--accent-primary) 8%, transparent) 0%, color-mix(in srgb, var(--accent-primary) 1%, transparent) 100%)',
-        borderLeft: '3px solid var(--accent-primary)',
-      }}
-    >
+    <AccentCard accent="primary" tinted bodyStyle={{ padding: 0 }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <TrendingUp size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -831,7 +825,7 @@ export function CompoundMathCallout({
           )}
         </div>
       </div>
-    </div>
+    </AccentCard>
   );
 }
 
@@ -865,7 +859,7 @@ export function SkillTimeline({ skills }: SkillTimelineProps) {
   if (grouped.length === 0) return null;
 
   return (
-    <div className="card">
+    <AccentCard accent="info" bodyStyle={{ padding: 0 }}>
       <div className="card-body">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <Target size={15} style={{ color: 'var(--accent-primary)' }} />
@@ -970,6 +964,6 @@ export function SkillTimeline({ skills }: SkillTimelineProps) {
           ))}
         </div>
       </div>
-    </div>
+    </AccentCard>
   );
 }

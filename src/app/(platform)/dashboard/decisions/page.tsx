@@ -24,7 +24,15 @@
 import { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Plus, Filter, Network, Layout, BookOpen, BrainCircuit } from 'lucide-react';
+import {
+  Plus,
+  Filter,
+  Network,
+  Layout,
+  BookOpen,
+  BrainCircuit,
+  ArrowUpRight,
+} from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
@@ -120,6 +128,13 @@ export default function DecisionsPage() {
           active={view === 'log'}
           onClick={() => setView('log')}
         />
+        {/* Constellation peer-pill — locked 2026-05-10 batch 4 #3.
+            Visually balanced with Kanban + Log ViewPills (same padding,
+            border, font weight). The ArrowUpRight indicator signals this
+            view routes to a sibling page rather than swapping the
+            ?view= query param — keeps the user oriented when they
+            return from the constellation. Hover state mirrors ViewPill
+            so the eye reads the 3 views as equally weighted. */}
         <Link
           href="/dashboard/decisions/constellation"
           style={{
@@ -134,11 +149,21 @@ export default function DecisionsPage() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
+            transition: 'border-color 0.15s, background 0.15s',
           }}
-          title="Open the longitudinal Decision Pipeline Constellation viz"
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--accent-primary)';
+            (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border-color)';
+            (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
+          }}
+          title="Open the longitudinal Decision Pipeline Constellation viz (cognitive-lineage between decisions)"
         >
           <Network size={12} />
           Constellation
+          <ArrowUpRight size={11} style={{ opacity: 0.6 }} />
         </Link>
       </div>
 

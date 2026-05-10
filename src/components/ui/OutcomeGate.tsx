@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
+import { useModalSlot, MODAL_STACK_PRIORITY } from '@/components/ui/ModalStackContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import {
   AlertTriangle,
@@ -64,9 +65,17 @@ export function OutcomeGateBanner({
 }: OutcomeGateBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 
-  if (dismissed) return null;
-
   const isHard = level === 'hard';
+
+  // Modal-stack participation: hard banner gets outcome_gate_soft tier
+  // (the HARD-blocking surface is OutcomeGateModal below). The banner
+  // here is the soft / dismissible reminder.
+  const shouldRender = useModalSlot(
+    isHard ? 'outcome_gate_soft' : 'outcome_gate_soft',
+    isHard ? MODAL_STACK_PRIORITY.outcome_gate_soft : MODAL_STACK_PRIORITY.outcome_gate_soft,
+    !dismissed
+  );
+  if (!shouldRender) return null;
 
   return (
     <motion.div
@@ -314,6 +323,15 @@ function WhyThisMattersBlock() {
 export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: OutcomeGateModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Hard-block tier — top of the modal stack. When this surface
+  // claims the slot, every other dashboard banner suppresses (locked
+  // 2026-05-10 batch 4 #1).
+  const shouldRender = useModalSlot(
+    'outcome_gate_hard',
+    MODAL_STACK_PRIORITY.outcome_gate_hard,
+    true
+  );
+
   // Focus trap
   useFocusTrap(panelRef, true);
 
@@ -474,6 +492,10 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
     { value: 'failure', label: 'Failed', color: '#ef4444', icon: AlertTriangle },
     { value: 'too_early', label: 'Too Early', color: '#a1a1aa', icon: Clock },
   ] as const;
+
+  // Modal-stack gate — when something higher-priority claims (none today,
+  // but the slot system is forward-compatible), this surface yields.
+  if (!shouldRender) return null;
 
   return (
     <div
