@@ -165,6 +165,12 @@ export async function GET(request: NextRequest) {
         crossRefHighSeverityCount: crossRef?.highSeverityCount ?? 0,
         updatedAt: r.updatedAt.toISOString(),
         createdAt: r.createdAt.toISOString(),
+        // 2026-05-10 — list endpoint returns null for priors +
+        // culturalPairingRisk to keep payload size bounded; the detail
+        // endpoint returns the full JSON. Consumers reading from list
+        // know to fetch detail when they need the captured values.
+        priors: null,
+        culturalPairingRisk: null,
       };
     });
 

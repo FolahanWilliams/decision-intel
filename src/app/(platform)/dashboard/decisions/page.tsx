@@ -24,7 +24,16 @@
 import { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Plus, Filter, Network, Layout, BookOpen, BrainCircuit, ArrowUpRight } from 'lucide-react';
+import {
+  Plus,
+  Filter,
+  Network,
+  Layout,
+  BookOpen,
+  BrainCircuit,
+  ArrowUpRight,
+  XCircle,
+} from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
@@ -37,9 +46,11 @@ import {
   DecisionLogFeed,
   type DecisionLogFeedHandle,
 } from '@/components/decisions/DecisionLogFeed';
+import { RejectedDecisionsTab } from '@/components/decisions/RejectedDecisionsTab';
+import { NextMoveContainer } from '@/components/recommendations/NextMoveContainer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-type DecisionsView = 'kanban' | 'log';
+type DecisionsView = 'kanban' | 'log' | 'passed';
 
 export default function DecisionsPage() {
   const role = useOnboardingRole();
@@ -48,7 +59,8 @@ export default function DecisionsPage() {
   const router = useRouter();
 
   const rawView = searchParams.get('view');
-  const view: DecisionsView = rawView === 'log' ? 'log' : 'kanban';
+  const view: DecisionsView =
+    rawView === 'log' ? 'log' : rawView === 'passed' ? 'passed' : 'kanban';
 
   const [kindFilter, setKindFilter] = useState<DecisionContainerKind | 'all'>(defaultKind ?? 'all');
   const [statusFilter, setStatusFilter] = useState<'active' | 'archived'>('active');
@@ -67,6 +79,9 @@ export default function DecisionsPage() {
   const heroSubtitle = useMemo(() => {
     if (view === 'log') {
       return 'Journal entries + cognitive audits — every decision-flavoured artefact, chronologically.';
+    }
+    if (view === 'passed') {
+      return 'Anti-Portfolio — decisions you passed on, with eventual outcome attribution. Per Bessemer, institutionalize vulnerability.';
     }
     if (kindFilter === 'investment') {
       return 'Pre-IC memo audits before Monday partner meeting';
@@ -118,6 +133,12 @@ export default function DecisionsPage() {
           active={view === 'log'}
           onClick={() => setView('log')}
         />
+        <ViewPill
+          icon={<XCircle size={12} />}
+          label="Passed on"
+          active={view === 'passed'}
+          onClick={() => setView('passed')}
+        />
         {/* Constellation peer-pill — locked 2026-05-10 batch 4 #3.
             Visually balanced with Kanban + Log ViewPills (same padding,
             border, font weight). The ArrowUpRight indicator signals this
@@ -157,6 +178,13 @@ export default function DecisionsPage() {
         </Link>
       </div>
 
+      {/* Constellation Next Move — paper-grounded recommendation
+          engine. Renders above all three views (kanban / log / passed)
+          so the strip is the first signal regardless of view choice.
+          Antagonist prompt suppressed here because the constellation
+          page is the canonical intelligent-antagonist surface. */}
+      <NextMoveContainer showAntagonistPrompt={false} />
+
       {view === 'kanban' && (
         <KanbanView
           kindFilter={kindFilter}
@@ -172,6 +200,8 @@ export default function DecisionsPage() {
       {view === 'log' && (
         <LogView onLogEntry={() => logFeedRef.current?.openNewEntry()} feedRef={logFeedRef} />
       )}
+
+      {view === 'passed' && <RejectedDecisionsTab />}
     </ErrorBoundary>
   );
 }

@@ -16,6 +16,8 @@ import { useContainer } from '@/hooks/useContainers';
 import { ContainerCompositeHero } from '@/components/containers/ContainerCompositeHero';
 import { ContainerTopFixesCard } from '@/components/containers/ContainerTopFixesCard';
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
+import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
+import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
 import { ContainerLinksPanel } from '@/components/constellation/ContainerLinksPanel';
@@ -128,6 +130,33 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
         className="container-detail-grid"
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Pre-artefact priors capture (locked 2026-05-10) — only
+              surfaces when the container has no priors AND zero
+              analyzed docs. Per Deep Research paper Ch 1, the actual
+              cognitive commitment is forged BEFORE the audit lands;
+              capturing priors gives the audit something honest to
+              compare against, not just the engineered IC narrative. */}
+          {container.priors === null && container.analyzedDocCount === 0 && (
+            <PriorsCaptureCard
+              containerId={container.id}
+              containerName={container.name}
+              onSaved={() => mutate()}
+            />
+          )}
+
+          {/* Cultural-pairing risk capture (locked 2026-05-10) — only
+              surfaces when the container is acquisition-mode AND no
+              cultural-pairing risk has been captured yet. Per paper
+              Ch 10, cross-border M&A failures are dominated by
+              cultural reasoning failure, not financial mathematics. */}
+          {container.kind === 'acquisition' && container.culturalPairingRisk === null && (
+            <CulturalPairingRiskCard
+              containerId={container.id}
+              containerName={container.name}
+              onSaved={() => mutate()}
+            />
+          )}
+
           <ContainerCompositeHero container={container} />
 
           {/* Top-3 Fix Tiles at the container level (locked 2026-05-10

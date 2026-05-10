@@ -67,6 +67,41 @@ export interface ContainerSummary {
   /** Latest run timestamp (ISO). */
   updatedAt: string;
   createdAt: string;
+  /**
+   * Pre-artefact priors capture (locked 2026-05-10 per Deep Research
+   * paper Ch 1). Conviction snapshot + kill criteria + intermediate-
+   * proxy micro-predictions captured BEFORE the IC memo lands.
+   * Surfaced on the container detail page when null + zero analyzed
+   * docs to prompt capture; readable everywhere else.
+   */
+  priors: {
+    convictionLevel: 'low' | 'medium' | 'high' | 'very_high';
+    convictionRationale: string;
+    killCriteria: string[];
+    microPredictions: Array<{
+      prediction: string;
+      horizonDays: number;
+      confidence: number;
+      resolvedAt?: string;
+      resolution?: 'true' | 'false' | 'partial';
+    }>;
+    capturedAt: string;
+    capturedByUserId: string;
+  } | null;
+  /**
+   * Cultural-pairing risk (locked 2026-05-10 per Deep Research paper
+   * Ch 10). Surfaced on cross-border acquisition containers — forces
+   * explicit naming of regulatory pairing + cultural integration risks
+   * + named historical analog.
+   */
+  culturalPairingRisk: {
+    regulatoryPairing: string;
+    culturalIntegrationRisks: string[];
+    historicalAnalogDeal: string;
+    gaapIfrsReconciliationNote?: string;
+    capturedAt: string;
+    capturedByUserId: string;
+  } | null;
 }
 
 export interface ContainerListResponse {

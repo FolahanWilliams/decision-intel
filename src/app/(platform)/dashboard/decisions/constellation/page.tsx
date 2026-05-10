@@ -19,6 +19,7 @@ import { defaultContainerKindForRole } from '@/hooks/useContainers';
 import { ContainerConstellation } from '@/components/constellation/ContainerConstellation';
 import { ContainerFormModal } from '@/components/containers/ContainerFormModal';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { NextMoveContainer } from '@/components/recommendations/NextMoveContainer';
 
 export default function ConstellationPage() {
   const role = useOnboardingRole();
@@ -131,6 +132,12 @@ export default function ConstellationPage() {
           New decision
         </button>
       </div>
+
+      {/* Constellation Next Move — paper-grounded recommendation engine.
+          Strip + drawer + intelligent-antagonist priority capture.
+          Renders above the SVG so it's the first signal a CSO sees on
+          page load. */}
+      <NextMoveContainer showAntagonistPrompt />
 
       <ContainerConstellation />
 

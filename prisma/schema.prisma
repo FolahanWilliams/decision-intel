@@ -36,25 +36,25 @@ datasource db {
 }
 
 model Document {
-  id               String              @id @default(cuid())
-  userId           String
-  filename         String
-  fileType         String
-  fileSize         Int
-  content          String              @db.Text
-  contentEncrypted String?             @db.Text
-  contentIv        String?
-  contentTag       String?
+  id                    String                      @id @default(cuid())
+  userId                String
+  filename              String
+  fileType              String
+  fileSize              Int
+  content               String                      @db.Text
+  contentEncrypted      String?                     @db.Text
+  contentIv             String?
+  contentTag            String?
   /// Key-rotation version stamp. Null = legacy (v1). Populated by new
   /// writes and by the rotate:encryption-key CLI. See
   /// src/lib/utils/encryption.ts for the protocol.
-  contentKeyVersion Int?
-  uploadedAt       DateTime            @default(now())
-  status           String              @default("pending")
-  updatedAt        DateTime            @updatedAt
-  contentHash      String?             @unique
-  orgId            String?
-  documentType     String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | qofe | synergy_model | integration_plan | other
+  contentKeyVersion     Int?
+  uploadedAt            DateTime                    @default(now())
+  status                String                      @default("pending")
+  updatedAt             DateTime                    @updatedAt
+  contentHash           String?                     @unique
+  orgId                 String?
+  documentType          String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | qofe | synergy_model | integration_plan | other
   /// Type-aware structured parser output (locked 2026-05-09 — M&A cascade
   /// hard-layer ship). Populated at upload time when the parser detects a
   /// recognisable structure (today: synergy_model spreadsheets via
@@ -65,18 +65,18 @@ model Document {
   /// type-aware parser OR when extraction fell through to flat-text only.
   /// Replaces the inline-marker text round-trip in Document.content for
   /// downstream consumers (DPR, structured rendering, deal aggregation).
-  parsedStructuredData Json?
-  source           String?
-  sourceRef        String?
-  isSample         Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
+  parsedStructuredData  Json?
+  source                String?
+  sourceRef             String?
+  isSample              Boolean                     @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
   /// Soft-delete timestamp. Set when the user clicks Delete or when the
   /// retention cron passes the tier's window. Soft-deleted rows are
   /// invisible in normal queries; the enforce-retention cron hard-deletes
   /// them (DB cascade + storage cleanup) after a 30-day grace window.
-  deletedAt        DateTime?
+  deletedAt             DateTime?
   /// Free-text reason populated when `deletedAt` is set. Values used today:
   /// 'user_request' | 'retention_expired' | 'org_offboard'.
-  deletionReason   String?
+  deletionReason        String?
   /// Document-level versioning. v1 of a memo has parentDocumentId=null. When
   /// the user uploads a revision via "Upload new version", we create a new
   /// Document row with parentDocumentId pointing to the ROOT of the chain
@@ -84,19 +84,19 @@ model Document {
   /// all versions of a memo: WHERE id = X OR parentDocumentId = X.
   /// Plan reference: 2.3 — "DQI 42 → 71 (+29), sunk_cost_bias resolved,
   /// anchoring_bias emerged" delta loop.
-  parentDocumentId String?
-  versionNumber    Int                 @default(1)
+  parentDocumentId      String?
+  versionNumber         Int                         @default(1)
   /// Optional human-readable label for the version surface (e.g.
   /// "Pre-IC draft", "Post-counsel rev"). Free text, ≤80 chars enforced
   /// in the route. Falls back to "v{N}" in UI when null. (2.3 deep)
-  versionLabel     String?
+  versionLabel          String?
   /// Document-level access control (3.5). Values:
   ///   'private' — only `userId` can read/write (default for new uploads).
   ///   'team'    — anyone in the same org (matches the pre-3.5 default).
   ///   'specific' — explicit allowlist via DocumentAccess rows.
   /// The owner (matching `userId`) always retains full access regardless of
   /// this setting; visibility only controls what additional users can see.
-  visibility       String              @default("team")
+  visibility            String                      @default("team")
   /// Stamp set by the retention cron when a pre-deletion warning email
   /// has been dispatched. Used to avoid duplicate warnings when the
   /// cron runs daily inside the warning window. Null = not yet warned.
@@ -105,16 +105,16 @@ model Document {
   /// Foreign key to a LegalHold row when this document is currently
   /// preserved from retention enforcement. The retention cron skips
   /// any document with a non-null legalHoldId. (2.1 deep)
-  legalHoldId      String?
-  legalHold        LegalHold?          @relation(fields: [legalHoldId], references: [id], onDelete: SetNull)
-  parentDocument   Document?           @relation("DocumentVersions", fields: [parentDocumentId], references: [id], onDelete: SetNull)
-  childVersions    Document[]          @relation("DocumentVersions")
-  analyses         Analysis[]
-  embeddings       DecisionEmbedding[]
-  failedAnalyses   FailedAnalysis[]
-  decisionFrame    DecisionFrame?
-  documentAccess   DocumentAccess[]
-  containers       DecisionContainerDocument[]
+  legalHoldId           String?
+  legalHold             LegalHold?                  @relation(fields: [legalHoldId], references: [id], onDelete: SetNull)
+  parentDocument        Document?                   @relation("DocumentVersions", fields: [parentDocumentId], references: [id], onDelete: SetNull)
+  childVersions         Document[]                  @relation("DocumentVersions")
+  analyses              Analysis[]
+  embeddings            DecisionEmbedding[]
+  failedAnalyses        FailedAnalysis[]
+  decisionFrame         DecisionFrame?
+  documentAccess        DocumentAccess[]
+  containers            DecisionContainerDocument[]
 
   @@index([userId])
   @@index([orgId])
@@ -140,18 +140,18 @@ model Document {
 /// covering a deal's full document set). The owner records `reason`
 /// + `holdUntil` on creation; both are required for audit defensibility.
 model LegalHold {
-  id          String     @id @default(cuid())
-  orgId       String?
+  id           String     @id @default(cuid())
+  orgId        String?
   /// Human-readable reason — auditor needs to see why each hold exists.
-  reason      String     @db.Text
+  reason       String     @db.Text
   /// Optional sunset; null = until manually released.
-  holdUntil   DateTime?
-  grantedById String
-  releasedAt  DateTime?
+  holdUntil    DateTime?
+  grantedById  String
+  releasedAt   DateTime?
   releasedById String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  documents   Document[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  documents    Document[]
 
   @@index([orgId])
   @@index([releasedAt])
@@ -162,24 +162,24 @@ model LegalHold {
 /// analysis so the cross-analysis exposure aggregator can read them
 /// without re-running the agent. One row per flagged determinant.
 model StructuralAssumption {
-  id              String   @id @default(cuid())
-  analysisId      String
+  id                String   @id @default(cuid())
+  analysisId        String
   /// Stable determinant id from src/lib/constants/dalio-determinants.ts
   /// (e.g. 'debt_cycle', 'currency_cycle', 'reserve_currency_status').
-  determinantId   String
-  determinantLabel String?
-  category        String? // 'cycles' | 'power' | 'fundamentals' | 'internal' | 'external'
-  assumption      String   @db.Text
-  defensibility   String   // well_supported | partially_supported | unsupported | contradicted
-  severity        String   // low | medium | high | critical
-  evidenceFromMemo String? @db.Text
-  hardeningQuestion String? @db.Text
-  framework       String   @default("dalio-18-determinants")
-  generatedAt     DateTime @default(now())
+  determinantId     String
+  determinantLabel  String?
+  category          String? // 'cycles' | 'power' | 'fundamentals' | 'internal' | 'external'
+  assumption        String   @db.Text
+  defensibility     String // well_supported | partially_supported | unsupported | contradicted
+  severity          String // low | medium | high | critical
+  evidenceFromMemo  String?  @db.Text
+  hardeningQuestion String?  @db.Text
+  framework         String   @default("dalio-18-determinants")
+  generatedAt       DateTime @default(now())
   /// Effective market context at the time of the run (so cross-analysis
   /// aggregation can filter by EM/DM exposure when surfacing patterns).
-  marketContext   String? // emerging_market | developed_market | cross_border | unknown
-  analysis        Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  marketContext     String? // emerging_market | developed_market | cross_border | unknown
+  analysis          Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@index([analysisId])
   @@index([determinantId])
@@ -240,78 +240,78 @@ model DocumentAccess {
 /// own visibility still applies; this only controls whether the
 /// container SHELL shows up in another teammate's list view.
 model DecisionContainer {
-  id                        String                            @id @default(cuid())
-  orgId                     String?
-  ownerUserId               String
+  id          String  @id @default(cuid())
+  orgId       String?
+  ownerUserId String
 
   /// SSOT-discriminator: 'investment' | 'acquisition' | 'strategic'.
   /// Drives mode-specific UI, outcome shape, required-doc rules. See
   /// CONTAINER_MODES in decision-container-modes.ts.
-  kind                      String
+  kind String
 
   /// User-facing name. Investment: portco name. Acquisition: target
   /// name. Strategic: short label like "DACH market entry 2026".
-  name                      String
+  name String
 
   /// Free-text decision frame — the line the committee has to vote
   /// yes/no on. Especially central for strategic mode (where it IS
   /// the decision), encouraged for investment + acquisition.
-  decisionFrame             String?                           @db.Text
+  decisionFrame String? @db.Text
 
   /// Mode-specific stage id from SSOT (e.g. investment → 'sourcing',
   /// acquisition → 'diligence', strategic → 'drafting'). The kanban
   /// column. Validated against CONTAINER_MODES[kind].stages at write.
-  stageId                   String
+  stageId String
 
   /// Active/archived axis — independent of stage. 'archived' hides
   /// the container from default kanban view but preserves history.
   /// Lifecycle TERMINAL state (exited / outcome_logged) lives in
   /// stageId, not status.
-  status                    String                            @default("active")
+  status String @default("active")
 
   /// Visibility — same three-state model as Document.
-  visibility                String                            @default("team")
+  visibility String @default("team")
 
   /// When the committee gate fired (decided / passed / approved).
   /// Set by the system when stageId moves past the committee_gate phase.
-  decidedAt                 DateTime?
+  decidedAt DateTime?
 
   /// Optional committee-gate target date. Drives "T-N days until
   /// {committeeLabel}" countdowns + sorts. Renames legacy Deal.icDate
   /// to reflect that acquisition mode uses "Board / IC Review" not
   /// just IC Review.
-  committeeDate             DateTime?
+  committeeDate DateTime?
 
   // ─── Investment-mode optional fields ─────────────────────────────
 
-  fundName                  String?
-  vintage                   Int?
+  fundName String?
+  vintage  Int?
 
   // ─── Acquisition-mode optional fields ────────────────────────────
 
   /// 'buyout' | 'growth_equity' | 'venture' | 'secondary' | 'add_on' |
   /// 'recapitalization'. Mostly informational — the kind discriminator
   /// already drives the UI behaviour.
-  dealType                  String?
+  dealType String?
 
   // ─── Cross-mode optional fields ──────────────────────────────────
 
   /// Cheque size (investment) or purchase price (acquisition).
   /// Decimal for currency precision. Null for strategic mode.
-  ticketSize                Decimal?
-  currency                  String                            @default("USD")
+  ticketSize Decimal?
+  currency   String   @default("USD")
 
   /// Target company (acquisition: target being bought; investment:
   /// portco). Optional but populated for nearly all investment +
   /// acquisition rows.
-  targetCompany             String?
+  targetCompany String?
 
   /// Sector tag for analytics (technology / healthcare / industrials /
   /// consumer / financial_services / energy / etc.).
-  sector                    String?
+  sector String?
 
   /// Date when position was exited / decision concluded (post-outcome).
-  exitDate                  DateTime?
+  exitDate DateTime?
 
   // ─── Composite metrics (cached on write) ─────────────────────────
 
@@ -319,30 +319,75 @@ model DecisionContainer {
   /// Recomputed when docs are added/removed or new analyses land.
   compositeDqi              Float?
   compositeGrade            String? // A | B | C | D | F | null
-  documentCount             Int                               @default(0)
-  analyzedDocCount          Int                               @default(0)
-  recurringBiasCount        Int                               @default(0)
-  conflictCount             Int                               @default(0)
-  highSeverityConflictCount Int                               @default(0)
+  documentCount             Int     @default(0)
+  analyzedDocCount          Int     @default(0)
+  recurringBiasCount        Int     @default(0)
+  conflictCount             Int     @default(0)
+  highSeverityConflictCount Int     @default(0)
+
+  /// Pre-artefact priors capture (locked 2026-05-10 per the Deep Research
+  /// paper Ch 1 / Finding #1 — formalization-reality discontinuity). The
+  /// actual cognitive commitment is forged BEFORE the IC memo lands; the
+  /// memo is post-hoc rationalization. Capture conviction + kill criteria
+  /// + 3 micro-predictions at DecisionFrame creation so the audit can
+  /// compare against the user's pre-artefact reasoning, not just the
+  /// engineered narrative.
+  ///
+  /// Shape (Json):
+  /// {
+  ///   convictionLevel: 'low' | 'medium' | 'high' | 'very_high',
+  ///   convictionRationale: string,
+  ///   killCriteria: string[],     // what would falsify this decision
+  ///   microPredictions: Array<{   // Brier-scored proxies (paper Ch 9)
+  ///     prediction: string,
+  ///     horizonDays: number,      // 30 | 60 | 90 | 180
+  ///     confidence: number,       // 0-1
+  ///     resolvedAt?: string,
+  ///     resolution?: 'true' | 'false' | 'partial',
+  ///   }>,
+  ///   capturedAt: string,
+  ///   capturedByUserId: string,
+  /// }
+  priors Json?
+
+  /// Cultural-pairing risk capture (locked 2026-05-10 per paper Ch 10 —
+  /// Daimler-Chrysler / HP-Autonomy class failures). Required when a
+  /// container's market context spans jurisdictions (acquirer ≠ target
+  /// country, or emergingMarketCountries surfaced). Forces the team to
+  /// explicitly name the regulatory pairing, the cultural integration
+  /// risks, and a named historical analog deal — preventing the
+  /// "cultural reasoning failure" that was the Daimler-Chrysler root
+  /// cause according to the post-mortem literature.
+  ///
+  /// Shape (Json):
+  /// {
+  ///   regulatoryPairing: string,           // e.g. "EU AI Act + NDPR Nigeria"
+  ///   culturalIntegrationRisks: string[],  // explicitly named risks
+  ///   historicalAnalogDeal: string,        // canonical named comparable
+  ///   gaapIfrsReconciliationNote?: string, // accounting-standard divergence
+  ///   capturedAt: string,
+  ///   capturedByUserId: string,
+  /// }
+  culturalPairingRisk Json?
 
   // ─── Timestamps ──────────────────────────────────────────────────
 
-  createdAt                 DateTime                          @default(now())
-  updatedAt                 DateTime                          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // ─── Relations ───────────────────────────────────────────────────
 
-  documents                 DecisionContainerDocument[]
-  outcome                   DecisionContainerOutcome?
-  crossReferences           DecisionContainerCrossReference[]
-  auditPurchases            DecisionContainerAuditPurchase[]
+  documents       DecisionContainerDocument[]
+  outcome         DecisionContainerOutcome?
+  crossReferences DecisionContainerCrossReference[]
+  auditPurchases  DecisionContainerAuditPurchase[]
 
   /// Phase 3.5 — Decision Pipeline Constellation. Outbound + inbound
   /// edges express cognitive lineage between containers (the thesis
   /// that spawned this deal, the prior decision it depends on, the
   /// parent strategic frame, etc.). See container-link-types SSOT.
-  outboundLinks             DecisionContainerLink[]           @relation("LinkFromContainer")
-  inboundLinks              DecisionContainerLink[]           @relation("LinkToContainer")
+  outboundLinks DecisionContainerLink[] @relation("LinkFromContainer")
+  inboundLinks  DecisionContainerLink[] @relation("LinkToContainer")
 
   @@index([orgId])
   @@index([ownerUserId])
@@ -375,18 +420,18 @@ model DecisionContainer {
 /// `note` is optional free-text the creator adds when the link is
 /// non-obvious (e.g. "depends on Q3 governance regime per Dangote DPR").
 model DecisionContainerLink {
-  id          String            @id @default(cuid())
-  fromId      String
-  toId        String
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
   /// One of: precedes | spawned_from | depends_on | parent_of.
   /// Validated against CONTAINER_LINK_TYPES SSOT at write.
-  linkType    String
-  note        String?           @db.Text
-  createdAt   DateTime          @default(now())
-  createdBy   String?
+  linkType  String
+  note      String?  @db.Text
+  createdAt DateTime @default(now())
+  createdBy String?
 
-  from        DecisionContainer @relation("LinkFromContainer", fields: [fromId], references: [id], onDelete: Cascade)
-  to          DecisionContainer @relation("LinkToContainer", fields: [toId], references: [id], onDelete: Cascade)
+  from DecisionContainer @relation("LinkFromContainer", fields: [fromId], references: [id], onDelete: Cascade)
+  to   DecisionContainer @relation("LinkToContainer", fields: [toId], references: [id], onDelete: Cascade)
 
   @@unique([fromId, toId, linkType])
   @@index([fromId])
@@ -473,35 +518,35 @@ model DecisionContainerOutcome {
 }
 
 model Analysis {
-  id                  String   @id @default(cuid())
-  documentId          String
-  overallScore        Float
-  noiseScore          Float
-  summary             String   @db.Text
-  createdAt           DateTime @default(now())
-  compliance          Json?
-  factCheck           Json?
-  noiseStats          Json?
-  preMortem           Json?
-  sentiment           Json?
-  speakers            String[]
-  structuredContent   String?  @db.Text
-  updatedAt           DateTime @updatedAt
-  logicalAnalysis     Json?
-  swotAnalysis        Json?
-  cognitiveAnalysis   Json?
-  simulation          Json?
-  institutionalMemory Json?
-  modelVersion        String?
-  noiseBenchmarks     Json?
-  intelligenceContext Json?
-  metaVerdict         String?  @db.Text
-  biasWebImageUrl     String?
-  preMortemImageUrl   String?
-  preMortemRating     Int?
-  recognitionCues     Json?
-  narrativePreMortem  Json?
-  forgottenQuestions  Json?
+  id                    String   @id @default(cuid())
+  documentId            String
+  overallScore          Float
+  noiseScore            Float
+  summary               String   @db.Text
+  createdAt             DateTime @default(now())
+  compliance            Json?
+  factCheck             Json?
+  noiseStats            Json?
+  preMortem             Json?
+  sentiment             Json?
+  speakers              String[]
+  structuredContent     String?  @db.Text
+  updatedAt             DateTime @updatedAt
+  logicalAnalysis       Json?
+  swotAnalysis          Json?
+  cognitiveAnalysis     Json?
+  simulation            Json?
+  institutionalMemory   Json?
+  modelVersion          String?
+  noiseBenchmarks       Json?
+  intelligenceContext   Json?
+  metaVerdict           String?  @db.Text
+  biasWebImageUrl       String?
+  preMortemImageUrl     String?
+  preMortemRating       Int?
+  recognitionCues       Json?
+  narrativePreMortem    Json?
+  forgottenQuestions    Json?
   // Market-context priors applied by the bias detector (3.6). Shape:
   // { context, emergingMarketCountries[], developedMarketCountries[],
   //   cagrCeiling, rationale }. Null when the memo is jurisdiction-agnostic.
@@ -541,19 +586,19 @@ model Analysis {
   // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
   isSample Boolean @default(false)
 
-  document   Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  biases     BiasInstance[]
-  versions   AnalysisVersion[]
-  shareLinks ShareLink[]
-  outcome    DecisionOutcome?
-  prior      DecisionPrior?
+  document              Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  biases                BiasInstance[]
+  versions              AnalysisVersion[]
+  shareLinks            ShareLink[]
+  outcome               DecisionOutcome?
+  prior                 DecisionPrior?
   /// Persisted Dalio structural-assumptions findings (1.3a deep).
   structuralAssumptions StructuralAssumption[]
 
-  toxicCombinations   ToxicCombination[]
-  draftOutcomes       DraftOutcome[]
-  fingerprintWarnings FingerprintWarning[]
-  provenanceRecord    DecisionProvenanceRecord?
+  toxicCombinations         ToxicCombination[]
+  draftOutcomes             DraftOutcome[]
+  fingerprintWarnings       FingerprintWarning[]
+  provenanceRecord          DecisionProvenanceRecord?
   /// GTM v3.5 — fast-feedback micro-deliberation events captured during
   /// or after the IC / board review meeting where this analysis was
   /// presented. Each row is one predicted-reaction confirmation/refutation.
@@ -613,7 +658,7 @@ model BiasComment {
   resolvedByUserId String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
-  biasInstance    BiasInstance   @relation(fields: [biasInstanceId], references: [id], onDelete: Cascade)
+  biasInstance     BiasInstance  @relation(fields: [biasInstanceId], references: [id], onDelete: Cascade)
 
   @@index([biasInstanceId])
   @@index([orgId])
@@ -681,26 +726,26 @@ model AuditLog {
 }
 
 model UserSettings {
-  id                   String   @id @default(cuid())
-  userId               String   @unique
-  updatedAt            DateTime @updatedAt
-  analysisAlerts       Boolean  @default(true)
-  createdAt            DateTime @default(now())
-  darkMode             Boolean  @default(false)
-  emailNotifications   Boolean  @default(true)
-  weeklyDigest         Boolean  @default(false)
-  notificationSeverity String   @default("all")
-  onboardingCompleted  Boolean  @default(false)
-  onboardingStep       Int      @default(0)
-  onboardingRole       String?
-  onboardingTourSeen   Boolean  @default(false)
-  emailForwardToken    String?  @unique
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  updatedAt               DateTime @updatedAt
+  analysisAlerts          Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  darkMode                Boolean  @default(false)
+  emailNotifications      Boolean  @default(true)
+  weeklyDigest            Boolean  @default(false)
+  notificationSeverity    String   @default("all")
+  onboardingCompleted     Boolean  @default(false)
+  onboardingStep          Int      @default(0)
+  onboardingRole          String?
+  onboardingTourSeen      Boolean  @default(false)
+  emailForwardToken       String?  @unique
   // GTM v3.5 Phase 1 buyer-class-continuous persona gating.
   // Allowed values: 'fractional_cso' | 'midmarket_corp_dev' | 'smaller_fund_gp' | 'pe_backed_founder' | 'other'.
   // hxcEligible is computed: true iff phase1Persona is one of the 4 continuous personas.
   phase1Persona           String?
   phase1PersonaRoleDetail String?
-  phase1HxcEligible       Boolean @default(false)
+  phase1HxcEligible       Boolean  @default(false)
 
   @@index([userId])
 }
@@ -709,26 +754,26 @@ model UserSettings {
 /// Trigger: user completes 2 audits within 14 days AND no completed survey in last 30 days.
 /// HXC filter: phase1HxcEligible at trigger time. Phase-graduation gate: ≥40% "very_disappointed" on HXC cohort.
 model VohraPMFResponse {
-  id                String    @id @default(cuid())
-  userId            String
-  triggeredAt       DateTime  @default(now())
-  completedAt       DateTime?
+  id                  String    @id @default(cuid())
+  userId              String
+  triggeredAt         DateTime  @default(now())
+  completedAt         DateTime?
   // Vohra Q1 — the central PMF question. null = pending.
-  veryDisappointed  String? // "very_disappointed" | "somewhat_disappointed" | "not_disappointed"
+  veryDisappointed    String? // "very_disappointed" | "somewhat_disappointed" | "not_disappointed"
   // Vohra Q2-5 — qualitative.
-  hxcType            String?
-  mainBenefit        String?
-  improvement        String?
+  hxcType             String?
+  mainBenefit         String?
+  improvement         String?
   referralWillingness Int?
   // Cohort metadata snapshotted at trigger time so reporting stays consistent
   // even if the user's persona is later edited.
   phase1PersonaAtTime String?
-  hxcEligibleAtTime   Boolean @default(false)
-  auditCountAtTrigger Int     @default(0)
-  daysSinceSignup     Int     @default(0)
-  triggerReason       String  @default("audits_complete_2_in_14d")
+  hxcEligibleAtTime   Boolean   @default(false)
+  auditCountAtTrigger Int       @default(0)
+  daysSinceSignup     Int       @default(0)
+  triggerReason       String    @default("audits_complete_2_in_14d")
   // Dismissal tracking (user can defer the modal up to 3 times before forced).
-  dismissedCount      Int     @default(0)
+  dismissedCount      Int       @default(0)
   lastDismissedAt     DateTime?
 
   @@index([userId])
@@ -829,13 +874,13 @@ model IntelligenceSync {
 }
 
 model Organization {
-  id                 String             @id @default(cuid())
-  name               String
-  slug               String             @unique
-  avatarUrl          String?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  isAnonymized       Boolean            @default(false) // Consent to anonymous aggregation
+  id                    String             @id @default(cuid())
+  name                  String
+  slug                  String             @unique
+  avatarUrl             String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  isAnonymized          Boolean            @default(false) // Consent to anonymous aggregation
   /// Per-org retention override (2.1 deep). When set, the retention
   /// cron uses this value instead of the plan-tier default for documents
   /// owned by this org. Min 30 days enforced in the API. Null = use the
@@ -853,10 +898,10 @@ model Organization {
   /// when outcome capture becomes a hard gate, not a soft nudge. Per
   /// `es_11` Founder School lesson + CLAUDE.md "Outcome Gate
   /// Enforcement" lock.
-  enforceOutcomeGate Boolean            @default(false)
-  invites            TeamInvite[]
-  members            TeamMember[]
-  ssoConfigurations  SsoConfiguration[]
+  enforceOutcomeGate    Boolean            @default(false)
+  invites               TeamInvite[]
+  members               TeamMember[]
+  ssoConfigurations     SsoConfiguration[]
 
   @@index([slug])
 }
@@ -873,29 +918,43 @@ model Organization {
 // One Org can register multiple domains (e.g. acme.com + acme.co.uk) by
 // creating multiple rows; each row maps a single domain to a single provider.
 model SsoConfiguration {
-  id                 String       @id @default(cuid())
-  orgId              String
-  /** Email domain matched at login. Lowercased, no leading @, no trailing dot. */
-  domain             String
-  /** Stable Supabase `sso_provider_id` UUID returned by `supabase sso add`. */
-  providerId         String
-  /** 'saml' | 'oidc' — matches Supabase's provider type. Saml is the only
-   *  form supported at launch. */
-  protocol           String       @default("saml")
-  /** Human-facing label used in admin UI (e.g. "Okta · Acme Inc"). */
-  displayName        String?
-  /** 'pending' (created, not yet registered with Supabase) |
-   *  'active' (registered + verified) |
-   *  'disabled' (manually suspended, login falls back to password). */
-  status             String       @default("pending")
-  /** Timestamp the first successful SAML login landed. */
-  activatedAt        DateTime?
-  /** Free-text notes — the admin's contact at the IdP, ticket reference, etc. */
-  notes              String?      @db.Text
-  createdAt          DateTime     @default(now())
-  createdByUserId    String?
-  updatedAt          DateTime     @updatedAt
-  organization       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  id              String       @id @default(cuid())
+  orgId           String
+  /**
+   * Email domain matched at login. Lowercased, no leading @, no trailing dot.
+   */
+  domain          String
+  /**
+   * Stable Supabase `sso_provider_id` UUID returned by `supabase sso add`.
+   */
+  providerId      String
+  /**
+   * 'saml' | 'oidc' — matches Supabase's provider type. Saml is the only
+   * form supported at launch.
+   */
+  protocol        String       @default("saml")
+  /**
+   * Human-facing label used in admin UI (e.g. "Okta · Acme Inc").
+   */
+  displayName     String?
+  /**
+   * 'pending' (created, not yet registered with Supabase) |
+   * 'active' (registered + verified) |
+   * 'disabled' (manually suspended, login falls back to password).
+   */
+  status          String       @default("pending")
+  /**
+   * Timestamp the first successful SAML login landed.
+   */
+  activatedAt     DateTime?
+  /**
+   * Free-text notes — the admin's contact at the IdP, ticket reference, etc.
+   */
+  notes           String?      @db.Text
+  createdAt       DateTime     @default(now())
+  createdByUserId String?
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([domain])
   @@index([orgId])
@@ -944,25 +1003,25 @@ model TeamInvite {
 }
 
 model SlackInstallation {
-  id                String    @id @default(cuid())
-  teamId            String    @unique
-  teamName          String
-  orgId             String?
-  installedByUserId String
-  botTokenEncrypted String
-  botTokenIv        String
-  botTokenTag       String
+  id                 String    @id @default(cuid())
+  teamId             String    @unique
+  teamName           String
+  orgId              String?
+  installedByUserId  String
+  botTokenEncrypted  String
+  botTokenIv         String
+  botTokenTag        String
   /// Key-rotation version stamp. Null = legacy (v1). See
   /// src/lib/utils/encryption.ts for the protocol.
   botTokenKeyVersion Int?
-  botUserId         String?
-  scopes            String[]
-  monitoredChannels String[]  @default([])
-  nudgeFrequency    String    @default("normal")
-  status            String    @default("active")
-  revokedAt         DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  botUserId          String?
+  scopes             String[]
+  monitoredChannels  String[]  @default([])
+  nudgeFrequency     String    @default("normal")
+  status             String    @default("active")
+  revokedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@index([teamId])
   @@index([orgId])
@@ -1279,40 +1338,40 @@ model FounderOsCommitment {
 /// (MicroDeliberationOutcome) — the per-org calibration moat compounds
 /// faster as a result.
 model MicroDeliberationOutcome {
-  id           String   @id @default(cuid())
-  analysisId   String
-  userId       String
-  orgId        String?
+  id                  String    @id @default(cuid())
+  analysisId          String
+  userId              String
+  orgId               String?
   /// One of: 'committee_pushback' | 'gc_flag' | 'chairman_concern' |
   /// 'reviewer_dismissal' | 'predicted_bias_surfaced' | 'cfo_objection' |
   /// 'compliance_block' | 'lp_question' | 'audit_committee_query' | 'other'.
-  eventType    String
+  eventType           String
   /// The bias the audit predicted would surface in deliberation. Nullable
   /// for events that don't bind to a specific bias (e.g., 'lp_question').
-  targetBiasId String?
+  targetBiasId        String?
   /// What the audit predicted would happen in the deliberation, captured
   /// verbatim from the audit output at the time the user opened the
   /// micro-deliberation capture panel.
-  predictedReaction String  @db.Text
+  predictedReaction   String    @db.Text
   /// What actually happened. Free text from the user.
-  actualReaction    String? @db.Text
+  actualReaction      String?   @db.Text
   /// Did the predicted reaction match the actual reaction? null = not
   /// yet observed (the IC meeting hasn't happened, the board hasn't met).
   /// true = the audit predicted it AND it surfaced. false = the audit
   /// predicted it AND it did NOT surface (false-positive prediction).
-  confirmed Boolean?
+  confirmed           Boolean?
   /// Confidence the audit assigned to this specific prediction at audit
   /// time (0-1). Used to compute per-prediction Brier increments when
   /// the user confirms/refutes.
   predictedConfidence Float?
   /// When the deliberation event actually occurred (the IC meeting / board
   /// review date). Null until the user logs the confirmation.
-  happenedAt DateTime?
+  happenedAt          DateTime?
   /// When the user captured this micro-deliberation event in the UI.
-  capturedAt DateTime  @default(now())
+  capturedAt          DateTime  @default(now())
   /// Optional context — e.g. "GC raised the NDPR question 8 minutes into
   /// the discussion before I'd even brought it up."
-  notes      String?  @db.Text
+  notes               String?   @db.Text
 
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
@@ -1328,30 +1387,30 @@ model MicroDeliberationOutcome {
 }
 
 model DecisionOutcome {
-  id                 String   @id @default(cuid())
-  analysisId         String   @unique
-  userId             String
-  orgId              String?
-  outcome            String
-  timeframe          String?
-  impactScore        Int?
-  notes              String?
-  lessonsLearned     String?
+  id                  String   @id @default(cuid())
+  analysisId          String   @unique
+  userId              String
+  orgId               String?
+  outcome             String
+  timeframe           String?
+  impactScore         Int?
+  notes               String?
+  lessonsLearned      String?
   confirmedBiases     String[]
   falsePositiveBiases String[]
-  mostAccurateTwin   String?
+  mostAccurateTwin    String?
   /// Brier score between predicted DQI and actual outcome. Lower is
   /// better calibrated (0 = perfect, 1 = worst). Nullable for rows
   /// created before brier-scoring.ts shipped; populated on every
   /// outcome submission going forward. See src/lib/learning/brier-scoring.ts.
-  brierScore         Float?
+  brierScore          Float?
   /// Categorical calibration label derived from brierScore — 'excellent'
   /// (<= 0.10), 'good' (<= 0.20), 'fair' (<= 0.35), 'poor' (> 0.35).
   /// Stored alongside the raw score so filter / analytics queries don't
   /// have to recompute the bucket every read.
-  brierCategory      String?
-  reportedAt         DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  brierCategory       String?
+  reportedAt          DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   analysis      Analysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
   decisionRooms DecisionRoom[]
@@ -1721,34 +1780,34 @@ model RedTeamChallenge {
 }
 
 model DecisionRoom {
-  id              String            @id @default(cuid())
-  documentId      String?
-  analysisId      String?
-  title           String
-  createdBy       String // userId
-  orgId           String?
-  status          String            @default("open") // open, closed, archived
-  decisionType    String? // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
-  consensusScore  Float? // 0-100, computed from blind prior convergence on close
-  dissenterWeight Json? // { userId: predictionAccuracy } — learned from outcomes
-  outcomeId       String?
-  outcome         DecisionOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  biasBriefing    Json? // Auto-generated pre-meeting bias context from linked analysis
-  closedAt        DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                      String                   @id @default(cuid())
+  documentId              String?
+  analysisId              String?
+  title                   String
+  createdBy               String // userId
+  orgId                   String?
+  status                  String                   @default("open") // open, closed, archived
+  decisionType            String? // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
+  consensusScore          Float? // 0-100, computed from blind prior convergence on close
+  dissenterWeight         Json? // { userId: predictionAccuracy } — learned from outcomes
+  outcomeId               String?
+  outcome                 DecisionOutcome?         @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  biasBriefing            Json? // Auto-generated pre-meeting bias context from linked analysis
+  closedAt                DateTime?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   /// Pre-IC blind-prior platform (4.1 deep). Survey closes at this timestamp.
-  blindPriorDeadline    DateTime?
+  blindPriorDeadline      DateTime?
   /// Stamped when the owner-fired reveal flips the room from `collecting`
   /// to `revealed`. Once set, the per-participant aggregate is visible
   /// to every invitee. Nullable until the reveal fires.
-  blindPriorRevealedAt  DateTime?
+  blindPriorRevealedAt    DateTime?
   /// Human-readable decision frame surfaced to invitees on the survey:
   /// e.g. "Should we approve Project Atlas at $40M?". Optional — when
   /// absent the room title is used.
-  blindPriorOutcomeFrame String?       @db.Text
-  participants    RoomParticipant[]
-  blindPriors     BlindPrior[]
+  blindPriorOutcomeFrame  String?                  @db.Text
+  participants            RoomParticipant[]
+  blindPriors             BlindPrior[]
   decisionRoomBlindPriors DecisionRoomBlindPrior[]
   decisionRoomInvites     DecisionRoomInvite[]
 
@@ -1768,35 +1827,35 @@ model DecisionRoom {
 /// Either `respondentUserId` (existing platform user) or `respondentEmail`
 /// (external invitee submitting via magic-link) is set — never both.
 model DecisionRoomBlindPrior {
-  id                  String        @id @default(cuid())
-  roomId              String
+  id                String       @id @default(cuid())
+  roomId            String
   /// Set when an existing platform user submits.
-  respondentUserId    String?
+  respondentUserId  String?
   /// Set when an external invitee submits via the magic-link token flow.
-  respondentEmail     String?
+  respondentEmail   String?
   /// Display name carried forward from the invite, used when
   /// `shareIdentity = true` so the reveal can attribute by name.
-  respondentName      String?
+  respondentName    String?
   /// 0–100. Subjective probability the decision succeeds.
-  confidencePercent   Int
+  confidencePercent Int
   /// Free-text top-3 risks. Each entry capped at 200 chars in the
   /// API; up to 3 entries.
-  topRisks            String[]
+  topRisks          String[]
   /// Optional one-sentence private rationale. Surfaced in the aggregate
   /// only when `shareRationale = true`.
-  privateRationale    String?       @db.Text
+  privateRationale  String?      @db.Text
   /// Whether the participant agreed to share their rationale in the reveal.
-  shareRationale      Boolean       @default(false)
+  shareRationale    Boolean      @default(false)
   /// Whether the participant agreed to share their identity (name) in
   /// the reveal. Defaults false — reveal is anonymised by default.
-  shareIdentity       Boolean       @default(false)
-  submittedAt         DateTime      @default(now())
+  shareIdentity     Boolean      @default(false)
+  submittedAt       DateTime     @default(now())
   /// Brier score per participant computed once the linked outcome is
   /// logged. Lower is better calibrated. See src/lib/learning/brier-scoring.ts.
-  brierScore          Float?
-  brierCategory       String?
-  brierCalculatedAt   DateTime?
-  room                DecisionRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  brierScore        Float?
+  brierCategory     String?
+  brierCalculatedAt DateTime?
+  room              DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   @@unique([roomId, respondentUserId])
   @@unique([roomId, respondentEmail])
@@ -2458,6 +2517,106 @@ model DecisionContainerAuditPurchase {
   @@index([orgId])
 }
 
+/// Constellation Next Move — intelligent-antagonist priority capture
+/// (locked 2026-05-10 per Deep Research paper Ch 8 / Finding #4 —
+/// automation-bias defense). Before the system reveals its ranked
+/// recommendations on the constellation, the user names what THEY
+/// think the highest-priority decision is. The named gap between
+/// user-priority and algo-priority is the recommendation's actual
+/// value — not the recommendation alone. The capture is logged
+/// per-render so we can quarterly review the user's calibration.
+model ConstellationPriorityCapture {
+  id                      String   @id @default(cuid())
+  userId                  String
+  orgId                   String?
+  capturedAt              DateTime @default(now())
+  /// 1-2 sentence freeform — the user's named highest-priority
+  /// container, in their own language, before seeing the algo output.
+  userPriorityText        String   @db.Text
+  /// Optional containerId the user named (parsed from the text via
+  /// LLM intent-extraction). Null when the user-priority doesn't map
+  /// cleanly to a single container.
+  userPriorityContainerId String?
+  /// The algorithm's top-ranked containerId at the moment of capture.
+  algoTopContainerId      String?
+  /// The "why this fires" trace string for the algo's top pick,
+  /// snapshotted so the divergence record stays interpretable even
+  /// after the underlying signals shift.
+  algoTopReason           String?  @db.Text
+  /// 0.0 = perfect agreement; 1.0 = total mismatch. Computed from
+  /// (a) container-id match, (b) ranked-list overlap. Used for
+  /// quarterly calibration review.
+  divergenceScore         Float?
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([userId, capturedAt])
+}
+
+/// Anti-Portfolio tracking — locked 2026-05-10 per Deep Research paper
+/// Ch 4 (Bessemer Anti-Portfolio model). Track decisions the user
+/// PASSED ON via explicit reject + outcome attribution. Surfaces
+/// false-negative patterns (decisions we should have made but didn't)
+/// the same way the audit pipeline surfaces false-positive patterns
+/// (decisions we made but shouldn't have).
+///
+/// Bessemer's discipline: institutionalize vulnerability by publicly
+/// documenting failures of imagination. The Anti-Portfolio neutralizes
+/// the ego-defense mechanisms that block organizational learning from
+/// passes.
+model RejectedDecision {
+  id                          String    @id @default(cuid())
+  userId                      String
+  orgId                       String?
+  /// User-facing name (target company, fund opportunity, strategic
+  /// option). Mirrors DecisionContainer.name shape.
+  name                        String
+  /// What was the decision. Same free-text shape as
+  /// DecisionContainer.decisionFrame.
+  decisionFrame               String?   @db.Text
+  /// 'investment' | 'acquisition' | 'strategic' — same kind enum as
+  /// DecisionContainer so the Anti-Portfolio can be filtered + sorted
+  /// alongside active containers.
+  kind                        String
+  /// Sector / industry tag, mirrors DecisionContainer.sector.
+  sector                      String?
+  /// Date the IC / committee / user formally passed.
+  rejectedAt                  DateTime  @default(now())
+  /// Rationale at time of rejection. Critical for the post-hoc
+  /// learning loop — when the eventual outcome lands, we compare
+  /// the rejection reason to the actual driver.
+  rejectionReason             String    @db.Text
+  /// Did a competitor / different fund / different acquirer pick this
+  /// up? Surfaces "this happened in the market" attribution.
+  passedToCompetitor          Boolean   @default(false)
+  competitorName              String?
+  /// Eventual outcome attribution. Populated when the user logs
+  /// observed outcome 6+ months post-rejection. Shape:
+  /// {
+  ///   outcomeBand: 'outlier_success' | 'modest_success' | 'wash' |
+  ///                'modest_failure' | 'outlier_failure',
+  ///   evidence: string,           // headline / news / disclosure
+  ///   evidenceUrl?: string,
+  ///   learnedLesson: string,      // free-text retrospective
+  ///   wouldRedecideToday: 'yes' | 'no' | 'still_unclear',
+  ///   loggedAt: string,
+  /// }
+  eventualOutcome             Json?
+  eventualOutcomeAttributedAt DateTime?
+  /// Soft-delete to match DecisionContainer pattern; the daily
+  /// /api/cron/enforce-retention pass hard-purges after the grace
+  /// window.
+  deletedAt                   DateTime?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([userId, rejectedAt])
+  @@index([kind])
+  @@index([sector])
+}
+
 model GoogleDriveInstallation {
   id                    String    @id @default(cuid())
   userId                String    @unique
@@ -2531,13 +2690,13 @@ model FounderProspect {
   company          String?
   role             String?
   linkedInUrl      String?
-  intent           String    // connect | pilot | poc | investor
+  intent           String // connect | pilot | poc | investor
   status           String    @default("cold") // cold | warm | active | converted | archived
   outreachDate     DateTime  @default(now())
   lastContact      DateTime?
   followUpDue      DateTime? // auto-set to outreachDate + 5 days on creation
   notes            String?   @db.Text
-  sourceArtifactId String?   // links to OutreachArtifact.id when saved from generator
+  sourceArtifactId String? // links to OutreachArtifact.id when saved from generator
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -2605,7 +2764,7 @@ model DecisionProvenanceRecord {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  analysis           Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([orgId])
@@ -2627,26 +2786,26 @@ model DecisionProvenanceRecord {
 // tools they currently use (validates the four-tool graveyard story on
 // real data) + how they heard about DI (source attribution).
 model DesignPartnerApplication {
-  id             String    @id @default(cuid())
-  name           String
-  email          String
-  company        String
-  role           String
-  linkedInUrl    String?
-  industry       String    // banking | insurance | pharma | aerospace | energy | mna | other
-  teamSize       String    // '1-5' | '6-15' | '16-50' | '51-200' | '200+'
-  memoCadence    String?   // e.g. "3-5 strategic memos per quarter"
-  currentStack   String?   // free-text list of tools they use today
-  whyNow         String    @db.Text
-  source         String?   // warm-intro | linkedin | press | direct | other
+  id              String    @id @default(cuid())
+  name            String
+  email           String
+  company         String
+  role            String
+  linkedInUrl     String?
+  industry        String // banking | insurance | pharma | aerospace | energy | mna | other
+  teamSize        String // '1-5' | '6-15' | '16-50' | '51-200' | '200+'
+  memoCadence     String? // e.g. "3-5 strategic memos per quarter"
+  currentStack    String? // free-text list of tools they use today
+  whyNow          String    @db.Text
+  source          String? // warm-intro | linkedin | press | direct | other
   // Internal triage
-  status         String    @default("applied")
+  status          String    @default("applied")
   // 'applied' | 'reviewing' | 'scheduled_call' | 'accepted' | 'declined' | 'withdrawn'
-  founderNotes   String?   @db.Text
-  reviewedAt     DateTime?
+  founderNotes    String?   @db.Text
+  reviewedAt      DateTime?
   callScheduledAt DateTime?
-  submittedAt    DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  submittedAt     DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // ─── 5-seat cohort slot (2026-04-24) ──────────────────────────────────
   // Which of the 5 cohort slots this partner occupies. Null means the
@@ -2692,25 +2851,25 @@ model PartnerContact {
   id           String @id @default(cuid())
   partnerAppId String
 
-  name        String
-  role        String
-  linkedInUrl String?
+  name           String
+  role           String
+  linkedInUrl    String?
   // Raw profile summary pasted by the founder (About section, bio,
   // recent roles). The meeting-prep route reads this to ground its
   // plan. Required because the prep generator refuses to run with
   // fewer than 40 chars of info.
-  linkedInInfo String  @db.Text
+  linkedInInfo   String    @db.Text
   // How the meeting came to be — shared between contacts at the same
   // partner or personalised per contact. Defaults to a stub the UI
   // pre-fills.
-  meetingContext String? @db.Text
+  meetingContext String?   @db.Text
   // Founder's desired outcome for this specific meeting (different
   // asks for the investment partner vs the GC, for example).
-  founderAsk String? @db.Text
+  founderAsk     String?   @db.Text
   // Generated meeting prep (the full streamed-then-accumulated
   // plan). Null until the founder clicks "Generate meeting prep."
-  generatedPrep String?   @db.Text
-  generatedAt   DateTime?
+  generatedPrep  String?   @db.Text
+  generatedAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

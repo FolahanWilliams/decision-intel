@@ -193,6 +193,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       crossRefHighSeverityCount: latestCr?.highSeverityCount ?? 0,
       updatedAt: row.updatedAt.toISOString(),
       createdAt: row.createdAt.toISOString(),
+      // 2026-05-10 priors + cultural-pairing extensions. Both fields
+      // are JSONB on Prisma; cast through unknown to the typed shape
+      // declared on ContainerSummary. Null when not yet captured.
+      priors: (row.priors as ContainerDetail['priors']) ?? null,
+      culturalPairingRisk:
+        (row.culturalPairingRisk as ContainerDetail['culturalPairingRisk']) ?? null,
       documents: memberRefs,
       outcome: row.outcome
         ? {

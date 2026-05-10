@@ -38,6 +38,15 @@ const TOKEN_COSTS: Record<string, { input: number; output: number }> = {
   // proportionally tiny on Flash-tier traffic.
   'google/gemini-3-flash-preview': { input: 0.00015, output: 0.0006 },
   'google/gemini-3.1-flash-lite': { input: 0.00005, output: 0.0002 },
+  // DeepSeek-v4-Flash via AI Gateway — locked 2026-05-10 alongside the
+  // Constellation Next Move recommendation engine ship. $0.14/M input
+  // ($0.00014 per 1K) + $0.28/M output ($0.00028 per 1K) per the Vercel
+  // AI Gateway model list. Sub-cent per recommendation; with Runtime
+  // Cache keyed on signal-hash, most renders are cache hits.
+  'deepseek/deepseek-v4-flash': { input: 0.00014, output: 0.00028 },
+  // DeepSeek-v4-Pro reserved for future heavier-reasoning surfaces.
+  // Same Gateway routing convention; ~3× the v4-flash rate.
+  'deepseek/deepseek-v4-pro': { input: 0.00043, output: 0.00087 },
 };
 
 /**

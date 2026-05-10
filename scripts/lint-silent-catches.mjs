@@ -114,7 +114,15 @@ const SCAN_DIR = join(ROOT, 'src');
 // error body before throwing (so the panel surfaces the real
 // diagnostic, not a generic "Failed to fetch DQI"). Same canonical
 // req.json() body-parse exception class.
-const SILENT_CATCH_BASELINE = 153;
+// 153 → 157: Constellation Next Move + paper-grounded surfaces ship
+// (2026-05-10 evening). Four new `res.json().catch(() => null)`
+// body-parse error paths in PriorsCaptureCard / CulturalPairingRiskCard
+// / RejectedDecisionsTab (RejectDecisionModal + AttributeOutcomeModal).
+// All four parse the API error body before throwing so the form
+// surfaces the actual server error rather than a generic "Failed to
+// save". Canonical req.json() body-parse exception class CLAUDE.md
+// explicitly lists as legitimate.
+const SILENT_CATCH_BASELINE = 157;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
