@@ -37,10 +37,20 @@ import {
   Loader2,
   AlertCircle,
   Plus,
+  Trash2,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { useToast } from '@/components/ui/EnhancedToast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { gradeFromScore } from '@/lib/utils/grade';
 
 type StatusFilter = 'all' | 'complete' | 'analyzing' | 'pending';
@@ -69,6 +79,9 @@ export default function DocumentsListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortKey>('newest');
   const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const { showToast } = useToast();
 
   // Debounce search → searchQuery (300ms) so we don't filter on every keystroke.
   useEffect(() => {
@@ -76,7 +89,7 @@ export default function DocumentsListPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  const { documents, total, totalPages, isLoading } = useDocuments(true, page, 25);
+  const { documents, total, totalPages, isLoading, mutate } = useDocuments(true, page, 25);
 
   const filteredDocs = useMemo(() => {
     return documents.filter(doc => {
@@ -111,6 +124,68 @@ export default function DocumentsListPage() {
     const ids = Array.from(selectedDocs).slice(0, 3);
     if (ids.length < 2) return;
     router.push(`/dashboard/compare?doc=${ids.join(',')}`);
+  };
+
+  // Bulk delete handler — runs the per-doc DELETE in parallel and reports
+  // partial success when the server-side rate limit (10/hr/user) bites.
+  // Optimistically updates the SWR cache by filtering successfully-deleted
+  // ids out of the current page; revalidate=true triggers a background
+  // refetch so total/totalPages stay correct after server-side soft-delete.
+  const handleBulkDelete = async () => {
+    if (selectedDocs.size === 0) return;
+    setDeleting(true);
+    const ids = Array.from(selectedDocs);
+    try {
+      const results = await Promise.all(
+        ids.map(id =>
+          fetch(`/api/documents/${id}`, { method: 'DELETE' }).then(res => ({
+            id,
+            ok: res.ok,
+            status: res.status,
+          }))
+        )
+      );
+      const successIds = new Set(results.filter(r => r.ok).map(r => r.id));
+      const failedIds = results.filter(r => !r.ok).map(r => r.id);
+      const successCount = successIds.size;
+      const rateLimited = results.some(r => r.status === 429);
+
+      if (successCount > 0) {
+        await mutate(
+          current =>
+            current
+              ? { ...current, documents: current.documents.filter(d => !successIds.has(d.id)) }
+              : current,
+          { revalidate: true }
+        );
+      }
+      // Preserve failed ids for retry; clear successful ones from selection.
+      setSelectedDocs(new Set(failedIds));
+      setDeleteConfirmOpen(false);
+
+      if (successCount === ids.length) {
+        showToast(`Deleted ${successCount} document${successCount === 1 ? '' : 's'}`, 'success');
+      } else if (successCount > 0) {
+        showToast(
+          rateLimited
+            ? `Deleted ${successCount} of ${ids.length} — rate limit hit, try again in a few minutes`
+            : `Deleted ${successCount} of ${ids.length} — some failed`,
+          'warning'
+        );
+      } else {
+        showToast(
+          rateLimited
+            ? 'Rate limit exceeded — try again in a few minutes'
+            : 'Failed to delete documents',
+          'error'
+        );
+      }
+    } catch {
+      showToast('Failed to delete documents', 'error');
+      setDeleteConfirmOpen(false);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -259,8 +334,9 @@ export default function DocumentsListPage() {
         </Link>
       </div>
 
-      {/* Multi-select compare bar — only renders when 2+ selected */}
-      {selectedDocs.size >= 2 && (
+      {/* Multi-select action bar — renders when ≥1 selected. Delete is
+          always available; Compare shows only when 2-3 selected. */}
+      {selectedDocs.size >= 1 && (
         <div
           style={{
             display: 'flex',
@@ -281,7 +357,12 @@ export default function DocumentsListPage() {
               color: 'var(--text-primary)',
             }}
           >
-            {selectedDocs.size} selected · compare 2-3 documents side-by-side
+            {selectedDocs.size} selected
+            {selectedDocs.size >= 2 && selectedDocs.size <= 3
+              ? ' · compare side-by-side or delete'
+              : selectedDocs.size > 3
+                ? ' · delete (compare requires 2-3)'
+                : ' · open or delete'}
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
@@ -301,25 +382,50 @@ export default function DocumentsListPage() {
             </button>
             <button
               type="button"
-              onClick={goToCompare}
-              disabled={selectedDocs.size > 3}
+              onClick={() => setDeleteConfirmOpen(true)}
+              disabled={deleting}
+              aria-label={`Delete ${selectedDocs.size} selected document${selectedDocs.size === 1 ? '' : 's'}`}
               style={{
                 padding: '6px 12px',
-                background: selectedDocs.size > 3 ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-                border: 'none',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--fs-sm)',
                 fontWeight: 600,
-                color: selectedDocs.size > 3 ? 'var(--text-muted)' : '#fff',
-                cursor: selectedDocs.size > 3 ? 'not-allowed' : 'pointer',
+                color: 'var(--error)',
+                cursor: deleting ? 'not-allowed' : 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
               }}
             >
-              <GitCompareArrows size={14} />
-              {selectedDocs.size > 3 ? 'Max 3' : 'Compare'}
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              {selectedDocs.size === 1 ? 'Delete' : `Delete ${selectedDocs.size}`}
             </button>
+            {selectedDocs.size >= 2 && (
+              <button
+                type="button"
+                onClick={goToCompare}
+                disabled={selectedDocs.size > 3}
+                style={{
+                  padding: '6px 12px',
+                  background:
+                    selectedDocs.size > 3 ? 'var(--bg-elevated)' : 'var(--accent-primary)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 600,
+                  color: selectedDocs.size > 3 ? 'var(--text-muted)' : '#fff',
+                  cursor: selectedDocs.size > 3 ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <GitCompareArrows size={14} />
+                {selectedDocs.size > 3 ? 'Max 3' : 'Compare'}
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -503,6 +609,74 @@ export default function DocumentsListPage() {
           </>
         )}
       </div>
+
+      {/* Soft-delete confirmation. Per CLAUDE.md "Native browser dialogs
+          banned" rule on primary surfaces — uses the canonical Dialog
+          primitive, not window.confirm. Soft-delete only; the daily
+          /api/cron/enforce-retention pass hard-purges after the grace
+          window. */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onOpenChange={open => {
+          if (!deleting) setDeleteConfirmOpen(open);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Delete {selectedDocs.size === 1 ? 'this document' : `${selectedDocs.size} documents`}?
+            </DialogTitle>
+            <DialogDescription>
+              {selectedDocs.size === 1
+                ? 'The document and its analyses will be soft-deleted and queued for hard purge after the retention grace window. Outcomes and shared links will stop working.'
+                : `These ${selectedDocs.size} documents and their analyses will be soft-deleted and queued for hard purge after the retention grace window. Outcomes and shared links will stop working.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setDeleteConfirmOpen(false)}
+              disabled={deleting}
+              style={{
+                padding: '8px 14px',
+                background: 'transparent',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--fs-sm)',
+                color: 'var(--text-secondary)',
+                cursor: deleting ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              disabled={deleting}
+              style={{
+                padding: '8px 14px',
+                background: 'var(--error)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--fs-sm)',
+                fontWeight: 600,
+                color: '#fff',
+                cursor: deleting ? 'wait' : 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              {deleting
+                ? 'Deleting…'
+                : selectedDocs.size === 1
+                  ? 'Delete'
+                  : `Delete ${selectedDocs.size}`}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </ErrorBoundary>
   );
 }
