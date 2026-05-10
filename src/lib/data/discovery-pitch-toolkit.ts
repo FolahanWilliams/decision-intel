@@ -41,9 +41,9 @@
  */
 export type PersonaId =
   | 'fractional_cso'
-  | 'midmarket_corpdev_head'
-  | 'smallfund_gp'
-  | 'pebacked_founder';
+  | 'midmarket_corp_dev'
+  | 'smaller_fund_gp'
+  | 'pe_backed_founder';
 
 export interface DiscoveryQuestion {
   /** Order in the conversation (1-4). Always asked in this order. */
@@ -210,7 +210,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       "Kahneman's 'Inside View' theory — strategists build a coherent narrative but fail to anticipate the 'Outside View' pushback. GTM v3.3 Hybrid Discovery Toolkit pattern.",
   },
   {
-    id: 'midmarket_corpdev_head',
+    id: 'midmarket_corp_dev',
     label: 'Head of Corp Dev / M&A at scale-up',
     archetype: 'Damien',
     opener:
@@ -224,7 +224,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       "Mercier & Sperber argumentative theory (isolated teams suppress dissent to justify prior intuitions) + 143-case library WeWork 'Echo Chamber' + Nokia 'Yes Committee' failure patterns.",
   },
   {
-    id: 'smallfund_gp',
+    id: 'smaller_fund_gp',
     label: 'GP / principal at smaller fund',
     archetype: 'Aisha',
     opener:
@@ -240,7 +240,7 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       'Never name a specific fund (Sankore or any prospect) aloud. Keep the framing abstract — "smaller-fund GPs" / "your fund" / "LP-governance pressure" — never the firm name. The relationship is private.',
   },
   {
-    id: 'pebacked_founder',
+    id: 'pe_backed_founder',
     label: 'PE-backed founder / CEO',
     archetype: 'Henrik',
     opener:

@@ -24,9 +24,9 @@ export type BuyerPersonaId =
   // the four buyer-class-continuous personas the £249/mo wedge motion
   // targets. Sparring Room defaults to one of these.
   | 'fractional_cso'
-  | 'midmarket_corpdev_head'
-  | 'smallfund_gp'
-  | 'pebacked_founder'
+  | 'midmarket_corp_dev'
+  | 'smaller_fund_gp'
+  | 'pe_backed_founder'
   // Expansion personas — useful for rehearsal but NOT the Phase 1 wedge.
   // Phase 4 ceiling buyers (F500 CSO + GC), Phase 2-3 bridge personas
   // (Pan-African fund partner, mid-market PE associate), advisor /
@@ -284,7 +284,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     color: '#16A34A',
   },
   {
-    id: 'midmarket_corpdev_head',
+    id: 'midmarket_corp_dev',
     label: 'Mid-market corp dev head',
     archetype: 'Damien',
     tier: 'phase1_hxc',
@@ -326,7 +326,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     color: '#0EA5E9',
   },
   {
-    id: 'smallfund_gp',
+    id: 'smaller_fund_gp',
     label: 'Small-fund GP / principal',
     archetype: 'Aisha',
     tier: 'phase1_hxc',
@@ -367,7 +367,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     color: '#7C3AED',
   },
   {
-    id: 'pebacked_founder',
+    id: 'pe_backed_founder',
     label: 'PE-backed founder / CEO',
     archetype: 'Henrik',
     tier: 'phase1_hxc',

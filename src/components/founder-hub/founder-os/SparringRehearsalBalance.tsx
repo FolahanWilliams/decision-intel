@@ -31,14 +31,14 @@ const HISTORY_KEY = 'di-sparring-room-history-v1';
 // keys — the widget only needs to match the four ids without round-tripping
 // through the Sparring data file.
 const HXC_PERSONAS: Array<{
-  id: 'fractional_cso' | 'midmarket_corpdev_head' | 'smallfund_gp' | 'pebacked_founder';
+  id: 'fractional_cso' | 'midmarket_corp_dev' | 'smaller_fund_gp' | 'pe_backed_founder';
   shortLabel: string;
   archetype: string;
 }> = [
   { id: 'fractional_cso', shortLabel: 'Fractional CSO', archetype: 'Marcus' },
-  { id: 'midmarket_corpdev_head', shortLabel: 'Mid-mkt corp dev', archetype: 'Damien' },
-  { id: 'smallfund_gp', shortLabel: 'Smaller-fund GP', archetype: 'Aisha' },
-  { id: 'pebacked_founder', shortLabel: 'PE-backed founder', archetype: 'Henrik' },
+  { id: 'midmarket_corp_dev', shortLabel: 'Mid-mkt corp dev', archetype: 'Damien' },
+  { id: 'smaller_fund_gp', shortLabel: 'Smaller-fund GP', archetype: 'Aisha' },
+  { id: 'pe_backed_founder', shortLabel: 'PE-backed founder', archetype: 'Henrik' },
 ];
 
 interface SparringHistoryEntry {

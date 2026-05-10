@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { ChevronLeft, FileText, Download, GitCompareArrows, CheckCircle2 } from 'lucide-react';
 import { useContainer } from '@/hooks/useContainers';
 import { ContainerCompositeHero } from '@/components/containers/ContainerCompositeHero';
+import { ContainerTopFixesCard } from '@/components/containers/ContainerTopFixesCard';
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
@@ -128,6 +129,16 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <ContainerCompositeHero container={container} />
+
+          {/* Top-3 Fix Tiles at the container level (locked 2026-05-10
+              batch 3 #3, DESIGN.md persona-validated layout direction
+              universal point #2). Mirrors RemediationChecklist pattern
+              from doc-detail; surfaces critical/high named patterns
+              (Synergy Mirage / Conglomerate Fallacy / Winner's Curse /
+              etc.) + recurring biases as actionable fix tiles ranked
+              by severity. Renders nothing when no patterns + no biases
+              flagged (early-stage container with clean single doc). */}
+          <ContainerTopFixesCard container={container} />
 
           {/* Anatomy-of-a-Call brand anchor (locked 2026-05-10 batch 2 #1).
               Quiet 5-layer constellation tying this decision to the same

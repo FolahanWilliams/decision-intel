@@ -115,21 +115,21 @@ export const PERSONA_ARCHETYPES: PersonaArchetype[] = [
   },
   {
     name: 'Mid-market Head of Corp Dev / M&A',
-    archetype: 'midmarket_corpdev_head',
+    archetype: 'midmarket_corp_dev',
     dailyVerbs: ['screen', 'diligence', 'synergy_check', 'present_to_board', 'close'],
     uniqueAngle:
       'Runs the deal pipeline at a $50M-$500M revenue scale-up. Pays £249/mo personally pre-team-budget. The most common buyer at the IC-readiness gate. Phase 1 HXC wedge persona per GTM v3.5.',
   },
   {
     name: 'Smaller-fund GP / VC partner',
-    archetype: 'smallfund_gp',
+    archetype: 'smaller_fund_gp',
     dailyVerbs: ['screen_deal', 'read_ic_memo', 'thesis_anchor', 'lp_governance', 'commit'],
     uniqueAngle:
       'GP or principal at a £5M-£100M AUM fund with active deal flow OR LP governance pressure. Reads IC memos in the back of an Uber. The Cornerstone-magnetic persona — cares about thesis-anchor + structural-assumption ripple. Phase 1 HXC wedge per GTM v3.5.',
   },
   {
     name: 'PE-backed founder / CEO',
-    archetype: 'pebacked_founder',
+    archetype: 'pe_backed_founder',
     dailyVerbs: ['prep_board_deck', 'sign_off_strategic_memo', 'brief_sponsor', 'authorise'],
     uniqueAngle:
       '$80M-revenue PE-backed CEO with personal-decisive budget. The synergy-mirage detector is the highest-leverage signal for this persona. Phase 1 HXC wedge per GTM v3.5.',

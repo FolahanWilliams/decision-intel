@@ -25,6 +25,11 @@ import {
   gradeFromRecallScore,
   type RecallGradeResult,
 } from '@/components/founder-hub/education/education-room-data';
+import {
+  BANNED_VOCABULARY,
+  PROTECTED_VOCABULARY,
+  CATEGORY_CLAIM,
+} from '@/lib/constants/icp';
 
 const log = createLogger('EducationGradeRecall');
 
@@ -101,7 +106,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(mockResult(card.canonicalAnswer, userAnswer));
   }
 
-  const prompt = `You are a knowledge-recall coach grading a founder's typed recall of a Decision Intel concept. The founder is studying for live sales conversations — they need to recall this information under pressure.
+  // Positioning-discipline injection (locked 2026-05-10 audit batch 3 #4).
+  // The recall grader is the founder's pre-event drilling tool — answers
+  // that drift to banned vocabulary ('decision intelligence platform' /
+  // 'decision hygiene' / etc.) should NOT score high even if they
+  // semantically capture the canonical concept, because shipping that
+  // vocabulary to a live procurement reader breaks the locked positioning
+  // category claim. Inject the banned + protected vocabulary lists from
+  // icp.ts (canonical SSOT) so the grader downgrades drifted answers
+  // automatically.
+  const bannedList = BANNED_VOCABULARY.map(b => `  - "${b.phrase}" — ${b.reason}`).join('\n');
+  const protectedList = PROTECTED_VOCABULARY.map(p => `  - "${p}"`).join('\n');
+
+  const prompt = `You are a knowledge-recall coach grading a founder's typed recall of a Decision Intel concept. The founder is studying for live sales conversations — they need to recall this information under pressure AND use the locked positioning vocabulary procurement readers will scan for.
 
 THE PROMPT THE FOUNDER WAS GIVEN:
 "${card.prompt}"
@@ -116,20 +133,32 @@ THE FOUNDER'S TYPED RECALL:
 ${userAnswer}
 """
 
-GRADE the recall on semantic faithfulness to the canonical answer. The founder doesn't need to match wording exactly — they need to capture the LOAD-BEARING concepts in their own voice. The goal is mastery for live conversation use, not verbatim memorisation.
+GRADE the recall on semantic faithfulness to the canonical answer. The founder doesn't need to match wording exactly — they need to capture the LOAD-BEARING concepts in their own voice AND use the canonical category vocabulary. The goal is mastery for live conversation use, not verbatim memorisation.
+
+POSITIONING DISCIPLINE — locked vocabulary the answer must respect:
+
+The protected category claim is "${CATEGORY_CLAIM}". Treat this string like R²F / DPR / DQI — never substitute synonyms.
+
+Protected vocabulary (using these correctly is a positive signal):
+${protectedList}
+
+Banned drift targets (using ANY of these in the recall is a 10-point penalty per occurrence; max 30-point penalty cap. Note in whatMissed):
+${bannedList}
+
+When the founder's answer uses banned vocabulary or substitutes the category claim with a paraphrase ("reasoning analyser" / "decision audit platform" / etc.), apply the penalty AND surface the specific drift in whatMissed. The founder is drilling for procurement-grade conversations where category-claim consistency IS the moat.
 
 Score 0-100:
-  - 90-100: All load-bearing concepts captured + correctly phrased + nuance preserved.
-  - 70-89: Most load-bearing concepts captured; minor gaps or slight imprecision.
-  - 55-69: About half the load-bearing concepts; missed one important nuance or inverted a meaning.
-  - 40-54: Some recognition but missed multiple key concepts or got something materially wrong.
+  - 90-100: All load-bearing concepts captured + correctly phrased + nuance preserved + canonical vocabulary used.
+  - 70-89: Most load-bearing concepts captured; minor gaps OR slight imprecision OR mild vocabulary drift.
+  - 55-69: About half the load-bearing concepts; missed one important nuance, inverted a meaning, OR used banned vocabulary.
+  - 40-54: Some recognition but missed multiple key concepts, got something materially wrong, OR drifted to banned vocabulary multiple times.
   - <40: Wrong on the central concept, or essentially blank.
 
 Output:
-- score: integer 0-100
+- score: integer 0-100 (apply banned-vocabulary penalty cap of 30 points after concept-grading)
 - whatLanded: array of 1-3 specific concepts the founder GOT RIGHT. Quote a phrase from their answer if possible.
-- whatMissed: array of 1-3 specific concepts they missed or got wrong. Be precise — name the specific gap.
-- coachNote: ONE sentence the founder should remember next time. Actionable, specific.
+- whatMissed: array of 1-3 specific concepts they missed or got wrong. If banned vocabulary appeared, name it explicitly here ("Used 'decision intelligence platform' — banned per CLAUDE.md positioning lock; the canonical claim is 'the reasoning audit platform'"). Be precise — name the specific gap.
+- coachNote: ONE sentence the founder should remember next time. Actionable, specific. If vocabulary drift was the dominant issue, surface that here.
 
 Output ONLY valid JSON (no prose, no markdown fence):
 {

@@ -496,6 +496,15 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
         }}
         onClick={onClose}
       />
+      {/* Drawer panel — retoned 2026-05-10 (audit batch 3 #5) from
+          error-red to warning-amber per the AccentCard accent='warning'
+          tinted semantic. The Outcome Gate is the canonical wow surface
+          GATING the Phase 1 data flywheel — it should read as "this is
+          your data flywheel firing, address it to unlock value", NOT as
+          "this is an error." Top accent stripe (3px var(--warning))
+          mirrors the AccentCard primitive's stripe-on-stacked-card
+          pattern even though the drawer geometry can't wrap an
+          AccentCard component directly. */}
       <motion.div
         ref={panelRef}
         initial={{ x: '100%' }}
@@ -508,17 +517,18 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
           bottom: 0,
           width: '100%',
           maxWidth: '480px',
-          background: 'var(--bg-secondary, #1a1a2e)',
-          borderLeft: '1px solid rgba(239, 68, 68, 0.2)',
+          background: 'var(--bg-card)',
+          borderTop: '3px solid var(--warning)',
+          borderLeft: '1px solid var(--border-color)',
           overflow: 'auto',
         }}
       >
-        {/* Header */}
+        {/* Header — amber-warning tinted per AccentCard `tinted` semantic. */}
         <div
           style={{
             padding: '20px 24px',
-            background: 'rgba(239, 68, 68, 0.06)',
-            borderBottom: '1px solid rgba(239, 68, 68, 0.1)',
+            background: 'color-mix(in srgb, var(--warning) 8%, var(--bg-card))',
+            borderBottom: '1px solid color-mix(in srgb, var(--warning) 22%, var(--border-color))',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -529,13 +539,13 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
               width: '40px',
               height: '40px',
               borderRadius: '10px',
-              background: 'rgba(239, 68, 68, 0.12)',
+              background: 'color-mix(in srgb, var(--warning) 14%, var(--bg-card))',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <AlertTriangle size={20} style={{ color: '#ef4444' }} />
+            <AlertTriangle size={20} style={{ color: 'var(--warning)' }} />
           </div>
           <div>
             <h3

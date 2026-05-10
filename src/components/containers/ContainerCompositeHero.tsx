@@ -8,15 +8,77 @@
  */
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  GitCompareArrows,
+  ShieldCheck,
+  AlertTriangle,
+  AlertOctagon,
+  Hash,
+  Clock,
+  ExternalLink,
+} from 'lucide-react';
 import { dqiColorFor } from '@/lib/utils/grade';
 import { getContainerMode, type DecisionContainerKind } from '@/lib/data/decision-container-modes';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 import type { ContainerDetail } from '@/types/containers';
 import {
   ContainerDqiBreakdownPanel,
   fetchPerDocBreakdowns,
 } from '@/components/dqi/ContainerDqiBreakdownPanel';
 import type { PerDocBreakdown } from '@/components/dqi/ContainerDqiBreakdownPanel';
+
+/**
+ * Status pill semantics for container-level verdict (mirrors the
+ * VerdictBand `deriveStatus` helper at the document level). Procurement
+ * grammar — "audit-ready" / "needs revision" / "revise before board"
+ * reads enterprise; "passed/failed" reads SaaS. Container-level
+ * overrides include critical named patterns (Synergy Mirage / Winner's
+ * Curse / Conglomerate Fallacy) which are deal-blocking signals
+ * regardless of composite grade.
+ */
+function deriveContainerStatus(
+  grade: string | null,
+  criticalPatternCount: number,
+  highSeverityConflicts: number
+): { label: string; color: string; icon: typeof ShieldCheck } {
+  if (criticalPatternCount > 0 || highSeverityConflicts > 0) {
+    return { label: 'Revise before committee', color: 'var(--error)', icon: AlertOctagon };
+  }
+  if (grade === 'A' || grade === 'B') {
+    return { label: 'Audit-ready', color: 'var(--success)', icon: ShieldCheck };
+  }
+  if (grade === 'C') {
+    return { label: 'Needs revision', color: 'var(--warning)', icon: AlertTriangle };
+  }
+  if (grade === null) {
+    return { label: 'Pending audits', color: 'var(--text-muted)', icon: Clock };
+  }
+  return { label: 'Revise before committee', color: 'var(--error)', icon: AlertOctagon };
+}
+
+/** Format the container id as a SHA-256-style mono prefix (first 12
+ *  chars + ellipsis). Mirrors the doc-detail VerdictBand contentHash
+ *  treatment so the procurement reader sees the same shape across both
+ *  detail surfaces. The container id is a UUID, not a hash, so no
+ *  cryptographic claim — just a stable monospace identity reference. */
+function formatContainerIdMono(id: string): string {
+  if (!id) return '';
+  return id.length > 12 ? `${id.slice(0, 12)}…` : id;
+}
+
+function formatRelativeDays(iso: string | null | undefined, now: number): string | null {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  if (!Number.isFinite(then)) return null;
+  const days = Math.max(0, Math.floor((now - then) / (24 * 60 * 60 * 1000)));
+  if (days === 0) return 'today';
+  if (days === 1) return '1d ago';
+  if (days < 30) return `${days}d ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+}
 
 interface ContainerCompositeHeroProps {
   container: ContainerDetail;
@@ -37,6 +99,9 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
   const [perDoc, setPerDoc] = useState<PerDocBreakdown[]>([]);
   const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [breakdownError, setBreakdownError] = useState<string | null>(null);
+  // Capture mount-time so relative-time copy stays pure across renders
+  // (react-hooks/purity flags Date.now() in render).
+  const [mountTime] = useState(() => Date.now());
   const mode = getContainerMode(container.kind as DecisionContainerKind);
 
   // Open the composite-DQI breakdown panel + lazy-fetch per-doc DQI on
@@ -58,6 +123,20 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
     container.compositeDqi != null ? dqiColorFor(container.compositeDqi) : 'var(--text-muted)';
   const ticket = formatTicket(container.ticketSize, container.currency);
 
+  // Status pill + audit-metadata strip (locked 2026-05-10 batch 3 #3).
+  // Per DESIGN.md persona-validated layout direction: the verdict is the
+  // FIRST read on every detail surface. Container detail mirrors the
+  // doc-detail VerdictBand pattern with container-shaped semantics —
+  // critical named patterns (Synergy Mirage / etc.) override grade-
+  // based labels because they're deal-blocking signals.
+  const status = deriveContainerStatus(
+    container.compositeGrade,
+    container.aggregation.criticalPatternCount,
+    container.crossRefHighSeverityCount
+  );
+  const StatusIcon = status.icon;
+  const auditedRelative = formatRelativeDays(container.updatedAt, mountTime);
+
   return (
     <div
       style={{
@@ -70,6 +149,29 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
         gap: 14,
       }}
     >
+      {/* Status pill — first read at the container level. Mirrors the
+          doc-detail VerdictBand status semantics; container override
+          fires on critical named patterns (Synergy Mirage / etc.) +
+          high-severity cross-doc conflicts. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '6px 12px',
+          background: `color-mix(in srgb, ${status.color} 8%, var(--bg-card))`,
+          border: `1px solid color-mix(in srgb, ${status.color} 22%, var(--border-color))`,
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 'var(--fs-xs)',
+          fontWeight: 600,
+          color: status.color,
+          alignSelf: 'flex-start',
+        }}
+      >
+        <StatusIcon size={14} />
+        <span>{status.label}</span>
+      </div>
+
       {/* Top: kind + stage + counts */}
       <div
         style={{
@@ -371,6 +473,63 @@ export function ContainerCompositeHero({ container }: ContainerCompositeHeroProp
           </span>
         </div>
       )}
+
+      {/* Monospace audit-metadata strip — James persona "FIRST-orientation
+          content" ask, container-shaped. Container id mono prefix +
+          methodology version stamp + last-audited relative timestamp +
+          audit-log deep link. Mirrors doc-detail VerdictBand pattern. */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 12,
+          padding: '8px 10px',
+          marginTop: 4,
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-sm)',
+          fontFamily: 'var(--font-mono, ui-monospace, SFMono-Regular, monospace)',
+          fontSize: 11,
+          color: 'var(--text-muted)',
+        }}
+      >
+        <span
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          title={`Container id: ${container.id}`}
+        >
+          <Hash size={11} />
+          {formatContainerIdMono(container.id)}
+        </span>
+        <span style={{ color: 'var(--border-color)' }}>·</span>
+        <span title="DQI methodology version (from canonical METHODOLOGY_VERSION)">
+          DQI v{METHODOLOGY_VERSION}
+        </span>
+        {auditedRelative && (
+          <>
+            <span style={{ color: 'var(--border-color)' }}>·</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Clock size={11} />
+              audited {auditedRelative}
+            </span>
+          </>
+        )}
+        <span style={{ color: 'var(--border-color)' }}>·</span>
+        <a
+          href={`/dashboard/admin/audit-log?containerId=${encodeURIComponent(container.id)}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            color: 'var(--accent-primary)',
+            textDecoration: 'none',
+          }}
+          title="Filter the audit log to this decision"
+        >
+          audit log
+          <ExternalLink size={10} />
+        </a>
+      </div>
 
       <ContainerDqiBreakdownPanel
         open={breakdownOpen}
