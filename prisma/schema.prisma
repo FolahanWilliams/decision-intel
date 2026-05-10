@@ -512,7 +512,34 @@ model DecisionContainerOutcome {
   brierScore       Float?
   reportedAt       DateTime          @default(now())
   reportedByUserId String
-  container        DecisionContainer @relation(fields: [containerId], references: [id], onDelete: Cascade)
+
+  /// PMI signal capture for acquisition-mode containers (locked 2026-05-10
+  /// per Tier 2 + PMI Path B). Treats PMI as the TARGET of the audit —
+  /// did the deal deliver what the IC memo claimed? Not a new product
+  /// domain, just the close-the-loop layer the existing audit was always
+  /// missing.
+  ///
+  /// Shape (Json):
+  /// {
+  ///   signals: Array<{
+  ///     key: 'synergy_realisation_pct' | 'talent_retention_pct' |
+  ///          'integration_cost_vs_forecast' | 'day_one_milestone_hit_rate' |
+  ///          'customer_retention_pct' | 'revenue_growth_vs_forecast',
+  ///     proxy: string,            // verbatim IC-memo claim
+  ///     horizonDays: number,      // 90 | 180 | 365
+  ///     predictedConfidence: number, // 0-1 from priors / IC memo
+  ///     observedValue?: number,
+  ///     observedAt?: string,
+  ///     brierScore?: number,
+  ///     resolution?: 'hit' | 'miss' | 'partial' | 'unmeasured',
+  ///   }>,
+  ///   capturedAt: string,
+  ///   capturedByUserId: string,
+  ///   lastUpdatedAt?: string,
+  /// }
+  pmiSignals Json?
+
+  container DecisionContainer @relation(fields: [containerId], references: [id], onDelete: Cascade)
 
   @@index([containerId])
 }
@@ -1019,6 +1046,13 @@ model SlackInstallation {
   monitoredChannels  String[]  @default([])
   nudgeFrequency     String    @default("normal")
   status             String    @default("active")
+  /// Ambient thesis-detection consent (locked 2026-05-10 per Tier 2.2).
+  /// Default OFF — explicit per-installation opt-in required before the
+  /// cron parses any threads for sponsor-thesis-formation signals.
+  /// Privacy posture: ambientCaptureChannels gates which channels can
+  /// be parsed (empty = none even when ambientCaptureEnabled = true).
+  ambientCaptureEnabled  Boolean   @default(false)
+  ambientCaptureChannels String[]  @default([])
   revokedAt          DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
@@ -2630,6 +2664,12 @@ model GoogleDriveInstallation {
   changesPageToken      String?
   status                String    @default("active")
   lastSyncAt            DateTime?
+  /// Ambient thesis-detection consent (locked 2026-05-10 per Tier 2.2).
+  /// Default OFF — separate opt-in from analysis monitoring (which is
+  /// gated by monitoredFolders). When true the cron parses new files in
+  /// monitoredFolders for sponsor-thesis-formation signals; folder
+  /// scoping comes from monitoredFolders so users only get one consent UI.
+  ambientCaptureEnabled Boolean   @default(false)
   revokedAt             DateTime?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -2980,4 +3020,144 @@ model FounderMeeting {
   @@index([status, scheduledAt])
   @@index([happenedAt])
   @@index([createdAt])
+}
+
+/// User- or org-adjustable DQI weights (locked 2026-05-10 per Tier 2.1 +
+/// Deep Research paper Ch 4 / Dietvorst 2016 algorithm-aversion fix).
+///
+/// Dietvorst, Simmons & Massey 2015 named the failure mode (Algorithm
+/// Aversion); the 2016 follow-up showed people will use imperfect
+/// algorithms IF allowed to slightly modify the inputs or weights.
+/// This model is the storage layer for that fix.
+///
+/// Scope discipline:
+///   - 'org' overrides apply to every audit on containers owned by the org
+///     (highest precedence)
+///   - 'user' overrides apply when the audit runs in a context without
+///     an org match (e.g. solo containers, demo path)
+///   - canonical WEIGHTS_CANONICAL fallback when no override exists
+///
+/// Two partial-unique indexes (one per scope) — PostgreSQL allows
+/// multiple NULLs in a UNIQUE column so the same model handles both
+/// scopes cleanly. Validation rule: weights JSON must contain exactly
+/// the 7 component keys and sum to 1.0 ± 0.001 (verified server-side
+/// before write).
+model DqiWeightOverride {
+  id String @id @default(cuid())
+
+  /// 'user' | 'org' — used by override-resolution logic; persisted so
+  /// joins stay cheap.
+  scope String
+
+  /// Set when scope = 'user'; null otherwise.
+  userId String?
+  /// Set when scope = 'org'; null otherwise.
+  orgId String?
+
+  /// Json map componentId → weight. All 7 components present
+  /// (biasLoad, noiseLevel, evidenceQuality, processMaturity,
+  /// complianceRisk, historicalAlignment, compoundRisk). Server validates
+  /// sum-to-1.0 ± 0.001 + each weight ∈ [0, 1].
+  weights Json
+
+  /// MD5 hash of the canonical-ordered weight vector. Stamped on every
+  /// DPR cover for tamper-evident provenance — procurement readers can
+  /// verify which weight set produced the score. Recomputed on every
+  /// weight change.
+  weightsHash String
+
+  /// Methodology version at the moment the override was set. Pinned to
+  /// '2.3.0' (the version the user-adjustable surface introduces); legacy
+  /// audits scored before this override existed stamp the version they
+  /// ran under, unchanged.
+  methodologyVersion String @default("2.3.0")
+
+  /// Who set the override (for audit log + accountability).
+  setByUserId String
+
+  setAt     DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// Two partial-unique indexes — one per scope. PostgreSQL allows
+  /// multiple NULLs in a UNIQUE column so the org rows (userId=null)
+  /// and user rows (orgId=null) don't collide.
+  @@unique([userId])
+  @@unique([orgId])
+  @@index([scope])
+  @@index([setByUserId])
+  @@index([updatedAt])
+}
+
+/// Ambient thesis-formation signal detected on Slack / Drive / email
+/// (locked 2026-05-10 per Tier 2.2 + Deep Research paper Ch 12 condition
+/// #1 / Ch 6 ex-ante audit timing).
+///
+/// Cloverpop failed because manual logging kills adoption (system-of-
+/// record fallacy). Ambient capture fixes friction collapse — when a
+/// sponsor starts discussing a target or thesis in Slack / Drive,
+/// deepseek-v4-flash classification fires a signal, and the UI surfaces
+/// a banner inviting the user to start an audit BEFORE the IC memo
+/// crystallises. Paper Ch 6: audit must fire before deal-fever locks in.
+///
+/// Privacy posture:
+///   - default OFF on every SlackInstallation + GoogleDriveInstallation
+///   - per-channel / per-folder scoping (ambientCaptureChannels +
+///     monitoredFolders) — empty list = no parsing
+///   - 14-day auto-expiry on unconfirmed signals
+///   - excerpts capped at 500 chars; raw message content NEVER stored
+model AmbientThesisSignal {
+  id     String  @id @default(cuid())
+  userId String
+  orgId  String?
+
+  /// 'slack' | 'drive' | 'email' — discriminator for source-specific UI.
+  source String
+
+  /// Stable external id from the source system (slack channel + ts,
+  /// drive fileId, email message-id). Unique with source so we don't
+  /// double-fire on the same artefact.
+  sourceRef String
+
+  /// Optional grouping ref — slack thread root ts, drive folder, email
+  /// thread. Helps the UI cluster related signals.
+  sourceParentRef String?
+
+  detectedAt DateTime @default(now())
+
+  /// 0-1 confidence from the deepseek-v4-flash classifier. UI banner
+  /// fires at ≥ 0.75; auto-create container at ≥ 0.90.
+  confidence Float
+
+  /// Json:
+  /// {
+  ///   targetName?: string,
+  ///   decisionFrame?: string,
+  ///   convictionLanguage?: string,
+  ///   sector?: string,
+  ///   kind?: 'investment' | 'acquisition' | 'strategic',
+  /// }
+  extractedFields Json
+
+  /// Verbatim excerpt the classifier matched on (≤500 chars). The user
+  /// needs to see exactly what we flagged before confirming.
+  excerpt String @db.Text
+
+  /// 'pending' | 'confirmed' | 'dismissed' | 'expired' | 'auto_created'
+  status String @default("pending")
+
+  /// Linked container after confirm (null while pending / dismissed /
+  /// expired).
+  containerId String?
+
+  resolvedAt DateTime?
+
+  /// 14 days from detectedAt — the daily cron auto-archives signals
+  /// past expiry.
+  expiresAt DateTime
+
+  @@unique([source, sourceRef])
+  @@index([userId, status])
+  @@index([orgId, status])
+  @@index([userId, detectedAt])
+  @@index([status, expiresAt])
 }

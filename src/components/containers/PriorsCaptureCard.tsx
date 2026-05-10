@@ -11,18 +11,23 @@
  * post-hoc rationalization. Capturing pre-artefact priors gives the
  * audit something honest to compare against.
  *
- * Surface rules:
- *   - Mounted on the container detail page when container.priors is
- *     null AND analyzedDocCount === 0 (truly pre-artefact state).
- *   - Three sections: Conviction · Kill Criteria · Micro-Predictions.
- *   - Each micro-prediction captures a verifiable proxy outcome the
- *     user is willing to be Brier-scored on (paper Ch 9 — collapses
- *     the calibration feedback loop from terminal-IRR to per-prediction
- *     horizon).
+ * Two modes:
+ *   - `persist` (default) — mounted on the container detail page when
+ *     container.priors is null AND analyzedDocCount === 0. POSTs to
+ *     /api/decisions/[id]/priors directly.
+ *   - `draft` (T2.3, locked 2026-05-10) — mounted on /dashboard/
+ *     decisions/new BEFORE the container exists. Persists to
+ *     localStorage; the new-container creation flow calls
+ *     flushDraftPriorsToContainer(id) on success.
+ *
+ * Each micro-prediction captures a verifiable proxy outcome the user
+ * is willing to be Brier-scored on (paper Ch 9 — collapses the
+ * calibration feedback loop from terminal-IRR to per-prediction horizon).
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Lightbulb, Loader2, Plus, Target, Trash2, XCircle, CheckCircle } from 'lucide-react';
+import { saveDraftPriors, loadDraftPriors, clearDraftPriors } from '@/lib/priors/draft-handoff';
 
 const CONVICTION_LEVELS = [
   { value: 'low', label: 'Low — exploring' },
@@ -45,8 +50,16 @@ interface MicroPrediction {
 }
 
 interface PriorsCaptureCardProps {
-  containerId: string;
+  /** Required when mode='persist'. Optional in draft mode. */
+  containerId?: string;
+  /** User-facing label. In draft mode this can be a placeholder like
+   *  "this decision" until the user has named the container. */
   containerName: string;
+  /** Capture mode (locked 2026-05-10 per T2.3):
+   *    - 'persist' (default) — POST directly to /api/decisions/[id]/priors
+   *    - 'draft' — persist to localStorage; container creation flow
+   *      flushes via flushDraftPriorsToContainer(id) on success */
+  mode?: 'persist' | 'draft';
   onSaved?: () => void;
   /// When provided, hides the card entirely after save.
   dismissible?: boolean;
@@ -55,6 +68,7 @@ interface PriorsCaptureCardProps {
 export function PriorsCaptureCard({
   containerId,
   containerName,
+  mode = 'persist',
   onSaved,
   dismissible = true,
 }: PriorsCaptureCardProps) {
@@ -71,6 +85,24 @@ export function PriorsCaptureCard({
   const [saved, setSaved] = useState(false);
   const [hidden, setHidden] = useState(false);
 
+  // Hydrate draft mode from localStorage on mount — lets a user navigate
+  // away from the new-decision page and come back without losing input.
+  useEffect(() => {
+    if (mode !== 'draft') return;
+    const draft = loadDraftPriors();
+    if (draft) {
+      setConvictionLevel(draft.convictionLevel);
+      setConvictionRationale(draft.convictionRationale);
+      setKillCriteria(draft.killCriteria.length > 0 ? draft.killCriteria : ['']);
+      setMicroPredictions(
+        draft.microPredictions.length > 0
+          ? draft.microPredictions
+          : [{ prediction: '', horizonDays: 90, confidence: 0.7 }]
+      );
+      setSaved(true);
+    }
+  }, [mode]);
+
   if (hidden) return null;
 
   const handleSave = async () => {
@@ -83,30 +115,58 @@ export function PriorsCaptureCard({
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/decisions/${containerId}/priors`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      if (mode === 'draft') {
+        // T2.3 — persist to localStorage; container creation flow flushes.
+        saveDraftPriors({
           convictionLevel,
           convictionRationale: convictionRationale.trim(),
           killCriteria: filteredKillCriteria,
           microPredictions: filteredPredictions,
-        }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? 'Failed to save priors');
-      }
-      setSaved(true);
-      onSaved?.();
-      if (dismissible) {
-        setTimeout(() => setHidden(true), 1500);
+          draftedAt: new Date().toISOString(),
+        });
+        setSaved(true);
+        onSaved?.();
+        // Don't auto-hide in draft mode — the user might want to edit
+        // before submitting the parent form.
+      } else {
+        if (!containerId) {
+          throw new Error('containerId required in persist mode');
+        }
+        const res = await fetch(`/api/decisions/${containerId}/priors`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            convictionLevel,
+            convictionRationale: convictionRationale.trim(),
+            killCriteria: filteredKillCriteria,
+            microPredictions: filteredPredictions,
+          }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(body?.error ?? 'Failed to save priors');
+        }
+        setSaved(true);
+        onSaved?.();
+        if (dismissible) {
+          setTimeout(() => setHidden(true), 1500);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save priors');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // In draft mode, support discard-draft action.
+  const handleDiscard = () => {
+    clearDraftPriors();
+    setConvictionLevel('medium');
+    setConvictionRationale('');
+    setKillCriteria(['']);
+    setMicroPredictions([{ prediction: '', horizonDays: 90, confidence: 0.7 }]);
+    setSaved(false);
   };
 
   return (
@@ -143,7 +203,9 @@ export function PriorsCaptureCard({
           margin: '0 0 6px',
         }}
       >
-        Before the audit runs on {containerName}, name your reasoning.
+        {mode === 'draft'
+          ? `Before you create ${containerName}, name your reasoning.`
+          : `Before the audit runs on ${containerName}, name your reasoning.`}
       </h2>
       <p
         style={{
@@ -494,6 +556,25 @@ export function PriorsCaptureCard({
       )}
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+        {saved && mode === 'draft' && (
+          <button
+            type="button"
+            onClick={handleDiscard}
+            disabled={submitting}
+            style={{
+              padding: '8px 14px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+              cursor: submitting ? 'not-allowed' : 'pointer',
+            }}
+          >
+            Discard draft
+          </button>
+        )}
         {saved ? (
           <span
             style={{
@@ -509,7 +590,7 @@ export function PriorsCaptureCard({
             }}
           >
             <CheckCircle size={14} />
-            Priors saved
+            {mode === 'draft' ? 'Draft saved — will flush on create' : 'Priors saved'}
           </span>
         ) : (
           <button
@@ -538,7 +619,7 @@ export function PriorsCaptureCard({
             }}
           >
             {submitting && <Loader2 size={14} className="animate-spin" />}
-            Save priors
+            {mode === 'draft' ? 'Save draft' : 'Save priors'}
           </button>
         )}
       </div>

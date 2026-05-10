@@ -47,6 +47,8 @@ import { defaultContainerKindForRole } from '@/hooks/useContainers';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AccentCard } from '@/components/ui/AccentCard';
 import { ContainerFormModal } from '@/components/containers/ContainerFormModal';
+import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
+import { flushDraftPriorsToContainer } from '@/lib/priors/draft-handoff';
 
 type Path = 'pick' | 'document' | 'manual';
 
@@ -116,10 +118,20 @@ export default function NewDecisionPage() {
       </p>
 
       {path === 'pick' && (
-        <PathPicker
-          onPickDocument={() => setPath('document')}
-          onPickManual={() => setPath('manual')}
-        />
+        <>
+          {/* T2.3 — earlier-than-DecisionFrame priors capture (locked
+              2026-05-10 per paper Ch 1 / Ch 6 / Ch 11). Capture pre-
+              artefact reasoning BEFORE the user even picks document vs
+              manual; localStorage holds the draft, the new container's
+              creation flow flushes via flushDraftPriorsToContainer.
+              Self-hides once filled — non-blocking. */}
+          <PriorsCaptureCard mode="draft" containerName="this decision" />
+
+          <PathPicker
+            onPickDocument={() => setPath('document')}
+            onPickManual={() => setPath('manual')}
+          />
+        </>
       )}
 
       {path === 'document' && (
@@ -153,7 +165,11 @@ export default function NewDecisionPage() {
           <ContainerFormModal
             defaultKind={defaultKind}
             onClose={() => setPath('pick')}
-            onCreated={id => router.push(`/dashboard/decisions/${id}`)}
+            onCreated={id => {
+              // T2.3 — flush draft priors before navigating.
+              void flushDraftPriorsToContainer(id);
+              router.push(`/dashboard/decisions/${id}`);
+            }}
           />
         </div>
       )}
@@ -402,6 +418,11 @@ function DocumentPath({ defaultKind, onBack, onCreated }: DocumentPathProps) {
         throw new Error(containerJson?.error || 'Failed to create decision');
       }
       const containerId = containerJson.id as string;
+
+      // T2.3 — flush any draft priors captured before container creation.
+      // Fire-and-forget; failure leaves the draft for retry from the
+      // container detail page.
+      void flushDraftPriorsToContainer(containerId);
 
       // Step 2 — upload the doc with containerId so the join row gets
       // created + composite metrics recompute. The audit pipeline runs

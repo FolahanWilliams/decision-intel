@@ -126,59 +126,72 @@ export default function DocumentsListPage() {
     router.push(`/dashboard/compare?doc=${ids.join(',')}`);
   };
 
-  // Bulk delete handler — runs the per-doc DELETE in parallel and reports
-  // partial success when the server-side rate limit (10/hr/user) bites.
-  // Optimistically updates the SWR cache by filtering successfully-deleted
-  // ids out of the current page; revalidate=true triggers a background
-  // refetch so total/totalPages stay correct after server-side soft-delete.
+  // Bulk delete handler — single POST to /api/documents/bulk-delete with
+  // all selected ids (replaces the prior pattern of N parallel DELETE
+  // calls that hit the 10/hr per-route rate limit and partially failed
+  // with 429s). The new endpoint uses one rate-limit budget + one
+  // `updateMany` so the soft-delete commits in one transaction. Server
+  // returns `deletedIds` + `skippedIds`; we filter the SWR cache by
+  // `deletedIds` and preserve `skippedIds` in selection for retry.
   const handleBulkDelete = async () => {
     if (selectedDocs.size === 0) return;
     setDeleting(true);
     const ids = Array.from(selectedDocs);
     try {
-      const results = await Promise.all(
-        ids.map(id =>
-          fetch(`/api/documents/${id}`, { method: 'DELETE' }).then(res => ({
-            id,
-            ok: res.ok,
-            status: res.status,
-          }))
-        )
-      );
-      const successIds = new Set(results.filter(r => r.ok).map(r => r.id));
-      const failedIds = results.filter(r => !r.ok).map(r => r.id);
-      const successCount = successIds.size;
-      const rateLimited = results.some(r => r.status === 429);
+      const res = await fetch('/api/documents/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids }),
+      });
+      const body = await res.json().catch(() => null);
 
-      if (successCount > 0) {
+      if (res.status === 429) {
+        const retrySec = body?.retryAfterSeconds as number | undefined;
+        showToast(
+          retrySec
+            ? `Bulk-delete rate limit hit — try again in ${Math.ceil(retrySec / 60)} min`
+            : 'Bulk-delete rate limit exceeded — try again in a few minutes',
+          'error'
+        );
+        setDeleteConfirmOpen(false);
+        return;
+      }
+
+      if (!res.ok) {
+        showToast(body?.error ?? 'Failed to delete documents', 'error');
+        setDeleteConfirmOpen(false);
+        return;
+      }
+
+      const deletedIds = (body?.deletedIds as string[] | undefined) ?? [];
+      const skippedIds = (body?.skippedIds as string[] | undefined) ?? [];
+      const deletedSet = new Set(deletedIds);
+
+      if (deletedIds.length > 0) {
         await mutate(
           current =>
             current
-              ? { ...current, documents: current.documents.filter(d => !successIds.has(d.id)) }
+              ? { ...current, documents: current.documents.filter(d => !deletedSet.has(d.id)) }
               : current,
           { revalidate: true }
         );
       }
-      // Preserve failed ids for retry; clear successful ones from selection.
-      setSelectedDocs(new Set(failedIds));
+      // Preserve any skipped ids in selection so the user can retry.
+      setSelectedDocs(new Set(skippedIds));
       setDeleteConfirmOpen(false);
 
-      if (successCount === ids.length) {
-        showToast(`Deleted ${successCount} document${successCount === 1 ? '' : 's'}`, 'success');
-      } else if (successCount > 0) {
+      if (deletedIds.length === ids.length) {
         showToast(
-          rateLimited
-            ? `Deleted ${successCount} of ${ids.length} — rate limit hit, try again in a few minutes`
-            : `Deleted ${successCount} of ${ids.length} — some failed`,
+          `Deleted ${deletedIds.length} document${deletedIds.length === 1 ? '' : 's'}`,
+          'success'
+        );
+      } else if (deletedIds.length > 0) {
+        showToast(
+          `Deleted ${deletedIds.length} of ${ids.length} — ${skippedIds.length} skipped (already removed or not yours)`,
           'warning'
         );
       } else {
-        showToast(
-          rateLimited
-            ? 'Rate limit exceeded — try again in a few minutes'
-            : 'Failed to delete documents',
-          'error'
-        );
+        showToast('No documents were deleted — they may have already been removed', 'error');
       }
     } catch {
       showToast('Failed to delete documents', 'error');
@@ -611,38 +624,150 @@ export default function DocumentsListPage() {
       </div>
 
       {/* Soft-delete confirmation. Per CLAUDE.md "Native browser dialogs
-          banned" rule on primary surfaces — uses the canonical Dialog
-          primitive, not window.confirm. Soft-delete only; the daily
+          banned" rule on primary surfaces. Soft-delete only; daily
           /api/cron/enforce-retention pass hard-purges after the grace
-          window. */}
+          window. Redesigned 2026-05-10 — proper danger-accent layout,
+          recovery callout, icon hierarchy + platform-token styling so
+          it doesn't render with shadcn defaults. */}
       <Dialog
         open={deleteConfirmOpen}
         onOpenChange={open => {
           if (!deleting) setDeleteConfirmOpen(open);
         }}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Delete {selectedDocs.size === 1 ? 'this document' : `${selectedDocs.size} documents`}?
-            </DialogTitle>
-            <DialogDescription>
-              {selectedDocs.size === 1
-                ? 'The document and its analyses will be soft-deleted and queued for hard purge after the retention grace window. Outcomes and shared links will stop working.'
-                : `These ${selectedDocs.size} documents and their analyses will be soft-deleted and queued for hard purge after the retention grace window. Outcomes and shared links will stop working.`}
-            </DialogDescription>
+        <DialogContent
+          className="!sm:max-w-md"
+          style={{
+            background: 'var(--bg-card)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)',
+            borderTop: '3px solid var(--error)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 0,
+            maxWidth: 480,
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+          showCloseButton={false}
+        >
+          <DialogHeader
+            style={{
+              padding: '20px 24px 12px',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--error) 12%, transparent)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Trash2 size={18} style={{ color: 'var(--error)' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'var(--error)',
+                    marginBottom: 2,
+                  }}
+                >
+                  Delete document{selectedDocs.size === 1 ? '' : 's'}
+                </span>
+                <DialogTitle
+                  style={{
+                    fontSize: 'var(--fs-md)',
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    margin: 0,
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {selectedDocs.size === 1
+                    ? 'Delete this document?'
+                    : `Delete ${selectedDocs.size} documents?`}
+                </DialogTitle>
+              </div>
+            </div>
           </DialogHeader>
-          <DialogFooter>
+
+          <div style={{ padding: '0 24px 16px' }}>
+            <DialogDescription
+              style={{
+                fontSize: 'var(--fs-sm)',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                margin: 0,
+              }}
+            >
+              {selectedDocs.size === 1
+                ? 'The document and its analyses will be soft-deleted. Outcomes and shared links stop working immediately; the file is permanently purged after the retention grace window.'
+                : `These ${selectedDocs.size} documents and their analyses will be soft-deleted. Outcomes and shared links stop working immediately; files are permanently purged after the retention grace window.`}
+            </DialogDescription>
+
+            {/* Recovery callout — soft-delete is recoverable from support
+                during the grace window. Surfacing this lowers anxiety on
+                the destructive action without inviting carelessness. */}
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 12px',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                gap: 8,
+                alignItems: 'flex-start',
+                lineHeight: 1.5,
+              }}
+            >
+              <AlertCircle
+                size={12}
+                style={{ color: 'var(--text-muted)', marginTop: 2, flexShrink: 0 }}
+              />
+              <span>
+                Recoverable from support during the grace window. After purge, cross-references +
+                DPRs that cited the document keep their hash stamp but lose live links.
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter
+            style={{
+              padding: '12px 20px',
+              background: 'var(--bg-secondary)',
+              borderTop: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              gap: 8,
+              margin: 0,
+              borderRadius: 0,
+            }}
+          >
             <button
               type="button"
               onClick={() => setDeleteConfirmOpen(false)}
               disabled={deleting}
               style={{
                 padding: '8px 14px',
-                background: 'transparent',
+                background: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--fs-sm)',
+                fontWeight: 500,
                 color: 'var(--text-secondary)',
                 cursor: deleting ? 'not-allowed' : 'pointer',
               }}
@@ -654,8 +779,10 @@ export default function DocumentsListPage() {
               onClick={handleBulkDelete}
               disabled={deleting}
               style={{
-                padding: '8px 14px',
-                background: 'var(--error)',
+                padding: '8px 16px',
+                background: deleting
+                  ? 'color-mix(in srgb, var(--error) 50%, transparent)'
+                  : 'var(--error)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--fs-sm)',
@@ -671,8 +798,8 @@ export default function DocumentsListPage() {
               {deleting
                 ? 'Deleting…'
                 : selectedDocs.size === 1
-                  ? 'Delete'
-                  : `Delete ${selectedDocs.size}`}
+                  ? 'Delete document'
+                  : `Delete ${selectedDocs.size} documents`}
             </button>
           </DialogFooter>
         </DialogContent>

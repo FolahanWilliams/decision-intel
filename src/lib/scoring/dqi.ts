@@ -18,6 +18,7 @@
  * Grades: A (85-100), B (70-84), C (55-69), D (40-54), F (0-39)
  */
 
+import { createHash } from 'crypto';
 import { createLogger } from '@/lib/utils/logger';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
 import type { CaseStudy } from '@/lib/data/case-studies';
@@ -152,6 +153,21 @@ export interface DQIResult {
   system1Ratio: number | null;
   /** Methodology version for reproducibility */
   methodologyVersion: string;
+  /** Effective weights actually used to compute this score (locked 2026-
+   *  05-10 per Tier 2.1). May differ from canonical when user-adjustable
+   *  weights or org auto-calibration applied. Per-component `weight`
+   *  fields on `components` are also re-stamped to this value so the
+   *  weighted breakdown adds up to `score`. */
+  effectiveWeights: typeof WEIGHTS;
+  /** Source of the effective weights (drives DPR cover label):
+   *   - 'canonical' — WEIGHTS_CANONICAL baseline
+   *   - 'validity_shifted' — canonical + Kahneman/Klein validity-class shift
+   *   - 'org_calibrated' — outcome-count-blended org override (legacy auto-cal)
+   *   - 'user_adjustable' — explicit user/org-set weights (T2.1) */
+  weightsSource: 'canonical' | 'validity_shifted' | 'org_calibrated' | 'user_adjustable';
+  /** Hash of effectiveWeights — stamped on every DPR cover for tamper-
+   *  evident provenance. */
+  weightsHash: string;
 }
 
 export interface DQIComponent {
@@ -209,8 +225,31 @@ export const WEIGHTS = {
   compoundRisk: 0.06,
 };
 
+/**
+ * Frozen canonical baseline (locked 2026-05-10 per Tier 2.1 ship). Used
+ * to compute the delta from canonical when the user adjusts weights —
+ * surfaces on the settings UI ("amber: shifted 0.07 from canonical") and
+ * on every DPR cover so procurement readers see which weight set produced
+ * the score. Mirror of WEIGHTS as of methodology 2.2.0; never reassign.
+ */
+export const WEIGHTS_CANONICAL: Readonly<typeof WEIGHTS> = Object.freeze({ ...WEIGHTS });
+
+/** Ordered component-key list — guarantees stable hashing + UI render order. */
+export const WEIGHT_COMPONENT_IDS: ReadonlyArray<keyof typeof WEIGHTS> = [
+  'biasLoad',
+  'noiseLevel',
+  'evidenceQuality',
+  'processMaturity',
+  'complianceRisk',
+  'historicalAlignment',
+  'compoundRisk',
+];
+
 /** Compute effective weights by blending org overrides with defaults.
  *  mixCoeff scales with org outcome count: 0 at 0, 0.5 at 50, 0.8 at 200+.
+ *  This is the LEGACY auto-calibration path (used by `orgWeightOverrides`
+ *  in `computeDQI`). The new user-adjustable surface (T2.1) takes a
+ *  different code path that REPLACES canonical fully rather than blending.
  */
 export function computeEffectiveWeights(
   orgOverrides?: Partial<typeof WEIGHTS>,
@@ -232,6 +271,123 @@ export function computeEffectiveWeights(
     effective[key] /= total;
   }
   return effective;
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// T2.1 — User-adjustable DQI weights (locked 2026-05-10)
+// ───────────────────────────────────────────────────────────────────────
+//
+// Per Deep Research paper Ch 4 + Dietvorst 2016 follow-up to the 2015
+// Algorithm Aversion finding (Dietvorst, Simmons & Massey, J. Exp.
+// Psychol. General, doi:10.1037/xge0000033): people will use imperfect
+// algorithms IF allowed to slightly modify the inputs or weights. Users
+// who currently reject "false precision" on the DQI scorecard ARE the
+// wedge customer per Paper #2 Ch 7. Letting them adjust the weights —
+// while keeping a canonical baseline visible — is the literature's
+// documented fix.
+//
+// This is NOT the legacy `orgWeightOverrides` auto-calibration path
+// (which blends canonical with outcome-derived weights over time). User-
+// adjustable weights REPLACE canonical fully for the org / user who
+// set them. Every audit run under user-adjustable weights stamps
+// `methodologyVersion: '2.3.0'` + the override hash for tamper-evidence.
+
+/** Methodology version stamp when an audit runs under user-adjustable
+ *  weights (Tier 2.1). Trichotomy is now: 2.0.0-no-validity | 2.1.0 |
+ *  2.2.0 | 2.3.0. Canonical engine constant remains METHODOLOGY_VERSION;
+ *  2.3.0 is stamped on a per-audit basis when the user-adjustable path
+ *  fires, not on the engine globally. */
+export const METHODOLOGY_VERSION_2_3_0 = '2.3.0';
+
+/** Acceptable absolute tolerance when validating the user weight vector
+ *  sums to 1.0. Tight enough to catch real errors, loose enough to
+ *  accommodate floating-point drift from UI sliders. */
+export const WEIGHT_SUM_TOLERANCE = 0.001;
+
+export interface ValidateWeightsResult {
+  valid: boolean;
+  error?: string;
+  /** Normalised weight vector (snapped to sum to 1.0 exactly when valid).
+   *  All 7 components present; ordering matches WEIGHT_COMPONENT_IDS. */
+  normalised?: typeof WEIGHTS;
+}
+
+/** Validate a user-adjustable weight vector. Rules:
+ *  - All 7 component keys present (biasLoad, noiseLevel, evidenceQuality,
+ *    processMaturity, complianceRisk, historicalAlignment, compoundRisk).
+ *  - Each weight ∈ [0, 1].
+ *  - Sum to 1.0 ± WEIGHT_SUM_TOLERANCE.
+ *  On success, returns a normalised vector that sums to exactly 1.0
+ *  (handles UI floating-point drift). Pure function — no I/O. */
+export function validateUserAdjustableWeights(
+  raw: Partial<Record<keyof typeof WEIGHTS, number>>
+): ValidateWeightsResult {
+  const missing = WEIGHT_COMPONENT_IDS.filter(k => typeof raw[k] !== 'number');
+  if (missing.length > 0) {
+    return {
+      valid: false,
+      error: `Missing weight(s): ${missing.join(', ')}`,
+    };
+  }
+  for (const k of WEIGHT_COMPONENT_IDS) {
+    const v = raw[k] as number;
+    if (!Number.isFinite(v) || v < 0 || v > 1) {
+      return {
+        valid: false,
+        error: `Weight ${k} = ${v} out of [0, 1]`,
+      };
+    }
+  }
+  const sum = WEIGHT_COMPONENT_IDS.reduce((acc, k) => acc + (raw[k] as number), 0);
+  if (Math.abs(sum - 1.0) > WEIGHT_SUM_TOLERANCE) {
+    return {
+      valid: false,
+      error: `Weights sum to ${sum.toFixed(4)}, must be 1.0 ± ${WEIGHT_SUM_TOLERANCE}`,
+    };
+  }
+  // Snap to exact 1.0 by scaling — corrects UI float drift.
+  const normalised = { ...WEIGHTS };
+  for (const k of WEIGHT_COMPONENT_IDS) {
+    normalised[k] = (raw[k] as number) / sum;
+  }
+  return { valid: true, normalised };
+}
+
+/**
+ * Deterministic MD5 hash of a weight vector in canonical key order.
+ * Used as the `weightsHash` on DqiWeightOverride and stamped on every
+ * DPR cover for tamper-evident provenance. Procurement readers can
+ * verify which weight set produced this DQI without recomputing.
+ *
+ * Output: 12-char hex prefix (`d4a8c2e9b3f1`) — short enough for a DPR
+ * cover line, long enough for collision-resistance at any realistic
+ * customer-org count.
+ */
+export function hashWeights(weights: typeof WEIGHTS): string {
+  const canonicalString = WEIGHT_COMPONENT_IDS.map(k => `${k}:${weights[k].toFixed(6)}`).join('|');
+  return createHash('md5').update(canonicalString).digest('hex').slice(0, 12);
+}
+
+/**
+ * Compute per-component delta vs canonical baseline. Returns a map of
+ * componentId → signed delta (positive = shifted UP from canonical;
+ * negative = DOWN). Used by the settings UI to render shift indicators
+ * (blue ≤0.05 / amber ≤0.15 / red >0.15) and by the DPR cover surface.
+ */
+export function computeWeightDeltas(weights: typeof WEIGHTS): Record<keyof typeof WEIGHTS, number> {
+  const out = {} as Record<keyof typeof WEIGHTS, number>;
+  for (const k of WEIGHT_COMPONENT_IDS) {
+    out[k] = weights[k] - WEIGHTS_CANONICAL[k];
+  }
+  return out;
+}
+
+/** Maximum absolute delta from canonical. Drives the warning band
+ *  (blue ≤0.05 / amber ≤0.15 / red >0.15 — the soft warning fires per
+ *  the handoff doc rule). */
+export function maxAbsoluteDelta(weights: typeof WEIGHTS): number {
+  const deltas = computeWeightDeltas(weights);
+  return Math.max(...WEIGHT_COMPONENT_IDS.map(k => Math.abs(deltas[k])));
 }
 
 const BIAS_SEVERITY_COST: Record<string, number> = {
@@ -1180,10 +1336,22 @@ export function getHistoricalComparisons(dqiScore: number): Array<{
 export function computeDQI(
   input: DQIInput,
   options?: {
-    /** Org-specific weight overrides (blended with defaults based on outcome count) */
+    /** Org-specific weight overrides — LEGACY auto-calibration path
+     *  (blended with defaults based on outcome count). NOT the same as
+     *  userAdjustableWeights, which fully replaces canonical. */
     orgWeightOverrides?: Partial<typeof WEIGHTS>;
     /** Number of confirmed outcomes for this org (controls override mix strength) */
     orgOutcomeCount?: number;
+    /** User-adjustable weight vector from DqiWeightOverride (Tier 2.1, locked
+     *  2026-05-10 per Dietvorst 2016). When supplied + valid, fully REPLACES
+     *  canonical weights (no blending) AND stamps methodologyVersion='2.3.0'
+     *  on the result. Validity-class shift is NOT applied on top — the user's
+     *  explicit input wins outright. */
+    userAdjustableWeights?: typeof WEIGHTS;
+    /** Hash of the userAdjustableWeights vector. Persisted on the audit
+     *  for tamper-evidence + DPR cover surfacing. Caller computes via
+     *  hashWeights() so the hash is stable across resolvers. */
+    userAdjustableWeightsHash?: string;
   }
 ): DQIResult {
   // Auto-compute System 1 ratio if not provided
@@ -1210,22 +1378,38 @@ export function computeDQI(
     compoundRisk,
   };
 
-  // Compute weighted total using effective weights (org-blended if overrides provided
-  // AND validity-aware shift if validityClass is supplied).
-  // Validity shift derives from Kahneman & Klein 2009 first condition
-  // (locked 2026-04-30) — see src/lib/learning/validity-classifier.ts.
-  let baseWeights = options?.orgWeightOverrides;
-  if (input.validityClass) {
-    // validity-classifier only imports `WEIGHTS` as a type from this file
-    // (erased at compile time), so a static import is safe — no runtime
-    // circular dep. Required for ESM/Vitest path-alias resolution; the
-    // prior lazy require() bypassed `@/` alias resolution under Vitest.
-    const validityShift = getValidityWeightShift(input.validityClass);
-    if (validityShift) {
-      baseWeights = { ...validityShift, ...(baseWeights ?? {}) };
+  // Resolve effective weights. Precedence (highest → lowest):
+  //   1. userAdjustableWeights (T2.1) — explicit user input, REPLACES canonical
+  //      fully + stamps methodology 2.3.0. Validity-class shift is NOT applied
+  //      on top because the user's explicit choice wins.
+  //   2. orgWeightOverrides + orgOutcomeCount — legacy auto-calibration
+  //      blending path (stamps prior methodology versions per validity /
+  //      compoundPatterns logic below).
+  //   3. WEIGHTS canonical baseline + optional validity-class shift.
+  //
+  // Validity shift (Kahneman & Klein 2009 first condition, locked
+  // 2026-04-30) — see src/lib/learning/validity-classifier.ts.
+  let ew: typeof WEIGHTS;
+  let userAdjustableApplied = false;
+  if (options?.userAdjustableWeights) {
+    // Trust caller — the API endpoint validated via validateUserAdjustableWeights
+    // before persisting. Spread to defensive-copy.
+    ew = { ...options.userAdjustableWeights };
+    userAdjustableApplied = true;
+  } else {
+    let baseWeights = options?.orgWeightOverrides;
+    if (input.validityClass) {
+      // validity-classifier only imports `WEIGHTS` as a type from this file
+      // (erased at compile time), so a static import is safe — no runtime
+      // circular dep. Required for ESM/Vitest path-alias resolution; the
+      // prior lazy require() bypassed `@/` alias resolution under Vitest.
+      const validityShift = getValidityWeightShift(input.validityClass);
+      if (validityShift) {
+        baseWeights = { ...validityShift, ...(baseWeights ?? {}) };
+      }
     }
+    ew = computeEffectiveWeights(baseWeights, options?.orgOutcomeCount);
   }
-  const ew = computeEffectiveWeights(baseWeights, options?.orgOutcomeCount);
   const rawScore =
     biasLoad.score * ew.biasLoad +
     noiseLevel.score * ew.noiseLevel +
@@ -1251,16 +1435,48 @@ export function computeDQI(
   // Find top improvement
   const topImprovement = findTopImprovement(components);
 
-  // Methodology version stamp:
-  //   compoundPatterns supplied → 2.2.0 (new default, post-2026-05-09)
-  //   only validityClass supplied → 2.1.0 (audits during 2026-04-30 → 2026-05-09)
-  //   neither → 2.0.0-no-validity (legacy)
-  const methodologyVersion =
-    input.compoundPatterns !== undefined
+  // Methodology version stamp (highest precedence first):
+  //   userAdjustableWeights supplied → 2.3.0 (Tier 2.1, locked 2026-05-10)
+  //   compoundPatterns supplied      → 2.2.0 (M&A hard-layer, 2026-05-09)
+  //   only validityClass supplied    → 2.1.0 (validity shift, 2026-04-30)
+  //   none of the above              → 2.0.0-no-validity (legacy)
+  const methodologyVersion = userAdjustableApplied
+    ? METHODOLOGY_VERSION_2_3_0
+    : input.compoundPatterns !== undefined
       ? METHODOLOGY_VERSION
       : input.validityClass
         ? METHODOLOGY_VERSION_2_1_0
         : METHODOLOGY_VERSION_LEGACY;
+
+  // Re-stamp per-component `weight` + `weighted` with the EFFECTIVE
+  // weights actually used (Tier 2.1 fix). Pre-T2.1 the component
+  // breakdown rendered canonical weights even when ew was different;
+  // the buyer-facing breakdown then didn't add up to `score`. Now it
+  // does.
+  for (const k of WEIGHT_COMPONENT_IDS) {
+    const c = components[k];
+    c.weight = ew[k];
+    c.weighted = Math.round(c.score * ew[k] * 10) / 10;
+  }
+
+  // Determine the weights source for the DPR cover label.
+  let weightsSource: DQIResult['weightsSource'];
+  if (userAdjustableApplied) {
+    weightsSource = 'user_adjustable';
+  } else if (options?.orgWeightOverrides && (options?.orgOutcomeCount ?? 0) > 0) {
+    weightsSource = 'org_calibrated';
+  } else if (input.validityClass && getValidityWeightShift(input.validityClass)) {
+    weightsSource = 'validity_shifted';
+  } else {
+    weightsSource = 'canonical';
+  }
+
+  // Prefer caller-supplied hash when present (callers persist it on
+  // DqiWeightOverride; reusing it keeps the hash stable across reads).
+  const weightsHash =
+    userAdjustableApplied && options?.userAdjustableWeightsHash
+      ? options.userAdjustableWeightsHash
+      : hashWeights(ew);
 
   const result: DQIResult = {
     score: Math.round(finalScore),
@@ -1272,6 +1488,9 @@ export function computeDQI(
     topImprovement,
     system1Ratio: input.process.system1Ratio ?? null,
     methodologyVersion,
+    effectiveWeights: ew,
+    weightsSource,
+    weightsHash,
   };
 
   logger.info('DQI computed', {

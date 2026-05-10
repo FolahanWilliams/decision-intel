@@ -86,7 +86,18 @@ export type AuditAction =
   | 'CONTAINER_OUTCOME_LOGGED'
   // Decision Pipeline Constellation (Phase 3.5 lock 2026-05-09 evening)
   | 'CONTAINER_LINK_CREATED'
-  | 'CONTAINER_LINK_DELETED';
+  | 'CONTAINER_LINK_DELETED'
+  // T2.1 — User-adjustable DQI weights (locked 2026-05-10)
+  | 'DQI_WEIGHTS_SET'
+  | 'DQI_WEIGHTS_RESET'
+  // T2.2 — Ambient thesis-formation capture (locked 2026-05-10)
+  | 'AMBIENT_SIGNAL_DETECTED'
+  | 'AMBIENT_SIGNAL_CONFIRMED'
+  | 'AMBIENT_SIGNAL_DISMISSED'
+  | 'AMBIENT_CONSENT_TOGGLED'
+  // PMI Path B (locked 2026-05-10)
+  | 'PMI_SIGNAL_RECORDED'
+  | 'PMI_SIGNAL_OBSERVED';
 
 export interface AuditLogParams {
   action: AuditAction;

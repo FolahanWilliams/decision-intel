@@ -16,6 +16,7 @@ import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { classifyValidity } from '@/lib/learning/validity-classifier';
+import { resolveActiveWeightsForUser } from '@/lib/scoring/weight-overrides';
 
 const log = createLogger('DQIInternalRoute');
 
@@ -252,8 +253,24 @@ export async function GET(request: NextRequest) {
         }));
     }
 
+    // ── Resolve user-adjustable weights (T2.1, locked 2026-05-10) ─────
+    // Org override beats user override beats canonical. When present,
+    // user-adjustable weights REPLACE canonical fully + stamp
+    // methodology 2.3.0 on the result (per Dietvorst 2016 fix). Falls
+    // back to canonical when no override exists or schema-drift errors
+    // fire during lookup.
+    const activeWeights = await resolveActiveWeightsForUser(userId);
+
     // ── Compute DQI ───────────────────────────────────────────────────
-    const dqi = computeDQI(dqiInput);
+    const dqi = computeDQI(
+      dqiInput,
+      activeWeights.source === 'canonical'
+        ? undefined
+        : {
+            userAdjustableWeights: activeWeights.effective,
+            userAdjustableWeightsHash: activeWeights.override?.weightsHash,
+          }
+    );
     const badge = generateDQIBadge(dqi);
 
     return NextResponse.json(

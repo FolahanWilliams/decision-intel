@@ -17,6 +17,7 @@ import { ContainerCompositeHero } from '@/components/containers/ContainerComposi
 import { ContainerTopFixesCard } from '@/components/containers/ContainerTopFixesCard';
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
 import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
+import { PmiTrackerTab } from '@/components/containers/PmiTrackerTab';
 import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
@@ -155,6 +156,17 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
               containerName={container.name}
               onSaved={() => mutate()}
             />
+          )}
+
+          {/* PMI Tracker — Path B + thin Path C (locked 2026-05-10).
+              Closes the audit loop by tracking the PMI metrics the IC
+              memo committed to. Mounts on acquisition-mode containers
+              with at least one analyzed doc (i.e. past target-ID stage)
+              so the tracker shows up when there's an audit to validate
+              against. Per paper Ch 7 + Ch 11. NOT a project-management
+              surface — claim/predicted/observed/Brier only. */}
+          {container.kind === 'acquisition' && container.analyzedDocCount > 0 && (
+            <PmiTrackerTab containerId={container.id} containerName={container.name} />
           )}
 
           <ContainerCompositeHero container={container} />

@@ -18,6 +18,21 @@
 - 32-test vitest suite locking engine + persona framing
 - Schema migration `20260510140000_constellation_priors_anti_portfolio_cultural_pairing`
 
+## What shipped 2026-05-10 evening (Tier 2 + PMI Path B/C, all four in lockstep)
+
+Founder-approved: "proceed fully with t2, and with the adaptation of di to consume pmi signals as well where applicable, but not as a new domain di sells into/focuses on."
+
+- **T2.1 — User-adjustable DQI weights**: WEIGHTS_CANONICAL frozen baseline + validateUserAdjustableWeights + hashWeights helpers (`dqi.ts`); methodology version 2.3.0 stamped when user weights applied; computeDQI accepts `userAdjustableWeights` option that REPLACES canonical (not blends); per-component weights re-stamped post-resolution to fix the pre-T2.1 latent bug where breakdown weights showed canonical even after override. Resolution helper at `weight-overrides.ts`. API at `/api/dqi/weights` (GET/PATCH/DELETE with org-scope precedence). UI panel on Settings → Preferences with auto-rebalancing sliders + canonical-delta indicators + Dietvorst 2016 educational footer. 19 new vitest tests (75/75 dqi tests pass).
+- **T2.2 — Ambient thesis-formation detection**: `ambient-thesis-detection.ts` service (deepseek-v4-flash classifier + Slack channel poller + idempotent persistence + 14d expiry); cron at `/api/cron/ambient-detection`; CRUD at `/api/ambient-signals` + `/api/ambient-signals/[id]`; consent endpoint at `/api/integrations/ambient-consent`. UI: `AmbientSignalBanner` on /dashboard + `AmbientCaptureConsentPanel` on Settings → Integrations. Privacy posture: default OFF, per-channel + per-folder scoping, raw content never persisted, 500-char excerpt cap. Drive ingestion is v1 metadata-only (full file-body classification queued for follow-up). Cost ceiling ≤ $0.05/user/day.
+- **T2.3 — Earlier-than-DecisionFrame priors capture**: `draft-handoff.ts` helper (localStorage with 24h expiry + flushDraftPriorsToContainer); `PriorsCaptureCard` extended with `mode: 'persist' | 'draft'`; mounted on /dashboard/decisions/new above the path picker. Both document + manual paths flush draft priors on container creation.
+- **PMI Path B + thin Path C**: `pmiSignals` JSON column on DecisionContainerOutcome (6 canonical signal keys); `/api/decisions/[id]/pmi-signals` (GET/POST/PATCH with per-signal Brier scoring); `PmiTrackerTab` mounted on /dashboard/decisions/[id] when `kind === 'acquisition' && analyzedDocCount > 0`; `pmi-outcome-inference.ts` pure-function helper (`inferOutcomeFromPmiSignals` + `pmiDirectionToAcquisitionVerdict`) with 13/13 vitest tests. NO project-management surfacing — claim/predicted/observed/Brier only. PMI is the TARGET of the audit, not a new product DI sells into.
+
+Schema migration: `20260510230000_tier2_dqi_weights_ambient_pmi` (DqiWeightOverride + AmbientThesisSignal models + DecisionContainerOutcome.pmiSignals + SlackInstallation/GoogleDriveInstallation ambient consent flags).
+
+Audit-log actions added: DQI_WEIGHTS_SET / DQI_WEIGHTS_RESET / AMBIENT_SIGNAL_DETECTED / AMBIENT_SIGNAL_CONFIRMED / AMBIENT_SIGNAL_DISMISSED / AMBIENT_CONSENT_TOGGLED / PMI_SIGNAL_RECORDED / PMI_SIGNAL_OBSERVED.
+
+Open follow-ups: DPR cover weight-set surface · Drive file-body classification · post-upload priors variant on /dashboard · outcome-inference pipeline integration of inferOutcomeFromPmiSignals · IC-memo PMI auto-extraction · held-out-sample DQI distribution check (process step, founder-driven).
+
 ## Counter-intuitive findings from Paper #2 (the four that shape Tiers 1-3)
 
 1. **Awareness does not reduce bias** — the Boomerang Effect paradoxically _increases_ overconfidence. Educating practitioners on biases makes them more vulnerable, not less. **Implication**: our bias-education-heavy marketing surfaces are a liability, not an asset.

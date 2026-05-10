@@ -794,3 +794,239 @@ describe('SYNTHETIC_WEIGHTS_LEGACY_2_0_0', () => {
     expect(SYNTHETIC_WEIGHTS_LEGACY_2_0_0.historicalAlignment).toBe(0.1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// T2.1 — User-adjustable DQI weights (locked 2026-05-10 per Dietvorst 2016)
+// ---------------------------------------------------------------------------
+
+describe('WEIGHTS_CANONICAL', () => {
+  it('is a frozen mirror of WEIGHTS as of methodology 2.2.0', async () => {
+    const { WEIGHTS_CANONICAL } = await import('./dqi');
+    expect(WEIGHTS_CANONICAL.biasLoad).toBe(0.22);
+    expect(WEIGHTS_CANONICAL.compoundRisk).toBe(0.06);
+    const sum = Object.values(WEIGHTS_CANONICAL).reduce((a, b) => a + b, 0);
+    expect(Math.abs(sum - 1.0)).toBeLessThan(0.001);
+  });
+
+  it('is structurally frozen — attempted mutation throws in strict mode', async () => {
+    const { WEIGHTS_CANONICAL } = await import('./dqi');
+    expect(Object.isFrozen(WEIGHTS_CANONICAL)).toBe(true);
+  });
+});
+
+describe('validateUserAdjustableWeights', () => {
+  const validVec = {
+    biasLoad: 0.3,
+    noiseLevel: 0.18,
+    evidenceQuality: 0.15,
+    processMaturity: 0.13,
+    complianceRisk: 0.13,
+    historicalAlignment: 0.05,
+    compoundRisk: 0.06,
+  };
+
+  it('accepts a balanced vector that sums to 1.0', async () => {
+    const { validateUserAdjustableWeights } = await import('./dqi');
+    const r = validateUserAdjustableWeights(validVec);
+    expect(r.valid).toBe(true);
+    expect(r.error).toBeUndefined();
+    expect(r.normalised).toBeDefined();
+    const sum = Object.values(r.normalised!).reduce((a, b) => a + b, 0);
+    expect(Math.abs(sum - 1.0)).toBeLessThan(1e-9);
+  });
+
+  it('rejects a vector with missing components', async () => {
+    const { validateUserAdjustableWeights } = await import('./dqi');
+    const bad = { ...validVec } as Partial<typeof validVec>;
+    delete bad.compoundRisk;
+    const r = validateUserAdjustableWeights(bad);
+    expect(r.valid).toBe(false);
+    expect(r.error).toMatch(/compoundRisk/);
+  });
+
+  it('rejects a vector with negative weights', async () => {
+    const { validateUserAdjustableWeights } = await import('./dqi');
+    const r = validateUserAdjustableWeights({ ...validVec, biasLoad: -0.1 });
+    expect(r.valid).toBe(false);
+    expect(r.error).toMatch(/biasLoad/);
+  });
+
+  it('rejects a vector that does not sum to 1.0 outside tolerance', async () => {
+    const { validateUserAdjustableWeights } = await import('./dqi');
+    const r = validateUserAdjustableWeights({ ...validVec, biasLoad: 0.5 });
+    expect(r.valid).toBe(false);
+    expect(r.error).toMatch(/sum to/);
+  });
+
+  it('snaps UI float-drift to exactly 1.0', async () => {
+    const { validateUserAdjustableWeights } = await import('./dqi');
+    // 0.2 + 0.18 + 0.18 + 0.13 + 0.13 + 0.1 + 0.08 = 1.0000000000000002 (float)
+    const drifty = {
+      biasLoad: 0.2,
+      noiseLevel: 0.18,
+      evidenceQuality: 0.18,
+      processMaturity: 0.13,
+      complianceRisk: 0.13,
+      historicalAlignment: 0.1,
+      compoundRisk: 0.08,
+    };
+    const r = validateUserAdjustableWeights(drifty);
+    expect(r.valid).toBe(true);
+    const sum = Object.values(r.normalised!).reduce((a, b) => a + b, 0);
+    expect(sum).toBe(1.0);
+  });
+});
+
+describe('hashWeights', () => {
+  it('produces a stable 12-char hex hash', async () => {
+    const { hashWeights, WEIGHTS_CANONICAL } = await import('./dqi');
+    const h1 = hashWeights(WEIGHTS_CANONICAL);
+    const h2 = hashWeights(WEIGHTS_CANONICAL);
+    expect(h1).toBe(h2);
+    expect(h1).toMatch(/^[a-f0-9]{12}$/);
+  });
+
+  it('produces different hashes for different vectors', async () => {
+    const { hashWeights, WEIGHTS_CANONICAL } = await import('./dqi');
+    const h1 = hashWeights(WEIGHTS_CANONICAL);
+    const shifted = { ...WEIGHTS_CANONICAL, biasLoad: 0.3, evidenceQuality: 0.1 };
+    const h2 = hashWeights(shifted);
+    expect(h1).not.toBe(h2);
+  });
+});
+
+describe('computeWeightDeltas + maxAbsoluteDelta', () => {
+  it('returns zero deltas for canonical weights', async () => {
+    const { computeWeightDeltas, maxAbsoluteDelta, WEIGHTS_CANONICAL } = await import('./dqi');
+    const deltas = computeWeightDeltas(WEIGHTS_CANONICAL);
+    for (const v of Object.values(deltas)) {
+      expect(Math.abs(v)).toBeLessThan(1e-9);
+    }
+    expect(maxAbsoluteDelta(WEIGHTS_CANONICAL)).toBeLessThan(1e-9);
+  });
+
+  it('signs deltas correctly (positive = shifted UP)', async () => {
+    const { computeWeightDeltas, WEIGHTS_CANONICAL } = await import('./dqi');
+    const shifted = { ...WEIGHTS_CANONICAL, biasLoad: 0.3, evidenceQuality: 0.1 };
+    const deltas = computeWeightDeltas(shifted);
+    expect(deltas.biasLoad).toBeGreaterThan(0); // 0.3 - 0.22 = +0.08
+    expect(deltas.evidenceQuality).toBeLessThan(0); // 0.1 - 0.18 = -0.08
+  });
+});
+
+describe('computeDQI — user-adjustable weights (T2.1)', () => {
+  it('stamps methodologyVersion="2.3.0" when userAdjustableWeights is supplied', async () => {
+    const { computeDQI, WEIGHTS_CANONICAL } = await import('./dqi');
+    const result = computeDQI(makeInput({ compoundPatterns: [] }), {
+      userAdjustableWeights: { ...WEIGHTS_CANONICAL },
+    });
+    expect(result.methodologyVersion).toBe('2.3.0');
+    expect(result.weightsSource).toBe('user_adjustable');
+  });
+
+  it('stamps "2.2.0" when only compoundPatterns supplied (no user override)', async () => {
+    const { computeDQI } = await import('./dqi');
+    const result = computeDQI(makeInput({ compoundPatterns: [] }));
+    expect(result.methodologyVersion).toBe('2.2.0');
+    expect(result.weightsSource).toBe('canonical');
+  });
+
+  it('user-adjustable weights REPLACE canonical (no blending)', async () => {
+    const { computeDQI } = await import('./dqi');
+    // Force biasLoad to 0.0 and shift everything else — verify score is
+    // computed entirely off non-bias-load components.
+    const userWeights = {
+      biasLoad: 0.0,
+      noiseLevel: 0.25,
+      evidenceQuality: 0.25,
+      processMaturity: 0.2,
+      complianceRisk: 0.15,
+      historicalAlignment: 0.1,
+      compoundRisk: 0.05,
+    };
+    const result = computeDQI(makeInput({ compoundPatterns: [] }), {
+      userAdjustableWeights: userWeights,
+    });
+    expect(result.effectiveWeights.biasLoad).toBe(0);
+    expect(result.effectiveWeights.noiseLevel).toBe(0.25);
+  });
+
+  it('per-component weighted breakdown adds up to score (T2.1 fix)', async () => {
+    const { computeDQI } = await import('./dqi');
+    const userWeights = {
+      biasLoad: 0.3,
+      noiseLevel: 0.15,
+      evidenceQuality: 0.15,
+      processMaturity: 0.15,
+      complianceRisk: 0.13,
+      historicalAlignment: 0.06,
+      compoundRisk: 0.06,
+    };
+    const result = computeDQI(makeInput({ compoundPatterns: [] }), {
+      userAdjustableWeights: userWeights,
+    });
+    const sumOfWeighted = Object.values(result.components).reduce((a, c) => a + c.weighted, 0);
+    // Round-trip tolerance: score is rounded; weighted is rounded * 10 / 10
+    expect(Math.abs(sumOfWeighted - result.score)).toBeLessThan(1.0);
+  });
+
+  it('user-adjustable wins precedence over validity-shift', async () => {
+    const { computeDQI } = await import('./dqi');
+    const userWeights = {
+      biasLoad: 0.3,
+      noiseLevel: 0.15,
+      evidenceQuality: 0.15,
+      processMaturity: 0.15,
+      complianceRisk: 0.13,
+      historicalAlignment: 0.06,
+      compoundRisk: 0.06,
+    };
+    // Validity=zero would normally drive historicalAlignment +0.20 but
+    // user weights win and historicalAlignment stays at 0.06.
+    const result = computeDQI(makeInput({ validityClass: 'zero', compoundPatterns: [] }), {
+      userAdjustableWeights: userWeights,
+    });
+    expect(result.effectiveWeights.historicalAlignment).toBe(0.06);
+    expect(result.methodologyVersion).toBe('2.3.0');
+    expect(result.weightsSource).toBe('user_adjustable');
+  });
+
+  it('returns weightsHash on every result', async () => {
+    const { computeDQI } = await import('./dqi');
+    const result = computeDQI(makeInput({ compoundPatterns: [] }));
+    expect(result.weightsHash).toMatch(/^[a-f0-9]{12}$/);
+  });
+
+  it('reuses caller-supplied weightsHash when provided', async () => {
+    const { computeDQI, WEIGHTS_CANONICAL } = await import('./dqi');
+    const result = computeDQI(makeInput({ compoundPatterns: [] }), {
+      userAdjustableWeights: { ...WEIGHTS_CANONICAL },
+      userAdjustableWeightsHash: 'sentinel-1234',
+    });
+    expect(result.weightsHash).toBe('sentinel-1234');
+  });
+});
+
+describe('computeDQI — weightsSource discrimination', () => {
+  it('returns "canonical" for vanilla input', async () => {
+    const { computeDQI } = await import('./dqi');
+    const r = computeDQI(makeInput());
+    expect(r.weightsSource).toBe('canonical');
+  });
+
+  it('returns "validity_shifted" when validityClass triggers a non-trivial shift', async () => {
+    const { computeDQI } = await import('./dqi');
+    // zero-validity produces non-trivial shift per validity-classifier.ts
+    const r = computeDQI(makeInput({ validityClass: 'zero' }));
+    expect(r.weightsSource).toBe('validity_shifted');
+  });
+
+  it('returns "org_calibrated" when orgWeightOverrides + outcome count present', async () => {
+    const { computeDQI, WEIGHTS_CANONICAL } = await import('./dqi');
+    const r = computeDQI(makeInput(), {
+      orgWeightOverrides: { biasLoad: WEIGHTS_CANONICAL.biasLoad + 0.05 },
+      orgOutcomeCount: 100,
+    });
+    expect(r.weightsSource).toBe('org_calibrated');
+  });
+});

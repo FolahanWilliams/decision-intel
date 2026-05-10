@@ -122,7 +122,25 @@ const SCAN_DIR = join(ROOT, 'src');
 // surfaces the actual server error rather than a generic "Failed to
 // save". Canonical req.json() body-parse exception class CLAUDE.md
 // explicitly lists as legitimate.
-const SILENT_CATCH_BASELINE = 157;
+// 157 → 169: Tier 2 + PMI Path B/C ship (2026-05-10 evening). 12 new
+// catches across the ship: (a) draft-handoff.ts saveDraftPriors /
+// loadDraftPriors / clearDraftPriors / flushDraftPriorsToContainer
+// — fire-and-forget localStorage helpers, can't surface UI errors
+// pre-container creation; (b) ambient-thesis-detection.ts service
+// classifier + Slack fetch + persist + cron polling fallbacks
+// (per-installation catches prevent one bad token from poisoning
+// the batch); (c) ambient-signals + dqi/weights + ambient-consent
+// req.json() body-parse catches (canonical exception class); (d)
+// PmiTrackerTab + AmbientSignalBanner + AmbientCaptureConsentPanel
+// fetch + body-parse catches. All 12 either fail-silent fire-and-
+// forget paths or canonical req.json() body-parse cases per CLAUDE.md
+// fire-and-forget exception list.
+// 169 → 171: bulk-delete ship (2026-05-10 evening follow-up). Two new
+// canonical req.json() body-parse exceptions — one in the bulk-delete
+// route handler, one in the handleBulkDelete client to parse the
+// response error body. Both belong to CLAUDE.md's documented
+// fire-and-forget exception list.
+const SILENT_CATCH_BASELINE = 171;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

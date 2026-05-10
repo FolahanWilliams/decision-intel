@@ -31,6 +31,8 @@ import { BillingSection } from '@/components/ui/BillingSection';
 // ApiKeysSection cut 2026-05-10 streamlining batch (see SettingsForm body comment).
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AccentCard } from '@/components/ui/AccentCard';
+import { DqiWeightsAdjustmentPanel } from '@/components/settings/DqiWeightsAdjustmentPanel';
+import { AmbientCaptureConsentPanel } from '@/components/settings/AmbientCaptureConsentPanel';
 
 const IntegrationsTabContent = dynamic(
   () =>
@@ -640,6 +642,14 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 {isPending ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
+
+            {/* DQI Weight Calibration — Tier 2.1, locked 2026-05-10 per
+                Dietvorst 2016 algorithm-aversion fix. Lives on the
+                Preferences tab because it's a personal calibration
+                setting (org-scoped when caller is in an org, user-scoped
+                otherwise) — same shape as the notification-severity
+                preference above. */}
+            <DqiWeightsAdjustmentPanel />
           </div>
         </TabsContent>
 
@@ -795,6 +805,12 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
 
             {/* Full integration marketplace (connect, disconnect, manage scopes) */}
             <IntegrationsTabContent />
+
+            {/* Ambient capture consent — Tier 2.2, locked 2026-05-10.
+                Default OFF; per-channel + per-folder scoping. Lives in
+                Integrations because consent is a per-integration
+                privacy posture, not a notification preference. */}
+            <AmbientCaptureConsentPanel />
           </div>
         </TabsContent>
 

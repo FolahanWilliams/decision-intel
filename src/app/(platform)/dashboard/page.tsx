@@ -63,6 +63,7 @@ import { SampleBadge } from '@/components/ui/SampleBadge';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
 import { ContainersWidget } from '@/components/dashboard/ContainersWidget';
+import { AmbientSignalBanner } from '@/components/dashboard/AmbientSignalBanner';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -1261,6 +1262,15 @@ export default function Dashboard() {
             onDismiss={() => setHardGateInfo(null)}
           />
         ) : null}
+
+        {/* Ambient thesis-formation signals (T2.2, locked 2026-05-10) —
+            renders when ambient detection has surfaced pending signals
+            from connected Slack channels / Drive folders. Self-hides when
+            empty. Per Paper #2 Ch 6: the audit must fire BEFORE deal-fever
+            locks in; ambient capture is the surface that gets us there. */}
+        <ErrorBoundary sectionName="Ambient signals">
+          <AmbientSignalBanner />
+        </ErrorBoundary>
 
         <OnboardingGuide documentCount={totalDocs ?? 0} />
         <DecisionTriageWidget />
