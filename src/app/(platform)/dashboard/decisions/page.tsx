@@ -2,19 +2,32 @@
 
 /**
  * /dashboard/decisions — unified decisions surface (Phase 2 lock + Phase
- * G fold 2026-05-10). Three views accessible from one parent page:
+ * G fold 2026-05-10 + portfolio above-fold refactor 2026-05-11).
+ *
+ * Three views accessible from one parent page:
  *
  *   - Kanban (default): workflow-grade containers (investment /
  *     acquisition / strategic) — daily-ops triage board.
- *   - Log: chronological feed of journal entries + cognitive audits.
- *     Folded in 2026-05-10 from the deleted /dashboard/decision-log
- *     standalone route — "still too much cognitive load with all the
- *     pages — is the Decision Log really a necessary standalone page,
- *     can't we just incorporate elements from it into the Decisions
- *     page" (founder audit).
- *   - Constellation: sibling page (heavy SVG, justifies own URL) at
- *     /dashboard/decisions/constellation. Cognitive lineage between
- *     containers — thesis anchors, dependency ripple, escalation chains.
+ *   - Log: chronological feed of journal entries + cognitive audits
+ *     (Phase G fold 2026-05-10 from the deleted /dashboard/decision-log
+ *     standalone route).
+ *   - Passed on: Anti-Portfolio per Bessemer model — decisions you
+ *     passed on, with eventual outcome attribution.
+ *
+ * Above-fold cluster (2026-05-11 refactor — translates the doc-detail
+ * verdict pattern from a single artefact to the PORTFOLIO):
+ *
+ *   1. PortfolioVerdictBand — status pill (Audit-ready / Needs
+ *      attention / Time-sensitive / Revise before committee) derived
+ *      from worst grade × high-severity conflicts × nearest committee
+ *      gate, plus 3 stat tiles (active decisions / docs audited / next
+ *      gate) and a monospace methodology + freshness metadata strip.
+ *   2. PortfolioSignalTiles — top 3 portfolio signals worth acting on
+ *      (highest-risk decision · next committee gate · most cross-doc
+ *      conflicts). Each tile deep-links to /decisions/[id].
+ *   3. NextMoveContainer — paper-grounded recommendation engine. Now
+ *      the canonical Intelligent Antagonist surface (the constellation
+ *      SVG that previously held that role was retired 2026-05-11).
  *
  * Persona-aware kanban defaults via useOnboardingRole: small-fund GP /
  * fractional CSO → investment; mid-market corp dev → acquisition;
@@ -24,16 +37,7 @@
 import { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import {
-  Plus,
-  Filter,
-  Network,
-  Layout,
-  BookOpen,
-  BrainCircuit,
-  ArrowUpRight,
-  XCircle,
-} from 'lucide-react';
+import { Plus, Filter, Layout, BookOpen, BrainCircuit, XCircle } from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
@@ -47,6 +51,8 @@ import {
   type DecisionLogFeedHandle,
 } from '@/components/decisions/DecisionLogFeed';
 import { RejectedDecisionsTab } from '@/components/decisions/RejectedDecisionsTab';
+import { PortfolioVerdictBand } from '@/components/decisions/PortfolioVerdictBand';
+import { PortfolioSignalTiles } from '@/components/decisions/PortfolioSignalTiles';
 import { NextMoveContainer } from '@/components/recommendations/NextMoveContainer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -75,6 +81,17 @@ export default function DecisionsPage() {
   );
 
   const { containers, isLoading } = useContainers(filters, 1, 100);
+
+  // Portfolio cluster reads from the UNFILTERED active container set so
+  // the above-fold verdict reflects the full pipeline regardless of
+  // whether the user has a mode chip active on the kanban. Without this,
+  // filtering down to "Acquisitions" would silently hide a critical
+  // investment-mode signal that the reader still needs to act on.
+  const { containers: portfolioContainers } = useContainers(
+    { status: 'active' },
+    1,
+    200
+  );
 
   const heroSubtitle = useMemo(() => {
     if (view === 'log') {
@@ -105,18 +122,43 @@ export default function DecisionsPage() {
 
   return (
     <ErrorBoundary sectionName="Decisions">
-      <div className="page-header" style={{ marginBottom: 12 }}>
+      <div className="page-header" style={{ marginBottom: 16 }}>
         <h1>Decisions</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--fs-sm)' }}>{heroSubtitle}</p>
       </div>
 
-      {/* View switcher — Kanban / Log inline; Constellation as sibling
-          page link (heavy SVG, justifies its own URL). */}
+      {/* Above-fold portfolio cluster — translates the doc-detail
+          verdict pattern to the portfolio. Renders only when the user
+          actually has decisions on the books (each component returns
+          null on empty input so cold-start users see the kanban empty
+          state below instead of a stack of skeleton cards). */}
+      {portfolioContainers.length > 0 && (
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}
+        >
+          <ErrorBoundary sectionName="Portfolio verdict band">
+            <PortfolioVerdictBand containers={portfolioContainers} />
+          </ErrorBoundary>
+          <ErrorBoundary sectionName="Portfolio signal tiles">
+            <PortfolioSignalTiles containers={portfolioContainers} />
+          </ErrorBoundary>
+        </div>
+      )}
+
+      {/* NextMoveContainer — paper-grounded recommendation engine, now
+          the canonical Intelligent Antagonist surface after the
+          constellation SVG was retired 2026-05-11. Renders above all
+          three views so the strip + antagonist prompt stay visible
+          regardless of view choice. */}
+      <NextMoveContainer />
+
+      {/* View switcher */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 6,
+          marginTop: 16,
           marginBottom: 16,
           flexWrap: 'wrap',
         }}
@@ -139,51 +181,7 @@ export default function DecisionsPage() {
           active={view === 'passed'}
           onClick={() => setView('passed')}
         />
-        {/* Constellation peer-pill — locked 2026-05-10 batch 4 #3.
-            Visually balanced with Kanban + Log ViewPills (same padding,
-            border, font weight). The ArrowUpRight indicator signals this
-            view routes to a sibling page rather than swapping the
-            ?view= query param — keeps the user oriented when they
-            return from the constellation. Hover state mirrors ViewPill
-            so the eye reads the 3 views as equally weighted. */}
-        <Link
-          href="/dashboard/decisions/constellation"
-          style={{
-            padding: '6px 12px',
-            borderRadius: 'var(--radius-full)',
-            border: '1px solid var(--border-color)',
-            background: 'var(--bg-card)',
-            color: 'var(--text-secondary)',
-            fontSize: 'var(--fs-xs)',
-            fontWeight: 500,
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            transition: 'border-color 0.15s, background 0.15s',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--accent-primary)';
-            (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border-color)';
-            (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
-          }}
-          title="Open the longitudinal Decision Pipeline Constellation viz (cognitive-lineage between decisions)"
-        >
-          <Network size={12} />
-          Constellation
-          <ArrowUpRight size={11} style={{ opacity: 0.6 }} />
-        </Link>
       </div>
-
-      {/* Constellation Next Move — paper-grounded recommendation
-          engine. Renders above all three views (kanban / log / passed)
-          so the strip is the first signal regardless of view choice.
-          Antagonist prompt suppressed here because the constellation
-          page is the canonical intelligent-antagonist surface. */}
-      <NextMoveContainer showAntagonistPrompt={false} />
 
       {view === 'kanban' && (
         <KanbanView
@@ -193,7 +191,6 @@ export default function DecisionsPage() {
           setStatusFilter={setStatusFilter}
           containers={containers}
           isLoading={isLoading}
-          defaultKind={defaultKind}
         />
       )}
 
@@ -215,7 +212,6 @@ function KanbanView({
   setStatusFilter,
   containers,
   isLoading,
-  defaultKind: _defaultKind,
 }: {
   kindFilter: DecisionContainerKind | 'all';
   setKindFilter: (k: DecisionContainerKind | 'all') => void;
@@ -223,7 +219,6 @@ function KanbanView({
   setStatusFilter: (s: 'active' | 'archived') => void;
   containers: ReturnType<typeof useContainers>['containers'];
   isLoading: boolean;
-  defaultKind: DecisionContainerKind | null | undefined;
 }) {
   return (
     <>
@@ -273,9 +268,7 @@ function KanbanView({
         {/* New decision routes to the canonical hybrid create surface
             at /dashboard/decisions/new — same destination ContainerKanban
             empty-state, ContainersWidget, and CommandPalette already use.
-            Previously opened ContainerFormModal directly, which created a
-            divergent flow (3 modals + 1 page = 4 different "new decision"
-            entry shapes). Locked 2026-05-10 streamlining batch. */}
+            Locked 2026-05-10 streamlining batch. */}
         <Link
           href="/dashboard/decisions/new"
           style={{

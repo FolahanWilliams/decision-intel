@@ -6,12 +6,12 @@
  * fetch lifecycle for both the recommendations + the user-priority
  * capture.
  *
- * Mounted on /dashboard/decisions and /dashboard/decisions/constellation
- * as the recommendation engine's entry point. Persists across the
- * three-view-switcher pattern (kanban / log / constellation) so
- * recommendations stay visible regardless of the user's chosen view.
+ * Mounted on /dashboard/decisions as the recommendation engine's entry
+ * point. Persists across the view-switcher pattern (kanban / log /
+ * passed-on) so recommendations stay visible regardless of view.
  *
- * Locked 2026-05-10.
+ * Locked 2026-05-10; constellation surface retired 2026-05-11 — decisions
+ * page is now the canonical intelligent-antagonist surface.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -52,8 +52,8 @@ const fetcher = (url: string) =>
 export function NextMoveContainer({
   showAntagonistPrompt = true,
 }: {
-  /// When false (e.g. on a non-constellation page like the kanban),
-  /// skip the antagonist prompt entirely and just render the strip.
+  /// When false, skip the antagonist prompt entirely and just render
+  /// the strip. Defaults true on the canonical decisions page.
   showAntagonistPrompt?: boolean;
 }) {
   const [includeLlm, setIncludeLlm] = useState(false);

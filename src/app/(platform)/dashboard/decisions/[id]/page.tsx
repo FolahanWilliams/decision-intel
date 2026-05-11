@@ -22,7 +22,7 @@ import { DealFeverPremortemCard } from '@/components/containers/DealFeverPremort
 import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
-import { ContainerLinksPanel } from '@/components/constellation/ContainerLinksPanel';
+import { ContainerLinksPanel } from '@/components/containers/ContainerLinksPanel';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { dqiColorFor } from '@/lib/utils/grade';

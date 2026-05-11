@@ -1,19 +1,20 @@
 /**
- * Decision Pipeline Constellation — link types SSOT (locked 2026-05-09
- * evening, Phase 3.5 ship). Maps the four canonical edge types between
- * DecisionContainers. Edge model is COGNITIVE LINEAGE, not data lineage
- * (Palantir Foundry's trap per the master KB synthesis).
+ * Decision-to-decision link types SSOT (locked 2026-05-09 evening; the
+ * Phase 3.5 constellation viz was retired 2026-05-11 but the cognitive-
+ * lineage data model + ContainerLinksPanel CRUD surface stay). Maps the
+ * four canonical edge types between DecisionContainers. Edge model is
+ * COGNITIVE LINEAGE, not data lineage (Palantir Foundry's trap per the
+ * master KB synthesis).
  *
  * Consumers:
- *   - prisma/schema.prisma                     — DecisionContainerLink.linkType validation
- *   - /api/containers/[id]/links/route.ts      — POST/DELETE links
- *   - /api/containers/constellation/route.ts   — list-all-edges read for the viz
- *   - components/constellation/*               — the longitudinal viz
+ *   - prisma/schema.prisma                       — DecisionContainerLink.linkType validation
+ *   - /api/containers/[id]/links/route.ts        — POST/DELETE links
+ *   - components/containers/ContainerLinksPanel  — list + create + delete UI on /decisions/[id]
  *
  * Forward-looking rule: when adding a 5th link type, every consumer
- * above updates in lockstep. The viz reads `LinkTypeMeta.color` so a
- * new type with a new color propagates automatically — never inline
- * hex in the viz.
+ * above updates in lockstep. LinkTypeMeta.color is still useful for any
+ * future surface that needs severity-tinted rendering — keep colors as
+ * CSS-var references, never inline hex.
  */
 export const CONTAINER_LINK_TYPES = [
   'precedes',

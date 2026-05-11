@@ -3,16 +3,18 @@
 /**
  * ContainerLinksPanel — list + create + delete cognitive-lineage edges
  * for a single container. Mounted on /dashboard/decisions/[id] below
- * the cross-reference card. Lets a user wire the constellation manually
- * without leaving the decision they're auditing.
+ * the cross-reference card. Lets a user wire decision-to-decision
+ * dependencies without leaving the decision they're auditing.
  *
- * Phase 3.5 ship — paired with /api/containers/[id]/links + the
- * ContainerConstellation viz.
+ * Phase 3.5 ship — paired with /api/containers/[id]/links. The
+ * standalone SVG constellation viz that previously visualised these
+ * edges was retired 2026-05-11; this CRUD panel remains the canonical
+ * link-management surface.
  */
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Network, Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import {
   CONTAINER_LINK_TYPES,
   CONTAINER_LINK_TYPE_META,
@@ -121,25 +123,6 @@ export function ContainerLinksPanel({ containerId }: { containerId: string }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
-          <Link
-            href="/dashboard/decisions/constellation"
-            style={{
-              padding: '6px 10px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-secondary)',
-              fontSize: 'var(--fs-xs)',
-              fontWeight: 600,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Network size={11} />
-            View constellation
-          </Link>
           <button
             type="button"
             onClick={() => setShowCreate(true)}

@@ -728,7 +728,7 @@ function PipelinePreview() {
             <Network size={16} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
             <span style={{ flex: 1 }}>Where it&apos;ll fit</span>
             <Link
-              href="/dashboard/decisions/constellation"
+              href="/dashboard/decisions"
               style={{
                 fontSize: 11,
                 color: 'var(--accent-secondary, #6366f1)',
@@ -739,7 +739,7 @@ function PipelinePreview() {
                 gap: 4,
               }}
             >
-              Open constellation <ChevronRight size={12} />
+              Open pipeline <ChevronRight size={12} />
             </Link>
           </>
         }
@@ -752,10 +752,10 @@ function PipelinePreview() {
             margin: 0,
           }}
         >
-          The new decision lands on the Decision Pipeline Constellation alongside your existing
-          investments, acquisitions, and strategic decisions. Once it&apos;s created, link it to a
-          parent thesis (<code>spawned_from</code>) or a structural assumption (
-          <code>depends_on</code>) so dependency cascades fire when the assumption shifts.
+          The new decision joins your existing investments, acquisitions, and strategic decisions on
+          the Decisions kanban. Once it&apos;s created, link it to a parent thesis (
+          <code>spawned_from</code>) or a structural assumption (<code>depends_on</code>) from its
+          detail page so cognitive-lineage edges fire when an assumption shifts.
         </p>
       </AccentCard>
     </div>

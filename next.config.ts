@@ -108,6 +108,15 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/decisions?view=log',
         permanent: true,
       },
+      // Constellation SVG viz retired 2026-05-11 (founder feedback — the
+      // visualization was structurally hard to read; the cognitive-lineage
+      // value lives in the per-decision ContainerLinksPanel anyway).
+      // Bookmarks redirect to the canonical decisions kanban + log surface.
+      {
+        source: '/dashboard/decisions/constellation',
+        destination: '/dashboard/decisions',
+        permanent: true,
+      },
       // Outcome Flywheel folded into Analytics → Intelligence as a section
       // 2026-05-10 streamlining batch (founder ask: "wouldn't it just be
       // best to almost merge or incorporate some elements from that into
