@@ -381,9 +381,114 @@ These two lines are the operational follow-through to the pain framing — the p
 - Outcome-inference pipeline integration of `inferOutcomeFromPmiSignals`.
 - IC-memo PMI signal auto-extraction.
 
-## DecisionContainer Phase 3.5 — Decision Pipeline Constellation (locked 2026-05-09 evening)
+## Session locks 2026-05-11 (constellation retirement + decisions refactor + audit-platform.mjs + modal Dialog migration + /onepager + /proof ROI + /pricing refresh + dark-mode sweep)
 
-**The longitudinal/relational viz that converts the kanban from a daily-ops triage board into a strategic narrative surface.** Cornerstone-magnetic, Margaret-class CSO ready, demo-deck-grade. The kanban shows _what's on your plate today_; the constellation shows _how every decision rests on every other_ — temporal decay, escalation chains, thesis-anchor cascades, structural-assumption ripple.
+Single-session batch shipping seven distinct improvements. Commit chain: `1a752cb7` (shortcuts + constellation band-label-clipping fix) → `ac8e74e3` (Constellation viz retirement + decisions page refactor) → `9c22ffc7` (audit-platform.mjs + DQI gauge fix + /terms + /about + NewDecisionModal content) → `4f39a0a9` (/onepager + footer split + /proof ROI + modal Dialog migration) → `74861f3d` (dark-mode token sweep + /pricing refresh + ExperimentsContent.tsx deletion). All gates clean (tsc + 5 lints + 793/793 vitest + slop-scan).
+
+### 1. Constellation SVG viz retired (commit `ac8e74e3`)
+
+The standalone `/dashboard/decisions/constellation` SVG was structurally hard to read — band labels clipped, N×N edges across the whole portfolio always rendered cluttered. The cognitive-lineage VALUE lives in the per-decision `ContainerLinksPanel`. Full retirement detailed in the Phase 3.5 lock supersession note above.
+
+### 2. Decisions page refactor (commit `ac8e74e3`)
+
+`/dashboard/decisions` translates the doc-detail above-fold pattern (VerdictBand + RemediationChecklist + PaperApplicationsCard) from a single artifact to the PORTFOLIO. Two new components:
+
+- **[PortfolioVerdictBand](src/components/decisions/PortfolioVerdictBand.tsx)** — status pill derived from worst grade × high-severity conflicts × nearest committee gate (Audit-ready / Time-sensitive / Needs revision / Revise before committee). 3 stat tiles: Active decisions · Documents audited · Next committee gate (T-Nd). Monospace metadata strip: methodology version + pipeline freshness + canonical methodology pointer.
+- **[PortfolioSignalTiles](src/components/decisions/PortfolioSignalTiles.tsx)** — Top-3 portfolio signals worth acting on. (#1) Highest-risk decision (lowest composite DQI, only fires when grade ≤ C). (#2) Next committee gate (closest future committeeDate). (#3) Most cross-doc conflicts (highest high-severity count). Each tile deep-links to `/decisions/[id]`. Renders null when 0 actionable signals.
+
+Above-fold cluster reads from the UNFILTERED active container set (separate `useContainers({ status: 'active' }, 1, 200)` SWR call) so kanban mode-filtering can't silently hide a critical signal. `NextMoveContainer` now mounts with `showAntagonistPrompt={true}` (default) — `/dashboard/decisions` inherits the canonical Intelligent Antagonist surface role from the retired constellation. View switcher reduced to Kanban / Log / Passed-on (Constellation pill removed).
+
+### 3. Audit-platform.mjs systematic discovery script (commit `9c22ffc7`)
+
+See "Platform audit script" lock in the lint-gates section above. The audit replaces the founder's manual "click through pages and screenshot what's broken" workflow with a single command. First run surfaced 7 native dialogs, 6 hand-rolled modals, 72 dark-mode tokens, 2 stale comment refs.
+
+### 4. Modal → Dialog migration (commit `4f39a0a9`)
+
+All 6 hand-rolled modals routed through the shadcn `<Dialog>` primitive at `@/components/ui/dialog`:
+
+- [NewDecisionModal](src/components/ui/NewDecisionModal.tsx) — 4-option grid; added "Frame a new decision" → `/decisions/new` route
+- [KGMergeConsentModal](src/components/pricing/KGMergeConsentModal.tsx) — controlled `open` WITHOUT `onOpenChange` to preserve no-dismiss semantics (user must pick merged vs private)
+- [TeammateWallModal](src/components/pricing/TeammateWallModal.tsx) — standard upsell modal
+- [AuditsPageContent](src/components/audits/AuditsPageContent.tsx) — inline delete-confirmation modal
+- [QuickScanModal](src/components/ui/QuickScanModal.tsx) — KEPT as intentional slide-in panel (uses `useFocusTrap` + ESC handler + click-outside); annotated with `intentional-modal-pattern` marker in the JSDoc header so the audit script honors the deliberate UX choice
+- [LiquidGlassEffect](src/components/ui/LiquidGlassEffect.tsx) — audit allowlisted (cursor-light bloom overlay, not a modal — false positive)
+
+Each migrated modal preserves existing visual design (inline styles, copy, layout) but routes focus management, ESC handling, click-outside dismiss, and mobile Safari behavior through `<Dialog>`. `DialogTitle` / `DialogDescription` added for screen-reader announcement.
+
+**Forward-looking rule**: when adding a NEW modal, use `<Dialog>` from `@/components/ui/dialog` by default. The only reason to use a hand-rolled `position: fixed + inset: 0` shape is an intentional slide-in or non-modal panel — in that case add the `intentional-modal-pattern` marker to the file header (first 40 lines) so the audit script's `checkModalShape` recognizes it. The marker is the audit trail.
+
+### 5. `/onepager` route (commit `4f39a0a9`)
+
+New procurement-grade one-page artifact at `/onepager`. Arden-style format (the YC-backed company the founder shared as reference: `ardentech.ai/onepager.html`). Single-page format with numbered sections (`01/THE PROBLEM`, `02/WHAT DECISION INTEL DOES`, `03/TEAM`), clean serif typography, 3-stat strip (`HISTORICAL_CASE_COUNT` audited decisions · `BIAS_COUNT` biases · `FRAMEWORK_COUNT` frameworks), team credibility row, academic sources cited verbatim at the bottom (McKinsey 8%, KPMG 70-90% M&A failure, Kahneman & Klein 2009, Kahneman & Lovallo 2003 HBR, EU AI Act, Basel III ICAAP, SEC AI disclosure, AI Verify Foundation). All counts derive from canonical exports so the one-pager never drifts when the reference library or compliance registry changes.
+
+**When to share**: cold-context warm-intro DMs where the founder needs a single linkable artifact a CSO / M&A head / fund partner can read end-to-end in under 90 seconds without context. NOT the live demo (that's `/demo`); the one-pager is the leave-behind that gets forwarded internally.
+
+### 6. `/proof` ROI extensions (commit `4f39a0a9`)
+
+The page was strong on hindsight discipline but soft on procurement-grade ROI framing. Two additions:
+
+- **Value-at-stake banner** below the hero — names the aggregate cost of missing what's on the page across all proof cases ("Across these N pre-decision documents, hundreds of billions in market capitalization were destroyed AFTER bias-laden reasoning made it through the audit committee"). Green-accent border, ShieldAlert icon, anchors the procurement-grade "this is what your audit committee could have caught BEFORE the outcome" claim.
+- **Per-case ROI callout** below the bias web — navy panel with red `AlertOctagon` icon: "What the {documentType} carried, in writing, before the outcome: N red flags · N biases · {estimatedImpact}." Right-side CTA cluster: "Audit yours now →" (primary) + "From £249/mo per seat →" (secondary deep-link to `/pricing`).
+
+### 7. Footer 4-column split (commit `4f39a0a9`)
+
+The Product column on the landing-page footer was 8 links stacked vertically (Privacy / Security / How It Works / R²F Standard / Case Studies / Proof / Bias Genome / Pricing). Founder feedback: "incredibly lengthy column." Split into 3 semantic columns via new `FooterColumn` helper:
+
+- **Platform**: How It Works · R²F Standard · Bias Genome · Pricing
+- **Proof**: Case Studies · Proof · One-pager · Demo
+- **Trust**: Security · Privacy · Trust center · Calibration
+
+Grid widened from 4 to 5 columns (`1.6fr 1fr 1fr 1fr 1.5fr`); mobile breakpoint collapses to `1fr 1fr` as before.
+
+### 8. /terms refresh (commit `9c22ffc7`)
+
+Fixed actual rendering bug — contact email link rendered `color: '#FFFFFF'` (invisible on light background). Reordered section letters from A→B→C→D→E→H→F→G (out-of-order) to A→B→C→D→E→F→G→H. Refreshed last-updated to 2026-05-11. Expanded Section 2 to name R²F + DPR + DQI explicitly per canonical positioning vocabulary.
+
+### 9. /about refresh (commit `9c22ffc7`)
+
+Added "What you get from every audit" 5-tile section (R²F bias detection · cross-doc conflict scan · DQI · DPR · regulatory map) between hero and company facts. Tiles use the AccentCard pattern (3px green top border, accent-tinted icon square). Refreshed last-reviewed timestamp.
+
+### 10. /pricing refresh (commit `74861f3d`)
+
+Count-drift fix: hardcoded "30+ cognitive biases" replaced with `${BIAS_COUNT}-bias R²F taxonomy` derived from canonical `BIAS_EDUCATION` export (two sites: Individual-tier highlight + `COMPARISON_ROWS` row). No other staleness found — hero, billing toggle, tier cards, design-partner strip, trust band, comparison table, FAQ all current.
+
+### 11. DQI gauge needle fix (commit `9c22ffc7`)
+
+[CounterfactualLiftViz.tsx:376](src/components/marketing/how-it-works/CounterfactualLiftViz.tsx) needle angle formula corrected from `-90 + (score/100)*180` to `-180 + (score/100)*180`. Prior formula mapped score 0 to the TOP of the arc and score 100 to the BOTTOM, but the SVG arc itself runs LEFT to TOP to RIGHT. Needle and score arc rendered on opposite sides for any score under 50. The fix lands score 0 at -180° (left endpoint), score 50 at -90° (top), score 100 at 0° (right) — matching the arc geometry.
+
+### 12. Native-dialog migration (commits `9c22ffc7` + `4f39a0a9`)
+
+- `/dashboard/decisions/[id]` cross-reference trigger: `alert()` → `useToast` (procurement-grade error feedback + success toast on completion).
+- Audit script extended with explicit allow-list for CLAUDE.md-tolerated admin-side confirms (BiasCollabPanel comment/task delete, TeamPage member-remove).
+
+### 13. Dark-mode token sweep + dead-code purge (commit `74861f3d`)
+
+72 → 0 audit-flagged `text-zinc-*` / `bg-zinc-*` / `text-white` instances on platform pages. Strategy:
+
+- **DELETED**: `src/components/experiments/ExperimentsContent.tsx` (~636 LOC). Dead code — `/dashboard/experiments` route was retired in the platform consolidation pass; component had ~60 of the 72 findings and no remaining consumers per grep.
+- **MIGRATED**: 26 instances across 7 components to CSS-var-backed shadcn tokens — `text-zinc-400/500` → `text-muted-foreground` (maps to `--muted-foreground`), `text-zinc-200/300` → `text-foreground`, `bg-zinc-800/50 + border-zinc-700/50` → `bg-muted + border-border`. Files: RelatedDecisions · RecommendationsPanel · CrossSiloAlertCards · DraftOutcomeCard · DraftOutcomeBanner · FingerprintContent · ForgottenQuestionsTab.
+- **ALLOWLISTED** in audit-platform.mjs: dialog.tsx backdrop (`bg-black/10` load-bearing) · GlassMicroInteractions + LiquidGlassAdvanced (glass effect overlays use `bg-white/N` legitimately) · founder-context.ts (class names mentioned in narrative prose) · `src/app/demo/` (demo has its own slate palette intentionally) · `.test.ts` files excluded entirely.
+
+**Forward-looking rule**: when migrating platform-page dark-mode classes, prefer the shadcn token family (`text-foreground` / `text-muted-foreground` / `bg-background` / `bg-muted` / `border-border`) — these resolve through the `--*-foreground` / `--muted` / `--border` CSS variables in `globals.css` and stay theme-aware. Marketing surfaces are allowed rich palettes per `DARK_TOKEN_ALLOWED_PREFIXES` in the audit script.
+
+### 14. Audit results (post-batch)
+
+Per `npm run audit:platform`:
+
+- CRITICAL · 2 (false positives + admin-tolerated `window.confirm` per CLAUDE.md carve-out)
+- MODAL · 0 (all hand-rolled modals migrated or marker-opted-out)
+- VISUAL · dark-mode 0 · hex 766 (low-severity platform-component hex; mostly legitimate severity/status colors)
+- STALE · 2 (legitimate `UnifiedDecisionsFeed` historical comment + `DecisionDNAPreviewCard` reference)
+
+The dark-mode sub-category dropped from 72 → 0. The MODAL category dropped from 6 → 0. The remaining 766 hex literals are low-severity and mostly intentional (severity color maps, status badges, button text colors); a deep sweep would be future work but not blocking.
+
+**Forward-looking rule**: when adding a new marketing surface that needs to derive from canonical counts (cases / biases / frameworks), import from the canonical exports — `HISTORICAL_CASE_COUNT` from `@/lib/data/case-studies`, `BIAS_EDUCATION` length from `@/lib/constants/bias-education`, `getAllRegisteredFrameworks().length` from `@/lib/compliance/frameworks`. The `/onepager` page is the canonical example of this pattern in a single artifact.
+
+## DecisionContainer Phase 3.5 — Decision Pipeline Constellation (locked 2026-05-09 evening — SVG VIZ RETIRED 2026-05-11; data model + ContainerLinksPanel stay)
+
+**RETIREMENT NOTE (2026-05-11):** the standalone SVG constellation viz at `/dashboard/decisions/constellation` was retired 2026-05-11 (founder feedback after the band-label-clipping fix — "remove the viz entirely. also, fully update and improve the decisions page"). The N×N edge visualization across the whole portfolio always read as cluttered; the cognitive-lineage VALUE lives in the per-decision `ContainerLinksPanel` CRUD surface anyway. What stays: (a) `DecisionContainerLink` Prisma model + 4 link types + SSOT at `src/lib/data/container-link-types.ts`, (b) `/api/containers/[id]/links/route.ts` CRUD endpoints, (c) `ContainerLinksPanel` mounted on `/decisions/[id]` (moved from `src/components/constellation/` → `src/components/containers/` in the cleanup). What was deleted: (a) `/dashboard/decisions/constellation/page.tsx`, (b) `src/components/constellation/ContainerConstellation.tsx` + `ContainerNodeDetailPopup.tsx` + `constellation-layout.ts`, (c) `src/hooks/useConstellation.ts`, (d) `/api/containers/constellation/route.ts`. Plus 308 redirect from the old URL → `/dashboard/decisions`, CommandPalette entry removed, NewDecisionModal cross-link updated, founder-context.ts chat preamble updated (3 sites). The `/dashboard/decisions` page now hosts the canonical Intelligent Antagonist surface (`NextMoveContainer` mounts with `showAntagonistPrompt={true}` by default; was suppressed when constellation was the canonical capture point). Decisions page also gained `PortfolioVerdictBand` + `PortfolioSignalTiles` above-fold cluster — see "Decisions page refactor 2026-05-11" lock below.
+
+**The original Phase 3.5 design intent (retained as historical context):** The longitudinal/relational viz that converts the kanban from a daily-ops triage board into a strategic narrative surface. Cornerstone-magnetic, Margaret-class CSO ready, demo-deck-grade. The kanban shows _what's on your plate today_; the constellation showed _how every decision rests on every other_ — temporal decay, escalation chains, thesis-anchor cascades, structural-assumption ripple.
 
 **Master KB synthesis** (notebook `809f5104`, 2026-05-09 evening) drove the design. Three rules locked:
 
@@ -894,6 +999,8 @@ npx prisma generate  # Regenerate Prisma client
 ```
 
 **Pre-commit hook:** Runs four gates in order — `npm run lint:positioning` (banned-vocabulary scanner), `npm run lint:silent-catches` (silent-catch ratchet), `npm run lint:counts` (count-drift ratchet, see lock below), and `npm run audit:ai` (Gemini architectural audit). Can be bypassed with `--no-verify` but should generally be fixed instead.
+
+**Platform audit script (on-demand 6th gate, locked 2026-05-11).** [scripts/audit-platform.mjs](scripts/audit-platform.mjs) extends the deterministic lint family with HEURISTIC checks that catch the "outdated / out of place / broken / visually incoherent" cluster — surfaced by the founder ask "is there a way for you to systematically audit and catch everything that might be outdated, out of place, broken, and visually incoherent so I don't have to keep manually going through all the pages and telling you what to fix?" Run via `npm run audit:platform` (stderr summary) or `npm run audit:platform:write` (writes markdown report to `docs/platform-audits/audit-<DATE>.md`). 9 check categories: (1) **dead-route-href** — links to retired routes (`/dashboard/playbooks`, `/dashboard/provenance`, `/dashboard/decision-log`, `/dashboard/decisions/constellation`, `/decision-alpha`, etc.); (2) **native-browser-dialog** — `window.confirm` / `window.alert` on wow-moment surfaces (with allowlist for admin/settings/founder-hub + the CLAUDE.md-named exceptions BiasCollabPanel + TeamPage); (3) **dark-mode-tailwind-token** — `text-white` / `text-gray-100..500` / `bg-zinc-800..950` / `bg-white/N` / `bg-black` on platform pages (excludes visualizations / DPR renderers / specific intentional-navy marketing surfaces / `.test.ts` files / files with `intentional-dark` header marker); (4) **hardcoded-hex-color** — `color:` / `background:` style props on platform components (allow-list for graph viz / PDF generators / canonical color maps; tolerates `#fff` and `#000`); (5) **modal-without-dialog-primitive** — `position: fixed + inset: 0 + zIndex ≥ 100` not routed through `@/components/ui/dialog`; opt-out via `intentional-modal-pattern` marker in the file header (used by QuickScanModal's intentional slide-in shape); (6) **platform-h1-token-drift** — platform-page `<h1>` using raw `text-2xl/3xl/4xl` or `fontSize: 24/28/32/36/40` instead of `var(--fs-page-h1-platform)`; (7) **stale-stage-language** — `we just launched` / `solo founder` / `early days of` / `our journey` / `just shipped` on marketing surfaces; (8) **stale-as-of-date** — `as of <Month> <Year>` more than 90 days old without `drift-tolerant` marker; (9) **deleted-component-reference** — references to retired symbols (`ContainerConstellation`, `useConstellation`, `UnifiedDecisionsFeed`, `AuditSummaryCards`, etc.). Output: 4-category report (CRITICAL · MODAL · VISUAL · STALE) with severity × rule × file:line, top 25 offenders per rule. NOT a pre-commit gate by design — it's a discovery tool the founder runs when they want to know what's stale; the dedicated lint scripts catch the deterministic drift classes at commit time. **Forward-looking rule**: when adding a new check, write a `check<Name>(files)` function returning `Finding[]` with `{ category, severity, rule, file, line, snippet, suggestion }`, wire it into `runAllChecks()`, document it in the header comment. When a check produces too many false positives, add the file/dir to the appropriate ALLOWED_PREFIXES list rather than rewriting the rule.
 
 **Vitest exclude pattern (locked 2026-05-10).** [vitest.config.ts](vitest.config.ts) excludes `e2e/**` + `**/node_modules/**` + `voice-worker/**`. The first iteration only excluded `node_modules/**` (no glob), which **only matches the root `node_modules/`** — the voice-worker has its own nested `node_modules/` (separate Node app, Railway-hosted, NOT bundled with the Vercel main app per the voice-mode lock 2026-05-03), and vitest was recursively running upstream package tests shipped inside vendored packages (`@livekit/agents`, `pino`, `pino-pretty`, `on-exit-leak-free`). 60 "pre-existing failures" turned out to be those upstream tests failing under our vitest config — not our code. The 2026-05-10 fix: bare `node_modules/**` → `**/node_modules/**` to catch every nested location, plus `voice-worker/**` belt-and-braces to skip the whole sub-app. **Forward-looking rule**: when adding a new sub-app under `voice-worker/`-style architecture (separate Node app, own `node_modules`), add it to the vitest exclude in the same commit. The actual product test count is 713 across 53 files; if `npx vitest run` ever shows >50 failures, the first instinct should be "is the exclude pattern still right?" not "what production code broke?"
 
