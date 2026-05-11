@@ -219,7 +219,7 @@ export const WEAKNESSES: Weakness[] = [
     whyItHurts:
       'If the analyst has to change behavior to use DI (vs. their existing email + Slack + Drive workflow), DI becomes shelfware by month three. Adoption is THE adoption metric — without it, even the few paid pilots churn before the data flywheel rotates.',
     countermove: [
-      'Integration-first onboarding (Founder School es_9): map the workflow IN the discovery call, set up Google Drive polling or analyze+token@in.decision-intel.com forwarder in 15 minutes BEFORE contract',
+      'Integration-first onboarding (Founder School es_9): map the workflow IN the discovery call, set up Google Drive polling or analyze+token@decision-intel.com forwarder in 15 minutes BEFORE contract',
       "Make zero behavior change the default — DI runs on the analyst's existing artefact stream (memos arrive in Drive → audit fires automatically → email digest summarises)",
       'On free pilots: hard 6-week ceiling, then conversion to paid. No "we will keep extending the pilot." (Founder School es_7 + es_11)',
     ],

@@ -918,7 +918,7 @@ function EmailForwardingSection() {
   const [regenerating, setRegenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const domain = process.env.NEXT_PUBLIC_EMAIL_INBOUND_DOMAIN || 'in.decision-intel.com';
+  const domain = process.env.NEXT_PUBLIC_EMAIL_INBOUND_DOMAIN || 'decision-intel.com';
 
   useEffect(() => {
     fetch('/api/integrations/email/token')

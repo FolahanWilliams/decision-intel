@@ -145,7 +145,7 @@ export const NETWORK_NODES: NetworkNode[] = [
     },
     status: 'active',
     cadence:
-      'Day 1-7: integration-first onboarding (Drive polling or analyze+token@in.decision-intel.com forwarder live in 15 min during discovery call) · weekly Brier-score sync · Day 30 / 60 / 90 metric checkpoints · monthly partner 1:1 with founder',
+      'Day 1-7: integration-first onboarding (Drive polling or analyze+token@decision-intel.com forwarder live in 15 min during discovery call) · weekly Brier-score sync · Day 30 / 60 / 90 metric checkpoints · monthly partner 1:1 with founder',
     notes:
       'Per founder direction 2026-04-28: Sankore is the SUMMER 2026 design-partner wedge — NOT the primary 30-day outbound target. The Naira pricing reality (£2K/mo Nigerian feels like £5K/mo in real purchasing power) means revenue mathematics are weaker for a UK-based founder than focusing on the 3 fast-converter archetypes (mid-market PE/VC associate, boutique M&A advisor, solo fractional CSO). Sankore is essential for product rigor + Pan-African network + Q4 2026 Bias Autopsy reference case. But pitching them now dilutes focus from the validators who will pay £149-£499 in 14-30 days. Per NotebookLM 2026-04-27 Day-90 synthesis: three highest-probability failure modes — (1) Integration shelfware (countermove: integration-first onboarding, zero behavior change); (2) Dormant data flywheel (countermove: enforce 409 Outcome Gate); (3) Unpaid dev shop / scope creep (countermove: "no custom features outside published roadmap" rule). Sankore brief stays INSIDE the Founder Hub per CLAUDE.md no-named-prospects rule.',
     nextStep:

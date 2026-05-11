@@ -381,30 +381,30 @@ Six workstreams. The 50/50 split (per NotebookLM verdict): 50% on workflow-owner
 
 **What CLAUDE.md says exists** (the canonical integration list):
 
-| Integration                         | Promised function                                                                                                                                                             | Source                                  |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| **Email inbound**                   | Unique address per user (`analyze+{token}@in.decision-intel.com`). Token-based auth. Cloudflare Email Routing forwards `*@decision-intel.com` → personal Gmail → DI ingestion | CLAUDE.md "Integrations" + "Tech Stack" |
-| **Slack**                           | 7 slash commands · thread monitoring · auto-creates CopilotSession + DecisionRoom after audits · OAuth                                                                        | CLAUDE.md "Integrations"                |
-| **Google Drive**                    | OAuth + Changes API polling via cron · dedup by `sourceRef` · 24h cooldown · content-hash comparison for updates                                                              | CLAUDE.md "Integrations"                |
-| **Stripe checkout**                 | £249/mo Individual · per-deal audit pricing · subscription state                                                                                                              | CLAUDE.md "Tech Stack" + "Plan limits"  |
-| **Resend SMTP (outbound)**          | `smtp.resend.com:465` · Supabase Auth password-reset / magic-link / confirm + Gmail "Send mail as" identity for `*@decision-intel.com` replies + daily-linkedin cron          | CLAUDE.md "Tech Stack"                  |
-| **Supabase Auth**                   | Google OAuth + email magic link + email + password + SAML SSO                                                                                                                 | CLAUDE.md "Tech Stack" + Terms §3       |
-| **Ambient capture (Slack + Drive)** | Opt-in per channel, 14-day expiry, 500-char excerpt cap, thesis-formation signal detection via deepseek-v4-flash                                                              | CLAUDE.md Tier 2.2 lock 2026-05-10      |
+| Integration                         | Promised function                                                                                                                                                                                    | Source                                  |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| **Email inbound**                   | Unique address per user (`analyze+{token}@decision-intel.com`). Token-based auth. Cloudflare Email Routing sends the `analyze@` rule to an Email Worker, which posts signed payloads to DI ingestion | CLAUDE.md "Integrations" + "Tech Stack" |
+| **Slack**                           | 7 slash commands · thread monitoring · auto-creates CopilotSession + DecisionRoom after audits · OAuth                                                                                               | CLAUDE.md "Integrations"                |
+| **Google Drive**                    | OAuth + Changes API polling via cron · dedup by `sourceRef` · 24h cooldown · content-hash comparison for updates                                                                                     | CLAUDE.md "Integrations"                |
+| **Stripe checkout**                 | £249/mo Individual · per-deal audit pricing · subscription state                                                                                                                                     | CLAUDE.md "Tech Stack" + "Plan limits"  |
+| **Resend SMTP (outbound)**          | `smtp.resend.com:465` · Supabase Auth password-reset / magic-link / confirm + Gmail "Send mail as" identity for `*@decision-intel.com` replies + daily-linkedin cron                                 | CLAUDE.md "Tech Stack"                  |
+| **Supabase Auth**                   | Google OAuth + email magic link + email + password + SAML SSO                                                                                                                                        | CLAUDE.md "Tech Stack" + Terms §3       |
+| **Ambient capture (Slack + Drive)** | Opt-in per channel, 14-day expiry, 500-char excerpt cap, thesis-formation signal detection via deepseek-v4-flash                                                                                     | CLAUDE.md Tier 2.2 lock 2026-05-10      |
 
 **The Tier 0 audit (Week 1, 2-3 days):**
 
 Run an end-to-end smoke test for every integration. For each, the test is: a NEW user, on a fresh browser, completes the full happy path. Document every break.
 
-| Integration                          | E2E smoke test                                                                                                                 | What "working" looks like                                                                                    |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Email inbound                        | New user signs up, gets unique email address, forwards an email with PDF attachment to `analyze+{token}@in.decision-intel.com` | Attachment ingested, audit fires, DPR generated, result visible in /dashboard within 90 seconds              |
-| Slack OAuth + slash                  | Connect Slack workspace from /dashboard/settings/integrations, run `/decision-intel audit` in a channel with a memo paste      | Audit fires, result posted back to channel, CopilotSession auto-created                                      |
-| Google Drive OAuth + polling         | Connect Drive, place a strategic memo PDF in a monitored folder                                                                | DI auto-pulls, audit fires within 24h cooldown window, result surfaces in /dashboard                         |
-| Stripe checkout (Individual £249/mo) | Click "Upgrade to Individual" on /pricing as a Free-tier user                                                                  | Stripe Checkout opens, test card succeeds, plan flips to Individual within 60 seconds, AnalysisLimit unlocks |
-| Resend outbound (Supabase auth)      | New sign-up via magic link from /login                                                                                         | Magic link email arrives within 30 seconds, click → authenticated session                                    |
-| Daily-linkedin cron                  | Manual trigger of `/api/cron/daily-linkedin` via curl                                                                          | Email arrives at `FOUNDER_EMAIL` with generated post draft, no errors in Vercel logs                         |
-| Ambient Slack capture                | Toggle ambient consent ON in /dashboard/settings, post a memo-shaped message in a consented channel                            | Within 1 hour, signal detected, AmbientThesisSignal row created, banner surfaces on /dashboard               |
-| Ambient Drive capture                | Toggle ambient Drive consent ON, drop a strategic memo PDF in a monitored Drive folder                                         | Metadata signal detected within 1 hour, banner surfaces on /dashboard                                        |
+| Integration                          | E2E smoke test                                                                                                              | What "working" looks like                                                                                    |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Email inbound                        | New user signs up, gets unique email address, forwards an email with PDF attachment to `analyze+{token}@decision-intel.com` | Attachment ingested, audit fires, DPR generated, result visible in /dashboard within 90 seconds              |
+| Slack OAuth + slash                  | Connect Slack workspace from /dashboard/settings/integrations, run `/decision-intel audit` in a channel with a memo paste   | Audit fires, result posted back to channel, CopilotSession auto-created                                      |
+| Google Drive OAuth + polling         | Connect Drive, place a strategic memo PDF in a monitored folder                                                             | DI auto-pulls, audit fires within 24h cooldown window, result surfaces in /dashboard                         |
+| Stripe checkout (Individual £249/mo) | Click "Upgrade to Individual" on /pricing as a Free-tier user                                                               | Stripe Checkout opens, test card succeeds, plan flips to Individual within 60 seconds, AnalysisLimit unlocks |
+| Resend outbound (Supabase auth)      | New sign-up via magic link from /login                                                                                      | Magic link email arrives within 30 seconds, click → authenticated session                                    |
+| Daily-linkedin cron                  | Manual trigger of `/api/cron/daily-linkedin` via curl                                                                       | Email arrives at `FOUNDER_EMAIL` with generated post draft, no errors in Vercel logs                         |
+| Ambient Slack capture                | Toggle ambient consent ON in /dashboard/settings, post a memo-shaped message in a consented channel                         | Within 1 hour, signal detected, AmbientThesisSignal row created, banner surfaces on /dashboard               |
+| Ambient Drive capture                | Toggle ambient Drive consent ON, drop a strategic memo PDF in a monitored Drive folder                                      | Metadata signal detected within 1 hour, banner surfaces on /dashboard                                        |
 
 **The Tier 0 repair (Week 1, 3-5 days based on audit findings):**
 
@@ -412,14 +412,14 @@ For each broken path, document the break + fix + re-test in this same document u
 
 **Specific known break (confirmed by founder 2026-05-11):**
 
-- **Email forwarding** — `analyze+{token}@in.decision-intel.com` → audit pipeline is broken end-to-end. Likely root causes to investigate (in order of probability):
-  1. Cloudflare Email Routing forwarding rule for `analyze+*` pattern not configured
+- **Email forwarding** — `analyze+{token}@decision-intel.com` → audit pipeline is broken end-to-end. Likely root causes to investigate (in order of probability):
+  1. Cloudflare Email Routing subaddressing / `analyze@` Worker rule not configured
   2. Token-extraction regex on inbound mail not matching the new email format
   3. PDF attachment extraction failing because of MIME boundary changes
   4. Audit pipeline rejecting the inbound payload because of missing user context
   5. Resend inbound webhook handler missing entirely
 
-Investigation must start from "send a test email to the address and follow it through every system log" (Cloudflare → Resend → Vercel function logs → Prisma write). The repair lives in `src/app/api/integrations/email/route.ts` (likely) and the Cloudflare DNS / routing config.
+Investigation must start from "send a test email to the address and follow it through every system log" (Cloudflare Email Routing → Email Worker logs → Vercel function logs → Prisma write). The repair lives in `src/app/api/integrations/email/inbound/route.ts` and the Cloudflare Email Routing / Worker config.
 
 **Why Tier 0 cannot be skipped or deferred:**
 
@@ -1120,7 +1120,7 @@ Marketing surfaces cleared: WelcomeModal first-login experience
 ```text
 Status: 🔴 RED (confirmed broken by founder 2026-05-11)
 Scope: Inbound email → DI ingestion via Cloudflare Email Routing →
-        analyze+{token}@in.decision-intel.com → audit pipeline
+        analyze+{token}@decision-intel.com → Email Worker → audit pipeline
 Known break: end-to-end flow does not work
 Repair work: pending audit session (5 likely root causes listed in
         Section 8 Workstream 0)

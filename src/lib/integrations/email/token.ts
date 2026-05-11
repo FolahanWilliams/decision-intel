@@ -31,6 +31,6 @@ export async function resolveUserFromToken(token: string): Promise<string | null
  * Build the full forwarding email address for a given token.
  */
 export function getForwardingAddress(token: string): string {
-  const domain = process.env.EMAIL_INBOUND_DOMAIN || 'in.decision-intel.com';
+  const domain = process.env.EMAIL_INBOUND_DOMAIN || 'decision-intel.com';
   return `analyze+${token}@${domain}`;
 }

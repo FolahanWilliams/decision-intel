@@ -81,10 +81,10 @@ export const PLANS = {
       'Walk into your next meeting with the one question the CSO missed. Full audit plus your Personal Decision History.',
     priceMonthly: 249,
     priceAnnual: 2490,
-    priceIdMonthly: process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
-    priceIdAnnual: process.env.STRIPE_PRO_PRICE_ANNUAL_ID || 'price_1TLhBhJHs8Ws3oeLgB24ycVf',
+    priceIdMonthly: process.env.STRIPE_PRO_PRICE_MONTHLY_ID || '',
+    priceIdAnnual: process.env.STRIPE_PRO_PRICE_ANNUAL_ID || '',
     // Legacy alias points to monthly for existing callers
-    priceId: process.env.STRIPE_PRO_PRICE_MONTHLY_ID || 'price_1TLh8pJHs8Ws3oeL7VzAcJgA',
+    priceId: process.env.STRIPE_PRO_PRICE_MONTHLY_ID || '',
     analysesPerMonth: 15,
     maxPages: 100,
     biasTypes: 30,

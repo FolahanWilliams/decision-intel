@@ -500,7 +500,7 @@ export const SLIP = {
       question:
         'Can the design partner be value-extracting in 15 minutes after the contract signs?',
       diAnswer:
-        'Yes IF the workflow mapping happens IN the discovery call (per es_9). Google Drive integration: 5-min OAuth + folder ID. Email-forward fallback: analyze+{token}@in.decision-intel.com. NO behaviour change required from the analyst.',
+        'Yes IF the workflow mapping happens IN the discovery call (per es_9). Google Drive integration: 5-min OAuth + folder ID. Email-forward fallback: analyze+{token}@decision-intel.com. NO behaviour change required from the analyst.',
     },
     {
       letter: 'L',
@@ -555,7 +555,7 @@ export const ENTERPRISE_FRICTION_MATRIX: EnterpriseFriction[] = [
     surfacedAs:
       '"Your cross-document conflict detection is impressive, but our deal team lives in Intralinks / Ansarada. We\'d need integration there. Plus we need NDA expiry tracking + automated bulk-delete when a deal collapses — your platform doesn\'t cover the workflow we actually live in."',
     preBakedResponse:
-      "Honest answer: VDR integration is on the roadmap, not shipped. Today, the integration is email-forward to analyze+{token}@in.decision-intel.com, which works for any deal-room platform. NDA expiry + bulk-delete are real gaps; for design-partner pilots we set retention to your firm's policy via Document.contentKeyVersion + the retention cron. If VDR-native integration is the deal-breaker, I'd rather know in week 1 than week 12.",
+      "Honest answer: VDR integration is on the roadmap, not shipped. Today, the integration is email-forward to analyze+{token}@decision-intel.com, which works for any deal-room platform. NDA expiry + bulk-delete are real gaps; for design-partner pilots we set retention to your firm's policy via Document.contentKeyVersion + the retention cron. If VDR-native integration is the deal-breaker, I'd rather know in week 1 than week 12.",
     productStatus: 'partial',
     statusDetail:
       'Email-forward path works today. VDR-native integration deferred to Phase 3 (post-wedge); NDA expiry tracking + bulk-delete: gap to fill in next 90 days.',

@@ -96,7 +96,7 @@ const ITEMS: FaqItem[] = [
         Under 30 minutes for the standard path: upload documents directly, connect Slack and Google
         Drive via OAuth, and send memos to a unique{' '}
         <code style={{ background: C.slate100, padding: '1px 6px', borderRadius: 4 }}>
-          analyze+token@in.decision-intel.com
+          analyze+token@decision-intel.com
         </code>{' '}
         address. For programmatic use there&apos;s a REST API with per-org keys and scoped
         permissions — most teams land their first automated audit inside a single engineering

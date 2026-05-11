@@ -34,6 +34,14 @@ interface InboundEmailPayload {
  * Checks svix-id, svix-timestamp, and svix-signature headers.
  */
 function verifyWebhookSignature(req: NextRequest, body: string): boolean {
+  const svixId = req.headers.get('svix-id');
+  const svixTimestamp = req.headers.get('svix-timestamp');
+  const svixSignature = req.headers.get('svix-signature');
+
+  if (!svixId && !svixTimestamp && !svixSignature) {
+    return false;
+  }
+
   const secret = process.env.RESEND_WEBHOOK_SECRET;
   if (!secret) {
     // Dev-only bypass. In production this MUST be configured — missing
@@ -45,10 +53,6 @@ function verifyWebhookSignature(req: NextRequest, body: string): boolean {
     log.warn('RESEND_WEBHOOK_SECRET not configured — skipping signature verification (dev only)');
     return true;
   }
-
-  const svixId = req.headers.get('svix-id');
-  const svixTimestamp = req.headers.get('svix-timestamp');
-  const svixSignature = req.headers.get('svix-signature');
 
   if (!svixId || !svixTimestamp || !svixSignature) {
     log.error('Missing svix webhook headers');
@@ -81,8 +85,24 @@ function verifyWebhookSignature(req: NextRequest, body: string): boolean {
 }
 
 /**
+ * Verify signature from the Cloudflare Email Worker.
+ * Header: x-cf-email-signature: sha256={hex-digest}
+ * The digest is HMAC-SHA256(CF_EMAIL_WEBHOOK_SECRET, body).
+ */
+function verifyCfWorkerSignature(req: NextRequest, body: string): boolean {
+  const secret = process.env.CF_EMAIL_WEBHOOK_SECRET;
+  if (!secret) return false;
+
+  const sig = req.headers.get('x-cf-email-signature');
+  if (!sig?.startsWith('sha256=')) return false;
+
+  const expected = createHmac('sha256', secret).update(body).digest('hex');
+  return safeCompare(sig.slice(7), expected);
+}
+
+/**
  * Extract the user token from the "to" email address.
- * Expected format: analyze+{token}@in.decision-intel.com
+ * Expected format: analyze+{token}@decision-intel.com
  */
 function extractTokenFromAddress(to: string): string | null {
   const match = to.match(/analyze\+([a-zA-Z0-9_-]+)@/);
@@ -157,9 +177,11 @@ export async function POST(req: NextRequest) {
     // 1. Read raw body for signature verification
     const rawBody = await req.text();
 
-    // 2. Verify webhook signature
-    if (!verifyWebhookSignature(req, rawBody)) {
-      log.error('Webhook signature verification failed');
+    // 2. Verify webhook signature (accept either Resend/svix or Cloudflare Worker HMAC)
+    const isResendSigned = verifyWebhookSignature(req, rawBody);
+    const isCfSigned = verifyCfWorkerSignature(req, rawBody);
+    if (!isResendSigned && !isCfSigned) {
+      log.error('Webhook signature verification failed (neither Resend nor CF Worker)');
       return OK(); // Still return 200 to not leak info
     }
 

@@ -200,7 +200,7 @@ export const SHIPPED_FEATURES: ShippedFeature[] = [
   {
     title: 'Email Forwarding Integration',
     detail:
-      'Unique email address per user (analyze+{token}@in.decision-intel.com). Forward documents or paste text, auto-analyzed with results emailed back.',
+      'Unique email address per user (analyze+{token}@decision-intel.com). Forward documents or paste text, auto-analyzed with results emailed back.',
     category: 'integration',
   },
   {

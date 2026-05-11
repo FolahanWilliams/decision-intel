@@ -374,7 +374,7 @@ export function IntegrationsAndFlywheelTab() {
           <Mail size={18} style={{ color: '#16A34A' }} /> Email Forwarding Integration
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
-          Every user gets a unique email address (<code>analyze+token@in.decision-intel.com</code>).
+          Every user gets a unique email address (<code>analyze+token@decision-intel.com</code>).
           Forward any document or paste decision text — auto-analyzed with results emailed back.
           Zero setup, works from any email client on any device.
         </p>
@@ -394,7 +394,7 @@ export function IntegrationsAndFlywheelTab() {
             },
             {
               title: 'Secure Token Auth',
-              desc: 'Unique per-user token, Resend webhook HMAC verification, rate + plan limits',
+              desc: 'Unique per-user token, HMAC signature verification, rate + plan limits',
             },
           ].map((item, i) => (
             <div

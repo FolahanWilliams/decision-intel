@@ -32,8 +32,9 @@ const OPTIONAL_ENV_VARS = [
   'SLACK_TOKEN_ENCRYPTION_KEY', // AES-256 key for encrypting per-workspace tokens
   'GOOGLE_CLIENT_ID', // Google OAuth app ID for Drive integration
   'GOOGLE_CLIENT_SECRET', // Google OAuth app secret for Drive integration
-  'EMAIL_INBOUND_DOMAIN', // Domain for email forwarding (e.g., in.decision-intel.com)
-  'RESEND_WEBHOOK_SECRET', // HMAC secret for verifying inbound email webhooks
+  'EMAIL_INBOUND_DOMAIN', // Domain for email forwarding (e.g., decision-intel.com)
+  'RESEND_WEBHOOK_SECRET', // HMAC secret for verifying inbound email webhooks (Resend/svix)
+  'CF_EMAIL_WEBHOOK_SECRET', // HMAC secret for verifying inbound email webhooks (Cloudflare Email Worker)
   'EMAIL_FROM', // Sender address for outbound emails
 ];
 

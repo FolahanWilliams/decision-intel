@@ -47,7 +47,7 @@ export const FAILURE_MODES: FailureMode[] = [
       'Building a system focused on multi-stakeholder collaboration and decision tracking that relies on humans to manually log decisions and fill out templates. Massive adoption friction. Becomes shelfware by month three.',
     diExposure: 'critical',
     countermove: [
-      'Integration-first onboarding (Founder School es_9): map workflow IN the discovery call, set up Drive polling or analyze+token@in.decision-intel.com forwarder in 15 minutes BEFORE contract',
+      'Integration-first onboarding (Founder School es_9): map workflow IN the discovery call, set up Drive polling or analyze+token@decision-intel.com forwarder in 15 minutes BEFORE contract',
       "Zero behavior change is the default — DI runs on the analyst's existing artefact stream",
       'Outcome Gate Phase 3 (shipped 2026-04-27) auto-prefills outcome drafts so the user clicks ONCE to confirm',
     ],
