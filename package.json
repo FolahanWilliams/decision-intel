@@ -25,6 +25,8 @@
     "lint:counts": "node scripts/lint-counts.mjs",
     "lint:canonical-imports": "node scripts/lint-canonical-imports.mjs",
     "lint:doc-sync": "node scripts/lint-doc-sync.mjs",
+    "audit:platform": "node scripts/audit-platform.mjs",
+    "audit:platform:write": "node scripts/audit-platform.mjs --write",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
     "test:gateway": "tsx ./scripts/test-ai-gateway.ts",
     "sentry:upload-sourcemaps": "npx -y @sentry/cli@latest sourcemaps upload --org=decision-intel-bu --project=decisionintelsentry --release=${VERCEL_GIT_COMMIT_SHA:-$(git rev-parse HEAD)} .next",

@@ -372,8 +372,14 @@ function DqiGauge({
   score: number;
   grade: { letter: string; color: string; label: string };
 }) {
-  // Half-circle gauge: -90deg = 0, 90deg = 100. We render an SVG arc.
-  const angle = -90 + (score / 100) * 180;
+  // Half-circle gauge: the SVG arc runs left → top → right (clockwise
+  // from cx-radius to cx+radius). Score 0 → -180° (left endpoint),
+  // score 50 → -90° (top of arc), score 100 → 0° (right endpoint). The
+  // needle math has to match the arc geometry; the prior -90 + ...
+  // formula mapped score 0 to the top and 100 to the bottom, which put
+  // the needle on the opposite side of the score arc for any score
+  // under 50.
+  const angle = -180 + (score / 100) * 180;
   const radius = 78;
   const cx = 100;
   const cy = 100;

@@ -30,6 +30,11 @@ import {
   Briefcase,
   Users,
   Target,
+  Brain,
+  Network,
+  Gauge,
+  ScrollText,
+  Scale,
 } from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import {
@@ -172,6 +177,80 @@ export default function AboutPage() {
             {HISTORICAL_CASE_COUNT}-case public reference library, and compounds confirmed outcomes
             back into a calibrated Decision Quality Index your audit committee can defend.
           </p>
+        </div>
+      </section>
+
+      {/* WHAT THE PLATFORM DELIVERS — the 5 concrete artefacts a CSO /
+          CFO / GC actually receives from an audit. Above the company-
+          facts block so a procurement reader sees the product before
+          the legal entity. */}
+      <section style={{ padding: '0 24px 56px', background: C.white }}>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: C.slate500,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              marginBottom: 20,
+            }}
+          >
+            What you get from every audit
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+            }}
+          >
+            {[
+              {
+                icon: <Brain size={20} color={C.green} strokeWidth={2.25} />,
+                title: 'R²F bias detection',
+                body: 'Recognition-Rigor Framework runs Kahneman + Klein arbitration over a 22-bias taxonomy on every memo.',
+              },
+              {
+                icon: <Network size={20} color={C.green} strokeWidth={2.25} />,
+                title: 'Cross-document conflict scan',
+                body: 'Surfaces contradicting claims across CIM + IC memo + counsel review + financial model in a single pass.',
+              },
+              {
+                icon: <Gauge size={20} color={C.green} strokeWidth={2.25} />,
+                title: 'Decision Quality Index',
+                body: 'Composite score from 7 weighted components, validity-aware, methodology v2.1.0 stamped on every result.',
+              },
+              {
+                icon: <ScrollText size={20} color={C.green} strokeWidth={2.25} />,
+                title: 'Decision Provenance Record',
+                body: 'Hashed + tamper-evident PDF that maps to EU AI Act Art 14, Basel III ICAAP, and SEC AI disclosure rules.',
+              },
+              {
+                icon: <Scale size={20} color={C.green} strokeWidth={2.25} />,
+                title: `${FRAMEWORK_COUNT}-framework regulatory map`,
+                body: 'G7 + EU + GCC + African coverage including NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria 2007.',
+              },
+            ].map(t => (
+              <div
+                key={t.title}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderTop: `3px solid ${C.green}`,
+                  borderRadius: 12,
+                  padding: '18px 18px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}
+              >
+                {t.icon}
+                <div style={{ fontSize: 14, fontWeight: 700, color: C.slate900 }}>{t.title}</div>
+                <div style={{ fontSize: 13, color: C.slate600, lineHeight: 1.55 }}>{t.body}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -456,7 +535,7 @@ export default function AboutPage() {
               letterSpacing: '0.04em',
             }}
           >
-            Last reviewed: April 26, 2026
+            Last reviewed: May 11, 2026
           </div>
           <div style={{ fontSize: 12, color: C.slate500 }}>
             Procurement diligence?{' '}

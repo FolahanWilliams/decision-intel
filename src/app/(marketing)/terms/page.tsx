@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
           Terms of Service
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '48px' }}>
-          Last updated: May 7, 2026
+          Last updated: May 11, 2026
         </p>
 
         <div
@@ -68,11 +68,13 @@ export default function TermsOfServicePage() {
               2. Description of Service
             </h2>
             <p>
-              Decision Intel is the reasoning audit platform. The Platform analyzes strategic
-              documents for cognitive bias and decision noise, and provides bias detection, noise
-              scoring, decision quality indexing, outcome tracking, and related analytics tools.
-              Analysis results are generated with the assistance of machine-learning models and
-              should be used as a supplement to, not a replacement for, professional judgment.
+              Decision Intel is the reasoning audit platform. The Platform runs the
+              Recognition-Rigor Framework (R²F) audit pipeline over strategic documents —
+              detecting cognitive biases, scoring decision noise, computing a Decision Quality
+              Index (DQI), producing a Decision Provenance Record (DPR), and tracking outcomes
+              for calibration. Analysis results are generated with the assistance of
+              machine-learning models and should be used as a supplement to, not a replacement
+              for, professional judgment.
             </p>
           </section>
 
@@ -378,28 +380,6 @@ export default function TermsOfServicePage() {
 
           <section>
             <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
-              10H. AI Sub-Processor No-Training Commitment
-            </h2>
-            <p>
-              The AI inference layer of the Platform uses Google Gemini and Anthropic Claude as
-              sub-processors. Both providers contractually commit, in their enterprise data
-              processing terms, that customer prompts and outputs are NOT used to train upstream
-              foundation models. Decision Intel itself does not train or fine-tune any model on
-              customer content. The current provider DPA references are mirrored at{' '}
-              <Link
-                href="/security"
-                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
-              >
-                /security
-              </Link>{' '}
-              and updated within thirty (30) days of any provider-policy change. Where a customer
-              elects sovereign-AI routing (Enterprise tier, executed Order Form), the same
-              no-training commitment applies to the routed alternative provider.
-            </p>
-          </section>
-
-          <section>
-            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
               10F. Audit Rights (Enterprise)
             </h2>
             <p>
@@ -423,6 +403,28 @@ export default function TermsOfServicePage() {
               aggregate liability under this clause is capped at the fees you paid us in the twelve
               (12) months preceding the claim, except for breaches of confidentiality, the
               indemnification obligations themselves, or wilful misconduct.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10H. AI Sub-Processor No-Training Commitment
+            </h2>
+            <p>
+              The AI inference layer of the Platform uses Google Gemini and Anthropic Claude as
+              sub-processors. Both providers contractually commit, in their enterprise data
+              processing terms, that customer prompts and outputs are NOT used to train upstream
+              foundation models. Decision Intel itself does not train or fine-tune any model on
+              customer content. The current provider DPA references are mirrored at{' '}
+              <Link
+                href="/security"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /security
+              </Link>{' '}
+              and updated within thirty (30) days of any provider-policy change. Where a customer
+              elects sovereign-AI routing (Enterprise tier, executed Order Form), the same
+              no-training commitment applies to the routed alternative provider.
             </p>
           </section>
 
@@ -459,7 +461,7 @@ export default function TermsOfServicePage() {
               For questions about these Terms, contact us at:{' '}
               <a
                 href="mailto:team@decision-intel.com"
-                style={{ color: '#FFFFFF', textDecoration: 'underline' }}
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
               >
                 team@decision-intel.com
               </a>

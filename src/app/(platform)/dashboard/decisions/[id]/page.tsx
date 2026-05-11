@@ -10,6 +10,7 @@
  */
 
 import { use, useState } from 'react';
+import { useToast } from '@/components/ui/EnhancedToast';
 import Link from 'next/link';
 import { ChevronLeft, FileText, Download, GitCompareArrows, CheckCircle2 } from 'lucide-react';
 import { useContainer } from '@/hooks/useContainers';
@@ -31,6 +32,7 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
   const { id } = use(params);
   const { container, isLoading, error, mutate } = useContainer(id);
   const [showOutcomeModal, setShowOutcomeModal] = useState(false);
+  const { showToast } = useToast();
 
   if (isLoading) {
     return <div style={{ padding: 24, color: 'var(--text-muted)' }}>Loading decision…</div>;
@@ -79,12 +81,13 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
       });
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        alert(json?.error ?? 'Cross-reference failed');
+        showToast(json?.error ?? 'Cross-reference failed', 'error');
         return;
       }
       mutate();
+      showToast('Cross-reference complete', 'success');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Cross-reference failed');
+      showToast(err instanceof Error ? err.message : 'Cross-reference failed', 'error');
     }
   };
 

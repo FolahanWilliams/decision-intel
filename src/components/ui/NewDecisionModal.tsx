@@ -2,36 +2,40 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Upload, Bot, BrainCircuit } from 'lucide-react';
+import { X, Upload, Bot, BrainCircuit, Layers } from 'lucide-react';
 
 const OPTIONS = [
   {
+    key: 'frame',
+    icon: Layers,
+    title: 'Frame a new decision',
+    description: 'Investment, acquisition, or strategic — start the container.',
+    href: '/dashboard/decisions/new',
+  },
+  {
     key: 'analyze',
     icon: Upload,
-    title: 'Analyze a Document',
+    title: 'Analyze a document',
     description: 'Upload a strategic memo for a full reasoning audit.',
     href: '/dashboard',
   },
   {
     key: 'copilot',
     icon: Bot,
-    title: 'Think Through a Decision',
-    description: 'Get help from your AI advisory team',
+    title: 'Think through a decision',
+    description: 'Open the AI Copilot to pressure-test reasoning before commit.',
     href: '/dashboard/ask',
   },
   {
     key: 'audit',
     icon: BrainCircuit,
-    title: 'Audit a Decision',
-    description: 'Submit a human decision for cognitive auditing',
+    title: 'Audit a past decision',
+    description: 'Submit a human decision for cognitive auditing.',
     href: '/dashboard/cognitive-audits/submit',
   },
   // Meeting entry retired 2026-05-10 — meetings are now uploaded as
   // documents (meeting_transcript / meeting_minutes types) via the
-  // standard /dashboard upload flow. The Decision Container picks them
-  // up like any other document; the constellation viz blends them with
-  // memos / models / DPRs. Founder ask: "what if you can just upload
-  // your minutes as a document" — done.
+  // standard /dashboard upload flow.
 ];
 
 export function NewDecisionModal() {
@@ -188,7 +192,7 @@ export function NewDecisionModal() {
                     width: 44,
                     height: 44,
                     borderRadius: '12px',
-                    background: 'rgba(249, 115, 22, 0.1)',
+                    background: 'rgba(22, 163, 74, 0.1)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
