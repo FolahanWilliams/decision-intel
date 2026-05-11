@@ -499,7 +499,6 @@ function BandGuides() {
     <g>
       {KIND_BAND_ORDER.map((kind, i) => {
         const yTop = PAD_Y + i * bandHeight;
-        const yCenter = yTop + bandHeight / 2;
         return (
           <g key={kind}>
             {i > 0 && (
@@ -513,26 +512,31 @@ function BandGuides() {
                 strokeDasharray="1 4"
               />
             )}
+            {/* Band label placed INSIDE the chart at top-left of the band so
+                the full text renders without clipping by the SVG edge. Low
+                opacity keeps it from competing with node glyphs. */}
             <text
-              x={PAD_X / 2 - 4}
-              y={yCenter - 4}
+              x={PAD_X / 2}
+              y={yTop + 16}
               fontSize={11}
-              fontWeight={600}
+              fontWeight={700}
               fill="var(--text-secondary)"
-              textAnchor="end"
-              style={{ textTransform: 'uppercase', letterSpacing: '0.08em' }}
+              textAnchor="start"
+              opacity={0.75}
+              style={{ textTransform: 'uppercase', letterSpacing: '0.10em' }}
             >
               {KIND_BAND_LABELS[kind]}
             </text>
             <text
-              x={PAD_X / 2 - 4}
-              y={yCenter + 9}
-              fontSize={8}
+              x={PAD_X / 2}
+              y={yTop + 28}
+              fontSize={8.5}
               fill="var(--text-muted)"
-              textAnchor="end"
+              textAnchor="start"
+              opacity={0.65}
               style={{ fontStyle: 'italic' }}
             >
-              {KIND_BAND_DESCRIPTIONS[kind].slice(0, 32)}
+              {KIND_BAND_DESCRIPTIONS[kind]}
             </text>
           </g>
         );

@@ -56,7 +56,7 @@ interface CommandGroup {
 
 const SHORTCUTS = [
   { keys: ['⌘', 'K'], description: 'Open command palette' },
-  { keys: ['Shift', '?'], description: 'Show keyboard shortcuts' },
+  { keys: ['?'], description: 'Show keyboard shortcuts (outside input fields)' },
   { keys: ['↑', '↓'], description: 'Navigate items' },
   { keys: ['↵'], description: 'Select item / confirm' },
   { keys: ['Esc'], description: 'Close dialog' },
@@ -487,7 +487,7 @@ export function CommandPalette() {
           setShowShortcuts(true);
         },
         keywords: ['keys', 'help', 'hotkeys'],
-        rightHint: 'Shift+?',
+        rightHint: '?',
       },
       {
         id: 'theme-toggle',
@@ -689,9 +689,20 @@ export function CommandPalette() {
           return !prev;
         });
       }
-      if (e.shiftKey && e.key === '?' && !open) {
-        e.preventDefault();
-        setShowShortcuts(true);
+      // ? shows shortcuts — gated to non-input contexts so users can still
+      // type `?` in textareas, search fields, comment boxes, etc.
+      if (e.key === '?' && !open) {
+        const target = e.target as HTMLElement | null;
+        const tag = target?.tagName;
+        const isEditable =
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT' ||
+          target?.isContentEditable === true;
+        if (!isEditable) {
+          e.preventDefault();
+          setShowShortcuts(true);
+        }
       }
       // Theme toggle shortcut
       if (e.metaKey && e.shiftKey && e.key === 'L') {
