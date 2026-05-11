@@ -1,5 +1,31 @@
 'use client';
 
+/**
+ * EnhancedEmptyState — procurement-grade empty-state primitive.
+ *
+ * Redesigned 2026-05-11 after the founder flagged the prior layout as
+ * "poorly designed viz" — the old version stacked a faded icon-in-circle
+ * above a floating Lightbulb-icon-with-3-vertical-green-dots Tips header,
+ * with text rendered in Tailwind `text-muted` classes that washed out
+ * against the light platform background (the user could only see the
+ * icons + dots, not the suggestion text).
+ *
+ * Redesign principles (per CLAUDE.md):
+ *   - Inline `style={{}}` with CSS variables, NOT Tailwind utility classes
+ *     for color (the platform is light-theme only; `text-muted` may resolve
+ *     but at near-invisible contrast)
+ *   - Clean horizontal hierarchy: icon on left, content on right (or
+ *     centered for narrow surfaces)
+ *   - Suggestions render as a clean inline list with proper bullets +
+ *     visible text (no broken Lightbulb + dot-stack header pattern)
+ *   - Primary action is unmistakable (high-contrast green button); secondary
+ *     action is platform-secondary (border + text)
+ *   - framer-motion animations kept minimal (single fade-in, no per-element
+ *     spring choreography that adds nothing)
+ *
+ * API is unchanged — all 8 consumer surfaces continue to work without edits.
+ */
+
 import { motion } from 'framer-motion';
 import {
   FileText,
@@ -13,14 +39,11 @@ import {
   ArrowRight,
   Plus,
   MessageSquare,
-  // Video icon retired 2026-05-10 (meetings → document type cascade).
   Bell,
   GitCompareArrows,
-  Lightbulb,
+  CheckCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { useDensity } from '@/components/DensityProvider';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { ALL_CASES } from '@/lib/data/case-studies';
 
@@ -51,15 +74,14 @@ interface EmptyStateConfig {
     variant?: 'primary' | 'secondary';
     icon?: React.ReactNode;
   }>;
-  illustration?: React.ReactNode;
 }
 
 const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   documents: {
-    icon: <FileText className="w-12 h-12" />,
+    icon: <FileText size={28} strokeWidth={1.5} />,
     title: 'Start your first audit',
     description:
-      'Upload a strategic memo, board deck, or market-entry recommendation. We\u2019ll audit the reasoning, score the biases, and surface the questions your CEO is about to ask in under 60 seconds.',
+      'Upload a strategic memo, board deck, or market-entry recommendation. We’ll audit the reasoning, score the biases, and surface the questions your CEO is about to ask in under 60 seconds.',
     suggestions: [
       'Strategic memos, board decks, market-entry papers',
       'PDF, Word, Excel, or plain text',
@@ -70,18 +92,18 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Upload Document',
         onClick: () => document.getElementById('file-input')?.click(),
         variant: 'primary',
-        icon: <Upload className="w-4 h-4" />,
+        icon: <Upload size={14} />,
       },
       {
         label: 'Learn More',
         href: '/dashboard/analytics?view=library',
         variant: 'secondary',
-        icon: <Brain className="w-4 h-4" />,
+        icon: <Brain size={14} />,
       },
     ],
   },
   insights: {
-    icon: <BarChart3 className="w-12 h-12" />,
+    icon: <BarChart3 size={28} strokeWidth={1.5} />,
     title: 'No insights available yet',
     description:
       'Upload and analyze documents to see trends, patterns, and bias breakdowns over time.',
@@ -95,12 +117,12 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Upload First Document',
         href: '/dashboard',
         variant: 'primary',
-        icon: <Plus className="w-4 h-4" />,
+        icon: <Plus size={14} />,
       },
     ],
   },
   search: {
-    icon: <Search className="w-12 h-12" />,
+    icon: <Search size={28} strokeWidth={1.5} />,
     title: 'No search results',
     description: "Try adjusting your search terms or filters to find what you're looking for.",
     suggestions: [
@@ -118,7 +140,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     ],
   },
   'cognitive-audits': {
-    icon: <Brain className="w-12 h-12" />,
+    icon: <Brain size={28} strokeWidth={1.5} />,
     title: 'No strategic memos audited yet',
     description: `Run your first audit and see the reasoning behind the numbers, scored against ${HISTORICAL_CASE_COUNT} historical decisions and 30+ cognitive biases.`,
     suggestions: [
@@ -131,7 +153,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Start New Audit',
         href: '/dashboard/cognitive-audits/submit',
         variant: 'primary',
-        icon: <Sparkles className="w-4 h-4" />,
+        icon: <Sparkles size={14} />,
       },
       {
         label: 'View Bias Library',
@@ -141,7 +163,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     ],
   },
   team: {
-    icon: <Users className="w-12 h-12" />,
+    icon: <Users size={28} strokeWidth={1.5} />,
     title: 'No team members yet',
     description: 'Invite colleagues to collaborate on decision analysis and share insights.',
     suggestions: [
@@ -154,7 +176,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Invite Team Member',
         href: '/dashboard/team',
         variant: 'primary',
-        icon: <Plus className="w-4 h-4" />,
+        icon: <Plus size={14} />,
       },
     ],
   },
@@ -163,7 +185,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   // standard /dashboard upload flow. Kept the key for back-compat with
   // upstream type unions; redirects users to the canonical upload entry.
   meetings: {
-    icon: <Upload className="w-12 h-12" />,
+    icon: <Upload size={28} strokeWidth={1.5} />,
     title: 'No meeting transcripts yet',
     description:
       'Upload meeting transcripts or minutes as documents. They flow into the Decision Container alongside memos, models, and DPRs.',
@@ -177,12 +199,12 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Upload Transcript',
         href: '/dashboard',
         variant: 'primary',
-        icon: <Upload className="w-4 h-4" />,
+        icon: <Upload size={14} />,
       },
     ],
   },
   nudges: {
-    icon: <Bell className="w-12 h-12" />,
+    icon: <Bell size={28} strokeWidth={1.5} />,
     title: 'No active nudges',
     description:
       'Nudges will appear here when the system detects decision patterns that need attention.',
@@ -200,7 +222,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     ],
   },
   chat: {
-    icon: <MessageSquare className="w-12 h-12" />,
+    icon: <MessageSquare size={28} strokeWidth={1.5} />,
     title: 'Start a conversation',
     description: 'Ask questions about your documents, biases, or get decision-making advice.',
     suggestions: [
@@ -213,12 +235,12 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
         label: 'Start Chat',
         onClick: () => document.querySelector<HTMLInputElement>('[data-chat-input]')?.focus(),
         variant: 'primary',
-        icon: <MessageSquare className="w-4 h-4" />,
+        icon: <MessageSquare size={14} />,
       },
     ],
   },
   compare: {
-    icon: <GitCompareArrows className="w-12 h-12" />,
+    icon: <GitCompareArrows size={28} strokeWidth={1.5} />,
     title: 'Select documents to compare',
     description:
       'Choose two or more documents to see how their biases and decision quality differ.',
@@ -236,13 +258,13 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     ],
   },
   generic: {
-    icon: <AlertCircle className="w-12 h-12" />,
+    icon: <AlertCircle size={28} strokeWidth={1.5} />,
     title: 'Nothing here yet',
     description: 'This section will populate as you use the platform.',
     actions: [],
   },
   error: {
-    icon: <AlertCircle className="w-12 h-12 text-error" />,
+    icon: <AlertCircle size={28} strokeWidth={1.5} />,
     title: 'Something went wrong',
     description:
       "We couldn't load this content. Please try again or contact support if the issue persists.",
@@ -297,7 +319,6 @@ export function EnhancedEmptyState({
   briefContext,
 }: EnhancedEmptyStateProps) {
   const config = emptyStateConfigs[type];
-  const { density } = useDensity();
 
   const finalTitle = title || config.title;
   const finalDescription = description || config.description;
@@ -305,158 +326,178 @@ export function EnhancedEmptyState({
   const finalActions = actions || config.actions;
   const finalSuggestions = suggestions || config.suggestions;
 
-  const isCompact = density === 'compact' || density === 'dense';
+  const accentColor = type === 'error' ? 'var(--error)' : 'var(--accent-primary)';
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className={cn(
-        'flex flex-col items-center justify-center text-center',
-        'py-12 px-6 rounded-xl',
-        'liquid-glass',
-        isCompact ? 'py-8 px-4' : 'py-12 px-6',
-        className
-      )}
-      style={{ border: '1px solid var(--border-color)' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
+      className={className}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        padding: '32px 24px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderTop: `3px solid ${accentColor}`,
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-sm)',
+        maxWidth: 640,
+        marginInline: 'auto',
+      }}
     >
-      {/* Icon with animation */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-        className={cn('mb-6 p-4 rounded-full', isCompact && 'mb-4 p-3')}
+      {/* Icon — clean, no spinning spring animation. Just a sized circle
+          with the icon in the accent color. */}
+      <div
         style={{
-          background: 'var(--bg-tertiary)',
-          border: '1px solid var(--border-color)',
+          width: 56,
+          height: 56,
+          borderRadius: 'var(--radius-md)',
+          background: `color-mix(in srgb, ${accentColor} 10%, transparent)`,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: accentColor,
+          marginBottom: 16,
         }}
       >
-        <div className="text-muted">{finalIcon}</div>
-      </motion.div>
+        {finalIcon}
+      </div>
 
-      {/* Title */}
-      <motion.h3
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className={cn('text-xl font-semibold mb-2', isCompact && 'text-lg')}
+      {/* Title — explicit color, no Tailwind class drift. */}
+      <h3
+        style={{
+          fontSize: 'var(--fs-lg)',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          margin: 0,
+          marginBottom: 8,
+          lineHeight: 1.3,
+        }}
       >
         {finalTitle}
-      </motion.h3>
+      </h3>
 
-      {/* Description */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className={cn('text-muted max-w-md mb-6', isCompact ? 'text-sm mb-4' : 'text-base mb-6')}
+      {/* Description — explicit color, NOT Tailwind text-muted (which
+          rendered near-invisible against the light card background). */}
+      <p
+        style={{
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text-secondary)',
+          margin: 0,
+          marginBottom: finalSuggestions && finalSuggestions.length > 0 ? 20 : 16,
+          maxWidth: 520,
+          lineHeight: 1.55,
+        }}
       >
         {finalDescription}
-      </motion.p>
+      </p>
 
-      {/* Suggestions */}
+      {/* Suggestions — replaces the prior broken "Lightbulb header + 3
+          vertical green dots" pattern. Each suggestion renders as a row
+          with a check icon + visible text. */}
       {finalSuggestions && finalSuggestions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className={cn('mb-6 text-left', isCompact && 'mb-4')}
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            marginBottom: 20,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            alignItems: 'flex-start',
+            textAlign: 'left',
+            maxWidth: 480,
+            width: '100%',
+          }}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <Lightbulb className="w-4 h-4 text-warning" />
-            <span className={cn('text-xs font-medium text-muted', isCompact && 'text-xs')}>
-              Tips
-            </span>
-          </div>
-          <ul className="space-y-1">
-            {finalSuggestions.map((suggestion, index) => (
-              <motion.li
-                key={index}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className={cn('flex items-start gap-2 text-sm text-muted', isCompact && 'text-xs')}
-              >
-                <span className="text-success mt-1">•</span>
-                <span>{suggestion}</span>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
+          {finalSuggestions.map(suggestion => (
+            <li
+              key={suggestion}
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 8,
+                fontSize: 'var(--fs-xs)',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+              }}
+            >
+              <CheckCircle
+                size={12}
+                style={{
+                  color: accentColor,
+                  flexShrink: 0,
+                  marginTop: 3,
+                }}
+              />
+              <span>{suggestion}</span>
+            </li>
+          ))}
+        </ul>
       )}
 
-      {/* Intelligence Brief */}
+      {/* Intelligence brief — kept inline below suggestions when requested.
+          Contained in a max-width wrapper so a long brief doesn't blow out
+          the card width. */}
       {showBrief && briefContext && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="w-full max-w-md mb-6"
-        >
+        <div style={{ width: '100%', maxWidth: 520, marginBottom: 20 }}>
           <IntelligenceBrief context={briefContext} />
-        </motion.div>
+        </div>
       )}
 
-      {/* Actions */}
+      {/* Actions — primary always green, secondary always bordered. No
+          Tailwind `bg-accent-primary text-black` which may not resolve;
+          inline styles guarantee the buttons render correctly. */}
       {finalActions && finalActions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="flex flex-wrap gap-3 justify-center"
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            justifyContent: 'center',
+          }}
         >
-          {finalActions.map((action, index) => {
-            const secondaryStyle =
-              action.variant === 'primary'
-                ? undefined
-                : {
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-color)',
-                  };
+          {finalActions.map(action => {
+            const isPrimary = action.variant === 'primary';
+            const buttonStyle: React.CSSProperties = {
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 14px',
+              fontSize: 'var(--fs-sm)',
+              fontWeight: 600,
+              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer',
+              border: isPrimary ? 'none' : '1px solid var(--border-color)',
+              background: isPrimary ? accentColor : 'var(--bg-card)',
+              color: isPrimary ? '#fff' : 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'opacity 0.15s, transform 0.15s',
+            };
+
             if (action.href) {
               return (
-                <Link
-                  key={index}
-                  href={action.href}
-                  className={cn(
-                    'inline-flex items-center gap-2 px-4 py-2 rounded-lg',
-                    'transition-all duration-200',
-                    action.variant === 'primary'
-                      ? 'bg-accent-primary text-black hover:bg-accent-secondary'
-                      : 'hover:opacity-80',
-                    isCompact && 'px-3 py-1.5 text-sm'
-                  )}
-                  style={secondaryStyle}
-                >
+                <Link key={action.label} href={action.href} style={buttonStyle}>
                   {action.icon}
                   <span>{action.label}</span>
-                  <ArrowRight className="w-3 h-3" />
+                  {isPrimary && <ArrowRight size={12} />}
                 </Link>
               );
             }
 
             return (
-              <button
-                key={index}
-                onClick={action.onClick}
-                className={cn(
-                  'inline-flex items-center gap-2 px-4 py-2 rounded-lg',
-                  'transition-all duration-200',
-                  action.variant === 'primary'
-                    ? 'bg-accent-primary text-black hover:bg-accent-secondary'
-                    : 'hover:opacity-80',
-                  isCompact && 'px-3 py-1.5 text-sm'
-                )}
-                style={secondaryStyle}
-              >
+              <button key={action.label} type="button" onClick={action.onClick} style={buttonStyle}>
                 {action.icon}
                 <span>{action.label}</span>
               </button>
             );
           })}
-        </motion.div>
+        </div>
       )}
     </motion.div>
   );
