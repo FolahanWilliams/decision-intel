@@ -13,6 +13,9 @@ import {
 } from '@/lib/constants/trust-copy';
 import { DESIGN_PARTNER_SEATS_TOTAL } from '@/lib/constants/company-info';
 import { ENTERPRISE_QUOTE_DEFAULTS } from '@/lib/stripe';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 type BillingCycle = 'monthly' | 'annual';
 
@@ -129,7 +132,7 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       anchor: '$2,490/year (save ~16%) on annual',
       highlights: [
         { label: '15 audits per month', strong: true },
-        { label: 'Full DQI + 30+ cognitive biases' },
+        { label: `Full DQI + ${BIAS_COUNT}-bias R²F taxonomy` },
         { label: 'Boardroom Simulation + Forgotten Questions' },
         { label: 'Personal Decision History' },
         { label: 'Calibration dashboard' },
@@ -194,7 +197,13 @@ const COMPARISON_ROWS: Array<{
     enterprise: 'Unlimited',
   },
   { label: 'Decision Quality Index (DQI)', free: true, pro: true, team: true, enterprise: true },
-  { label: 'Cognitive biases detected', free: '5', pro: '30+', team: '30+', enterprise: '30+' },
+  {
+    label: 'Cognitive biases detected',
+    free: '5',
+    pro: `${BIAS_COUNT} (R²F)`,
+    team: `${BIAS_COUNT} (R²F)`,
+    enterprise: `${BIAS_COUNT} (R²F)`,
+  },
   {
     label: 'Boardroom Simulation',
     free: 'Limited',

@@ -29,10 +29,10 @@ const EDGE_LABELS: Record<string, { label: string; color: string }> = {
   similar_to: { label: 'Similar', color: 'text-blue-400' },
   shared_bias: { label: 'Shared bias', color: 'text-purple-400' },
   same_participants: { label: 'Same team', color: 'text-teal-400' },
-  influenced_by: { label: 'Influenced by', color: 'text-zinc-400' },
+  influenced_by: { label: 'Influenced by', color: 'text-muted-foreground' },
   escalated_from: { label: 'Escalated from', color: 'text-orange-400' },
   reversed: { label: 'Reversed', color: 'text-red-400' },
-  depends_on: { label: 'Depends on', color: 'text-zinc-400' },
+  depends_on: { label: 'Depends on', color: 'text-muted-foreground' },
 };
 
 interface RelatedDecisionsProps {
@@ -134,9 +134,9 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
           </span>
         </h3>
         {expanded ? (
-          <ChevronUp size={14} className="text-zinc-500" />
+          <ChevronUp size={14} className="text-muted-foreground" />
         ) : (
-          <ChevronDown size={14} className="text-zinc-500" />
+          <ChevronDown size={14} className="text-muted-foreground" />
         )}
       </button>
 
@@ -158,8 +158,8 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
                 className="flex items-center gap-3 px-4 py-3 transition-colors related-decisions-row"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-zinc-200 truncate">{node.label}</div>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-zinc-500">
+                  <div className="text-sm text-foreground truncate">{node.label}</div>
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                     {edgeStyle && (
                       <span className={`${edgeStyle.color} flex items-center gap-1`}>
                         <Link2 size={10} />
@@ -178,7 +178,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
           })}
 
           {connectedNodes.length > 10 && (
-            <div className="px-4 py-2 text-xs text-zinc-500 text-center">
+            <div className="px-4 py-2 text-xs text-muted-foreground text-center">
               +{connectedNodes.length - 10} more related decisions
             </div>
           )}

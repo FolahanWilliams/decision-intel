@@ -83,7 +83,7 @@ function outcomeBadge(outcome: string): string {
     case 'failure':
       return 'bg-red-500/15 text-red-400';
     default:
-      return 'bg-zinc-500/15 text-zinc-400';
+      return 'bg-muted text-muted-foreground';
   }
 }
 

@@ -265,6 +265,19 @@ const DARK_TOKEN_ALLOWED_PREFIXES = [
   'src/components/marketing/HeroDecisionGraph.tsx',
   'src/components/marketing/CaseStudyBiasGraph',
   'src/components/marketing/genome/ToxicNetworkGraph.tsx',
+  // Founder-context.ts is a giant template-literal chat preamble that
+  // mentions class names in narrative prose ("text-white classes break
+  // light theme..."). Not styling, just description.
+  'src/app/api/founder-hub/founder-context.ts',
+  // Dialog primitive backdrop uses bg-black/10 — load-bearing.
+  'src/components/ui/dialog.tsx',
+  // Glass-effect components legitimately use bg-white/N + border-white/N
+  // to create translucent overlays on top of any background.
+  'src/components/ui/GlassMicroInteractions.tsx',
+  'src/components/ui/LiquidGlassAdvanced.tsx',
+  // Demo page has its own slate palette intentional for the consumer-
+  // facing paste-audit flow (not platform theme territory).
+  'src/app/demo/',
 ];
 
 function checkDarkModeTokens(files) {
@@ -273,6 +286,7 @@ function checkDarkModeTokens(files) {
     const rel = relative(ROOT, file);
     if (!rel.startsWith('src/')) continue;
     if (!/\.(tsx?|jsx?)$/.test(rel)) continue;
+    if (rel.includes('.test.') || rel.includes('.spec.')) continue;
     if (DARK_TOKEN_ALLOWED_PREFIXES.some(p => rel.startsWith(p))) continue;
     // Marketing surfaces frequently have intentional dark sections;
     // require an opt-in marker to skip the check for an entire file.

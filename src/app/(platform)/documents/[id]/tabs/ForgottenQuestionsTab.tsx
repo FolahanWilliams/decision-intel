@@ -17,7 +17,7 @@ const SEVERITY_STYLES: Record<
 > = {
   low: {
     border: 'border-l-zinc-500/50',
-    badge: 'bg-zinc-500/10 text-zinc-400',
+    badge: 'bg-zinc-500/10 text-muted-foreground',
     label: 'Low',
   },
   medium: {
@@ -157,7 +157,7 @@ export function ForgottenQuestionsTab({
                             ? 'text-red-400'
                             : severity === 'medium'
                               ? 'text-amber-400'
-                              : 'text-zinc-400'
+                              : 'text-muted-foreground'
                         }
                       />
                       <span

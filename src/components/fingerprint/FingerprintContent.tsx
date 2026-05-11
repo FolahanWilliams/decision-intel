@@ -30,7 +30,7 @@ import {
 function TrendIcon({ trend }: { trend: string | null }) {
   if (trend === 'decreasing') return <TrendingDown size={12} className="text-emerald-400" />;
   if (trend === 'increasing') return <TrendingUp size={12} className="text-red-400" />;
-  return <Minus size={12} className="text-zinc-400" />;
+  return <Minus size={12} className="text-muted-foreground" />;
 }
 
 function SeverityBadge({ severity }: { severity: string }) {

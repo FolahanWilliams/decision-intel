@@ -75,7 +75,7 @@ export function CrossSiloAlertCards({ antiPatterns, onExplorePattern }: CrossSil
   return (
     <div className="card">
       <div className="card-header">
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           Structural Risks &amp; Cross-Silo Alerts
         </span>
       </div>
@@ -138,23 +138,23 @@ function AlertCard({
             <span className={`text-xs font-semibold capitalize ${accent.label}`}>
               {config.label}
             </span>
-            <span className="text-[10px] text-zinc-500 ml-auto">
+            <span className="text-[10px] text-muted-foreground ml-auto">
               severity {pattern.severity} &bull; {pattern.affectedNodes} nodes
             </span>
           </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">{pattern.description}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{pattern.description}</p>
         </div>
 
-        <div className="flex-shrink-0 text-zinc-500">
+        <div className="flex-shrink-0 text-muted-foreground">
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
       </button>
 
       {expanded && (
         <div className="px-3 pb-3 pt-0 ml-5 space-y-2">
-          <div className="p-2 rounded bg-zinc-800/50 border border-zinc-700/50">
-            <p className="text-[11px] text-zinc-400 leading-relaxed">
-              <span className="font-semibold text-zinc-300">Recommendation: </span>
+          <div className="p-2 rounded bg-muted border border-border">
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              <span className="font-semibold text-foreground">Recommendation: </span>
               {pattern.recommendation}
             </p>
           </div>
