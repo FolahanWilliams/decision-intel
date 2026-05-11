@@ -72,9 +72,13 @@ const SCAN_PATHS = [
 // removed the legacy "Calibration baseline · seed" eyebrow on /r2f-standard
 // (now reads "investor-diligence answer") which retired one stale
 // literal-shaped phrase that the linter previously counted in the
-// baseline budget. The actual count came in at 80, so the ratchet lands
-// at 80 to keep the trip-wire honest.
-const COUNT_BASELINE = 80;
+// baseline budget.
+// 2026-05-11: ratcheted 80 → 77 after the CLAUDE.md archive split
+// (Phase 1 + Phase 2 + Phase 3.5 + AI Copilot ship-log prose moved to
+// docs/CLAUDE-archive-2026-Q2.md). The archived sections carried 3
+// count literals in their stable prose; the archive file isn't scanned
+// by this linter, so the working-set count dropped to 77.
+const COUNT_BASELINE = 77;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical
