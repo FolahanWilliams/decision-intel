@@ -63,6 +63,21 @@ export interface DprPageOneCoverProps {
    * (legacy records that pre-date methodology stamping).
    */
   methodologyVersion?: string;
+  /**
+   * DQI weight-vector resolution snapshot (locked 2026-05-11 per Tier 2.1
+   * P2 ship). Surfaces the EFFECTIVE weights the score was computed
+   * under — canonical / validity-shifted / org-calibrated / user-adjustable.
+   * Procurement readers verify by comparing the hash on two DPRs from
+   * the same caller: same hash = same engine state. When undefined, the
+   * row is suppressed (legacy records pre-T2.1 + audits where the
+   * resolver returned null due to schema drift).
+   */
+  weightsResolution?: {
+    source: 'canonical' | 'user' | 'org';
+    hash: string;
+    /** Max absolute delta vs canonical baseline (0.0 = canonical). */
+    maxDelta?: number;
+  };
   /** Where to verify this record online. */
   verifyUrl: string;
   /** Document classification — drives the header band flag. */
@@ -90,6 +105,7 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
     schemaVersion,
     pipelineVersion,
     methodologyVersion,
+    weightsResolution,
     verifyUrl,
     classification = 'confidential',
     totalPages,
@@ -120,6 +136,33 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
             v: `v${methodologyVersion}`,
             mono: true,
             mark: { kind: 'info' as const, label: 'Scoring engine' },
+          },
+        ]
+      : []),
+    ...(weightsResolution
+      ? [
+          {
+            k: 'DQI weights',
+            v: (() => {
+              const sourceLabel =
+                weightsResolution.source === 'org'
+                  ? 'Org-adjusted'
+                  : weightsResolution.source === 'user'
+                    ? 'User-adjusted'
+                    : 'Canonical baseline';
+              const deltaSuffix =
+                weightsResolution.source !== 'canonical' &&
+                typeof weightsResolution.maxDelta === 'number' &&
+                weightsResolution.maxDelta > 1e-4
+                  ? ` · Δ ${weightsResolution.maxDelta.toFixed(2)} vs canonical`
+                  : '';
+              return `${sourceLabel} · hash ${weightsResolution.hash}${deltaSuffix}`;
+            })(),
+            mono: true,
+            mark:
+              weightsResolution.source === 'canonical'
+                ? { kind: 'ok' as const, label: 'Canonical' }
+                : { kind: 'info' as const, label: 'Adjusted' },
           },
         ]
       : []),

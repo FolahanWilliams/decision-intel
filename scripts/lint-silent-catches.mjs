@@ -140,7 +140,15 @@ const SCAN_DIR = join(ROOT, 'src');
 // route handler, one in the handleBulkDelete client to parse the
 // response error body. Both belong to CLAUDE.md's documented
 // fire-and-forget exception list.
-const SILENT_CATCH_BASELINE = 171;
+// 171 → 173: Strategy World prep batch (2026-05-11) — N1 Deal Fever
+// pre-mortem ship added two new catches: (a) DealFeverPremortemCard
+// `res.json().catch(() => null)` body-parse on the error path so the
+// card surfaces the real API error instead of "Failed to run pre-mortem",
+// (b) deal-fever-premortem route `cacheGet().catch(() => null)` fire-
+// and-forget cache miss (cache-layer outages should not block the
+// pre-mortem from running fresh). Both belong to the documented
+// fire-and-forget exception class.
+const SILENT_CATCH_BASELINE = 173;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

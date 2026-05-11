@@ -40,6 +40,16 @@ export interface SynergyClaimInput {
   hasOwner: boolean;
   /** Whether the claim row carries an explicit measurable milestone (90-day or otherwise). */
   hasMilestone: boolean;
+  /**
+   * Stricter BCG-mandate check (N2 ship 2026-05-11). BCG's integration-
+   * best-practices framework requires a 90-DAY milestone specifically —
+   * not just "any future milestone." A 2027 target date is not the same
+   * as a Day-1 + 90-day commitment. When this field is supplied, the
+   * verdict + severity sharpen accordingly. When omitted (legacy callers),
+   * the scorer falls back to `hasMilestone` and treats general milestones
+   * as defensible.
+   */
+  has90DayMilestone?: boolean;
   /** Synergy classification — drives the base-rate realisation band. */
   type: SynergyClaimType;
 }
@@ -58,6 +68,25 @@ export interface SynergyDefensibilityScore {
   baseRateHigh: number;
   /** One-line procurement-grade verdict naming the gap and the base rate. */
   verdict: string;
+  /**
+   * BCG-mandate decomposition (N2 ship 2026-05-11). Strict per-element
+   * compliance with BCG's integration-best-practices framework. The
+   * 90-day milestone is the load-bearing distinction — a 2027 target
+   * date is not the same as a 90-day commitment. Used by the DPR cover
+   * + the FindingsTab Synergy Mirage card to surface the SPECIFIC BCG
+   * gap (vs the more permissive "any milestone" check from the existing
+   * scorer).
+   */
+  bcgMandate: {
+    mechanism: boolean;
+    owner: boolean;
+    ninetyDayMilestone: boolean;
+    allThreePresent: boolean;
+    /** Names of the BCG-mandate elements specifically missing. */
+    missingElements: Array<'mechanism' | 'owner' | 'ninety_day_milestone'>;
+    /** Sharper procurement-grade verdict naming the BCG-mandate failure. */
+    verdict: string;
+  };
 }
 
 const BASE_RATES: Record<SynergyClaimType, { low: number; high: number; label: string }> = {
@@ -106,6 +135,39 @@ export function scoreSynergyClaim(claim: SynergyClaimInput): SynergyDefensibilit
     verdict = `${missingPhrase} ${baseRate.label} base-rate realisation is ${lowPct}-${highPct}%; claim is structurally under-defended for that band.`;
   }
 
+  // BCG mandate — stricter check requiring the 90-day milestone
+  // specifically (not just "any milestone"). When the caller doesn't
+  // supply has90DayMilestone, we fall back to hasMilestone to preserve
+  // backwards-compat with legacy parsers that only detect general
+  // milestone language.
+  const has90Day =
+    typeof claim.has90DayMilestone === 'boolean' ? claim.has90DayMilestone : claim.hasMilestone;
+  const bcgMandateMissing: Array<'mechanism' | 'owner' | 'ninety_day_milestone'> = [];
+  if (!claim.hasMechanism) bcgMandateMissing.push('mechanism');
+  if (!claim.hasOwner) bcgMandateMissing.push('owner');
+  if (!has90Day) bcgMandateMissing.push('ninety_day_milestone');
+  const allThreePresent = bcgMandateMissing.length === 0;
+  let bcgVerdict: string;
+  if (allThreePresent) {
+    bcgVerdict = `BCG mandate satisfied: mechanism + owner + 90-day milestone all named. Apply ${lowPct}-${highPct}% ${baseRate.label} base-rate discount before underwriting.`;
+  } else {
+    const labelMap: Record<(typeof bcgMandateMissing)[number], string> = {
+      mechanism: 'operational mechanism',
+      owner: 'accountable executive',
+      ninety_day_milestone: '90-day milestone',
+    };
+    const missingPretty =
+      bcgMandateMissing.length === 1
+        ? labelMap[bcgMandateMissing[0]]
+        : bcgMandateMissing.length === 2
+          ? `${labelMap[bcgMandateMissing[0]]} and ${labelMap[bcgMandateMissing[1]]}`
+          : `${bcgMandateMissing
+              .slice(0, -1)
+              .map(e => labelMap[e])
+              .join(', ')}, and ${labelMap[bcgMandateMissing[bcgMandateMissing.length - 1]]}`;
+    bcgVerdict = `BCG-mandate failure — missing ${missingPretty}. Per BCG integration-best-practices, every synergy claim must name all three before the IC vote; this claim cannot clear the ${lowPct}-${highPct}% ${baseRate.label} base-rate without them.`;
+  }
+
   return {
     score,
     missing,
@@ -113,6 +175,14 @@ export function scoreSynergyClaim(claim: SynergyClaimInput): SynergyDefensibilit
     baseRateLow: baseRate.low,
     baseRateHigh: baseRate.high,
     verdict,
+    bcgMandate: {
+      mechanism: claim.hasMechanism,
+      owner: claim.hasOwner,
+      ninetyDayMilestone: has90Day,
+      allThreePresent,
+      missingElements: bcgMandateMissing,
+      verdict: bcgVerdict,
+    },
   };
 }
 

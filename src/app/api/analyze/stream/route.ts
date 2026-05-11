@@ -17,6 +17,8 @@ import { checkVohraEligibility, createPendingSurvey } from '@/lib/learning/vohra
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { classifyValidity } from '@/lib/learning/validity-classifier';
+import { resolveActiveWeightsForUser } from '@/lib/scoring/weight-overrides';
+import { hashWeights } from '@/lib/scoring/dqi';
 import {
   NoiseStatsSchema,
   FactCheckSchema,
@@ -739,6 +741,31 @@ export async function POST(request: NextRequest) {
                       documentType: documentType ?? null,
                       industry: null,
                     }),
+                    // Weights resolution snapshot (locked 2026-05-11 per
+                    // Tier 2.1 + P2 ship). Persists the weight vector +
+                    // hash + source + methodology version that produced
+                    // this audit's DQI, so the DPR cover renders the
+                    // ACTUAL weights the score was computed under — not
+                    // the canonical baseline. Procurement readers
+                    // verify: same hash = same engine state.
+                    // @schema-drift-tolerant — falls back to null when
+                    // DqiWeightOverride table is missing (pre-T2.1 envs).
+                    weightsResolution: await (async () => {
+                      try {
+                        const resolved = await resolveActiveWeightsForUser(userId);
+                        return {
+                          weights: resolved.effective,
+                          hash: resolved.override?.weightsHash ?? hashWeights(resolved.effective),
+                          source: resolved.source,
+                          methodologyVersion: resolved.override?.methodologyVersion ?? null,
+                          overrideId: resolved.override?.id ?? null,
+                          setAt: resolved.override?.setAt?.toISOString() ?? null,
+                        };
+                      } catch {
+                        // @schema-drift-tolerant — pre-T2.1 envs return null
+                        return null;
+                      }
+                    })(),
                     capturedAt: new Date().toISOString(),
                   }),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,

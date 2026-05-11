@@ -58,7 +58,7 @@ For a continuous low-friction per-decision bias-audit layer to succeed where eve
 
 ---
 
-# Tier 1 — Surface changes that operationalise paper findings (SHIPPING THIS SESSION)
+## Tier 1 — Surface changes that operationalise paper findings (SHIPPING THIS SESSION)
 
 These are no-pipeline, no-schema-change copy + framing edits that land paper findings on existing surfaces. ~1-2 hours of work.
 
@@ -106,9 +106,9 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 ---
 
-# Tier 2 — Product changes that unlock structural conditions (FOUNDER-APPROVED, OWN SESSIONS)
+## Tier 2 — Product changes that unlock structural conditions (FOUNDER-APPROVED, OWN SESSIONS)
 
-### T2.1 — User-adjustable DQI weights
+#### T2.1 — User-adjustable DQI weights
 
 **Status**: Founder-approved 2026-05-10. **Pipeline-modification scope** — needs regression-test plan + methodology version bump 2.2.0 → 2.3.0 + held-out-sample DQI distribution check before/after per CLAUDE.md "modifying the pipeline" rule.
 **Paper anchor**: Ch 4 + Dietvorst 2016 follow-up — algorithm aversion drops dramatically when users can slightly modify weights. Most direct fix the paper names.
@@ -127,7 +127,7 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 **Failure mode to avoid**: weights that drift from canonical baselines by >0.15 should fire a soft warning ("you've shifted X significantly from the platform baseline of Y; the per-org Brier calibration starts diverging from the platform-wide 143-case corpus baseline"). Don't block — warn.
 
-### T2.2 — Ambient capture from email + Slack threads
+#### T2.2 — Ambient capture from email + Slack threads
 
 **Status**: Founder-approved 2026-05-10. Substantial ship — own session.
 **Paper anchor**: Ch 12 condition #1 (friction collapse) + Ch 6 (audit must fire ex-ante before deal fever locks in). Cloverpop failed due to the system-of-record fallacy — manual data entry kills adoption.
@@ -146,7 +146,7 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 **Failure mode to avoid**: false-positive ambient detection that creates spurious containers. Confidence threshold ≥ 0.75 to fire the banner; ≥ 0.90 to auto-create. User can dismiss + train the classifier.
 
-### T2.3 — Earlier-than-DecisionFrame priors capture
+#### T2.3 — Earlier-than-DecisionFrame priors capture
 
 **Status**: Smaller scope than T2.2; can ship in one session.
 **Paper anchor**: Ch 6 + Ch 11 (ex-post scorecards devolve into rationalisation theatre absent founder-dictator culture). Audit must fire before capital is allocated, not after.
@@ -156,9 +156,9 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 ---
 
-# Tier 3 — Strategic shifts (FOUNDER-APPROVED, POSITIONING + FUNDRAISE)
+## Tier 3 — Strategic shifts (FOUNDER-APPROVED, POSITIONING + FUNDRAISE)
 
-### T3.1 — Refine category claim away from "always-on red team"
+#### T3.1 — Refine category claim away from "always-on red team"
 
 **Status**: Founder-approved 2026-05-10. Decision needs to be locked before next pitch / cold email batch.
 **Paper anchor**: Ch 2 — red teams have structurally bad properties (political antagonism, deal-team-vs-red-team friction, ego cost) we'd inherit by claiming the category.
@@ -180,7 +180,7 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 - CLAUDE.md "Positioning & Vocabulary" section.
 - founder-context.ts chat preamble.
 
-### T3.2 — Generational-change narrative for fundraise
+#### T3.2 — Generational-change narrative for fundraise
 
 **Status**: Founder-approved 2026-05-10. Pitch language change.
 **Paper anchor**: Ch 12 condition #5 — _"A new cohort, trained in data-native environments and painfully aware of the catastrophic costs of deal fever, must normalize algorithmic decision support not as an insult to their expertise, but as the foundational safety mechanism enabling high-velocity, programmatic growth."_
@@ -193,7 +193,7 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 **File**: [src/components/founder-hub/path-to-100m/data/honest-probability-data.ts](../src/components/founder-hub/path-to-100m/data/honest-probability-data.ts) — new section `GENERATIONAL_CHANGE_ANCHOR` rendered as a card in `HonestProbabilityPath`.
 
-### T3.3 — Liability-shift compulsion framing on Why Now
+#### T3.3 — Liability-shift compulsion framing on Why Now
 
 **Status**: Currently the EU AI Act + Basel III + IIA Three Lines references are accessory. They should become a _primary_ axis of the Why Now slide — the artefact will be legally compulsory, not optional.
 **Paper anchor**: Ch 12 condition #4 + Ch 9 historical analog (FAA AQP 1990 made CRM compulsory; that was the inflection). The pitch must emphasise compulsion timing — EU AI Act Art 14 enforceable Aug 2026; Basel III ICAAP live.
@@ -205,7 +205,7 @@ Keep the 22-bias taxonomy as DPR-methodology IP exhibit (procurement readers wan
 
 ---
 
-# DQI Weight Adjustability (T2.1 dedicated section — own session)
+## DQI Weight Adjustability (T2.1 dedicated section — own session)
 
 This deserves a separate section because it's the highest-leverage product change in the entire plan.
 
@@ -228,7 +228,7 @@ This deserves a separate section because it's the highest-leverage product chang
 
 ---
 
-# PMI strategic question (open — founder decision)
+## PMI strategic question (open — founder decision)
 
 **The question**: should Decision Intel expand to Post-Merger Integration tooling, or adapt DI to help with PMI from the existing audit-platform shape?
 
@@ -258,7 +258,7 @@ PMI is where the largest pool of M&A value destruction actually fires (Daimler-C
 
 ---
 
-# Cross-cutting open questions
+## Cross-cutting open questions
 
 1. **Buyer-research validation**. Paper #2 Ch 7 says the wedge is the programmatic operator. We have ONE practitioner data point (Kyle Price). A third Deep Research paper specifically on _"would the validity-class argument actually land with Roblox-class buyers, or is Price an outlier"_ could de-risk the wedge. **OR** founder runs 5-10 cold-context discovery DMs with Roblox-class buyers (mid-market corp dev heads at $200M-$5B revenue scale-ups) using the validity-class argument as the opener; pattern-match across the responses. Discovery > more synthesis at this point.
 2. **Boomerang Effect mitigation on existing surfaces**. /bias-genome and /how-it-works first-paragraph reframes are in Tier 1, but the deeper bias-education surfaces (Education Room, Taxonomy, BiasDetailModal) need an audit. Are they currently _creating_ the bias blind spot the paper warns about? Or are they pure procurement-grade IP exhibits that don't fire the Boomerang? Worth a focused audit pass.
@@ -270,13 +270,15 @@ PMI is where the largest pool of M&A value destruction actually fires (Daimler-C
 
 Tier 1 + Tier 2.1 + Tier 2.2 + Tier 2.3 + PMI Path B/C all shipped 2026-05-10 evening (commit `c2e6c1fb`). Plan refined with NotebookLM master-KB synthesis (notebook `809f5104`, conversation `9a90e1e8`).
 
+**UPDATE 2026-05-11 — ALL 6 ITEMS SHIPPED (P1 + P2 + P3 + P4 + N1 + N2).** See CLAUDE.md "Strategy World prep batch (locked 2026-05-11)" for the full ship summary. The status lines below are kept for historical reference; all six tasks are now ✅ COMPLETED.
+
 ### Top 4 deferred items, ranked by ROI for Strategy World London T-30d (June 9-10 BAFTA)
 
 The single objective of the next 30 days is converting a 20-minute coffee with a Margaret-class CSO or Damien-class corp dev head into a £249/mo wedge pilot. Backend plumbing without buyer-conversion impact is explicitly deferred.
 
 **P1 — T3.1: Refine category claim away from "always-on red team".** Paper anchor: Mercier & Sperber argumentative theory (humans evolved reasoning for social justification → red-team framing triggers ego threat). Replace with _"the antagonist that costs you no political capital — fires before the IC memo can hide what the deal sponsor doesn't want to see"_ as the contrast sub-head; H1 stays unchanged. Wedge personas served: fractional CSO + mid-market corp dev head. **Cost: low (copy + icp.ts BANNED_VOCABULARY).** Files: [src/lib/constants/icp.ts](../src/lib/constants/icp.ts) (POSITIONING_CONTRAST_SUBHEAD + extend BANNED_VOCABULARY with `always-on red team`), landing-page first-impression copy, /how-it-works first paragraph, COLD_CONTEXT_ONRAMPS, CLAUDE.md Positioning & Vocabulary section, founder-context.ts chat preamble. **Lowest-cost-highest-payoff move; ship first.**
 
-**P2 — DPR cover weight-set surface.** Data flows already (`DQIResult.effectiveWeights` + `weightsHash` + `weightsSource` all returned by `computeDQI`). The cover-page renderer doesn't yet pull from them. When a GP sees the printed DPR with `Weights: hash d4a8c2e9b3f1 · user-adjusted (Δ 0.07 vs canonical)` stamped on page 1, it proves the engine is calibrated to their domain, not generic. Paper anchor: Kahneman & Klein 2009 first-condition + Dietvorst 2016 trust-via-adjustability. **Cost: medium ([src/app/dpr-render/dpr.css](../src/app/dpr-render/dpr.css) + [src/app/dpr-render/[type]/[id]/page.tsx](<../src/app/dpr-render/[type]/[id]/page.tsx>) + provenance-record-data assembler reads `analysis.judgeOutputs.weightsHash` if persisted, falls back to live compute).** Persist the hash on `Analysis.judgeOutputs.weightsResolution = { source, hash, methodologyVersion }` in [/api/analyze/stream](../src/app/api/analyze/stream/route.ts) at audit-completion time so the DPR can read the band the audit was originally scored against.
+**P2 — DPR cover weight-set surface.** Data flows already (`DQIResult.effectiveWeights` + `weightsHash` + `weightsSource` all returned by `computeDQI`). The cover-page renderer doesn't yet pull from them. When a GP sees the printed DPR with `Weights: hash d4a8c2e9b3f1 · user-adjusted (Δ 0.07 vs canonical)` stamped on page 1, it proves the engine is calibrated to their domain, not generic. Paper anchor: Kahneman & Klein 2009 first-condition + Dietvorst 2016 trust-via-adjustability. **Cost: medium ([src/app/dpr-render/dpr.css](../src/app/dpr-render/dpr.css) + [src/app/dpr-render/[type]/[id]/page.tsx](../src/app/dpr-render/[type]/[id]/page.tsx) + provenance-record-data assembler reads `analysis.judgeOutputs.weightsHash` if persisted, falls back to live compute).** Persist the hash on `Analysis.judgeOutputs.weightsResolution = { source, hash, methodologyVersion }` in [/api/analyze/stream](../src/app/api/analyze/stream/route.ts) at audit-completion time so the DPR can read the band the audit was originally scored against.
 
 **P3 — T3.3: Liability-shift compulsion framing on Why Now slide.** Promote EU AI Act Art 14 (Aug 2026 enforceable) + Basel III ICAAP from accessory to primary axis. Pitch deck slide 3 restructured around the three inflection conditions from Paper #2 Ch 9 (liability shift in motion + friction collapse unlocked + status reframing). Wedge personas: mid-market corp dev head via their GC; PE-backed founder via legal-risk avoidance. **Cost: low (trust-copy.ts liability-shift block + /security + /trust + pitch deck slide 3 restructure).**
 
@@ -316,7 +318,7 @@ The NotebookLM synthesis included a _"Fortis Advisors LLC v. Krafton Inc. (2026 
 
 The plan above assumes the founder is attending Strategy World London June 9-10. If not — or if the 4 HXC personas in the founder's pre-booked 1:1 calendar shift — the ROI ranking flips. **P1 (category claim) is load-bearing regardless** — it's pure cold-context vocabulary discipline that compounds on every surface. P2 + N1 + N2 are most valuable when the founder has a CIM upload in front of a corp-dev-head buyer AT THE EVENT. P3 (liability shift) is the slide-3 move for the post-event follow-up email + the seed-conversation deck six months out. **Founder decision needed**: confirm Strategy World attendance + 1:1 calendar, OR redirect the plan toward the next-highest-signal channel.
 
-# Files this doc references
+## Files this doc references
 
 - [src/components/recommendations/IntelligentAntagonistPrompt.tsx](../src/components/recommendations/IntelligentAntagonistPrompt.tsx)
 - [src/lib/recommendations/persona-framing.ts](../src/lib/recommendations/persona-framing.ts)
@@ -330,7 +332,7 @@ The plan above assumes the founder is attending Strategy World London June 9-10.
 - [src/lib/constants/trust-copy.ts](../src/lib/constants/trust-copy.ts)
 - [src/components/founder-hub/path-to-100m/data/honest-probability-data.ts](../src/components/founder-hub/path-to-100m/data/honest-probability-data.ts)
 
-# Memory references
+## Memory references
 
 - `feedback-gemini-deep-research-allowed.md`
 - `feedback-mention-decision-intel-in-research-prompts.md`

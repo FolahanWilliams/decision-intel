@@ -27,6 +27,10 @@ import {
   AUDIT_LOG_RETENTION_TIERS,
   AUDIT_LOG_RETENTION_BODY,
   VENDOR_QUESTIONNAIRE_ROWS,
+  LIABILITY_SHIFT_ANCHORS,
+  LIABILITY_SHIFT_COMPULSION_HEADLINE,
+  LIABILITY_SHIFT_COMPULSION_BODY,
+  LIABILITY_SHIFT_COMPULSION_CLOSE,
 } from '@/lib/constants/trust-copy';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -1076,6 +1080,133 @@ export default function SecurityPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      {/* Liability-shift compulsion framing — Tier 3.3 lock 2026-05-11
+          per Paper #2 Ch 9. Sits ABOVE the regulatory-tailwinds grid
+          because the compulsion argument is the PRIMARY axis and the
+          tailwinds are the supporting evidence. The aviation-CRM
+          analog gives the structural argument procurement readers
+          recognise as "this kind of inflection has happened before." */}
+      <section
+        id="compulsion"
+        style={{
+          padding: '64px 24px 16px',
+          background: C.navy,
+          color: C.white,
+          borderTop: `1px solid ${C.slate200}`,
+        }}
+      >
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ marginBottom: 24 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: '#FCA5A5',
+                marginBottom: 10,
+              }}
+            >
+              The inflection · why now matters
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(26px, 3vw, 34px)',
+                fontWeight: 800,
+                color: C.white,
+                letterSpacing: '-0.015em',
+                lineHeight: 1.2,
+                margin: 0,
+                maxWidth: 880,
+              }}
+            >
+              {LIABILITY_SHIFT_COMPULSION_HEADLINE}
+            </h2>
+            <p
+              style={{
+                marginTop: 16,
+                fontSize: 15,
+                color: C.slate300,
+                lineHeight: 1.65,
+                maxWidth: 820,
+              }}
+            >
+              {LIABILITY_SHIFT_COMPULSION_BODY}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+              marginBottom: 20,
+            }}
+          >
+            {LIABILITY_SHIFT_ANCHORS.map(a => (
+              <div
+                key={a.label}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: `1px solid rgba(255, 255, 255, 0.08)`,
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: C.white,
+                    marginBottom: 4,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {a.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    color: '#FCA5A5',
+                    marginBottom: 8,
+                  }}
+                >
+                  {a.status}
+                </div>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: C.slate300,
+                    lineHeight: 1.55,
+                    margin: 0,
+                  }}
+                >
+                  {a.dprMechanism}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p
+            style={{
+              fontSize: 14,
+              color: C.white,
+              fontWeight: 600,
+              lineHeight: 1.55,
+              margin: 0,
+              maxWidth: 820,
+              paddingTop: 16,
+              borderTop: `1px solid rgba(255, 255, 255, 0.08)`,
+            }}
+          >
+            {LIABILITY_SHIFT_COMPULSION_CLOSE}
+          </p>
         </div>
       </section>
 

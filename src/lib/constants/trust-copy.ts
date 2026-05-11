@@ -554,3 +554,85 @@ export const SUB_PROCESSORS: SubProcessor[] = [
     verification: 'https://www.cloudflare.com/cloudflare-customer-dpa/.',
   },
 ];
+
+// =============================================================================
+// Liability-shift compulsion framing — locked 2026-05-11 per Tier 3.3
+// =============================================================================
+//
+// Paper #2 Ch 9 historical analog: Aviation CRM crossed from "exercise" to
+// "continuous practice" via three structural inflection conditions —
+// (i) liability shift in motion, (ii) friction collapse unlocked,
+// (iii) status reframing. The 1990 FAA Advanced Qualification Program made
+// CRM compulsory; that was the inflection moment.
+//
+// Corporate M&A is at the same inflection. EU AI Act Article 14 enforceable
+// August 2026 + Basel III Pillar 2 ICAAP (already live) + SEC AI disclosure
+// rulemaking (evolving through 2026) make the audit artefact COMPULSORY, not
+// optional. The Why Now pitch slide leads with the compulsion framing rather
+// than the regulatory tailwinds being accessory.
+//
+// Vocabulary discipline: "compulsory" / "auditable" / "defensible record" —
+// NOT "compliance theatre" or "checking the box." Procurement readers
+// recognise the difference between a real liability shift and a regulatory
+// claim padded for marketing.
+
+export interface LiabilityShiftAnchor {
+  /** Short label for the slide-3 chip. */
+  label: string;
+  /** Status — "enforceable Aug 2026" / "live" / "in motion". */
+  status: string;
+  /** The DPR field that satisfies the obligation. */
+  dprMechanism: string;
+}
+
+export const LIABILITY_SHIFT_ANCHORS: ReadonlyArray<LiabilityShiftAnchor> = [
+  {
+    label: 'EU AI Act Article 14',
+    status: 'enforceable August 2026',
+    dprMechanism:
+      "Human oversight + record-keeping mapped onto the DPR's hashed input + judge variance + meta-verdict trail.",
+  },
+  {
+    label: 'Basel III Pillar 2 ICAAP',
+    status: 'live for regulated banks',
+    dprMechanism:
+      'Qualitative decision documentation requirement satisfied by the DPR — every flagged bias attaches a Basel III provision citation.',
+  },
+  {
+    label: 'SEC AI disclosure (proposed)',
+    status: 'evolving through 2026',
+    dprMechanism:
+      "Model lineage + prompt fingerprint + judge variance documented per the DPR's methodology section.",
+  },
+  {
+    label: 'AI Verify Foundation (Singapore IMDA)',
+    status: 'aligned to all 11 principles',
+    dprMechanism:
+      'Every DPR field maps onto the 11 internationally-recognised AI governance principles.',
+  },
+] as const;
+
+/**
+ * The compulsion headline for the Why Now pitch slide + the /security
+ * "Regulatory tailwinds" section. Use verbatim — this is the move that
+ * shifts the conversation from "nice to have" to "you don't have a
+ * choice once August 2026 lands."
+ */
+export const LIABILITY_SHIFT_COMPULSION_HEADLINE =
+  'The audit artefact is becoming compulsory, not optional — and we already produce the artefact your high-stakes decisions need to defend in front of the regulator.';
+
+/**
+ * The supporting paragraph for the Why Now slide. Names the three Paper
+ * #2 Ch 9 inflection conditions explicitly so a procurement-stage reader
+ * sees the structural argument, not just the dates.
+ */
+export const LIABILITY_SHIFT_COMPULSION_BODY =
+  'Aviation Crew Resource Management crossed from "exercise" to compulsory practice in 1990 when the FAA Advanced Qualification Program made it the standard. Corporate M&A is at the same inflection — three structural conditions converging: a liability shift in motion (EU AI Act Article 14 enforceable August 2026 + Basel III Pillar 2 ICAAP live + SEC AI disclosure rulemaking), friction collapse unlocked (sub-cent per render via deepseek-v4-flash through the AI Gateway), and the status reframing of structured decision support from "false precision" to "elite operational hygiene." Decision Intel produces the Decision Provenance Record the August 2026 enforcement deadline calls for, today.';
+
+/**
+ * The closing one-liner that converts the compulsion argument to a wedge
+ * action. Goes at the bottom of the Why Now slide + the /security
+ * tailwinds section.
+ */
+export const LIABILITY_SHIFT_COMPULSION_CLOSE =
+  'Buy the audit before the regulator forces it. The artefact is the same either way; the difference is whether your audit committee is staring at a clean DPR or scrambling to produce one mid-enforcement.';

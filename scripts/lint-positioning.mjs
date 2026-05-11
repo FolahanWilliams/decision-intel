@@ -85,12 +85,45 @@ const BANNED = [
   },
   {
     pattern: /\bAI decision tool\b/i,
-    label: '"AI decision tool" (generic SaaS tell — too crowded; use "the reasoning audit platform")',
+    label:
+      '"AI decision tool" (generic SaaS tell — too crowded; use "the reasoning audit platform")',
   },
   {
     pattern: /\bAI-powered decision (platform|tool|system)\b/i,
     label:
       '"AI-powered decision X" (generic SaaS prefix — drop "AI-powered"; use "the reasoning audit platform")',
+  },
+  // T3.1 ship 2026-05-11 — Paper #2 Ch 2 + Ch 10. Red teams fail
+  // structurally because the political/ego cost of dissent in sponsor-
+  // driven deal environments is unsustainable. Claiming the category
+  // inherits the failure mode. Replaced by POSITIONING_POLITICAL_CAPITAL_LINE:
+  // "the antagonist that costs you no political capital — fires before
+  // the IC memo can hide what the deal sponsor doesn't want to see."
+  // The bare "red team" phrase stays legal when describing a competitor
+  // / historical practice / Kyle Price's description of the conventional
+  // countermeasure — that's background context, not a category claim. The
+  // patterns below match ONLY the category-claim shape ("the always-on
+  // red team", "DI is the red team", "we are the red team"), not
+  // descriptive prose.
+  {
+    pattern: /\balways-?on (digital |internal )?red(-|\s)?team\b/i,
+    label:
+      '"always-on red team" (DEPRECATED 2026-05-11, Tier 3.1 + Paper #2 Ch 2 — red teams fail structurally on political/ego cost; use POSITIONING_POLITICAL_CAPITAL_LINE in icp.ts)',
+  },
+  {
+    pattern: /\bdigital red(-|\s)?team\b/i,
+    label:
+      '"digital red team" (DEPRECATED 2026-05-11 — same failure mode; the "digital" prefix doesn\'t fix the structural antagonism)',
+  },
+  {
+    pattern: /\b(?:we are|we\'re|DI is|Decision Intel is) (?:the |a |an )?red(-|\s)?team\b/i,
+    label:
+      '"we are the red team" / "Decision Intel is the red team" (banned as a category claim 2026-05-11 per Tier 3.1; use POSITIONING_POLITICAL_CAPITAL_LINE)',
+  },
+  {
+    pattern: /\bthe red(-|\s)?team (you can buy|as a service|platform|tool|product)\b/i,
+    label:
+      '"the red team you can buy / as-a-service / platform" (banned 2026-05-11 — same Tier 3.1 reasoning)',
   },
 
   // Stage-of-company language banned on marketing surfaces.

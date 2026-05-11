@@ -51,6 +51,7 @@ import {
   type ReferenceClassForecast,
 } from '@/lib/learning/reference-class-forecast';
 import { classifyValidity, type ValidityClassification } from '@/lib/learning/validity-classifier';
+import { WEIGHTS_CANONICAL as WEIGHTS_CANONICAL_FOR_DELTA } from '@/lib/scoring/dqi';
 import {
   extractSynergyDefensibilityFromContent,
   summariseSynergyDefensibility,
@@ -186,6 +187,21 @@ export interface ProvenanceRecordData {
    * with the validity shift applied.
    */
   validityClassification?: ValidityClassification;
+  /**
+   * DQI weight-vector resolution snapshot (locked 2026-05-11 per Tier
+   * 2.1 P2 ship). Surfaces the EFFECTIVE weights the DQI score was
+   * computed under on every DPR cover. Procurement readers verify
+   * two DPRs are from the same engine state by comparing the hash.
+   * Read from `analysis.judgeOutputs.weightsResolution` (persisted by
+   * the analyze/stream pipeline at audit-completion). Falls back to
+   * live-resolved canonical weights when missing.
+   */
+  weightsResolution?: {
+    source: 'canonical' | 'user' | 'org';
+    hash: string;
+    /** Max absolute delta vs canonical baseline (0.0 = canonical). */
+    maxDelta?: number;
+  };
   /**
    * Calibrated Rejection of Subjective Confidence (R²F paper-app #10,
    * Item 3 lock 2026-05-07). Pure-function combination of validity +
@@ -1472,6 +1488,39 @@ export async function assembleProvenanceRecordData(
       industry,
     });
 
+  // Weights resolution snapshot — read persisted-first per the same
+  // pattern as validityClassification above (P2 ship 2026-05-11). When
+  // the audit was scored on canonical weights AND the pipeline didn't
+  // persist the snapshot (legacy analyses), we surface a default
+  // canonical entry so the DPR cover always shows the weights row.
+  const persistedWeightsResolution = (
+    analysis as unknown as {
+      judgeOutputs?: {
+        weightsResolution?: {
+          source?: 'canonical' | 'user' | 'org';
+          hash?: string;
+          weights?: Record<string, number>;
+        } | null;
+      } | null;
+    }
+  ).judgeOutputs?.weightsResolution;
+  let weightsResolutionForCover: ProvenanceRecordData['weightsResolution'] | undefined;
+  if (persistedWeightsResolution?.hash && persistedWeightsResolution.source) {
+    const weights = persistedWeightsResolution.weights ?? null;
+    const maxDelta = weights
+      ? Math.max(
+          ...Object.entries(WEIGHTS_CANONICAL_FOR_DELTA).map(([k, canon]) =>
+            Math.abs((weights[k] ?? canon) - canon)
+          )
+        )
+      : 0;
+    weightsResolutionForCover = {
+      source: persistedWeightsResolution.source,
+      hash: persistedWeightsResolution.hash,
+      maxDelta,
+    };
+  }
+
   // Bias-input shape shared across the next 4 detectors. Severity is
   // normalised to the 4-band canonical lowercase form once.
   const dprNormalisedBiases = (analysis.biases ?? []).map(b => ({
@@ -1598,6 +1647,7 @@ export async function assembleProvenanceRecordData(
     feedbackAdequacy,
     referenceClassForecast,
     validityClassification,
+    weightsResolution: weightsResolutionForCover,
     calibratedRejection,
     fractionationOfExpertise,
     decisionRubric,

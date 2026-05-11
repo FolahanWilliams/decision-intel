@@ -70,6 +70,43 @@ export const POSITIONING_ASYMMETRIC_TAIL_BODY =
   "Most strategic memos pass cleanly. The ones that don't are the ones that destroy value. You can't tell the catastrophic memo from the clean memo without auditing both — which is why you run the audit on every memo, not just the suspicious ones.";
 
 /**
+ * Political-capital framing (locked 2026-05-11 per Tier 3.1 — Deep
+ * Research Paper #2 Ch 2 + Ch 10).
+ *
+ * Paper #2 Ch 2 demolished the "always-on red team" positioning: red
+ * teams fail to scale because they're structurally antagonistic; the
+ * political / ego cost of dissent is unsustainable in high-velocity
+ * sponsor-driven deal environments. Calling DI an "always-on red team"
+ * inherits the same failure mode — corp dev professionals would suppress
+ * the audit results to protect their relationship with the deal sponsor.
+ *
+ * The Ch 10 fix: position DI as the antagonist that costs NO political
+ * capital. The audit fires structurally before the IC memo crystallises;
+ * the corp dev professional shifts from "antagonist trying to kill the
+ * sponsor's deal" to "facilitator surfacing a system-generated risk
+ * flag." Same dissent, zero ego cost.
+ *
+ * Layered usage: this is the BUYER-PSYCHOLOGY companion to the existing
+ * POSITIONING_HERO_CONTRAST (which is the CATEGORY-DIFFERENTIATOR move,
+ * BI vs reasoning audit). On a single surface, use them in sequence:
+ *   - POSITIONING_HERO_CONTRAST first → resolves the category question
+ *     (this isn't BI, this isn't model-risk-management)
+ *   - POSITIONING_POLITICAL_CAPITAL_LINE second → resolves the
+ *     buyer-psychology question (this isn't a red team — your champion
+ *     doesn't pay an ego tax to use it)
+ *
+ * Use this line specifically on:
+ *   - the corp-dev / fractional-CSO sales pages (mid-market corp dev
+ *     head + fractional CSO are the personas Paper #2 named most
+ *     directly)
+ *   - the AntagonistPrompt / audit reveal copy on /dashboard/decisions
+ *   - cold email subject lines for corp-dev-head buyers
+ *   - Strategy World London conference pitch (T-30d)
+ */
+export const POSITIONING_POLITICAL_CAPITAL_LINE =
+  'The antagonist that costs you no political capital — fires before the IC memo can hide what the deal sponsor doesn’t want to see.';
+
+/**
  * Secondary H1 — for cold investor / regulatory-tailwind contexts where
  * tension beats elegance. Pairs the category claim with the regulatory
  * urgency. Used in cold investor DMs, VC pitches, "Why Now" deck slides.
@@ -407,6 +444,21 @@ export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }
     reason:
       'Banned ALONE (without "reasoning") 2026-05-08. Drops the IP differentiator — Cloverpop (logs decisions) and IBM watsonx (audits models) can both legally claim "we solve unaudited decisions." The word "reasoning" is what locks them out. Always use "unaudited reasoning in strategic decisions" or pair with "reasoning" in the same sentence.',
   },
+  {
+    phrase: 'always-on red team',
+    reason:
+      'Deprecated 2026-05-11 (Tier 3.1, Paper #2 Ch 2). Red teams fail structurally because the political/ego cost of dissent in sponsor-driven deal environments is unsustainable — claiming the category inherits that failure mode (corp dev professionals would suppress audit findings to protect sponsor relationships). Replaced by POSITIONING_POLITICAL_CAPITAL_LINE: "the antagonist that costs you no political capital — fires before the IC memo can hide what the deal sponsor doesn’t want to see." Same dissent, zero ego cost.',
+  },
+  {
+    phrase: 'red team',
+    reason:
+      'Banned 2026-05-11 ONLY when used as DI\'s category claim or as the noun describing DI\'s capability (e.g. "the always-on red team" / "we are the red team"). Same Paper #2 Ch 2 reasoning as "always-on red team" above. STAYS valid when describing a competitor / historical practice / Kyle Price\'s description of the conventional countermeasure — that\'s background context, not a category claim.',
+  },
+  {
+    phrase: 'digital red team',
+    reason:
+      'Banned 2026-05-11 alongside "always-on red team" — same deprecation reasoning. The "digital" prefix doesn\'t fix the structural antagonism problem.',
+  },
 ] as const;
 
 /**
@@ -421,6 +473,8 @@ export const PROTECTED_VOCABULARY: ReadonlyArray<string> = [
   'reasoning audit', // softer variant for cold contexts
   'fatal blind spots', // the load-bearing stake noun in the H1 + sub-head
   'before the committee does', // the time-anchor closing in the contrast sub-head
+  'no political capital', // the buyer-psychology load-bearing phrase (Tier 3.1)
+  'before the IC memo can hide', // the timing-anchor in the political-capital line
   'R²F', // existing IP moat
   'DPR', // existing artefact noun
   'DQI', // existing scoring metric
@@ -439,6 +493,8 @@ export const COLD_CONTEXT_ONRAMPS: ReadonlyArray<string> = [
   'pre-IC audit',
   'strategic memo audits',
   'reasoning audit',
+  'an antagonist that costs no political capital', // Tier 3.1, corp-dev-head cold DM hook
+  'audit that fires before the IC memo can hide it', // Tier 3.1, sponsor-driven-deal cold DM hook
 ] as const;
 
 /**
@@ -468,7 +524,9 @@ export function buildPositioningPromptBlock(): string {
   return [
     `CATEGORY CLAIM (locked 2026-05-04 — replaces the prior "native reasoning layer" lock):`,
     `Primary H1: "${POSITIONING_HERO_PRIMARY}"`,
-    `Contrast sub-head (use as second sentence on landing / pitch deck): "${POSITIONING_HERO_CONTRAST}"`,
+    `Contrast sub-head (CATEGORY-DIFFERENTIATOR move — use as second sentence on landing / pitch deck; resolves "this isn't BI, isn't model-risk-management"): "${POSITIONING_HERO_CONTRAST}"`,
+    `Political-capital line (BUYER-PSYCHOLOGY move — locked 2026-05-11 per Tier 3.1 + Paper #2 Ch 2 + Ch 10; use on corp-dev / fractional-CSO sales pages + AntagonistPrompt + cold corp-dev-head outreach): "${POSITIONING_POLITICAL_CAPITAL_LINE}"`,
+    `Layering rule: when both sub-heads fit a surface (e.g. landing page sales section), use them in sequence — contrast first (resolves category question), political-capital second (resolves buyer-psychology question). DO NOT pick "always-on red team" or "digital red team" framings; both banned 2026-05-11 because red teams fail structurally (sponsor-driven deal environments make dissent ego-costly). The political-capital line is the literature-grounded fix.`,
     `Asymmetric-tail body (use as JUSTIFICATION for running the audit on every memo): "${POSITIONING_ASYMMETRIC_TAIL_BODY}"`,
     `Secondary H1 (cold investor / regulatory-tailwind contexts only): "${POSITIONING_HERO_SECONDARY}"`,
     ``,

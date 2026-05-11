@@ -18,6 +18,7 @@ import { ContainerTopFixesCard } from '@/components/containers/ContainerTopFixes
 import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadinessGate';
 import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
 import { PmiTrackerTab } from '@/components/containers/PmiTrackerTab';
+import { DealFeverPremortemCard } from '@/components/containers/DealFeverPremortemCard';
 import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
@@ -167,6 +168,17 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
               surface — claim/predicted/observed/Brier only. */}
           {container.kind === 'acquisition' && container.analyzedDocCount > 0 && (
             <PmiTrackerTab containerId={container.id} containerName={container.name} />
+          )}
+
+          {/* Deal Fever pre-mortem — N1 ship 2026-05-11. Kyle-Price
+              overlay (Roblox Head of Corp Dev / master KB source #23).
+              Mounts on acquisition-mode containers with at least one
+              analyzed doc — the user clicks to fire 3 brutal questions
+              targeted at Deal Fever / Winner's Curse / Synergy Mirage.
+              NOT auto-fire (cost discipline + the click is a conscious
+              "I'm inviting dissent" moment for the corp dev professional). */}
+          {container.kind === 'acquisition' && container.analyzedDocCount > 0 && (
+            <DealFeverPremortemCard containerId={container.id} containerName={container.name} />
           )}
 
           <ContainerCompositeHero container={container} />

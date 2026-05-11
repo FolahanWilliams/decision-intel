@@ -357,11 +357,19 @@ export function extractSynergyStructure(workbook: ExcelJSType.Workbook): Synergy
         header.milestoneColumns.map(c => asString(row.getCell(c).value)).find(Boolean) ?? undefined;
 
       const type = classifyClaim(label, sheet.name);
+      const milestoneText = (milestone ?? '').toLowerCase();
+      // BCG-mandate 90-day check (N2 ship 2026-05-11). Stricter than
+      // "any milestone" — looks for explicit 90-day / day-1 / Q1
+      // post-close language. Avoids treating "FY2027 target" as a
+      // BCG-compliant milestone when it isn't.
+      const has90DayMilestone =
+        /\b(90[\s-]?day|day[\s-]?1|q1[\s-]?post[\s-]?close|first[\s-]?90)\b/i.test(milestoneText);
       const claimInput = {
         type,
         hasMechanism: Boolean(mechanism && mechanism.length >= 8), // 8 chars filters "TBD" / "—" / blank-equivalents
         hasOwner: Boolean(owner && owner.length >= 2),
         hasMilestone: Boolean(milestone && milestone.length >= 4),
+        has90DayMilestone,
       };
       const defensibility = scoreSynergyClaim(claimInput);
 

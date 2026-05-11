@@ -134,6 +134,7 @@ export default async function DprRenderPage({
         schemaVersion={`${data.schemaVersion}.1.0`}
         pipelineVersion={pipelineVersionFromLineage(data)}
         methodologyVersion={METHODOLOGY_VERSION}
+        weightsResolution={data.weightsResolution}
         verifyUrl={verifyUrl}
         classification={classification}
         totalPages={totalPages}

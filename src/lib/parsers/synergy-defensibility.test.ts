@@ -202,3 +202,80 @@ describe('aggregateDefensibility', () => {
     expect(result.fullyDefendedPct).toBe(25);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// N2 ship 2026-05-11 — BCG-mandate decomposition tests
+// ─────────────────────────────────────────────────────────────────────
+
+describe('scoreSynergyClaim — BCG mandate decomposition', () => {
+  it('reports allThreePresent when mechanism + owner + 90-day all true', () => {
+    const r = scoreSynergyClaim({
+      type: 'cost_cogs',
+      hasMechanism: true,
+      hasOwner: true,
+      hasMilestone: true,
+      has90DayMilestone: true,
+    });
+    expect(r.bcgMandate.allThreePresent).toBe(true);
+    expect(r.bcgMandate.missingElements).toEqual([]);
+    expect(r.bcgMandate.verdict).toMatch(/BCG mandate satisfied/);
+  });
+
+  it('flags missing 90-day milestone even when general milestone is present', () => {
+    const r = scoreSynergyClaim({
+      type: 'revenue',
+      hasMechanism: true,
+      hasOwner: true,
+      hasMilestone: true, // permissive
+      has90DayMilestone: false, // strict BCG check fails
+    });
+    expect(r.bcgMandate.allThreePresent).toBe(false);
+    expect(r.bcgMandate.missingElements).toContain('ninety_day_milestone');
+    expect(r.bcgMandate.verdict).toMatch(/BCG-mandate failure/);
+    expect(r.bcgMandate.verdict).toMatch(/90-day milestone/);
+  });
+
+  it('flags all three missing when nothing is supplied', () => {
+    const r = scoreSynergyClaim({
+      type: 'revenue',
+      hasMechanism: false,
+      hasOwner: false,
+      hasMilestone: false,
+      has90DayMilestone: false,
+    });
+    expect(r.bcgMandate.allThreePresent).toBe(false);
+    expect(r.bcgMandate.missingElements).toEqual(['mechanism', 'owner', 'ninety_day_milestone']);
+    expect(r.bcgMandate.verdict).toMatch(/operational mechanism/);
+    expect(r.bcgMandate.verdict).toMatch(/accountable executive/);
+    expect(r.bcgMandate.verdict).toMatch(/90-day milestone/);
+  });
+
+  it('falls back to hasMilestone when has90DayMilestone is undefined (legacy parser)', () => {
+    const r = scoreSynergyClaim({
+      type: 'cost_cogs',
+      hasMechanism: true,
+      hasOwner: true,
+      hasMilestone: true,
+      // has90DayMilestone undefined — legacy caller
+    });
+    // Backwards-compat: legacy callers that don't supply the strict
+    // 90-day flag get the same allThreePresent verdict they had before
+    // the BCG-mandate field existed.
+    expect(r.bcgMandate.allThreePresent).toBe(true);
+    expect(r.bcgMandate.ninetyDayMilestone).toBe(true);
+  });
+
+  it('reports per-element booleans accurately', () => {
+    const r = scoreSynergyClaim({
+      type: 'cost_opex',
+      hasMechanism: true,
+      hasOwner: false,
+      hasMilestone: false,
+      has90DayMilestone: false,
+    });
+    expect(r.bcgMandate.mechanism).toBe(true);
+    expect(r.bcgMandate.owner).toBe(false);
+    expect(r.bcgMandate.ninetyDayMilestone).toBe(false);
+    expect(r.bcgMandate.missingElements).toEqual(['owner', 'ninety_day_milestone']);
+  });
+});

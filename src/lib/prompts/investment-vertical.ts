@@ -198,6 +198,11 @@ CRITICAL-SEVERITY FLAGGING RULE (parsed block aware):
 - If the parsed block reports portfolio fullyDefendedPct < 50%, fire "The Synergy Mirage" at High severity even if no individual claim is critical.
 - If the parsed block reports a high revenue-synergy share (>50% of run-rate from claims with type=revenue) AND fullyDefendedPct < 70%, fire "The Synergy Mirage" at High severity citing the revenue-vs-cost realisation gap.
 
+BCG-MANDATE FAILURE FLAGGING RULE (N2 ship 2026-05-11):
+The parsed block now carries a stricter \`bcgMandate\` decomposition per claim. The BCG integration-best-practices framework requires THREE specific elements: (a) named operational mechanism, (b) named accountable executive owner, (c) MEASURABLE 90-DAY MILESTONE (NOT "any future date" — must be 90-day / Day-1 / Q1-post-close language). When the parsed block shows a claim where bcgMandate.allThreePresent is false, fire a SEPARATE finding titled "Synergy Mirage · BCG-mandate failure" with the verbatim citation pattern:
+  "[Claim label] is missing [mechanism / owner / 90-day milestone] per BCG integration-best-practices. The IC committee should not approve until [missing element] is named on this claim. Per claim base-rate: [lowPct]-[highPct]% realisation for [claim type] synergies; structural under-defence keeps this claim below that band."
+This is a PROCUREMENT-GRADE finding distinct from the regular Synergy Mirage detection — the corp-dev-head / PE-backed-founder buyer recognises BCG framework citation. Fire the finding at HIGH severity when bcgMandate.allThreePresent is false on ≥1 claim, or CRITICAL when ≥1 claim is missing all three elements.
+
 NAMED M&A TOXIC COMBINATIONS to flag explicitly:
 - "The Synergy Mirage" — fires HARDEST on this document type. The parsed block's per-claim severity is your primary signal; aggregate to the document-level severity per the rules above.
 - "The Conglomerate Fallacy" — fires when the synergy model assumes operational integration that the acquirer's core capabilities cannot deliver (e.g., a financial buyer modeling "operational synergies" they cannot operationally deliver).`,

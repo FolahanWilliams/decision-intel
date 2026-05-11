@@ -114,7 +114,7 @@ export function IntelligentAntagonistPrompt({
             color: 'var(--accent-primary)',
           }}
         >
-          Intelligent Antagonist
+          The antagonist that costs no political capital
         </span>
       </div>
       <h2
@@ -138,8 +138,9 @@ export function IntelligentAntagonistPrompt({
       >
         Naming your priority before seeing the algorithm&rsquo;s output is the discipline that
         protects you from automation bias. The gap between your read and the system&rsquo;s read is
-        the recommendation&rsquo;s actual value &mdash; and the audit log shifts the political cost
-        of dissent off you and onto the system.
+        the recommendation&rsquo;s actual value &mdash; and the audit log fires before the IC memo
+        can hide what the deal sponsor doesn&rsquo;t want to see. Same dissent, zero political
+        capital spent.
       </p>
       <textarea
         ref={textareaRef}
