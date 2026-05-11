@@ -38,6 +38,15 @@
  *       shadcn <Dialog> primitive
  *     - modal headers without a close button
  *
+ *   SEMANTIC (added 2026-05-11 after the WelcomeModal v3.5-drift miss)
+ *     - onboarding-persona-drift: sign-up / welcome / persona-gating
+ *       files that define a role taxonomy without referencing the v3.5
+ *       HXC personas (fractional_cso / midmarket_corp_dev /
+ *       smaller_fund_gp / pe_backed_founder). The structural checks
+ *       above pass clean on a welcome modal that's technically valid
+ *       but semantically out-of-date against CLAUDE.md GTM locks; this
+ *       check catches that drift class.
+ *
  * Usage:
  *   node scripts/audit-platform.mjs                  # stderr report
  *   node scripts/audit-platform.mjs --write          # writes a markdown
@@ -149,10 +158,7 @@ function checkDeadRoutes(files) {
       if (/retired|redirect|folded|deprecated|deleted|legacy|historical/i.test(line)) continue;
       for (const route of RETIRED_ROUTES) {
         // Match as an href value (quote-delimited) or in a markdown link.
-        const re = new RegExp(
-          `['"\`(]${route.replace(/\//g, '\\/')}(?=['"\\s)?#])`,
-          ''
-        );
+        const re = new RegExp(`['"\`(]${route.replace(/\//g, '\\/')}(?=['"\\s)?#])`, '');
         if (re.test(line)) {
           findings.push({
             category: 'critical',
@@ -313,7 +319,7 @@ function checkDarkModeTokens(files) {
             line: i + 1,
             snippet: line.trim().slice(0, 140),
             suggestion:
-              "Replace with CSS-variable styling (var(--text-primary) / var(--bg-card) etc). Product is light-theme only per CLAUDE.md.",
+              'Replace with CSS-variable styling (var(--text-primary) / var(--bg-card) etc). Product is light-theme only per CLAUDE.md.',
           });
           break;
         }
@@ -423,8 +429,7 @@ function checkModalShape(files) {
       // Look in the next 12 lines for inset: 0 or top + left + zIndex.
       const window = lines.slice(i, Math.min(i + 14, lines.length)).join('\n');
       const isModalShape =
-        (/inset:\s*0/.test(window) ||
-          (/top:\s*0/.test(window) && /left:\s*0/.test(window))) &&
+        (/inset:\s*0/.test(window) || (/top:\s*0/.test(window) && /left:\s*0/.test(window))) &&
         /z(?:Index|-index):\s*[1-9]\d{2,}/i.test(window);
       if (!isModalShape) continue;
       // Skip when the same file imports Dialog — heuristic says it's
@@ -554,7 +559,18 @@ function checkStaleAsOfDates(files) {
       const month = m[1];
       const year = parseInt(m[2], 10);
       const monthIdx = [
-        'january','february','march','april','may','june','july','august','september','october','november','december',
+        'january',
+        'february',
+        'march',
+        'april',
+        'may',
+        'june',
+        'july',
+        'august',
+        'september',
+        'october',
+        'november',
+        'december',
       ].indexOf(month.toLowerCase());
       const refDate = new Date(year, monthIdx, 1);
       const daysOld = Math.floor((now.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -619,6 +635,103 @@ function checkDeletedReferences(files) {
   return findings;
 }
 
+// ─── checkOnboardingPersonaCoherence ─────────────────────────────────────
+//
+// Flags SEMANTIC drift in onboarding / sign-up / persona-gating files.
+// The earlier structural checks (modal-shape / native-dialog / dark-tokens)
+// catch HOW a modal is built; they don't catch WHAT IT SAYS. The
+// 2026-05-11 audit found WelcomeModal had stayed on the pre-v3.5 broad role
+// taxonomy (cso / ma / bizops / pe_vc / other) for ~7 days after v3.5
+// shipped the HXC narrowing (fractional_cso / midmarket_corp_dev /
+// smaller_fund_gp / pe_backed_founder / other → waitlist) in PHASE_1_PERSONAS
+// at src/lib/constants/icp.ts.
+//
+// The fix shape: for any file that LIVES IN an onboarding / welcome /
+// sign-up directory AND defines a role/persona taxonomy (enum, array of
+// labels, type union), verify the file references at least one of the
+// canonical HXC persona ids. If it doesn't, flag it as potentially
+// outdated against the v3.5 lock.
+//
+// This is a heuristic — a downstream cascade file (TOUR_STEPS_BY_ROLE in
+// OnboardingTour, COPY in role-empty-states, bundlesForRole in
+// sample-bundles) legitimately uses the legacy 5-role enum because the
+// auto-derive helper phase1PersonaToOnboardingRole feeds it. The check
+// distinguishes those by looking for the legacy enum INSIDE files that
+// also gate sign-up (the modal layer) vs files that consume the derived
+// role downstream (everything else).
+
+const HXC_PERSONA_IDS = [
+  'fractional_cso',
+  'midmarket_corp_dev',
+  'smaller_fund_gp',
+  'pe_backed_founder',
+];
+const HXC_PERSONA_LABELS = [
+  'fractional cso',
+  'mid-market corp dev',
+  'smaller-fund gp',
+  'pe-backed founder',
+];
+
+// Explicit list of sign-up GATE files — files where the user picks a role
+// for the first time, OR where that choice is persisted. Downstream
+// consumers (OnboardingTour / sample-bundles / role-empty-states /
+// FirstRunInlineWalkthrough / useOnboardingRole / RoleSamplePicker)
+// legitimately use the legacy 5-role enum via the phase1PersonaToOnboardingRole
+// bridge and are excluded by omission. When a new gate ships (e.g., a
+// dedicated /signup form), add its path here.
+const ONBOARDING_GATE_FILES = [
+  'src/components/ui/WelcomeModal.tsx',
+  'src/components/onboarding/Phase1PersonaModal.tsx',
+  'src/app/api/onboarding/route.ts',
+];
+
+function checkOnboardingPersonaCoherence(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!ONBOARDING_GATE_FILES.includes(rel)) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    const text = lines.join('\n');
+    const textLower = text.toLowerCase();
+
+    // Heuristic: does the file reference any HXC persona id or label,
+    // or the canonical PHASE_1_PERSONAS export, or the bridge helper?
+    const referencesHxc =
+      HXC_PERSONA_IDS.some(id => text.includes(id)) ||
+      HXC_PERSONA_LABELS.some(label => textLower.includes(label)) ||
+      text.includes('PHASE_1_PERSONAS') ||
+      text.includes('Phase1PersonaId') ||
+      text.includes('phase1PersonaToOnboardingRole');
+
+    if (!referencesHxc) {
+      // Find the first taxonomy-defining line to anchor the finding.
+      let line = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (
+          /type\s+\w*(Role|Persona)\w*\s*=/.test(lines[i]) ||
+          /const\s+(ROLES|PERSONAS)/.test(lines[i])
+        ) {
+          line = i + 1;
+          break;
+        }
+      }
+      findings.push({
+        category: 'stale',
+        severity: 'high',
+        rule: 'onboarding-persona-drift',
+        file: rel,
+        line: line || 1,
+        snippet: line ? lines[line - 1].trim().slice(0, 140) : '',
+        suggestion:
+          'Onboarding gate file defines a role taxonomy without referencing v3.5 HXC personas. Import from PHASE_1_PERSONAS in @/lib/constants/icp, or use phase1PersonaToOnboardingRole to bridge the legacy 5-role enum.',
+      });
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -639,6 +752,7 @@ function runAllChecks() {
     ...checkStaleStageLanguage(files),
     ...checkStaleAsOfDates(files),
     ...checkDeletedReferences(files),
+    ...checkOnboardingPersonaCoherence(files),
   ];
 
   return allFindings;
@@ -703,7 +817,9 @@ function formatTerminalSummary(findings) {
   const byCategory = groupBy(findings, f => f.category);
   const order = ['critical', 'modal', 'visual', 'stale'];
   const lines = [];
-  lines.push(`\n⚠ platform-audit: ${findings.length} finding${findings.length === 1 ? '' : 's'}.\n`);
+  lines.push(
+    `\n⚠ platform-audit: ${findings.length} finding${findings.length === 1 ? '' : 's'}.\n`
+  );
   for (const cat of order) {
     const items = byCategory[cat];
     if (!items || items.length === 0) continue;

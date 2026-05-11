@@ -713,6 +713,38 @@ export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> = PHASE_1_PERSON
 );
 
 /**
+ * Maps the v3.5 HXC persona id to the legacy onboardingRole enum used by
+ * the downstream personalization cascade (OnboardingTour, sample bundles,
+ * role-empty-states, FirstRunInlineWalkthrough). The merged WelcomeModal
+ * captures phase1Persona as the canonical signal and derives onboardingRole
+ * from it atomically — so the entire cascade keeps working unchanged while
+ * sign-up itself reflects the locked HXC narrowing.
+ *
+ * Mapping rationale:
+ *   fractional_cso     → cso       (CSO downstream surfaces: strategic memo + board pack)
+ *   midmarket_corp_dev → ma        (M&A workflow overlay: 9 doc types + 5 toxic combos)
+ *   pe_backed_founder  → ma        (their primary memo workflow is acquisitions + IC)
+ *   smaller_fund_gp    → pe_vc     (PE / VC / fund overlay)
+ *   other              → other     (no downstream personalization)
+ */
+export type OnboardingRoleId = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
+
+export function phase1PersonaToOnboardingRole(persona: Phase1PersonaId): OnboardingRoleId {
+  switch (persona) {
+    case 'fractional_cso':
+      return 'cso';
+    case 'midmarket_corp_dev':
+      return 'ma';
+    case 'pe_backed_founder':
+      return 'ma';
+    case 'smaller_fund_gp':
+      return 'pe_vc';
+    case 'other':
+      return 'other';
+  }
+}
+
+/**
  * Phase-graduation gate per Vohra / Superhuman methodology — locked v3.5.
  * A user-tier reaches PMF when ≥40% of HXC respondents report being "very
  * disappointed" if they could no longer use the product. Below 30% by month 4

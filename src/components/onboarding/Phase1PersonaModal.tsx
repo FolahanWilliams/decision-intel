@@ -1,22 +1,38 @@
 'use client';
 
 /**
- * GTM v3.5 Phase 1 buyer-class-continuous persona gate.
+ * GTM v3.5 Phase 1 buyer-class-continuous persona gate (LEGACY BACKFILL,
+ * 2026-05-11 lock).
  *
- * Fires after the WelcomeModal flow completes if phase1Persona is still null.
+ * As of 2026-05-11, the merged WelcomeModal captures phase1Persona directly
+ * during first sign-up using PHASE_1_PERSONAS as the canonical taxonomy. New
+ * users complete sign-up with both onboardingCompleted=true AND phase1Persona
+ * set atomically — so this modal NO-OPS for them via the early returns below.
+ *
+ * This component now exists ONLY to backfill legacy users who completed the
+ * pre-2026-05-11 WelcomeModal (broad role enum: cso / ma / bizops / pe_vc /
+ * other) and still have phase1Persona=null on their UserSettings row. The
+ * mount on (platform)/layout.tsx stays so the backfill catches them on their
+ * next dashboard visit.
+ *
  * Captures one of the four HXC personas (fractional CSO / mid-market Corp Dev /
  * smaller-fund GP / PE-backed founder) OR "other" for waitlist routing.
  *
- * Why this gate exists: the Vohra "very disappointed" PMF metric is meaningful
- * ONLY on the HXC cohort. Without persona gating, the score gets diluted by
- * non-buyer-class users (e.g., junior analysts trialing on a personal card)
- * and the Phase 1 graduation gate becomes noise. Strict ICP gating in Phase 1
- * is mitigation #1 for the Continuity Chasm risk surfaced in the cross-source
- * synthesis.
+ * Why the HXC gate exists at all: the Vohra "very disappointed" PMF metric is
+ * meaningful ONLY on the HXC cohort. Without persona gating, the score gets
+ * diluted by non-buyer-class users (e.g., junior analysts trialing on a
+ * personal card) and the Phase 1 graduation gate becomes noise. Strict ICP
+ * gating in Phase 1 is mitigation #1 for the Continuity Chasm risk surfaced
+ * in the cross-source synthesis.
  *
  * The "other" path captures the role free-text and surfaces a friendly waitlist
  * card — DI is currently optimised for the four roles above; we'll reach out
  * when the platform extends to the user's use case.
+ *
+ * SAFE TO DELETE once production user count with phase1Persona=null is zero.
+ * Run: SELECT COUNT(*) FROM "UserSettings" WHERE "onboardingCompleted" = true
+ * AND "phase1Persona" IS NULL; — when this hits 0, this file + the layout.tsx
+ * import + mount can be removed in the same commit.
  */
 
 import { useState, useEffect, useCallback } from 'react';

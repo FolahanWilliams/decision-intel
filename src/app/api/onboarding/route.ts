@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
-import { isHxcEligible } from '@/lib/constants/icp';
+import { isHxcEligible, phase1PersonaToOnboardingRole } from '@/lib/constants/icp';
 
 const log = createLogger('OnboardingRoute');
 
@@ -149,9 +149,23 @@ export async function PATCH(request: Request) {
     // Server-side derive phase1HxcEligible from phase1Persona so the client
     // can never lie about eligibility. The Vohra HXC cohort filter depends
     // on this field; client-tampering would distort the PMF metric.
+    //
+    // Also auto-derive onboardingRole from phase1Persona when both are not
+    // supplied together. The merged WelcomeModal (2026-05-11) writes phase1Persona
+    // as the canonical signal; the downstream cascade (OnboardingTour, sample
+    // bundles, role-empty-states) reads onboardingRole. Auto-derivation keeps
+    // the two in sync without forcing the client to compute the mapping.
+    // Explicit onboardingRole in the same PATCH wins (preserves backwards-
+    // compat with the legacy WelcomeModal flow which writes onboardingRole
+    // directly).
     const writeData: Record<string, unknown> = { ...data };
     if (typeof data.phase1Persona === 'string') {
       writeData.phase1HxcEligible = isHxcEligible(data.phase1Persona);
+      if (!data.onboardingRole) {
+        writeData.onboardingRole = phase1PersonaToOnboardingRole(
+          data.phase1Persona as Parameters<typeof phase1PersonaToOnboardingRole>[0]
+        );
+      }
     }
 
     try {
