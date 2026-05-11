@@ -1,5 +1,18 @@
 'use client';
 
+/**
+ * QuickScanModal — intentional slide-in right panel (not a centered
+ * dialog). Uses the useFocusTrap hook + manual ESC handler + click-
+ * outside dismiss for the standard accessibility envelope. The shadcn
+ * Dialog primitive is centered-modal-by-default; the slide-in shape
+ * here is the intentional UX choice (matches Linear / Notion command-K
+ * patterns where the audit sidebar slides in from the right while the
+ * dashboard stays visible behind it).
+ *
+ * intentional-modal-pattern — DO NOT migrate to <Dialog> without
+ * a design decision on switching from slide-in to centered.
+ */
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { X, Zap, Loader2, AlertTriangle, ArrowRight } from 'lucide-react';

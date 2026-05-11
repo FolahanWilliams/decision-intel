@@ -391,9 +391,14 @@ function checkModalShape(files) {
     if (rel.includes('src/components/ui/dialog.tsx')) continue;
     if (rel.includes('src/components/ui/CommandPalette.tsx')) continue;
     if (rel.includes('src/components/ui/EnhancedToast')) continue;
+    // LiquidGlassEffect uses position: fixed for a cursor-light bloom
+    // overlay — visual effect, not a modal.
+    if (rel.includes('src/components/ui/LiquidGlassEffect.tsx')) continue;
 
     const lines = readLines(file);
     if (!lines) continue;
+    // Check for the intentional-modal-pattern marker in the header.
+    if (lines.slice(0, 40).join('\n').includes('intentional-modal-pattern')) continue;
     const full = lines.join('\n');
     // Quick early-exit if file has no fixed-positioned content.
     if (!/position:\s*['"]fixed['"]/.test(full)) continue;

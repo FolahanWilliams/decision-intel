@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, FileText, ShieldCheck, Gauge } from 'lucide-react';
+import { ArrowRight, FileText, ShieldCheck, Gauge, AlertOctagon, ShieldAlert } from 'lucide-react';
 import { ALL_CASES, getDeepCases, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
@@ -178,6 +178,87 @@ export function ProofPageClient() {
         </div>
       </section>
 
+      {/* VALUE-AT-STAKE BANNER ─────────────────────────────────────
+          The page was already strong on hindsight discipline but soft
+          on the procurement-grade "why this matters in dollars" frame.
+          This banner translates the proof exercise into the cost of
+          missing what's already on the page. */}
+      <section style={{ padding: '32px 24px 0' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div
+            style={{
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderTop: `4px solid ${C.green}`,
+              borderRadius: 16,
+              padding: '28px 32px',
+              display: 'grid',
+              gridTemplateColumns: 'auto 1fr',
+              gap: 24,
+              alignItems: 'flex-start',
+            }}
+            className="proof-value-banner"
+          >
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 12,
+                background: 'rgba(22, 163, 74, 0.10)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <ShieldAlert size={26} style={{ color: C.green }} />
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  color: C.green,
+                  marginBottom: 8,
+                }}
+              >
+                The cost of missing what&apos;s on the page
+              </div>
+              <h3
+                style={{
+                  fontSize: 'clamp(20px, 2.4vw, 26px)',
+                  fontWeight: 700,
+                  lineHeight: 1.3,
+                  margin: 0,
+                  marginBottom: 10,
+                  color: C.slate900,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                Across these {deepCases.length} pre-decision documents, hundreds of billions in
+                market capitalization were destroyed after bias-laden reasoning made it through
+                the audit committee.
+              </h3>
+              <p
+                style={{
+                  fontSize: 14.5,
+                  lineHeight: 1.6,
+                  color: C.slate600,
+                  margin: 0,
+                }}
+              >
+                Every flag below was visible in writing <strong>before</strong> the outcome was
+                known. The DPR your audit committee defends is the artifact that catches the
+                same reasoning patterns on your next strategic memo — for £249/mo per seat,
+                not the McKinsey bill.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* DECISION TIMELINE — hero visualization of the full set ───── */}
       <section style={{ padding: '40px 24px 0' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -272,13 +353,124 @@ export function ProofPageClient() {
         </div>
 
         {/* BIAS WEB for the featured case ─────────────────────────── */}
-        <div style={{ marginBottom: 56 }}>
+        <div style={{ marginBottom: 32 }}>
           <CaseBiasWeb
             biases={evidence.flaggableBiases}
             primaryBias={active.primaryBias}
             caseLabel={`${active.company}, ${active.year}`}
             activePatterns={active.toxicCombinations}
           />
+        </div>
+
+        {/* PER-CASE ROI CALLOUT ──────────────────────────────────────
+            The user-facing translation: "this many biases were on the
+            page · this much was destroyed · DI would have flagged them
+            in 60 seconds at £X". The most procurement-relevant chunk
+            of the page — surfaces directly below the bias web so the
+            reader sees the cost of missing what's already detectable. */}
+        <div
+          style={{
+            background: C.navy,
+            color: C.white,
+            borderRadius: 16,
+            padding: '28px 32px',
+            marginBottom: 56,
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr auto',
+            gap: 24,
+            alignItems: 'center',
+          }}
+          className="proof-case-roi"
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 14,
+              background: 'rgba(239, 68, 68, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <AlertOctagon size={28} style={{ color: '#FCA5A5' }} />
+          </div>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: C.green,
+                marginBottom: 8,
+              }}
+            >
+              What the {evidence.documentType ?? 'document'} carried, in writing, before the
+              outcome
+            </div>
+            <h3
+              style={{
+                fontSize: 'clamp(20px, 2.4vw, 26px)',
+                fontWeight: 700,
+                lineHeight: 1.3,
+                margin: 0,
+                marginBottom: 10,
+                color: C.white,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {evidence.detectableRedFlags.length} red flags · {evidence.flaggableBiases.length}{' '}
+              biases · {active.estimatedImpact}.
+            </h3>
+            <p
+              style={{
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: C.slate300,
+                margin: 0,
+                maxWidth: 720,
+              }}
+            >
+              The original auditors signed off. The audit committee approved. A 60-second R²F
+              audit on the same {evidence.documentType ?? 'document'} would have surfaced every
+              item below before any of this {Math.abs(yearsElapsed) > 0 ? `${yearsElapsed}-year` : '12-month'}{' '}
+              outcome could unfold.
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '12px 20px',
+                borderRadius: 10,
+                background: C.green,
+                color: C.white,
+                fontSize: 14,
+                fontWeight: 600,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Audit yours now <ArrowRight size={14} />
+            </Link>
+            <Link
+              href="/pricing"
+              style={{
+                fontSize: 12,
+                color: C.slate400,
+                textDecoration: 'none',
+                fontWeight: 500,
+                textAlign: 'center',
+              }}
+            >
+              From £249/mo per seat →
+            </Link>
+          </div>
         </div>
 
         {/* METHOD NOTE ───────────────────────────────────────────── */}
@@ -562,10 +754,21 @@ export function ProofPageClient() {
           .proof-split {
             grid-template-columns: 1fr !important;
           }
+          .proof-case-roi {
+            grid-template-columns: auto 1fr !important;
+          }
+          .proof-case-roi > :last-child {
+            grid-column: 1 / -1;
+          }
         }
         @media (max-width: 720px) {
           .proof-method,
-          .proof-cta {
+          .proof-cta,
+          .proof-value-banner {
+            grid-template-columns: 1fr !important;
+            padding: 24px !important;
+          }
+          .proof-case-roi {
             grid-template-columns: 1fr !important;
             padding: 24px !important;
           }

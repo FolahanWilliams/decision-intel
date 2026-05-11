@@ -165,6 +165,46 @@ function NewsletterForm({ source = 'footer' }: { source?: string }) {
 // ── Competitor Comparison + FAQ (extracted to components/marketing/ for
 //    maintainability — the landing page file was already 1500+ lines).
 
+function FooterColumn({
+  heading,
+  links,
+}: {
+  heading: string;
+  links: Array<{ label: string; href: string }>;
+}) {
+  return (
+    <div>
+      <h4
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: '#FFFFFF',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          marginBottom: 16,
+        }}
+      >
+        {heading}
+      </h4>
+      {links.map(l => (
+        <a
+          key={l.label}
+          href={l.href}
+          style={{
+            display: 'block',
+            fontSize: 14,
+            color: '#94A3B8',
+            textDecoration: 'none',
+            marginBottom: 10,
+          }}
+        >
+          {l.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   return (
     <div style={{ background: C.white, color: C.slate900, overflowX: 'hidden' }}>
@@ -1395,8 +1435,8 @@ export default function LandingPage() {
             margin: '0 auto',
             padding: '64px 24px 32px',
             display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1.5fr',
-            gap: 48,
+            gridTemplateColumns: '1.6fr 1fr 1fr 1fr 1.5fr',
+            gap: 40,
           }}
           className="footer-grid"
         >
@@ -1418,64 +1458,35 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div>
-            <h4
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: C.white,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: 16,
-              }}
-            >
-              Product
-            </h4>
-            {[
-              'Privacy',
-              'Security',
-              'How It Works',
-              'R²F Standard',
-              'Case Studies',
-              'Proof',
-              'Bias Genome',
-              'Pricing',
-            ].map(l => {
-              const href =
-                l === 'How It Works'
-                  ? '/how-it-works'
-                  : l === 'R²F Standard'
-                    ? '/r2f-standard'
-                    : l === 'Case Studies'
-                      ? '/case-studies'
-                      : l === 'Proof'
-                        ? '/proof'
-                        : l === 'Bias Genome'
-                          ? '/bias-genome'
-                          : l === 'Pricing'
-                            ? '/pricing'
-                            : l === 'Privacy'
-                              ? '/privacy'
-                              : l === 'Security'
-                                ? '/security'
-                                : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
-              return (
-                <a
-                  key={l}
-                  href={href}
-                  style={{
-                    display: 'block',
-                    fontSize: 14,
-                    color: '#94A3B8',
-                    textDecoration: 'none',
-                    marginBottom: 10,
-                  }}
-                >
-                  {l}
-                </a>
-              );
-            })}
-          </div>
+          <FooterColumn
+            heading="Platform"
+            links={[
+              { label: 'How It Works', href: '/how-it-works' },
+              { label: 'R²F Standard', href: '/r2f-standard' },
+              { label: 'Bias Genome', href: '/bias-genome' },
+              { label: 'Pricing', href: '/pricing' },
+            ]}
+          />
+
+          <FooterColumn
+            heading="Proof"
+            links={[
+              { label: 'Case Studies', href: '/case-studies' },
+              { label: 'Proof', href: '/proof' },
+              { label: 'One-pager', href: '/onepager' },
+              { label: 'Demo', href: '/demo' },
+            ]}
+          />
+
+          <FooterColumn
+            heading="Trust"
+            links={[
+              { label: 'Security', href: '/security' },
+              { label: 'Privacy', href: '/privacy' },
+              { label: 'Trust center', href: '/trust' },
+              { label: 'Calibration', href: '/calibration' },
+            ]}
+          />
 
           <div>
             <h4

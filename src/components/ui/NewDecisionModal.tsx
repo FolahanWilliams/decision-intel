@@ -1,8 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Upload, Bot, BrainCircuit, Layers } from 'lucide-react';
+import { Upload, Bot, BrainCircuit, Layers } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const OPTIONS = [
   {
@@ -33,126 +39,63 @@ const OPTIONS = [
     description: 'Submit a human decision for cognitive auditing.',
     href: '/dashboard/cognitive-audits/submit',
   },
-  // Meeting entry retired 2026-05-10 — meetings are now uploaded as
-  // documents (meeting_transcript / meeting_minutes types) via the
-  // standard /dashboard upload flow.
 ];
 
+/**
+ * NewDecisionModal — routes the user to one of four create surfaces.
+ * Migrated to the shadcn Dialog primitive 2026-05-11 so focus trap,
+ * ESC handling, click-outside dismiss, and mobile Safari behavior come
+ * for free.
+ */
 export function NewDecisionModal() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = useCallback(() => setIsOpen(true), []);
-  const handleClose = useCallback(() => setIsOpen(false), []);
 
   useEffect(() => {
     window.addEventListener('open-new-decision-modal', handleOpen);
     return () => window.removeEventListener('open-new-decision-modal', handleOpen);
   }, [handleOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const modal = modalRef.current;
-    if (!modal) return;
-
-    const focusableElements = modal.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    const first = focusableElements[0];
-    const last = focusableElements[focusableElements.length - 1];
-
-    first?.focus();
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose();
-        return;
-      }
-      if (e.key !== 'Tab') return;
-
-      if (e.shiftKey) {
-        if (document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--overlay-backdrop)',
-        backdropFilter: 'blur(4px)',
-      }}
-      onClick={handleClose}
-    >
-      <div
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="New Decision"
-        onClick={e => e.stopPropagation()}
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent
+        className="!max-w-[520px]"
         style={{
-          width: '90%',
-          maxWidth: 520,
           background: 'var(--bg-secondary)',
           border: '1px solid var(--border-color)',
-          borderRadius: '16px',
-          overflow: 'hidden',
+          borderRadius: 16,
+          padding: 0,
+          gap: 0,
+          color: 'var(--text-primary)',
         }}
       >
-        {/* Header */}
+        <DialogDescription className="sr-only">
+          Pick what you want to do next: frame a decision, analyze a document, talk to the AI
+          Copilot, or audit a past decision.
+        </DialogDescription>
         <div
-          className="flex items-center justify-between"
           style={{
+            display: 'flex',
+            alignItems: 'center',
             padding: '16px 20px',
             borderBottom: '1px solid var(--border-color)',
           }}
         >
-          <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
-            What would you like to do?
-          </h2>
-          <button
-            onClick={handleClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              padding: '4px',
-              display: 'flex',
-            }}
+          <DialogTitle
+            className="!font-sans"
+            style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}
           >
-            <X size={18} />
-          </button>
+            What would you like to do?
+          </DialogTitle>
         </div>
-
-        {/* Options Grid */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px',
-            padding: '20px',
+            gap: 12,
+            padding: 20,
           }}
         >
           {OPTIONS.map(opt => {
@@ -160,19 +103,20 @@ export function NewDecisionModal() {
             return (
               <button
                 key={opt.key}
+                type="button"
                 onClick={() => {
-                  handleClose();
+                  setIsOpen(false);
                   router.push(opt.href);
                 }}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '10px',
+                  gap: 10,
                   padding: '20px 16px',
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: '12px',
+                  borderRadius: 12,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   textAlign: 'center',
@@ -191,7 +135,7 @@ export function NewDecisionModal() {
                   style={{
                     width: 44,
                     height: 44,
-                    borderRadius: '12px',
+                    borderRadius: 12,
                     background: 'rgba(22, 163, 74, 0.1)',
                     display: 'flex',
                     alignItems: 'center',
@@ -200,15 +144,15 @@ export function NewDecisionModal() {
                 >
                   <Icon size={22} style={{ color: 'var(--accent-primary)' }} />
                 </div>
-                <div style={{ fontSize: '14px', fontWeight: 600 }}>{opt.title}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.3 }}>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{opt.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.3 }}>
                   {opt.description}
                 </div>
               </button>
             );
           })}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

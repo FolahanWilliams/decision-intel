@@ -16,6 +16,12 @@ import {
   PenLine,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { createClientLogger } from '@/lib/utils/logger';
 import {
   SOURCE_ICONS,
@@ -571,55 +577,71 @@ export function AuditsPageContent() {
         </Link>
       </div>
 
-      {/* Delete Modal */}
-      {deleteModal.open && (
-        <div
+      {/* Delete Modal — migrated to Dialog primitive 2026-05-11 */}
+      <Dialog
+        open={deleteModal.open}
+        onOpenChange={o => !o && setDeleteModal({ open: false, id: '', label: '' })}
+      >
+        <DialogContent
+          className="!max-w-[400px]"
           style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 0,
+            gap: 0,
+            color: 'var(--text-primary)',
           }}
         >
-          <div className="card" style={{ maxWidth: 400, width: '90%' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
-                Delete Decision
-              </h3>
-            </div>
-            <div className="card-body">
-              <p className="mb-lg">
-                Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will
-                remove the decision, its cognitive audit, and all nudges.
-              </p>
-              <div className="flex items-center gap-md justify-end">
-                <button
-                  onClick={() => setDeleteModal({ open: false, id: '', label: '' })}
-                  className="btn btn-ghost"
-                  disabled={deleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="btn"
-                  style={{ background: 'var(--error)', color: '#fff' }}
-                  disabled={deleting}
-                >
-                  {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
-                </button>
-              </div>
+          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)' }}>
+            <DialogTitle
+              className="!font-sans flex items-center"
+              style={{
+                gap: 10,
+                fontSize: 16,
+                fontWeight: 700,
+                margin: 0,
+                color: 'var(--text-primary)',
+              }}
+            >
+              <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
+              Delete Decision
+            </DialogTitle>
+          </div>
+          <div style={{ padding: '20px 24px 24px' }}>
+            <DialogDescription
+              style={{
+                marginBottom: 20,
+                fontSize: 14,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.6,
+              }}
+            >
+              Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will
+              remove the decision, its cognitive audit, and all nudges.
+            </DialogDescription>
+            <div className="flex items-center gap-md justify-end">
+              <button
+                type="button"
+                onClick={() => setDeleteModal({ open: false, id: '', label: '' })}
+                className="btn btn-ghost"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="btn"
+                style={{ background: 'var(--error)', color: '#fff' }}
+                disabled={deleting}
+              >
+                {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
+              </button>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,8 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Check, ArrowRight, Users, Network, Shield, MessageSquare } from 'lucide-react';
+import { Check, ArrowRight, Users, Network, Shield, MessageSquare } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface TeammateWallModalProps {
   open: boolean;
@@ -38,8 +44,6 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!open) return null;
-
   const handleUpgrade = async () => {
     setLoading(true);
     setError(null);
@@ -64,33 +68,14 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="teammate-wall-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(15, 23, 42, 0.65)',
-        backdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px',
-        zIndex: 1000,
-      }}
-      onClick={onClose}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
+    <Dialog open={open} onOpenChange={o => !o && onClose()}>
+      <DialogContent
+        className="!max-w-[640px] !max-h-[90vh] overflow-auto"
         style={{
           background: '#FFFFFF',
           borderRadius: 20,
-          maxWidth: 640,
-          width: '100%',
-          maxHeight: '90vh',
-          overflow: 'auto',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.25)',
+          padding: 0,
+          gap: 0,
           border: '1px solid #E2E8F0',
         }}
       >
@@ -102,26 +87,6 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
             position: 'relative',
           }}
         >
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 20,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 6,
-              borderRadius: 8,
-              color: '#94A3B8',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <X size={20} />
-          </button>
           <div
             style={{
               fontSize: 11,
@@ -134,8 +99,8 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
           >
             Upgrade to Strategy
           </div>
-          <h2
-            id="teammate-wall-title"
+          <DialogTitle
+            className="!font-sans"
             style={{
               fontSize: 24,
               fontWeight: 700,
@@ -146,8 +111,8 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
             }}
           >
             Your Personal Decision History stays yours on Individual.
-          </h2>
-          <p
+          </DialogTitle>
+          <DialogDescription
             style={{
               fontSize: 15,
               color: '#64748B',
@@ -159,7 +124,7 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
             To invite a teammate, your team needs a shared Decision Knowledge Graph. Strategy
             connects everyone&rsquo;s memos, assumptions, and outcomes so your team learns as one
             asset instead of siloed notebooks.
-          </p>
+          </DialogDescription>
         </div>
 
         {/* Benefits */}
@@ -320,7 +285,7 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
             $2,499/mo · 15 seats · No card required for the pilot
           </p>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

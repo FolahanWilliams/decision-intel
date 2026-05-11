@@ -3,6 +3,12 @@
 import { useState } from 'react';
 import { Check, Network, Lock, Loader2, AlertCircle } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface KGMergeConsentModalProps {
   open: boolean;
@@ -22,8 +28,6 @@ export function KGMergeConsentModal({
 }: KGMergeConsentModalProps) {
   const [loading, setLoading] = useState<'merged' | 'private' | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  if (!open) return null;
 
   const recordDecision = async (decision: 'merged' | 'private') => {
     setLoading(decision);
@@ -47,31 +51,19 @@ export function KGMergeConsentModal({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="kg-consent-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(15, 23, 42, 0.72)',
-        backdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px',
-        zIndex: 1000,
-      }}
-    >
-      <div
+    // Controlled open + no onOpenChange handler — this is a one-time
+    // consent decision; the user MUST click "merge" or "keep private"
+    // and cannot dismiss via ESC or backdrop click. The Dialog primitive
+    // honors the absence of onOpenChange by keeping the modal open.
+    <Dialog open={open}>
+      <DialogContent
+        showCloseButton={false}
+        className="!max-w-[620px] !max-h-[92vh] overflow-auto"
         style={{
           background: '#FFFFFF',
           borderRadius: 20,
-          maxWidth: 620,
-          width: '100%',
-          maxHeight: '92vh',
-          overflow: 'auto',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
+          padding: 0,
+          gap: 0,
           border: '1px solid #E2E8F0',
         }}
       >
@@ -95,8 +87,8 @@ export function KGMergeConsentModal({
           >
             <Network size={12} /> Welcome to Strategy
           </div>
-          <h2
-            id="kg-consent-title"
+          <DialogTitle
+            className="!font-sans"
             style={{
               fontSize: 24,
               fontWeight: 700,
@@ -108,8 +100,8 @@ export function KGMergeConsentModal({
           >
             Merge your Personal Decision History into{' '}
             {orgName ? orgName + '\u2019s' : 'your team\u2019s'} Knowledge Graph?
-          </h2>
-          <p
+          </DialogTitle>
+          <DialogDescription
             style={{
               fontSize: 15,
               color: '#475569',
@@ -121,7 +113,7 @@ export function KGMergeConsentModal({
             {memoCount === 1 ? '' : 's'} tracked in your Personal Decision History. Your team is now
             on Strategy, which unlocks a shared Decision Knowledge Graph. Your decision below
             controls whether your prior memos join that shared graph or stay private to you.
-          </p>
+          </DialogDescription>
         </div>
 
         {/* Option A: Merge */}
@@ -303,7 +295,7 @@ export function KGMergeConsentModal({
           forward will automatically live in the team graph. You can contact support if you need to
           revise this choice later.
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
