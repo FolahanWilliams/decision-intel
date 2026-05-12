@@ -266,7 +266,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
                 Welcome to Decision Intel
               </DialogTitle>
-              <DialogDescription className="text-[var(--fs-sm)] text-[var(--text-secondary)] mt-2">
+              <DialogDescription className="text-[var(--fs-sm)] text-[var(--text-secondary)] mt-3 leading-relaxed">
                 Which of these best describes your work? We&apos;re currently optimised for four
                 specific roles — picking one tunes the audit, the case studies we surface, and the
                 network we point you at.
@@ -274,7 +274,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             </DialogHeader>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-              {PHASE_1_PERSONAS.map(persona => {
+              {PHASE_1_PERSONAS.map((persona, idx) => {
                 const PersonaIcon = PERSONA_ICON[persona.id];
                 const isSelected = selectedPersona === persona.id;
                 const isOtherChoice = persona.id === 'other';
@@ -286,14 +286,15 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     onClick={() => setSelectedPersona(persona.id)}
                     className={`
                       ${isOtherChoice ? 'sm:col-span-2' : 'col-span-1'}
-                      flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-200
-                      border
+                      flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-300
+                      border active:scale-[0.98] animate-in fade-in slide-in-from-bottom-2 fill-mode-both
                       ${
                         isSelected 
-                          ? 'bg-[rgba(22,163,74,0.06)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] ring-opacity-20 shadow-md' 
-                          : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[1px] hover:shadow-md hover:border-[rgba(22,163,74,0.3)] shadow-sm'
+                          ? 'bg-[rgba(22,163,74,0.04)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] shadow-[0_0_15px_rgba(22,163,74,0.12)] z-10' 
+                          : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[2px] hover:shadow-md hover:border-[rgba(22,163,74,0.3)] shadow-sm'
                       }
                     `}
+                    style={{ animationDelay: `${idx * 75}ms` }}
                   >
                     <div
                       className={`
@@ -354,12 +355,12 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     value={otherRoleDetail}
                     onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
                     placeholder="e.g. Risk officer at a Tier-1 bank"
-                    className="w-full p-3 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-sm)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
+                    className="w-full p-3 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-sm)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all shadow-inner"
                   />
                 </label>
                 <button
                   onClick={handleOtherSubmit}
-                  className="mt-4 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold"
+                  className="mt-4 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold active:scale-[0.98] hover:shadow-lg"
                 >
                   Add me to the waitlist
                 </button>
@@ -378,7 +379,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={() => completeOnboarding({ launchTour: true })}
-                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-200 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[1px] shadow-sm hover:shadow-lg"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
                   >
                     <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <Compass size={20} color="#fff" />
@@ -393,7 +394,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
                   <button
                     onClick={() => completeOnboarding()}
-                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[1px] shadow-sm hover:shadow-md group"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
                   >
                     <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                       <Upload size={20} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
@@ -411,7 +412,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   <button
                     onClick={handleTrySample}
                     disabled={loadingSample}
-                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[1px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait active:scale-[0.98] disabled:active:scale-100"
                   >
                     <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                       {loadingSample ? (
@@ -464,7 +465,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 setOpen(false);
                 onClose();
               }}
-              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-md"
+              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-lg active:scale-[0.98]"
             >
               Got it
             </button>
