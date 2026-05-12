@@ -233,19 +233,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   if (!open) return null;
 
   const headerIcon = (
-    <div
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        background: 'rgba(22, 163, 74, 0.12)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 10,
-      }}
-    >
-      <Compass size={22} style={{ color: 'var(--accent-primary)' }} />
+    <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[rgba(22,163,74,0.12)] flex items-center justify-center mb-3">
+      <Compass size={24} className="text-[var(--accent-primary)]" />
     </div>
   );
 
@@ -269,86 +258,59 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         }
       }}
     >
-      <DialogContent className="sm:max-w-md" showCloseButton>
+      <DialogContent className="sm:max-w-2xl p-6 sm:p-8" showCloseButton>
         {step === 'pick' ? (
-          <>
-            <DialogHeader>
+          <div className="flex flex-col animate-in fade-in duration-300">
+            <DialogHeader className="mb-4">
               {headerIcon}
-              <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
+              <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
                 Welcome to Decision Intel
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-[var(--fs-sm)] text-[var(--text-secondary)] mt-2">
                 Which of these best describes your work? We&apos;re currently optimised for four
                 specific roles — picking one tunes the audit, the case studies we surface, and the
                 network we point you at.
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 6,
-                margin: '8px 0 4px',
-              }}
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
               {PHASE_1_PERSONAS.map(persona => {
                 const PersonaIcon = PERSONA_ICON[persona.id];
                 const isSelected = selectedPersona === persona.id;
+                const isOtherChoice = persona.id === 'other';
+
                 return (
                   <button
                     key={persona.id}
                     type="button"
                     onClick={() => setSelectedPersona(persona.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '10px 12px',
-                      background: isSelected ? 'rgba(22, 163, 74, 0.06)' : 'var(--bg-card)',
-                      border: `1px solid ${
-                        isSelected ? 'var(--accent-primary)' : 'var(--border-color)'
-                      }`,
-                      borderRadius: 10,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.15s',
-                    }}
+                    className={`
+                      ${isOtherChoice ? 'sm:col-span-2' : 'col-span-1'}
+                      flex items-start gap-4 p-4 rounded-[var(--radius-lg)] text-left transition-all duration-200
+                      border
+                      ${
+                        isSelected 
+                          ? 'bg-[rgba(22,163,74,0.06)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] ring-opacity-20' 
+                          : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[1px] hover:shadow-sm hover:border-[rgba(22,163,74,0.3)]'
+                      }
+                    `}
                   >
                     <div
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 8,
-                        background: isSelected ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
+                      className={`
+                        w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 transition-colors duration-200
+                        ${isSelected ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-tertiary)]'}
+                      `}
                     >
                       <PersonaIcon
-                        size={14}
+                        size={18}
                         color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'}
                       />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: 'var(--text-primary)',
-                        }}
-                      >
+                    <div className="flex-1">
+                      <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] tracking-tight">
                         {persona.label}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 11,
-                          color: 'var(--text-muted)',
-                          marginTop: 1,
-                        }}
-                      >
+                      <div className="text-[var(--fs-xs)] text-[var(--text-secondary)] mt-1 leading-snug">
                         {persona.description}
                       </div>
                     </div>
@@ -357,97 +319,34 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               })}
             </div>
 
-            {/* Value-prop card reveals once a persona is picked. Sharpened
-                per HXC persona — the mid-market corp dev user sees Synergy
-                Mirage + PMI Tracker by name BEFORE uploading. */}
+            {/* Value-prop card reveals once a persona is picked. */}
             {valueProp && !isOther && (
-              <div
-                style={{
-                  marginTop: 10,
-                  padding: '12px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(22, 163, 74, 0.05)',
-                  border: '1px solid rgba(22, 163, 74, 0.20)',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: 'var(--accent-primary)',
-                    marginBottom: 6,
-                  }}
-                >
+              <div className="mt-2 p-5 rounded-[var(--radius-lg)] bg-[rgba(22,163,74,0.05)] border border-[rgba(22,163,74,0.20)] animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-2">
                   {valueProp.eyebrow}
                 </div>
-                <div
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                    color: 'var(--text-primary)',
-                    lineHeight: 1.4,
-                    marginBottom: 8,
-                  }}
-                >
+                <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] leading-snug mb-3">
                   {valueProp.headline}
                 </div>
-                <ul
-                  style={{
-                    margin: 0,
-                    paddingLeft: 16,
-                    fontSize: 11.5,
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.55,
-                  }}
-                >
+                <ul className="m-0 pl-5 text-[var(--fs-sm)] text-[var(--text-secondary)] leading-relaxed space-y-1 list-disc marker:text-[var(--accent-primary)]">
                   {valueProp.bullets.map(b => (
-                    <li key={b} style={{ marginBottom: 2 }}>
-                      {b}
-                    </li>
+                    <li key={b}>{b}</li>
                   ))}
                 </ul>
               </div>
             )}
 
-            {/* "Other" path: inline waitlist capture + free-text role detail.
-                Replaces the HXC CTAs (tour / upload / sample). Submit routes
-                to step='other_thanks'. */}
+            {/* "Other" path: inline waitlist capture */}
             {isOther && (
-              <div
-                style={{
-                  marginTop: 10,
-                  padding: '12px 14px',
-                  borderRadius: 10,
-                  background: 'var(--bg-secondary, rgba(0,0,0,0.02))',
-                  border: '1px solid var(--border-color)',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: 'var(--text-secondary)',
-                    marginBottom: 6,
-                  }}
-                >
+              <div className="mt-2 p-5 rounded-[var(--radius-lg)] bg-[var(--bg-secondary)] border border-[var(--border-color)] animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
                   {VALUE_PROPS_BY_PERSONA.other.eyebrow}
                 </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.5,
-                    marginBottom: 10,
-                  }}
-                >
+                <div className="text-[var(--fs-sm)] text-[var(--text-secondary)] leading-relaxed mb-4">
                   {VALUE_PROPS_BY_PERSONA.other.headline}
                 </div>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11.5px] font-medium text-[var(--text-muted)]">
                     Your role (we&apos;ll keep you posted as the platform extends):
                   </span>
                   <input
@@ -455,224 +354,105 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     value={otherRoleDetail}
                     onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
                     placeholder="e.g. Risk officer at a Tier-1 bank"
-                    style={{
-                      padding: '10px 12px',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      background: 'var(--bg-card)',
-                      color: 'var(--text-primary)',
-                      fontSize: 13,
-                    }}
+                    className="w-full p-3 border border-[var(--border-color)] rounded-[var(--radius-md)] bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-sm)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
                   />
                 </label>
                 <button
                   onClick={handleOtherSubmit}
-                  style={{
-                    marginTop: 10,
-                    width: '100%',
-                    padding: '11px 14px',
-                    background: 'var(--accent-primary)',
-                    border: '1px solid var(--accent-primary)',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    color: '#FFFFFF',
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
+                  className="mt-4 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-[var(--radius-md)] text-white text-[var(--fs-sm)] font-semibold"
                 >
                   Add me to the waitlist
                 </button>
               </div>
             )}
 
-            {/* CTAs reveal once an HXC persona is picked. Three primary
-                actions on the same screen — no second step. Suppressed for
-                'other' because that path uses the inline waitlist submit. */}
+            {/* CTAs reveal once an HXC persona is picked. */}
             {selectedPersona && !isOther && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                  marginTop: 10,
-                }}
-              >
+              <div className="flex flex-col gap-3 mt-5 animate-in fade-in slide-in-from-top-4 duration-400">
                 {sampleError && (
-                  <div
-                    style={{
-                      padding: '8px 12px',
-                      background: 'rgba(248, 113, 113, 0.08)',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      color: '#f87171',
-                    }}
-                  >
+                  <div className="w-full p-3 bg-red-500/10 border border-red-500/20 rounded-[var(--radius-md)] text-[var(--fs-xs)] text-red-600 font-medium">
                     {sampleError}
                   </div>
                 )}
-                <button
-                  onClick={() => completeOnboarding({ launchTour: true })}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '12px 14px',
-                    background: 'var(--accent-primary)',
-                    border: '1px solid var(--accent-primary)',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    color: '#FFFFFF',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 9,
-                      background: 'rgba(255, 255, 255, 0.18)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => completeOnboarding({ launchTour: true })}
+                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-200 border border-[var(--accent-primary)] rounded-[var(--radius-lg)] text-white text-left hover:-translate-y-[1px] hover:shadow-md"
                   >
-                    <Compass size={16} color="#fff" />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>Take the 60-second tour</div>
-                    <div style={{ fontSize: 11, opacity: 0.85, marginTop: 1 }}>
-                      Spotlight the upload zone, audit tabs, Knowledge Graph.
+                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-white/20 flex items-center justify-center shrink-0">
+                      <Compass size={20} color="#fff" />
                     </div>
-                  </div>
-                </button>
-                <button
-                  onClick={() => completeOnboarding()}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '12px 14px',
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    color: 'inherit',
-                    textAlign: 'left',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 9,
-                      background: 'var(--bg-tertiary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
+                    <div>
+                      <div className="text-[var(--fs-sm)] font-semibold">Take the 60-second tour</div>
+                      <div className="text-[11px] opacity-90 mt-1 leading-snug">
+                        Spotlight the upload zone, audit tabs, Knowledge Graph.
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => completeOnboarding()}
+                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-[var(--radius-lg)] text-left hover:-translate-y-[1px] hover:shadow-sm group"
                   >
-                    <Upload size={16} style={{ color: 'var(--text-secondary)' }} />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      Upload a strategic memo now
+                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                      <Upload size={20} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                      PDF, DOCX, PPTX, XLSX — up to 5MB.
+                    <div>
+                      <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)]">
+                        Upload a memo now
+                      </div>
+                      <div className="text-[11px] text-[var(--text-muted)] mt-1 leading-snug">
+                        PDF, DOCX, PPTX, XLSX — up to 5MB.
+                      </div>
                     </div>
-                  </div>
-                </button>
-                <button
-                  onClick={handleTrySample}
-                  disabled={loadingSample}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '12px 14px',
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 10,
-                    cursor: loadingSample ? 'wait' : 'pointer',
-                    color: 'inherit',
-                    textAlign: 'left',
-                    opacity: loadingSample ? 0.7 : 1,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 9,
-                      background: 'var(--bg-tertiary)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
+                  </button>
+
+                  <button
+                    onClick={handleTrySample}
+                    disabled={loadingSample}
+                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-[var(--radius-lg)] text-left hover:-translate-y-[1px] hover:shadow-sm group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait"
                   >
-                    <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      {loadingSample ? 'Loading sample...' : 'Try with a sample memo'}
+                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                      {loadingSample ? (
+                        <div className="w-5 h-5 border-2 border-[var(--text-secondary)] border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FileText size={20} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
+                      )}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                      Pre-loaded specimen tuned to your role.
+                    <div>
+                      <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)]">
+                        {loadingSample ? 'Loading...' : 'Try sample memo'}
+                      </div>
+                      <div className="text-[11px] text-[var(--text-muted)] mt-1 leading-snug">
+                        Pre-loaded specimen tuned to your role.
+                      </div>
                     </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Art 13 privacy notice — always visible before any upload-
-                triggering CTA. Mandatory disclosure under GDPR Art 13 (and
-                equivalent NDPR / PoPIA / UK GDPR provisions): the data subject
-                must be informed at the time personal data is collected. */}
-            <div
-              style={{
-                marginTop: 10,
-                padding: '10px 12px',
-                borderRadius: 8,
-                background: 'var(--bg-secondary, rgba(0,0,0,0.02))',
-                border: '1px solid var(--border-color)',
-                fontSize: 11.5,
-                color: 'var(--text-secondary)',
-                lineHeight: 1.5,
-              }}
-            >
-              <strong style={{ color: 'var(--text-primary)' }}>Before you upload:</strong> documents
+            {/* Art 13 privacy notice */}
+            <div className="mt-6 p-4 rounded-[var(--radius-md)] bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[11.5px] text-[var(--text-secondary)] leading-relaxed">
+              <strong className="text-[var(--text-primary)] font-medium">Before you upload:</strong> documents
               are encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+, and a GDPR /
               NDPR anonymizer strips PII as the literal first step of the analysis pipeline — no LLM
               ever sees raw personal data.{' '}
-              <a href="/privacy" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+              <a href="/privacy" className="text-[var(--accent-primary)] font-medium hover:underline">
                 See /privacy
               </a>{' '}
               for the full Art 13 disclosure (lawful basis, retention, your rights).
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <DialogHeader>
+          <div className="flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <DialogHeader className="mb-2">
               {headerIcon}
-              <DialogTitle style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
+              <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
                 Thanks — we&apos;ll keep you posted.
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-[var(--fs-sm)] text-[var(--text-secondary)] leading-relaxed mt-2">
                 Decision Intel is currently optimised for fractional CSOs, mid-market Heads of Corp
                 Dev, GPs at smaller funds, and PE-backed founders. You&apos;ll still be able to use
                 the platform, but the Phase 1 experience may not be tuned for your use case yet.
@@ -684,22 +464,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 setOpen(false);
                 onClose();
               }}
-              style={{
-                marginTop: 12,
-                width: '100%',
-                padding: '11px 14px',
-                background: 'var(--accent-primary)',
-                border: '1px solid var(--accent-primary)',
-                borderRadius: 10,
-                cursor: 'pointer',
-                color: '#FFFFFF',
-                fontSize: 13,
-                fontWeight: 600,
-              }}
+              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-[var(--radius-md)] text-white text-[var(--fs-sm)] font-semibold hover:shadow-md"
             >
               Got it
             </button>
-          </>
+          </div>
         )}
       </DialogContent>
     </Dialog>
