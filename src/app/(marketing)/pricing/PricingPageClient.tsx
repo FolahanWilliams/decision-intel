@@ -152,15 +152,11 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       // starting ACV BEFORE the customer has to give an email or contact
       // sales. Derived from ENTERPRISE_QUOTE_DEFAULTS so the number stays
       // in lock-step with the quote builder. 25 seats × $119/mo × 12.
-      customPrice: `From $${(
-        ENTERPRISE_QUOTE_DEFAULTS.minSeats *
-        ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly *
-        12
-      ).toLocaleString()}/yr`,
-      anchor: `${ENTERPRISE_QUOTE_DEFAULTS.minSeats} seats × $${ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly}/mo · build your number in 3 minutes`,
+      customPrice: 'Custom',
+      anchor: 'Tailored to your organization · build your number in 3 minutes',
       highlights: [
         {
-          label: `Starts at ${ENTERPRISE_QUOTE_DEFAULTS.minSeats} seats × $${ENTERPRISE_QUOTE_DEFAULTS.perSeatMonthly}/mo`,
+          label: `Starts at ${ENTERPRISE_QUOTE_DEFAULTS.minSeats} seats`,
           strong: true,
         },
         { label: 'Unlimited audits and Decision Packages' },
