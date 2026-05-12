@@ -258,11 +258,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         }
       }}
     >
-      <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden bg-[var(--bg-primary)] shadow-2xl" showCloseButton>
+      <DialogContent className="sm:max-w-[950px] p-0 overflow-hidden bg-[var(--bg-primary)] shadow-2xl rounded-2xl" showCloseButton>
         {step === 'pick' ? (
-          <div className="flex flex-col md:flex-row min-h-[600px] animate-in fade-in duration-300">
+          <div className="flex flex-col md:grid md:grid-cols-2 min-h-[600px] animate-in fade-in duration-300">
             {/* LEFT COLUMN: Header & Personas */}
-            <div className="flex-1 p-6 sm:p-10 flex flex-col md:w-1/2 overflow-y-auto">
+            <div className="p-6 sm:p-10 flex flex-col overflow-y-auto">
               <DialogHeader className="mb-6 text-left">
                 {headerIcon}
                 <DialogTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
@@ -275,7 +275,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid grid-cols-1 gap-3 mt-auto">
+              <div className="grid grid-cols-1 gap-3 mt-auto p-1 -m-1">
                 {PHASE_1_PERSONAS.map((persona, idx) => {
                   const PersonaIcon = PERSONA_ICON[persona.id];
                   const isSelected = selectedPersona === persona.id;
@@ -307,8 +307,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                           color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'}
                         />
                       </div>
-                      <div className="flex-1">
-                        <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] tracking-tight">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] tracking-tight truncate">
                           {persona.label}
                         </div>
                         <div className="text-[var(--fs-xs)] text-[var(--text-secondary)] mt-1 leading-snug">
@@ -322,11 +322,11 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             </div>
 
             {/* RIGHT COLUMN: Value Prop, CTAs & Privacy */}
-            <div className="flex-1 md:w-1/2 bg-[var(--bg-secondary)] border-t md:border-t-0 md:border-l border-[var(--border-color)] relative">
+            <div className="bg-[var(--bg-secondary)] border-t md:border-t-0 md:border-l border-[var(--border-color)] relative flex flex-col overflow-hidden">
               {/* Premium colored top strip */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-primary)] opacity-90 shadow-[0_2px_10px_rgba(22,163,74,0.4)]"></div>
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-primary)] opacity-90 shadow-[0_2px_10px_rgba(22,163,74,0.4)] z-20"></div>
               
-              <div className="p-6 sm:p-10 flex flex-col h-full justify-center">
+              <div className="p-6 sm:p-10 sm:pt-14 sm:pr-14 flex flex-col h-full justify-center relative z-10">
                 {!selectedPersona && (
                   <div className="text-center text-[var(--text-muted)] animate-in fade-in flex flex-col items-center justify-center h-full gap-4">
                     <Compass size={48} className="opacity-20" />
@@ -345,9 +345,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       <div className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] leading-tight mb-5">
                         {valueProp.headline}
                       </div>
-                      <ul className="m-0 pl-5 text-[var(--fs-sm)] sm:text-[var(--fs-md)] text-[var(--text-secondary)] leading-relaxed space-y-3 list-disc marker:text-[var(--accent-primary)]">
+                      <ul className="m-0 pl-5 text-[var(--fs-sm)] sm:text-[var(--fs-md)] text-[var(--text-secondary)] leading-relaxed space-y-3 list-outside list-disc marker:text-[var(--accent-primary)]">
                         {valueProp.bullets.map(b => (
-                          <li key={b}>{b}</li>
+                          <li key={b} className="pl-1">{b}</li>
                         ))}
                       </ul>
                     </div>
@@ -367,24 +367,24 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                             <Compass size={18} color="#fff" />
                           </div>
-                          <div>
-                            <div className="text-[var(--fs-sm)] font-semibold">Take the 60-second tour</div>
-                            <div className="text-[11px] opacity-90 mt-0.5 leading-snug">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[var(--fs-sm)] font-semibold truncate">Take the 60-second tour</div>
+                            <div className="text-[11px] opacity-90 mt-0.5 leading-snug truncate">
                               Spotlight the upload zone, audit tabs, Knowledge Graph.
                             </div>
                           </div>
                         </button>
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
                           <button
                             onClick={() => completeOnboarding()}
-                            className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
+                            className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
                           >
                             <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                               <Upload size={18} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                             </div>
-                            <div>
-                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)]">
+                            <div className="flex-1 min-w-0">
+                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
                                 Upload a memo
                               </div>
                             </div>
@@ -393,7 +393,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                           <button
                             onClick={handleTrySample}
                             disabled={loadingSample}
-                            className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait active:scale-[0.98] disabled:active:scale-100"
+                            className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait active:scale-[0.98] disabled:active:scale-100"
                           >
                             <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                               {loadingSample ? (
@@ -402,8 +402,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                                 <FileText size={18} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                               )}
                             </div>
-                            <div>
-                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)]">
+                            <div className="flex-1 min-w-0">
+                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
                                 {loadingSample ? 'Loading...' : 'Try sample'}
                               </div>
                             </div>
