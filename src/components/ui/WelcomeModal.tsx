@@ -233,7 +233,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   if (!open) return null;
 
   const headerIcon = (
-    <div className="w-12 h-12 rounded-[var(--radius-lg)] bg-[rgba(22,163,74,0.12)] flex items-center justify-center mb-3">
+    <div className="w-12 h-12 rounded-2xl bg-[rgba(22,163,74,0.12)] flex items-center justify-center mb-3">
       <Compass size={24} className="text-[var(--accent-primary)]" />
     </div>
   );
@@ -258,7 +258,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         }
       }}
     >
-      <DialogContent className="sm:max-w-2xl p-6 sm:p-8" showCloseButton>
+      <DialogContent className="sm:max-w-2xl p-6 sm:p-10" showCloseButton>
         {step === 'pick' ? (
           <div className="flex flex-col animate-in fade-in duration-300">
             <DialogHeader className="mb-4">
@@ -273,7 +273,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
               {PHASE_1_PERSONAS.map(persona => {
                 const PersonaIcon = PERSONA_ICON[persona.id];
                 const isSelected = selectedPersona === persona.id;
@@ -286,18 +286,18 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     onClick={() => setSelectedPersona(persona.id)}
                     className={`
                       ${isOtherChoice ? 'sm:col-span-2' : 'col-span-1'}
-                      flex items-start gap-4 p-4 rounded-[var(--radius-lg)] text-left transition-all duration-200
+                      flex items-start gap-4 p-5 rounded-2xl text-left transition-all duration-200
                       border
                       ${
                         isSelected 
-                          ? 'bg-[rgba(22,163,74,0.06)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] ring-opacity-20' 
-                          : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[1px] hover:shadow-sm hover:border-[rgba(22,163,74,0.3)]'
+                          ? 'bg-[rgba(22,163,74,0.06)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] ring-opacity-20 shadow-md' 
+                          : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[1px] hover:shadow-md hover:border-[rgba(22,163,74,0.3)] shadow-sm'
                       }
                     `}
                   >
                     <div
                       className={`
-                        w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 transition-colors duration-200
+                        w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200
                         ${isSelected ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-tertiary)]'}
                       `}
                     >
@@ -321,7 +321,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
             {/* Value-prop card reveals once a persona is picked. */}
             {valueProp && !isOther && (
-              <div className="mt-2 p-5 rounded-[var(--radius-lg)] bg-[rgba(22,163,74,0.05)] border border-[rgba(22,163,74,0.20)] animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="mt-4 p-6 rounded-2xl bg-[rgba(22,163,74,0.05)] border border-[rgba(22,163,74,0.20)] shadow-inner animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-2">
                   {valueProp.eyebrow}
                 </div>
@@ -338,7 +338,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
             {/* "Other" path: inline waitlist capture */}
             {isOther && (
-              <div className="mt-2 p-5 rounded-[var(--radius-lg)] bg-[var(--bg-secondary)] border border-[var(--border-color)] animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="mt-4 p-6 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
                   {VALUE_PROPS_BY_PERSONA.other.eyebrow}
                 </div>
@@ -354,12 +354,12 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     value={otherRoleDetail}
                     onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
                     placeholder="e.g. Risk officer at a Tier-1 bank"
-                    className="w-full p-3 border border-[var(--border-color)] rounded-[var(--radius-md)] bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-sm)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
+                    className="w-full p-3 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-sm)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
                   />
                 </label>
                 <button
                   onClick={handleOtherSubmit}
-                  className="mt-4 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-[var(--radius-md)] text-white text-[var(--fs-sm)] font-semibold"
+                  className="mt-4 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold"
                 >
                   Add me to the waitlist
                 </button>
@@ -370,17 +370,17 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             {selectedPersona && !isOther && (
               <div className="flex flex-col gap-3 mt-5 animate-in fade-in slide-in-from-top-4 duration-400">
                 {sampleError && (
-                  <div className="w-full p-3 bg-red-500/10 border border-red-500/20 rounded-[var(--radius-md)] text-[var(--fs-xs)] text-red-600 font-medium">
+                  <div className="w-full p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-[var(--fs-xs)] text-red-600 font-medium">
                     {sampleError}
                   </div>
                 )}
                 
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={() => completeOnboarding({ launchTour: true })}
-                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-200 border border-[var(--accent-primary)] rounded-[var(--radius-lg)] text-white text-left hover:-translate-y-[1px] hover:shadow-md"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-200 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[1px] shadow-sm hover:shadow-lg"
                   >
-                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-white/20 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                       <Compass size={20} color="#fff" />
                     </div>
                     <div>
@@ -393,9 +393,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
                   <button
                     onClick={() => completeOnboarding()}
-                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-[var(--radius-lg)] text-left hover:-translate-y-[1px] hover:shadow-sm group"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[1px] shadow-sm hover:shadow-md group"
                   >
-                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                       <Upload size={20} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                     </div>
                     <div>
@@ -411,9 +411,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   <button
                     onClick={handleTrySample}
                     disabled={loadingSample}
-                    className="flex-1 flex flex-col items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-[var(--radius-lg)] text-left hover:-translate-y-[1px] hover:shadow-sm group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait"
+                    className="flex-1 flex flex-col items-start gap-4 p-5 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-200 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[1px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait"
                   >
-                    <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
                       {loadingSample ? (
                         <div className="w-5 h-5 border-2 border-[var(--text-secondary)] border-t-transparent rounded-full animate-spin" />
                       ) : (
@@ -434,7 +434,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             )}
 
             {/* Art 13 privacy notice */}
-            <div className="mt-6 p-4 rounded-[var(--radius-md)] bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[11.5px] text-[var(--text-secondary)] leading-relaxed">
+            <div className="mt-8 p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[11.5px] text-[var(--text-secondary)] leading-relaxed">
               <strong className="text-[var(--text-primary)] font-medium">Before you upload:</strong> documents
               are encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+, and a GDPR /
               NDPR anonymizer strips PII as the literal first step of the analysis pipeline — no LLM
@@ -464,7 +464,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 setOpen(false);
                 onClose();
               }}
-              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-[var(--radius-md)] text-white text-[var(--fs-sm)] font-semibold hover:shadow-md"
+              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-colors border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-md"
             >
               Got it
             </button>
