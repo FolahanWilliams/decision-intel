@@ -3,6 +3,13 @@
 import { Fragment } from 'react';
 import { Zap, Brain, Target, CheckCircle, FileText, Users, Cpu } from 'lucide-react';
 import { card, sectionTitle, label, badge } from '@/components/founder-hub/shared-styles';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Canonical taxonomy count — derives from BIAS_EDUCATION so DI-B-023+ updates
+// automatically (CLAUDE.md "Bias Taxonomy" cascade discipline). BIAS_EDUCATION
+// is a Record<BiasCategory, ...>, NOT an array — use Object.keys().length per
+// the canonical pattern in onepager / how-it-works / bias-genome / pricing.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 type ModelTier = 'cheap' | 'main' | 'none';
 
@@ -23,7 +30,7 @@ const NODE_ROUTING: Array<{ node: string; tier: ModelTier; why: string }> = [
   {
     node: 'biasDetective',
     tier: 'main',
-    why: '20-bias taxonomy; needs reasoning + grounded search',
+    why: `${BIAS_COUNT}-bias taxonomy; needs reasoning + grounded search`,
   },
   { node: 'noiseJudge', tier: 'main', why: 'Multi-instance jury for variance measurement' },
   { node: 'verificationNode', tier: 'main', why: 'Fact-check via search + compliance mapping' },

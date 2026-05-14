@@ -21,6 +21,21 @@
  * develops.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Canonical counts — derive so pitch templates never drift when the
+// taxonomy or framework registry grows. CLAUDE.md "Inconsistent count
+// copy" + "Marketing voice" rules. BIAS_EDUCATION is a Record (not array)
+// so use Object.keys().length per the canonical pattern. Note: 8 sibling
+// sites in this file still carry hardcoded "17-framework" /
+// scenario-specific claims that need curatorial review (e.g. ISA Nigeria
+// 2007 was ADDED to the registry 2026-04-29 — scenarios that say
+// "missing ISA 2007" are now stale). Surfaced as Section 5 brainstorm in
+// the 2026-05-12 audit.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+
 // ─── Ian Spaulding — personal & professional profile ─────────────────────
 
 export const IAN_PROFILE = {
@@ -267,8 +282,7 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     fitStrength: 'high',
     whereInLrqaStack:
       'Mission AI Possible hackathon (87 ideas, 5 deployed projects). LRQA AI capability stack.',
-    diValueAdd:
-      "LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + 20-bias taxonomy + 17-framework regulatory map + 143-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.",
+    diValueAdd: `LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + ${BIAS_COUNT}-bias taxonomy + ${FRAMEWORK_COUNT}-framework regulatory map + 143-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.`,
     pitchPositioning:
       "\"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 143-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA.\"",
     proofArtefact:

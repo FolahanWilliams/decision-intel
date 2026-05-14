@@ -79,8 +79,7 @@ export const CLOVERPOP_COMPARISON: ComparisonRow[] = [
   {
     dimension: 'Output',
     cloverpop: 'Logged "Decision Flow" + AI recommendations',
-    decisionIntel:
-      'Decision Quality Index (A-F + 0-100) + Noise score + Decision Provenance Record (hashed, tamper-evident, 17-framework regulatory mapping)',
+    decisionIntel: `Decision Quality Index (A-F + 0-100) + Noise score + Decision Provenance Record (hashed, tamper-evident, ${FRAMEWORK_COUNT}-framework regulatory mapping)`,
   },
   {
     dimension: 'Moat Type',

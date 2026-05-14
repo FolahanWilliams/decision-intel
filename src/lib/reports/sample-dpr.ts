@@ -109,9 +109,11 @@ const SAMPLE_CITATIONS: CitationEntry[] = [
  * African frameworks are surfaced alongside the existing EU/US/UK
  * regimes — every public-tier DPR sample now carries NDPR + WAEMU +
  * CMA Kenya + PoPIA + FRC Nigeria entries on the same biases an
- * African-market deal would touch. The full map across the 18-framework
- * registry is in src/lib/compliance/frameworks/; this file exposes the
- * subset the SPECIMEN renders.
+ * African-market deal would touch. The full map across the canonical
+ * framework registry (derive count via getAllRegisteredFrameworks().length
+ * — currently 19 post the 2026-04-29 ISA Nigeria 2007 ship) is in
+ * src/lib/compliance/frameworks/; this file exposes the subset the
+ * SPECIMEN renders.
  */
 const SAMPLE_REGULATORY: RegulatoryEntry[] = [
   {

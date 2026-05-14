@@ -174,9 +174,14 @@ export default function NewDecisionPage() {
         </div>
       )}
 
-      {/* Pipeline preview + constellation cross-link — anchors the user
+      {/* Pipeline preview + Decisions-kanban cross-link — anchors the user
           regardless of which path they pick. Same audit runs either way;
-          the viz is a contextual reminder of what's about to happen. */}
+          the preview is a contextual reminder of what's about to happen.
+          The standalone constellation SVG viz was retired 2026-05-11; the
+          "Where it'll fit" card below now links to /dashboard/decisions
+          (canonical kanban). The legacy /dashboard/decisions/constellation
+          URL 308-redirects to /dashboard/decisions so external bookmarks
+          still resolve. */}
       {path === 'pick' && <PipelinePreview />}
     </ErrorBoundary>
   );
@@ -693,7 +698,9 @@ function DocumentPath({ defaultKind, onBack, onCreated }: DocumentPathProps) {
   );
 }
 
-// ─── Pipeline preview + constellation cross-link ─────────────────────────
+// ─── Pipeline preview + Decisions-kanban cross-link ──────────────────────
+// (Cross-link routes to /dashboard/decisions post the 2026-05-11
+// constellation SVG retirement; 308 redirect catches the legacy URL.)
 
 function PipelinePreview() {
   return (

@@ -20,7 +20,19 @@ import {
   getAlphaStatistics,
 } from '@/lib/data/decision-alpha';
 import type { PublicCompanyAnalysis } from '@/lib/data/decision-alpha';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { formatBias } from './shared-styles';
+
+// Canonical taxonomy count — derives from BIAS_EDUCATION (CLAUDE.md "Bias
+// Taxonomy" cascade discipline). BIAS_EDUCATION is a Record<BiasCategory, ...>,
+// NOT an array — use Object.keys().length per the canonical pattern. The
+// pairwise interaction matrix at src/lib/ontology/interaction-matrix.ts is
+// structurally still 20×20; the 2026-04-30 paper-application sprint added
+// DI-B-021 + DI-B-022 to the taxonomy but the matrix has not yet been
+// extended — surfaced as M-1 in the 2026-05-12 audit. Until that ships,
+// prose here avoids quoting a specific matrix dimension to stay
+// procurement-honest.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
@@ -581,8 +593,8 @@ export function DecisionAlphaTab() {
         <div style={bodyText}>
           <strong style={{ color: 'var(--text-primary, #fff)' }}>What we analyze:</strong> The
           linguistic and cognitive patterns in CEO public communications — annual letters, earnings
-          calls, SEC filings. The same 20-bias detection engine and 20x20 compound scoring matrix
-          used for IC memos is applied to these public documents.
+          calls, SEC filings. The same {BIAS_COUNT}-bias detection engine and pairwise compound
+          scoring matrix used for IC memos is applied to these public documents.
         </div>
         <div style={{ ...bodyText, marginTop: 12 }}>
           <strong style={{ color: 'var(--text-primary, #fff)' }}>Scoring adjustments:</strong>{' '}
