@@ -97,7 +97,9 @@ export type AuditAction =
   | 'AMBIENT_CONSENT_TOGGLED'
   // PMI Path B (locked 2026-05-10)
   | 'PMI_SIGNAL_RECORDED'
-  | 'PMI_SIGNAL_OBSERVED';
+  | 'PMI_SIGNAL_OBSERVED'
+  // M-3 — Auto-extract PMI signals from IC memo content (locked 2026-05-13)
+  | 'PMI_SIGNAL_EXTRACT_ATTEMPTED';
 
 export interface AuditLogParams {
   action: AuditAction;

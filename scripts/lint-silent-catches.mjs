@@ -148,7 +148,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // and-forget cache miss (cache-layer outages should not block the
 // pre-mortem from running fresh). Both belong to the documented
 // fire-and-forget exception class.
-const SILENT_CATCH_BASELINE = 173;
+// 173 → 175: M-3 ship 2026-05-13 (PMI signal auto-extraction) added two
+// `res.json().catch(() => null)` body-parse error paths in
+// PmiTrackerTab.runExtraction + acceptSuggestion — both parse the API
+// error body before throwing so the form surfaces the real server
+// error instead of a generic "Failed". Canonical req.json() body-parse
+// exception class.
+const SILENT_CATCH_BASELINE = 175;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

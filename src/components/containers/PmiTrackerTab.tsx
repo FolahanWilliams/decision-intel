@@ -34,6 +34,8 @@ import {
   CheckCircle,
   AlertCircle,
   Lightbulb,
+  Sparkles,
+  X,
 } from 'lucide-react';
 
 type PmiSignalKey =
@@ -80,6 +82,34 @@ interface PmiSignalsBlob {
   lastUpdatedAt?: string;
 }
 
+/**
+ * Suggestion shape returned by /api/decisions/[id]/pmi-signals/extract.
+ * Mirrors ExtractedPmiSignal in src/lib/pmi/extract-from-memo.ts —
+ * intentionally duplicated here as a client-side type so the tab can
+ * compile without a server-only import. When the extract schema
+ * evolves, update both surfaces in lockstep.
+ */
+interface ExtractedSignalSuggestion {
+  key: PmiSignalKey;
+  quote: string;
+  proxy: string;
+  horizonDays: 90 | 180 | 365;
+  predictedConfidence: number;
+  rationale: string;
+}
+
+interface ExtractResponse {
+  containerId: string;
+  sourceDocument?: {
+    id: string;
+    filename: string;
+    documentType: string | null;
+  };
+  signals: ExtractedSignalSuggestion[];
+  llmSucceeded: boolean;
+  contentChars: number;
+}
+
 const RESOLUTION_COLORS: Record<NonNullable<PmiSignal['resolution']>, string> = {
   hit: 'var(--success)',
   partial: 'var(--warning)',
@@ -109,6 +139,16 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
   const [draftHorizon, setDraftHorizon] = useState<90 | 180 | 365>(180);
   const [draftConfidence, setDraftConfidence] = useState(0.7);
   const [busyKey, setBusyKey] = useState<PmiSignalKey | null>(null);
+
+  // M-3 (locked 2026-05-13) — auto-extract suggestion state. Suggestions
+  // never persist directly; the user accepts each via the canonical
+  // POST /pmi-signals path so the audit log + Brier flow stay intact.
+  const [extracting, setExtracting] = useState(false);
+  const [suggestions, setSuggestions] = useState<ExtractedSignalSuggestion[] | null>(null);
+  const [extractSource, setExtractSource] = useState<ExtractResponse['sourceDocument'] | null>(
+    null
+  );
+  const [acceptingKey, setAcceptingKey] = useState<PmiSignalKey | null>(null);
 
   const fetchSignals = useCallback(async () => {
     try {
@@ -165,6 +205,96 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
     } finally {
       setAdding(false);
     }
+  };
+
+  const runExtraction = async () => {
+    setExtracting(true);
+    setError(null);
+    setSuggestions(null);
+    setExtractSource(null);
+    try {
+      const res = await fetch(`/api/decisions/${containerId}/pmi-signals/extract`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const body = (await res.json().catch(() => null)) as ExtractResponse | { error?: string } | null;
+      if (!res.ok) {
+        const errMsg =
+          body && 'error' in body && typeof body.error === 'string'
+            ? body.error
+            : 'Extraction failed';
+        throw new Error(errMsg);
+      }
+      const data = body as ExtractResponse;
+      setSuggestions(data.signals);
+      setExtractSource(data.sourceDocument ?? null);
+      if (data.signals.length === 0 && data.llmSucceeded) {
+        // LLM ran but found no committed PMI metrics — surface this
+        // honestly so the user knows manual entry is needed (and that
+        // their memo may need more concrete commitments).
+        setError(
+          'No concrete PMI commitments found in the memo. Add signals manually below.'
+        );
+      } else if (data.signals.length === 0 && !data.llmSucceeded) {
+        // Gateway error or parse failure — fall back to manual.
+        setError('Auto-extraction unavailable right now. Add signals manually below.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Extraction failed');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const acceptSuggestion = async (suggestion: ExtractedSignalSuggestion) => {
+    setAcceptingKey(suggestion.key);
+    setError(null);
+    try {
+      const res = await fetch(`/api/decisions/${containerId}/pmi-signals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          signal: {
+            key: suggestion.key,
+            proxy: suggestion.proxy,
+            horizonDays: suggestion.horizonDays,
+            predictedConfidence: suggestion.predictedConfidence,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const errBody = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(errBody?.error ?? 'Failed to accept suggestion');
+      }
+      const data = (await res.json()) as { pmiSignals: PmiSignalsBlob };
+      setBlob(data.pmiSignals);
+      // Drop the accepted suggestion from the preview list. Other
+      // suggestions remain so the user can review them one at a time.
+      setSuggestions(prev => (prev ? prev.filter(s => s.key !== suggestion.key) : null));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to accept suggestion');
+    } finally {
+      setAcceptingKey(null);
+    }
+  };
+
+  const dismissSuggestion = (key: PmiSignalKey) => {
+    setSuggestions(prev => (prev ? prev.filter(s => s.key !== key) : null));
+  };
+
+  const dismissAllSuggestions = () => {
+    setSuggestions(null);
+    setExtractSource(null);
+  };
+
+  const editSuggestionIntoDraft = (suggestion: ExtractedSignalSuggestion) => {
+    setDraftKey(suggestion.key);
+    setDraftProxy(suggestion.proxy);
+    setDraftHorizon(suggestion.horizonDays);
+    setDraftConfidence(suggestion.predictedConfidence);
+    // Drop from preview; the draft form is now editable for this signal.
+    setSuggestions(prev => (prev ? prev.filter(s => s.key !== suggestion.key) : null));
   };
 
   const observe = async (key: PmiSignalKey, observedValue: number) => {
@@ -392,6 +522,245 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
           })}
         </div>
       )}
+
+      {/* Auto-extract from IC memo (M-3, locked 2026-05-13) */}
+      <div
+        style={{
+          padding: '12px',
+          marginBottom: 12,
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--bg-secondary)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+            marginBottom: suggestions || extracting ? 12 : 0,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 auto' }}>
+            <Sparkles size={14} style={{ color: 'var(--accent-secondary, #6366f1)' }} />
+            <div>
+              <div
+                style={{
+                  fontSize: 'var(--fs-xs)',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 2,
+                }}
+              >
+                Auto-extract PMI signals from IC memo
+              </div>
+              <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+                Reads the latest analyzed IC memo / synergy model / integration plan and
+                proposes signals to track. Every suggestion needs your accept &mdash; nothing
+                persists until you confirm.
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => void runExtraction()}
+            disabled={extracting}
+            style={{
+              padding: '6px 12px',
+              background: extracting ? 'var(--bg-elevated)' : 'transparent',
+              border: '1px solid var(--accent-secondary, #6366f1)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--fs-xs)',
+              fontWeight: 600,
+              color: extracting ? 'var(--text-muted)' : 'var(--accent-secondary, #6366f1)',
+              cursor: extracting ? 'not-allowed' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              flexShrink: 0,
+            }}
+          >
+            {extracting ? (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                Extracting&hellip;
+              </>
+            ) : (
+              <>
+                <Sparkles size={12} />
+                {suggestions ? 'Re-extract' : 'Extract from memo'}
+              </>
+            )}
+          </button>
+        </div>
+
+        {suggestions && suggestions.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div
+              style={{
+                fontSize: 'var(--fs-2xs)',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              <span>
+                {suggestions.length} suggestion{suggestions.length === 1 ? '' : 's'}
+                {extractSource?.filename ? ` from ${extractSource.filename}` : ''}
+                {' · review each before persisting'}
+              </span>
+              <button
+                type="button"
+                onClick={dismissAllSuggestions}
+                style={{
+                  padding: '2px 6px',
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: 'var(--fs-2xs)',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
+              >
+                Dismiss all
+              </button>
+            </div>
+            {suggestions.map(suggestion => {
+              const isAccepting = acceptingKey === suggestion.key;
+              return (
+                <div
+                  key={suggestion.key}
+                  style={{
+                    padding: 10,
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'var(--bg-card)',
+                    borderLeft: '3px solid var(--accent-secondary, #6366f1)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: 8,
+                      marginBottom: 4,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {SIGNAL_LABELS[suggestion.key]}
+                    </span>
+                    <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+                      {suggestion.horizonDays}d &middot;{' '}
+                      {(suggestion.predictedConfidence * 100).toFixed(0)}% confidence
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      margin: '0 0 6px',
+                      fontSize: 'var(--fs-xs)',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    &ldquo;{suggestion.quote}&rdquo;
+                  </p>
+                  <p
+                    style={{
+                      margin: '0 0 8px',
+                      fontSize: 'var(--fs-2xs)',
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {suggestion.rationale}
+                  </p>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => void acceptSuggestion(suggestion)}
+                      disabled={isAccepting || acceptingKey !== null}
+                      style={{
+                        padding: '4px 10px',
+                        background:
+                          isAccepting || acceptingKey !== null
+                            ? 'var(--bg-elevated)'
+                            : 'var(--accent-primary)',
+                        border: 'none',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: 'var(--fs-2xs)',
+                        fontWeight: 600,
+                        color:
+                          isAccepting || acceptingKey !== null ? 'var(--text-muted)' : '#fff',
+                        cursor: isAccepting || acceptingKey !== null ? 'wait' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      {isAccepting ? (
+                        <Loader2 size={10} className="animate-spin" />
+                      ) : (
+                        <CheckCircle size={10} />
+                      )}
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editSuggestionIntoDraft(suggestion)}
+                      disabled={acceptingKey !== null}
+                      style={{
+                        padding: '4px 10px',
+                        background: 'transparent',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: 'var(--fs-2xs)',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)',
+                        cursor: acceptingKey !== null ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => dismissSuggestion(suggestion.key)}
+                      disabled={acceptingKey !== null}
+                      style={{
+                        padding: '4px 10px',
+                        background: 'transparent',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: 'var(--fs-2xs)',
+                        color: 'var(--text-muted)',
+                        cursor: acceptingKey !== null ? 'not-allowed' : 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <X size={10} />
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Add-signal form */}
       <div
