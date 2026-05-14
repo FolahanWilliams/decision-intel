@@ -747,13 +747,18 @@ export function R2FStandardClient() {
           below.
         </p>
 
-        {/* Methodology version progression — Item 2 lock 2026-05-07.
-            Procurement readers ask "which methodology produced this number?"
-            The progression shows the audit trail: legacy 2.0.0 (deprecated)
-            → 2.0.0-seed (current platform baseline) → 2.1.0 (live audits,
-            validity-aware weight shift per Kahneman & Klein 2009) → per-org
+        {/* Methodology version progression — Item 2 lock 2026-05-07,
+            extended 2026-05-13 (M-4 sharpening) to surface the full
+            engine-epoch chain through 2.4.0. Procurement readers ask
+            "which methodology produced this number?" The progression
+            shows the audit trail: legacy 2.0.0 (deprecated) → 2.0.0-seed
+            (current platform baseline) → 2.1.0 (validity shift) → 2.2.0
+            (compound-pattern 7th component) → 2.3.0 (user-adjustable
+            weights per Dietvorst 2016) → 2.4.0 (22×22 interaction matrix
+            covering DI-B-021 + DI-B-022; CURRENT LIVE stamp) → per-org
             Brier supersedes once outcomes accumulate via Outcome Gate
-            enforcement. */}
+            enforcement + the Vohra HXC PMF cohort signals the org has
+            converged. */}
         <div
           style={{
             background: C.white,
@@ -797,42 +802,77 @@ export function R2FStandardClient() {
               },
               {
                 version: '2.1.0',
-                label: 'Live audits',
+                label: 'Validity shift',
+                state: 'superseded' as const,
+                blurb:
+                  'Validity-aware weight shift per Kahneman & Klein 2009 first condition. Stamped when only validityClass is supplied; superseded by 2.2.0+ when compound patterns + matrix coverage land.',
+              },
+              {
+                version: '2.2.0',
+                label: 'Compound risk',
+                state: 'superseded' as const,
+                blurb:
+                  'Added compoundRisk as the 7th DQI component (M&A hard-layer ship 2026-05-09). 20×20 interaction matrix coverage. Stamped on audits between 2026-05-09 and 2026-05-13.',
+              },
+              {
+                version: '2.3.0',
+                label: 'User-adjustable weights',
                 state: 'live' as const,
                 blurb:
-                  'Validity-aware weight shift per Kahneman & Klein 2009 first condition. Active on every new audit since 2026-04-30.',
+                  'Customer tunes the DQI component weights for their domain (Dietvorst 2016 algorithm-aversion fix). Stamped when userAdjustableWeights are applied + the weights-hash for tamper-evidence.',
+              },
+              {
+                version: '2.4.0',
+                label: '22×22 matrix',
+                state: 'current-live' as const,
+                blurb:
+                  'Interaction matrix extended to cover DI-B-021 (illusion of validity) + DI-B-022 (inside-view dominance). Current canonical stamp when compound patterns are supplied. Coherent Confidence + Reference-Class Blindness toxic combinations now amplify properly.',
               },
               {
                 version: 'per-org',
                 label: 'Customer outcomes',
                 state: 'future' as const,
                 blurb:
-                  'When a customer org accumulates closed outcomes via Outcome Gate enforcement, per-org Brier replaces the seed baseline on every DPR they generate.',
+                  'Once a customer org accumulates closed outcomes via Outcome Gate enforcement AND the Vohra HXC PMF cohort exceeds the ≥5 sample-size floor, per-org Brier replaces the seed baseline on every DPR they generate.',
               },
             ].map(v => {
               const tone =
-                v.state === 'live'
+                v.state === 'current-live'
                   ? { color: C.green, bg: C.greenSoft, border: C.greenBorder, label: 'LIVE' }
-                  : v.state === 'current-seed'
+                  : v.state === 'live'
                     ? {
-                        color: C.blue,
-                        bg: C.blueSoft,
-                        border: 'rgba(37, 99, 235, 0.25)',
-                        label: 'SEED',
+                        color: C.green,
+                        bg: C.greenSoft,
+                        border: C.greenBorder,
+                        label: 'LIVE (USER-TUNE PATH)',
                       }
-                    : v.state === 'deprecated'
+                    : v.state === 'current-seed'
                       ? {
-                          color: C.slate500,
-                          bg: C.slate100,
-                          border: C.slate200,
-                          label: 'DEPRECATED',
+                          color: C.blue,
+                          bg: C.blueSoft,
+                          border: 'rgba(37, 99, 235, 0.25)',
+                          label: 'SEED',
                         }
-                      : {
-                          color: C.amber,
-                          bg: C.amberSoft,
-                          border: 'rgba(217, 119, 6, 0.25)',
-                          label: 'FUTURE',
-                        };
+                      : v.state === 'superseded'
+                        ? {
+                            color: C.slate600,
+                            bg: C.slate100,
+                            border: C.slate200,
+                            label: 'SUPERSEDED',
+                          }
+                        : v.state === 'deprecated'
+                          ? {
+                              color: C.slate500,
+                              bg: C.slate100,
+                              border: C.slate200,
+                              label: 'DEPRECATED',
+                            }
+                          : {
+                              color: C.amber,
+                              bg: C.amberSoft,
+                              border: 'rgba(217, 119, 6, 0.25)',
+                              label: 'FUTURE',
+                            };
               return (
                 <div
                   key={v.version}
@@ -1024,9 +1064,11 @@ export function R2FStandardClient() {
               Per-org Brier supersedes
             </div>
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: C.slate700 }}>
-              When a customer org accumulates closed outcomes via Outcome Gate enforcement, per-org
-              calibration replaces the seed baseline on every DPR they generate. Until then, the
-              seed is the contractual answer.
+              When a customer org accumulates closed outcomes via Outcome Gate enforcement AND the
+              Vohra HXC PMF cohort clears the ≥5 sample-size floor (locked v3.5 graduation gate),
+              per-org calibration replaces the seed baseline on every DPR they generate. Until
+              then, the seed IS the contractual answer — and the version stamp on the cover page
+              tells the audit-committee reader exactly which methodology epoch produced it.
             </p>
           </div>
           <div
