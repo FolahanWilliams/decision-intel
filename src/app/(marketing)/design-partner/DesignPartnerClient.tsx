@@ -31,6 +31,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_TOTAL } from '@/lib/constants/company-info';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 const C = {
   white: '#FFFFFF',
@@ -65,7 +66,7 @@ const YOU_RECEIVE: Array<{ icon: typeof ShieldCheck; title: string; body: string
   {
     icon: Sliders,
     title: 'Custom toxic-combination weights',
-    body: 'The founder personally tunes the 20×20 interaction matrix to your industry\u2019s failure modes, using your historical memo library as calibration data.',
+    body: `The founder personally tunes the ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix to your industry\u2019s failure modes, using your historical memo library as calibration data.`,
   },
   {
     icon: Users,

@@ -5,17 +5,22 @@
  *
  * Four-step horizontal visualization of how the Bias Genome is derived —
  * from source documents through taxonomy extraction, pair-scoring via the
- * 20×20 interaction matrix, and per-pattern mitigation. A dashed return
+ * 22×22 interaction matrix, and per-pattern mitigation. A dashed return
  * arrow from step 4 back to step 1 shows the outcome-feedback loop that
  * recalibrates weights as real outcomes come back.
  *
  * Light theme, SVG + Framer Motion, respects prefers-reduced-motion.
  * Everything traces back to real methodology; no fabricated numbers.
+ *
+ * Matrix dimension derives from MATRIX_DIMENSION so DI-B-023 ships extend
+ * this viz automatically (M-1 ship 2026-05-13 lock + Bias Taxonomy
+ * cascade rule #11).
  */
 
 import { motion } from 'framer-motion';
 import { FileText, Tag, Shield } from 'lucide-react';
 import { useReducedMotion } from '@/components/marketing/how-it-works/useReducedMotion';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 const C = {
   white: '#FFFFFF',
@@ -416,7 +421,7 @@ export function GenomeMethodologyViz() {
       viz: <ExtractViz reduced={reduced} />,
     },
     {
-      title: '20×20 interaction matrix',
+      title: `${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix`,
       descriptor:
         'Every bias pair is scored against the others. Context amplifiers (stakes, dissent, time pressure) multiply the score; false-positive damping kicks in when a pattern fires but the outcome succeeds.',
       viz: <MatrixViz reduced={reduced} />,

@@ -27,11 +27,14 @@ import { CounterfactualLiftViz } from '@/components/marketing/how-it-works/Count
 import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
 import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
 
 // Bias count derived from BIAS_EDUCATION (count-discipline rule); when DI-B-023
-// lands the marketing copy picks it up automatically.
+// lands the marketing copy picks it up automatically. The interaction matrix
+// dimension (MATRIX_DIMENSION imported above) is the same number by
+// construction — see the parity test in interaction-matrix.test.ts.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 // R²F detectors — the three operationalisations of Kahneman & Klein 2009 +
@@ -511,7 +514,7 @@ export function HowItWorksClient() {
             title="Individual biases are features. Combinations are catastrophic."
             body={
               <>
-                Our twenty-by-twenty interaction matrix scores every bias pair against the others.
+                Our {MATRIX_DIMENSION}×{MATRIX_DIMENSION} interaction matrix scores every bias pair against the others.
                 Context amplifiers multiply the score when monetary stakes are high, dissent is
                 absent, or time pressure is active. False-positive damping kicks in when a pattern
                 gets flagged but the outcome succeeded. Over time, each organization calibrates its

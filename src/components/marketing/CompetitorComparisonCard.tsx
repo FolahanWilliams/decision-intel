@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, Minus, X } from 'lucide-react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 // Drift-safe framework count — derives from the registry so a new framework
 // addition flows into the comparison table without a copy edit.
@@ -114,7 +115,7 @@ const PROFILES: CompetitorProfile[] = [
         dimension: 'Compound bias scoring',
         themLabel: 'Not offered',
         themRating: 'none',
-        usLabel: '20×20 interaction matrix',
+        usLabel: `${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix`,
         usRating: 'full',
       },
       {
