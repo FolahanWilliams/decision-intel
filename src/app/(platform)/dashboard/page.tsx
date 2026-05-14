@@ -64,6 +64,7 @@ import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
 import { ContainersWidget } from '@/components/dashboard/ContainersWidget';
 import { AmbientSignalBanner } from '@/components/dashboard/AmbientSignalBanner';
+import { RippleAlertBanner } from '@/components/dashboard/RippleAlertBanner';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -1270,6 +1271,17 @@ export default function Dashboard() {
             locks in; ambient capture is the surface that gets us there. */}
         <ErrorBoundary sectionName="Ambient signals">
           <AmbientSignalBanner />
+        </ErrorBoundary>
+
+        {/* RippleAlertBanner — M-7 ship 2026-05-13. Surfaces proactive
+            depends_on ripple alerts when an anchor container's status
+            shifts (archived) or its outcome resolves unfavorably (Brier
+            ≥ 0.20 OR failure-language summary). Self-hides when no
+            ripples. Paper #2 Ch 5: cross-decision pattern detection is
+            the killer differentiator; this is the proactive surface
+            that turns detection into a notification. */}
+        <ErrorBoundary sectionName="Ripple alerts">
+          <RippleAlertBanner />
         </ErrorBoundary>
 
         <OnboardingGuide documentCount={totalDocs ?? 0} />
