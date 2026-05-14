@@ -342,6 +342,10 @@ const FAQ: Array<{ q: string; a: string }> = [
     a: 'Strategy includes a 30-day pilot. No card required to start. During the pilot, your team\u2019s Knowledge Graph hydrates from each user\u2019s Personal Decision History as they opt in. At the end of the pilot, you either subscribe or revert cleanly with your personal data intact.',
   },
   {
+    q: 'How do I know your scoring is reliable? My team will say "the model can\'t replace a CSO\'s judgment."',
+    a: 'That objection is itself a documented cognitive bias \u2014 Algorithm Aversion (Dietvorst, Simmons & Massey 2015, Journal of Experimental Psychology: General, doi:10.1037/xge0000033). Humans are systematically more forgiving of human errors than equivalent algorithm errors; after seeing a forecasting algorithm err once, people prefer human judgment even when the algorithm is statistically superior. Decision Intel does NOT replace your CSO\u2019s judgment \u2014 we audit the reasoning the CSO produces. The DQI is a defensible baseline, not a verdict. Per Dietvorst\u2019s 2016 follow-up, people accept imperfect algorithms IF they can slightly modify the inputs or weights \u2014 which is why every customer can tune the DQI component weights to their domain on the Settings \u2192 Preferences panel (T2.1 ship 2026-05-10; methodology stamp 2.3.0). And the algorithm-aversion detector itself is one of the 10 R\u00b2F detectors we run on every memo \u2014 a CSO who dismisses quantitative analysis through narrative judgment is exhibiting exactly the pattern Decision Intel flags. Reproducible methodology, citable paper, user-tunable weights.',
+  },
+  {
     q: 'What team features can I not access on Individual?',
     a: 'Individual is intentionally solo: no Decision Rooms, no shared Knowledge Graph, no Slack/Drive/Email integrations, no compliance mapping, no custom toxic combination weights. These are team-only features that unlock on Strategy.',
   },

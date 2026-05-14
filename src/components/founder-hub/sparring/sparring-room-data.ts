@@ -1161,6 +1161,18 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     generatorHint:
       "James just said: \"Your DPR says 'tamper-evident' but your roadmap admits private-key signing isn't shipped. That's an overclaim — explain.\" You have 30 seconds.",
   },
+  {
+    personaId: 'f500_cso',
+    mode: 'objection_handler',
+    generatorHint:
+      "Margaret just said: \"My team isn't going to want AI questioning their judgment. The strategic call IS the CSO's job — that's why I hire them.\" The textbook algorithm-aversion objection, locked 2026-05-13 (Dietvorst, Simmons & Massey 2015 / doi:10.1037/xge0000033). You have 30 seconds. The right counter has three beats: (1) name the pattern without making her wrong (\"there's a 2015 paper for that — Algorithm Aversion. Real bias, well-documented\"), (2) reframe the artefact (\"DI doesn't replace your CSO's judgment — it audits the reasoning their memo produces, so they can defend the call in front of the audit committee\"), (3) close with the Dietvorst-2016 fix (\"your CSO tunes the weights to your domain — the DQI is a defensible baseline they shape, not a verdict imposed on them\"). Don't lecture. Don't quote the DOI to her face. Don't say \"great question.\"",
+  },
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'objection_handler',
+    generatorHint:
+      "Damien just said: \"You're claiming a 22-bias matrix can audit my analyst's reasoning better than I can? That feels reductive — strategic memos aren't a quant problem.\" The false-precision objection, locked 2026-05-13 (anchored on Dawes 1979 'Robust Beauty of Improper Linear Models' + Meehl 1954 clinical-vs-statistical-prediction). You have 30 seconds. The right counter has three beats: (1) agree with the felt sense (\"you're right that strategic memos aren't a quant problem — and the matrix isn't trying to score them quant-style\"), (2) name the actual claim (\"what we audit is whether the reasoning has structural rigor — explicit criteria vs narrative-only, reference-class anchoring vs inside view, confidence calibrated to evidence vs rhetorical. Dawes 1979 showed that even simple structured rubrics outperform pure narrative judgment on prediction tasks — that's the literature your analyst was implicitly arguing against\"), (3) flip the frame (\"the matrix is your second pair of eyes on whether your analyst is doing the structured work, not the structured work itself. You still make the call\"). Don't quote Meehl by name on a 30-second window — let the procurement reader find Dawes / Meehl in the DPR. Don't say \"great question.\"",
+  },
 
   // Live demo walkthrough per persona
   {
