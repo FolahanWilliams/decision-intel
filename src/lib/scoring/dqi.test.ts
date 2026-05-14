@@ -517,13 +517,17 @@ describe('computeDQI · compoundRisk component', () => {
     expect(result.components.compoundRisk.score).toBe(100);
   });
 
-  it('audits with empty compoundPatterns array stamp methodology 2.2.0', () => {
+  it('audits with empty compoundPatterns array stamp methodology 2.4.0', () => {
+    // Bumped from '2.2.0' to '2.4.0' on 2026-05-13 (M-1 ship) — the
+    // matrix-extension epoch advanced the "compoundPatterns supplied"
+    // stamp. Empty arrays still trigger the stamp because the engine
+    // ran through the compound-pattern resolution path.
     const result = computeDQI({
       ...makeInput(),
       validityClass: 'medium',
       compoundPatterns: [],
     });
-    expect(result.methodologyVersion).toBe('2.2.0');
+    expect(result.methodologyVersion).toBe('2.4.0');
     expect(result.components.compoundRisk.score).toBe(100);
   });
 
@@ -800,7 +804,11 @@ describe('SYNTHETIC_WEIGHTS_LEGACY_2_0_0', () => {
 // ---------------------------------------------------------------------------
 
 describe('WEIGHTS_CANONICAL', () => {
-  it('is a frozen mirror of WEIGHTS as of methodology 2.2.0', async () => {
+  it('is a frozen mirror of WEIGHTS as of methodology 2.2.0/2.4.0 (weight vector unchanged by M-1)', async () => {
+    // The 2026-05-13 M-1 matrix-extension ship did NOT change the
+    // weight vector — only the matrix coverage shifted. WEIGHTS_CANONICAL
+    // remains frozen at the 2.2.0 weight vector; the 2.4.0 stamp marks
+    // the engine epoch (22×22 matrix), not a weight rebalance.
     const { WEIGHTS_CANONICAL } = await import('./dqi');
     expect(WEIGHTS_CANONICAL.biasLoad).toBe(0.22);
     expect(WEIGHTS_CANONICAL.compoundRisk).toBe(0.06);
@@ -924,10 +932,12 @@ describe('computeDQI — user-adjustable weights (T2.1)', () => {
     expect(result.weightsSource).toBe('user_adjustable');
   });
 
-  it('stamps "2.2.0" when only compoundPatterns supplied (no user override)', async () => {
+  it('stamps "2.4.0" when only compoundPatterns supplied (no user override)', async () => {
+    // Bumped from 2.2.0 to 2.4.0 on 2026-05-13 (M-1 ship — engine epoch
+    // advanced when DI-B-021 + DI-B-022 gained matrix coverage).
     const { computeDQI } = await import('./dqi');
     const result = computeDQI(makeInput({ compoundPatterns: [] }));
-    expect(result.methodologyVersion).toBe('2.2.0');
+    expect(result.methodologyVersion).toBe('2.4.0');
     expect(result.weightsSource).toBe('canonical');
   });
 

@@ -68,7 +68,9 @@ describe('runDistributionCheck — held-out regression infrastructure', () => {
     }
   });
 
-  it('canonical config stamps 2.2.0 when compoundPatterns supplied', () => {
+  it('canonical config stamps 2.4.0 when compoundPatterns supplied', () => {
+    // Bumped from 2.2.0 to 2.4.0 on 2026-05-13 (M-1 ship — engine
+    // epoch advanced when DI-B-021 + DI-B-022 gained matrix coverage).
     const report = runDistributionCheck();
     const canonical = report.cells.filter(c => c.configId === 'canonical');
     const withCompound = canonical.filter(c => {
@@ -78,7 +80,7 @@ describe('runDistributionCheck — held-out regression infrastructure', () => {
     expect(withCompound.length).toBeGreaterThan(0);
     for (const c of withCompound) {
       // compoundPatterns wins over validityClass for the methodology stamp
-      expect(c.methodologyVersion).toBe('2.2.0');
+      expect(c.methodologyVersion).toBe('2.4.0');
       // weightsSource can be 'canonical' OR 'validity_shifted' depending on
       // whether the memo's validityClass produces a non-trivial weight shift
       expect(['canonical', 'validity_shifted']).toContain(c.weightsSource);

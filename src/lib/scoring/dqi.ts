@@ -293,11 +293,13 @@ export function computeEffectiveWeights(
 // `methodologyVersion: '2.3.0'` + the override hash for tamper-evidence.
 
 /** Methodology version stamp when an audit runs under user-adjustable
- *  weights (Tier 2.1). Trichotomy is now: 2.0.0-no-validity | 2.1.0 |
- *  2.2.0 | 2.3.0. Canonical engine constant remains METHODOLOGY_VERSION;
- *  2.3.0 is stamped on a per-audit basis when the user-adjustable path
- *  fires, not on the engine globally. */
-export const METHODOLOGY_VERSION_2_3_0 = '2.3.0';
+ *  weights (Tier 2.1). The version chain is now: 2.0.0-no-validity |
+ *  2.1.0 | 2.2.0 | 2.3.0 | 2.4.0. Canonical engine constant resolves
+ *  to METHODOLOGY_VERSION = '2.4.0' (matrix-extension epoch); 2.3.0
+ *  is stamped on a per-audit basis when the user-adjustable path fires,
+ *  not on the engine globally. The canonical METHODOLOGY_VERSION_2_3_0
+ *  + METHODOLOGY_VERSION_2_4_0 exports live below alongside the other
+ *  version constants — see the chain comment there. */
 
 /** Acceptable absolute tolerance when validating the user weight vector
  *  sums to 1.0. Tight enough to catch real errors, loose enough to
@@ -428,7 +430,20 @@ export const GRADE_THRESHOLDS: Array<{
  *  cover so a procurement reader can tell which methodology produced
  *  any given DQI without recomputing.
  */
-export const METHODOLOGY_VERSION = '2.2.0';
+// Methodology version chain:
+//   '2.0.0-no-validity' — legacy (audits before 2026-04-30)
+//   '2.1.0'             — validity-aware weight shift (2026-04-30)
+//   '2.2.0'             — compoundRisk 7th component + 20×20 matrix
+//   '2.3.0'             — user-adjustable weights (2026-05-10)
+//   '2.4.0'             — 22×22 interaction matrix (DI-B-021 +
+//                         DI-B-022 coverage; 2026-05-13 M-1 ship)
+// METHODOLOGY_VERSION resolves to the latest "compound patterns
+// supplied" stamp. METHODOLOGY_VERSION_2_3_0 stays exported for the
+// user-adjustable path's preserved stamp.
+export const METHODOLOGY_VERSION = '2.4.0';
+export const METHODOLOGY_VERSION_2_4_0 = '2.4.0';
+export const METHODOLOGY_VERSION_2_3_0 = '2.3.0';
+export const METHODOLOGY_VERSION_2_2_0 = '2.2.0';
 export const METHODOLOGY_VERSION_2_1_0 = '2.1.0';
 export const METHODOLOGY_VERSION_LEGACY = '2.0.0-no-validity';
 
@@ -1436,8 +1451,16 @@ export function computeDQI(
   const topImprovement = findTopImprovement(components);
 
   // Methodology version stamp (highest precedence first):
-  //   userAdjustableWeights supplied → 2.3.0 (Tier 2.1, locked 2026-05-10)
-  //   compoundPatterns supplied      → 2.2.0 (M&A hard-layer, 2026-05-09)
+  //   userAdjustableWeights supplied → 2.3.0 (Tier 2.1, locked 2026-05-10).
+  //     NB: user-adjustable audits still score against the 22×22 matrix
+  //     post-M-1 — the 2.3.0 stamp preserves the "user-weights epoch"
+  //     meaning; matrix coverage is reflected in the engine's
+  //     INTERACTION_MATRIX export, not in the version string.
+  //   compoundPatterns supplied      → 2.4.0 (matrix extension to 22×22;
+  //     M-1 ship 2026-05-13). Supersedes the 2.2.0 stamp from the
+  //     M&A hard-layer ship 2026-05-09 — the engine epoch shifted when
+  //     DI-B-021 + DI-B-022 gained matrix coverage. METHODOLOGY_VERSION_2_2_0
+  //     stays exported for back-compat (historical audits re-rendering).
   //   only validityClass supplied    → 2.1.0 (validity shift, 2026-04-30)
   //   none of the above              → 2.0.0-no-validity (legacy)
   const methodologyVersion = userAdjustableApplied

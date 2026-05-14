@@ -8,6 +8,21 @@
  * - 1.0 = neutral (no significant interaction)
  * - >1.0 = amplifying (biases reinforce each other)
  * - <1.0 = dampening (one bias reduces the other's effect)
+ *
+ * Matrix shape: 22×22 (DI-B-001 through DI-B-022). Extended from 20×20
+ * to 22×22 on 2026-05-13 (M-1 ship — closes the silent moat hole that
+ * had been live since the 2026-04-30 paper-application sprint added
+ * DI-B-021 (illusion_of_validity) + DI-B-022 (inside_view_dominance) to
+ * the BIAS_EDUCATION taxonomy without extending the matrix). Weights
+ * for the two new biases are anchored on CLAUDE.md "DI-B-021 paper
+ * application" + "Coherent Confidence" toxic combination locks plus
+ * "DI-B-022 paper application" + "Reference-Class Blindness" toxic
+ * combination locks (Kahneman & Klein 2009; Kahneman & Lovallo 2003
+ * HBR "Delusions of Success"). Methodology version bumped 2.2.0 → 2.4.0
+ * to reflect the engine-epoch change. Historical audits that fire
+ * IV/ID + another bias will recompute against the new matrix on
+ * re-render; the regression test at dqi-distribution-check.test.ts
+ * covers the score-shift envelope.
  */
 
 export interface InteractionEntry {
@@ -50,9 +65,12 @@ const HE: B = 'halo_effect';
 const GF: B = 'gamblers_fallacy';
 const ZE: B = 'zeigarnik_effect';
 const PC: B = 'paradox_of_choice';
+// DI-B-021 + DI-B-022 added 2026-05-13 (M-1 ship).
+const IV: B = 'illusion_of_validity';
+const ID: B = 'inside_view_dominance';
 
 /**
- * Full 20x20 interaction matrix.
+ * Full 22×22 interaction matrix.
  * INTERACTION_MATRIX[biasA][biasB] = how biasB affects biasA
  */
 export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>> = {
@@ -77,6 +95,12 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // CB amplified by IV (narrative-driven confirmation) — 1.4 high per
+    // CLAUDE.md "Coherent Confidence" toxic combo lock.
+    [IV]: A(1.4, 'high'),
+    // CB amplified by ID (inside view locks confirmation around the
+    // chosen narrative without reference class) — 1.3 high.
+    [ID]: A(1.3, 'high'),
   },
   [AB]: {
     [CB]: A(1.4, 'high'),
@@ -99,6 +123,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: A(1.2),
+    // Narrative coherence anchors on its own internal coherence — A(1.1).
+    [IV]: A(1.1),
+    // Inside view anchors on its own projections — A(1.2).
+    [ID]: A(1.2),
   },
   [AH]: {
     [CB]: A(1.2),
@@ -121,6 +149,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: A(1.1),
     [ZE]: N,
     [PC]: N,
+    [IV]: N,
+    [ID]: N,
   },
   [GT]: {
     [CB]: A(1.4, 'high'),
@@ -143,6 +173,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // Groupthink locks around the coherent narrative — A(1.3 high).
+    [IV]: A(1.3, 'high'),
+    // Group commits to the inside view collectively — A(1.2).
+    [ID]: A(1.2),
   },
   [AU]: {
     [CB]: A(1.2),
@@ -165,6 +199,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // Authority narratives are accepted as coherent — A(1.2).
+    [IV]: A(1.2),
+    // Authority figures' inside view becomes the team's — A(1.1).
+    [ID]: A(1.1),
   },
   [BE]: {
     [CB]: A(1.2),
@@ -187,6 +225,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: A(1.2),
+    [IV]: N,
+    [ID]: N,
   },
   [OC]: {
     [CB]: A(1.3, 'high'),
@@ -209,6 +249,12 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: A(1.3, 'high'),
     [ZE]: A(1.1),
     [PC]: N,
+    // OC amplified by IV — canonical "Coherent Confidence" pattern,
+    // 1.5 high per CLAUDE.md DI-B-021 paper application lock.
+    [IV]: A(1.5, 'high'),
+    // OC amplified by ID — canonical "Reference-Class Blindness"
+    // pattern, 1.5 high per CLAUDE.md DI-B-022 paper application lock.
+    [ID]: A(1.5, 'high'),
   },
   [HB]: {
     [CB]: A(1.3),
@@ -231,6 +277,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // Hindsight reconstructs past narrative as coherent — A(1.2).
+    [IV]: A(1.2),
+    // Hindsight strengthens the inside view ("we always knew") — A(1.2).
+    [ID]: A(1.2),
   },
   [PF]: {
     [CB]: A(1.2),
@@ -253,6 +303,11 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: A(1.2),
     [ZE]: A(1.4, 'high'),
     [PC]: N,
+    // PF amplified by IV (narrative confidence → optimistic planning) — A(1.3).
+    [IV]: A(1.3, 'high'),
+    // PF amplified by ID — canonical Kahneman & Lovallo 2003 pattern;
+    // 1.6 high per CLAUDE.md DI-B-022 paper application lock.
+    [ID]: A(1.6, 'high'),
   },
   [LA]: {
     [CB]: A(1.1),
@@ -275,6 +330,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: A(1.2),
     [PC]: A(1.3),
+    [IV]: N,
+    [ID]: N,
   },
   [SC]: {
     [CB]: A(1.3),
@@ -297,6 +354,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: A(1.2),
     [ZE]: N,
     [PC]: N,
+    // Coherent narrative justifies escalation despite mounting costs — A(1.2).
+    [IV]: A(1.2),
+    // Inside view dismisses reference-class base rates of failure → A(1.3).
+    [ID]: A(1.3),
   },
   [SQ]: {
     [CB]: A(1.2),
@@ -319,6 +380,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: D(0.85),
     [PC]: A(1.4, 'high'),
+    [IV]: N,
+    [ID]: N,
   },
   [FE]: {
     [CB]: A(1.3),
@@ -341,6 +404,9 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: A(1.2),
+    // Framing supports the coherent narrative — A(1.2).
+    [IV]: A(1.2),
+    [ID]: N,
   },
   [SP]: {
     [CB]: A(1.5, 'high'),
@@ -363,6 +429,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // Narrative locks what gets perceived — A(1.3) high.
+    [IV]: A(1.3, 'high'),
+    // Inside view sets the perceptual frame — A(1.2).
+    [ID]: A(1.2),
   },
   [RB]: {
     [CB]: A(1.2),
@@ -385,6 +455,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: A(1.2),
     [ZE]: N,
     [PC]: N,
+    [IV]: N,
+    [ID]: N,
   },
   [CM]: {
     [CB]: A(1.1),
@@ -407,6 +479,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: A(1.2),
     [PC]: A(1.3, 'high'),
+    // Coherent narrative IS cognitive miserliness manifesting — A(1.2).
+    [IV]: A(1.2),
+    // Inside view IS the cognitive shortcut over reference-class search — A(1.2).
+    [ID]: A(1.2),
   },
   [HE]: {
     [CB]: A(1.3, 'high'),
@@ -429,6 +505,10 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    // HE amplified by IV — coherent narrative strengthens halo, 1.3
+    // high per CLAUDE.md DI-B-021 paper application lock.
+    [IV]: A(1.3, 'high'),
+    [ID]: N,
   },
   [GF]: {
     [CB]: N,
@@ -451,6 +531,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    [IV]: N,
+    [ID]: N,
   },
   [ZE]: {
     [CB]: N,
@@ -473,6 +555,8 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    [IV]: N,
+    [ID]: A(1.1),
   },
   [PC]: {
     [CB]: N,
@@ -495,6 +579,67 @@ export const INTERACTION_MATRIX: Record<string, Record<string, InteractionEntry>
     [GF]: N,
     [ZE]: N,
     [PC]: N,
+    [IV]: N,
+    [ID]: N,
+  },
+  // ─── DI-B-021: Illusion of Validity ────────────────────────────────
+  // Added 2026-05-13 (M-1 ship). Weights anchored on CLAUDE.md
+  // "Coherent Confidence" toxic combo: IV+OC=1.5, IV+CB=1.4, IV+HE=1.3,
+  // IV+AU=1.3 per the DI-B-021 paper application lock.
+  [IV]: {
+    [CB]: A(1.4, 'high'),
+    [AB]: A(1.2),
+    [AH]: A(1.2),
+    [GT]: A(1.3, 'high'),
+    [AU]: A(1.3, 'high'),
+    [BE]: A(1.1),
+    [OC]: A(1.5, 'high'),
+    [HB]: A(1.2),
+    [PF]: A(1.1),
+    [LA]: N,
+    [SC]: A(1.2),
+    [SQ]: N,
+    [FE]: A(1.2),
+    [SP]: A(1.3, 'high'),
+    [RB]: A(1.1),
+    [CM]: A(1.2),
+    [HE]: A(1.3, 'high'),
+    [GF]: N,
+    [ZE]: N,
+    [PC]: N,
+    [IV]: N,
+    // Inside view AND illusion of validity = locked narrative without
+    // reference class — 1.4 high per CLAUDE.md DI-B-022 lock.
+    [ID]: A(1.4, 'high'),
+  },
+  // ─── DI-B-022: Inside-View Dominance ───────────────────────────────
+  // Added 2026-05-13 (M-1 ship). Weights anchored on CLAUDE.md
+  // "Reference-Class Blindness" toxic combo: ID+PF=1.6, ID+OC=1.5,
+  // ID+IV=1.4, ID+CB=1.3 per the DI-B-022 paper application lock
+  // (Kahneman & Lovallo 2003 HBR "Delusions of Success").
+  [ID]: {
+    [CB]: A(1.3, 'high'),
+    [AB]: A(1.2),
+    [AH]: A(1.1),
+    [GT]: A(1.2),
+    [AU]: A(1.1),
+    [BE]: N,
+    [OC]: A(1.5, 'high'),
+    [HB]: A(1.2),
+    [PF]: A(1.6, 'high'),
+    [LA]: N,
+    [SC]: A(1.3, 'high'),
+    [SQ]: N,
+    [FE]: A(1.2),
+    [SP]: A(1.2),
+    [RB]: A(1.1),
+    [CM]: A(1.2),
+    [HE]: N,
+    [GF]: N,
+    [ZE]: A(1.1),
+    [PC]: N,
+    [IV]: A(1.4, 'high'),
+    [ID]: N,
   },
 };
 
@@ -526,3 +671,35 @@ export function getStrongestInteractions(
     .sort((a, b) => Math.abs(b.weight - 1) - Math.abs(a.weight - 1))
     .slice(0, topN);
 }
+
+/**
+ * Canonical bias keys covered by the matrix. Use this for matrix-coverage
+ * assertions in tests / regression scripts.
+ */
+export const MATRIX_BIAS_KEYS = [
+  CB,
+  AB,
+  AH,
+  GT,
+  AU,
+  BE,
+  OC,
+  HB,
+  PF,
+  LA,
+  SC,
+  SQ,
+  FE,
+  SP,
+  RB,
+  CM,
+  HE,
+  GF,
+  ZE,
+  PC,
+  IV,
+  ID,
+] as const;
+
+/** Convenience: matrix dimension (22 as of 2026-05-13). */
+export const MATRIX_DIMENSION = MATRIX_BIAS_KEYS.length;

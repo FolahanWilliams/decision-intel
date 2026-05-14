@@ -175,7 +175,7 @@ export interface WeightConfig {
 export const WEIGHT_CONFIGS: ReadonlyArray<WeightConfig> = [
   {
     id: 'canonical',
-    label: 'Canonical baseline (methodology 2.2.0 default)',
+    label: 'Canonical baseline (methodology 2.4.0 default; 22×22 matrix)',
     weights: WEIGHTS_CANONICAL,
   },
   {
@@ -295,15 +295,17 @@ export function runDistributionCheck(): DistributionReport {
           rule: `user-adjustable should stamp 2.3.0, got ${result.methodologyVersion}`,
         });
       }
-      // Invariant 4: canonical with compoundPatterns + validity → 2.2.0
+      // Invariant 4: canonical with compoundPatterns + validity → 2.4.0
+      // (bumped from 2.2.0 on 2026-05-13 M-1 ship — engine epoch
+      // advanced when DI-B-021 + DI-B-022 gained matrix coverage).
       if (
         isCanonical &&
         memo.input.compoundPatterns !== undefined &&
-        result.methodologyVersion !== '2.2.0'
+        result.methodologyVersion !== '2.4.0'
       ) {
         violations.push({
           cell,
-          rule: `canonical + compoundPatterns should stamp 2.2.0, got ${result.methodologyVersion}`,
+          rule: `canonical + compoundPatterns should stamp 2.4.0, got ${result.methodologyVersion}`,
         });
       }
       // Invariant 5: weightsHash is non-empty 12-char hex
