@@ -256,25 +256,29 @@ export interface HxcCohortMetrics {
 }
 
 /**
- * Computes the HXC cohort PMF metrics for the founder-hub Phase 1 dashboard.
- * Filters to HXC-eligible respondents within the given window (default 90 days).
- * Returns the % "very disappointed", graduation-gate status, kill-threshold
- * status, plus per-persona breakdown.
+ * Minimum cohort size required before the kill-threshold can fire. Below
+ * this the variance is too high to act on — surface "awaiting volume"
+ * instead of triggering the wedge-discovery reset. Locked v3.5 §2.
  */
-export async function computeHxcCohortMetrics(windowDays: number = 90): Promise<HxcCohortMetrics> {
-  const windowStart = new Date(Date.now() - windowDays * DAY_MS);
-  const windowEnd = new Date();
+export const VOHRA_PMF_KILL_MIN_N = 5;
 
-  const responses = await prisma.vohraPMFResponse
-    .findMany({
-      where: {
-        completedAt: { not: null, gte: windowStart },
-        hxcEligibleAtTime: true,
-      },
-      select: { veryDisappointed: true, phase1PersonaAtTime: true },
-    })
-    .catch(() => []);
-
+/**
+ * Pure-function aggregator — extracted from computeHxcCohortMetrics so the
+ * load-bearing math can be unit-tested without a Prisma fixture. The
+ * computation that drives the GTM v3.5 graduation decision is pure: given
+ * the filtered responses, it computes the cohort %, gates, and per-persona
+ * breakdown deterministically.
+ *
+ * Caller responsibilities (in computeHxcCohortMetrics):
+ *   - Filter responses to HXC-eligible + completed + within window.
+ *   - This function does NOT re-filter; it assumes the inputs are already
+ *     the right cohort.
+ */
+export function aggregateHxcCohortMetrics(
+  responses: Array<{ veryDisappointed: string | null; phase1PersonaAtTime: string | null }>,
+  windowStart: Date,
+  windowEnd: Date
+): HxcCohortMetrics {
   const veryDisappointed = responses.filter(r => r.veryDisappointed === 'very_disappointed').length;
   const somewhatDisappointed = responses.filter(
     r => r.veryDisappointed === 'somewhat_disappointed'
@@ -304,14 +308,47 @@ export async function computeHxcCohortMetrics(windowDays: number = 90): Promise<
     somewhatDisappointed,
     notDisappointed,
     veryDisappointedPct,
-    graduationGatePassed: veryDisappointedPct >= VOHRA_PMF_GRADUATION_THRESHOLD,
-    killThresholdHit: totalRespondents >= 5 && veryDisappointedPct < VOHRA_PMF_KILL_THRESHOLD,
+    graduationGatePassed:
+      totalRespondents >= VOHRA_PMF_KILL_MIN_N &&
+      veryDisappointedPct >= VOHRA_PMF_GRADUATION_THRESHOLD,
+    killThresholdHit:
+      totalRespondents >= VOHRA_PMF_KILL_MIN_N && veryDisappointedPct < VOHRA_PMF_KILL_THRESHOLD,
     graduationThreshold: VOHRA_PMF_GRADUATION_THRESHOLD,
     killThreshold: VOHRA_PMF_KILL_THRESHOLD,
     windowStart: windowStart.toISOString(),
     windowEnd: windowEnd.toISOString(),
     cohortBreakdown,
   };
+}
+
+/**
+ * Computes the HXC cohort PMF metrics for the founder-hub Phase 1 dashboard.
+ * Filters to HXC-eligible respondents within the given window (default 90 days).
+ * Returns the % "very disappointed", graduation-gate status, kill-threshold
+ * status, plus per-persona breakdown.
+ *
+ * Note (locked 2026-05-13 M-2-follow-through): both graduation-gate AND
+ * kill-threshold now require N ≥ VOHRA_PMF_KILL_MIN_N (5) before they
+ * can fire. The prior implementation only N-gated the kill threshold —
+ * which meant the graduation gate could fire on a single "very
+ * disappointed" response and declare PMF prematurely. Both are now
+ * symmetrically gated.
+ */
+export async function computeHxcCohortMetrics(windowDays: number = 90): Promise<HxcCohortMetrics> {
+  const windowStart = new Date(Date.now() - windowDays * DAY_MS);
+  const windowEnd = new Date();
+
+  const responses = await prisma.vohraPMFResponse
+    .findMany({
+      where: {
+        completedAt: { not: null, gte: windowStart },
+        hxcEligibleAtTime: true,
+      },
+      select: { veryDisappointed: true, phase1PersonaAtTime: true },
+    })
+    .catch(() => []);
+
+  return aggregateHxcCohortMetrics(responses, windowStart, windowEnd);
 }
 
 /**
