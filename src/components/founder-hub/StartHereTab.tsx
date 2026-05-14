@@ -182,8 +182,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           'unicorn_roadmap',
           'path_to_100m',
           'overview',
-          'category_position',
-          'positioning',
+          'positioning_hub',
           'outreach_hub',
         ];
     const unvisited = candidates.filter(id => !visited.has(id));

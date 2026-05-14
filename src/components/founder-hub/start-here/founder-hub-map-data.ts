@@ -24,29 +24,37 @@
  */
 
 export type TabId =
+  // Start (5)
   | 'unicorn_roadmap'
   | 'path_to_100m'
   | 'overview'
+  | 'cornerstone'
+  | 'founder_os'
+  // Product (2)
   | 'product_deep'
   | 'research'
-  | 'positioning_copilot'
-  | 'positioning'
+  // Go-to-Market (8) — positioning_copilot + category_position + positioning
+  // consolidated into positioning_hub on 2026-05-10
+  | 'positioning_hub'
   | 'sales'
   | 'closing_lab'
   | 'sparring_room'
   | 'education_room'
   | 'outreach_hub'
-  | 'category_position'
   | 'lrqa'
   | 'content'
+  // Intelligence (4)
   | 'data_ecosystem'
   | 'case_library'
+  | 'forecast'
+  | 'metrics'
+  // Tools (5)
   | 'todo'
   | 'meetings_log'
-  | 'forecast'
   | 'founder_tips'
   | 'founder_school'
-  | 'cron_controls';
+  | 'cron_controls'
+  | 'voice_activity';
 
 export type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
@@ -180,43 +188,22 @@ export const NODES: MapNode[] = [
     iconName: 'BookOpen',
   },
 
-  // ─── Go-to-Market (10) ─────────────────────────────────────────────
+  // ─── Go-to-Market (8) ──────────────────────────────────────────────
+  // positioning_hub replaces category_position + positioning_copilot +
+  // positioning (consolidated 2026-05-10 batch 2 #5 with section-toggle
+  // UI: Practise / Reference / Map).
   {
-    id: 'category_position',
-    label: 'Category Position',
-    group: 'Go-to-Market',
-    x: 0.5,
-    y: 0.07,
-    whatItsFor: 'The DI competitive landscape. 5 incumbents mapped, 3 gaps DI uniquely closes.',
-    payoff: 'You can answer "how is this different from Cloverpop / IBM watsonx" in one sentence.',
-    minutes: 15,
-    prerequisites: [],
-    iconName: 'Radar',
-  },
-  {
-    id: 'positioning_copilot',
-    label: 'Positioning Copilot',
+    id: 'positioning_hub',
+    label: 'Positioning Hub',
     group: 'Go-to-Market',
     x: 0.5,
     y: 0.16,
     whatItsFor:
-      "Sharp's brand spine, market thesis, strategic compass, pitch deck, AI rehearsal coach.",
-    payoff: 'Rehearse a pitch out loud against the AI coach before a real meeting.',
-    minutes: 35,
+      'Three sections in one tab — Practise (AI rehearsal coach), Reference (Cloverpop comparison, moat layers, investor Q&A, top-3 DI-space gaps), Map (category landscape, 5 incumbents, 3 gaps DI uniquely closes). Consolidates the prior category_position / positioning_copilot / positioning trio.',
+    payoff:
+      'One tab, three depths: "how is DI different from Cloverpop" + "why this, why now, why you" + rehearse out loud against the coach before a meeting.',
+    minutes: 40,
     prerequisites: ['overview'],
-    iconName: 'Compass',
-  },
-  {
-    id: 'positioning',
-    label: 'Competitive Positioning',
-    group: 'Go-to-Market',
-    x: 0.5,
-    y: 0.25,
-    whatItsFor:
-      'Cloverpop comparison, 5 moat layers, capability matrix, 8 investor Q&As, top-3 DI-space gaps.',
-    payoff: 'Direct answers to "why this, why now, why you" for any procurement reader.',
-    minutes: 25,
-    prerequisites: ['category_position'],
     iconName: 'Shield',
   },
   {
@@ -228,7 +215,7 @@ export const NODES: MapNode[] = [
     whatItsFor: 'JOLT, SLIP, Cialdini, MEDDPICC, SPIN, Challenger, demo flow, audience pitches.',
     payoff: 'Tactical sales layer. Pick the framework that matches your current pipeline blocker.',
     minutes: 30,
-    prerequisites: ['positioning'],
+    prerequisites: ['positioning_hub'],
     iconName: 'MessageSquare',
   },
   {
@@ -296,7 +283,7 @@ export const NODES: MapNode[] = [
       'LinkedIn post generator, case-study analyzer, voice config, content opportunity scanner.',
     payoff: 'The content flywheel. Daily LinkedIn posts that warm up cold prospects.',
     minutes: 15,
-    prerequisites: ['positioning'],
+    prerequisites: ['positioning_hub'],
     iconName: 'Zap',
   },
   {
@@ -418,6 +405,81 @@ export const NODES: MapNode[] = [
     prerequisites: [],
     iconName: 'Terminal',
   },
+
+  // ─── New tabs added 2026-05-13 (F-6 map re-validation) ─────────────
+  // These tabs were already in the TabId union + mounted on the
+  // founder-hub page but missing from the visual map. The map auto-
+  // renders any node added here.
+  {
+    id: 'path_to_100m',
+    label: 'Path to $100M ARR',
+    group: 'Start',
+    x: 0.07,
+    y: 0.45,
+    whatItsFor:
+      'The strategic roadmap from Phase 1 wedge (£249/mo Individual × 4 HXC personas) → Phase 2 bridge (Sankore-class £1,999/mo founding-pilot) → Phase 3 mid-market (£4,999/mo team) → Phase 4 F500 ceiling ($50K-150K ACV). With honest conditional probabilities + per-phase tripwires.',
+    payoff:
+      'You can answer "what is the path from £249 to $100M ARR" in 3 phases with the conditional probability + the kill criterion at each one.',
+    minutes: 40,
+    prerequisites: ['unicorn_roadmap'],
+    iconName: 'TrendingUp',
+  },
+  {
+    id: 'cornerstone',
+    label: 'Cornerstone Brief',
+    group: 'Start',
+    x: 0.07,
+    y: 0.63,
+    whatItsFor:
+      'Sankore-class founding-pilot brief — the path-to-Phase-2 reference-grade design partner. Active scoping; never leaks named-prospect to public surfaces (CLAUDE.md no-named-prospects rule).',
+    payoff:
+      'You can describe the founding-pilot ask + the £1,999/mo locked rate + the 12-week summer 2026 in-person engagement in 60 seconds.',
+    minutes: 20,
+    prerequisites: ['path_to_100m'],
+    iconName: 'Anchor',
+  },
+  {
+    id: 'founder_os',
+    label: 'Founder OS',
+    group: 'Start',
+    x: 0.07,
+    y: 0.78,
+    whatItsFor:
+      'Personal operating system — Sharran 1-1-1 + 10-10 Forever + Lifestyle Freeze + 2× Tomorrow Stress Test + Build in Public + Commitment Record. The discipline layer above the strategic plan.',
+    payoff:
+      'The behavioural infrastructure the founder runs ON. Cadence, commitment, network expansion, and the talking-points template for investor questions about personal burn rate.',
+    minutes: 20,
+    prerequisites: [],
+    iconName: 'Compass',
+  },
+  {
+    id: 'metrics',
+    label: 'Metrics & Forecast',
+    group: 'Intelligence',
+    x: 0.73,
+    y: 0.78,
+    whatItsFor:
+      'Founder-hub usage metrics + Vohra HXC PMF cohort tracker + Phase 1 graduation-gate readout (≥40% on N≥5 of HXC respondents).',
+    payoff:
+      'See the cohort % climbing (or not) in real time. The Phase 1 forcing function — month 4 kill criterion fires at <30% HXC.',
+    minutes: 10,
+    prerequisites: [],
+    iconName: 'BarChart3',
+  },
+  {
+    id: 'voice_activity',
+    label: 'Voice Activity',
+    group: 'Tools',
+    x: 0.92,
+    y: 0.74,
+    whatItsFor:
+      'Voice-mode session log + cost telemetry for the 4-persona thinking-partners voice surface (Cartesia TTS + Deepgram STT + Grok 4.3 via gateway).',
+    payoff:
+      'See which thinking-partner persona (cognitive psychologist / business strategist / skeptical investor / default coach) you ran voice sessions against this week + cost.',
+    minutes: 5,
+    prerequisites: [],
+    iconName: 'Activity',
+  },
 ];
 
 // ─── EDGES ──────────────────────────────────────────────────────────
@@ -450,21 +512,13 @@ export const EDGES: MapEdge[] = [
     strength: 'primary',
   },
 
-  // Go-to-Market flow: category → positioning → sales → outreach → content / lrqa
+  // Go-to-Market flow: positioning_hub → sales → outreach → content / lrqa
+  // (positioning_hub consolidates the prior 3-tab cluster — category_position
+  // + positioning_copilot + positioning — into one tab with Practise /
+  // Reference / Map sections. The Go-to-Market flow used to chain through
+  // all three; now the chain enters at positioning_hub and exits to sales.)
   {
-    from: 'category_position',
-    to: 'positioning',
-    rationale: 'Once you know the landscape shape, the moat narrative follows.',
-    strength: 'primary',
-  },
-  {
-    from: 'positioning_copilot',
-    to: 'positioning',
-    rationale: 'The copilot rehearses what positioning details defend.',
-    strength: 'secondary',
-  },
-  {
-    from: 'positioning',
+    from: 'positioning_hub',
     to: 'sales',
     rationale: 'Positioning is the WHY; sales is the HOW for any specific account.',
     strength: 'primary',
@@ -541,8 +595,9 @@ export const EDGES: MapEdge[] = [
   },
   {
     from: 'overview',
-    to: 'category_position',
-    rationale: 'Once you know what DI does, you can place it on the competitive map.',
+    to: 'positioning_hub',
+    rationale:
+      'Once you know what DI does, you can place it on the competitive map via the Positioning Hub Map section.',
     strength: 'secondary',
   },
 
@@ -595,16 +650,14 @@ export const JOURNEYS: Journey[] = [
       'Walk into the meeting with the locked positioning, three case anchors, the silent-objections list, the persona-specific exact phrase recalled cold from memory, AND a graded sparring rep proving you can deliver it under pressure.',
     path: [
       'overview',
-      'category_position',
-      'positioning',
-      'positioning_copilot',
+      'positioning_hub',
       'sales',
       'closing_lab',
       'education_room',
       'sparring_room',
       'path_to_100m',
     ],
-    totalMinutes: 12 + 15 + 25 + 35 + 30 + 35 + 30 + 25 + 40,
+    totalMinutes: 12 + 40 + 30 + 35 + 30 + 25 + 40,
     color: '#16A34A',
   },
   {
@@ -614,15 +667,8 @@ export const JOURNEYS: Journey[] = [
       'You want to understand the competitive landscape and what makes Decision Intel structurally different.',
     outcome:
       'You can answer "what is decision intelligence" + "why is DI structurally different" in two sentences each.',
-    path: [
-      'overview',
-      'research',
-      'category_position',
-      'positioning',
-      'case_library',
-      'product_deep',
-    ],
-    totalMinutes: 12 + 25 + 15 + 25 + 25 + 30,
+    path: ['overview', 'research', 'positioning_hub', 'case_library', 'product_deep'],
+    totalMinutes: 12 + 25 + 40 + 25 + 30,
     color: '#0EA5E9',
   },
   {
@@ -633,7 +679,7 @@ export const JOURNEYS: Journey[] = [
     outcome:
       '5-10 Monday-morning outreach drafts queued. The right channel + the right opener + the right silent-objection rebuttal — recalled cold from memory and backed by at least one graded rep on the persona you are about to call.',
     path: [
-      'positioning',
+      'positioning_hub',
       'sales',
       'closing_lab',
       'education_room',

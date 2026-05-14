@@ -1044,6 +1044,30 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
       "Riya-class pre-seed VC associate at a London founder-pitch mixer. She's there to source. Her opener will be the casual 'cool, what's the one-liner?' (she's heard 30 already tonight). Generate her opener + 3 questions she'd ask in 60 seconds if your first line surprised her — she's looking for the ONE founder worth dragging her partner to coffee.",
   },
 
+  // ── Strategy World London BAFTA Piccadilly (T-26d, locked 2026-05-13) ──
+  // The 3 Phase 1 HXC personas missing networking_event_inperson scenarios.
+  // Tuned for a prestige strategy conference at BAFTA Piccadilly — drink-
+  // in-hand 30-second-connect context where every other vendor in the room
+  // is pitching. Lower-effort opener, higher-bar substance.
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Damien-class mid-market Head of Corp Dev/M&A at the Strategy World London conference at BAFTA Piccadilly. He's $200M-revenue scale-up corp dev, owns the IC memo workflow, paying personally pre-team-budget — exactly the Phase 1 HXC wedge. He's between sessions, drink in hand, his analyst beside him. He'll open polite-but-skeptical ('what does Decision Intel do?') because every vendor at the conference is pitching CFO-friendly software and he's tired of generic AI-for-something tools. Generate his opener + 3 questions he'd ask in 90 seconds if Folahan landed an IC-memo-shaped pain point. The win is the analyst leaning in — Damien defers to her on tactical fit.",
+  },
+  {
+    personaId: 'smaller_fund_gp',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Aisha-class smaller-fund GP at the Strategy World London conference at BAFTA Piccadilly — £40M AUM emerging-manager fund with active deal flow + LP-governance pressure. She's between sessions in the bar area, working two screens (phone, conference badge). She'll open warm but transactional ('cool, what's it for?') — her time is the constraint, every conversation is triaged for 'does this make my LP report easier or harder?' Generate her opener + 3 questions she'd ask in 60 seconds if Folahan landed an LP-governance pain point. The win is her asking for a calendar link — Aisha doesn't say yes to a meeting on the floor.",
+  },
+  {
+    personaId: 'pe_backed_founder',
+    mode: 'networking_event_inperson',
+    generatorHint:
+      "Henrik-class PE-backed founder at the Strategy World London conference at BAFTA Piccadilly — $80M-revenue PE-backed CEO with CEO-discretionary budget. He's there because his PE sponsor wants him visible at industry events; he's polite but cynical about AI tooling because his board has already pushed three failed AI experiments. He'll open with a polite test ('tell me what this isn't' — sophisticated buyer's anti-pitch probe). Generate his opener + 3 questions he'd ask in 90 seconds if Folahan landed a board-memo-defensibility pain. The win is Henrik admitting he has a strategic memo coming up next month — that's when he becomes a paid customer, not when he agrees the product is interesting.",
+  },
+
   // Cold first meeting per persona
   {
     personaId: 'mid_market_pe_associate',
