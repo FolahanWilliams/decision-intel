@@ -27,12 +27,12 @@ import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 // Canonical counts — derive so pitch templates never drift when the
 // taxonomy or framework registry grows. CLAUDE.md "Inconsistent count
 // copy" + "Marketing voice" rules. BIAS_EDUCATION is a Record (not array)
-// so use Object.keys().length per the canonical pattern. Note: 8 sibling
-// sites in this file still carry hardcoded "17-framework" /
-// scenario-specific claims that need curatorial review (e.g. ISA Nigeria
-// 2007 was ADDED to the registry 2026-04-29 — scenarios that say
-// "missing ISA 2007" are now stale). Surfaced as Section 5 brainstorm in
-// the 2026-05-12 audit.
+// so use Object.keys().length per the canonical pattern. Full content
+// sweep completed 2026-05-13 (U-4 ship) — all 9 prose-string sites
+// converted from hardcoded "17-framework" to interpolated
+// `${FRAMEWORK_COUNT}-framework` template literals. When the registry
+// grows (next jurisdiction add), every LRQA pitch line updates
+// automatically; no per-site re-rewrite.
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
@@ -123,7 +123,7 @@ export const IAN_PROFILE = {
       thrust:
         '"Trade weaponized, regulation weakened and strengthened at the same time, cyber and AI risks converging into supply chain risk." Drew on EiQ supply-chain intelligence software data + WEF risk report. The piece IS the strategic lens Ian sees the world through.',
       diRelevance:
-        "Decision Intel's R²F + 17-framework regulatory map + Pan-African anchor + the convergence of decision-quality with regulatory tailwinds map DIRECTLY onto Ian's framing. Folahan should reference this Reuters piece in the first 5 minutes — proves Folahan has read Ian's actual thinking, not just the CV.",
+        `Decision Intel's R²F + ${FRAMEWORK_COUNT}-framework regulatory map + Pan-African anchor + the convergence of decision-quality with regulatory tailwinds map DIRECTLY onto Ian's framing. Folahan should reference this Reuters piece in the first 5 minutes — proves Folahan has read Ian's actual thinking, not just the CV.`,
     },
     {
       date: '2026-04 (4d ago, Earth Day)',
@@ -179,7 +179,7 @@ export const LRQA_COMPANY = {
       date: '2026-02 (2mo ago)',
       move: 'Mission AI Possible internal hackathon — 87 ideas, 13 teams shortlisted, 3 finalists, 5 AI projects already deployed (scheduling, report writing, insights x2, technical reviews)',
       diRelevance:
-        'LRQA is investing in AI internally. This means they have organisational maturity to evaluate AI products + technical staff who can integrate them. It also means Folahan should NOT pitch DI as "we\'ll do AI for you" — pitch DI as "we bring R²F + 17-framework regulatory IP + 143-case library that you would not build internally."',
+        `LRQA is investing in AI internally. This means they have organisational maturity to evaluate AI products + technical staff who can integrate them. It also means Folahan should NOT pitch DI as "we'll do AI for you" — pitch DI as "we bring R²F + ${FRAMEWORK_COUNT}-framework regulatory IP + 143-case library that you would not build internally."`,
       strategicWeight: 'high',
     },
     {
@@ -253,9 +253,9 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     whereInLrqaStack:
       'Partner Africa (acquired April 2026) — ethical sourcing + food safety + human rights advisory across Africa.',
     diValueAdd:
-      "Partner Africa's clients face Pan-African regulatory complexity (NDPR, CBN, FRC Nigeria, WAEMU, PoPIA, CMA Kenya, BoG, CBE, SARB, BoT). Decision Intel's 17-framework regulatory map covers this exact set + the structural-assumptions audit branches on jurisdiction-specific FX cycles (NGN, KES, GHS, EGP). NO US-incumbent competitor (Bureau Veritas, SGS, Intertek) has this depth at the reasoning-audit layer for African markets.",
+      `Partner Africa's clients face Pan-African regulatory complexity (NDPR, CBN, FRC Nigeria, WAEMU, PoPIA, CMA Kenya, BoG, CBE, SARB, BoT). Decision Intel's ${FRAMEWORK_COUNT}-framework regulatory map covers this exact set + the structural-assumptions audit branches on jurisdiction-specific FX cycles (NGN, KES, GHS, EGP). NO US-incumbent competitor (Bureau Veritas, SGS, Intertek) has this depth at the reasoning-audit layer for African markets.`,
     pitchPositioning:
-      '"You just acquired Partner Africa — first EMEA acquisition, signal that Africa is strategic. I\'m a Lagos-rooted founder with two production specimen DPRs (WeWork US-pattern, Dangote 2014 Pan-African expansion) + a 17-framework map covering NDPR, CBN, WAEMU, PoPIA. Your Partner Africa clients need exactly this reasoning-audit layer to prove their decisions are defensible to LP / regulator scrutiny. We could build the joint Pan-African reasoning audit offering together."',
+      `"You just acquired Partner Africa — first EMEA acquisition, signal that Africa is strategic. I'm a Lagos-rooted founder with two production specimen DPRs (WeWork US-pattern, Dangote 2014 Pan-African expansion) + a ${FRAMEWORK_COUNT}-framework map covering NDPR, CBN, WAEMU, PoPIA. Your Partner Africa clients need exactly this reasoning-audit layer to prove their decisions are defensible to LP / regulator scrutiny. We could build the joint Pan-African reasoning audit offering together."`,
     proofArtefact:
       'Bring the Dangote DPR PDF on a tablet/phone. Walk through the regulatory mapping for NDPR + CBN + WAEMU. Show the sovereign-context branching for NGN, KES, GHS, EGP.',
     realisticTimeline:
@@ -284,7 +284,7 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
       'Mission AI Possible hackathon (87 ideas, 5 deployed projects). LRQA AI capability stack.',
     diValueAdd: `LRQA's internal AI initiative produces tactical AI tools (scheduling, report writing, insights, technical reviews). It does NOT produce category-defining IP like the R²F (Kahneman-Klein synthesis) + ${BIAS_COUNT}-bias taxonomy + ${FRAMEWORK_COUNT}-framework regulatory map + 143-case library + Brier-scored outcome flywheel. These take 5+ years of academic + product work. LRQA could license or partner with DI to bring this IP into the LRQA platform without rebuilding.`,
     pitchPositioning:
-      "\"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the 17-framework map + the 143-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA.\"",
+      `"Your Mission AI Possible hackathon shows internal AI capability. The question for any enterprise AI strategy is what to build vs partner. R²F + the ${FRAMEWORK_COUNT}-framework map + the 143-case library would take a team 3-5 years to recreate from scratch — and the academic IP (Kahneman-Klein 2009 'Conditions for Intuitive Expertise', the 50-year heuristics-and-biases program) anchors the credibility in a way internal builds rarely match. Worth exploring whether DI is a partner-don't-build candidate for LRQA."`,
     proofArtefact:
       'Send the Kahneman-Klein 2009 paper PDF (the R²F intellectual anchor) + a one-page IP moat brief.',
     realisticTimeline:
@@ -297,9 +297,9 @@ export const INTEGRATION_PATHS: IntegrationPath[] = [
     whereInLrqaStack:
       "Ian's strategic narrative + LRQA's public-voice positioning. The Reuters piece + WEF risk report.",
     diValueAdd:
-      "Ian's thesis: trade weaponization + regulatory fragmentation + cyber / AI / supply chain risk convergence = harder, more important risk decisions. Decision Intel is BUILT for exactly this convergence — the R²F + 17-framework regulatory map + structural-assumptions audit (FX cycles, sovereign context) handles cross-border decisions where the bias patterns are amplified by complexity.",
+      `Ian's thesis: trade weaponization + regulatory fragmentation + cyber / AI / supply chain risk convergence = harder, more important risk decisions. Decision Intel is BUILT for exactly this convergence — the R²F + ${FRAMEWORK_COUNT}-framework regulatory map + structural-assumptions audit (FX cycles, sovereign context) handles cross-border decisions where the bias patterns are amplified by complexity.`,
     pitchPositioning:
-      '"Your Reuters piece on 2026 risk trends — trade weaponized, regulation fragmenting, cyber + AI converging into supply chain risk — that\'s exactly the decision environment Decision Intel was built for. The harder cross-border decisions get, the more bias patterns compound. The R²F + 17-framework map + structural-assumptions audit ARE the operational answer to your strategic narrative."',
+      `"Your Reuters piece on 2026 risk trends — trade weaponized, regulation fragmenting, cyber + AI converging into supply chain risk — that's exactly the decision environment Decision Intel was built for. The harder cross-border decisions get, the more bias patterns compound. The R²F + ${FRAMEWORK_COUNT}-framework map + structural-assumptions audit ARE the operational answer to your strategic narrative."`,
     proofArtefact:
       "Quote Ian's Reuters piece directly. Show how the 12-node pipeline addresses each of his named convergence risks.",
     realisticTimeline:
@@ -446,7 +446,7 @@ export const MEETING_PREP: PrepItem[] = [
     category: 'rehearse',
     item: 'The "why this matters to LRQA" 3-sentence pitch',
     detail:
-      '"Your acquisition of Partner Africa + your Reuters piece on 2026 risk convergence + the EiQ supply chain intelligence software are the three signals I read as Decision Intel being uniquely complementary to LRQA. We bring R²F + the 17-framework Pan-African regulatory map + 143-case library. Together with EiQ + Partner Africa, that\'s a Pan-African reasoning audit offering no competitor can replicate in 12 months."',
+      `"Your acquisition of Partner Africa + your Reuters piece on 2026 risk convergence + the EiQ supply chain intelligence software are the three signals I read as Decision Intel being uniquely complementary to LRQA. We bring R²F + the ${FRAMEWORK_COUNT}-framework Pan-African regulatory map + 143-case library. Together with EiQ + Partner Africa, that's a Pan-African reasoning audit offering no competitor can replicate in 12 months."`,
   },
   {
     category: 'avoid',
@@ -504,7 +504,7 @@ export const QUESTION_BANK: QuestionEntry[] = [
     question:
       '"On the Partner Africa acquisition — what was the strategic gap you saw? Was it geographic coverage, sector expertise, regulatory depth, or something else?"',
     whyAsk:
-      "Tells Folahan exactly where DI's Pan-African anchor + 17-framework regulatory map + Dangote DPR fits in LRQA's stated rationale for the acquisition. Lets Folahan position DI as filling adjacent gaps Partner Africa doesn't.",
+      `Tells Folahan exactly where DI's Pan-African anchor + ${FRAMEWORK_COUNT}-framework regulatory map + Dangote DPR fits in LRQA's stated rationale for the acquisition. Lets Folahan position DI as filling adjacent gaps Partner Africa doesn't.`,
     signalIfYes:
       'If the answer is "regulatory depth + reasoning audit for African contexts," Decision Intel\'s positioning is uniquely strong. Lead the Tier 1 ask with this.',
   },

@@ -563,16 +563,13 @@ export const ENTERPRISE_FRICTION_MATRIX: EnterpriseFriction[] = [
   },
   {
     id: 'isa_2007_gap',
-    title: 'Nigerian SEC Investment and Securities Act 2007 not in compliance map',
+    title: 'Nigerian SEC Investment and Securities Act 2007 — now in compliance map (was a gap, shipped 2026-04-29)',
     buyerSegment: 'GC / Compliance',
-    surfacedAs:
-      '"Your 17-framework map is impressive — but for our Nigerian SEC-licensed entities, you\'re missing the Investment and Securities Act 2007 (ISA). Our GC will flag this as a critical procurement deal-killer."',
-    preBakedResponse:
-      "\"You're right — ISA 2007 is a gap I'm actively closing. I'll have the ISA mapping in the framework registry within 2 weeks. In the meantime, our NDPR + CBN + WAEMU coverage handles 80% of your Pan-African deal exposure; I'd rather ship the ISA addition correctly than fake coverage we don't have.\" This response demonstrates regulatory competence + treats the GC as a partner, not an obstacle.",
-    productStatus: 'gap',
-    statusDetail:
-      'CRITICAL gap for Sankore-class Nigerian SEC-licensed buyers. Should be added to src/lib/compliance/frameworks/africa-frameworks.ts as soon as practical. NotebookLM Q3 deal-stall analysis flagged this as a high-probability stall cause.',
-    severity: 'critical',
+    surfacedAs: `"Your ${FRAMEWORK_COUNT}-framework map covers NDPR, CBN, WAEMU, PoPIA — does it cover Nigerian SEC's Investment and Securities Act 2007? For our SEC-licensed entities that's the canonical local-securities statute."`,
+    preBakedResponse: `"Yes — ISA 2007 shipped into the framework registry on 2026-04-29. It's the ${FRAMEWORK_COUNT}th framework alongside the existing NDPR + CBN + WAEMU + PoPIA + FRC Nigeria + 13 other regimes. The mapping covers investor-protection disclosure (Part XIV), market-abuse provisions (Part XV), and the suitability rules SEC Rule 18 layers on top. I can send the registry export so your GC can verify before procurement." This response demonstrates that the gap was real, the fix is shipped, and the founder is on top of regulatory work — the strongest possible regulatory-competence signal.`,
+    productStatus: 'shipped',
+    statusDetail: `RESOLVED 2026-04-29 — ISA 2007 entry now in src/lib/compliance/frameworks/africa-frameworks.ts as the ${FRAMEWORK_COUNT}th registry entry. The scenario stays in the silent-objections list because a buyer who hasn't queried the registry may still raise the objection; the script now demonstrates the shipped state rather than promising a 2-week ETA. Sankore-class procurement reviewers can verify via the public registry export.`,
+    severity: 'medium',
   },
   {
     id: 'lp_anonymization',
@@ -780,11 +777,10 @@ export const BUYING_COMMITTEE: Record<
         title: 'General Counsel / Chief Compliance Officer',
         persona: 'The legal gatekeeper. Assesses regulatory + vendor risk.',
         cares:
-          'Data privacy; AI explainability; survivability of regulatory claims; alignment with NDPR, CBN, WAEMU, PoPIA, and local securities laws (e.g., Nigerian SEC ISA 2007).',
+          'Data privacy; AI explainability; survivability of regulatory claims; alignment with NDPR, CBN, WAEMU, PoPIA, FRC Nigeria, and local securities laws (e.g., Nigerian SEC ISA 2007).',
         vetoes:
-          'Unmanaged legal exposure; missing regional compliance frameworks (especially ISA 2007 for Nigerian SEC-licensed firms); inability to generate Client-Safe anonymised export modes.',
-        navigate:
-          'Lead with the 17-framework compliance map + signed DPA. Acknowledge the ISA 2007 gap honestly + commit to closing it within 2 weeks. Emphasise AES-256-GCM encryption + GDPR/NDPR anonymisers stripping PII before any model call + hashed tamper-evident DPR.',
+          'Unmanaged legal exposure; black-box AI scoring methodologies; inability to generate Client-Safe anonymised export modes for LP-bound / audit-committee-bound artefacts.',
+        navigate: `Lead with the ${FRAMEWORK_COUNT}-framework compliance map + signed DPA. Name ISA 2007 (Nigerian SEC), CBN, NDPR, WAEMU, PoPIA, FRC Nigeria explicitly — the registry covers them as named entries (verifiable via the public registry export). Emphasise AES-256-GCM encryption + GDPR/NDPR anonymisers stripping PII before any model call + hashed tamper-evident DPR.`,
         yPosition: 3,
         authority: 'veto',
       },
@@ -829,8 +825,7 @@ export const BUYING_COMMITTEE: Record<
           'Board-ready evidence per memo; compounding edge over time; the audit committee accepting AI-assisted strategic decisions as defensible.',
         vetoes:
           "Tools that introduce friction into existing committee cadence; vendors who can't produce regulator-grade artefacts; anything that requires C-suite explaining to their board.",
-        navigate:
-          'Lead with the Decision Provenance Record + 17-framework regulatory map. Frame as "the artefact your audit committee will eventually require evidence of, before regulators start asking." EU AI Act Article 14 enforcement August 2026 = the calendared why-now.',
+        navigate: `Lead with the Decision Provenance Record + ${FRAMEWORK_COUNT}-framework regulatory map. Frame as "the artefact your audit committee will eventually require evidence of, before regulators start asking." EU AI Act Article 14 enforcement August 2026 = the calendared why-now.`,
         yPosition: 0,
         authority: 'economic',
       },
@@ -855,8 +850,7 @@ export const BUYING_COMMITTEE: Record<
           'GDPR Article 22 automated-decision rights; SOC 2 Type II; the Decision Provenance Record being defensible under the EU AI Act + applicable US state laws (Colorado SB24-205 enforceable Feb 2026).',
         vetoes:
           "Vendors who claim certifications they don't have; black-box AI without explainability; missing Client-Safe export modes for any LP-bound or audit-committee-bound artefact.",
-        navigate:
-          'Match the F500 procurement bar: SOC 2 Type II infrastructure (Vercel + Supabase), AES-256-GCM encryption, hashed + tamper-evident DPR, full DPA, 17-framework regulatory map. Cite the trust-copy single source of truth (src/lib/constants/trust-copy.ts) so claims never drift.',
+        navigate: `Match the F500 procurement bar: SOC 2 Type II infrastructure (Vercel + Supabase), AES-256-GCM encryption, hashed + tamper-evident DPR, full DPA, ${FRAMEWORK_COUNT}-framework regulatory map. Cite the trust-copy single source of truth (src/lib/constants/trust-copy.ts) so claims never drift.`,
         yPosition: 2,
         authority: 'veto',
       },
@@ -928,15 +922,13 @@ export const DEAL_STALL_DIAGNOSTICS: DealStallDiagnostic[] = [
       '"I\'ve been refining DPR exports based on fund feedback. We are finalising Client-Safe Export Mode that auto-replaces target names + financials with placeholders ([COMPANY_NAME], [REDACTED-AMOUNT]) while preserving the bias analysis + DQI score for LP reporting. For the first cohort of design partners I do this redaction manually so you have a working artefact today — happy to walk through the template I\'d use."',
   },
   {
-    id: 'isa_2007_gap',
-    title: 'Nigerian SEC ISA 2007 compliance gap (Sankore-class)',
-    probability: 'High',
-    diagnostic:
-      "The partner forwarded your 17-framework compliance map to their GC or CCO. The GC noticed that while you have NDPR, CBN, and WAEMU, you're missing the Investment and Securities Act 2007. For a Nigerian SEC-licensed firm managing ₦100B+ AUM, this is a procurement deal-killer.",
+    id: 'isa_2007_followup',
+    title: 'GC raises Nigerian SEC ISA 2007 — proof-of-coverage follow-up',
+    probability: 'Medium',
+    diagnostic: `The partner forwarded your ${FRAMEWORK_COUNT}-framework compliance map to their GC or CCO. The GC asks whether ISA 2007 (Nigerian Investment & Securities Act) is covered. As of 2026-04-29 ISA 2007 IS in the registry; the deal stalls if the founder fails to demonstrate that quickly or if the GC has an older reference doc that still lists the gap. The recovery is proof-of-shipped, not promise-to-ship.`,
     recoveryMove:
-      "Demonstrate extreme regulatory competence. Don't fake coverage; commit to closing the gap in a credible timeframe (2 weeks). The response itself proves you're building a compliance moat, not just shipping a hacker product.",
-    recoveryScript:
-      "\"As we prepare for a potential pilot, I wanted to let you know I'm actively mapping the Nigerian SEC framework — specifically the Investment and Securities Act 2007 — into our compliance engine alongside our existing CBN + NDPR + WAEMU nodes. ETA 2 weeks. I'd rather ship the ISA mapping correctly than fake coverage we don't have.\"",
+      'Send the registry export + the framework-mapping entry from africa-frameworks.ts within 24 hours. The artefact resolves the objection without further conversation. If the GC has a stale internal note flagging it as missing, send the diff: "shipped 2026-04-29, here\'s the registry entry — please update your vendor-risk register."',
+    recoveryScript: `"Following up on the GC question on ISA 2007 — that framework shipped into our registry on 2026-04-29 as the ${FRAMEWORK_COUNT}th regulatory framework, alongside the existing NDPR / CBN / WAEMU / PoPIA / FRC Nigeria entries. Attaching the registry export so your team can paste it directly into your vendor-risk register. Happy to walk the GC through the specific Part XIV + XV mappings if useful."`,
   },
   {
     id: 'analysis_paralysis',
@@ -1126,8 +1118,7 @@ export const SALES_FRAMEWORK_GAPS: SalesMove[] = [
     framework: 'Cialdini Influence · Scarcity (operationalised through capacity, not gimmick)',
     whenToFire:
       'When the buyer expresses interest but is non-committal about timing. Or when they ask "what does it cost to start a pilot?"',
-    verbatim:
-      "We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.",
+    verbatim: `We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.`,
     mechanism:
       "Frames the constraint as structurally true (founder bandwidth + outcome calibration), not marketing scarcity. Triggers loss-aversion: the buyer who hesitates loses the seat. Names the contractual ask early so it's not a surprise at procurement.",
     antiPattern:
@@ -1368,8 +1359,7 @@ export const BRINKMANSHIP_MOVES: SalesMove[] = [
       'Brinkmanship · Natural Scarcity on Pilot Seats (Cialdini scarcity × Schelling commitment)',
     whenToFire:
       "When the buyer is interested but non-committal about timing, OR asks 'what's the cost to start a pilot?'",
-    verbatim:
-      "We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the 17-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.",
+    verbatim: `We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.`,
     mechanism:
       'The scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. The brinkmanship: the buyer cannot get the seat AND escape the commitments.',
     antiPattern:

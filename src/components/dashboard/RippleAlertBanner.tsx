@@ -23,6 +23,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GitBranch, AlertOctagon, AlertTriangle, X, ArrowRight } from 'lucide-react';
+import { SEVERITY_COLORS as CANONICAL_SEVERITY_COLORS } from '@/lib/constants/human-audit';
 
 type RippleSeverity = 'high' | 'medium';
 type RippleReason = 'anchor_archived' | 'anchor_outcome_failure' | 'anchor_outcome_partial';
@@ -68,9 +69,14 @@ interface RippleResponse {
   counts: { total: number; high: number; medium: number };
 }
 
+// Severity colors derive from the canonical SEVERITY_COLORS export
+// (CLAUDE.md "SEVERITY_COLORS canonical-import discipline" locked
+// 2026-05-01). RippleSeverity is a subset of the canonical 4-key map
+// (high/medium); the canonical entries map to the exact same vars we
+// would use locally, so the subset projection stays in lockstep.
 const SEVERITY_COLORS: Record<RippleSeverity, string> = {
-  high: 'var(--severity-high)',
-  medium: 'var(--warning)',
+  high: CANONICAL_SEVERITY_COLORS.high,
+  medium: CANONICAL_SEVERITY_COLORS.medium,
 };
 
 const SEVERITY_ICONS: Record<RippleSeverity, typeof AlertOctagon> = {
