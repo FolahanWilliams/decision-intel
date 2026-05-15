@@ -52,6 +52,7 @@ import {
 } from './sparring/sparring-room-data';
 import { Target } from 'lucide-react';
 import { SparringTrendViz } from './sparring/SparringTrendViz';
+import { BaftaPrepCallout } from './sparring/BaftaPrepCallout';
 
 interface Props {
   founderPass: string;
@@ -268,6 +269,8 @@ export function SparringRoomTab({ founderPass }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <Hero />
+
+      <BaftaPrepCallout history={history} />
 
       {error && (
         <div
