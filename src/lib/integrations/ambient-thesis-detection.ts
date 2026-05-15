@@ -29,6 +29,12 @@ import { createLogger } from '@/lib/utils/logger';
 import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_RECOMMENDATIONS } from '@/lib/ai/gateway-models';
 import { resolveToken } from '@/lib/integrations/slack/handler';
+import {
+  createAuthenticatedClient,
+  downloadFileContent,
+  listRecentFilesInFolders,
+} from '@/lib/integrations/google/drive';
+import { parseFile } from '@/lib/utils/file-parser';
 import { logAudit } from '@/lib/audit';
 import { Prisma } from '@prisma/client';
 
@@ -340,34 +346,196 @@ export async function pollSlackInstallationForSignals(install: {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// Drive ingestion (scaffolding — production parse path is a follow-up)
+// Drive ingestion (file-body classification — M-6 ship 2026-05-15)
 // ──────────────────────────────────────────────────────────────────────
 
 /**
- * Poll a Drive installation for new files in monitored folders. The
- * actual file-content classification piggybacks on the existing
- * downloadFileContent + structurer pipeline. For T2.2 v1 we surface
- * file METADATA signals (new file added to monitored folder with
- * thesis-shaped name) — file-body parsing is a follow-up.
+ * MIME types parseFile() can flatten to text. Kept conservative and in
+ * lockstep with src/lib/utils/file-parser.ts — anything outside this set
+ * is skipped rather than risking a parseFile throw mid-batch. parseFile
+ * calls are also try/caught per-file as defense-in-depth.
+ */
+const DRIVE_PARSABLE_MIME_TYPES = new Set<string>([
+  'application/pdf',
+  'text/csv',
+  'text/plain',
+  'text/html',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+]);
+
+/** Max files downloaded + classified per installation per cron pass. */
+export const DRIVE_MAX_FILES_PER_PASS = 25;
+
+/**
+ * Pure. Google-native types are exported by downloadFileContent() to a
+ * concrete format; parseFile() must be called with the EXPORTED type,
+ * not the google-apps type. Mirrors the googleTypes map in
+ * google/drive.ts downloadFileContent — keep the two in lockstep.
+ */
+export function resolveDriveParseMimeType(driveMimeType: string): string {
+  switch (driveMimeType) {
+    case 'application/vnd.google-apps.document':
+      return 'application/pdf';
+    case 'application/vnd.google-apps.spreadsheet':
+      return 'text/csv';
+    case 'application/vnd.google-apps.presentation':
+      return 'application/pdf';
+    default:
+      return driveMimeType;
+  }
+}
+
+export interface AmbientDriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  parents?: string[];
+}
+
+export interface SelectedDriveFile extends AmbientDriveFile {
+  /** MIME type to hand parseFile() after the downloadFileContent export. */
+  parseMimeType: string;
+}
+
+/**
+ * Pure: filter a listed-file set to those parseFile() can flatten, then
+ * cap at maxFiles (bounded cost + memory, mirrors the Slack 100-message
+ * cap philosophy). Deterministic — same input, same output; unit-tested.
+ * Order is preserved (caller lists modifiedTime desc → newest first).
+ */
+export function selectParsableDriveFiles(
+  files: AmbientDriveFile[],
+  maxFiles: number
+): SelectedDriveFile[] {
+  const selected: SelectedDriveFile[] = [];
+  for (const f of files) {
+    if (!f.id || !f.mimeType) continue;
+    const parseMimeType = resolveDriveParseMimeType(f.mimeType);
+    if (!DRIVE_PARSABLE_MIME_TYPES.has(parseMimeType)) continue;
+    selected.push({ ...f, parseMimeType });
+    if (selected.length >= maxFiles) break;
+  }
+  return selected;
+}
+
+/**
+ * Poll a Drive installation: list files modified in the last hour inside
+ * monitored folders, download + parseFile() each, classify the flattened
+ * text, persist a signal when it reads as thesis-formation.
  *
- * Returns the number of signals persisted.
+ * Idempotent on (source='drive', sourceRef=fileId). sourceRef is the
+ * STABLE Google file id (NOT fileId:modifiedTime) — matching the
+ * document-creation flow's dedup shape and avoiding duplicate-signal
+ * noise from non-substantive re-saves. A heavily-revised file that
+ * already produced a signal is intentionally not re-signalled; the
+ * 14-day expiry + user dismiss/confirm bound that edge for a hint
+ * feature. Do not "fix" this to fileId:modifiedTime without revisiting
+ * the cost/noise trade in the M-6 lock.
+ *
+ * Does NOT touch changesPageToken — see listRecentFilesInFolders.
+ *
+ * Returns the number of signals persisted in this run.
  */
 export async function pollDriveInstallationForSignals(install: {
   userId: string;
   orgId: string | null;
   monitoredFolders: string[];
+  refreshTokenEncrypted: string;
+  refreshTokenIv: string;
+  refreshTokenTag: string;
 }): Promise<number> {
-  // Conservative v1: surface a metadata-only signal when a new file
-  // lands in a monitored folder with a thesis-shaped name (target / deal
-  // / acquisition / market entry / strategic). The full file-content
-  // path requires reusing parseFile() + the structurer pipeline which
-  // is heavier; queued for the next session.
   if (install.monitoredFolders.length === 0) return 0;
-  log.info('Drive ambient polling — metadata-only v1', {
-    userId: install.userId,
-    folderCount: install.monitoredFolders.length,
-  });
-  return 0;
+
+  let drive: Awaited<ReturnType<typeof createAuthenticatedClient>>;
+  try {
+    drive = await createAuthenticatedClient({
+      refreshTokenEncrypted: install.refreshTokenEncrypted,
+      refreshTokenIv: install.refreshTokenIv,
+      refreshTokenTag: install.refreshTokenTag,
+    });
+  } catch (err) {
+    log.warn('Drive auth failed; skipping installation', {
+      userId: install.userId,
+      err: String(err),
+    });
+    return 0;
+  }
+
+  // 1-hour lookback mirrors the Slack pattern; idempotency on
+  // (source, sourceRef) skips already-signalled files across passes.
+  const modifiedAfterIso = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+
+  let listed: AmbientDriveFile[];
+  try {
+    const files = await listRecentFilesInFolders(
+      drive,
+      install.monitoredFolders,
+      modifiedAfterIso
+    );
+    listed = files.map(f => ({
+      id: f.id,
+      name: f.name,
+      mimeType: f.mimeType,
+      parents: f.parents,
+    }));
+  } catch (err) {
+    log.warn('Drive file list failed', { userId: install.userId, err: String(err) });
+    return 0;
+  }
+
+  const candidates = selectParsableDriveFiles(listed, DRIVE_MAX_FILES_PER_PASS);
+  let persistedCount = 0;
+
+  for (const file of candidates) {
+    try {
+      // Cheap idempotency gate before the expensive download + classify.
+      const existing = await prisma.ambientThesisSignal.findUnique({
+        where: { source_sourceRef: { source: 'drive', sourceRef: file.id } },
+        select: { id: true },
+      });
+      if (existing) continue;
+
+      const buffer = await downloadFileContent(drive, file.id, file.mimeType);
+      const parsed = (await parseFile(buffer, file.parseMimeType, file.name)).trim();
+      if (parsed.length < 20) continue;
+
+      const classification = await classifyTextForThesisFormation(parsed);
+      if (
+        !classification.isThesisFormation ||
+        classification.confidence < SIGNAL_BANNER_THRESHOLD
+      ) {
+        continue;
+      }
+
+      const parentFolder =
+        file.parents?.find(p => install.monitoredFolders.includes(p)) ??
+        install.monitoredFolders[0];
+
+      const result = await persistAmbientSignal({
+        userId: install.userId,
+        orgId: install.orgId,
+        source: 'drive',
+        sourceRef: file.id,
+        sourceParentRef: parentFolder,
+        excerpt: parsed,
+        confidence: classification.confidence,
+        extractedFields: classification.extractedFields,
+      });
+      if (result.created) persistedCount += 1;
+    } catch (err) {
+      // One bad file (too large, export failure, unparsable) must not
+      // poison the batch — log + continue. Not a silent catch.
+      log.warn('Drive file ambient parse failed; skipping', {
+        userId: install.userId,
+        fileId: file.id,
+        err: String(err),
+      });
+    }
+  }
+
+  return persistedCount;
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -430,6 +598,9 @@ export async function pollAllAmbientSources(): Promise<PollAllResult> {
         userId: true,
         orgId: true,
         monitoredFolders: true,
+        refreshTokenEncrypted: true,
+        refreshTokenIv: true,
+        refreshTokenTag: true,
       },
     });
     for (const install of driveInstalls) {

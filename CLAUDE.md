@@ -299,7 +299,7 @@ These two lines are the operational follow-through to the pain framing — the p
 
 - Service at [src/lib/integrations/ambient-thesis-detection.ts](src/lib/integrations/ambient-thesis-detection.ts) — `classifyTextForThesisFormation(text)` via deepseek-v4-flash (MODEL_RECOMMENDATIONS) with structured JSON output, falls back to negative on failure. `persistAmbientSignal` idempotent on (source, sourceRef). `pollSlackInstallationForSignals` fetches via `conversations.history` against consented channels (1-hour lookback). `pollAllAmbientSources` top-level entry point iterating installations + sweeping expired signals.
 - Privacy posture (load-bearing): default OFF; per-channel scoping via `SlackInstallation.ambientCaptureChannels`; Drive folder scoping reuses `monitoredFolders`; raw message content never persisted; excerpts capped at 500 chars; 14-day auto-expiry on unconfirmed signals.
-- Drive ingestion is v1 metadata-only — file-content parsing is a follow-up (requires reusing parseFile + structurer pipeline). Slack channel ingestion is full-featured.
+- Drive ingestion is FULL file-body classification as of the M-6 ship 2026-05-15 (see the M-6 lock below) — `pollDriveInstallationForSignals` lists recently-modified files in monitored folders, downloads + `parseFile()`s each, classifies the flattened text. Slack channel ingestion is full-featured.
 - Cron at [/api/cron/ambient-detection](src/app/api/cron/ambient-detection/route.ts) — Bearer CRON_SECRET auth. Wire to dispatcher for 5-min cadence.
 - CRUD at [/api/ambient-signals](src/app/api/ambient-signals/route.ts) (GET list, status-filtered) and [/api/ambient-signals/[id]](src/app/api/ambient-signals/[id]/route.ts) (PATCH confirm/dismiss with optional containerId link; DELETE convenience).
 - Consent toggle at [/api/integrations/ambient-consent](src/app/api/integrations/ambient-consent/route.ts) — Slack + Drive consent in one endpoint, audit-logged.
@@ -333,7 +333,7 @@ These two lines are the operational follow-through to the pain framing — the p
 **Open follow-ups (deferred from this ship, not load-bearing)**:
 
 - DPR cover surface for the active weight set + delta-vs-canonical (data flows but the cover-page renderer doesn't yet pull from `DQIResult.effectiveWeights` / `weightsHash`). **SHIPPED 2026-05-11 as P2.**
-- Drive file-body classification path (T2.2 v1 is metadata-only on Drive; full content parsing reuses parseFile + structurer — queued).
+- Drive file-body classification path — **SHIPPED 2026-05-15 as M-6** (see the M-6 lock below).
 - Post-upload reveal priors variant on /dashboard (T2.3 covers /decisions/new; the /dashboard post-upload-reveal variant requires a different shape since priors there are document-level, not container-level).
 - Outcome-inference pipeline integration of `inferOutcomeFromPmiSignals` — helper is built + tested; wiring into the 1111-line outcome-inference module is a follow-up.
 - IC-memo PMI signal auto-extraction via deepseek-v4-flash (currently the user types signals in by hand; LLM extraction would pre-populate from IC memo content).
@@ -376,7 +376,7 @@ These two lines are the operational follow-through to the pain framing — the p
 **Open follow-ups (deferred from this batch, not load-bearing)**:
 
 - T3.2 generational-change narrative for fundraise (post-seed-conversation, not pre-pilot conversion). Wait for seed conversations per Mr. Gabe rule.
-- Drive file-body classification (T2.2 v1 metadata-only).
+- Drive file-body classification — **SHIPPED 2026-05-15 as M-6**.
 - Post-upload priors variant on /dashboard.
 - Outcome-inference pipeline integration of `inferOutcomeFromPmiSignals`.
 - IC-memo PMI signal auto-extraction.
@@ -1300,6 +1300,18 @@ Any `findFirst` query that gates a Stripe checkout (active-purchase dedup, subsc
 - **Dismissal model (v1)**: client-side sessionStorage under `di-ripple-alerts-dismissed-v1`. The underlying anchor state doesn't change just because the user clicked dismiss — a dismissed ripple will re-appear on the next browser session if the assumption is still broken AND the dependent is still active. By design — "dismissed" means "acknowledged", not "resolved". Server-side dismissal would require a new Prisma model; deferred until the dismissal noise is real.
 - **No Prisma migration needed** — every signal flows through the existing `DecisionContainer.status`, `DecisionContainerOutcome.brierScore`, `DecisionContainerOutcome.summary`, and `DecisionContainerLink.linkType === 'depends_on'` columns.
 - **Forward-looking rule**: when adding new ripple triggers (e.g., anchor's structuralAssumptions audit flags a Critical change), extend `classifyAnchor` in `ripple-detection.ts` + add a new `RippleReason` value + add a new entry to `REASON_LABEL` in `RippleAlertBanner.tsx` + extend the test suite in lockstep. The pure-function shape keeps the rule additive.
+
+### Ambient Drive file-body capture (locked 2026-05-15 — M-6 ship)
+
+- **Closes the last unshipped M-\* item from the 2026-05-12 audit** + the asymmetric-pitch BAFTA risk: T2.2 ambient capture was Slack-full-content but Drive-metadata-only. ~60% of fractional-CSO + smaller-fund-GP HXC prospects live in Google Drive, not Slack — "ambient capture across your toolchain" was a procurement-grade falsehood at the cold-context door until this ship. The founder chose the deep ship (not the disclaimer fork) per the discovery-discipline lock.
+- **Architecture**: `pollDriveInstallationForSignals` in [ambient-thesis-detection.ts](src/lib/integrations/ambient-thesis-detection.ts) now lists files modified in the last hour inside `monitoredFolders`, downloads each via the existing `downloadFileContent`, flattens via the existing `parseFile()`, classifies the text via the same deepseek-v4-flash `classifyTextForThesisFormation` the Slack path uses, and persists a signal at confidence ≥ `SIGNAL_BANNER_THRESHOLD`. New Drive helper [listRecentFilesInFolders](src/lib/integrations/google/drive.ts) does a scoped `files.list` (parent-in-monitoredFolders + `modifiedTime >` floor + not-trashed, single bounded page).
+- **Does NOT touch `changesPageToken`** — that Changes-API cursor is owned by the document-creation flow in `/api/cron/google-drive-sync`. A second consumer advancing it would silently starve the other. The scoped `files.list` + `(source, sourceRef)` idempotency is the correct shape for a fire-and-forget hint feature; the 1-hour lookback mirrors the Slack pattern exactly.
+- **`sourceRef` is the STABLE Google file id** (NOT `fileId:modifiedTime`) — matches the doc-creation flow's dedup shape and avoids duplicate-signal noise from non-substantive re-saves. A heavily-revised file that already produced a signal is intentionally not re-signalled; the 14-day expiry + user dismiss/confirm bound that edge for a hint feature. Inline comment in the poller warns future sessions not to "fix" this to `fileId:modifiedTime` without revisiting the cost/noise trade.
+- **Pure-function-first discipline** (mirrors M-3 / M-7): `resolveDriveParseMimeType` (google-apps → export-target mime; lockstep with `downloadFileContent`'s googleTypes map) + `selectParsableDriveFiles` (parsable-filter + `DRIVE_MAX_FILES_PER_PASS=25` cap, order-preserving) are pure + unit-tested. 13-test suite at [ambient-thesis-detection.test.ts](src/lib/integrations/ambient-thesis-detection.test.ts). The I/O orchestration stays a thin wrapper; per-file try/catch (`log.warn`, not silent) so one bad file (too large / export failure / unparsable) can't poison the batch.
+- **`pollAllAmbientSources` Drive `select` extended** with `refreshTokenEncrypted/Iv/Tag` so the poller can build the Drive client without an N+1 re-fetch — symmetrical with how the Slack path passes `teamId` for `resolveToken`.
+- **Privacy posture unchanged + preserved**: default OFF (`GoogleDriveInstallation.ambientCaptureEnabled`), folder-scoped via `monitoredFolders`, excerpt capped at 500 chars by `persistAmbientSignal`, 14-day expiry. No raw file content persisted beyond the 500-char excerpt.
+- **No Prisma migration** — every field exists (`AmbientThesisSignal`, `GoogleDriveInstallation.ambientCaptureEnabled/monitoredFolders/refreshToken*`). Lint baselines unchanged (silent-catches 175 — the new catches are `log.warn`, not silent; counts 77; canonical-imports clean).
+- **Forward-looking rule**: when `parseFile()`'s supported MIME set changes, update `DRIVE_PARSABLE_MIME_TYPES` in lockstep (it is deliberately conservative + the per-file try/catch is the safety net). When `downloadFileContent`'s `googleTypes` export map changes, update `resolveDriveParseMimeType` in the same commit — the two MUST agree or a Google-native file is downloaded as one format and handed to `parseFile()` as another. Email ingestion (the 3rd `source`) follows the same shape when it lands: list → fetch → `parseFile` → classify → `persistAmbientSignal`, pure helpers extracted + tested, no Changes-cursor coupling.
 
 ### PMI signal auto-extraction (locked 2026-05-13 — M-3 ship)
 

@@ -130,3 +130,55 @@ export async function getStartPageToken(drive: drive_v3.Drive): Promise<string> 
   const res = await drive.changes.getStartPageToken({});
   return res.data.startPageToken || '';
 }
+
+export interface RecentDriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  parents?: string[];
+  modifiedTime?: string;
+}
+
+/**
+ * List files recently modified inside the given monitored folders.
+ *
+ * Used by ambient thesis-detection (M-6, ship 2026-05-15). Deliberately
+ * does NOT use the Changes API / changesPageToken cursor — that cursor
+ * is owned by the document-creation flow in /api/cron/google-drive-sync;
+ * a second consumer advancing it would silently starve the other. A
+ * scoped files.list with a modifiedTime floor + (source, sourceRef)
+ * idempotency on the signal table is the correct shape for a
+ * fire-and-forget hint feature.
+ *
+ * Bounded: single page, pageSize cap. The next cron pass re-lists;
+ * idempotency skips already-signalled files. folderIds are Google-issued
+ * opaque strings (no realistic quote-injection surface) but single
+ * quotes are escaped defensively for the Drive query DSL.
+ */
+export async function listRecentFilesInFolders(
+  drive: drive_v3.Drive,
+  folderIds: string[],
+  modifiedAfterIso: string,
+  pageSize = 50
+): Promise<RecentDriveFile[]> {
+  if (folderIds.length === 0) return [];
+  const parentsClause = folderIds
+    .map(id => `'${id.replace(/'/g, "\\'")}' in parents`)
+    .join(' or ');
+  const q = `(${parentsClause}) and modifiedTime > '${modifiedAfterIso}' and trashed = false`;
+  const res = await drive.files.list({
+    q,
+    fields: 'files(id, name, mimeType, parents, modifiedTime)',
+    pageSize,
+    orderBy: 'modifiedTime desc',
+  });
+  return (res.data.files || [])
+    .filter(f => Boolean(f.id && f.mimeType))
+    .map(f => ({
+      id: f.id as string,
+      name: f.name || 'untitled',
+      mimeType: f.mimeType as string,
+      parents: f.parents || undefined,
+      modifiedTime: f.modifiedTime || undefined,
+    }));
+}
