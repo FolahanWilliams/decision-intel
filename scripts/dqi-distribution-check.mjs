@@ -43,7 +43,13 @@ if (result.status !== 0) {
   process.exit(result.status ?? 1);
 }
 
-const markdown = result.stdout;
+// The DQI engine logger writes [INFO] lines to stdout during
+// runDistributionCheck(); this is a procurement deliverable, so slice
+// from the report header and drop the log-noise prefix. Defensive
+// fallback to full stdout if the header is somehow absent.
+const HEADER = '# DQI Distribution Check';
+const headerIdx = result.stdout.indexOf(HEADER);
+const markdown = headerIdx >= 0 ? result.stdout.slice(headerIdx) : result.stdout;
 
 if (outArg) {
   const outPath = resolve(outArg);

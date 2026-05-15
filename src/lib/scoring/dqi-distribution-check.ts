@@ -1,9 +1,10 @@
 /**
  * DQI distribution check (locked 2026-05-11 per P4 ship).
  *
- * Held-out-sample regression infrastructure for user-adjustable weights
- * (methodology 2.3.0). When a buyer asks "how do I know your score is
- * accurate?", the answer is documented + reproducible: 5 archetypal
+ * Held-out-sample regression infrastructure across the canonical 2.4.0
+ * engine epoch (22×22 interaction matrix, M-1 ship 2026-05-13) + the
+ * 2.3.0 user-adjustable-weights path. When a buyer asks "how do I know
+ * your score is accurate?", the answer is documented + reproducible: 5 archetypal
  * sample memos × 4 weight configurations (canonical + 3 persona-tuned)
  * with invariant checks on every cell.
  *
@@ -11,8 +12,9 @@
  *   1. Every computed DQI ∈ [0, 100]
  *   2. Every grade-band ordering preserved (A > B > C > D > F by min)
  *   3. User-adjustable weights produce methodology 2.3.0 stamp
- *   4. Canonical weights produce 2.2.0 / 2.1.0 / 2.0.0-no-validity per
- *      validity-class + compoundPatterns input
+ *   4. Canonical weights + compoundPatterns produce the 2.4.0 stamp
+ *      (M-1 epoch); 2.1.0 / 2.0.0-no-validity per validity-class when
+ *      compoundPatterns absent
  *   5. weightsHash is stable per (weights × input) pair
  *
  * This module is pure-function — no I/O. Run from vitest (locks the
@@ -338,7 +340,9 @@ export function formatDistributionReportMarkdown(report: DistributionReport): st
   lines.push('# DQI Distribution Check — Held-Out Sample Regression');
   lines.push('');
   lines.push(`Generated: ${new Date().toISOString()}`);
-  lines.push(`Methodology under test: 2.3.0 (user-adjustable weights, locked 2026-05-10)`);
+  lines.push(
+    `Methodology under test: 2.4.0 canonical default (22×22 interaction matrix, M-1 epoch 2026-05-13) · 2.3.0 user-adjustable-weights path`
+  );
   lines.push('');
   lines.push(
     `Cells computed: ${report.summary.cellCount} (${SAMPLE_MEMOS.length} sample memos × ${WEIGHT_CONFIGS.length} weight configs)`
@@ -371,7 +375,7 @@ export function formatDistributionReportMarkdown(report: DistributionReport): st
   lines.push('');
   lines.push('1. Every computed DQI ∈ [0, 100]');
   lines.push('2. User-adjustable weights stamp methodology 2.3.0');
-  lines.push('3. Canonical weights + compoundPatterns stamp methodology 2.2.0');
+  lines.push('3. Canonical weights + compoundPatterns stamp methodology 2.4.0');
   lines.push('4. weightsHash is a stable 12-char hex per (weights × input) pair');
   lines.push('5. All weight configs pass `validateUserAdjustableWeights` (sum-to-1 ± 0.001)');
   return lines.join('\n');
