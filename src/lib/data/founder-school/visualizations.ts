@@ -12,6 +12,13 @@
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "DI-B-001 → DI-B-020 + 30+ scope" is stale + the "30+
+// scope" is a deprecated hedge (CR-3 2026-05-13). Founder rehearses
+// pipeline architecture from this surface; the count must be canonical.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const BIAS_ID_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
@@ -1126,7 +1133,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
       {
         when: '2026',
         label: 'Decision Intel taxonomy',
-        detail: 'DI-B-001 → DI-B-020 + 30+ scope. Published at /taxonomy.',
+        detail: `${BIAS_ID_RANGE}. Published at /taxonomy.`,
         emphasis: true,
       },
     ],

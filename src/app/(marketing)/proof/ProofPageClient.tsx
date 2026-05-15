@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, FileText, ShieldCheck, Gauge, AlertOctagon, ShieldAlert } from 'lucide-react';
 import { ALL_CASES, getDeepCases, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
 import { PreDecisionDocument } from '@/components/marketing/proof/PreDecisionDocument';
@@ -12,6 +13,9 @@ import { FlaggedAnalysisPanel } from '@/components/marketing/proof/FlaggedAnalys
 import { OutcomeReveal } from '@/components/marketing/proof/OutcomeReveal';
 import { DecisionTimeline } from '@/components/marketing/proof/DecisionTimeline';
 import { CaseBiasWeb } from '@/components/marketing/proof/CaseBiasWeb';
+
+// Derived — "30+ bias" deprecated per CR-3 (2026-05-13).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const C = {
   navy: '#0F172A',
@@ -154,7 +158,7 @@ export function ProofPageClient() {
           >
             {deepCases.length} real documents (memos, SEC filings, earnings calls) from{' '}
             <strong style={{ color: C.white }}>before</strong> the outcome was known. Run through
-            the same 30+ bias detection methodology we apply to your next strategic memo.
+            the same {BIAS_COUNT}-bias detection methodology we apply to your next strategic memo.
           </p>
 
           {/* Hero stats */}

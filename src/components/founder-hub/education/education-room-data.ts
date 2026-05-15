@@ -28,6 +28,17 @@
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — these flashcards are what the founder REHEARSES. The legacy
+// '"30+ cognitive biases" is the canonical claim' card actively taught
+// the deprecated (CR-3 2026-05-13) hedge + the fictional "11
+// strategy-specific extensions" split. The card now teaches the
+// correct discipline: the precise count IS the procurement-grade
+// audit-trail standard; the taxonomy is DI-B-001 → DI-B-0NN, derived
+// not hardcoded; there is NO 20-base + extra-scope split.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const BIAS_ID_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
@@ -463,7 +474,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     deckId: 'di_vocabulary',
     prompt: 'How many cognitive biases does DI claim, and where does the taxonomy live?',
     canonicalAnswer:
-      '"30+ cognitive biases" — the canonical claim. The DI-B taxonomy IDs (currently 22 entries through DI-B-022, growing with the Kahneman-Klein paper-application sprint) are PERMANENT and published at /taxonomy. The "30+" allows for taxonomy growth + the 11 strategy-specific extensions without re-numbering. Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts. Never renumber or reassign IDs.',
+      `The canonical claim is the PRECISE count: ${BIAS_COUNT} cognitive biases (${BIAS_ID_RANGE}). "30+ cognitive biases" is DEPRECATED as of CR-3 (2026-05-13) — the "+" was a hedge against a stale count and it conflicts with the precise audit-trail discipline procurement readers expect; never say "30+" to a buyer. There is NO "20 base + 11 strategy-specific extensions" split — that framing was fictional; the taxonomy is one contiguous run of ${BIAS_COUNT} stable IDs (${BIAS_ID_RANGE}), PERMANENT and published at /taxonomy, growing only with the Kahneman-Klein paper-application sprint (never renumbered). Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts — every surface derives the count from there, never hardcodes it.`,
     difficulty: 'foundation',
     applicationContext: 'Investor asks: "how do you scope cognitive bias detection?"',
     source: 'CLAUDE.md Bias Taxonomy section',
@@ -1337,7 +1348,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the biasDetective node do and what taxonomy does it use?',
     canonicalAnswer:
-      "Detects cognitive biases in the memo against the 30+ bias DI taxonomy (DI-B-001 onward stable IDs, currently through DI-B-022 + extended strategy-specific set). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.",
+      `Detects cognitive biases in the memo against the ${BIAS_COUNT}-bias DI taxonomy (${BIAS_ID_RANGE}, one contiguous run of stable IDs — no "+ extended strategy-specific set"; that split was fictional). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.`,
     difficulty: 'foundation',
     applicationContext: 'Demoing the 60-second audit — what runs first?',
     source: 'src/lib/agents/nodes.ts',

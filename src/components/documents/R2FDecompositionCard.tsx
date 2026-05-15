@@ -16,6 +16,11 @@
 
 import { Scale, Compass, ArrowRight } from 'lucide-react';
 import { R2FBadge } from '@/components/ui/R2FBadge';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ bias" deprecated per CR-3 (2026-05-13). This is the
+// taxonomy size, distinct from the per-document biasCount prop.
+const TAXONOMY_SIZE = Object.keys(BIAS_EDUCATION).length;
 
 interface R2FDecompositionCardProps {
   overallScore: number;
@@ -24,7 +29,7 @@ interface R2FDecompositionCardProps {
 }
 
 const KAHNEMAN_SIDE = [
-  { label: 'Bias Detective', note: '30+ bias scan across the memo' },
+  { label: 'Bias Detective', note: `${TAXONOMY_SIZE}-bias scan across the memo` },
   { label: 'Noise Judge', note: 'Within-memo consistency check' },
   {
     label: 'Ensemble Sampling',

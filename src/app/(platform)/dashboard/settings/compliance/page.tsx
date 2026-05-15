@@ -11,7 +11,11 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { AccentCard, type AccentColor } from '@/components/ui/AccentCard';
+
+// Derived — "DI-B-001 through DI-B-020" was stale by 2 (CR-3 2026-05-13).
+const BIAS_ID_RANGE = `DI-B-001 → DI-B-${String(Object.keys(BIAS_EDUCATION).length).padStart(3, '0')}`;
 
 // ─── Static compliance mapping: DI features → framework controls ────────────
 
@@ -223,7 +227,7 @@ const FRAMEWORKS: FrameworkPosture[] = [
         controlId: 'Art. 10',
         controlName: 'Data Governance',
         description: 'Training data must be relevant, representative, and free of errors',
-        diFeature: `${HISTORICAL_CASE_COUNT} annotated case studies with pre-decision evidence, curated bias taxonomy (DI-B-001 through DI-B-020), academic citations for all bias detection methodology`,
+        diFeature: `${HISTORICAL_CASE_COUNT} annotated case studies with pre-decision evidence, curated bias taxonomy (${BIAS_ID_RANGE}), academic citations for all bias detection methodology`,
         status: 'pass',
       },
       {

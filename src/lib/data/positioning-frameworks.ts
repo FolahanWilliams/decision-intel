@@ -11,6 +11,12 @@
 //   - Ideal Customer Profile (9 steps)
 
 import type { Status } from './positioning-copilot';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ biases" + "DI-B-001–020" deprecated/stale per CR-3 +
+// the Kahneman-Klein sprint (DI-B-021/022). Founder-rehearsal surface.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const BIAS_ID_RANGE = `DI-B-001–${String(BIAS_COUNT).padStart(3, '0')}`;
 
 // ─── Framework 1 — 5 Levels of Entrepreneurship Thinking ───────────────────
 
@@ -279,7 +285,7 @@ export const BRAND_STEPS: BrandStep[] = [
     title: 'Execution & Credibility',
     question: 'Do you have proof points to back up your claims?',
     diAnswer:
-      'Retrospective 143-case library. Published bias taxonomy (DI-B-001–020). /proof page with live detection demos. GAP: no paying pilot yet.',
+      `Retrospective 143-case library. Published bias taxonomy (${BIAS_ID_RANGE}). /proof page with live detection demos. GAP: no paying pilot yet.`,
     status: 'partial',
     ifWeak: 'Brand gap. Fix operations or delivery. Collect proof stories and facts.',
   },
@@ -383,7 +389,7 @@ export const STORY_STEPS: StoryStep[] = [
       cold_email: 'Link to /proof with the Kodak pre-decision memo + the 4 biases we flagged.',
       demo: 'Walk through the 12-node pipeline on THEIR document. Every flag has a citation to the passage that triggered it.',
       pitch:
-        '143 historical decisions. 30+ biases taxonomy. Published academic foundations (Kahneman, Tetlock).',
+        `143 historical decisions. ${BIAS_COUNT}-bias taxonomy. Published academic foundations (Kahneman, Tetlock).`,
     },
   },
   {

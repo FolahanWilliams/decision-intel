@@ -6,6 +6,15 @@
 // implements it. Organized by category + ring layer so the Intellectual
 // Constellation viz can lay them out radially.
 
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+
+// Derived — "30+ bias taxonomy" + "20×20 interaction matrix" are stale
+// post-M-1 (2026-05-13: matrix is MATRIX_DIMENSION×MATRIX_DIMENSION;
+// "30+" deprecated per CR-3). Investor technical-DD surface; never
+// hardcode the count here.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+
 export type ThinkerCategory =
   | 'cognitive'
   | 'structuring'
@@ -105,7 +114,7 @@ export const THINKERS: Thinker[] = [
       'Judgment under Uncertainty (1974), Thinking Fast and Slow (2011). Catalogued the heuristics and biases that drive systematic error.',
     summary:
       'Fast, automatic System 1 judgment is easily hijacked by anchoring, availability, representativeness, loss aversion, and confirmation. System 2 is capable of correction but lazy.',
-    why: 'The 30+ bias taxonomy the platform detects is a direct inheritance from this research program. Every bias card traces back to a specific paper here.',
+    why: `The ${BIAS_COUNT}-bias taxonomy the platform detects is a direct inheritance from this research program. Every bias card traces back to a specific paper here.`,
     surface:
       'Bias taxonomy across the detection pipeline, compound scoring engine, src/lib/constants/bias-education.ts',
     shipped: true,
@@ -673,7 +682,7 @@ export const STREBULAEV_PRINCIPLES: StrebulaevPrinciple[] = [
     product:
       'Management Halo Effect is already detected. Go deeper: build a Jockey/Horse Balance Score — flag when a memo is 80% team pedigree / 20% fundamentals.',
     startup:
-      'Your codebase IS your jockey credibility: causal learning service, 30+ bias taxonomy, 20×20 interaction matrix. In technical DD, depth signals you\u2019re the right founder.',
+      `Your codebase IS your jockey credibility: causal learning service, ${BIAS_COUNT}-bias taxonomy, ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. In technical DD, depth signals you\u2019re the right founder.`,
     actions: [
       'Add Jockey/Horse Balance Score to bias detection',
       'Track ratio of team vs. fundamentals language in memos',
@@ -1002,7 +1011,7 @@ export const DUAL_FRAMEWORK = {
     thesis:
       'Human judgment is systematically flawed. Structured processes beat intuition at scale.',
     diProduct: [
-      '30+ bias taxonomy detection',
+      `${BIAS_COUNT}-bias taxonomy detection`,
       'Triple-judge noise decomposition',
       'Structured DQI components',
       'Blind priors in Decision Rooms',
@@ -1074,7 +1083,7 @@ export const DQ_CHAIN: DQChainLink[] = [
     label: 'Logical reasoning',
     question: 'Does the reasoning hold?',
     diCoverage:
-      'The 30+ bias taxonomy + 20×20 interaction matrix. Toxic combinations detected. Causal vs. correlational claims classified.',
+      `The ${BIAS_COUNT}-bias taxonomy + ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. Toxic combinations detected. Causal vs. correlational claims classified.`,
     shipped: true,
   },
   {

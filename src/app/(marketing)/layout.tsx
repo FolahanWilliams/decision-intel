@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { SOC2_JSON_LD_DATA_PROTECTION } from '@/lib/constants/trust-copy';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived, never hardcoded — the "30+ biases" phrasing is deprecated
+// per CR-3 (2026-05-13); JSON-LD must carry the canonical 22-bias count.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 export const metadata: Metadata = {
   title: 'Decision Intel · The reasoning audit platform',
@@ -84,7 +89,7 @@ const jsonLd = [
       'Human-AI reasoning audit: every recommendation traceable to the evidence that triggered it',
       'What-if interventions: see how removing a bias changes outcome probability',
       `Decision Quality Index (DQI): benchmarked against a ${HISTORICAL_CASE_COUNT}-case public reference library`,
-      '30+ cognitive biases detected automatically, with severity scoring and evidence excerpts',
+      `${BIAS_COUNT} cognitive biases detected automatically, with severity scoring and evidence excerpts`,
       'Compliance mapping: SOX, FCA, EU AI Act, Basel III, GDPR, SEC, LPOA',
       'Board-ready PDF export with regulatory citations',
       'Closed-loop outcome tracking: every confirmed outcome recalibrates the signal',
@@ -110,7 +115,7 @@ const jsonLd = [
           billingDuration: 'P1M',
         },
         description:
-          'For the high-stakes strategist. 15 audits/month, 30+ bias types, forgotten-question prediction, and your Personal Decision History.',
+          `For the high-stakes strategist. 15 audits/month, ${BIAS_COUNT} bias types, forgotten-question prediction, and your Personal Decision History.`,
       },
       {
         '@type': 'Offer',

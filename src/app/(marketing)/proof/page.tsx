@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getDeepCases } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { ProofPageClient } from './ProofPageClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 const deepCount = getDeepCases().length;
+// Derived — "30+ bias" deprecated per CR-3 (2026-05-13).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 export const metadata: Metadata = {
   title: `Proof — ${deepCount} documents we would have flagged, before the outcome was known | Decision Intel`,
@@ -19,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: `${deepCount} decisions, flagged at the time, not in hindsight`,
-    description: `Real memos from before the outcome was known — run through the same 30+ bias detector we use on live strategic memos.`,
+    description: `Real memos from before the outcome was known — run through the same ${BIAS_COUNT}-bias detector we use on live strategic memos.`,
   },
 };
 

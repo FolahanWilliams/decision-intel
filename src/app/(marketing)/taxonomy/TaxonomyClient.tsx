@@ -91,6 +91,11 @@ export function TaxonomyClient() {
       ),
     []
   );
+  // Derived from the sorted taxonomy — never hardcode the ID range. The
+  // published-contract page that shows a stale "DI-B-001 → DI-B-020"
+  // range is the worst possible drift; this reads the actual max ID.
+  const biasIdMin = entries[0]?.[1].taxonomyId ?? 'DI-B-001';
+  const biasIdMax = entries[entries.length - 1]?.[1].taxonomyId ?? biasIdMin;
 
   const [query, setQuery] = useState('');
   const [difficulty, setDifficulty] = useState<FilterDifficulty>('all');
@@ -207,8 +212,8 @@ export function TaxonomyClient() {
                   maxWidth: 620,
                 }}
               >
-                Every bias the Decision Intel pipeline detects has a stable, permanent ID (DI-B-001
-                through DI-B-020), a named historical failure, and a primary academic citation. Cite
+                Every bias the Decision Intel pipeline detects has a stable, permanent ID ({biasIdMin}{' '}
+                through {biasIdMax}), a named historical failure, and a primary academic citation. Cite
                 these IDs in research, audits, and regulatory filings.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 620 }}>
@@ -276,7 +281,7 @@ export function TaxonomyClient() {
             <StatCard
               icon={Hash}
               label="Stable IDs"
-              value="DI-B-001 → DI-B-020"
+              value={`${biasIdMin} → ${biasIdMax}`}
               sub="Published contract; IDs never change."
             />
             <StatCard

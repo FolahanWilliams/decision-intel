@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { OnbordaProvider, Onborda, useOnborda } from 'onborda';
 import type { Step, CardComponentProps } from 'onborda';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ biases" deprecated per CR-3 (2026-05-13); the tour
+// must show the canonical count, never a hardcoded hedge.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 import {
   Upload,
   BarChart3,
@@ -91,7 +96,7 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       content: (
         <>
           Upload a strategic memo, market-entry recommendation, or quarterly board deck. The audit
-          surfaces 30+ cognitive biases with traceable excerpts and the questions a CEO or audit
+          surfaces {BIAS_COUNT} cognitive biases with traceable excerpts and the questions a CEO or audit
           committee will surface — in 60 seconds.
         </>
       ),

@@ -3,6 +3,16 @@
  * and Folahan Williams (16-year-old solo founder, pre-revenue, targeting enterprise).
  */
 
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ bias taxonomy" + the fictional "Twenty biases plus
+// thirty more" / "broader 30+ scope" split are deprecated per CR-3
+// (2026-05-13). There is NO 20-base + extra-scope split; canonical is
+// BIAS_COUNT biases, DI-B-001 → DI-B-0NN. Founder rehearses pipeline
+// architecture from these lessons — the count must be canonical.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const BIAS_ID_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
+
 export interface Lesson {
   id: string;
   order: number;
@@ -1167,9 +1177,9 @@ export const TRACKS: Track[] = [
         title: 'The Heuristics & Biases Program',
         readTime: '6 min',
         summary:
-          "Decision Intel's 30+ bias taxonomy descends directly from Kahneman & Tversky's Nobel-winning research program. You should be able to trace every bias back to it.",
+          `Decision Intel's ${BIAS_COUNT}-bias taxonomy descends directly from Kahneman & Tversky's Nobel-winning research program. You should be able to trace every bias back to it.`,
         insight:
-          'Amos Tversky and Daniel Kahneman\'s 1974 paper "Judgment Under Uncertainty: Heuristics and Biases" launched the entire field of behavioural decision science. The core finding: people don\'t compute probabilities; they substitute harder questions with easier ones (availability, representativeness, anchoring). Each substitution produces a systematic error — a bias. Over 50 years of peer-reviewed research has catalogued these errors, and Decision Intel\'s taxonomy (DI-B-001 through DI-B-020, plus the broader 30+ marketing scope) maps each one to that literature. Confirmation bias, anchoring, overconfidence, optimism, sunk cost, availability, representativeness — these are not our inventions. We operationalised what already existed. Kahneman\'s 2011 "Thinking, Fast and Slow" is the layperson synthesis; the 1982 "Judgment Under Uncertainty" collection (Kahneman, Slovic, Tversky) is the academic canon.',
+          `Amos Tversky and Daniel Kahneman's 1974 paper "Judgment Under Uncertainty: Heuristics and Biases" launched the entire field of behavioural decision science. The core finding: people don't compute probabilities; they substitute harder questions with easier ones (availability, representativeness, anchoring). Each substitution produces a systematic error — a bias. Over 50 years of peer-reviewed research has catalogued these errors, and Decision Intel's taxonomy (${BIAS_ID_RANGE}) maps each one to that literature. Confirmation bias, anchoring, overconfidence, optimism, sunk cost, availability, representativeness — these are not our inventions. We operationalised what already existed. Kahneman's 2011 "Thinking, Fast and Slow" is the layperson synthesis; the 1982 "Judgment Under Uncertainty" collection (Kahneman, Slovic, Tversky) is the academic canon.`,
         whyItMatters:
           'When a CSO asks "how do you know these biases are real?" you need to answer with names, dates, and papers — not "our AI detects them." The credibility of the whole product rests on the credibility of the underlying research. You are not asking prospects to trust your algorithm; you are asking them to trust 50 years of cognitive science, and your job is to make them confident that your platform applies it correctly.',
         action:
@@ -1203,7 +1213,7 @@ export const TRACKS: Track[] = [
         mnaPitch:
           'Every bias we flag on a thesis carries a citation — Tversky-Kahneman 1974 for anchoring, Malmendier-Tate 2005 for CEO overconfidence, Thaler-Sunstein for availability in deal comparables. When a partner asks "where does this come from?" the answer isn\'t our algorithm; it\'s fifty years of peer-reviewed economics research applied specifically to M&A decision artefacts. That provenance is what makes DI defensible inside a post-close review where the board is asking why the thesis broke.',
         corpStrategyPitch:
-          "The research our taxonomy is built on predates every management consultancy's decision-support offering. Twenty biases (DI-B-001 through DI-B-020) plus thirty more in the broader scope, each traced to a specific paper in the Kahneman-Tversky lineage, each mapped to the strategic-memo sections where it typically appears. If a steering-committee member challenges a flag, your analyst can pull the source citation in one click. Decision hygiene isn't an opinion at DI; it's a published literature your CSO office can defend.",
+          `The research our taxonomy is built on predates every management consultancy's decision-support offering. ${BIAS_COUNT} biases (${BIAS_ID_RANGE}), each traced to a specific paper in the Kahneman-Tversky lineage, each mapped to the strategic-memo sections where it typically appears. If a steering-committee member challenges a flag, your analyst can pull the source citation in one click. Decision hygiene isn't an opinion at DI; it's a published literature your CSO office can defend.`,
         vcPitch:
           "The moat isn't the model. It's the methodology. GPT can identify a bias; it cannot tell you which of the 30+ canonical biases is present, at what severity, in which section, mapped to which regulatory framework, with which compound-risk interaction. That mapping is three academic lineages deep and updates as the research updates. LLM wrappers can't reconstruct that.",
       },

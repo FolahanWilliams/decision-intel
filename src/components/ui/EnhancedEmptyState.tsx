@@ -46,8 +46,11 @@ import {
 import Link from 'next/link';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { ALL_CASES } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const HISTORICAL_CASE_COUNT = ALL_CASES.length;
+// Derived — "30+ cognitive biases" deprecated per CR-3 (2026-05-13).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 export type EmptyStateType =
   | 'documents'
@@ -142,7 +145,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
   'cognitive-audits': {
     icon: <Brain size={28} strokeWidth={1.5} />,
     title: 'No strategic memos audited yet',
-    description: `Run your first audit and see the reasoning behind the numbers, scored against ${HISTORICAL_CASE_COUNT} historical decisions and 30+ cognitive biases.`,
+    description: `Run your first audit and see the reasoning behind the numbers, scored against ${HISTORICAL_CASE_COUNT} historical decisions and ${BIAS_COUNT} cognitive biases.`,
     suggestions: [
       'Walk into the board with rigor that matches your data',
       'Predict steering-committee objections before the meeting',

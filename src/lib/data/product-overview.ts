@@ -3,6 +3,10 @@
 // and quote verbatim. Update here when product state changes.
 
 import { HISTORICAL_CASE_COUNT } from './case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ biases" deprecated per CR-3 (2026-05-13).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 export interface ProductMetric {
   value: string;
@@ -27,7 +31,7 @@ export const HERO = {
     },
     {
       label: 'Audit the Reasoning',
-      detail: '12-node pipeline. 30+ biases. Noise decomposition. Structured in 60 seconds.',
+      detail: `12-node pipeline. ${BIAS_COUNT} biases. Noise decomposition. Structured in 60 seconds.`,
     },
     {
       label: 'Close the Outcome Loop',

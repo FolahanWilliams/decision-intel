@@ -16,6 +16,10 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ cognitive biases" deprecated per CR-3 (2026-05-13).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const C = {
   white: '#FFFFFF',
@@ -51,7 +55,7 @@ const CARDS = [
     href: '/bias-genome',
     eyebrow: 'The taxonomy, openly published',
     title: 'Which biases most often precede failure.',
-    body: '143 audited corporate decisions across thirteen industries / regions. 30+ cognitive biases ranked by failure lift. Every number traceable to the underlying case — methodology and data are open.',
+    body: `143 audited corporate decisions across thirteen industries / regions. ${BIAS_COUNT} cognitive biases ranked by failure lift. Every number traceable to the underlying case — methodology and data are open.`,
     cta: 'Explore the Bias Genome',
     thumb: 'genome' as const,
   },

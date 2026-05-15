@@ -21,6 +21,12 @@ import { motion } from 'framer-motion';
 import { FileText, Tag, Shield } from 'lucide-react';
 import { useReducedMotion } from '@/components/marketing/how-it-works/useReducedMotion';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — "30+ biases" + the fictional "eleven strategy-specific
+// patterns" split are deprecated per CR-3 (2026-05-13). Canonical is
+// MATRIX_DIMENSION biases, period; no 20-base + 11-strategy split exists.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const C = {
   white: '#FFFFFF',
@@ -415,9 +421,8 @@ export function GenomeMethodologyViz() {
       viz: <SourceViz reduced={reduced} />,
     },
     {
-      title: '30+ biases per case, mapped',
-      descriptor:
-        'The Decision Intel taxonomy (DI-B-001 onward, plus eleven strategy-specific patterns) assigns biases to each case with an excerpt and an academic citation.',
+      title: `${BIAS_COUNT} biases per case, mapped`,
+      descriptor: `The Decision Intel taxonomy (DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}) assigns biases to each case with an excerpt and an academic citation.`,
       viz: <ExtractViz reduced={reduced} />,
     },
     {
