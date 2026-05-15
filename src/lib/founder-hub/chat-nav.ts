@@ -23,9 +23,30 @@ export interface TabNavTarget {
   aliases?: string[];
 }
 
+// Reconciled against the canonical 26-id TabId union in the hub page
+// (2026-05-15). The 2026-05-10 positioning consolidation +
+// 2026-04-28 OutreachHub consolidation half-shipped — this table still
+// carried 6 retired tab-ids (positioning_copilot / positioning /
+// category_position / outreach_cmd / outreach / design_partners) that
+// the hub handler's `TABS.some(t => t.id === next)` check rejects, so
+// chat-driven nav to those was BROKEN. The retired ids are folded into
+// the consolidated `positioning_hub` / `outreach_hub` with the old
+// labels preserved as aliases (the AI still says "competitive
+// positioning"; it must resolve to the live tab). 9 tabs shipped
+// 2026-04-27→2026-05-13 without a nav target are added so the AI can
+// actually navigate the founder to them (sparring_room is load-bearing
+// for BAFTA prep; path_to_100m + metrics for seed prep).
 export const TAB_NAV_TARGETS: TabNavTarget[] = [
+  // Start
   { id: 'start', label: 'Start Here', aliases: ['start here tab'] },
+  { id: 'founder_os', label: 'Founder OS', aliases: ['founder os tab', 'os tab'] },
   { id: 'unicorn_roadmap', label: 'Unicorn Roadmap' },
+  {
+    id: 'path_to_100m',
+    label: 'Path to £100M Exits',
+    aliases: ['path to 100m', 'path to a hundred million', 'exit path', 'path to exit'],
+  },
+  // Product
   { id: 'overview', label: 'Product Overview' },
   { id: 'product_deep', label: 'Pipeline & Scoring', aliases: ['pipeline and scoring'] },
   {
@@ -33,29 +54,72 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
     label: 'Research & Foundations',
     aliases: ['research tab', 'research and foundations', 'foundations tab'],
   },
-  { id: 'positioning_copilot', label: 'Positioning Copilot' },
-  { id: 'positioning', label: 'Competitive Positioning' },
+  // Go-to-Market
+  {
+    id: 'positioning_hub',
+    label: 'Positioning Hub',
+    aliases: [
+      'positioning',
+      'positioning copilot',
+      'competitive positioning',
+      'category position',
+      'positioning tab',
+    ],
+  },
   { id: 'sales', label: 'Sales Toolkit' },
+  { id: 'closing_lab', label: 'Closing Lab', aliases: ['closing lab tab'] },
   {
-    id: 'outreach_cmd',
-    label: 'Outreach Strategy',
-    aliases: ['outreach strategy tab'],
+    id: 'sparring_room',
+    label: 'Sparring Room',
+    aliases: ['sparring tab', 'sales rehearsal', 'rehearsal room', 'practice room'],
   },
-  { id: 'category_position', label: 'Category Position' },
   {
-    id: 'outreach',
-    label: 'Message Generator',
-    aliases: ['message generator tab'],
+    id: 'education_room',
+    label: 'Education Room',
+    aliases: ['education tab', 'flashcards', 'recall drill'],
   },
-  { id: 'design_partners', label: 'Design Partners', aliases: ['design partner tab'] },
+  {
+    id: 'outreach_hub',
+    label: 'Outreach Hub',
+    aliases: [
+      'outreach strategy',
+      'message generator',
+      'design partners',
+      'design partner tab',
+      'outreach tab',
+      'outreach command center',
+    ],
+  },
+  {
+    id: 'lrqa',
+    label: 'Assurance Firm · Warm Intro',
+    aliases: ['assurance firm warm intro', 'lrqa brief', 'assurance brief'],
+  },
+  {
+    id: 'cornerstone',
+    label: 'Pre-Seed VC · Warm Intro',
+    aliases: ['pre-seed vc warm intro', 'cornerstone brief', 'vc warm intro brief'],
+  },
   { id: 'content', label: 'Content Studio' },
+  // Intelligence
   { id: 'data_ecosystem', label: 'Data Ecosystem' },
   { id: 'case_library', label: 'Case Library' },
+  {
+    id: 'metrics',
+    label: 'Metrics',
+    aliases: ['metrics tab', 'phase 1 dashboard', 'pmf dashboard', 'kpi dashboard'],
+  },
+  // Tools
   { id: 'todo', label: 'To-Do', aliases: ['to do tab', 'todo tab'] },
   {
     id: 'meetings_log',
     label: 'Meetings Log',
     aliases: ['meeting log', 'meetings tab', 'past meetings', 'meeting history'],
+  },
+  {
+    id: 'voice_activity',
+    label: 'Voice Activity',
+    aliases: ['voice tab', 'voice sessions', 'voice mode log'],
   },
   { id: 'forecast', label: '12-Month Forecast', aliases: ['forecast tab'] },
   { id: 'founder_tips', label: 'Founder Tips' },
@@ -102,7 +166,7 @@ export function detectNavTargets(text: string, limit = 3): TabNavTarget[] {
 
 /** Explicit navigation marker the chat system prompt teaches the model
  *  to emit when the user asks the AI to take them to a specific tab.
- *  Form: [[nav:tabId]]  — e.g. "[[nav:outreach_cmd]]". The widget
+ *  Form: [[nav:tabId]]  — e.g. "[[nav:outreach_hub]]". The widget
  *  auto-fires the founder-hub-navigate event for the first valid marker
  *  in a response and strips every marker from the displayed text.
  *
