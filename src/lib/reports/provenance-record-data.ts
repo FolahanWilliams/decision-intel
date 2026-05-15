@@ -20,7 +20,7 @@
  *
  * IP-PROTECTION RULES — do not break:
  *   1. Never serialize prompt content — only the SHA-256 fingerprint.
- *   2. Never serialize the 20×20 toxic-combination weight matrix.
+ *   2. Never serialize the 22×22 toxic-combination weight matrix (methodology 2.4.0).
  *   3. Never serialize per-org causal edges or learned bias genome values.
  *   4. Pipeline lineage stores node IDs + order only; per-node I/O
  *      hashing is deferred to record schema v2 (requires instrumentation

@@ -10,6 +10,11 @@
 // the founder via the Positioning Copilot tab and the cheat-sheet PDF, so keep
 // the voice concrete and CSO-ready — no filler, no hedging language.
 
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const BIAS_ID_RANGE = `DI-B-001 → DI-B-0${String(BIAS_COUNT).padStart(2, '0')}`;
+
 export type Status = 'strong' | 'partial' | 'gap';
 
 export const STATUS_COLOR: Record<Status, string> = {
@@ -463,7 +468,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     title: 'Insight',
     purpose: 'Share a fresh perspective',
     decisionIntelAnswer:
-      "Strategic failure is not a data problem. It's a bias problem. 30+ cognitive biases, well-studied since Kahneman, have never been operationalized at the C-suite. We did it in 60 seconds per memo.",
+      `Strategic failure is not a data problem. It's a bias problem. The ${BIAS_COUNT}-bias R²F taxonomy, well-studied since Kahneman, has never been operationalized at the C-suite. We did it in 60 seconds per memo.`,
     kind: 'hook',
   },
   {
@@ -637,7 +642,7 @@ export const POSITIONING_NODES: PositioningNode[] = [
     label: 'Memo Bias',
     kind: 'problem',
     detail:
-      'Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. 30+ biases taxonomy. Uncaught in most peer review.',
+      `Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. ${BIAS_COUNT}-bias R²F taxonomy. Uncaught in most peer review.`,
   },
   {
     id: 'tenure',
@@ -682,7 +687,7 @@ export const POSITIONING_NODES: PositioningNode[] = [
     id: 'taxonomy',
     label: 'Bias Taxonomy',
     kind: 'proof',
-    detail: '30+ biases with stable IDs DI-B-001–020 live. Published at /taxonomy.',
+    detail: `${BIAS_COUNT}-bias R²F taxonomy with stable IDs ${BIAS_ID_RANGE} live. Published at /taxonomy.`,
   },
   {
     id: 'pipeline',

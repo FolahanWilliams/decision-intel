@@ -360,7 +360,7 @@ function getPatternOverrideWeight(
  * Priority chain:
  * 1. Caller-supplied weights (e.g. org-calibrated)
  * 2. Pattern-specific overrides (when the named pattern fired on this audit)
- * 3. Full 20×20 ontology interaction matrix (interaction-matrix.ts)
+ * 3. Full 22×22 ontology interaction matrix (interaction-matrix.ts; methodology 2.4.0 since M-1 ship 2026-05-13)
  * 4. Hardcoded DEFAULT_INTERACTION_WEIGHTS (fallback)
  */
 function getInteractionWeight(

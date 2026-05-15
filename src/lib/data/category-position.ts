@@ -8,8 +8,12 @@
 // judgment, not third-party data. They are transparent on the chart.
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const MATRIX_DIM = BIAS_COUNT; // pairwise interaction matrix is BIAS_COUNT × BIAS_COUNT
+const BIAS_ID_RANGE = `DI-B-001 to DI-B-0${String(BIAS_COUNT).padStart(2, '0')}`;
 
 export type Incumbent = {
   id: string;
@@ -119,8 +123,7 @@ export const INCUMBENTS: Incumbent[] = [
     valuationNote: 'Pre-seed prep',
     focus: 'Causal decision audit · Strategic memos + M&A',
     oneLiner: 'Decision Knowledge Graph for strategic memos — the four moments others miss.',
-    strength:
-      'Only DI platform with per-org causal weights (PC algorithm), published DQI standard, 30+ bias taxonomy, 143-case benchmark, and closed outcome loop.',
+    strength: `Only DI platform with per-org causal weights (PC algorithm), published DQI standard, ${BIAS_COUNT}-bias R²F taxonomy, 143-case benchmark, and closed outcome loop.`,
     gap: 'Zero paying customers yet. Distribution, brand, and enterprise sales machinery are the build-out.',
     x: 86,
     y: 88,
@@ -168,7 +171,7 @@ export const MARKET_GAPS: MarketGap[] = [
           path: 'src/lib/learning/causal-learning.ts',
         },
         {
-          label: 'Bias interaction matrix (20×20 toxic combinations)',
+          label: `Bias interaction matrix (${MATRIX_DIM}×${MATRIX_DIM} toxic combinations)`,
           path: 'src/lib/learning/toxic-combinations.ts',
         },
         { label: 'Counterfactual score engine', path: 'src/lib/replay/score-calculator.ts' },
@@ -211,8 +214,7 @@ export const MARKET_GAPS: MarketGap[] = [
     whatsMissing:
       'An embedded governance layer: bias-by-regulation mapping, decision fingerprints, audit trail, board-exportable evidence. Nobody in DI ships this as first-class.',
     whatWeShip: {
-      summary:
-        'Seven regulatory frameworks mapped to 30+ biases with citations. Decision fingerprints for audit trail. Board-ready PDF export of the full decision audit in two pages.',
+      summary: `${FRAMEWORK_COUNT} regulatory frameworks mapped to the ${BIAS_COUNT}-bias R²F taxonomy with citations. Decision fingerprints for audit trail. Board-ready PDF export of the full decision audit in two pages.`,
       evidence: [
         {
           label: 'Bias ↔ regulation mapping (7 frameworks)',
@@ -327,8 +329,7 @@ export const LEADING_EDGES: ScorecardItem[] = [
   },
   {
     label: 'Bias taxonomy breadth',
-    detail:
-      '30+ biases across 7 categories with stable IDs (DI-B-001 to DI-B-020 published). Interaction matrix for toxic combinations.',
+    detail: `${BIAS_COUNT}-bias R²F taxonomy across 7 categories with stable IDs (${BIAS_ID_RANGE} published). ${MATRIX_DIM}×${MATRIX_DIM} interaction matrix for toxic combinations.`,
   },
   {
     label: 'DQI as published external standard',
@@ -401,7 +402,7 @@ export const CATEGORY_THESIS = {
     },
     {
       label: 'Reasoning audit',
-      body: `30+ biases scored across 6 DQI components, mapped to ${FRAMEWORK_COUNT} regulatory frameworks. Every score traceable.`,
+      body: `${BIAS_COUNT} biases scored across 6 DQI components, mapped to ${FRAMEWORK_COUNT} regulatory frameworks. Every score traceable.`,
     },
     {
       label: 'Outcome loop',

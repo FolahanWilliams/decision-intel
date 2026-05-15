@@ -3,8 +3,11 @@
 // framework (Challenger, MEDDPICC, SPIN). Update here when pitch evolves.
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const MATRIX_DIM = BIAS_COUNT; // pairwise interaction matrix is BIAS_COUNT × BIAS_COUNT
 
 // ─── Pitch Reframe (Strebulaev-inspired) ──────────────────────────────────
 
@@ -46,8 +49,7 @@ export const SALES_OBJECTIONS: SalesObjection[] = [
   {
     id: 'chatgpt_diff',
     objection: '"How is this different from just asking ChatGPT?"',
-    response:
-      "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 31 domain-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every decision you make. Plus Chrome extension for real-time checking and Slack for meeting-time coaching. It's the difference between asking a friend and hiring a forensic auditor.",
+    response: `ChatGPT gives you one opinion from one model. We use 3 decorrelated samples across frame and architecture to measure noise, a ${MATRIX_DIM}×${MATRIX_DIM} bias interaction matrix for compound scoring, the ${BIAS_COUNT}-bias R²F taxonomy that general models don't know to look for, and an outcome flywheel that makes us smarter with every decision you make. Plus Chrome extension for real-time checking and Slack for meeting-time coaching. It's the difference between asking a friend and hiring a forensic auditor.`,
     tone: 'Technical credibility',
   },
   {
@@ -246,11 +248,10 @@ export const AUDIENCE_PITCHES: AudiencePitch[] = [
     id: 'technical',
     audience: 'Technical Audience',
     seconds: 35,
-    pitch:
-      'LangGraph 12-node pipeline (8 sequential + 4 parallel), schema-validated outputs between every step, Bayesian prior integration for per-org recalibration, Brier-scored outcome loop (Tetlock superforecasting research), 20×20 bias interaction matrix with 18 named toxic combinations. Two-model policy: gemini-3-flash-preview (analytical) + gemini-3.1-flash-lite (lightweight). ~17 LLM calls per audit, ~$0.40-0.65 cost, ~90% blended margin against $2,499/month Strategy tier. Not an LLM wrapper — twelve specialised products bound by deterministic glue.',
+    pitch: `LangGraph 12-node pipeline (8 sequential + 4 parallel), schema-validated outputs between every step, Bayesian prior integration for per-org recalibration, Brier-scored outcome loop (Tetlock superforecasting research), ${MATRIX_DIM}×${MATRIX_DIM} bias interaction matrix with 13 named toxic combinations including 3 M&A-specific (Synergy Mirage / Conglomerate Fallacy / Winner's Curse). Two-model policy: gemini-3-flash-preview (analytical) + gemini-3.1-flash-lite (lightweight). ~17 LLM calls per audit, ~$0.40-0.65 cost, ~90% blended margin against $2,499/month Strategy tier. Not an LLM wrapper — twelve specialised products bound by deterministic glue.`,
     color: '#0EA5E9',
     emphasis: [
-      '20×20 bias interaction matrix',
+      `${MATRIX_DIM}×${MATRIX_DIM} bias interaction matrix`,
       'Brier-scored outcome loop',
       'twelve specialised products',
     ],
@@ -1186,8 +1187,7 @@ export const AGE_ASYMMETRY_TACTICS: SalesMove[] = [
     id: 'klein_competence_specificity',
     framework: 'Gary Klein / Cal Newport · Competence-signalling via extreme specificity',
     whenToFire: "When they ask 'why did you build this?' or express ChatGPT-wrapper suspicion.",
-    verbatim:
-      "I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a 20×20 toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.",
+    verbatim: `I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a ${MATRIX_DIM}×${MATRIX_DIM} toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.`,
     mechanism:
       "True experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't.",
     antiPattern:
