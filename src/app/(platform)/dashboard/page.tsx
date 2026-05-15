@@ -2206,8 +2206,17 @@ export default function Dashboard() {
         {/* ═══════ BROWSE & ANALYZE VIEW ═══════ */}
         {activeView === 'browse' && (
           <>
-            {/* Activity Feed - Collapsible */}
-            <div className="card">
+            {/* Activity Feed - Collapsible. AccentCard info accent
+                (informational/data surface); bodyStyle padding:0 keeps
+                the existing collapse-button header + card-body
+                edge-to-edge. The sibling Documents card below stays a
+                bare .card on purpose — it's a ~250-line deep-nested
+                anchored section with its own prominent search/filter
+                header (already highly visually distinct, not the
+                indistinct-stacked-white-card problem the AccentCard
+                discipline targets), and a close-tag rematch there is
+                pure regression risk for a marginal stripe. */}
+            <AccentCard accent="info" bodyStyle={{ padding: 0 }}>
               <button
                 onClick={() => setShowActivityFeed(prev => !prev)}
                 className="w-full card-header flex items-center justify-between hover:bg-[var(--bg-card-hover)] transition-colors"
@@ -2239,7 +2248,7 @@ export default function Dashboard() {
                   </ErrorBoundary>
                 </div>
               )}
-            </div>
+            </AccentCard>
 
             {/* Documents List */}
             <style>

@@ -8,6 +8,7 @@ import { BiasTreemap } from '@/components/visualizations/BiasTreemap';
 import { SwotQuadrant } from '@/components/visualizations/SwotQuadrant';
 import { FactVerificationBar } from '@/components/visualizations/FactVerificationBar';
 import { ComplianceGrid } from '@/components/visualizations/ComplianceGrid';
+import { AccentCard } from '@/components/ui/AccentCard';
 import {
   BarChart,
   Bar,
@@ -330,7 +331,7 @@ export function InsightsPageContent() {
   if (error) {
     return (
       <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-        <div className="card" style={{ borderColor: 'var(--error)' }}>
+        <AccentCard accent="danger" bodyStyle={{ padding: 0 }}>
           <div className="card-body" style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>
             <AlertTriangle size={32} style={{ color: 'var(--error)', margin: '0 auto 12px' }} />
             <p
@@ -347,7 +348,7 @@ export function InsightsPageContent() {
               <RefreshCw size={12} /> Retry
             </button>
           </div>
-        </div>
+        </AccentCard>
       </div>
     );
   }
@@ -542,15 +543,15 @@ export function InsightsPageContent() {
 
         {/* Market Intelligence overlay */}
         {marketAnalysisError && (
-          <div className="card mb-md" style={{ border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+          <AccentCard accent="danger" className="mb-md" bodyStyle={{ padding: 0 }}>
             <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
               <AlertTriangle size={14} style={{ color: 'var(--error)', flexShrink: 0 }} />
               <span style={{ fontSize: '12px', color: 'var(--error)' }}>{marketAnalysisError}</span>
             </div>
-          </div>
+          </AccentCard>
         )}
         {marketAnalysis && (
-          <div className="card mb-md" style={{ border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+          <AccentCard accent="success" className="mb-md" bodyStyle={{ padding: 0 }}>
             <div className="card-header flex items-center justify-between">
               <div className="flex items-center gap-sm">
                 <Globe size={14} style={{ color: 'var(--accent-primary)' }} />
@@ -668,7 +669,7 @@ export function InsightsPageContent() {
                 </div>
               )}
             </div>
-          </div>
+          </AccentCard>
         )}
 
         {/* Main double-line chart: quality + noise over trendRange */}
@@ -825,38 +826,42 @@ export function InsightsPageContent() {
         {/* Stats row */}
         {trendData && trendData.trendData.length > 0 && (
           <div className="grid grid-4 gap-md" style={{ marginBottom: 'var(--spacing-md)' }}>
-            <div className="card">
+            {/* Metric-coded stat row — each tile's accent matches its
+                value semantic (score=primary, noise=danger,
+                biases=warning, analyses=success), the canonical
+                stat-row pattern from the dashboard KPI grid. */}
+            <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
               <div className="card-body text-center p-md">
                 <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--accent-primary)' }}>
                   {trendData.stats.avgScore}
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
               </div>
-            </div>
-            <div className="card">
+            </AccentCard>
+            <AccentCard accent="danger" bodyStyle={{ padding: 0 }}>
               <div className="card-body text-center p-md">
                 <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--error)' }}>
                   {trendData.stats.avgNoise}%
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
               </div>
-            </div>
-            <div className="card">
+            </AccentCard>
+            <AccentCard accent="warning" bodyStyle={{ padding: 0 }}>
               <div className="card-body text-center p-md">
                 <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--warning)' }}>
                   {trendData.stats.totalBiases}
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
               </div>
-            </div>
-            <div className="card">
+            </AccentCard>
+            <AccentCard accent="success" bodyStyle={{ padding: 0 }}>
               <div className="card-body text-center p-md">
                 <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--success)' }}>
                   {trendData.stats.totalAnalyses}
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
               </div>
-            </div>
+            </AccentCard>
           </div>
         )}
       </div>

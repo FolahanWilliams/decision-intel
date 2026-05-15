@@ -51,6 +51,10 @@ export interface AccentCardProps {
   tinted?: boolean;
   className?: string;
   style?: CSSProperties;
+  /** Optional DOM id — for cards that are deep-link anchor targets
+   *  (e.g. `#documents`). Without this, migrating an anchored bare
+   *  `.card` to AccentCard would silently drop the fragment link. */
+  id?: string;
   /**
    * Override styles on the inner body wrapper. Use when you need
    * full-bleed content (`{ padding: 0 }`) — e.g. a list of rows that
@@ -73,6 +77,7 @@ export function AccentCard({
   className,
   style,
   bodyStyle,
+  id,
   children,
 }: AccentCardProps) {
   const color = ACCENT_COLORS[accent];
@@ -89,7 +94,7 @@ export function AccentCard({
   const defaultBodyPadding = title ? '16px 18px' : '18px';
 
   return (
-    <div className={className} style={baseStyle}>
+    <div id={id} className={className} style={baseStyle}>
       {title && (
         <div
           style={{
