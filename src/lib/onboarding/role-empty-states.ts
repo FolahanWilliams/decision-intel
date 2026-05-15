@@ -9,6 +9,10 @@
  * onboarding role via /api/onboarding and indexes into the same map.
  */
 
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+
 export type EmptyStateRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 export type EmptyStateSurface = 'dashboard' | 'deals' | 'decision-log' | 'analytics';
 
@@ -21,8 +25,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
   dashboard: {
     cso: {
       title: 'Audit your first strategic memo',
-      description:
-        'Upload a board recommendation, market-entry memo, or quarterly review. The 60-second audit surfaces 30+ cognitive biases with traceable excerpts plus the questions a CEO or audit committee will surface — and produces a hashed, tamper-evident Decision Provenance Record on the way out.',
+      description: `Upload a board recommendation, market-entry memo, or quarterly review. The 60-second audit surfaces the ${BIAS_COUNT}-bias R²F taxonomy with traceable excerpts plus the questions a CEO or audit committee will surface — and produces a hashed, tamper-evident Decision Provenance Record on the way out.`,
     },
     ma: {
       title: 'Audit your first IC memo or CIM',
@@ -41,8 +44,7 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
     },
     other: {
       title: 'Run your first audit',
-      description:
-        'Upload a strategic memo, board deck, or market-entry recommendation. We surface 30+ cognitive biases, predicted committee questions, and a hashed, tamper-evident Decision Provenance Record.',
+      description: `Upload a strategic memo, board deck, or market-entry recommendation. We surface the ${BIAS_COUNT}-bias R²F taxonomy, predicted committee questions, and a hashed, tamper-evident Decision Provenance Record.`,
     },
   },
   deals: {

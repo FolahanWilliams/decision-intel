@@ -12,8 +12,11 @@
  */
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const MATRIX_DIM = BIAS_COUNT; // pairwise interaction matrix is BIAS_COUNT × BIAS_COUNT
 
 export type PipelineZone = 'preprocessing' | 'analysis' | 'synthesis';
 
@@ -92,10 +95,9 @@ export const PIPELINE_NODES: PipelineNode[] = [
     id: 'biasDetective',
     zone: 'analysis',
     label: 'Bias Detective',
-    tagline: 'Detects 30+ cognitive biases with severity and excerpts.',
+    tagline: `Detects ${BIAS_COUNT} cognitive biases with severity and excerpts.`,
     iconName: 'Brain',
-    purpose:
-      'Runs the published DI-B-001 through DI-B-020 taxonomy plus 11 strategy-specific biases against the structured memo. Every detection comes back with an excerpt, a severity level, and a confidence score — never a bare label.',
+    purpose: `Runs the published DI-B-001 through DI-B-0${String(BIAS_COUNT).padStart(2, '0')} taxonomy against the structured memo, including strategy-specific biases (illusion of validity, inside-view dominance, narrative coherence). Every detection comes back with an excerpt, a severity level, and a confidence score — never a bare label.`,
     output:
       'A list of bias instances: { biasType, severity, confidence, excerpt, explanation, suggestion }.',
     academicAnchor:
@@ -191,8 +193,7 @@ export const PIPELINE_NODES: PipelineNode[] = [
     label: 'Risk Scorer',
     tagline: 'Computes the final DQI — deterministic math.',
     iconName: 'Calculator',
-    purpose:
-      'Compound scoring with the 20x20 bias-interaction matrix, context amplifiers (monetary stakes, dissent absent, time pressure), false-positive damping, and org-specific calibration. This is a deterministic math pass — no LLM — so the same inputs always produce the same DQI.',
+    purpose: `Compound scoring with the ${MATRIX_DIM}×${MATRIX_DIM} bias-interaction matrix, context amplifiers (monetary stakes, dissent absent, time pressure), false-positive damping, and org-specific calibration. This is a deterministic math pass — no LLM — so the same inputs always produce the same DQI.`,
     output:
       'The Decision Quality Index (0–100, A–F grade), toxic combination flags, and a calibrated report.',
     academicAnchor:

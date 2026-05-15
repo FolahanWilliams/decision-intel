@@ -32,10 +32,11 @@
  * claim was overstated when they ask for backup.
  *
  * IP-PROTECTION RULES — do not break: never serialise prompt content
- * (only the SHA-256 fingerprint), never serialise the 20×20 toxic-
- * combination weight matrix, never serialise per-org causal edges or
- * learned bias-genome values. Per-node input/output hashing is deferred
- * to record schema v3 (requires instrumentation in nodes.ts).
+ * (only the SHA-256 fingerprint), never serialise the 22×22 toxic-
+ * combination weight matrix (methodology 2.4.0), never serialise per-org
+ * causal edges or learned bias-genome values. Per-node input/output
+ * hashing is deferred to record schema v3 (requires instrumentation
+ * in nodes.ts).
  */
 
 import jsPDF, { GState } from 'jspdf';
