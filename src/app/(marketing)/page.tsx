@@ -526,7 +526,7 @@ export default function LandingPage() {
                       lineHeight: 1.45,
                     }}
                   >
-                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong> —
+                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong>:
                     projections without named owner, mechanism, or 90-day milestone.
                   </li>
                   <li
@@ -538,8 +538,9 @@ export default function LandingPage() {
                   >
                     <strong style={{ color: C.slate900, fontWeight: 700 }}>
                       Conglomerate Fallacy
-                    </strong>{' '}
-                    — far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
+                    </strong>
+                    :{' '}
+                    far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
                   </li>
                   <li
                     style={{
@@ -550,8 +551,9 @@ export default function LandingPage() {
                   >
                     <strong style={{ color: C.slate900, fontWeight: 700 }}>
                       Winner&rsquo;s Curse
-                    </strong>{' '}
-                    — auction-dynamic anchoring above intrinsic value.
+                    </strong>
+                    :{' '}
+                    auction-dynamic anchoring above intrinsic value.
                   </li>
                 </ul>
                 <p
