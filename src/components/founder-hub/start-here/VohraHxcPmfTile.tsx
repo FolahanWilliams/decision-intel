@@ -26,6 +26,7 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
+import { getHighestPriorityUpcomingEvent, daysUntil } from '@/lib/data/event-prep';
 
 interface PmfPayload {
   veryDisappointedPct: number;
@@ -36,6 +37,10 @@ interface PmfPayload {
   killThresholdHit: boolean;
   graduationThreshold: number;
   killThreshold: number;
+  /** N-floor: BOTH gates stay dark until sampleSize >= this (M-2).
+   *  Derived server-side from VOHRA_PMF_KILL_MIN_N — never hardcode
+   *  the floor in this client tile. */
+  killMinN: number;
   daysSinceLastSurveyResponse: number | null;
 }
 
@@ -115,6 +120,11 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
   const [pmf, setPmf] = useState<PmfPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Capture "now" once at mount (react-hooks/purity — Date.now() is
+  // impure during render). Hook is unconditional, before the loading
+  // early-return, per rules-of-hooks. Minute precision is plenty for a
+  // survey-window / event-countdown reminder that doesn't tick.
+  const [nowMs] = useState(() => Date.now());
 
   useEffect(() => {
     let cancelled = false;
@@ -174,6 +184,42 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
   const progressPct = pmf
     ? Math.min(100, Math.max(0, (pmf.veryDisappointedPct / pmf.graduationThreshold) * 100))
     : 0;
+
+  // Survey-window reminder (audit §5.4 / Tip 2). BOTH gates stay dark
+  // until sampleSize >= killMinN; surface that as an actionable nudge
+  // tied to the next highest-priority event so the founder sends the
+  // survey BEFORE walking into investor conversations there. When the
+  // gate is live (sampleSize >= killMinN) the status pill already
+  // carries graduation/kill — no reminder noise.
+  const needed = pmf ? Math.max(0, pmf.killMinN - pmf.sampleSize) : 0;
+  const surveyWindow = (() => {
+    if (!pmf || needed <= 0) return null;
+    const today = new Date(nowMs);
+    const event = getHighestPriorityUpcomingEvent(today);
+    const daysToEvent = event ? daysUntil(event, today) : null;
+    const eventAnchored =
+      event != null && daysToEvent != null && daysToEvent >= 0 && daysToEvent <= 45;
+    const accent = eventAnchored
+      ? daysToEvent != null && daysToEvent <= 14
+        ? 'var(--error)'
+        : 'var(--warning)'
+      : 'var(--info)';
+    const s = needed === 1 ? '' : 's';
+    const pendingClause =
+      pmf.pendingSurveys > 0
+        ? ` ${pmf.pendingSurveys} survey${pmf.pendingSurveys === 1 ? '' : 's'} already outstanding.`
+        : '';
+    const body =
+      eventAnchored && event && daysToEvent != null
+        ? `Graduation gate is dark — n = ${pmf.sampleSize} / ${pmf.killMinN}. ${event.name} is T-${daysToEvent}d; investors and warm intros there will ask whether you have PMF signal. ${needed} more HXC "very disappointed" response${s} unlocks the gate.${pendingClause} Send the Vohra survey to every HXC customer 30+ days in before the event.`
+        : `Graduation gate needs n ≥ ${pmf.killMinN} HXC responses (currently ${pmf.sampleSize}). ${needed} more unlock${needed === 1 ? 's' : ''} the gate.${pendingClause}${
+            pmf.daysSinceLastSurveyResponse != null &&
+            pmf.daysSinceLastSurveyResponse > 14
+              ? ` Last response was ${pmf.daysSinceLastSurveyResponse}d ago — cadence is slipping.`
+              : ' Keep the survey cadence going.'
+          }`;
+    return { accent, body };
+  })();
 
   return (
     <section
@@ -333,6 +379,35 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
                 )}
               </div>
             </>
+          )}
+
+          {surveyWindow && (
+            <div
+              style={{
+                display: 'flex',
+                gap: 8,
+                alignItems: 'flex-start',
+                padding: '9px 12px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderLeft: `3px solid ${surveyWindow.accent}`,
+                borderRadius: 'var(--radius-sm, 6px)',
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <AlertTriangle
+                size={13}
+                strokeWidth={2}
+                aria-hidden
+                style={{ flexShrink: 0, marginTop: 2, color: surveyWindow.accent }}
+              />
+              <span>
+                <strong style={{ color: 'var(--text-primary)' }}>Survey window:</strong>{' '}
+                {surveyWindow.body}
+              </span>
+            </div>
           )}
 
           <button

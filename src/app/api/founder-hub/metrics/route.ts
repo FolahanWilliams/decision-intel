@@ -20,7 +20,7 @@
 import { NextResponse } from 'next/server';
 import { verifyFounderPass } from '@/lib/utils/founder-auth';
 import { prisma } from '@/lib/prisma';
-import { computeHxcCohortMetrics } from '@/lib/learning/vohra-pmf';
+import { computeHxcCohortMetrics, VOHRA_PMF_KILL_MIN_N } from '@/lib/learning/vohra-pmf';
 import {
   PHASE_1_CUSTOMER_BASELINE_MIN,
   PHASE_1_CUSTOMER_BASELINE_MAX,
@@ -60,6 +60,8 @@ interface MetricsResponse {
     killThresholdHit: boolean;
     graduationThreshold: number;
     killThreshold: number;
+    /** N-floor: BOTH gates stay dark until sampleSize >= this (M-2). */
+    killMinN: number;
     daysSinceLastSurveyResponse: number | null;
     perPersona: Array<{
       personaId: string;
@@ -325,6 +327,7 @@ export async function GET(request: Request) {
       killThresholdHit: hxc?.killThresholdHit ?? false,
       graduationThreshold: hxc?.graduationThreshold ?? 40,
       killThreshold: hxc?.killThreshold ?? 30,
+      killMinN: VOHRA_PMF_KILL_MIN_N,
       daysSinceLastSurveyResponse,
       perPersona: hxc?.cohortBreakdown ?? [],
     },
