@@ -17,6 +17,8 @@ import {
   getContainerStage,
   isRequiredCommitteeDoc,
   isKnownContainerDocType,
+  validateStageTransition,
+  getNextContainerStage,
   type DecisionContainerKind,
   type ContainerLifecyclePhase,
 } from './decision-container-modes';
@@ -288,5 +290,152 @@ describe('cross-mode invariants', () => {
     const allKinds: DecisionContainerKind[] = ['investment', 'acquisition', 'strategic'];
     expect(CONTAINER_KINDS).toEqual(allKinds);
     expect(new Set(CONTAINER_KINDS).size).toBe(CONTAINER_KINDS.length);
+  });
+});
+
+// V5 — rigid stage-gated schema. Locks the pure transition validator
+// shared verbatim by the PATCH route (server enforcement) and any
+// client guidance — never two implementations that can drift.
+describe('validateStageTransition — rigid lifecycle', () => {
+  it('allows a no-op move (same stage) regardless of docs', () => {
+    expect(
+      validateStageTransition({
+        kind: 'investment',
+        fromStageId: 'sourcing',
+        toStageId: 'sourcing',
+        attachedDocTypes: [],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('allows pre-committee forward moves without docs (no gate yet)', () => {
+    expect(
+      validateStageTransition({
+        kind: 'investment',
+        fromStageId: 'sourcing',
+        toStageId: 'diligence',
+        attachedDocTypes: [],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('BLOCKS entering the committee stage without the required docs', () => {
+    const v = validateStageTransition({
+      kind: 'investment',
+      fromStageId: 'diligence',
+      toStageId: 'ic_review',
+      attachedDocTypes: ['ic_memo'], // missing pitch_deck
+    });
+    expect(v.allowed).toBe(false);
+    expect(v.reason).toMatch(/pitch_deck/);
+  });
+
+  it('ALLOWS committee entry once every required doc is attached', () => {
+    expect(
+      validateStageTransition({
+        kind: 'investment',
+        fromStageId: 'diligence',
+        toStageId: 'ic_review',
+        attachedDocTypes: ['ic_memo', 'pitch_deck'],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('BLOCKS skipping the committee gate even with all docs present', () => {
+    const v = validateStageTransition({
+      kind: 'investment',
+      fromStageId: 'sourcing',
+      toStageId: 'closed',
+      attachedDocTypes: ['ic_memo', 'pitch_deck'],
+    });
+    expect(v.allowed).toBe(false);
+    expect(v.reason).toMatch(/skip|committee/i);
+  });
+
+  it('ALLOWS backward revision kickback (committee → diligence)', () => {
+    expect(
+      validateStageTransition({
+        kind: 'investment',
+        fromStageId: 'ic_review',
+        toStageId: 'diligence',
+        attachedDocTypes: [],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('BLOCKS an unknown target stage', () => {
+    const v = validateStageTransition({
+      kind: 'investment',
+      fromStageId: 'sourcing',
+      toStageId: 'not_a_stage',
+      attachedDocTypes: [],
+    });
+    expect(v.allowed).toBe(false);
+    expect(v.reason).toMatch(/not a valid stage/i);
+  });
+
+  it('enforces the per-mode required-doc set (acquisition needs ic_memo + cim + due_diligence)', () => {
+    const missing = validateStageTransition({
+      kind: 'acquisition',
+      fromStageId: 'diligence',
+      toStageId: 'committee_review',
+      attachedDocTypes: ['ic_memo', 'cim'], // missing due_diligence
+    });
+    expect(missing.allowed).toBe(false);
+    expect(missing.reason).toMatch(/due_diligence/);
+
+    expect(
+      validateStageTransition({
+        kind: 'acquisition',
+        fromStageId: 'diligence',
+        toStageId: 'committee_review',
+        attachedDocTypes: ['ic_memo', 'cim', 'due_diligence'],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('strategic mode gates under_review on the memo doc', () => {
+    expect(
+      validateStageTransition({
+        kind: 'strategic',
+        fromStageId: 'drafting',
+        toStageId: 'under_review',
+        attachedDocTypes: [],
+      }).allowed
+    ).toBe(false);
+    expect(
+      validateStageTransition({
+        kind: 'strategic',
+        fromStageId: 'drafting',
+        toStageId: 'under_review',
+        attachedDocTypes: ['memo'],
+      }).allowed
+    ).toBe(true);
+  });
+
+  it('the doc-gate also guards post-committee stages (not just the gate stage)', () => {
+    // Entering a post-committee stage from the committee stage still
+    // requires the docs (you cannot reach committee without them, but
+    // this locks the invariant directly).
+    const v = validateStageTransition({
+      kind: 'investment',
+      fromStageId: 'ic_review',
+      toStageId: 'term_sheet',
+      attachedDocTypes: [],
+    });
+    expect(v.allowed).toBe(false);
+  });
+});
+
+describe('getNextContainerStage', () => {
+  it('returns the next ordered stage', () => {
+    expect(getNextContainerStage('investment', 'sourcing')?.id).toBe('diligence');
+  });
+  it('returns undefined at the terminal stage', () => {
+    const last = CONTAINER_MODES.investment.stages.at(-1)!.id;
+    expect(getNextContainerStage('investment', last)).toBeUndefined();
+  });
+  it('returns undefined for an unknown stage', () => {
+    expect(getNextContainerStage('strategic', 'nope')).toBeUndefined();
   });
 });

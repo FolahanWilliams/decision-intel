@@ -483,3 +483,111 @@ const VALID_DOC_TYPES = new Set<string>([
 export function isKnownContainerDocType(docType: string): boolean {
   return VALID_DOC_TYPES.has(docType);
 }
+
+const PHASE_ORDER: Record<ContainerLifecyclePhase, number> = {
+  pre_committee: 0,
+  committee_gate: 1,
+  post_committee: 2,
+};
+
+export interface StageTransitionInput {
+  kind: DecisionContainerKind;
+  /** Current stage id (may be unknown on legacy rows — leniently handled). */
+  fromStageId: string;
+  /** Requested next stage id. */
+  toStageId: string;
+  /** documentType values of the docs currently attached to the container. */
+  attachedDocTypes: ReadonlyArray<string>;
+}
+
+export interface StageTransitionResult {
+  allowed: boolean;
+  /** Human, procurement-grade reason when blocked — surfaced verbatim in
+   *  the API 400 and the kanban guidance toast. */
+  reason?: string;
+}
+
+/**
+ * V5 — rigid stage-gated decision schema (ship 2026-05-16). The single
+ * source of truth for whether a stage move is legal. Pure + deterministic
+ * so it is unit-tested AND shared verbatim between the PATCH route
+ * (server enforcement) and the kanban (client guidance) — never two
+ * implementations that can drift.
+ *
+ * Rigid, but not broken:
+ *   - The committee-gate doc requirement is ENFORCED: a container cannot
+ *     enter the committee-gate stage (or any post-committee stage)
+ *     unless every `requiredDocsForCommittee` type is attached. This
+ *     promotes CommitteeReadinessGate's (previously advisory) gate #1
+ *     into a hard gate — you cannot take an under-documented decision to
+ *     committee.
+ *   - The committee gate cannot be SKIPPED: a pre-committee → post-
+ *     committee jump is blocked even when docs are present; the decision
+ *     must pass through the committee stage.
+ *   - Backward moves (revision kickback, e.g. committee → diligence) and
+ *     same-stage no-ops stay ALLOWED — rigidity must not block sending a
+ *     decision back for more work.
+ */
+export function validateStageTransition(
+  input: StageTransitionInput
+): StageTransitionResult {
+  const { kind, fromStageId, toStageId, attachedDocTypes } = input;
+  const mode = getContainerMode(kind);
+
+  const toStage = mode.stages.find(s => s.id === toStageId);
+  if (!toStage) {
+    return { allowed: false, reason: `"${toStageId}" is not a valid stage for a ${mode.label.toLowerCase()}.` };
+  }
+
+  // No-op move is always fine.
+  if (fromStageId === toStageId) return { allowed: true };
+
+  const fromStage = mode.stages.find(s => s.id === fromStageId);
+
+  // Committee-gate doc requirement: entering the committee stage OR any
+  // post-committee stage requires the full required-doc set.
+  if (
+    toStage.phase === 'committee_gate' ||
+    toStage.phase === 'post_committee'
+  ) {
+    const attached = new Set(attachedDocTypes);
+    const missing = mode.requiredDocsForCommittee.filter(d => !attached.has(d));
+    if (missing.length > 0) {
+      return {
+        allowed: false,
+        reason: `Cannot move to ${toStage.label} — ${mode.committeeLabel} requires ${missing.join(', ')} attached first.`,
+      };
+    }
+  }
+
+  // The committee gate cannot be skipped (even with docs present).
+  if (
+    fromStage &&
+    fromStage.phase === 'pre_committee' &&
+    toStage.phase === 'post_committee'
+  ) {
+    return {
+      allowed: false,
+      reason: `Cannot skip ${mode.committeeLabel} — move through the committee stage before ${toStage.label}.`,
+    };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Convenience: the canonical next stage in the lifecycle (the stage one
+ * position forward in the ordered list). Kanban uses this to highlight
+ * the recommended forward move. Returns undefined at the terminal stage.
+ */
+export function getNextContainerStage(
+  kind: DecisionContainerKind,
+  stageId: string
+): ContainerStage | undefined {
+  const stages = getContainerMode(kind).stages;
+  const idx = stages.findIndex(s => s.id === stageId);
+  if (idx < 0 || idx >= stages.length - 1) return undefined;
+  return stages[idx + 1];
+}
+
+export { PHASE_ORDER };

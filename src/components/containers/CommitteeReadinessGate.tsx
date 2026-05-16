@@ -9,9 +9,14 @@
  *   acquisition  → Board / IC Review readiness
  *   strategic    → Decision Committee readiness
  *
- * Five gates, advisory not blocking:
+ * Five gates. Gate 1 is ENFORCED server-side as of V5 (2026-05-16):
+ * a container cannot move into the committee stage (or any
+ * post-committee stage) until the required docs are attached — the
+ * PATCH route rejects the transition via validateStageTransition.
+ * Gates 2–5 remain advisory (surface the friction the committee will
+ * see; they do not block):
  *   1. Required document types attached (per CONTAINER_MODES[kind]
- *      .requiredDocsForCommittee)
+ *      .requiredDocsForCommittee) — HARD GATE on stage entry
  *   2. All member docs analyzed
  *   3. Composite DQI ≥ 55 (D-band gate; same threshold as legacy)
  *   4. No critical M&A toxic combinations (named-pattern aggregation
@@ -265,8 +270,9 @@ export function CommitteeReadinessGate({ container }: CommitteeReadinessGateProp
             background: 'var(--bg-secondary)',
           }}
         >
-          Advisory only — gates surface friction the committee will see; they don&apos;t block the
-          decision.
+          Required documents (gate 1) is a hard gate: the decision cannot enter the committee stage
+          until they&apos;re attached. Gates 2&ndash;5 are advisory &mdash; they surface friction the
+          committee will see; they don&apos;t block the decision.
         </div>
       )}
     </div>

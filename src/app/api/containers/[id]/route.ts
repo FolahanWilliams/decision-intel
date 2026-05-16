@@ -14,7 +14,11 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
-import { getContainerMode, type DecisionContainerKind } from '@/lib/data/decision-container-modes';
+import {
+  getContainerMode,
+  validateStageTransition,
+  type DecisionContainerKind,
+} from '@/lib/data/decision-container-modes';
 import { aggregateAnalyses, type AnalyzedDocument } from '@/lib/scoring/container-aggregation';
 import type {
   ContainerDetail,
@@ -260,7 +264,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const orgId = await resolveOrgId(user.id);
     const existing = await prisma.decisionContainer.findFirst({
       where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
-      select: { id: true, kind: true, ownerUserId: true },
+      select: { id: true, kind: true, ownerUserId: true, stageId: true, decidedAt: true },
     });
     if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -274,24 +278,60 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updates.name = body.name.trim();
     if (body.decisionFrame !== undefined)
       updates.decisionFrame = body.decisionFrame?.trim() || null;
-    if (body.stageId) {
-      const mode = getContainerMode(existing.kind as DecisionContainerKind);
-      if (!mode.stages.find(s => s.id === body.stageId)) {
+    if (body.stageId && body.stageId !== existing.stageId) {
+      const kind = existing.kind as DecisionContainerKind;
+      const mode = getContainerMode(kind);
+
+      // V5 — rigid stage-gated schema. Fetch the attached doc types so
+      // the committee-gate doc requirement can be enforced. Schema-drift-
+      // tolerant: a transient join-query failure falls back to the legacy
+      // "valid stage id" check (fail-open on a UX gate, not a security
+      // boundary — the client also guides with the same pure validator).
+      let attachedDocTypes: string[] = [];
+      let docLookupOk = true;
+      try {
+        const rows = await prisma.decisionContainerDocument.findMany({
+          where: { containerId: id },
+          select: { document: { select: { documentType: true, deletedAt: true } } },
+        });
+        attachedDocTypes = rows
+          .filter(r => r.document.deletedAt == null)
+          .map(r => r.document.documentType)
+          .filter((d): d is string => d != null);
+      } catch (err) {
+        docLookupOk = false;
+        log.warn('Stage-transition doc lookup failed; falling back to id-only check:', err);
+      }
+
+      if (docLookupOk) {
+        const verdict = validateStageTransition({
+          kind,
+          fromStageId: existing.stageId,
+          toStageId: body.stageId,
+          attachedDocTypes,
+        });
+        if (!verdict.allowed) {
+          return NextResponse.json(
+            { error: verdict.reason ?? 'Stage transition not allowed', code: 'STAGE_TRANSITION_BLOCKED' },
+            { status: 400 }
+          );
+        }
+      } else if (!mode.stages.find(s => s.id === body.stageId)) {
         return NextResponse.json(
           { error: `Invalid stageId for kind ${existing.kind}` },
           { status: 400 }
         );
       }
+
       updates.stageId = body.stageId;
       // When the stage moves past the committee gate for the first time,
       // stamp decidedAt.
       const stage = mode.stages.find(s => s.id === body.stageId);
-      if (stage?.phase === 'committee_gate' || stage?.phase === 'post_committee') {
-        const current = await prisma.decisionContainer.findUnique({
-          where: { id },
-          select: { decidedAt: true },
-        });
-        if (!current?.decidedAt) updates.decidedAt = new Date();
+      if (
+        (stage?.phase === 'committee_gate' || stage?.phase === 'post_committee') &&
+        !existing.decidedAt
+      ) {
+        updates.decidedAt = new Date();
       }
     }
     if (body.status === 'active' || body.status === 'archived') updates.status = body.status;
