@@ -12,7 +12,16 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Radar, Loader2, AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
+import {
+  Radar,
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+  RefreshCw,
+  Copy,
+  Check,
+  Users,
+} from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 
 interface IntelItem {
@@ -24,10 +33,25 @@ interface IntelItem {
   sourceLink: string;
 }
 
+interface ShortlistEntry {
+  personaId: string;
+  personaLabel: string;
+  sector: string;
+  intelHeadline: string;
+  intelWhyItMatters: string;
+  biasAngle: string;
+  anchorCaseTitle: string;
+  anchorCaseCompany: string;
+  anchorCaseSlug: string;
+  anchorCaseBias: string;
+  dmOpener: string;
+}
+
 interface BriefData {
   briefDate: string;
   summary: string;
   items: IntelItem[];
+  shortlist: ShortlistEntry[];
   articleCount: number;
   generatedAt: string;
 }
@@ -40,6 +64,19 @@ export function IntelBriefPanel({ founderPass }: Props) {
   const [brief, setBrief] = useState<BriefData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  const copyOpener = useCallback(async (text: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(c => (c === idx ? null : c)), 1800);
+    } catch {
+      // clipboard may be blocked (insecure context / permission) —
+      // silent per CLAUDE.md fire-and-forget exceptions; the opener is
+      // still visible on screen for manual copy.
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -267,6 +304,170 @@ export function IntelBriefPanel({ founderPass }: Props) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {brief.shortlist && brief.shortlist.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 'var(--fs-2xs)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  color: 'var(--text-secondary)',
+                  marginBottom: 4,
+                }}
+              >
+                <Users size={12} />
+                Suggested outreach — {brief.shortlist.length}
+              </div>
+              <p
+                style={{
+                  margin: '0 0 10px',
+                  fontSize: 'var(--fs-2xs)',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.55,
+                }}
+              >
+                Each one pairs a persona with a <strong>public</strong> case in their sector — never
+                the prospect&rsquo;s own deal. You do the LinkedIn lookup and the send; this is the
+                anchor, not an auto-sender.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {brief.shortlist.map((s, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      border: '1px solid var(--border-color)',
+                      borderLeft: '3px solid var(--accent-primary)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '10px 12px',
+                      background: 'var(--bg-secondary)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginBottom: 6,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 'var(--fs-2xs)',
+                          fontWeight: 700,
+                          color: 'var(--accent-primary)',
+                          background: 'rgba(22, 163, 74, 0.10)',
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-full)',
+                        }}
+                      >
+                        {s.personaLabel}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 'var(--fs-2xs)',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        {s.sector}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 'var(--fs-sm)',
+                        color: 'var(--text-primary)',
+                        fontWeight: 600,
+                        lineHeight: 1.4,
+                        marginBottom: 4,
+                      }}
+                    >
+                      {s.intelHeadline}
+                    </div>
+                    <p
+                      style={{
+                        margin: '0 0 6px',
+                        fontSize: 'var(--fs-xs)',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {s.intelWhyItMatters}
+                    </p>
+                    <div
+                      style={{
+                        fontSize: 'var(--fs-2xs)',
+                        color: 'var(--text-secondary)',
+                        marginBottom: 8,
+                      }}
+                    >
+                      Public anchor:{' '}
+                      <a
+                        href={`/case-studies/${s.anchorCaseSlug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: 'var(--accent-primary)',
+                          textDecoration: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {s.anchorCaseTitle}
+                      </a>{' '}
+                      <span style={{ color: 'var(--text-muted)' }}>
+                        · {s.anchorCaseBias} · {s.anchorCaseCompany}
+                      </span>
+                    </div>
+                    {s.dmOpener && (
+                      <div
+                        style={{
+                          position: 'relative',
+                          fontSize: 'var(--fs-xs)',
+                          color: 'var(--text-secondary)',
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: '8px 10px',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {s.dmOpener}
+                        <button
+                          type="button"
+                          onClick={() => copyOpener(s.dmOpener, i)}
+                          aria-label="Copy DM opener"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            marginTop: 6,
+                            padding: '3px 8px',
+                            fontSize: 'var(--fs-3xs)',
+                            fontWeight: 600,
+                            color:
+                              copiedIdx === i
+                                ? 'var(--success)'
+                                : 'var(--accent-secondary, #6366f1)',
+                            background: 'transparent',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
+                          {copiedIdx === i ? 'Copied — fill {name} before sending' : 'Copy opener'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
