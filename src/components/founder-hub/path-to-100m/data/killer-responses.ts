@@ -173,6 +173,19 @@ export const KILLER_RESPONSES: KillerResponse[] = [
     followUpMove:
       'Surface the Pan-African / EM-fund wedge as the IBM-bundle bypass. "IBM does not sell into Pan-African corp dev or EM-focused funds with our regulatory depth. Win the wedge, expand to F500 with reference cases — by then the bundling argument is already lost on the strategic-reasoning side."',
   },
+  {
+    id: 'different_prompt_wrapper',
+    scenario: 'how_are_you_different',
+    buyerSignal:
+      '"Isn\'t Decision Intel just a sophisticated prompt-wrapper — input, specialised prompts, output? That is very different from a company you scale to $100M ARR."',
+    underlyingRoadblock:
+      'The advisor is measuring the engine, not the accumulating asset. Two traps: defensively denying the wrapper (false — they will know instantly), or accepting the acqui-hire box as a fixed identity (premature). The move is to concede the engine, relocate the company, and dissolve the binary — "don\'t let anyone box you in" applies to the advisor\'s own framing too.',
+    responseCategory: 'Category Contrast · engine vs accumulating asset (concede the wrapper, relocate the company)',
+    exactPhrasing: `"You're right — the audit engine is a wrapper. Any competent team rebuilds it in a few weeks; I rebuilt the whole regulatory layer solo in days. That is not where the company is. A prompt produces an opinion. What I am building is the system of record for how a high-stakes decision was actually reasoned — the enforced process, the tamper-evident institutional record, and the per-organisation calibration data that compounds. The wrapper is the wedge that buys me into the decision workflow. The company is the accumulating decision-to-outcome graph and the standard the audit committee ends up running on. The honest part: that asset only exists once I am embedded. So the next twelve months are not about more product — they are about getting deeply embedded in one or two organisations with measurable ROI. If I cannot, it stays a great wrapper and acqui-hire is the right outcome. If I can, the data and the standard are the company — and the only way to find out which is true is to run exactly that experiment."`,
+    whyItWorks: `Conceding the literal claim disarms the challenge — denial would fail instantly and lose credibility. It then reframes "wrapper vs company" into "engine vs accumulating asset," which is the real distinction (every software company is a wrapper at some layer; the question is what compounds inside it). Finally it dissolves the acqui-hire-vs-scale binary into a single 12-month experiment, which is honest, non-defensive, and shows the founder is reasoning about defensibility at the level the advisor respects — not selling a fabricated moat.`,
+    followUpMove:
+      'Name the experiment and the tripwires concretely: "The proof is the calibration loop — I capture priors before the decision and score 90-day operational proxies, so I am not waiting two years to know if the audit improved outcomes. The tripwires are explicit: the cannibalisation delta, the calibration-latency proof, and whether I actually get embedded. That is the next build, not more features." (This is the founder-approved Vector 1 ship — see the CLAUDE.md Defensibility lock.)',
+  },
 ];
 
 // =========================================================================
