@@ -61,6 +61,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-05-16)
+
+Test-coverage cascade — full prose in CLAUDE.md "Coverage-gap cascade + threshold ratchet (locked 2026-05-16)".
+
+- [x] Audited repo test coverage; identified the scoring engine / R²F detectors / outcome-recalibration flywheel / revenue+security gates as the high-risk untested layers.
+- [x] Shipped 12 new suites, 122 tests (Tier 1 pure: compound-engine, weight-overrides, validity-classifier, reference-class-forecast, calibrated-rejection, decision-rubric, algorithm-aversion, redaction-scanner · Tier 2/3 Prisma-mocked: recalibration, outcome-gate, plan-limits, document-access). Full suite 1012 passing across 74 files.
+- [x] Ratcheted vitest coverage thresholds 30 → 50/40/48/50 (stmts/branch/funcs/lines) against measured 53.08/43.30/51.23/53.67.
+- [x] Gates green: tsc clean · lint:positioning/silent-catches(175)/counts(77)/canonical-imports all pass.
+
 ## Recently Completed (2026-05-11)
 
 Six commits in one session — full prose lives in CLAUDE.md "Session locks 2026-05-11" + `docs/CLAUDE-archive-2026-Q2.md` (when split).
