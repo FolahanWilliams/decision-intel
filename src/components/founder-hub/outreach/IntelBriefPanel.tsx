@@ -21,6 +21,7 @@ import {
   Copy,
   Check,
   Users,
+  FileText,
 } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 
@@ -66,17 +67,80 @@ export function IntelBriefPanel({ founderPass }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
-  const copyOpener = useCallback(async (text: string, idx: number) => {
+  const [opIdx, setOpIdx] = useState<number | null>(null);
+  const [opCompany, setOpCompany] = useState('');
+  const [opLoading, setOpLoading] = useState(false);
+  const [opResult, setOpResult] = useState<{ onepager: string; anchorCompany: string } | null>(
+    null
+  );
+  const [opError, setOpError] = useState<string | null>(null);
+  const [opCopied, setOpCopied] = useState(false);
+
+  const copyText = useCallback(async (text: string, onDone: () => void) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopiedIdx(idx);
-      setTimeout(() => setCopiedIdx(c => (c === idx ? null : c)), 1800);
+      onDone();
     } catch {
       // clipboard may be blocked (insecure context / permission) —
-      // silent per CLAUDE.md fire-and-forget exceptions; the opener is
+      // silent per CLAUDE.md fire-and-forget exceptions; the text is
       // still visible on screen for manual copy.
     }
   }, []);
+
+  const copyOpener = useCallback(
+    (text: string, idx: number) => {
+      void copyText(text, () => {
+        setCopiedIdx(idx);
+        setTimeout(() => setCopiedIdx(c => (c === idx ? null : c)), 1800);
+      });
+    },
+    [copyText]
+  );
+
+  const openOnepager = useCallback((idx: number) => {
+    setOpIdx(prev => (prev === idx ? null : idx));
+    setOpCompany('');
+    setOpResult(null);
+    setOpError(null);
+    setOpCopied(false);
+  }, []);
+
+  const generateOnepager = useCallback(
+    async (entry: ShortlistEntry) => {
+      const company = opCompany.trim();
+      if (!company) {
+        setOpError('Enter the prospect company first');
+        return;
+      }
+      setOpLoading(true);
+      setOpError(null);
+      setOpResult(null);
+      try {
+        const res = await fetch('/api/founder-hub/outreach/onepager', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
+          body: JSON.stringify({
+            prospectCompany: company,
+            prospectRole: entry.personaLabel,
+            sector: entry.sector,
+            personaId: entry.personaId,
+          }),
+        });
+        const json = await res.json().catch(() => null); // canonical body-parse exception
+        if (!res.ok) throw new Error(json?.error || 'Failed to draft the 1-pager');
+        const d = json?.data;
+        setOpResult({
+          onepager: d?.onepager ?? '',
+          anchorCompany: d?.anchor?.company ?? entry.anchorCaseCompany,
+        });
+      } catch (err) {
+        setOpError(err instanceof Error ? err.message : 'Failed to draft the 1-pager');
+      } finally {
+        setOpLoading(false);
+      }
+    },
+    [opCompany, founderPass]
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -463,6 +527,157 @@ export function IntelBriefPanel({ founderPass }: Props) {
                           {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
                           {copiedIdx === i ? 'Copied — fill {name} before sending' : 'Copy opener'}
                         </button>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => openOnepager(i)}
+                      style={{
+                        marginTop: 8,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        padding: '5px 10px',
+                        fontSize: 'var(--fs-2xs)',
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                        background: 'transparent',
+                        border: '1px solid var(--accent-primary)',
+                        borderRadius: 'var(--radius-sm)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <FileText size={11} />
+                      {opIdx === i ? 'Hide 1-pager' : 'Draft a public-case 1-pager →'}
+                    </button>
+
+                    {opIdx === i && (
+                      <div
+                        style={{
+                          marginTop: 8,
+                          padding: '10px 12px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--border-color)',
+                          background: 'var(--bg-card)',
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: '0 0 8px',
+                            fontSize: 'var(--fs-2xs)',
+                            color: 'var(--text-muted)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          Anchors on the <strong>public {s.anchorCaseCompany}</strong> case — never{' '}
+                          {s.personaLabel}&rsquo;s own deal. Saved to the pipeline as a draft; you
+                          review and send.
+                        </p>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <input
+                            type="text"
+                            value={opCompany}
+                            onChange={e => setOpCompany(e.target.value)}
+                            placeholder="Prospect company you're targeting"
+                            style={{
+                              flex: '1 1 200px',
+                              padding: '6px 9px',
+                              fontSize: 'var(--fs-xs)',
+                              color: 'var(--text-primary)',
+                              background: 'var(--bg-secondary)',
+                              border: '1px solid var(--border-color)',
+                              borderRadius: 'var(--radius-sm)',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => generateOnepager(s)}
+                            disabled={opLoading}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 5,
+                              padding: '6px 12px',
+                              fontSize: 'var(--fs-xs)',
+                              fontWeight: 600,
+                              color: '#fff',
+                              background: 'var(--accent-primary)',
+                              border: 'none',
+                              borderRadius: 'var(--radius-sm)',
+                              cursor: opLoading ? 'wait' : 'pointer',
+                            }}
+                          >
+                            {opLoading ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <FileText size={12} />
+                            )}
+                            {opLoading ? 'Drafting…' : 'Generate'}
+                          </button>
+                        </div>
+
+                        {opError && (
+                          <div
+                            style={{
+                              marginTop: 8,
+                              fontSize: 'var(--fs-2xs)',
+                              color: 'var(--error)',
+                            }}
+                          >
+                            {opError}
+                          </div>
+                        )}
+
+                        {opResult && (
+                          <div style={{ marginTop: 8 }}>
+                            <div
+                              style={{
+                                whiteSpace: 'pre-wrap',
+                                fontSize: 'var(--fs-xs)',
+                                color: 'var(--text-primary)',
+                                lineHeight: 1.6,
+                                padding: '10px 12px',
+                                background: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                              }}
+                            >
+                              {opResult.onepager}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                copyText(opResult.onepager, () => {
+                                  setOpCopied(true);
+                                  setTimeout(() => setOpCopied(false), 1800);
+                                })
+                              }
+                              aria-label="Copy 1-pager"
+                              style={{
+                                marginTop: 6,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                padding: '4px 9px',
+                                fontSize: 'var(--fs-3xs)',
+                                fontWeight: 600,
+                                color: opCopied
+                                  ? 'var(--success)'
+                                  : 'var(--accent-secondary, #6366f1)',
+                                background: 'transparent',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-sm)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {opCopied ? <Check size={11} /> : <Copy size={11} />}
+                              {opCopied
+                                ? `Copied · anchored on public ${opResult.anchorCompany}`
+                                : 'Copy 1-pager'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -165,7 +165,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // findFirst().catch(null) + intel-brief.ts per-category searchNews
 // degraded-mode fallback to [] (one feed-category read failing must
 // not sink the whole brief). All canonical fire-and-forget classes.
-const SILENT_CATCH_BASELINE = 182;
+// 182 → 183 (Outreach 1-pager / Phase C 2026-05-17): IntelBriefPanel
+// generateOnepager res.json().catch(() => null) error-body parse —
+// canonical req.json()/res.json() body-parse exception class.
+const SILENT_CATCH_BASELINE = 183;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
