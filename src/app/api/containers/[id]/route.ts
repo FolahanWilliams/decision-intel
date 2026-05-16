@@ -203,6 +203,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       priors: (row.priors as ContainerDetail['priors']) ?? null,
       culturalPairingRisk:
         (row.culturalPairingRisk as ContainerDetail['culturalPairingRisk']) ?? null,
+      premortemDefence:
+        (row.premortemDefence as ContainerDetail['premortemDefence']) ?? null,
       documents: memberRefs,
       outcome: row.outcome
         ? {

@@ -171,6 +171,7 @@ export async function GET(request: NextRequest) {
         // know to fetch detail when they need the captured values.
         priors: null,
         culturalPairingRisk: null,
+        premortemDefence: null,
       };
     });
 

@@ -20,8 +20,10 @@ import { CommitteeReadinessGate } from '@/components/containers/CommitteeReadine
 import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
 import { PmiTrackerTab } from '@/components/containers/PmiTrackerTab';
 import { DealFeverPremortemCard } from '@/components/containers/DealFeverPremortemCard';
+import { PremortemDefenceCaptureCard } from '@/components/containers/PremortemDefenceCaptureCard';
 import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
+import { checkPremortemDefenceGate } from '@/lib/containers/premortem-defence';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
 import { ContainerLinksPanel } from '@/components/containers/ContainerLinksPanel';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
@@ -182,6 +184,21 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
               "I'm inviting dissent" moment for the corp dev professional). */}
           {container.kind === 'acquisition' && container.analyzedDocCount > 0 && (
             <DealFeverPremortemCard containerId={container.id} containerName={container.name} />
+          )}
+
+          {/* V2 — mandatory pre-mortem dissent gate. Sequenced right
+              after the antagonist: the sponsor records a written defence
+              before the outcome can be logged; the exchange flows into
+              the DPR. Same acquisition + analyzed gate as the pre-mortem
+              card; the card itself flips to a read-only confirmation
+              once a complete defence exists. */}
+          {container.kind === 'acquisition' && container.analyzedDocCount > 0 && (
+            <PremortemDefenceCaptureCard
+              containerId={container.id}
+              containerName={container.name}
+              premortemDefence={container.premortemDefence}
+              onSaved={() => mutate()}
+            />
           )}
 
           <ContainerCompositeHero container={container} />
@@ -388,7 +405,24 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
 
           <OutcomeBlock
             outcome={container.outcome}
-            onCaptureClick={() => setShowOutcomeModal(true)}
+            onCaptureClick={() => {
+              // V2 client guard — mirrors the server hard-gate via the
+              // shared pure predicate so the sponsor gets a clear nudge
+              // instead of a raw 400. Non-acquisition / empty pass.
+              const gate = checkPremortemDefenceGate({
+                kind: container.kind,
+                analyzedDocCount: container.analyzedDocCount,
+                premortemDefence: container.premortemDefence,
+              });
+              if (!gate.allowed) {
+                showToast(
+                  gate.reason ?? 'Record the pre-mortem defence first.',
+                  'warning'
+                );
+                return;
+              }
+              setShowOutcomeModal(true);
+            }}
           />
         </div>
 

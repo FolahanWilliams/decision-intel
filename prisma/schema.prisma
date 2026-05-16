@@ -370,6 +370,22 @@ model DecisionContainer {
   /// }
   culturalPairingRisk Json?
 
+  /// V2 — mandatory pre-mortem dissent gate (locked 2026-05-16).
+  /// The sponsor's written defence to the Deal-Fever pre-mortem
+  /// questions. Required (acquisition + analyzed docs) before an
+  /// outcome can be logged; flows into the DPR as part of the
+  /// human-oversight record. Shape: {
+  ///   answers: Array<{
+  ///     pattern: 'deal_fever' | 'winners_curse' | 'synergy_mirage',
+  ///     question: string,        // verbatim from the premortem
+  ///     writtenDefence: string,  // sponsor's answer (non-empty)
+  ///   }>,
+  ///   answeredByUserId: string,
+  ///   answeredAt: string,        // ISO
+  /// }
+  /// @schema-drift-tolerant — null on pre-V2 rows + non-acquisition.
+  premortemDefence Json?
+
   // ─── Timestamps ──────────────────────────────────────────────────
 
   createdAt DateTime @default(now())

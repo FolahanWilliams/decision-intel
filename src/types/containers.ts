@@ -102,6 +102,22 @@ export interface ContainerSummary {
     capturedAt: string;
     capturedByUserId: string;
   } | null;
+
+  /**
+   * V2 — sponsor's written defence to the Deal-Fever pre-mortem
+   * questions (locked 2026-05-16). Required (acquisition + analyzed
+   * docs) before an outcome can be logged; flows into the DPR
+   * human-oversight record.
+   */
+  premortemDefence: {
+    answers: Array<{
+      pattern: 'deal_fever' | 'winners_curse' | 'synergy_mirage';
+      question: string;
+      writtenDefence: string;
+    }>;
+    answeredByUserId: string;
+    answeredAt: string;
+  } | null;
 }
 
 export interface ContainerListResponse {

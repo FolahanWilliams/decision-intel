@@ -16,6 +16,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { getContainerMode, type DecisionContainerKind } from '@/lib/data/decision-container-modes';
 import { recomputeContainerMetrics } from '@/lib/scoring/container-aggregation';
+import { checkPremortemDefenceGate } from '@/lib/containers/premortem-defence';
 
 const log = createLogger('ContainerOutcomeRoute');
 
@@ -40,9 +41,32 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const container = await prisma.decisionContainer.findFirst({
       where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
-      select: { id: true, kind: true, compositeDqi: true },
+      select: {
+        id: true,
+        kind: true,
+        compositeDqi: true,
+        analyzedDocCount: true,
+        premortemDefence: true,
+      },
     });
     if (!container) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+    // V2 — mandatory pre-mortem dissent gate. Acquisition-mode decisions
+    // with analyzed docs cannot log an outcome until the sponsor has
+    // recorded a written defence to the Deal-Fever pre-mortem questions.
+    // Shared pure predicate — identical to the client guard on the
+    // detail page. Non-acquisition / empty containers always pass.
+    const gate = checkPremortemDefenceGate({
+      kind: container.kind,
+      analyzedDocCount: container.analyzedDocCount,
+      premortemDefence: container.premortemDefence,
+    });
+    if (!gate.allowed) {
+      return NextResponse.json(
+        { error: gate.reason, code: gate.code },
+        { status: 400 }
+      );
+    }
 
     const body = (await request.json().catch(() => null)) as OutcomeBody | null;
     if (!body || typeof body !== 'object') {

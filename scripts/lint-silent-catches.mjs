@@ -154,7 +154,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // error body before throwing so the form surfaces the real server
 // error instead of a generic "Failed". Canonical req.json() body-parse
 // exception class.
-const SILENT_CATCH_BASELINE = 175;
+// 175 → 179 (V2 mandatory pre-mortem dissent gate, locked 2026-05-16):
+// premortem-defence route req.json() body-parse + the teamMember orgId
+// fail-soft lookup (mirrors the existing outcome-route pattern verbatim)
+// + PremortemDefenceCaptureCard res.json() error-body parse ×2. All
+// canonical req.json()/res.json() body-parse + orgId-resolve exception
+// classes — no delivery/audit/flywheel path swallowed.
+const SILENT_CATCH_BASELINE = 179;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

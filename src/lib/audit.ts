@@ -99,7 +99,9 @@ export type AuditAction =
   | 'PMI_SIGNAL_RECORDED'
   | 'PMI_SIGNAL_OBSERVED'
   // M-3 — Auto-extract PMI signals from IC memo content (locked 2026-05-13)
-  | 'PMI_SIGNAL_EXTRACT_ATTEMPTED';
+  | 'PMI_SIGNAL_EXTRACT_ATTEMPTED'
+  // V2 — mandatory pre-mortem dissent gate (locked 2026-05-16)
+  | 'PREMORTEM_DEFENCE_RECORDED';
 
 export interface AuditLogParams {
   action: AuditAction;
