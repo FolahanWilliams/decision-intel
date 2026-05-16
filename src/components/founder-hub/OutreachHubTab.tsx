@@ -29,6 +29,7 @@ import { Zap, Crosshair, Handshake } from 'lucide-react';
 import { OutreachCommandCenterTab } from './OutreachCommandCenterTab';
 import { OutreachAndMeetingsTab } from './OutreachAndMeetingsTab';
 import { DesignPartnersTab } from './DesignPartnersTab';
+import { IntelBriefPanel } from './outreach/IntelBriefPanel';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Section = 'pipeline' | 'messages' | 'design_partners';
@@ -186,9 +187,14 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
           their internal structure here. */}
       <div role="tabpanel">
         {section === 'pipeline' && (
-          <ErrorBoundary sectionName="Outreach Command Center">
-            <OutreachCommandCenterTab founderPass={founderPass} />
-          </ErrorBoundary>
+          <>
+            <ErrorBoundary sectionName="Outreach Intel Brief">
+              <IntelBriefPanel founderPass={founderPass} />
+            </ErrorBoundary>
+            <ErrorBoundary sectionName="Outreach Command Center">
+              <OutreachCommandCenterTab founderPass={founderPass} />
+            </ErrorBoundary>
+          </>
         )}
         {section === 'messages' && (
           <ErrorBoundary sectionName="Message Generator">

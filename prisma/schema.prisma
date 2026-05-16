@@ -518,15 +518,15 @@ model DecisionContainerCrossReference {
 /// and computed on the back-end when the container's member analyses
 /// recalibrate post-outcome (used by per-org Brier accumulation).
 model DecisionContainerOutcome {
-  id               String            @id @default(cuid())
-  containerId      String            @unique
-  summary          String            @db.Text
+  id               String   @id @default(cuid())
+  containerId      String   @unique
+  summary          String   @db.Text
   /// Mode-specific metric blob — see SSOT outcomeShape.fields.
   metrics          Json
   /// DQI realisation after outcome — for Brier-scoring.
   realisedDqi      Float?
   brierScore       Float?
-  reportedAt       DateTime          @default(now())
+  reportedAt       DateTime @default(now())
   reportedByUserId String
 
   /// PMI signal capture for acquisition-mode containers (locked 2026-05-10
@@ -1046,22 +1046,22 @@ model TeamInvite {
 }
 
 model SlackInstallation {
-  id                 String    @id @default(cuid())
-  teamId             String    @unique
-  teamName           String
-  orgId              String?
-  installedByUserId  String
-  botTokenEncrypted  String
-  botTokenIv         String
-  botTokenTag        String
+  id                     String    @id @default(cuid())
+  teamId                 String    @unique
+  teamName               String
+  orgId                  String?
+  installedByUserId      String
+  botTokenEncrypted      String
+  botTokenIv             String
+  botTokenTag            String
   /// Key-rotation version stamp. Null = legacy (v1). See
   /// src/lib/utils/encryption.ts for the protocol.
-  botTokenKeyVersion Int?
-  botUserId          String?
-  scopes             String[]
-  monitoredChannels  String[]  @default([])
-  nudgeFrequency     String    @default("normal")
-  status             String    @default("active")
+  botTokenKeyVersion     Int?
+  botUserId              String?
+  scopes                 String[]
+  monitoredChannels      String[]  @default([])
+  nudgeFrequency         String    @default("normal")
+  status                 String    @default("active")
   /// Ambient thesis-detection consent (locked 2026-05-10 per Tier 2.2).
   /// Default OFF — explicit per-installation opt-in required before the
   /// cron parses any threads for sponsor-thesis-formation signals.
@@ -1069,9 +1069,9 @@ model SlackInstallation {
   /// be parsed (empty = none even when ambientCaptureEnabled = true).
   ambientCaptureEnabled  Boolean   @default(false)
   ambientCaptureChannels String[]  @default([])
-  revokedAt          DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  revokedAt              DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@index([teamId])
   @@index([orgId])
@@ -2761,6 +2761,34 @@ model FounderProspect {
   @@index([createdAt])
 }
 
+// ─── Outreach Intelligence Brief ──────────────────────────────────────────
+//
+// Nightly corp-dev / M&A intelligence digest + a persona-matched prospect
+// shortlist, surfaced in the Founder Hub Outreach Hub. Populated by the
+// /api/cron/outreach-intel sub-job (runs after sync-intelligence so the
+// NewsArticle table is fresh). One row per UTC day — `briefDate` is the
+// idempotency key so a duplicate dispatch upserts rather than duplicates.
+//
+// `items` is the distilled corp-dev/M&A signal set; `shortlist` is the
+// Phase-B persona match (null until that layer runs). The artefacts this
+// feeds NEVER reference a prospect's own deal — every case anchor is a
+// PUBLIC 143-library case matched by industry (the ego-threat lock made
+// structural, not just prompt-level).
+
+model OutreachIntelBrief {
+  id           String   @id @default(cuid())
+  briefDate    String   @unique // YYYY-MM-DD (UTC) — idempotency key for the nightly cron
+  summary      String   @db.Text
+  items        Json // OutreachIntelItem[] — distilled corp-dev/M&A signal
+  shortlist    Json? // OutreachShortlistEntry[] — Phase B persona match (null until that layer runs)
+  articleCount Int      @default(0)
+  status       String   @default("active") // active | archived
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
 // ─── Decision Provenance Record ───────────────────────────────────────────
 //
 // Renamed from AuditDefensePacket on 2026-04-22. "Provenance" maps directly
@@ -3068,7 +3096,7 @@ model DqiWeightOverride {
   /// Set when scope = 'user'; null otherwise.
   userId String?
   /// Set when scope = 'org'; null otherwise.
-  orgId String?
+  orgId  String?
 
   /// Json map componentId → weight. All 7 components present
   /// (biasLoad, noiseLevel, evidenceQuality, processMaturity,

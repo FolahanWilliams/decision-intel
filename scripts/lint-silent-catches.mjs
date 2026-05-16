@@ -160,7 +160,12 @@ const SCAN_DIR = join(ROOT, 'src');
 // + PremortemDefenceCaptureCard res.json() error-body parse ×2. All
 // canonical req.json()/res.json() body-parse + orgId-resolve exception
 // classes — no delivery/audit/flywheel path swallowed.
-const SILENT_CATCH_BASELINE = 179;
+// 179 → 182 (Outreach Intel Brief / Phase A 2026-05-17): IntelBriefPanel
+// res.json() body-parse + intel-brief route @schema-drift-tolerant
+// findFirst().catch(null) + intel-brief.ts per-category searchNews
+// degraded-mode fallback to [] (one feed-category read failing must
+// not sink the whole brief). All canonical fire-and-forget classes.
+const SILENT_CATCH_BASELINE = 182;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

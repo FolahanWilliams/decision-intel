@@ -133,7 +133,8 @@
       "Bash(notebooklm history:*)",
       "Bash(notebooklm language list:*)",
       "Bash(notebooklm language get:*)",
-      "Bash(notebooklm research status:*)"
+      "Bash(notebooklm research status:*)",
+      "Bash(node_modules/.bin/prisma format *)"
     ],
     "additionalDirectories": [
       "/Users/folahan/decision-intel/src/app/(platform)/documents/[id]/legacy",

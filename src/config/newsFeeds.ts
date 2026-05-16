@@ -11,7 +11,13 @@ export interface FeedConfig {
   category: FeedCategory;
 }
 
-export type FeedCategory = 'psychology' | 'business' | 'regulatory' | 'industry' | 'academic';
+export type FeedCategory =
+  | 'psychology'
+  | 'business'
+  | 'regulatory'
+  | 'industry'
+  | 'academic'
+  | 'corp_dev';
 
 export const NEWS_FEEDS: FeedConfig[] = [
   // ── Psychology & Decision Science ────────────────────────────────
@@ -60,6 +66,23 @@ export const NEWS_FEEDS: FeedConfig[] = [
     url: 'https://feeds.bbci.co.uk/news/business/rss.xml',
     name: 'BBC Business',
     category: 'industry',
+  },
+
+  // ── Corp Dev / M&A deal flow ─────────────────────────────────────
+  // Feeds for the nightly Outreach Intelligence Brief. fetchFeed()
+  // fails soft (logs a warn, returns []) if a feed URL dies, and the
+  // brief synthesis also draws on the `business` + SEC `regulatory`
+  // feeds above, so a flaky source degrades the brief rather than
+  // breaking it. Verify these resolve before assuming zero signal.
+  {
+    url: 'https://news.crunchbase.com/feed/',
+    name: 'Crunchbase News',
+    category: 'corp_dev',
+  },
+  {
+    url: 'https://www.pehub.com/feed/',
+    name: 'PE Hub',
+    category: 'corp_dev',
   },
 ];
 

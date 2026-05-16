@@ -95,6 +95,9 @@ export async function GET() {
   // (the original root cause of the April 2026 cost spike).
   const dailyJobs = [
     '/api/cron/sync-intelligence',
+    // Must run AFTER sync-intelligence so the NewsArticle table is fresh
+    // before the brief synthesizes the day's corp-dev / M&A signal.
+    '/api/cron/outreach-intel',
     '/api/cron/detect-outcomes',
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
