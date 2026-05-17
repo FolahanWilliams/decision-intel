@@ -174,7 +174,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // teamMember orgId fail-soft lookup (mirrors the outcome route
 // verbatim). All canonical body-parse / orgId-resolve exception
 // classes — no delivery/audit/flywheel path swallowed.
-const SILENT_CATCH_BASELINE = 187;
+// 187 → 188 (friction audit #2 / OrgRoiCard 2026-05-17): the
+// `res.json().catch(() => null)` body-parse on the /api/analytics/roi
+// fetch — canonical res.json() body-parse exception class; the card
+// degrades to not-rendered, no delivery/audit/flywheel path swallowed.
+const SILENT_CATCH_BASELINE = 188;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

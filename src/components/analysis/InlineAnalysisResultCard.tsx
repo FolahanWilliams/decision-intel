@@ -630,6 +630,51 @@ export function InlineAnalysisResultCard({
         </div>
       )}
 
+      {/* Loop-close prompt at the wow moment (friction audit #3,
+          2026-05-17). The calibration loop — and the per-org moat —
+          only compounds if the outcome gets logged. Previously the
+          ONLY prompt was a 30-day-aged sticky pill on the detail page;
+          nothing on the hot path asked. This is the non-gated ask,
+          framed as the next step, routed to where the outcome reporter
+          already lives. */}
+      <div
+        style={{
+          padding: '12px 20px',
+          borderTop: '1px solid var(--border-color)',
+          background: 'rgba(22,163,74,0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          This decision only sharpens the next one if you close the loop. Log what actually happened
+          when it lands — that&rsquo;s what builds your calibration.
+        </span>
+        <Link
+          href={`/documents/${analysis.docId}`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 14px',
+            background: 'transparent',
+            color: 'var(--accent-primary)',
+            border: '1px solid var(--accent-primary)',
+            borderRadius: 'var(--radius-full)',
+            fontSize: 12.5,
+            fontWeight: 600,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Set the outcome
+          <ArrowRight size={13} />
+        </Link>
+      </div>
+
       <div
         style={{
           padding: '14px 20px',

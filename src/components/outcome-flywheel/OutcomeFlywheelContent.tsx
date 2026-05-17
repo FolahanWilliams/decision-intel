@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { OrgRoiCard } from './OrgRoiCard';
 import { formatBiasName } from '@/lib/utils/labels';
 
 interface FlywheelData {
@@ -183,6 +184,12 @@ export function OutcomeFlywheelContent() {
 
   return (
     <div>
+      {/* Persistent per-org ROI value narrative (friction audit #2,
+          2026-05-17). Leads the retention page — the surface the audit
+          named as "renders metrics, never a value narrative". Its own
+          fetch + honest day-1/sparse states; never recomputes value. */}
+      <OrgRoiCard />
+
       {/* Contextual Intelligence Brief — what to do next */}
       <IntelligenceBrief
         context="outcomes"
