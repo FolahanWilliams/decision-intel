@@ -362,7 +362,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                         
                         <button
                           onClick={() => completeOnboarding({ launchTour: true })}
-                          className="w-full flex items-center gap-4 p-4 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
+                          className="w-full flex items-center gap-4 p-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
                         >
                           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                             <Compass size={18} color="#fff" />
@@ -448,7 +448,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     </label>
                     <button
                       onClick={handleOtherSubmit}
-                      className="mt-6 w-full py-4 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-md)] font-semibold active:scale-[0.98] hover:shadow-lg"
+                      className="mt-6 w-full py-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-md)] font-semibold active:scale-[0.98] hover:shadow-lg"
                     >
                       Add me to the waitlist
                     </button>
@@ -476,7 +476,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                 setOpen(false);
                 onClose();
               }}
-              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[#15803d] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-lg active:scale-[0.98]"
+              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-lg active:scale-[0.98]"
             >
               Got it
             </button>
