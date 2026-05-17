@@ -60,6 +60,7 @@ import { StrengthsWeaknessesMatrix } from './path-to-100m/StrengthsWeaknessesMat
 import { R2FDeepDive } from './path-to-100m/R2FDeepDive';
 import { ThreeLayerModel } from './path-to-100m/ThreeLayerModel';
 import { AiNativeMatrix } from './path-to-100m/AiNativeMatrix';
+import { DefensibilityVectorsCard } from './path-to-100m/DefensibilityVectorsCard';
 import { CategoryAndPitchLibrary } from './path-to-100m/CategoryAndPitchLibrary';
 import { RoleOutreachPlaybooks } from './path-to-100m/RoleOutreachPlaybooks';
 import { KillerResponsesPlaybook } from './path-to-100m/KillerResponsesPlaybook';
@@ -186,6 +187,15 @@ export function PathToHundredMillionTab() {
         accent="#0EA5E9"
       >
         <AiNativeMatrix />
+      </Section>
+
+      <Section
+        icon={<Shield size={16} />}
+        title="Defensibility Vectors · the 'is it just a wrapper?' answer"
+        subtitle="The honest frame (the wrapper is the wedge; the accumulating decision→outcome record + enforced process is the company) + the 7 non-wrapper vectors with live shipped/queued status + the acqui-hire-vs-scale-binary-is-false reframe + the do-not-quote guardrail. The verbatim spoken answer is in Killer Responses → 'How are you different?'; this is the daily visual reference. Rehearse before Strategy World London."
+        accent="#16A34A"
+      >
+        <DefensibilityVectorsCard />
       </Section>
 
       <Section

@@ -1189,7 +1189,7 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     personaId: 'f500_cso',
     mode: 'objection_handler',
     generatorHint:
-      "Margaret just said: \"My team isn't going to want AI questioning their judgment. The strategic call IS the CSO's job — that's why I hire them.\" The textbook algorithm-aversion objection, locked 2026-05-13 (Dietvorst, Simmons & Massey 2015 / doi:10.1037/xge0000033). You have 30 seconds. The right counter has three beats: (1) name the pattern without making her wrong (\"there's a 2015 paper for that — Algorithm Aversion. Real bias, well-documented\"), (2) reframe the artefact (\"DI doesn't replace your CSO's judgment — it audits the reasoning their memo produces, so they can defend the call in front of the audit committee\"), (3) close with the Dietvorst-2016 fix (\"your CSO tunes the weights to your domain — the DQI is a defensible baseline they shape, not a verdict imposed on them\"). Don't lecture. Don't quote the DOI to her face. Don't say \"great question.\"",
+      'Margaret just said: "My team isn\'t going to want AI questioning their judgment. The strategic call IS the CSO\'s job — that\'s why I hire them." The textbook algorithm-aversion objection, locked 2026-05-13 (Dietvorst, Simmons & Massey 2015 / doi:10.1037/xge0000033). You have 30 seconds. The right counter has three beats: (1) name the pattern without making her wrong ("there\'s a 2015 paper for that — Algorithm Aversion. Real bias, well-documented"), (2) reframe the artefact ("DI doesn\'t replace your CSO\'s judgment — it audits the reasoning their memo produces, so they can defend the call in front of the audit committee"), (3) close with the Dietvorst-2016 fix ("your CSO tunes the weights to your domain — the DQI is a defensible baseline they shape, not a verdict imposed on them"). Don\'t lecture. Don\'t quote the DOI to her face. Don\'t say "great question."',
   },
   {
     personaId: 'midmarket_corp_dev',
@@ -1210,6 +1210,37 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     mode: 'live_demo_walkthrough',
     generatorHint:
       "Titi wants the Dangote 2014 expansion plan walkthrough. She knows the deal — she'll catch any factual error instantly. Tour the artefact, not the UI.",
+  },
+
+  // ── Wrapper-challenge objection (FH-5.2, locked 2026-05-17) ──
+  // The single most-probable advisor/investor/buyer challenge of the
+  // next 90 days (Strategy World London T~23d). The verbatim spoken
+  // answer is `different_prompt_wrapper` in killer-responses.ts; these
+  // make the founder LIVE the 3-beat under pressure. The 3 beats
+  // (never deny — the founder catches flattery): (1) ADMIT the engine
+  // is a replicable wrapper, (2) REFRAME wrapper=wedge vs the company=
+  // the accumulating decision→outcome record + enforced process the
+  // fast-follower can't reconstruct, (3) CLOSE on embeddedness grounded
+  // in SHIPPED proof (V1 forced-at-vote 90-day proxy loop 2026-05-17 +
+  // V2 pre-mortem dissent gate 2026-05-16 + V5 stage-gate 2026-05-16 —
+  // not aspiration).
+  {
+    personaId: 'preseed_vc_associate',
+    mode: 'objection_handler',
+    generatorHint:
+      'Riya just said: "Isn\'t this just a GPT wrapper? You ran specialised prompts over a model. GPT-5 with better reasoning ships and your moat evaporates." The canonical skeptical-investor challenge. You have 30 seconds. Three beats: (1) ADMIT it — "You\'re right. The audit engine IS a replicable prompt-wrapper. I rebuilt the regulatory layer solo in days. Anyone competent rebuilds the engine in weeks. I\'m not going to pretend otherwise" (denying it fails — she\'s seen 50 founders flatter a non-moat). (2) REFRAME — "The wrapper is the wedge, not the company. The company is what accumulates around it that a fast-follower or the model provider can\'t reconstruct: the enforced decision process, the tamper-evident institutional record, and the per-org calibration data. GPT-6 doesn\'t get me an executive who returns at day-90 to admit the synergy timeline was a delusion." (3) CLOSE on shipped embeddedness — "That\'s why the next 12 months are embeddedness in 1-2 orgs with measurable ROI, not more product. The forced-at-vote 90-day proxy gate, the mandatory pre-mortem dissent gate, the rigid stage schema — all shipped. The summer goal is ≥5 embedded users + a case study, which is also how I find out if the scale-company asset is real." Don\'t get defensive. Don\'t quote Brier 0.258 or any margin number. Don\'t say "great question."',
+  },
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'objection_handler',
+    generatorHint:
+      "Damien just said: \"What stops me building this myself? My team has a ChatGPT Enterprise seat — I get my analyst to write the bias-detection prompt and we keep the budget.\" The buyer-side wrapper challenge. You have 30 seconds. Three beats: (1) ADMIT — \"Honestly? Nothing stops you writing the prompt. The detection prompt isn't the hard part — you could have a v1 by Friday.\" (2) REFRAME to what the prompt can't do — \"What your ChatGPT seat won't do is make the deal sponsor type a written defence into the record before the Go vote, fire a falsifiable 90-day proxy that auto-scores at horizon, and accumulate which bias patterns actually fail at YOUR firm across deals. A prompt gives an opinion your analyst can quietly ignore; an enforced process + a tamper-evident record is what the audit committee runs on.\" (3) CLOSE — \"The question isn't 'can you prompt GPT' — it's 'will your team have the institutional discipline to return at day-90 and grade their own call.' That's the product. Want to see the gate?\" Don't be defensive about the prompt being simple — agreeing is the move. Don't pitch features. Don't say \"great question.\"",
+  },
+  {
+    personaId: 'smaller_fund_gp',
+    mode: 'objection_handler',
+    generatorHint:
+      'Aisha just said: "My LP is going to look at this and say it\'s ChatGPT with extra steps. How do I defend the line item?" The LP-pressure flavour of the wrapper challenge. You have 30 seconds. Three beats: (1) ADMIT plainly — "Your LP is half right: the analysis itself is a model with specialised prompts. Don\'t oversell that part to them." (2) REFRAME to the LP\'s actual question — "What the LP really audits after a deal goes wrong is: did the IC memo flag the risk and the team ignore it, or did you never see it? A prompt can\'t answer that. A tamper-evident record where the proxy was logged at the vote and scored at 90 days can — that\'s the artefact that protects YOU in the LP letter." (3) CLOSE on the switching cost — "Once three years of your IC trail is hashed on this methodology, ripping it out means explaining to the LP why you downgraded your evidentiary standard. The line item isn\'t the audit — it\'s the defensible record." Don\'t deny the engine is a wrapper. Don\'t quote calibration numbers. Don\'t say "great question."',
   },
 ];
 
