@@ -22,7 +22,6 @@
  * external palette dependency. Safe to render anywhere.
  */
 
-import Link from 'next/link';
 import { ArrowRight, FileText } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
 
@@ -66,7 +65,11 @@ export function WeWorkProofPanel({
   eventName = 'wework_proof_panel_clicked',
 }: WeWorkProofPanelProps = {}) {
   return (
-    <Link
+    // Plain <a>, NOT next/link: this points at a STATIC asset in public/.
+    // next/link would RSC-prefetch `/dpr-sample-wework.pdf?rsc=…`, which
+    // has no route → a 404 that console-spams on /demo (the highest-
+    // leverage acquisition surface, where this panel is mounted).
+    <a
       className="wework-proof-panel"
       href="/dpr-sample-wework.pdf"
       target="_blank"
@@ -223,6 +226,6 @@ export function WeWorkProofPanel({
           PDF &middot; opens in new tab
         </span>
       </div>
-    </Link>
+    </a>
   );
 }

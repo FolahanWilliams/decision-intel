@@ -176,6 +176,7 @@ const nextConfig: NextConfig = {
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: blob: https:;
       font-src 'self' data:;
+      media-src 'self' data: blob:;
       connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://cdn.jsdelivr.net https://fonts.gstatic.com https://*.livekit.cloud wss://*.livekit.cloud;
       frame-ancestors 'none';
       base-uri 'self';

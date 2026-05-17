@@ -57,6 +57,19 @@
  *       between the number and "biases"), which is exactly why M-1
  *       stayed PARTIAL while the gates were green. History / derivation
  *       comments are skipped.
+ *     - static-asset-next-link (added 2026-05-17 after the /demo
+ *       WeWorkProofPanel 404): next/link <Link> pointing at a static
+ *       public/ asset (.pdf/.docx/…) RSC-prefetches a non-route → a
+ *       404 that console-spams on the surface it's mounted on. Plain
+ *       <a> on the same href is correct and is NOT flagged.
+ *     - blocking-await-pipeline-path (added 2026-05-17 after the
+ *       Friction-#4 news-sync P0): a >=20s blocking timeout AWAITED
+ *       sequentially in src/lib/{agents,intelligence,synthesis,copilot}
+ *       froze the whole audit pipeline platform-wide. Bounded timeouts
+ *       that are elements of an `await Promise.allSettled([...])`
+ *       fan-out (no leading `await`) are parallel and NOT flagged.
+ *       Encodes the "structure-passes-but-runtime-hangs" miss the
+ *       structural checks above are blind to by design.
  *
  * Usage:
  *   node scripts/audit-platform.mjs                  # stderr report
@@ -828,6 +841,86 @@ function checkLockedCountDrift(files) {
   return findings;
 }
 
+// Static assets in public/ MUST be a plain <a>, never next/link <Link>.
+// next/link RSC-prefetches the href as a route; a static .pdf/.docx has
+// no route, so the prefetch 404s and console-spams on the surface it's
+// mounted on. This exact class shipped on /demo via WeWorkProofPanel
+// (caught 2026-05-17). Plain <a> on a static-ext href is correct and
+// is NOT flagged — only <Link> is.
+const STATIC_ASSET_HREF =
+  /href=["']\/[^"']+\.(pdf|docx|xlsx|xls|csv|zip|png|jpg|jpeg|svg|txt)["']/i;
+function checkStaticAssetLink(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!rel.endsWith('.tsx') || rel.includes('scripts/audit-platform')) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    if (!lines.some(l => /from ['"]next\/link['"]/.test(l))) continue;
+    for (let i = 0; i < lines.length; i++) {
+      if (!/<Link\b/.test(lines[i])) continue;
+      // Scan the <Link …> opening tag (multi-line) for a static-asset href.
+      for (let j = i; j < Math.min(i + 14, lines.length); j++) {
+        const m = lines[j].match(STATIC_ASSET_HREF);
+        if (m) {
+          findings.push({
+            category: 'critical',
+            severity: 'high',
+            rule: 'static-asset-next-link',
+            file: rel,
+            line: j + 1,
+            snippet: lines[j].trim().slice(0, 140),
+            suggestion: `next/link <Link> points at a static public asset (.${m[1]}) — it RSC-prefetches a non-route → 404 console-spam. Use a plain <a href target="_blank" rel="noopener noreferrer">, never <Link>, for public/ files.`,
+          });
+          break;
+        }
+        if (j > i && lines[j].includes('>')) break; // opening tag closed
+      }
+    }
+  }
+  return findings;
+}
+
+// A long blocking timeout AWAITED sequentially on the audit critical
+// path froze the whole pipeline 60s platform-wide (the 2026-05-17
+// news-sync P0). Bounded timeouts that are ELEMENTS of an
+// `await Promise.allSettled([...])` fan-out are fine (parallel) — those
+// lines have no leading `await`, so this high-precision rule skips them.
+const PIPELINE_PATH = /^src\/lib\/(agents|intelligence|synthesis|copilot)\//;
+// Matches BOTH the canonical `withTimeout(` and the `withTimeout as
+// utilTimeout` alias call site (the alias is what the 2026-05-17
+// news-sync P0 line actually used — a behavior test caught that a
+// `[wW]ithTimeout`-only pattern would never fire on the real bug).
+const BLOCKING_AWAIT =
+  /^\s*(?:const\s+\w+\s*=\s*)?await\s+(?:withTimeout|utilTimeout|utilWithTimeout)\s*\(/;
+const BIG_BUDGET_MS = /\b(?:[2-9]\d|\d{3,})_?000\b/; // >= 20_000 ms
+function checkBlockingAwaitOnPipelinePath(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!PIPELINE_PATH.test(rel) || rel.endsWith('.test.ts')) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) {
+      if (!BLOCKING_AWAIT.test(lines[i])) continue;
+      // Budget may be on this line or the next few (multi-line call args).
+      const span = lines.slice(i, Math.min(i + 4, lines.length)).join(' ');
+      if (BIG_BUDGET_MS.test(span)) {
+        findings.push({
+          category: 'critical',
+          severity: 'high',
+          rule: 'blocking-await-pipeline-path',
+          file: rel,
+          line: i + 1,
+          snippet: lines[i].trim().slice(0, 140),
+          suggestion: `>=20s blocking timeout awaited on the audit critical path. Non-fatal enrichment must NEVER block the pipeline — background it (Promise.race vs a small wait budget) or move it into the bounded parallel fan-out. See the "Friction audit #4" CLAUDE.md lock.`,
+        });
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -850,6 +943,8 @@ function runAllChecks() {
     ...checkDeletedReferences(files),
     ...checkOnboardingPersonaCoherence(files),
     ...checkLockedCountDrift(files),
+    ...checkStaticAssetLink(files),
+    ...checkBlockingAwaitOnPipelinePath(files),
   ];
 
   return allFindings;
