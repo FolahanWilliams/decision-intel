@@ -329,6 +329,8 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
                       flexDirection: 'column',
                       gap: 4,
                       borderTop: '1px solid var(--border-color)',
+                      maxHeight: 220,
+                      overflowY: 'auto',
                     }}
                   >
                     {catHits.map(h => {
@@ -401,39 +403,73 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
 
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 8,
             marginTop: 16,
             paddingTop: 12,
             borderTop: '1px solid var(--border-color)',
-            flexWrap: 'wrap',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
           }}
         >
-          <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-            {selected.length} of {totalHits} will be redacted
-          </span>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: 'var(--text-muted)',
+              textAlign: 'center',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {totalHits === 0 ? (
+              'Nothing flagged — safe to submit'
+            ) : (
+              <>
+                <strong style={{ color: 'var(--text-secondary)' }}>{selected.length}</strong> of{' '}
+                {totalHits} flagged {totalHits === 1 ? 'item' : 'items'} will be replaced with
+                placeholders
+              </>
+            )}
+          </div>
+          {/* Three actions spread full-width and equal-weight; colour, not
+              size, carries the primary/secondary/tertiary hierarchy. */}
+          <div style={{ display: 'flex', gap: 8, width: '100%' }}>
             <Button
               variant="outline"
               onClick={onCancel}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              style={{
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+              }}
             >
               <X size={13} /> Cancel
             </Button>
-            <Button variant="outline" onClick={handleSkip} style={{ fontSize: 12 }}>
-              Continue without redacting
+            <Button
+              variant="outline"
+              onClick={handleSkip}
+              style={{
+                flex: 1,
+                fontSize: 12,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              Skip redaction
             </Button>
             <Button
               onClick={handleRedact}
               disabled={selected.length === 0}
               style={{
+                flex: 1.4,
                 background: 'var(--accent-primary)',
                 color: 'white',
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 6,
+                fontWeight: 700,
               }}
             >
               <Check size={13} />

@@ -65,6 +65,85 @@ describe('scanForPii — category detection', () => {
   });
 });
 
+describe('scanForPii — person-name PRECISION (2026-05-17 false-positive fix)', () => {
+  // Verbatim Title-Case bigrams the old deny-list heuristic wrongly
+  // surfaced as "Person names" on the /demo screenshot. Every one
+  // contains a function / business / finance / strategy / geo word in
+  // at least one slot, so the bounded rejection must drop them all.
+  const SCREENSHOT_FALSE_POSITIVES = [
+    'Project Baobab',
+    'African Consumer',
+    'Staples Roll',
+    'African Investments',
+    'Lagos Office',
+    'Tiger Brands',
+    'Why Now',
+    'Exit Thesis',
+    'Synergies We',
+    'Combined Year',
+    'Federal Competition',
+    'Consumer Protection',
+    'Comparable Transactions',
+    'Track Record',
+    'Ask We',
+    'The Three',
+    'The Nairobi',
+  ];
+
+  it('flags ZERO of the screenshot false-positive bigrams as names', () => {
+    const memo = `Project Baobab — African Consumer Staples Roll-up. African Investments
+      via the Lagos Office. Tiger Brands and African peers. Why Now: the window
+      is closing. Exit Thesis: trade sale. Synergies We can realise. Combined
+      Year one EBITDA. Federal Competition Commission clearance. Consumer
+      Protection review. Comparable Transactions support the multiple. Track
+      Record of the sponsor. Ask We are seeking. The Three workstreams. The
+      Nairobi hub.`;
+    const names = scanForPii(memo)
+      .hits.filter(h => h.category === 'name')
+      .map(h => h.value);
+    for (const fp of SCREENSHOT_FALSE_POSITIVES) {
+      expect(names).not.toContain(fp);
+    }
+  });
+
+  it('still flags genuine person names (recall preserved)', () => {
+    const r = scanForPii(
+      'The thesis was sponsored by Aliko Dangote and reviewed with Sarah Guo before IC.'
+    );
+    const names = r.hits.filter(h => h.category === 'name').map(h => h.value);
+    expect(names).toContain('Aliko Dangote');
+    expect(names).toContain('Sarah Guo');
+  });
+
+  it('honorific / role signal rescues a name whose token is a common word', () => {
+    // "Cash" is in COMMON_WORD; without the honorific it would be dropped.
+    const withTitle = scanForPii('Prepared by Dr. Helen Cash for the committee.');
+    expect(
+      withTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')
+    ).toBe(true);
+    const noTitle = scanForPii('The annual Helen Cash reserve was set aside.');
+    expect(
+      noTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')
+    ).toBe(false);
+  });
+
+  it('the canonical demo memo no longer produces a wall of name garbage', () => {
+    const memo = `INVESTMENT COMMITTEE MEMO — PROJECT BAOBAB
+      Target: an African Consumer Staples Roll-up anchored by Tiger Brands.
+      African Investments routed through the Lagos Office. Why Now, Exit
+      Thesis, Track Record, Combined Year, Comparable Transactions, Federal
+      Competition, Consumer Protection — all standard sections. Sponsor: the
+      partner Aliko Dangote.`;
+    const counts = scanForPii(memo).counts;
+    // Pre-fix this produced ~24 "names"; now only the real one survives.
+    expect(counts.name).toBeLessThanOrEqual(2);
+    const names = scanForPii(memo)
+      .hits.filter(h => h.category === 'name')
+      .map(h => h.value);
+    expect(names).toContain('Aliko Dangote');
+  });
+});
+
 describe('scanForPii — overlap dedupe', () => {
   it('keeps the longest match when an entity name overlaps a person-name hit', () => {
     const r = scanForPii('Sankore Investments Ltd led the round.');

@@ -340,6 +340,29 @@ function checkDarkModeTokens(files) {
       // Skip lines inside dark-wrapped severity cards (heuristic — line
       // mentions bg-red-*, bg-amber-*, bg-yellow-* in same line block).
       if (/bg-(red|amber|yellow|emerald|rose|violet)-9\d\d/.test(line)) continue;
+      // Skip when the SAME element sets its own colored background via a
+      // CSS variable or explicit hex (`bg-[var(--accent-primary)]`,
+      // `bg-[#16A34A]`): white text / a white/N overlay on a solid
+      // colored surface is correct contrast in light theme, NOT a
+      // dark-mode token. Same intent as the severity-wrapper skip above
+      // — extended to the CSS-var-driven colored-button pattern (the
+      // 2026-05-17 WelcomeModal false-positive class).
+      if (/bg-\[var\(--/.test(line) || /bg-\[#[0-9a-fA-F]{3,8}\]/.test(line)) continue;
+      // Skip the translucent icon-/avatar-chip idiom: a small fixed box
+      // (`w-N h-N`) + `rounded*` + low-opacity `bg-white/≤25`. Per the
+      // CLAUDE.md dark-token-sweep lock, low-α white overlays are a
+      // legitimate tint-on-colour pattern, not a dark-mode surface; a
+      // real violation (`bg-zinc-900` panel, `text-gray-400` body) never
+      // takes this shape. Bounds the rule instead of chasing one FP via
+      // an ever-growing regex (the codebase's anti-over-fit philosophy).
+      if (
+        /\bbg-white\/(?:[0-9]|1[0-9]|2[0-5])\b/.test(line) &&
+        /\brounded(?:-|\b)/.test(line) &&
+        /\bw-\d{1,2}\b/.test(line) &&
+        /\bh-\d{1,2}\b/.test(line)
+      ) {
+        continue;
+      }
 
       for (const p of DARK_TOKEN_PATTERNS) {
         if (p.test(line)) {

@@ -62,12 +62,94 @@ const AMOUNT_RE =
 const ENTITY_RE =
   /\b((?:[A-Z][A-Za-z0-9&'’.-]+(?:\s+(?:&\s+|of\s+|the\s+)?)?){1,5}),?\s+(?:Inc|LLC|L\.L\.C\.|Ltd|Limited|GmbH|Pty|Plc|PLC|AG|SA|N\.V\.|NV|Corp|Corporation|Co\.|Company|S\.A\.|S\.A\.R\.L|S\.r\.l|S\.p\.A|BV|B\.V\.|AB|AS|ApS|Oy|S\.L\.|S\.L|Pvt|Pvt\.|Holdings|Group|Trust|Fund|Capital|Partners|Ventures|Bank|PLC\.|Limited\.)(?=[\s.,;:!?\]\)\}'\"]|$)/g;
 
-// Person-name heuristic: two consecutive Capitalised words, neither a
-// known stop word, neither immediately preceded by a sentence-starter
-// boundary that would make it a normal phrase. We post-filter against
-// a deny-list of capitalised non-name terms (common geographies, common
-// corporate words, days/months).
+// Person-name heuristic. The hard problem: a strategy memo is FULL of
+// Title-Case bigrams that are NOT people — project codenames ("Project
+// Baobab"), section headers ("Why Now", "Exit Thesis", "Track Record"),
+// deal vocab ("Combined Year", "Comparable Transactions"), company /
+// geo phrases ("Tiger Brands", "Lagos Office", "African Consumer").
+// Enumerating those bigrams (the old deny-list) is unbounded and loses.
+// The bounded inversion: reject the pair if EITHER token is a common
+// function / business / finance / strategy / geo word — that set IS
+// enumerable, and ~every false bigram contains at least one. A positive
+// honorific/role signal ("CEO Sarah Guo", "Dr. Jane Doe", "led by X")
+// rescues real names. Precision over recall is the documented intent:
+// this is a pre-submit safety net with a per-hit deselect UI, not a
+// compliance filter — a missed name is cheaper than a wall of garbage
+// that trains the user to "Continue without redacting".
 const NAME_RE = /\b([A-Z][a-z]{1,15})\s+([A-Z][a-z]{1,20})\b/g;
+
+// Honorific / role / name-introducing token immediately before the
+// bigram → strong positive personhood signal (rescues a real name even
+// if a token is borderline). Checked against the ~28 preceding chars.
+const HONORIFIC_RE =
+  /\b(?:Mr|Mrs|Ms|Mx|Dr|Prof|Sir|Dame|Lord|Lady|Hon|CEO|CFO|COO|CTO|CMO|CIO|CHRO|GC|VP|SVP|EVP|Chair|Chairman|Chairwoman|Chairperson|Director|President|Founder|Co-?founder|Partner|Principal|Counsel|Analyst|Manager|Head|Lead|Author|Authored\s+by|Led\s+by|Signed\s+by|Prepared\s+by|Reviewed\s+by|Contact|Attn|According\s+to)\.?\s*$/i;
+
+// Bounded rejection set: function words + business/finance/M&A/strategy
+// vocab + number words + demonyms + common geo tokens. If EITHER token
+// of a Title-Case pair is in here, it is not a person name.
+const COMMON_WORD = new Set(
+  [
+    // Function / closed-class
+    'the', 'a', 'an', 'we', 'us', 'our', 'ours', 'you', 'your', 'yours', 'they',
+    'them', 'their', 'this', 'that', 'these', 'those', 'it', 'its', 'he', 'she',
+    'his', 'her', 'why', 'how', 'when', 'where', 'who', 'whom', 'whose', 'what',
+    'which', 'now', 'then', 'here', 'there', 'ask', 'asks', 'will', 'would',
+    'shall', 'should', 'can', 'could', 'may', 'might', 'must', 'has', 'have',
+    'had', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does',
+    'did', 'not', 'no', 'nor', 'yes', 'all', 'any', 'each', 'every', 'some',
+    'more', 'most', 'less', 'least', 'both', 'either', 'neither', 'very',
+    'such', 'same', 'other', 'another', 'as', 'so', 'if', 'but', 'and', 'or',
+    'for', 'to', 'of', 'in', 'on', 'at', 'by', 'with', 'from', 'into', 'onto',
+    'over', 'under', 'above', 'below', 'about', 'after', 'before', 'during',
+    'per', 'via', 'vs', 'versus', 'than', 'up', 'down', 'out', 'off', 'again',
+    // Number words
+    'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine',
+    'ten', 'first', 'second', 'third', 'fourth', 'fifth', 'next', 'last',
+    'series', 'phase', 'tier', 'step', 'part', 'round',
+    // Business / finance / M&A / strategy vocab
+    'thesis', 'exit', 'record', 'track', 'year', 'years', 'quarter', 'quarterly',
+    'combined', 'comparable', 'comparables', 'transaction', 'transactions',
+    'synergy', 'synergies', 'consumer', 'consumers', 'protection', 'competition',
+    'competitive', 'federal', 'brand', 'brands', 'investment', 'investments',
+    'office', 'offices', 'group', 'holding', 'holdings', 'capital', 'partner',
+    'partners', 'fund', 'funds', 'venture', 'ventures', 'project', 'projects',
+    'deal', 'deals', 'target', 'targets', 'growth', 'market', 'markets',
+    'revenue', 'revenues', 'margin', 'margins', 'roll', 'rollout', 'staple',
+    'staples', 'board', 'committee', 'summary', 'overview', 'appendix',
+    'section', 'executive', 'strategic', 'strategy', 'financial', 'operating',
+    'operations', 'integration', 'diligence', 'valuation', 'scenario',
+    'scenarios', 'base', 'case', 'upside', 'downside', 'risk', 'risks',
+    'return', 'returns', 'equity', 'debt', 'cash', 'flow', 'ebitda', 'irr',
+    'moic', 'multiple', 'multiples', 'premium', 'discount', 'baseline',
+    'forecast', 'forecasts', 'projection', 'projections', 'assumption',
+    'assumptions', 'rationale', 'recommendation', 'recommendations',
+    'objective', 'objectives', 'milestone', 'milestones', 'timeline',
+    'roadmap', 'pipeline', 'portfolio', 'mandate', 'governance', 'compliance',
+    'regulatory', 'framework', 'taxonomy', 'methodology', 'hypothesis',
+    'conclusion', 'context', 'background', 'problem', 'solution',
+    'opportunity', 'threat', 'strength', 'weakness', 'proceeds', 'terms',
+    'structure', 'model', 'models', 'plan', 'plans', 'review', 'sourcing',
+    'screening', 'closing', 'post', 'pre', 'day', 'days', 'week', 'weeks',
+    'month', 'months', 'cost', 'costs', 'price', 'pricing', 'value', 'values',
+    'rate', 'rates', 'share', 'shares', 'stake', 'asset', 'assets', 'company',
+    'companies', 'business', 'sector', 'industry', 'segment', 'segments',
+    'product', 'products', 'service', 'services', 'customer', 'customers',
+    'team', 'teams', 'people', 'talent', 'culture', 'leadership', 'management',
+    // Demonyms / geo adjectives + common place tokens
+    'african', 'nigerian', 'kenyan', 'ghanaian', 'egyptian', 'american',
+    'european', 'asian', 'british', 'english', 'french', 'german', 'chinese',
+    'indian', 'japanese', 'latin', 'pan', 'sub', 'saharan', 'lagos', 'nairobi',
+    'abuja', 'accra', 'cairo', 'johannesburg', 'london', 'paris', 'berlin',
+    'beijing', 'tokyo', 'dubai', 'riyadh', 'abu', 'dhabi', 'africa', 'europe',
+    'asia', 'america', 'west', 'east', 'north', 'south', 'central', 'region',
+    'regional', 'global', 'international', 'domestic', 'local', 'national',
+    'state', 'provincial', 'county', 'district', 'city', 'town', 'new', 'old',
+  ]
+);
+
+function isCommonWord(w: string): boolean {
+  return COMMON_WORD.has(w.toLowerCase());
+}
 
 const NAME_DENYLIST = new Set(
   [
@@ -228,7 +310,15 @@ export function scanForPii(text: string): ScanResult {
     ...collectMatches(text, ENTITY_RE, 'entity'),
     ...collectMatches(text, NAME_RE, 'name', m => {
       const [first, last] = [m[1], m[2]];
+      // Known multi-word non-name bigram (geos like "New York", boilerplate).
       if (inDenylist(first, last)) return '';
+      // Positive personhood signal in the ~28 preceding chars rescues a
+      // real name even if a token happens to be a common word.
+      const preceding = text.slice(Math.max(0, m.index - 28), m.index);
+      const hasHonorific = HONORIFIC_RE.test(preceding);
+      // Bounded rejection: a Title-Case pair with a function / business /
+      // finance / strategy / geo word in either slot is not a person.
+      if (!hasHonorific && (isCommonWord(first) || isCommonWord(last))) return '';
       return `${first} ${last}`;
     }),
   ].filter(h => h.value.length > 0);
