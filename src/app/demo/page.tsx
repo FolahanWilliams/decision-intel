@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { SSEReader } from '@/lib/sse';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -246,44 +247,87 @@ export default function DemoPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: textToAudit }),
       });
-      const body = (await res.json().catch(() => ({}))) as {
-        success?: boolean;
-        data?: { documentId: string; analysisId: string | null; result: AnalysisResult };
-        error?: string;
-      };
 
-      if (!res.ok || !body.success || !body.data) {
-        const msg = body.error || 'The audit ran into an error. Please try again in a moment.';
+      // Pre-stream guards (env 503 / IP-or-global rate-limit 429 / word
+      // 400 / 413) still return JSON, not SSE — handle them as before.
+      if (!res.ok || !res.body) {
+        const errBody = (await res.json().catch(() => ({}))) as { error?: string };
+        const msg = errBody.error || 'The audit ran into an error. Please try again in a moment.';
         trackEvent('demo_paste_error', { status: res.status });
         setPasteError(msg);
         setPasteAuditing(false);
         return;
       }
 
-      trackEvent('demo_paste_results', {
-        dqi: body.data.result.overallScore,
-        biasCount: body.data.result.biases?.length ?? 0,
-      });
-      // 3.2 deep — fire the redaction trail with the resolved analysisId
-      // (or the documentId fallback when there is no analysis).
-      if (trail) {
-        const { placeholderEntries, ...payload } = trail;
-        const idForTrail = body.data.analysisId ?? body.data.documentId;
-        postRedactionTrail({
-          ...payload,
-          analysisId: idForTrail,
-          source: 'demo_paste',
-        });
-        if (idForTrail && placeholderEntries.length > 0) {
-          savePlaceholderMap(idForTrail, placeholderEntries);
+      // Real SSE stream — the same per-node ProgressUpdate the authed
+      // pipeline emits. Drive the existing 8-stage UI from REAL progress
+      // (no more decoupled timer that could desync from the pipeline).
+      type DemoMsg = {
+        type?: string;
+        progress?: number;
+        message?: string;
+        result?: { documentId: string; analysisId: string | null; result: AnalysisResult };
+      };
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const sse = new SSEReader();
+      let settled = false;
+
+      const handle = (raw: unknown) => {
+        const m = raw as DemoMsg;
+        if (typeof m.progress === 'number') {
+          const idx = Math.min(
+            PIPELINE_STAGES.length - 1,
+            Math.max(0, Math.floor((m.progress / 100) * PIPELINE_STAGES.length))
+          );
+          setPasteStageIdx(idx);
         }
+        if (m.type === 'error') {
+          settled = true;
+          trackEvent('demo_paste_error', { stream: true });
+          setPasteError(m.message || 'The audit ran into an error. Please try again in a moment.');
+          setPasteAuditing(false);
+          return;
+        }
+        if (m.type === 'complete' && m.result) {
+          settled = true;
+          const data = m.result;
+          trackEvent('demo_paste_results', {
+            dqi: data.result.overallScore,
+            biasCount: data.result.biases?.length ?? 0,
+          });
+          // 3.2 deep — fire the redaction trail with the resolved
+          // analysisId (or the documentId fallback when there is none).
+          if (trail) {
+            const { placeholderEntries, ...payload } = trail;
+            const idForTrail = data.analysisId ?? data.documentId;
+            postRedactionTrail({ ...payload, analysisId: idForTrail, source: 'demo_paste' });
+            if (idForTrail && placeholderEntries.length > 0) {
+              savePlaceholderMap(idForTrail, placeholderEntries);
+            }
+          }
+          setPasteStageIdx(PIPELINE_STAGES.length - 1);
+          setPasteAudit(data);
+          setPasteAuditing(false);
+          setTimeout(() => {
+            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 220);
+        }
+      };
+
+       
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sse.processChunk(decoder.decode(value, { stream: true }), handle);
       }
-      setPasteAudit(body.data);
-      setPasteAuditing(false);
-      // Scroll to results after a short beat so the animation feels intentional
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 220);
+
+      // Stream closed without a terminal complete/error event.
+      if (!settled) {
+        trackEvent('demo_paste_error', { incomplete: true });
+        setPasteError('The audit did not finish. Please try again in a moment.');
+        setPasteAuditing(false);
+      }
     } catch (err) {
       const msg =
         err instanceof Error && err.message
@@ -308,14 +352,10 @@ export default function DemoPage() {
     void runPasteAudit(trimmed);
   }, [pasteText, runPasteAudit]);
 
-  // Cycle through the progress stages while the real pipeline runs
-  useEffect(() => {
-    if (!pasteAuditing) return;
-    const t = setInterval(() => {
-      setPasteStageIdx(i => Math.min(i + 1, PIPELINE_STAGES.length - 1));
-    }, 5500);
-    return () => clearInterval(t);
-  }, [pasteAuditing]);
+  // (The fake 5500ms stage cycler was removed 2026-05-17 — pasteStageIdx
+  // is now driven by REAL pipeline progress from the /api/demo/run SSE
+  // stream in runPasteAudit. Two writers would fight; the stream is the
+  // single source of truth.)
 
   // 4.3 deep — `?sample=<slug>` deep-link from /case-studies/sample/[slug]
   // pre-loads the memo body into the paste flow. Reads on mount only;

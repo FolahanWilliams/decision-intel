@@ -1,15 +1,20 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
-import { apiSuccess, apiError } from '@/lib/utils/api-response';
+import { apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { extractIp } from '@/lib/utils/request';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { isAdminUserId } from '@/lib/utils/admin';
-import { analyzeDocument } from '@/lib/analysis/analyzer';
+import { analyzeDocument, type ProgressUpdate } from '@/lib/analysis/analyzer';
+import { formatSSE, formatSSEHeartbeat } from '@/lib/sse';
 
 const log = createLogger('DemoRun');
+
+// The demo runs the same ~12-node pipeline as the authed flow (~60-90s).
+// Without this, the platform default would kill the SSE stream early.
+export const maxDuration = 240;
 
 // Demo budget + content guards. The demo runs the *real* 12-node pipeline
 // against a visitor-pasted memo; every audit costs ~£0.40 at Gemini paid
@@ -151,42 +156,87 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 7. Run the real 12-node pipeline
-  try {
-    const result = await analyzeDocument(documentId);
+  // 7. Stream the REAL 12-node pipeline as SSE.
+  //
+  // This is the highest-leverage acquisition surface — a stranger
+  // pasting a memo. Previously this was a single blocking JSON POST and
+  // the client faked progress with a decoupled timer that could visibly
+  // desync from reality. Now the demo gets the SAME real per-node
+  // narration the authed /api/analyze/stream path emits, by passing
+  // analyzeDocument its existing `onProgress` callback. Zero change to
+  // the audit or persistence — only the transport.
+  const encoder = new TextEncoder();
+  let eventCounter = 0;
+  let heartbeat: ReturnType<typeof setInterval> | null = null;
 
-    // analyzeDocument returns AnalysisResult (the output shape), not the
-    // persisted Analysis row. Fetch the just-created Analysis ID so the
-    // wow-sequence UI can deep-link into the full detail page if the
-    // visitor signs up.
-    const analysis = await prisma.analysis.findFirst({
-      where: { documentId },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true },
-    });
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (update: ProgressUpdate) => {
+        eventCounter++;
+        controller.enqueue(encoder.encode(formatSSE(update, String(eventCounter))));
+      };
 
-    log.info(`Demo audit completed for doc ${documentId}, wordCount=${wordCount}`);
+      heartbeat = setInterval(() => {
+        controller.enqueue(encoder.encode(formatSSEHeartbeat()));
+      }, 15000);
 
-    return apiSuccess({
-      data: {
-        documentId,
-        analysisId: analysis?.id ?? null,
-        result,
-      },
-    });
-  } catch (err) {
-    log.error('Demo audit pipeline failed:', err);
+      try {
+        send({
+          type: 'step',
+          step: 'Initializing audit pipeline',
+          status: 'running',
+          progress: 3,
+        });
 
-    // Clean up the demo document so a failed audit doesn't leave orphan rows
-    await prisma.document
-      .delete({ where: { id: documentId } })
-      .catch(deleteErr => log.warn('Demo doc cleanup after pipeline failure:', deleteErr));
+        // Same analyzeDocument the demo already called — its real
+        // per-node ProgressUpdate callbacks now stream out as SSE.
+        const result = await analyzeDocument(documentId, update => send(update));
 
-    return apiError({
-      error:
-        'The audit ran into an error. Please try again — if this keeps happening, reach us at team@decision-intel.com.',
-      status: 500,
-      cause: err instanceof Error ? err : undefined,
-    });
-  }
+        // analyzeDocument persists the Analysis row itself. Fetch its ID
+        // so the wow-sequence UI can deep-link / claim the audit on
+        // sign-up.
+        const analysis = await prisma.analysis.findFirst({
+          where: { documentId },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+
+        log.info(`Demo audit completed for doc ${documentId}, wordCount=${wordCount}`);
+
+        send({
+          type: 'complete',
+          progress: 100,
+          result: { documentId, analysisId: analysis?.id ?? null, result },
+        });
+      } catch (err) {
+        log.error('Demo audit pipeline failed:', err);
+
+        // Clean up the demo document so a failed audit leaves no orphan.
+        await prisma.document
+          .delete({ where: { id: documentId } })
+          .catch(deleteErr => log.warn('Demo doc cleanup after pipeline failure:', deleteErr));
+
+        send({
+          type: 'error',
+          message:
+            'The audit ran into an error. Please try again — if this keeps happening, reach us at team@decision-intel.com.',
+          progress: 0,
+        });
+      } finally {
+        if (heartbeat) clearInterval(heartbeat);
+        controller.close();
+      }
+    },
+    cancel() {
+      if (heartbeat) clearInterval(heartbeat);
+    },
+  });
+
+  return new NextResponse(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+    },
+  });
 }
