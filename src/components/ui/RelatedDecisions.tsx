@@ -129,9 +129,15 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
         className="card-header w-full flex items-center justify-between transition-colors related-decisions-toggle"
       >
         <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <GitBranch size={16} className="text-blue-400" />
+          <GitBranch size={16} style={{ color: 'var(--info)' }} />
           Related Decisions
-          <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300">
+          <span
+            className="text-xs font-normal px-2 py-0.5 rounded-full"
+            style={{
+              background: 'color-mix(in srgb, var(--info) 18%, transparent)',
+              color: 'var(--info)',
+            }}
+          >
             {connectedNodes.length}
           </span>
         </h3>

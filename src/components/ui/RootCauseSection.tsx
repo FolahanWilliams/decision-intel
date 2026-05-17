@@ -81,24 +81,36 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {isNegative ? (
-                    <TrendingDown size={12} className="text-green-400" />
+                    <TrendingDown size={12} style={{ color: 'var(--success)' }} />
                   ) : (
-                    <TrendingUp size={12} className="text-red-400" />
+                    <TrendingUp size={12} style={{ color: 'var(--error)' }} />
                   )}
                   <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                     {formatBiasName(attr.biasType)}
                   </span>
-                  <span
-                    className={cn(
-                      'px-1.5 py-0.5 rounded text-[10px] font-medium',
-                      attr.severity === 'critical' && 'bg-red-500/20 text-red-400',
-                      attr.severity === 'high' && 'bg-orange-500/20 text-orange-400',
-                      attr.severity === 'medium' && 'bg-yellow-500/20 text-yellow-400',
-                      attr.severity === 'low' && 'bg-green-500/20 text-green-400'
-                    )}
-                  >
-                    {attr.severity}
-                  </span>
+                  {(() => {
+                    // Canonical 4-level severity palette (CLAUDE.md
+                    // SEVERITY_COLORS): not literal Tailwind palette.
+                    const seed =
+                      attr.severity === 'critical'
+                        ? 'var(--error)'
+                        : attr.severity === 'high'
+                          ? 'var(--severity-high)'
+                          : attr.severity === 'medium'
+                            ? 'var(--warning)'
+                            : 'var(--success)';
+                    return (
+                      <span
+                        className="px-1.5 py-0.5 rounded text-[10px] font-medium"
+                        style={{
+                          background: `color-mix(in srgb, ${seed} 18%, transparent)`,
+                          color: seed,
+                        }}
+                      >
+                        {attr.severity}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <span
                   className="text-xs font-mono"

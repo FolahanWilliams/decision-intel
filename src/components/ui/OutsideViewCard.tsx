@@ -36,8 +36,11 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
     <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="rounded-lg bg-blue-500/10 p-2">
-            <Telescope className="h-5 w-5 text-blue-500" />
+          <div
+            className="rounded-lg p-2"
+            style={{ background: 'color-mix(in srgb, var(--info) 10%, transparent)' }}
+          >
+            <Telescope className="h-5 w-5" style={{ color: 'var(--info)' }} />
           </div>
           <div>
             <h3 className="text-base font-semibold text-foreground">Outside View</h3>
@@ -61,28 +64,34 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
       <div className="mb-4">
         <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted">
           <div
-            className="bg-red-500/70"
-            style={{ width: `${failurePct}%` }}
+            style={{
+              width: `${failurePct}%`,
+              background: 'color-mix(in srgb, var(--error) 70%, transparent)',
+            }}
             title={`${failurePct}% failures`}
           />
           {neutralPct > 0 && (
             <div
-              className="bg-yellow-500/40"
-              style={{ width: `${neutralPct}%` }}
+              style={{
+                width: `${neutralPct}%`,
+                background: 'color-mix(in srgb, var(--warning) 40%, transparent)',
+              }}
               title={`${neutralPct}% mixed outcomes`}
             />
           )}
           <div
-            className="bg-green-500/70"
-            style={{ width: `${successPct}%` }}
+            style={{
+              width: `${successPct}%`,
+              background: 'color-mix(in srgb, var(--success) 70%, transparent)',
+            }}
             title={`${successPct}% successes`}
           />
         </div>
         <div className="mt-2 flex justify-between text-xs">
-          <span className="flex items-center gap-1 text-red-500">
+          <span className="flex items-center gap-1" style={{ color: 'var(--error)' }}>
             <TrendingDown className="h-3 w-3" /> {failurePct}% failures
           </span>
-          <span className="flex items-center gap-1 text-green-600">
+          <span className="flex items-center gap-1" style={{ color: 'var(--success)' }}>
             <TrendingUp className="h-3 w-3" /> {successPct}% successes
           </span>
         </div>
@@ -137,15 +146,23 @@ export function OutsideViewCard({ sector, ticketSize }: OutsideViewCardProps) {
 
 function MatchBadge({ matchedBy }: { matchedBy: 'industry+stakes' | 'industry' | 'global' }) {
   const config = {
-    'industry+stakes': {
-      label: 'Industry + stakes',
-      color: 'bg-green-500/10 text-green-600 border-green-500/30',
-    },
-    industry: { label: 'Industry match', color: 'bg-blue-500/10 text-blue-600 border-blue-500/30' },
-    global: { label: 'Global base rate', color: 'bg-muted text-muted-foreground border-border' },
+    'industry+stakes': { label: 'Industry + stakes', seed: 'var(--success)' as string | null },
+    industry: { label: 'Industry match', seed: 'var(--info)' as string | null },
+    global: { label: 'Global base rate', seed: null as string | null },
   }[matchedBy];
+  const style: React.CSSProperties = config.seed
+    ? {
+        background: `color-mix(in srgb, ${config.seed} 10%, transparent)`,
+        color: config.seed,
+        borderColor: `color-mix(in srgb, ${config.seed} 30%, transparent)`,
+      }
+    : {
+        background: 'var(--bg-tertiary)',
+        color: 'var(--text-muted)',
+        borderColor: 'var(--border-color)',
+      };
   return (
-    <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${config.color}`}>
+    <span className="rounded-md border px-2 py-0.5 text-xs font-medium" style={style}>
       {config.label}
     </span>
   );

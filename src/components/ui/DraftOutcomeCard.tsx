@@ -21,17 +21,23 @@ function formatSource(source: string): string {
   return source.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function outcomeBadge(outcome: string): string {
-  switch (outcome) {
-    case 'success':
-      return 'bg-green-500/15 text-green-400';
-    case 'partial_success':
-      return 'bg-yellow-500/15 text-yellow-400';
-    case 'failure':
-      return 'bg-red-500/15 text-red-400';
-    default:
-      return 'bg-muted text-muted-foreground';
+// CSS-var seed per outcome (light-theme safe); tint via color-mix.
+function outcomeBadge(outcome: string): React.CSSProperties {
+  const seed =
+    outcome === 'success'
+      ? 'var(--success)'
+      : outcome === 'partial_success'
+        ? 'var(--warning)'
+        : outcome === 'failure'
+          ? 'var(--error)'
+          : null;
+  if (!seed) {
+    return { background: 'var(--bg-tertiary)', color: 'var(--text-muted)' };
   }
+  return {
+    background: `color-mix(in srgb, ${seed} 15%, transparent)`,
+    color: seed,
+  };
 }
 
 export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
@@ -97,7 +103,8 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
         <div key={draft.id} className="space-y-2">
           <div className="flex items-center gap-2">
             <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+              style={outcomeBadge(draft.outcome)}
             >
               {draft.outcome.replace(/_/g, ' ')}
             </span>

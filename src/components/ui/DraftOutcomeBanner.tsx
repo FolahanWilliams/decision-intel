@@ -74,17 +74,20 @@ function relativeTime(iso: string): string {
   return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
 }
 
-function outcomeBadge(outcome: string): string {
-  switch (outcome) {
-    case 'success':
-      return 'bg-green-500/15 text-green-400';
-    case 'partial_success':
-      return 'bg-yellow-500/15 text-yellow-400';
-    case 'failure':
-      return 'bg-red-500/15 text-red-400';
-    default:
-      return 'bg-muted text-muted-foreground';
+// CSS-var seed per outcome (light-theme safe); tint via color-mix.
+function outcomeBadge(outcome: string): React.CSSProperties {
+  const seed =
+    outcome === 'success'
+      ? 'var(--success)'
+      : outcome === 'partial_success'
+        ? 'var(--warning)'
+        : outcome === 'failure'
+          ? 'var(--error)'
+          : null;
+  if (!seed) {
+    return { background: 'var(--bg-tertiary)', color: 'var(--text-muted)' };
   }
+  return { background: `color-mix(in srgb, ${seed} 15%, transparent)`, color: seed };
 }
 
 export function DraftOutcomeBanner() {
@@ -198,7 +201,12 @@ export function DraftOutcomeBanner() {
         <div className="mt-3 space-y-3">
           {actionError && (
             <div
-              className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-400"
+              className="rounded-md border px-3 py-2 text-xs"
+              style={{
+                borderColor: 'color-mix(in srgb, var(--error) 20%, transparent)',
+                background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+                color: 'var(--error)',
+              }}
               role="alert"
             >
               {actionError}
@@ -216,7 +224,8 @@ export function DraftOutcomeBanner() {
                   )}
                 </div>
                 <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}
+                  className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                  style={outcomeBadge(draft.outcome)}
                 >
                   {draft.outcome.replace(/_/g, ' ')}
                 </span>

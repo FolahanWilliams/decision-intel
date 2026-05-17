@@ -68,7 +68,7 @@ export function RecommendationsPanel({ analysisId }: RecommendationsPanelProps) 
   return (
     <div className="mt-6">
       <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
-        <Lightbulb size={14} className="text-amber-400" />
+        <Lightbulb size={14} style={{ color: 'var(--warning)' }} />
         Graph Recommendations
       </h3>
       <div className="space-y-2">
@@ -83,9 +83,17 @@ export function RecommendationsPanel({ analysisId }: RecommendationsPanelProps) 
           >
             <div className="flex items-start gap-2">
               {rec.type === 'warning' ? (
-                <AlertTriangle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                <AlertTriangle
+                  size={14}
+                  className="mt-0.5 shrink-0"
+                  style={{ color: 'var(--error)' }}
+                />
               ) : (
-                <CheckCircle size={14} className="text-green-400 mt-0.5 shrink-0" />
+                <CheckCircle
+                  size={14}
+                  className="mt-0.5 shrink-0"
+                  style={{ color: 'var(--success)' }}
+                />
               )}
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-foreground mb-1">{rec.title}</div>
@@ -98,7 +106,8 @@ export function RecommendationsPanel({ analysisId }: RecommendationsPanelProps) 
                   </span>
                   <Link
                     href={`/documents/${rec.relatedDocumentId}`}
-                    className="flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300"
+                    className="flex items-center gap-1 text-[10px]"
+                    style={{ color: 'var(--info)' }}
                   >
                     View decision <ArrowRight size={10} />
                   </Link>

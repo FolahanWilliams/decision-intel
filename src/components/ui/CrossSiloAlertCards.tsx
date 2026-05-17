@@ -60,11 +60,11 @@ const PATTERN_CONFIG: Record<string, { icon: typeof Layers; label: string; accen
     },
   };
 
-function getSeverityStyle(severity: number) {
-  if (severity >= 70) return { border: 'border-red-500/30', bg: 'bg-red-500/5', dot: 'bg-red-400' };
-  if (severity >= 40)
-    return { border: 'border-amber-500/30', bg: 'bg-amber-500/5', dot: 'bg-amber-400' };
-  return { border: 'border-green-500/30', bg: 'bg-green-500/5', dot: 'bg-green-400' };
+// CSS-var seed per severity band (light-theme safe); tints via color-mix.
+function getSeverityStyle(severity: number): { seed: string } {
+  if (severity >= 70) return { seed: 'var(--error)' };
+  if (severity >= 40) return { seed: 'var(--severity-high)' };
+  return { seed: 'var(--success)' };
 }
 
 export function CrossSiloAlertCards({ antiPatterns, onExplorePattern }: CrossSiloAlertCardsProps) {
@@ -108,19 +108,24 @@ function AlertCard({
   const Icon = config.icon;
   const style = getSeverityStyle(pattern.severity);
 
-  const accentColors: Record<string, { icon: string; label: string }> = {
-    purple: { icon: 'text-purple-400', label: 'text-purple-300' },
-    amber: { icon: 'text-amber-400', label: 'text-amber-300' },
-    red: { icon: 'text-red-400', label: 'text-red-300' },
-    orange: { icon: 'text-orange-400', label: 'text-orange-300' },
-    yellow: { icon: 'text-yellow-400', label: 'text-yellow-300' },
+  // CSS-var seed per accent (light-theme safe) — not literal palette.
+  const accentSeeds: Record<string, string> = {
+    purple: 'var(--accent-secondary)',
+    amber: 'var(--warning)',
+    red: 'var(--error)',
+    orange: 'var(--warning)',
+    yellow: 'var(--warning)',
   };
-  const accent = accentColors[config.accentClass] ?? accentColors.amber;
+  const accentSeed = accentSeeds[config.accentClass] ?? accentSeeds.amber;
 
   return (
     <div
-      className={`rounded-lg border ${style.border} ${style.bg} overflow-hidden transition-all duration-200`}
-      style={{ animationDelay: `${delay}ms` }}
+      className="rounded-lg border overflow-hidden transition-all duration-200"
+      style={{
+        animationDelay: `${delay}ms`,
+        borderColor: `color-mix(in srgb, ${style.seed} 30%, transparent)`,
+        background: `color-mix(in srgb, ${style.seed} 5%, transparent)`,
+      }}
     >
       <button
         onClick={() => setExpanded(p => !p)}
@@ -129,13 +134,16 @@ function AlertCard({
       >
         {/* Severity dot */}
         <div className="flex-shrink-0 mt-0.5">
-          <div className={`w-2 h-2 rounded-full ${style.dot}`} />
+          <div className="w-2 h-2 rounded-full" style={{ background: style.seed }} />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <Icon size={14} className={accent.icon} />
-            <span className={`text-xs font-semibold capitalize ${accent.label}`}>
+            <Icon size={14} style={{ color: accentSeed }} />
+            <span
+              className="text-xs font-semibold capitalize"
+              style={{ color: accentSeed }}
+            >
               {config.label}
             </span>
             <span className="text-[10px] text-muted-foreground ml-auto">
@@ -164,7 +172,8 @@ function AlertCard({
                 e.stopPropagation();
                 onExplore(pattern.nodeIds!);
               }}
-              className="inline-flex items-center gap-1.5 text-[11px] font-medium text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors"
+              style={{ color: 'var(--info)' }}
             >
               <ExternalLink size={11} />
               Explore affected decisions

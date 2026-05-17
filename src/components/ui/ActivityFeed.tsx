@@ -58,18 +58,20 @@ const activityIcons: Record<string, React.ComponentType<{ className?: string }>>
   outcome: CheckCircle,
 };
 
+// CSS-var seeds (light-theme safe), applied via inline style — not
+// literal Tailwind palette classes (the washout class).
 const activityColors: Record<string, string> = {
-  analysis: 'text-blue-500',
-  analysis_complete: 'text-green-500',
-  analysis_error: 'text-red-500',
-  alert: 'text-red-500',
-  success: 'text-green-500',
-  pending: 'text-orange-500',
-  trend: 'text-purple-500',
-  team: 'text-indigo-500',
-  upload: 'text-blue-500',
-  nudge: 'text-purple-500',
-  outcome: 'text-green-500',
+  analysis: 'var(--info)',
+  analysis_complete: 'var(--success)',
+  analysis_error: 'var(--error)',
+  alert: 'var(--error)',
+  success: 'var(--success)',
+  pending: 'var(--warning)',
+  trend: 'var(--accent-secondary)',
+  team: 'var(--info)',
+  upload: 'var(--info)',
+  nudge: 'var(--accent-secondary)',
+  outcome: 'var(--success)',
 };
 
 export function ActivityFeed({ activities, className, compact = false }: ActivityFeedProps) {
@@ -104,7 +106,7 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
               e.currentTarget.style.background = 'transparent';
             }}
           >
-            <div className={cn('flex-shrink-0 mt-0.5', iconColor)}>
+            <div className="flex-shrink-0 mt-0.5" style={{ color: iconColor }}>
               <Icon className={cn('w-5 h-5', compact && 'w-4 h-4')} />
             </div>
 
