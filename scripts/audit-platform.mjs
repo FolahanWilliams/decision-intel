@@ -70,6 +70,14 @@
  *       fan-out (no leading `await`) are parallel and NOT flagged.
  *       Encodes the "structure-passes-but-runtime-hangs" miss the
  *       structural checks above are blind to by design.
+ *     - sequential-io-loop-pipeline-path (added 2026-05-17, the
+ *       unbounded sibling of the above): a `for…of`/`.forEach`/`while`
+ *       on the audit path whose body `await`s a Prisma/LLM/fetch call
+ *       — N serial round-trips (the 2026-05-17 news-sync's 210 serial
+ *       upserts + 11 serial Gemini batches). `Promise.all`/
+ *       `batchProcess` concurrency + `for await (…stream)` consumption
+ *       are NOT flagged; inline `// audit-allow-sequential` opts out a
+ *       deliberately-serial loop.
  *
  * Usage:
  *   node scripts/audit-platform.mjs                  # stderr report
@@ -927,6 +935,60 @@ function checkBlockingAwaitOnPipelinePath(files) {
   return findings;
 }
 
+// Sequential I/O inside a loop on the audit critical path is the
+// unbounded sibling of the blocking-timeout class: a `for…of` /
+// `.forEach` / `while` whose body `await`s a Prisma/LLM/fetch call
+// runs N round-trips serially (the 2026-05-17 news-sync had this exact
+// shape — 210 serial upserts + 11 serial Gemini batches). The
+// blocking-await check above only catches a >=20s `withTimeout`; this
+// catches the unbounded-loop form. Correct concurrency
+// (`Promise.all`/`Promise.allSettled`/`batchProcess`) and stream
+// consumption (`for await (… of result.stream)`) are NOT flagged.
+// Indentation-based body detection is reliable post the repo-wide
+// prettier pass (2-space, enforced).
+const LOOP_HEAD = /^(\s*)(?:for\s*\(|while\s*\(|[\w.]+\.forEach\s*\()/;
+const FOR_AWAIT_HEAD = /^\s*for\s+await\s*\(/;
+const AWAIT_IO =
+  /\bawait\s+[^;]*\b(?:prisma\.\w+\.(?:create|createMany|update|updateMany|upsert|delete|deleteMany|findFirst|findUnique|findMany|count|aggregate|groupBy)|fetch\(|generateText\(|generateChat\(|streamText\(|streamChat\()/;
+const SAFE_CONCURRENCY = /\b(?:Promise\.all|Promise\.allSettled|batchProcess|p[Mm]ap|mapLimit)\b/;
+function checkSequentialIoLoopOnPipelinePath(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!PIPELINE_PATH.test(rel) || rel.endsWith('.test.ts')) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const head = lines[i].match(LOOP_HEAD);
+      if (!head || FOR_AWAIT_HEAD.test(lines[i]) || SAFE_CONCURRENCY.test(lines[i])) continue;
+      // Inline opt-out: a deliberately-sequential loop annotates itself.
+      if (/audit-allow-sequential/.test(lines[i]) || (i > 0 && /audit-allow-sequential/.test(lines[i - 1]))) continue;
+      const headIndent = head[1].length;
+      // Walk the loop body by indentation (prettier-normalised 2-space).
+      for (let j = i + 1; j < Math.min(i + 80, lines.length); j++) {
+        const ln = lines[j];
+        if (ln.trim() === '') continue;
+        const indent = ln.length - ln.trimStart().length;
+        if (indent <= headIndent) break; // loop body ended
+        if (SAFE_CONCURRENCY.test(ln)) break; // body delegates to bounded concurrency
+        if (AWAIT_IO.test(ln)) {
+          findings.push({
+            category: 'critical',
+            severity: 'high',
+            rule: 'sequential-io-loop-pipeline-path',
+            file: rel,
+            line: j + 1,
+            snippet: ln.trim().slice(0, 140),
+            suggestion: `await I/O (Prisma/LLM/fetch) inside a loop on the audit critical path runs N serial round-trips. Use the canonical batchProcess helper at a concurrency cap, or Promise.all over a bounded map. If genuinely sequential-by-design, add an inline \`// audit-allow-sequential\` marker. See the "Friction audit #4" CLAUDE.md lock.`,
+          });
+          break; // one finding per loop is enough
+        }
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -951,6 +1013,7 @@ function runAllChecks() {
     ...checkLockedCountDrift(files),
     ...checkStaticAssetLink(files),
     ...checkBlockingAwaitOnPipelinePath(files),
+    ...checkSequentialIoLoopOnPipelinePath(files),
   ];
 
   return allFindings;
