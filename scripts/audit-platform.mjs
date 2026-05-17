@@ -78,6 +78,15 @@
  *       `batchProcess` concurrency + `for await (…stream)` consumption
  *       are NOT flagged; inline `// audit-allow-sequential` opts out a
  *       deliberately-serial loop.
+ *     - tailwind-literal-palette (added 2026-05-17 after IntelligenceBrief
+ *       shipped a washed-out box past the dark-mode check): literal
+ *       Tailwind palette colours (`text-red-400` / `bg-blue-500` /
+ *       `text-emerald-400`) on a platform component — a FIXED hue that
+ *       ignores the light-only theme. The `<prop>-<colour>-<NNN>` shape
+ *       cannot match the legit shadcn token family (no numeric suffix),
+ *       so it's precise by construction. viz / marketing / dpr / demo /
+ *       glass allowlisted; dark-severity-card interiors + an
+ *       `intentional-dark` file-header opt out.
  *
  * Usage:
  *   node scripts/audit-platform.mjs                  # stderr report
@@ -1012,6 +1021,56 @@ function checkSequentialIoLoopOnPipelinePath(files) {
   return findings;
 }
 
+// Literal Tailwind palette colours (`text-red-400`, `bg-blue-500`,
+// `text-emerald-400`, `bg-red-500/10` …) on a platform component are the
+// IntelligenceBrief washout class: a FIXED hue that ignores the light
+// theme + CLAUDE.md's "use var(--…) / shadcn token, never literal
+// palette" rule. The regex shape `<prop>-<colour>-<NNN>` CANNOT match
+// the legitimate shadcn token family (`text-foreground`,
+// `text-muted-foreground`, `bg-muted`, `border-border`, `bg-secondary`,
+// `text-destructive` — no numeric palette suffix), so this is precise
+// by construction. Reuses the dark-mode allowlist (viz / marketing /
+// dpr / demo / glass legitimately use rich or literal palettes), the
+// dark-severity-card interior skip, comment skip, and the
+// `intentional-dark` / `light-theme-exempt` file-header opt-out.
+const TW_LITERAL_PALETTE =
+  /\b(?:text|bg|border|ring|fill|stroke|divide|from|to|via)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:300|400|500|600|700)\b/;
+function checkTailwindLiteralPalette(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!rel.startsWith('src/')) continue;
+    if (!/\.(tsx?|jsx?)$/.test(rel)) continue;
+    if (rel.includes('.test.') || rel.includes('.spec.')) continue;
+    if (rel.includes('scripts/audit-platform')) continue;
+    if (DARK_TOKEN_ALLOWED_PREFIXES.some(p => rel.startsWith(p))) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    const fileHeader = lines.slice(0, 30).join('\n');
+    if (/light-theme-exempt|intentional-dark/.test(fileHeader)) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^\s*[/*]/.test(line)) continue; // comment
+      // Interior of a dark-wrapped severity card legitimately uses
+      // literal palette (CLAUDE.md visualization light-theme audit rule).
+      if (/bg-(red|amber|yellow|emerald|rose|violet)-9\d\d/.test(line)) continue;
+      if (TW_LITERAL_PALETTE.test(line)) {
+        findings.push({
+          category: 'visual',
+          severity: 'medium',
+          rule: 'tailwind-literal-palette',
+          file: rel,
+          line: i + 1,
+          snippet: line.trim().slice(0, 140),
+          suggestion:
+            'Literal Tailwind palette colour on a platform surface ignores the light-only theme (the IntelligenceBrief washout class). Use a CSS var inline (var(--error)/var(--info)/var(--text-secondary)/color-mix(...)) or the shadcn token family (text-foreground / text-muted-foreground / bg-muted / border-border). viz/marketing/dpr/demo are allowlisted; a deliberate dark section opts out with an intentional-dark file-header marker.',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -1037,6 +1096,7 @@ function runAllChecks() {
     ...checkStaticAssetLink(files),
     ...checkBlockingAwaitOnPipelinePath(files),
     ...checkSequentialIoLoopOnPipelinePath(files),
+    ...checkTailwindLiteralPalette(files),
   ];
 
   return allFindings;

@@ -25,14 +25,16 @@ interface RelatedNode {
   createdAt: string;
 }
 
+// CSS-var seed per edge (light-theme safe), applied via inline style —
+// NOT literal Tailwind palette classes (the washout class).
 const EDGE_LABELS: Record<string, { label: string; color: string }> = {
-  similar_to: { label: 'Similar', color: 'text-blue-400' },
-  shared_bias: { label: 'Shared bias', color: 'text-purple-400' },
-  same_participants: { label: 'Same team', color: 'text-teal-400' },
-  influenced_by: { label: 'Influenced by', color: 'text-muted-foreground' },
-  escalated_from: { label: 'Escalated from', color: 'text-orange-400' },
-  reversed: { label: 'Reversed', color: 'text-red-400' },
-  depends_on: { label: 'Depends on', color: 'text-muted-foreground' },
+  similar_to: { label: 'Similar', color: 'var(--info)' },
+  shared_bias: { label: 'Shared bias', color: 'var(--accent-secondary)' },
+  same_participants: { label: 'Same team', color: 'var(--success)' },
+  influenced_by: { label: 'Influenced by', color: 'var(--text-muted)' },
+  escalated_from: { label: 'Escalated from', color: 'var(--warning)' },
+  reversed: { label: 'Reversed', color: 'var(--error)' },
+  depends_on: { label: 'Depends on', color: 'var(--text-muted)' },
 };
 
 interface RelatedDecisionsProps {
@@ -161,7 +163,10 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
                   <div className="text-sm text-foreground truncate">{node.label}</div>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                     {edgeStyle && (
-                      <span className={`${edgeStyle.color} flex items-center gap-1`}>
+                      <span
+                        className="flex items-center gap-1"
+                        style={{ color: edgeStyle.color }}
+                      >
                         <Link2 size={10} />
                         {edgeStyle.label}
                       </span>

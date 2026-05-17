@@ -17,28 +17,20 @@ interface BiologicalRiskBadgeProps {
 interface BadgeConfig {
   label: string;
   icon: typeof Trophy;
-  bgClass: string;
-  textClass: string;
-  pulseClass: string;
-  borderClass: string;
+  /** Single CSS-var seed colour; tints derived via color-mix (light-theme safe). */
+  color: string;
 }
 
 const BADGE_CONFIG: Record<string, BadgeConfig> = {
   winner_effect: {
     label: 'Winner Effect',
     icon: Trophy,
-    bgClass: 'bg-amber-500/15',
-    textClass: 'text-amber-400',
-    pulseClass: 'bg-amber-400',
-    borderClass: 'border-amber-500/30',
+    color: 'var(--warning)',
   },
   stress_cortisol: {
     label: 'Stress Response',
     icon: HeartPulse,
-    bgClass: 'bg-red-500/15',
-    textClass: 'text-red-400',
-    pulseClass: 'bg-red-400',
-    borderClass: 'border-red-500/30',
+    color: 'var(--error)',
   },
 };
 
@@ -83,7 +75,12 @@ function SingleBadge({
     <div className="relative">
       <button
         type="button"
-        className={`inline-flex items-center rounded-full border font-medium ${config.bgClass} ${config.textClass} ${config.borderClass} ${sizeClasses} cursor-default transition-opacity hover:opacity-90`}
+        className={`inline-flex items-center rounded-full border font-medium ${sizeClasses} cursor-default transition-opacity hover:opacity-90`}
+        style={{
+          background: `color-mix(in srgb, ${config.color} 15%, transparent)`,
+          color: config.color,
+          borderColor: `color-mix(in srgb, ${config.color} 30%, transparent)`,
+        }}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         onFocus={() => setShowTooltip(true)}
@@ -92,11 +89,12 @@ function SingleBadge({
         {/* Pulsing dot */}
         <span className="relative flex" style={{ width: pulseSize, height: pulseSize }}>
           <span
-            className={`animate-ping absolute inset-0 rounded-full ${config.pulseClass} opacity-50`}
+            className="animate-ping absolute inset-0 rounded-full opacity-50"
+            style={{ background: config.color }}
           />
           <span
-            className={`relative inline-flex rounded-full ${config.pulseClass}`}
-            style={{ width: pulseSize, height: pulseSize }}
+            className="relative inline-flex rounded-full"
+            style={{ width: pulseSize, height: pulseSize, background: config.color }}
           />
         </span>
         <Icon size={iconSize} />
@@ -115,7 +113,7 @@ function SingleBadge({
             color: 'var(--text-secondary)',
           }}
         >
-          <div className={`font-semibold mb-1 ${config.textClass}`}>
+          <div className="font-semibold mb-1" style={{ color: config.color }}>
             {config.label} Detected (+{amplification}% amplification)
           </div>
           <p>{signal.description}</p>
