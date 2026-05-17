@@ -111,13 +111,14 @@ export function BiasGenomeBenchmark() {
                         {delta !== null && (
                           <span className="flex items-center gap-0.5">
                             {isBetter ? (
-                              <TrendingDown size={10} className="text-emerald-400" />
+                              <TrendingDown size={10} style={{ color: 'var(--success)' }} />
                             ) : isWorse ? (
-                              <TrendingUp size={10} className="text-red-400" />
+                              <TrendingUp size={10} style={{ color: 'var(--error)' }} />
                             ) : null}
                             {(isBetter || isWorse) && (
                               <span
-                                className={`text-[10px] font-mono ${isBetter ? 'text-emerald-400' : 'text-red-400'}`}
+                                className="text-[10px] font-mono"
+                                style={{ color: isBetter ? 'var(--success)' : 'var(--error)' }}
                               >
                                 {delta > 0 ? '+' : ''}
                                 {delta.toFixed(0)}%
@@ -223,7 +224,7 @@ export function BiasGenomeBenchmark() {
                       <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                         {formatBiasName(b.biasType)}
                       </span>
-                      <span className="text-[11px] font-mono text-red-400">
+                      <span className="text-[11px] font-mono" style={{ color: 'var(--error)' }}>
                         {b.costDelta.toFixed(1)}% success rate impact
                       </span>
                     </div>

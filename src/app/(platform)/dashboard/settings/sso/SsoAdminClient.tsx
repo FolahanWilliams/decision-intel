@@ -34,21 +34,10 @@ const STATUS_STYLES: Record<
   SsoConfig['status'],
   { label: string; badge: string; icon: typeof CheckCircle }
 > = {
-  active: {
-    label: 'Active',
-    badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-    icon: CheckCircle,
-  },
-  pending: {
-    label: 'Pending — not yet activated',
-    badge: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-    icon: CircleAlert,
-  },
-  disabled: {
-    label: 'Disabled',
-    badge: 'bg-red-500/10 text-red-300 border-red-500/20',
-    icon: XCircle,
-  },
+  // `badge` is a CSS-var seed (light-theme safe); tint via color-mix.
+  active: { label: 'Active', badge: 'var(--success)', icon: CheckCircle },
+  pending: { label: 'Pending — not yet activated', badge: 'var(--warning)', icon: CircleAlert },
+  disabled: { label: 'Disabled', badge: 'var(--error)', icon: XCircle },
 };
 
 export function SsoAdminClient({ orgs }: Props) {
@@ -435,7 +424,12 @@ export function SsoAdminClient({ orgs }: Props) {
                             {c.displayName ?? c.domain}
                           </span>
                           <span
-                            className={`text-xs px-2 py-0.5 rounded-full border inline-flex items-center gap-1 ${statusStyle.badge}`}
+                            className="text-xs px-2 py-0.5 rounded-full border inline-flex items-center gap-1"
+                            style={{
+                              background: `color-mix(in srgb, ${statusStyle.badge} 14%, transparent)`,
+                              color: statusStyle.badge,
+                              borderColor: `color-mix(in srgb, ${statusStyle.badge} 30%, transparent)`,
+                            }}
                           >
                             <StatusIcon size={10} /> {statusStyle.label}
                           </span>

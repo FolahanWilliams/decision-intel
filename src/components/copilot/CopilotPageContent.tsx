@@ -483,7 +483,10 @@ export function CopilotPageContent() {
                 }}
               >
                 {s.status === 'resolved' ? (
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-500" />
+                  <CheckCircle2
+                    className="h-4 w-4 flex-shrink-0"
+                    style={{ color: 'var(--success)' }}
+                  />
                 ) : (
                   <Brain className="h-4 w-4 flex-shrink-0" />
                 )}
@@ -498,7 +501,9 @@ export function CopilotPageContent() {
                     <span style={{ color: 'var(--text-muted)' }}>|</span>
                     <span>{s.turnCount} turns</span>
                     {s.status === 'resolved' && (
-                      <span className="text-green-500 font-medium">Resolved</span>
+                      <span className="font-medium" style={{ color: 'var(--success)' }}>
+                        Resolved
+                      </span>
                     )}
                     {s.dqiScore != null && (
                       <>

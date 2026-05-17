@@ -132,16 +132,16 @@ export default async function AuditLogPage({
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {log.action === 'EXPORT_PDF' && (
-                            <Download size={14} className="text-blue-500" />
+                            <Download size={14} style={{ color: 'var(--info)' }} />
                           )}
                           {log.action === 'SCAN_DOCUMENT' && (
-                            <Search size={14} className="text-green-500" />
+                            <Search size={14} style={{ color: 'var(--success)' }} />
                           )}
                           {log.action === 'VIEW_DOCUMENT' && (
-                            <FileText size={14} className="text-orange-500" />
+                            <FileText size={14} style={{ color: 'var(--warning)' }} />
                           )}
                           {log.action === 'LOGIN' && (
-                            <LogIn size={14} className="text-purple-500" />
+                            <LogIn size={14} style={{ color: 'var(--accent-secondary)' }} />
                           )}
                           <span className="font-medium text-sm">{log.action}</span>
                         </div>
@@ -178,15 +178,15 @@ export default async function AuditLogPage({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {log.action === 'EXPORT_PDF' && (
-                          <Download size={14} className="text-blue-500" />
+                          <Download size={14} style={{ color: 'var(--info)' }} />
                         )}
                         {log.action === 'SCAN_DOCUMENT' && (
-                          <Search size={14} className="text-green-500" />
+                          <Search size={14} style={{ color: 'var(--success)' }} />
                         )}
                         {log.action === 'VIEW_DOCUMENT' && (
-                          <FileText size={14} className="text-orange-500" />
+                          <FileText size={14} style={{ color: 'var(--warning)' }} />
                         )}
-                        {log.action === 'LOGIN' && <LogIn size={14} className="text-purple-500" />}
+                        {log.action === 'LOGIN' && <LogIn size={14} style={{ color: 'var(--accent-secondary)' }} />}
                         <span className="font-medium text-sm">{log.action}</span>
                       </div>
                       <span className="badge badge-secondary text-xs">{log.resource}</span>

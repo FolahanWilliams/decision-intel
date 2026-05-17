@@ -20,9 +20,12 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
   };
 
   return (
-    <div className="card animate-fade-in mt-6 border-l-4 border-l-purple-500">
+    <div
+      className="card animate-fade-in mt-6 border-l-4"
+      style={{ borderLeftColor: 'var(--accent-secondary)' }}
+    >
       <div className="card-header flex items-center gap-2 pb-2 border-b border-border/50">
-        <History className="w-5 h-5 text-purple-500" />
+        <History className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
         <h3 className="text-lg font-semibold">Institutional Memory</h3>
         <span
           className="ml-auto text-xs text-muted bg-surface-hover px-2 py-0.5"
@@ -47,7 +50,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
             memory.similarEvents.map((event, idx) => (
               <div
                 key={idx}
-                className="group relative bg-surface p-3 border border-border hover:border-purple-500/50 transition-colors"
+                className="group relative bg-surface p-3 border border-border hover:border-[var(--accent-secondary)] transition-colors"
               >
                 <div className="flex justify-between items-start mb-1">
                   <div className="flex items-center gap-2">
@@ -77,7 +80,9 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
                 </div>
 
                 <div className="text-xs bg-surface-hover p-2 text-foreground/80">
-                  <span className="font-semibold text-purple-400">Lesson:</span>{' '}
+                  <span className="font-semibold" style={{ color: 'var(--accent-secondary)' }}>
+                    Lesson:
+                  </span>{' '}
                   {event.lessonLearned}
                 </div>
               </div>
