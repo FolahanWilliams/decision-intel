@@ -12,11 +12,17 @@
 
 import type { Status } from './positioning-copilot';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 // Derived — "30+ biases" + "DI-B-001–020" deprecated/stale per CR-3 +
 // the Kahneman-Klein sprint (DI-B-021/022). Founder-rehearsal surface.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 const BIAS_ID_RANGE = `DI-B-001–${String(BIAS_COUNT).padStart(3, '0')}`;
+// Derive the matrix dimension + combination count from the engine so
+// the demo script can never drift (the M-1 regression: "20×20 / 400"
+// while the engine ran 22×22 / 484). MATRIX_DIMENSION = 22 today.
+const MATRIX = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
+const MATRIX_COMBINATIONS = MATRIX_DIMENSION * MATRIX_DIMENSION;
 
 // ─── Framework 1 — 5 Levels of Entrepreneurship Thinking ───────────────────
 
@@ -284,8 +290,7 @@ export const BRAND_STEPS: BrandStep[] = [
     step: 5,
     title: 'Execution & Credibility',
     question: 'Do you have proof points to back up your claims?',
-    diAnswer:
-      `Retrospective 143-case library. Published bias taxonomy (${BIAS_ID_RANGE}). /proof page with live detection demos. GAP: no paying pilot yet.`,
+    diAnswer: `Retrospective 143-case library. Published bias taxonomy (${BIAS_ID_RANGE}). /proof page with live detection demos. GAP: no paying pilot yet.`,
     status: 'partial',
     ifWeak: 'Brand gap. Fix operations or delivery. Collect proof stories and facts.',
   },
@@ -388,8 +393,7 @@ export const STORY_STEPS: StoryStep[] = [
     byContext: {
       cold_email: 'Link to /proof with the Kodak pre-decision memo + the 4 biases we flagged.',
       demo: 'Walk through the 12-node pipeline on THEIR document. Every flag has a citation to the passage that triggered it.',
-      pitch:
-        `143 historical decisions. ${BIAS_COUNT}-bias taxonomy. Published academic foundations (Kahneman, Tetlock).`,
+      pitch: `143 historical decisions. ${BIAS_COUNT}-bias taxonomy. Published academic foundations (Kahneman, Tetlock).`,
     },
   },
   {
@@ -401,7 +405,7 @@ export const STORY_STEPS: StoryStep[] = [
     byContext: {
       cold_email:
         '"CSO average tenure is 3 years. One bad board recommendation ends most careers."',
-      demo: 'Show the 20×20 bias interaction matrix — 400 toxic combinations the buyer has never seen mapped.',
+      demo: `Show the ${MATRIX} bias interaction matrix — ${MATRIX_COMBINATIONS} toxic combinations the buyer has never seen mapped.`,
       pitch:
         '$22.5M ARR at 5% penetration of the 15,000-company target TAM. ~90% blended gross margin.',
     },

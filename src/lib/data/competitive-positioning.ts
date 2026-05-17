@@ -3,8 +3,13 @@
 // so the new visual presentation preserves every quote, file reference, and number.
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+// Derive the matrix dimension so investor-facing copy can never drift
+// from the engine (the M-1 regression: copy said 20×20 / 400 combos
+// while the engine ran 22×22 / 484). MATRIX_DIMENSION = 22 today.
+const MATRIX = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 // ─── Elevator pitch + Cloverpop contrast ──────────────────────────────────
 
@@ -123,8 +128,7 @@ export const MOAT_LAYERS: MoatLayer[] = [
     name: 'Compound Scoring Engine',
     strength: 'high',
     timeline: 'Day 1',
-    description:
-      'Post-LLM deterministic layer: 20x20 bias interaction matrix, contextual multipliers (dissent absent = 1.25x, time pressure = 1.15x), biological signal detection (Winner Effect, cortisol stress patterns).',
+    description: `Post-LLM deterministic layer: ${MATRIX} bias interaction matrix, contextual multipliers (dissent absent = 1.25x, time pressure = 1.15x), biological signal detection (Winner Effect, cortisol stress patterns).`,
     files: 'src/lib/scoring/compound-engine.ts',
     why: 'Not an LLM — pure decision science encoded as software. Requires domain expertise competitors lack.',
   },
@@ -378,8 +382,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     id: 'moat_weekend',
     topic: 'moat',
     question: "What's your moat? I can build this with OpenAI's API in a weekend hackathon.",
-    answer:
-      'A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a 20x20 bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 143 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.',
+    answer: `A weekend gets you one LLM opinion with zero noise measurement. We use 3 independent judges for Kahneman noise decomposition. We have a ${MATRIX} bias interaction matrix with contextual multipliers — dissent absent amplifies groupthink 1.25x, time pressure shifts scoring 1.15x. We detect biological signals like Winner Effect language and cortisol stress patterns. We have 143 curated case studies with cross-correlation patterns and reference class forecasting. The compound scoring engine alone is 10,000+ LOC of proprietary IP. A weekend hackathon gets you layer zero. Our moat is five layers deep.`,
     proof:
       'src/lib/scoring/compound-engine.ts — deterministic post-LLM scoring with bio-signal detection. src/lib/scoring/noise-decomposition.ts — ANOVA-framework noise measurement. src/lib/data/case-correlations.ts — cross-case statistical patterns',
   },
@@ -394,7 +397,7 @@ export const INVESTOR_QA: InvestorQA[] = [
     id: 'platform_risk',
     topic: 'defensibility',
     question: 'What if OpenAI or Anthropic just builds this into their platform?',
-    answer: `LLM providers are infrastructure, not vertical SaaS. They don't have ${FRAMEWORK_COUNT} compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 143 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the 20×20 bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + ${FRAMEWORK_COUNT}-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.`,
+    answer: `LLM providers are infrastructure, not vertical SaaS. They don't have ${FRAMEWORK_COUNT} compliance frameworks implemented (G7, EU, GCC, African markets — including NDPR, CBN, WAEMU, PoPIA), 143 case studies with outcome correlations, two production specimen DPRs (WeWork S-1 + Dangote Pan-African expansion), the per-org Brier-scored recalibration flywheel (Tetlock superforecasting research), or the ${MATRIX} bias interaction matrix with 18 named toxic combinations. It's like asking 'What if AWS builds Datadog?' The platform layer and the domain layer are different businesses. Our value is the R²F engine + ${FRAMEWORK_COUNT}-framework regulatory mapping + per-org outcome learning + Pan-African geographic moat — not the LLM inference. We swap LLM models freely (locked 2-model policy: gemini-3-flash-preview + gemini-3.1-flash-lite) — that's by design.`,
   },
   {
     id: 'traction',
@@ -517,8 +520,7 @@ export const TOP_3_DI_GAPS: DiSpaceGap[] = [
       "Cloverpop logs decisions but doesn't reason about them. Aera, Quantexa, and Pyramid Analytics surface contextual data but not the cognitive mechanics behind a human decision on that data. Generic LLM wrappers produce plausible-sounding explanations that don't actually map to the model's reasoning chain. PhD-level expertise required for current causal-DI implementations means democratisation is broken.",
     whyItBlocksValue:
       "Without causal reasoning, organisations can't confidently audit, simulate, or defend high-stakes decisions. Boards can't use the output as evidence. Auditors can't cite it. Regulators can't accept it. The platform becomes \"smart suggestions you ignore.\"",
-    howDiSolves:
-      "Recognition-Rigor Framework (R²F) operationalises Kahneman's debiasing (System 2 rigor) arbitrated with Klein's Recognition-Primed Decisions (System 1 pattern matching) — every audit attributes the reasoning to either tradition with named causal links. The 12-node LangGraph pipeline produces schema-validated outputs at each step (bias detection cites the exact paragraph; counterfactual scoring quantifies the lift; pre-mortem generates failure scenarios with prospective hindsight). The 20×20 bias interaction matrix maps named toxic combinations (e.g. confirmation × overconfidence × sunk cost = the Kodak pattern) so the explanation is mechanistically traceable, not LLM-generated post-hoc.",
+    howDiSolves: `Recognition-Rigor Framework (R²F) operationalises Kahneman's debiasing (System 2 rigor) arbitrated with Klein's Recognition-Primed Decisions (System 1 pattern matching) — every audit attributes the reasoning to either tradition with named causal links. The 12-node LangGraph pipeline produces schema-validated outputs at each step (bias detection cites the exact paragraph; counterfactual scoring quantifies the lift; pre-mortem generates failure scenarios with prospective hindsight). The ${MATRIX} bias interaction matrix maps named toxic combinations (e.g. confirmation × overconfidence × sunk cost = the Kodak pattern) so the explanation is mechanistically traceable, not LLM-generated post-hoc.`,
     diProductSurfaces: [
       'src/lib/agents/graph.ts — 12-node pipeline with deterministic glue between LLM calls',
       'src/lib/scoring/dqi.ts — composite scoring with weights traceable to research (Kahneman-Sibony, Howard-Matheson)',
@@ -724,7 +726,7 @@ export const DI_GAPS: DiGap[] = [
         proofFile: 'src/lib/causal/',
       },
       {
-        label: '20×20 bias interaction matrix',
+        label: `${MATRIX} bias interaction matrix`,
         detail:
           'Compound-risk scorer names the specific toxic pattern, not just the single bias, and maps it to a historical exemplar.',
         proofFile: 'src/lib/scoring/compound-engine.ts',

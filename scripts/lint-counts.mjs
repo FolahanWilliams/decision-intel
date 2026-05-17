@@ -78,7 +78,12 @@ const SCAN_PATHS = [
 // docs/CLAUDE-archive-2026-Q2.md). The archived sections carried 3
 // count literals in their stable prose; the archive file isn't scanned
 // by this linter, so the working-set count dropped to 77.
-const COUNT_BASELINE = 77;
+// 2026-05-17: ratcheted 77 → 75 (M-1 residual cascade / U-3.1) — the
+// founder-school + competitive-positioning `N regulatory frameworks`
+// literals were migrated to ${FRAMEWORK_COUNT} interpolation across
+// lessons.ts + competitive-positioning.ts; two fewer hardcoded counts
+// the regex catches. Reducing is encouraged.
+const COUNT_BASELINE = 75;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical

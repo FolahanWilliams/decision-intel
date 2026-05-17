@@ -46,6 +46,17 @@
  *       above pass clean on a welcome modal that's technically valid
  *       but semantically out-of-date against CLAUDE.md GTM locks; this
  *       check catches that drift class.
+ *     - locked-count-drift (added 2026-05-17 after the M-1 "cascade
+ *       COMPLETE" claim was false for 2 days): founder-USED data /
+ *       teaching surfaces hardcoding a stale matrix dimension
+ *       (`20×20` / `20x20` / `21×21` — canonical is 22×22) or the
+ *       deprecated `30+ (cognitive) bias(es)/taxonomy` / fictional
+ *       "Twenty biases plus" / "20-base" split. The count-drift lint
+ *       regex (`/(\d{1,3})\s+(biases|frameworks|…)/i`) is structurally
+ *       BLIND to these (`×` is not whitespace; "cognitive" sits
+ *       between the number and "biases"), which is exactly why M-1
+ *       stayed PARTIAL while the gates were green. History / derivation
+ *       comments are skipped.
  *
  * Usage:
  *   node scripts/audit-platform.mjs                  # stderr report
@@ -732,6 +743,91 @@ function checkOnboardingPersonaCoherence(files) {
   return findings;
 }
 
+// Founder-USED data / teaching surfaces where a stale count is a
+// credibility hit (the founder rehearses investor answers from these).
+// Conservative explicit allowlist — mirrors ONBOARDING_GATE_FILES.
+const LOCKED_COUNT_DRIFT_FILES = [
+  'src/lib/data/competitive-positioning.ts',
+  'src/lib/data/positioning-frameworks.ts',
+  'src/lib/data/founder-school/lessons.ts',
+  'src/lib/data/founder-school/visualizations.ts',
+  'src/lib/data/founder-school/research-foundations.ts',
+  'src/components/founder-hub/path-to-100m/data/category-pitch.ts',
+  // NOTE: education-room-data.ts is deliberately NOT here. It's a
+  // deprecation-TEACHING flashcard deck — its cards already derive
+  // ${BIAS_COUNT} and quote "30+ cognitive biases" precisely to drill
+  // the founder OFF it. Flagging a corrective surface for containing
+  // the string it teaches against is noise (the V-4.1 false-positive-
+  // cluster anti-pattern). The M-1 risk is ASSERT-the-count surfaces,
+  // which a "this phrasing is DEPRECATED" card is the opposite of.
+];
+
+// Stale-count patterns the count-drift lint regex is structurally blind
+// to (`×` is not whitespace; "cognitive" sits between number + "biases").
+const LOCKED_COUNT_PATTERNS = [
+  { re: /\b2[01]\s*[×x]\s*2[01]\b/, what: 'stale matrix dimension (canonical: 22×22 via MATRIX_DIMENSION)' },
+  {
+    re: /\b30\+\s*(cognitive\s+)?(biases|bias|taxonomy)\b/i,
+    what: 'deprecated "30+ bias(es)/taxonomy" (canonical: ${BIAS_COUNT}-bias via BIAS_EDUCATION)',
+  },
+  { re: /twenty\s+biases\s+plus/i, what: 'fictional "Twenty biases plus N" split (no such split exists)' },
+  { re: /\b20-base\b/i, what: 'fictional "20-base + extra-scope" split (no such split exists)' },
+];
+
+// Lines that legitimately mention the stale strings: derivation /
+// history / methodology-version / meta-comments. Documented non-fixes
+// per the M-1 lock — never re-flag these.
+const LOCKED_COUNT_SKIP_MARKERS = [
+  'Derived —',
+  'M-1 regression',
+  'extended from 20×20',
+  'stale per CR-3',
+  'deprecated per CR-3',
+  'the engine ran 22×22',
+  'regression had',
+  'methodology-version',
+  '2.2.0',
+  'deprecated',
+];
+
+function checkLockedCountDrift(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!LOCKED_COUNT_DRIFT_FILES.includes(rel)) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i];
+      const trimmed = raw.trim();
+      // Skip comment lines + documented history/derivation markers.
+      if (
+        trimmed.startsWith('//') ||
+        trimmed.startsWith('*') ||
+        trimmed.startsWith('/*') ||
+        LOCKED_COUNT_SKIP_MARKERS.some(m => raw.includes(m))
+      ) {
+        continue;
+      }
+      for (const { re, what } of LOCKED_COUNT_PATTERNS) {
+        if (re.test(raw)) {
+          findings.push({
+            category: 'stale',
+            severity: 'high',
+            rule: 'locked-count-drift',
+            file: rel,
+            line: i + 1,
+            snippet: trimmed.slice(0, 140),
+            suggestion: `Regex-blind ${what}. Derive: import MATRIX_DIMENSION from @/lib/ontology/interaction-matrix, BIAS_COUNT from BIAS_EDUCATION, FRAMEWORK_COUNT from getAllRegisteredFrameworks() — interpolate, never literal. If genuinely fixed history-prose, add a skip marker comment.`,
+          });
+          break; // one finding per line is enough
+        }
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -753,6 +849,7 @@ function runAllChecks() {
     ...checkStaleAsOfDates(files),
     ...checkDeletedReferences(files),
     ...checkOnboardingPersonaCoherence(files),
+    ...checkLockedCountDrift(files),
   ];
 
   return allFindings;

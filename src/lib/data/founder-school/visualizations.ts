@@ -13,12 +13,16 @@
 
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 // Derived — "DI-B-001 → DI-B-020 + 30+ scope" is stale + the "30+
 // scope" is a deprecated hedge (CR-3 2026-05-13). Founder rehearses
 // pipeline architecture from this surface; the count must be canonical.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 const BIAS_ID_RANGE = `DI-B-001 → DI-B-${String(BIAS_COUNT).padStart(3, '0')}`;
+// Matrix dimension derived from the engine — the M-1 regression had
+// this surface saying 20×20 while the engine ran 22×22.
+const MATRIX = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
@@ -1251,7 +1255,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
   },
   pf_6: {
     type: 'matrix',
-    caption: '20×20 bias-interaction matrix — why combinations are multiplicatively worse.',
+    caption: `${MATRIX} bias-interaction matrix — why combinations are multiplicatively worse.`,
     rows: ['Confirmation', 'Overconfidence', 'Sunk cost', 'Anchoring'],
     cols: ['Confirmation', 'Overconfidence', 'Sunk cost', 'Anchoring'],
     cells: [
@@ -1280,7 +1284,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
       { label: 'GDPR anonymiser', detail: 'Strips PII before any external call.' },
       { label: 'Structurer', detail: 'Parses memo into sections.' },
       { label: 'Intelligence gatherer', detail: 'Pulls external context.' },
-      { label: 'Bias detector', detail: 'Flags 30+ taxonomy matches.' },
+      { label: 'Bias detector', detail: `Flags ${BIAS_COUNT}-bias taxonomy matches.` },
       { label: '3-judge noise', detail: 'Parallel noise measurement.', emphasis: true },
       { label: 'Logical coherence', detail: 'Argument-validity check.' },
       { label: 'Pre-mortem', detail: 'Generates failure scenarios.' },
@@ -1290,7 +1294,7 @@ const VIZ_PLATFORM_FOUNDATIONS: Record<string, LessonViz> = {
         label: 'Compliance mapper',
         detail: `Cross-links ${FRAMEWORK_COUNT} frameworks (G7 + EU + GCC + African).`,
       },
-      { label: 'Compound-risk scorer', detail: 'Applies 20×20 matrix.' },
+      { label: 'Compound-risk scorer', detail: `Applies ${MATRIX} matrix.` },
       { label: 'Verdict synthesiser', detail: 'DQI + exec summary.', emphasis: true },
     ],
   },
