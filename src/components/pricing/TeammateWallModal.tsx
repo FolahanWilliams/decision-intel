@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import { Check, ArrowRight, Users, Network, Shield, MessageSquare } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface TeammateWallModalProps {
   open: boolean;

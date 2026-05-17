@@ -32,18 +32,16 @@ describe('classifyValidity — base document-type mapping', () => {
   });
 
   it('maps canonical document types to their documented bands', () => {
-    expect(classifyValidity({ documentType: 'ic_memo', industry: null }).validityClass).toBe(
-      'low'
-    );
+    expect(classifyValidity({ documentType: 'ic_memo', industry: null }).validityClass).toBe('low');
     expect(classifyValidity({ documentType: 'ops_review', industry: null }).validityClass).toBe(
       'high'
     );
-    expect(
-      classifyValidity({ documentType: 'macro_forecast', industry: null }).validityClass
-    ).toBe('zero');
-    expect(
-      classifyValidity({ documentType: 'due_diligence', industry: null }).validityClass
-    ).toBe('medium');
+    expect(classifyValidity({ documentType: 'macro_forecast', industry: null }).validityClass).toBe(
+      'zero'
+    );
+    expect(classifyValidity({ documentType: 'due_diligence', industry: null }).validityClass).toBe(
+      'medium'
+    );
   });
 
   it('carries the signals block through for DPR-appendix transparency', () => {
@@ -129,7 +127,13 @@ describe('getValidityWeightShift', () => {
     for (const band of ['low', 'zero'] as ValidityClass[]) {
       const shift = getValidityWeightShift(band)!;
       expect(Object.keys(shift).sort()).toEqual(
-        ['biasLoad', 'complianceRisk', 'evidenceQuality', 'historicalAlignment', 'processMaturity'].sort()
+        [
+          'biasLoad',
+          'complianceRisk',
+          'evidenceQuality',
+          'historicalAlignment',
+          'processMaturity',
+        ].sort()
       );
     }
   });

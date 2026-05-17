@@ -96,8 +96,8 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       content: (
         <>
           Upload a strategic memo, market-entry recommendation, or quarterly board deck. The audit
-          surfaces {BIAS_COUNT} cognitive biases with traceable excerpts and the questions a CEO or audit
-          committee will surface — in 60 seconds.
+          surfaces {BIAS_COUNT} cognitive biases with traceable excerpts and the questions a CEO or
+          audit committee will surface — in 60 seconds.
         </>
       ),
     },

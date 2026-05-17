@@ -213,8 +213,7 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
       eventAnchored && event && daysToEvent != null
         ? `Graduation gate is dark — n = ${pmf.sampleSize} / ${pmf.killMinN}. ${event.name} is T-${daysToEvent}d; investors and warm intros there will ask whether you have PMF signal. ${needed} more HXC "very disappointed" response${s} unlocks the gate.${pendingClause} Send the Vohra survey to every HXC customer 30+ days in before the event.`
         : `Graduation gate needs n ≥ ${pmf.killMinN} HXC responses (currently ${pmf.sampleSize}). ${needed} more unlock${needed === 1 ? 's' : ''} the gate.${pendingClause}${
-            pmf.daysSinceLastSurveyResponse != null &&
-            pmf.daysSinceLastSurveyResponse > 14
+            pmf.daysSinceLastSurveyResponse != null && pmf.daysSinceLastSurveyResponse > 14
               ? ` Last response was ${pmf.daysSinceLastSurveyResponse}d ago — cadence is slipping.`
               : ' Keep the survey cadence going.'
           }`;

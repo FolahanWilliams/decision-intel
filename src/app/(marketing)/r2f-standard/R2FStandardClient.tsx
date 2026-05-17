@@ -1066,9 +1066,9 @@ export function R2FStandardClient() {
             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: C.slate700 }}>
               When a customer org accumulates closed outcomes via Outcome Gate enforcement AND the
               Vohra HXC PMF cohort clears the ≥5 sample-size floor (locked v3.5 graduation gate),
-              per-org calibration replaces the seed baseline on every DPR they generate. Until
-              then, the seed IS the contractual answer — and the version stamp on the cover page
-              tells the audit-committee reader exactly which methodology epoch produced it.
+              per-org calibration replaces the seed baseline on every DPR they generate. Until then,
+              the seed IS the contractual answer — and the version stamp on the cover page tells the
+              audit-committee reader exactly which methodology epoch produced it.
             </p>
           </div>
           <div

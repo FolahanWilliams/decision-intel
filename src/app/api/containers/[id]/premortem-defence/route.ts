@@ -25,11 +25,7 @@ import {
 
 const log = createLogger('PremortemDefenceRoute');
 
-const PATTERNS: ReadonlySet<string> = new Set([
-  'deal_fever',
-  'winners_curse',
-  'synergy_mirage',
-]);
+const PATTERNS: ReadonlySet<string> = new Set(['deal_fever', 'winners_curse', 'synergy_mirage']);
 
 interface DefenceBody {
   answers?: Array<{ pattern?: string; question?: string; writtenDefence?: string }>;

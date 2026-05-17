@@ -43,19 +43,19 @@ AI Verify has two plugin categories: technical-test plugins (run algorithmic tes
 
 A structured checklist that maps each of AI Verify's 11 governance principles onto the corresponding Decision Intel audit surface, so a procurement reviewer running AI Verify can tick off "decision-quality auditing — covered" with reference to the DI artefact:
 
-| AI Verify Principle | DI Audit Surface | DPR Field |
-|---|---|---|
-| Transparency | 12-node pipeline manifest published at /how-it-works | meta.pipelineNodes |
-| Explainability | Per-flag bias citations + DI-B-001..020 taxonomy IDs | biases[].taxonomyId |
-| Repeatability | Input hash + prompt fingerprint per audit | provenance.inputHash + .promptFingerprint |
-| Safety | Pre-mortem + Red Team adversarial nodes | preMortemFindings + redTeamObjection |
-| Security | AES-256-GCM encryption + hashed DPR | (security posture, not per-audit) |
-| Robustness | 3-judge noise measurement (Kahneman variance) | noiseScore |
-| Fairness | 20-bias detection across the taxonomy | biases[] |
-| Data Governance | GDPR/NDPR anonymiser node + 17-framework regulatory map | regulatoryMapping[] |
-| Accountability | Human-decision record + outcome reporting | humanDecision + outcome |
-| Human Agency & Oversight | EU AI Act Article 14 alignment per node | regulatoryProvision="EU AI Act Art 14" |
-| Inclusive Growth | African-framework coverage (NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more) | regulatoryMapping[] regional bands |
+| AI Verify Principle      | DI Audit Surface                                                      | DPR Field                                 |
+| ------------------------ | --------------------------------------------------------------------- | ----------------------------------------- |
+| Transparency             | 12-node pipeline manifest published at /how-it-works                  | meta.pipelineNodes                        |
+| Explainability           | Per-flag bias citations + DI-B-001..020 taxonomy IDs                  | biases[].taxonomyId                       |
+| Repeatability            | Input hash + prompt fingerprint per audit                             | provenance.inputHash + .promptFingerprint |
+| Safety                   | Pre-mortem + Red Team adversarial nodes                               | preMortemFindings + redTeamObjection      |
+| Security                 | AES-256-GCM encryption + hashed DPR                                   | (security posture, not per-audit)         |
+| Robustness               | 3-judge noise measurement (Kahneman variance)                         | noiseScore                                |
+| Fairness                 | 20-bias detection across the taxonomy                                 | biases[]                                  |
+| Data Governance          | GDPR/NDPR anonymiser node + 17-framework regulatory map               | regulatoryMapping[]                       |
+| Accountability           | Human-decision record + outcome reporting                             | humanDecision + outcome                   |
+| Human Agency & Oversight | EU AI Act Article 14 alignment per node                               | regulatoryProvision="EU AI Act Art 14"    |
+| Inclusive Growth         | African-framework coverage (NDPR, CBN, WAEMU, PoPIA, CMA Kenya, more) | regulatoryMapping[] regional bands        |
 
 Each row = one checklist item with description, evidence type required, and the AI Verify principle reference number.
 
@@ -93,12 +93,12 @@ The PR review may take days to weeks depending on AI Verify Foundation's bandwid
 
 ## Risks + how to mitigate
 
-| Risk | Mitigation |
-|---|---|
-| AI Verify Foundation rejects the plugin | The plugin is Apache 2.0, doesn't expose any DI proprietary IP, and adds documented value to the existing process-checklist surface. Rejection unlikely; if it happens, the PR itself remains a public artefact citable in marketing |
-| AI Verify principles change before merge | The 11-principle framework is internationally codified (aligned with EU + OECD); changes are unlikely on a 6-month horizon, and the plugin checklist would just need a minor refresh |
+| Risk                                                        | Mitigation                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AI Verify Foundation rejects the plugin                     | The plugin is Apache 2.0, doesn't expose any DI proprietary IP, and adds documented value to the existing process-checklist surface. Rejection unlikely; if it happens, the PR itself remains a public artefact citable in marketing                     |
+| AI Verify principles change before merge                    | The 11-principle framework is internationally codified (aligned with EU + OECD); changes are unlikely on a 6-month horizon, and the plugin checklist would just need a minor refresh                                                                     |
 | Open-sourcing the regulatory mapping reveals competitive IP | The MAPPING is not the IP — every regulatory framework is publicly published. The IP is the audit pipeline + scoring model + per-org calibration. This plugin contributes the boring procurement-checklist artefact, not the proprietary product surface |
-| Apache 2.0 license obligation | Apache 2.0 only attaches to the plugin code, not to Decision Intel itself. Standard for any open-source contribution; legally clean |
+| Apache 2.0 license obligation                               | Apache 2.0 only attaches to the plugin code, not to Decision Intel itself. Standard for any open-source contribution; legally clean                                                                                                                      |
 
 ---
 

@@ -564,7 +564,8 @@ export const ENTERPRISE_FRICTION_MATRIX: EnterpriseFriction[] = [
   },
   {
     id: 'isa_2007_gap',
-    title: 'Nigerian SEC Investment and Securities Act 2007 — now in compliance map (was a gap, shipped 2026-04-29)',
+    title:
+      'Nigerian SEC Investment and Securities Act 2007 — now in compliance map (was a gap, shipped 2026-04-29)',
     buyerSegment: 'GC / Compliance',
     surfacedAs: `"Your ${FRAMEWORK_COUNT}-framework map covers NDPR, CBN, WAEMU, PoPIA — does it cover Nigerian SEC's Investment and Securities Act 2007? For our SEC-licensed entities that's the canonical local-securities statute."`,
     preBakedResponse: `"Yes — ISA 2007 shipped into the framework registry on 2026-04-29. It's the ${FRAMEWORK_COUNT}th framework alongside the existing NDPR + CBN + WAEMU + PoPIA + FRC Nigeria + 13 other regimes. The mapping covers investor-protection disclosure (Part XIV), market-abuse provisions (Part XV), and the suitability rules SEC Rule 18 layers on top. I can send the registry export so your GC can verify before procurement." This response demonstrates that the gap was real, the fix is shipped, and the founder is on top of regulatory work — the strongest possible regulatory-competence signal.`,

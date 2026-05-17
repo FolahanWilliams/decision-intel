@@ -60,33 +60,33 @@ The page should be readable WITHOUT scrolling for a buyer who only wants the ver
 
 ## Spacing scale (codified from `globals.css`)
 
-| Token | Value | Use |
-|---|---|---|
-| `--gap-3xs` | 4px | Inline icon-to-text gap, chip internal padding |
-| `--gap-2xs` | 8px | Card title-to-meta, button internal gap |
-| `--gap-xs` | 12px | Tight stack of related rows (key-value pairs) |
-| `--gap-sm` | 16px | Default vertical rhythm inside cards |
-| `--gap-md` | 24px | Between cards in a column, between section headings and content |
-| `--gap-lg` | 32px | Between major page sections |
-| `--gap-xl` | 48px | Between H1-class blocks (rare) |
-| `--gap-2xl` | 64px | Page padding top/bottom (hero zones only) |
+| Token       | Value | Use                                                             |
+| ----------- | ----- | --------------------------------------------------------------- |
+| `--gap-3xs` | 4px   | Inline icon-to-text gap, chip internal padding                  |
+| `--gap-2xs` | 8px   | Card title-to-meta, button internal gap                         |
+| `--gap-xs`  | 12px  | Tight stack of related rows (key-value pairs)                   |
+| `--gap-sm`  | 16px  | Default vertical rhythm inside cards                            |
+| `--gap-md`  | 24px  | Between cards in a column, between section headings and content |
+| `--gap-lg`  | 32px  | Between major page sections                                     |
+| `--gap-xl`  | 48px  | Between H1-class blocks (rare)                                  |
+| `--gap-2xl` | 64px  | Page padding top/bottom (hero zones only)                       |
 
 **Rule:** never invent a new spacing value. If something looks wrong at one of these, the FIX is restructuring, not a custom 18px gap.
 
 ## Typography (codified from `globals.css`)
 
-| Token | Size | Weight | Use |
-|---|---|---|---|
-| `--fs-3xs` | 11px | 600 caps | Eyebrow, status pill text |
-| `--fs-2xs` | 12px | 500 | Meta (timestamps, byline) |
-| `--fs-xs` | 13px | 400 | Tertiary body (footnotes) |
-| `--fs-sm` | 14px | 400 | Default body in dense contexts (chips, table cells) |
-| `--fs-base` | 16px | 400 | Default body |
-| `--fs-md` | 18px | 500 | Card title, section heading body |
-| `--fs-lg` | 20px | 500 | Subsection heading |
-| `--fs-xl` | 24px | 600 | Section heading inside long-form |
-| `--fs-page-h1-platform` | clamp(28px, 2.2vw, 40px) | 700 | Platform page H1 (the artefact name) |
-| `--fs-page-h1-marketing-hero` | clamp(30px, 3vw, 48px) | 700 italic | Marketing hero only (Instrument Serif) |
+| Token                         | Size                     | Weight     | Use                                                 |
+| ----------------------------- | ------------------------ | ---------- | --------------------------------------------------- |
+| `--fs-3xs`                    | 11px                     | 600 caps   | Eyebrow, status pill text                           |
+| `--fs-2xs`                    | 12px                     | 500        | Meta (timestamps, byline)                           |
+| `--fs-xs`                     | 13px                     | 400        | Tertiary body (footnotes)                           |
+| `--fs-sm`                     | 14px                     | 400        | Default body in dense contexts (chips, table cells) |
+| `--fs-base`                   | 16px                     | 400        | Default body                                        |
+| `--fs-md`                     | 18px                     | 500        | Card title, section heading body                    |
+| `--fs-lg`                     | 20px                     | 500        | Subsection heading                                  |
+| `--fs-xl`                     | 24px                     | 600        | Section heading inside long-form                    |
+| `--fs-page-h1-platform`       | clamp(28px, 2.2vw, 40px) | 700        | Platform page H1 (the artefact name)                |
+| `--fs-page-h1-marketing-hero` | clamp(30px, 3vw, 48px)   | 700 italic | Marketing hero only (Instrument Serif)              |
 
 **Rule:** every heading on every platform surface uses `--fs-page-h1-platform` for H1 and `--fs-md` (18px / 500) for "this card's title." Never raw `text-2xl` or `font-size: 22px`.
 
@@ -194,6 +194,7 @@ Color band (1px left-border) maps to the verdict band. Footer includes the metho
 ## Mobile rules
 
 Below 700px:
+
 - Right rail collapses to bottom of main column (or behind a vaul drawer if it's >300px tall).
 - Tab bar switches to horizontal scroll with `scroll-snap`.
 - Card grids collapse to single column.

@@ -89,7 +89,9 @@ export function RecommendationsPanel({ analysisId }: RecommendationsPanelProps) 
               )}
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-foreground mb-1">{rec.title}</div>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{rec.description}</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  {rec.description}
+                </p>
                 <div className="flex items-center gap-3 mt-2">
                   <span className="text-[10px] text-muted-foreground">
                     Confidence: {Math.round(rec.confidence * 100)}%

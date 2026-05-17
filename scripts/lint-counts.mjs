@@ -46,11 +46,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_PATHS = [
-  join(ROOT, 'src'),
-  join(ROOT, 'CLAUDE.md'),
-  join(ROOT, 'TODO.md'),
-];
+const SCAN_PATHS = [join(ROOT, 'src'), join(ROOT, 'CLAUDE.md'), join(ROOT, 'TODO.md')];
 
 // Baseline as of 2026-05-01 (the commit shipping this linter). Captured
 // AFTER the genuinely-stale literals were fixed in the same commit. The
@@ -170,8 +166,7 @@ for (const scanRoot of SCAN_PATHS) {
 
       const isCanonical = CANONICAL_SIGNALS.some(sig => ctx.includes(sig));
       const isOptOut =
-        DRIFT_TOLERANT_MARKER.test(line) ||
-        (i > 0 && DRIFT_TOLERANT_MARKER.test(lines[i - 1]));
+        DRIFT_TOLERANT_MARKER.test(line) || (i > 0 && DRIFT_TOLERANT_MARKER.test(lines[i - 1]));
       if (isCanonical || isOptOut) continue;
 
       for (const m of matches) {
@@ -191,31 +186,15 @@ if (total > COUNT_BASELINE) {
   console.error(
     `\n❌ count-drift ratchet: ${total} hardcoded count literals found, baseline is ${COUNT_BASELINE}.`
   );
-  console.error(
-    `   ${total - COUNT_BASELINE} new hardcoded count(s) introduced. Either:`
-  );
-  console.error(
-    '     (a) interpolate from the canonical (e.g. `${BIAS_COUNT} biases`),'
-  );
+  console.error(`   ${total - COUNT_BASELINE} new hardcoded count(s) introduced. Either:`);
+  console.error('     (a) interpolate from the canonical (e.g. `${BIAS_COUNT} biases`),');
   console.error('     (b) replace with `getAllRegisteredFrameworks().length`,');
-  console.error(
-    '     (c) add an inline `// drift-tolerant — <reason>` comment on the'
-  );
-  console.error(
-    '         same line / line above naming why the literal is fixed,'
-  );
-  console.error(
-    '     (d) replace an existing offender (so net count stays at baseline),'
-  );
-  console.error(
-    '     (e) bump COUNT_BASELINE in scripts/lint-counts.mjs alongside an'
-  );
-  console.error(
-    '         inline comment naming the new acceptable class — discouraged;'
-  );
-  console.error(
-    '         the right move is almost always (a)-(c).'
-  );
+  console.error('     (c) add an inline `// drift-tolerant — <reason>` comment on the');
+  console.error('         same line / line above naming why the literal is fixed,');
+  console.error('     (d) replace an existing offender (so net count stays at baseline),');
+  console.error('     (e) bump COUNT_BASELINE in scripts/lint-counts.mjs alongside an');
+  console.error('         inline comment naming the new acceptable class — discouraged;');
+  console.error('         the right move is almost always (a)-(c).');
   console.error('');
   console.error('   Recent offenders (last 25 by file order):');
   for (const o of offenders.slice(-25)) {

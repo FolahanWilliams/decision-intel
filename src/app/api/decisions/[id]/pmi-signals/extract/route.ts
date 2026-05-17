@@ -43,11 +43,7 @@ const log = createLogger('PmiExtractRoute');
  * to the container; falls back to most-recent analyzed doc if no
  * preferred type is attached.
  */
-const PREFERRED_DOC_TYPES: ReadonlyArray<string> = [
-  'ic_memo',
-  'synergy_model',
-  'integration_plan',
-];
+const PREFERRED_DOC_TYPES: ReadonlyArray<string> = ['ic_memo', 'synergy_model', 'integration_plan'];
 
 async function resolveOrgId(userId: string): Promise<string | null> {
   try {

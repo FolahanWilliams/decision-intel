@@ -125,7 +125,8 @@ RIGHT NOW (per CLAUDE.md). If you can't, you haven't read enough.
    - "No email digest" — `sendWeeklyDigest` shipped 04-23
    - "No African regulators" — 12 African frameworks already shipped
    - "Compare route hidden" — exists, just not surfaced from deal context
-   Don't repeat these. Format:
+     Don't repeat these. Format:
+
    ```
    evidence:
      grepCommand: "rg -n 'sendWeeklyDigest' src/"
@@ -203,6 +204,7 @@ RIGHT NOW (per CLAUDE.md). If you can't, you haven't read enough.
 #### Section 1 — Bug Fixes (you auto-implement these)
 
 For each bug, return:
+
 - `file:line`
 - Evidence (1-2 sentences: `tsc` error, `rg` output, Prisma error, or
   test failure)
@@ -210,6 +212,7 @@ For each bug, return:
 - Risk class: `data_loss` / `ui_regression` / `drift` / `silent`
 
 What counts as a bug:
+
 - TypeScript errors caught by `npx tsc --noEmit`
 - Slop-scan baseline regressions (>0.5 score-per-kloc jump)
 - Count-drift literals vs canonical (e.g., "20 biases" hardcoded when
@@ -225,6 +228,7 @@ What counts as a bug:
 - Named-prospect leaks (per the no-named-prospect rule)
 
 What does NOT count as a bug (= goes to Section 3 brainstorm):
+
 - New features
 - Refactors touching >2 files
 - Layout / visual changes
@@ -239,6 +243,7 @@ discrete fix (per CLAUDE.md "Commit after each logical unit").
 #### Section 2 — Brainstorm: Moat & undeniable value proposition
 
 For each idea:
+
 - Phase tag `[WEDGE]` / `[BRIDGE]` / `[CEILING]` / `[INFRA]`
 - One-line claim ("R²F #10 (Calibrated Rejection of Subjective
   Confidence) is the highest-leverage paper application Margaret-class
@@ -250,6 +255,7 @@ For each idea:
 - Risk if NOT done
 
 Categories to explore explicitly:
+
 - R²F operationalisation (paper applications #1, #4, #7, #10 are queued
   per CLAUDE.md "Kahneman & Klein paper-application sprint" — name the
   specific paper, not generic "more rigor")
@@ -263,6 +269,7 @@ Categories to explore explicitly:
 - Regulatory-tailwind moves (EU AI Act Aug 2026 deadline)
 
 Anti-patterns to reject in this section:
+
 - "Build a [generic SaaS feature]" (e.g., notifications, dashboards) —
   must connect to a specific moat layer or persona pain
 - "Improve [X]" without naming what changes
@@ -271,6 +278,7 @@ Anti-patterns to reject in this section:
 #### Section 3 — Brainstorm: UI/UX consolidation & flow
 
 For each idea:
+
 - Phase tag
 - File(s) affected (specific paths)
 - Streamlining shape — what consolidates / what merges / what disappears
@@ -280,6 +288,7 @@ For each idea:
   InlineAnalysisResultCard, founder-hub Ask AI button)
 
 Anti-patterns to flag:
+
 - Tab/page proliferation (28-tab Founder Hub is at the practical limit)
 - Modal stacking (>2 modals can render simultaneously per CLAUDE.md
   brainstorm item from 2026-05-01)
@@ -290,12 +299,14 @@ Anti-patterns to flag:
   `.section-heading` utility per the 2026-04-29 brainstorm)
 
 What does NOT belong here:
+
 - Pure visual polish (goes to Section 4)
 - Adding new pages (goes to Section 2 if it's moat work)
 
 #### Section 4 — Brainstorm: Visuals & theme alignment
 
 Per CLAUDE.md:
+
 - Display-serif Instrument Serif on entry-point + deliverable surfaces
   (landing H1, dashboard headline, /ask H1, document-detail headline)
 - Sans-serif Inter for utility / authenticated daily-use surfaces
@@ -303,6 +314,7 @@ Per CLAUDE.md:
 - CSS variables not hardcoded hex (per Styling lock)
 
 For each idea:
+
 - File(s)
 - Current state (what exists today)
 - Proposed state (what should exist)
@@ -310,6 +322,7 @@ For each idea:
   a specific CLAUDE.md typography lock)
 
 Specific surfaces to evaluate:
+
 - AnatomyOfACallGraph pentagon consistency across landing /
   how-it-works / dashboard reveal / favicon (per the 2026-04-29 D1 lock)
 - Severity color usage (per `SEVERITY_COLORS` canonical-import discipline
@@ -324,6 +337,7 @@ the consolidation that already happened (Outreach Hub: Pipeline +
 Messages + Design Partners merged 2026-04-28).
 
 Specific surfaces to interrogate:
+
 - StartHereTab map discoverability (per the 2026-04-28 dynamic-map lock)
 - 28-tab grouping in 5 clusters (Start / Product / Go-to-Market /
   Intelligence / Tools)
@@ -343,6 +357,7 @@ this is HIS daily surface, not a generic founder-hub product.
 #### Section 6 — AI chat context updates (you auto-implement)
 
 Diffs to `src/app/api/founder-hub/founder-context.ts` for any of:
+
 - New positioning lock landed in CLAUDE.md (since the last context update)
 - New tab routing rule (founder asks "X" → chat should route to tab Y)
 - New banned/locked vocabulary (per CLAUDE.md positioning vocabulary lock)
@@ -362,6 +377,7 @@ audit.
 #### Section 7 — Personalized founder tips (3-5 tips, max)
 
 Discipline:
+
 - Specific to Folahan: 16yo solo, Lagos home + UK residence, US-bound at
   18 (Stanford / UC Berkeley November 2027), 50-70 hr/wk, no co-founder,
   $30M cash exit target, AP system not A-levels, six study halls / week
@@ -373,6 +389,7 @@ Discipline:
   "ship faster", "don't burn out") — these add zero value
 
 Examples of valid tips:
+
 - "Schedule a 30-min NotebookLM synthesis pass on the master KB this
   Sunday before the Monday networking event — fresh quotes from the
   Goldner Discovery deck will inflect Wednesday's Sankore-class warm
@@ -382,6 +399,7 @@ Examples of valid tips:
   hard-default before the next paid pilot, not after"
 
 Examples of invalid tips:
+
 - "Focus on customers" (generic)
 - "Don't get distracted by feature work" (already known, in CLAUDE.md)
 - "Consider talking to advisors" (no specific action / outcome)
@@ -406,11 +424,13 @@ twice in a row. Cap: ≤3 findings per persona, 12 total.
 
 Per persona, return as `PersonaAuditFinding[]` shape (per the file). Each
 finding carries:
+
 - `[LIKE]` — specific surface they'd value, with file:line evidence
 - `[CHANGE]` — specific friction, named against their actual workflow
 - `[BLOCKER]` — what kills the deal at procurement / first impression
 
 Plus the synthesis section per the V2 prompt:
+
 - False negatives caught + retracted
 - Phase-fit recommendation (ship now vs queue for after first paid pilot
   closes)
@@ -424,6 +444,7 @@ LRQA / Sankore / Wiz / Mr. Reiner-network context > generic archetype).
 
 Surface UP TO 3 things the founder didn't explicitly mention but you
 flagged as load-bearing. Examples that qualify:
+
 - Approaching deadline (regulatory: EU AI Act Aug 2026; fundraise: Q4
   2026 / Q1 2027 seed conversation gate)
 - Drift in a load-bearing claim (vocabulary lock at risk of decay; a
@@ -438,6 +459,7 @@ flagged as load-bearing. Examples that qualify:
   pushed without `npx tsc --noEmit`?)
 
 Each item carries:
+
 - One-line description
 - Why it matters now
 - Suggested action (NOT auto-implemented)
@@ -471,7 +493,7 @@ Run this checklist before submitting:
 - [ ] Section 1 bugs: did I cap at ~10 and rank by risk?
 - [ ] Section 7 tips: are they action-shaped + Folahan-specific (not
       generic)?
-- [ ] False-positive self-rate: ____% (target <25%; >25% → re-audit)
+- [ ] False-positive self-rate: \_\_\_\_% (target <25%; >25% → re-audit)
 - [ ] Did I implement Section 1 + Section 6 only? (Sections 2-5, 7-9
       stay as brainstorm.)
 
@@ -480,6 +502,7 @@ If any checkbox fails, fix before submitting.
 ### After submitting
 
 The founder reads in this order:
+
 1. Section 10 self-check (validates the audit before reading any findings)
 2. Section 1 bug fixes (already shipped — confirms or rejects)
 3. Section 9 critical pickups (what HE missed)

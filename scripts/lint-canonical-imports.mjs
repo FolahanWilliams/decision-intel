@@ -221,22 +221,12 @@ if (offenders.length > 0) {
   }
   console.error('Either:');
   console.error('  (a) Replace the local function with the canonical import.');
-  console.error(
-    "  (b) If the local behaviour genuinely differs (custom palette / collapse"
-  );
-  console.error(
-    '      whitespace / non-canonical thresholds intentional), add an inline'
-  );
-  console.error(
-    "      `// canonical-exception — <reason>` comment on the same line OR the"
-  );
+  console.error('  (b) If the local behaviour genuinely differs (custom palette / collapse');
+  console.error('      whitespace / non-canonical thresholds intentional), add an inline');
+  console.error('      `// canonical-exception — <reason>` comment on the same line OR the');
   console.error('      line above. The comment IS the audit trail.');
-  console.error(
-    '  (c) If the file is a domain-specific helper that should stay forever,'
-  );
-  console.error(
-    '      add it to BASELINE_EXCEPTIONS in scripts/lint-canonical-imports.mjs.'
-  );
+  console.error('  (c) If the file is a domain-specific helper that should stay forever,');
+  console.error('      add it to BASELINE_EXCEPTIONS in scripts/lint-canonical-imports.mjs.');
   console.error('');
   process.exit(1);
 }

@@ -258,7 +258,10 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         }
       }}
     >
-      <DialogContent className="sm:max-w-[950px] p-0 overflow-hidden bg-[var(--bg-primary)] shadow-2xl rounded-2xl" showCloseButton>
+      <DialogContent
+        className="sm:max-w-[950px] p-0 overflow-hidden bg-[var(--bg-primary)] shadow-2xl rounded-2xl"
+        showCloseButton
+      >
         {step === 'pick' ? (
           <div className="flex flex-col md:grid md:grid-cols-2 min-h-[600px] animate-in fade-in duration-300">
             {/* LEFT COLUMN: Header & Personas */}
@@ -289,8 +292,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                         flex items-start gap-4 p-4 rounded-2xl text-left transition-all duration-300
                         border active:scale-[0.98] animate-in fade-in slide-in-from-bottom-2 fill-mode-both
                         ${
-                          isSelected 
-                            ? 'bg-[rgba(22,163,74,0.04)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] shadow-[0_0_15px_rgba(22,163,74,0.12)] z-10' 
+                          isSelected
+                            ? 'bg-[rgba(22,163,74,0.04)] border-[var(--accent-primary)] ring-1 ring-[var(--accent-primary)] shadow-[0_0_15px_rgba(22,163,74,0.12)] z-10'
                             : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[2px] hover:shadow-md hover:border-[rgba(22,163,74,0.3)] shadow-sm'
                         }
                       `}
@@ -325,7 +328,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             <div className="bg-[var(--bg-secondary)] border-t md:border-t-0 md:border-l border-[var(--border-color)] relative flex flex-col overflow-hidden">
               {/* Premium colored top strip */}
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-primary)] opacity-90 shadow-[0_2px_10px_rgba(22,163,74,0.4)] z-20"></div>
-              
+
               <div className="p-6 sm:p-10 sm:pt-14 sm:pr-14 flex flex-col h-full justify-center relative z-10">
                 {!selectedPersona && (
                   <div className="text-center text-[var(--text-muted)] animate-in fade-in flex flex-col items-center justify-center h-full gap-4">
@@ -335,7 +338,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     </p>
                   </div>
                 )}
-                
+
                 {valueProp && !isOther && (
                   <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
                     <div className="mb-8 mt-4">
@@ -347,7 +350,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       </div>
                       <ul className="m-0 pl-5 text-[var(--fs-sm)] sm:text-[var(--fs-md)] text-[var(--text-secondary)] leading-relaxed space-y-3 list-outside list-disc marker:text-[var(--accent-primary)]">
                         {valueProp.bullets.map(b => (
-                          <li key={b} className="pl-1">{b}</li>
+                          <li key={b} className="pl-1">
+                            {b}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -359,7 +364,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                             {sampleError}
                           </div>
                         )}
-                        
+
                         <button
                           onClick={() => completeOnboarding({ launchTour: true })}
                           className="w-full flex items-center gap-4 p-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
@@ -368,7 +373,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                             <Compass size={18} color="#fff" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-[var(--fs-sm)] font-semibold truncate">Take the 60-second tour</div>
+                            <div className="text-[var(--fs-sm)] font-semibold truncate">
+                              Take the 60-second tour
+                            </div>
                             <div className="text-[11px] opacity-90 mt-0.5 leading-snug truncate">
                               Spotlight the upload zone, audit tabs, Knowledge Graph.
                             </div>
@@ -381,7 +388,10 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                             className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
                           >
                             <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
-                              <Upload size={18} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
+                              <Upload
+                                size={18}
+                                className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors"
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
@@ -399,7 +409,10 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                               {loadingSample ? (
                                 <div className="w-4 h-4 border-2 border-[var(--text-secondary)] border-t-transparent rounded-full animate-spin" />
                               ) : (
-                                <FileText size={18} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
+                                <FileText
+                                  size={18}
+                                  className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors"
+                                />
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -410,16 +423,22 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                           </button>
                         </div>
                       </div>
-                      
+
                       {/* Art 13 privacy notice */}
                       <div className="mt-6 text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        <strong className="text-[var(--text-secondary)] font-medium">Before you upload:</strong> documents
-                        are encrypted with AES-256-GCM at rest, transit-encrypted with TLS 1.2+, and a GDPR /
-                        NDPR anonymizer strips PII before analysis — no LLM
-                        ever sees raw personal data.{' '}
-                        <a href="/privacy" className="text-[var(--accent-primary)] font-medium hover:underline">
+                        <strong className="text-[var(--text-secondary)] font-medium">
+                          Before you upload:
+                        </strong>{' '}
+                        documents are encrypted with AES-256-GCM at rest, transit-encrypted with TLS
+                        1.2+, and a GDPR / NDPR anonymizer strips PII before analysis — no LLM ever
+                        sees raw personal data.{' '}
+                        <a
+                          href="/privacy"
+                          className="text-[var(--accent-primary)] font-medium hover:underline"
+                        >
                           See /privacy
-                        </a>.
+                        </a>
+                        .
                       </div>
                     </div>
                   </div>

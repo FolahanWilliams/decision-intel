@@ -10,7 +10,7 @@
 
 Decision Intel ran three independent Deep Research reports on a single thesis: as AI agents automate routine cognitive work in the knowledge economy, residual human reasoning load in high-stakes decisions concentrates rather than disappears. Each report was 8,000–12,000 words across cognitive science, validity gradients, regulatory tailwinds, role-level demand maps, competitive landscapes, and ICP synthesis with moat-utilization scoring.
 
-The three reports converge on a structural finding the locked v3.3 plan only partially captures: **the Individual £249/mo wedge is not a structurally coherent path to the F500 ceiling.** Individual buyers (CSO at smaller firm, fractional CSO, head of strategic planning) and F500 Heads of Corp Dev are *different categories*, not different scales of the same category. Word-of-mouth doesn't compound across the boundary. Mr. Reiner + Mr. Gabe networks point at the F500 ceiling, not at the Individual wedge — wedge-ceiling-incoherent.
+The three reports converge on a structural finding the locked v3.3 plan only partially captures: **the Individual £249/mo wedge is not a structurally coherent path to the F500 ceiling.** Individual buyers (CSO at smaller firm, fractional CSO, head of strategic planning) and F500 Heads of Corp Dev are _different categories_, not different scales of the same category. Word-of-mouth doesn't compound across the boundary. Mr. Reiner + Mr. Gabe networks point at the F500 ceiling, not at the Individual wedge — wedge-ceiling-incoherent.
 
 This document drafts the v3.4 amendment for cross-source verification, then primary-source verification, then lock.
 
@@ -35,6 +35,7 @@ This document drafts the v3.4 amendment for cross-source verification, then prim
 The most uncomfortable finding. The current v3.3 wedge motion ships qualified traffic to a buyer category that doesn't structurally graduate to the F500 ceiling. The amendment:
 
 **Old wedge (v3.3, 2026-04-30 lock):**
+
 - Individual buyers @ £249/mo
 - UK + US: CSOs at FTSE 250 / mid-market scale-ups + S&P 500 sub-segments + Heads of M&A at PE-backed mid-market + Heads of Strategic Planning + fractional CSOs
 - Frictionless tier — personal-card budget
@@ -42,15 +43,17 @@ The most uncomfortable finding. The current v3.3 wedge motion ships qualified tr
 - Conversion: 60-second audit + DPR specimen → self-serve sign-up
 
 **New wedge (v3.4 PROPOSED):**
+
 - Mid-market Corp Dev / Mid-market Fund Partners @ Strategy £2,499/mo
 - UK + US: Heads of Corporate Development at $500M-$2B revenue scale-ups doing 2-4 acquisitions/year + GPs at £50M-£500M AUM funds doing 4-10 deals/year
 - Same buying motion as F500 ceiling, smaller scale, faster procurement (often <90 days vs F500 12-month cycles)
 - Connection-leverage NOW coherent: Mr. Reiner's network points at exactly this persona; Mr. Gabe's network points at GPs in this band
 - Conversion: warm-intro → 20-minute audit on a real strategic memo / IC memo → Strategy tier subscription (Design Foundation rate £1,999/mo for first 5 founding cohort customers preserved from v3.3)
 
-**Individual £249/mo stays in the price ladder** as a marketing-funnel product (free-to-paid trial bridge) that surfaces qualified word-of-mouth into the mid-market wedge. It is no longer the primary growth motion. The £249 Individual subscriber is a *downstream consequence* of mid-market wedge buyers referring within their own networks (peer corp-dev heads, junior associates, fractional advisors in their sphere), not the *primary funnel*.
+**Individual £249/mo stays in the price ladder** as a marketing-funnel product (free-to-paid trial bridge) that surfaces qualified word-of-mouth into the mid-market wedge. It is no longer the primary growth motion. The £249 Individual subscriber is a _downstream consequence_ of mid-market wedge buyers referring within their own networks (peer corp-dev heads, junior associates, fractional advisors in their sphere), not the _primary funnel_.
 
 **Graduation rule (gates wedge → ceiling transition):**
+
 - 5 paid Mid-market Strategy subscribers retained 90+ days
 - 3+ using DI on every acquisition memo / IC memo (not just one-off audits)
 - 2+ verifiable referrals via DPR / advocacy from Mid-market subscribers
@@ -64,14 +67,15 @@ The current v3.3 plan implicitly collapses the buying committee into "GC writes 
 
 **v3.4 Buying-Committee Shape (locked across both wedge and ceiling):**
 
-| Role | Function | Wedge segment | Ceiling segment |
-|------|----------|---------------|-----------------|
-| **Economic Buyer** (writes the cheque) | Discretionary budget, deal-flow ownership | Head of Corp Dev at $500M-$2B scale-up, OR GP at £50M-£500M AUM fund | Head of Corp Dev at F500/FTSE 250, OR GP at £1B+ AUM fund |
-| **Regulatory Champion** (creates procurement pull) | Personal liability under EU AI Act / Basel III / SEC | GC / CRO at scale-up | GC / Audit Committee Chair / CRO at F500 |
-| **Signoff** (procurement gate) | Vendor-risk register, DPA signature | Procurement / Finance | Vendor risk management + Audit Committee |
-| **End User** (daily user) | Runs audits on memos pre-IC / pre-board | Deal team analysts + the deal partner | Deal team analysts + the deal partner |
+| Role                                               | Function                                             | Wedge segment                                                        | Ceiling segment                                           |
+| -------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| **Economic Buyer** (writes the cheque)             | Discretionary budget, deal-flow ownership            | Head of Corp Dev at $500M-$2B scale-up, OR GP at £50M-£500M AUM fund | Head of Corp Dev at F500/FTSE 250, OR GP at £1B+ AUM fund |
+| **Regulatory Champion** (creates procurement pull) | Personal liability under EU AI Act / Basel III / SEC | GC / CRO at scale-up                                                 | GC / Audit Committee Chair / CRO at F500                  |
+| **Signoff** (procurement gate)                     | Vendor-risk register, DPA signature                  | Procurement / Finance                                                | Vendor risk management + Audit Committee                  |
+| **End User** (daily user)                          | Runs audits on memos pre-IC / pre-board              | Deal team analysts + the deal partner                                | Deal team analysts + the deal partner                     |
 
 **Sales motion implications:**
+
 - Lead with the Economic Buyer (Head of Corp Dev / GP) — they have budget AND buying urgency from deal-flow rhythm
 - Activate Regulatory Champion as cover/justification — "your GC needs this to satisfy Art 14"
 - Signoff is a procurement-question to be navigated, not a buyer
@@ -79,15 +83,17 @@ The current v3.3 plan implicitly collapses the buying committee into "GC writes 
 
 ### Amendment 3: POSITIONING REFRAME — Audit-leads-the-narrative → DPR-leads-the-narrative
 
-The H1 stays: "Decision Intel is the reasoning audit platform." The CATEGORY claim survives untouched. What shifts is the *supporting narrative* across all buyer-voice surfaces.
+The H1 stays: "Decision Intel is the reasoning audit platform." The CATEGORY claim survives untouched. What shifts is the _supporting narrative_ across all buyer-voice surfaces.
 
 **The cultural-resistance finding (Report 3, three-fold confirmed):** elite decision-makers reject software that frames itself as "auditing your reasoning" — it triggers ego-threat and procurement resistance. The cover frame ("we generate the audit-committee-ready artefact your reasoning has to defend") wins.
 
 **The H1 + immediate body already do correctly:**
+
 - "Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does." → "before the committee does" already injects external-mandate frame at the H1 level
 - The asymmetric-tail body ("most memos pass cleanly...") already does cover-not-critique work
 
 **What changes downstream of the H1:**
+
 - **AUDIENCE_PITCHES** (Sales Toolkit) — every persona pitch reframed from "we'll catch your blind spots" → "we generate the artefact your audit committee / regulator / LP needs from you, with the bias detection wired in"
 - **Closing Lab role-playbooks** — verbatim phrases reframed
 - **Sparring Room scenarios** — buyer-voice questions reframed to elicit the cover-frame response
@@ -103,10 +109,12 @@ The H1 stays: "Decision Intel is the reasoning audit platform." The CATEGORY cla
 Mr. Reiner + Mr. Gabe networks now wedge-coherent because the wedge is mid-market versions of the ceiling persona.
 
 **Mr. Reiner (Wiz advisor → US enterprise SaaS / cybersecurity / governance acquirer network):**
+
 - Primary referral ask: 3-5 US-side warm intros to Heads of Corp Dev at $500M-$2B revenue scale-ups doing M&A — NOT to F500 directly (that's the ceiling, comes later)
 - Same network reach, just the persona ask is now mid-market not F500 ceiling
 
 **Mr. Gabe (Megasuto CEO → UK investor-side network):**
+
 - Primary referral ask: 3-5 UK-side warm intros to GPs at £50M-£500M AUM funds doing 4-10 deals/year — and to portfolio CSOs / corp dev heads at companies in their funds' portfolios
 
 **Discipline:** every warm intro = 20-min audit on a real memo, NOT a sales pitch (the artefact does the persuasion). Pattern-match across 10+ before declaring the motion working.
@@ -121,13 +129,13 @@ The v3.3 line "self-serve sign-up + Individual £249/mo subscription" is REPLACE
 
 ### Amendment 6: PRICING TIER MAP refined
 
-| Tier | Price | Buyer | Status v3.4 |
-|------|-------|-------|-------------|
-| Free | £0 (4 audits/mo) | Anyone curious | Marketing top-of-funnel |
-| Individual | £249/mo (15 audits) | Solo professionals, fractional advisors, junior strategic planners | Marketing-funnel product. NOT the wedge. Drives downstream referrals to mid-market buyers in the same network. |
-| **Mid-market Strategy (NEW WEDGE)** | **£2,499/mo (250 audits/mo + 5 seats)** | **Head of Corp Dev at $500M-$2B + GP at £50M-£500M AUM funds** | **PRIMARY GROWTH MOTION** |
-| Strategy+ | £4,999/mo (500 audits/mo + 10 seats) | Larger mid-market, smaller F500 sub-divisions | Bridge between wedge and ceiling |
-| Enterprise (CEILING) | £50K-£150K ACV custom | F500 / FTSE 250 + £1B+ AUM funds | Long-term ceiling target |
+| Tier                                | Price                                   | Buyer                                                              | Status v3.4                                                                                                    |
+| ----------------------------------- | --------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Free                                | £0 (4 audits/mo)                        | Anyone curious                                                     | Marketing top-of-funnel                                                                                        |
+| Individual                          | £249/mo (15 audits)                     | Solo professionals, fractional advisors, junior strategic planners | Marketing-funnel product. NOT the wedge. Drives downstream referrals to mid-market buyers in the same network. |
+| **Mid-market Strategy (NEW WEDGE)** | **£2,499/mo (250 audits/mo + 5 seats)** | **Head of Corp Dev at $500M-$2B + GP at £50M-£500M AUM funds**     | **PRIMARY GROWTH MOTION**                                                                                      |
+| Strategy+                           | £4,999/mo (500 audits/mo + 10 seats)    | Larger mid-market, smaller F500 sub-divisions                      | Bridge between wedge and ceiling                                                                               |
+| Enterprise (CEILING)                | £50K-£150K ACV custom                   | F500 / FTSE 250 + £1B+ AUM funds                                   | Long-term ceiling target                                                                                       |
 
 The Strategy tier price is unchanged from v3.3 (£2,499/mo). What changes is who it's positioned AT — v3.3 implicitly positioned Strategy as a team upgrade FROM Individual; v3.4 positions Strategy as the FRONT DOOR for mid-market corp dev / fund partner buyers.
 
@@ -144,6 +152,7 @@ The v3.4 amendments are based on three Deep Research reports converging on the s
 **What this tests:** Wedge thesis directly. Does the proposed Economic Buyer actually have budget?
 
 **Discovery script (45-min call):**
+
 - Q1: "Walk me through your last acquisition memo / IC memo. How many people read it before the IC vote?"
 - Q2: "Where do the biggest disagreements come up — assumptions, base rates, comparables, or risks?"
 - Q3: "When you procure tooling for IC memo review, whose budget does it come from? GC, CRO, your team, or someone else?"
@@ -157,6 +166,7 @@ The v3.4 amendments are based on three Deep Research reports converging on the s
 **What this tests:** Mid-market fund wedge → portfolio expansion path.
 
 **Discovery script (45-min call):**
+
 - Q1: "Walk me through your last IC vote. How was the IC memo authored — fully human, AI-assisted, or agent-generated?"
 - Q2: "Do you ever refer governance / audit / strategic-decision tooling to your portfolio CSOs?"
 - Q3: "Would your LP appreciate a tamper-evident evidence record on every IC vote, or would it create unwanted overhead?"
@@ -169,6 +179,7 @@ The v3.4 amendments are based on three Deep Research reports converging on the s
 **What this tests:** GC = champion, not buyer.
 
 **Discovery script (30-min call):**
+
 - Q1: "How is your firm currently preparing for EU AI Act Article 14 enforcement (Aug 2026)?"
 - Q2: "Whose budget covers AI governance tooling? GC, CRO, IT, or business unit?"
 - Q3: "Have you signed off on tooling that the business unit (corp dev, strategy team) bought specifically for governance reasons?"
@@ -209,6 +220,7 @@ The v3.4 amendments are based on three Deep Research reports converging on the s
 **Primary track (bootstrap-to-seed):** Mid-market wedge is a more defensible seed traction story than Individual £249. Five paid Mid-market Strategy subscribers @ £2,499/mo = £150K ARR run-rate ≈ same nominal traction as 50 Individual £249 subscribers but with much sharper unit economics, a coherent ceiling narrative, and a procurement pattern a Series A partner can underwrite.
 
 Seed conversation activation rule (Mr. Gabe customers-before-investors discipline, refined v3.4):
+
 - 5+ paid Mid-market Strategy subscribers retained 90+ days
 - 3+ using DI on every IC / acquisition memo
 - 1+ Sankore-grade specimen DPR published
@@ -224,6 +236,7 @@ Seed conversation activation rule (Mr. Gabe customers-before-investors disciplin
 The amendment touches:
 
 **Code (~25-30 files):**
+
 - `src/lib/constants/icp.ts` — ICP_WEDGE / ICP_CEILING / ICP_AVOID / ICP_AUDIENCE_SUMMARY rewrite
 - `src/app/api/founder-hub/founder-context.ts` — chat coaching ICP block + new buying-committee section
 - `src/lib/data/sales-toolkit.ts` — AUDIENCE_PITCHES (5 pitches refreshed for committee shape) + new BUYING_COMMITTEE_CORP entry mirroring BUYING_COMMITTEE
@@ -241,11 +254,13 @@ The amendment touches:
 - Landing protected-revenue strap — new "evidence-record" framing
 
 **Documents:**
+
 - `docs/gtm-plan-v3-4-2026-05-04.md` (this file finalised) — supersedes v3.3
 - CLAUDE.md ICP block + GTM block + connection-leverage motion + Sharran 1-1-1 + pricing tier discussion all refreshed
 - Master KB notebook 809f5104 — source list refreshed; new synthesis note saved with v3.4 lock
 
 **External:**
+
 - Mr. Reiner ask refresh (mid-market Corp Dev intros, not generic F500)
 - Mr. Gabe ask refresh (mid-market GPs + portfolio CSOs)
 
@@ -283,14 +298,15 @@ Five queries against the master KB (notebook 809f5104). Findings:
 
 ### Q2 — GC role + budget flow
 
-**Verdict: DEFINITIVE.** Budget sits with the business unit (Head of Corp Dev / CSO / Fund Partner), NOT the GC. Quote: *"Do not pitch the General Counsel to ask for money. Pitch the Chief Strategy Officer, Head of Corp Dev, or Fund Partner to secure their discretionary budget, and arm them with the tamper-evident DPR so they can easily push the deal past their GC and CFO."*
+**Verdict: DEFINITIVE.** Budget sits with the business unit (Head of Corp Dev / CSO / Fund Partner), NOT the GC. Quote: _"Do not pitch the General Counsel to ask for money. Pitch the Chief Strategy Officer, Head of Corp Dev, or Fund Partner to secure their discretionary budget, and arm them with the tamper-evident DPR so they can easily push the deal past their GC and CFO."_
 
 Specific evidence:
+
 - CSO discretionary spend: $250K–$500K departmental
 - Head of Corp Dev: $100K–$300K departmental
 - GC: 65% report budget constraints blocking new tech (cost-center)
-- Mr. Reiner verbatim: *"the buyer is the Chief Strategy Officer, not the data team"*
-- Maalouf principle: *"If you have the trust, they'll fight their CFO"* — sell to business unit, they fight for budget
+- Mr. Reiner verbatim: _"the buyer is the Chief Strategy Officer, not the data team"_
+- Maalouf principle: _"If you have the trust, they'll fight their CFO"_ — sell to business unit, they fight for budget
 - Sankore brief: pitch goes to investment committee, NOT compliance department
 
 **Amendment 2 (buying-committee shape) is hardened.**
@@ -302,8 +318,9 @@ Specific evidence:
 NotebookLM surfaced a critical nuance the draft missed: the reframe applies MID-FUNNEL onward, not top-of-funnel. Top-of-funnel needs the internal-critique frame because that's where Brinkmanship + JOLT FOMU mechanics fire ("the deliberate creation of risk sufficient to encourage the opponent to eliminate that risk"). Personal Social SSOT Archetype 2 (Room Dynamics / FOMU) explicitly relies on the internal-critique hook to trigger the reader.
 
 **Sequenced reframe (the corrected discipline):**
-- **Top-of-funnel** (LinkedIn personal social, cold outreach, conference 1:1 openers): KEEP internal-critique frame. *"Our R²F engine simulates the adversarial reviewer, identifies Reference-Class Blindness, and tells you what they're going to ask you."* The hook fires the JOLT FUD that creates urgency.
-- **Mid-funnel onward** (discovery call, Sparring Room, pricing page, demo, design-partner conversation): PIVOT to external-mandate / cover frame. *"We generate the audit-committee-ready evidence record your reasoning has to defend."* This satisfies Maalouf's trust principles (don't bruise CSO ego), centers the artefact (DPR), and lets the executive buy for self-preservation without admitting their intuition was flawed.
+
+- **Top-of-funnel** (LinkedIn personal social, cold outreach, conference 1:1 openers): KEEP internal-critique frame. _"Our R²F engine simulates the adversarial reviewer, identifies Reference-Class Blindness, and tells you what they're going to ask you."_ The hook fires the JOLT FUD that creates urgency.
+- **Mid-funnel onward** (discovery call, Sparring Room, pricing page, demo, design-partner conversation): PIVOT to external-mandate / cover frame. _"We generate the audit-committee-ready evidence record your reasoning has to defend."_ This satisfies Maalouf's trust principles (don't bruise CSO ego), centers the artefact (DPR), and lets the executive buy for self-preservation without admitting their intuition was flawed.
 
 **Amendment 3 needs revision: the reframe is sequenced (top-of-funnel keeps internal-critique; mid-funnel onward pivots to cover-frame), not universal.**
 
@@ -311,13 +328,13 @@ NotebookLM surfaced a critical nuance the draft missed: the reframe applies MID-
 
 Aggregate scoring (5 dimensions × 9 max each = 45 max):
 
-| Rank | Persona | Aggregate | Critical signals |
-|------|---------|-----------|------------------|
-| 1 | **Head of Corp Dev × Cross-border M&A × F500/FTSE 250** | 43/45 | Moat utilization 5/5 (all 5 layers compound) — the structurally hardest fit |
-| 2 | **CSO × Tech / General Corporate × F500/S&P 500** | 40/45 | Highest budget access ($250K–$500K); 19-framework map slightly less critical without international expansion |
-| 3 | **Fund Partner × PE / VC / Wealth Mgmt × Mid-market £50M-£500M+ AUM** | 38/45 | Cultural-resistance dampens score; LP-pressure increasingly mandates adoption; Sankore-class buyer |
-| 4 | **General Counsel × Financial Services / Tech × Global multinational** | 32/45 | Moat utilization 5/5 BUT budget access only 4/10 — champion, not buyer |
-| 5 | **Audit Committee Chair × Regulated Financial Services × EU/UK Basel III** | 31/45 | Stable demand but slow procurement; moat utilization 3/5 |
+| Rank | Persona                                                                    | Aggregate | Critical signals                                                                                             |
+| ---- | -------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------ |
+| 1    | **Head of Corp Dev × Cross-border M&A × F500/FTSE 250**                    | 43/45     | Moat utilization 5/5 (all 5 layers compound) — the structurally hardest fit                                  |
+| 2    | **CSO × Tech / General Corporate × F500/S&P 500**                          | 40/45     | Highest budget access ($250K–$500K); 19-framework map slightly less critical without international expansion |
+| 3    | **Fund Partner × PE / VC / Wealth Mgmt × Mid-market £50M-£500M+ AUM**      | 38/45     | Cultural-resistance dampens score; LP-pressure increasingly mandates adoption; Sankore-class buyer           |
+| 4    | **General Counsel × Financial Services / Tech × Global multinational**     | 32/45     | Moat utilization 5/5 BUT budget access only 4/10 — champion, not buyer                                       |
+| 5    | **Audit Committee Chair × Regulated Financial Services × EU/UK Basel III** | 31/45     | Stable demand but slow procurement; moat utilization 3/5                                                     |
 
 **Confirms v3.4 thesis:** Heads of Corp Dev #1, CSO #2, Fund Partners #3 are the structurally hardest buyers. GC + Audit Committee are champions, not economic buyers.
 
@@ -325,11 +342,11 @@ Aggregate scoring (5 dimensions × 9 max each = 45 max):
 
 **The Valley of Death Misalignment.** This is the most important finding from the entire synthesis run. NotebookLM's verbatim:
 
-> *"You are pitching an enterprise-grade compliance artifact to a mid-market buyer who lacks the regulatory terror to justify the procurement friction, mathematically guaranteeing you will run out of cash before you build your data moat."*
+> _"You are pitching an enterprise-grade compliance artifact to a mid-market buyer who lacks the regulatory terror to justify the procurement friction, mathematically guaranteeing you will run out of cash before you build your data moat."_
 
 The objection breaks across three sub-claims, each fatal if unaddressed:
 
-1. **Narrative vs. Buyer Mismatch (FUD evaporates).** The DPR-leads-narrative reframe ("audit-committee-ready evidence record") only generates urgency when there's existential regulatory liability behind it. F500 GCs have EU AI Act Art 14 personal liability — the urgency is real. Mid-market buyers DON'T have the same regulatory hammer. *"Regulatory moats matter less in unregulated funds."* Without that mandate, JOLT mechanics fail — there's no urgent "pain of same."
+1. **Narrative vs. Buyer Mismatch (FUD evaporates).** The DPR-leads-narrative reframe ("audit-committee-ready evidence record") only generates urgency when there's existential regulatory liability behind it. F500 GCs have EU AI Act Art 14 personal liability — the urgency is real. Mid-market buyers DON'T have the same regulatory hammer. _"Regulatory moats matter less in unregulated funds."_ Without that mandate, JOLT mechanics fail — there's no urgent "pain of same."
 2. **Procurement Trap.** At £2,499/mo, the personal-card / t-card budget motion is gone. You voluntarily trigger enterprise buying-committee shape. F500 CSO can fight CFO because GC backs them with regulatory cover. Mid-market GC = cost center, vetoes £2,499 as unnecessary expense. Sales cycles stretch to 6–18 months. Founder burns the $200K pre-seed runway long before hitting Mr. Gabe's 5-customer rule.
 3. **Data Moat 60-Day Churn.** Mid-market doesn't close 30 M&A deals fast enough to hit Convergence Threshold. They churn at 60 days due to workflow friction. Bias Genome moat never accumulates. Cloverpop wins via raw data advantage.
 
@@ -352,6 +369,7 @@ The wedge is NOT generic "Mid-market Corp Dev OR Fund Partners." It's specifical
 3. **Deal volume sufficient to hit Convergence Threshold within 24–36 months** — the data moat actually accumulates
 
 **Refined wedge persona (PRIMARY):**
+
 - **GP at £50M–£500M AUM PE/VC fund WITH active LP-governance pressure** (institutional LPs requiring SFDR / ESG / decision-quality reporting; or sovereign-wealth LP backing; or bank-LP-driven). Has all three:
   - Regulatory urgency: LP pressure = fiduciary duty + reporting requirement; some funds also touch Basel III via bank LPs + EU SFDR + SEC AI disclosure
   - Personal-decisive budget: GP at mid-market fund = personal-card-equivalent procurement; no committee at £1,999/mo
@@ -359,6 +377,7 @@ The wedge is NOT generic "Mid-market Corp Dev OR Fund Partners." It's specifical
 - **This is the Sankore pattern — generalize it.** Sankore IS a £70M–£80M+ AUM fund with active LP-governance pressure, the £1,799–£1,999/mo Design Foundation pilot worked, and the v3.4 thesis IS "find more Sankores."
 
 **Refined wedge persona (SECONDARY — tier-1.5):**
+
 - **Head of Corp Dev at $500M–$2B revenue scale-ups with active multi-acquisition rhythm** (3+ deals/year, multi-year M&A roadmap, divisional P&L authority). Has all three:
   - Regulatory urgency: weaker than fund-side, BUT cross-border M&A activates EU AI Act / GDPR / NDPR / PoPIA cover; audit committees at scale-ups increasingly demand reasoning-defensibility
   - Personal-decisive budget: divisional P&L authority = same motion as fund GP (no committee at £1,999/mo)
@@ -377,26 +396,28 @@ The wedge is NOT generic "Mid-market Corp Dev OR Fund Partners." It's specifical
 
 **Pricing tier map (refined):**
 
-| Tier | Price | Buyer | Status v3.4 PROPOSED |
-|------|-------|-------|----------------------|
-| Free | £0 (4 audits/mo) | Anyone curious | Marketing top-of-funnel |
-| Individual | £249/mo (15 audits) | Solo professionals, fractional advisors | Marketing-funnel product. NOT the wedge. |
-| **Wedge: Strategy Founding Tier** | **£1,999/mo (250 audits/mo + 5 seats)** | **Mid-market Fund GPs (LP-pressure) + Mid-market Head of Corp Dev (active acquirer)** | **PRIMARY GROWTH MOTION** |
-| Strategy Expansion | £2,499/mo (500 audits/mo + 10 seats) | Wedge customers expanding | Bridge to ceiling |
-| Strategy+ | £4,999/mo (1000 audits/mo + 20 seats) | Larger mid-market, smaller F500 sub-divisions | Bridge between wedge and ceiling |
-| Enterprise (CEILING) | £50K–£150K ACV custom | F500 / FTSE 250 + £1B+ AUM funds | 12–24 month ceiling target |
+| Tier                              | Price                                   | Buyer                                                                                 | Status v3.4 PROPOSED                     |
+| --------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Free                              | £0 (4 audits/mo)                        | Anyone curious                                                                        | Marketing top-of-funnel                  |
+| Individual                        | £249/mo (15 audits)                     | Solo professionals, fractional advisors                                               | Marketing-funnel product. NOT the wedge. |
+| **Wedge: Strategy Founding Tier** | **£1,999/mo (250 audits/mo + 5 seats)** | **Mid-market Fund GPs (LP-pressure) + Mid-market Head of Corp Dev (active acquirer)** | **PRIMARY GROWTH MOTION**                |
+| Strategy Expansion                | £2,499/mo (500 audits/mo + 10 seats)    | Wedge customers expanding                                                             | Bridge to ceiling                        |
+| Strategy+                         | £4,999/mo (1000 audits/mo + 20 seats)   | Larger mid-market, smaller F500 sub-divisions                                         | Bridge between wedge and ceiling         |
+| Enterprise (CEILING)              | £50K–£150K ACV custom                   | F500 / FTSE 250 + £1B+ AUM funds                                                      | 12–24 month ceiling target               |
 
 ### Refinement C — Reframe SEQUENCED, not universal
 
 Per Q3 finding, the DPR-leads-narrative reframe applies MID-FUNNEL onward only. Cascade gets surgically narrower:
 
 **KEEP internal-critique frame in (top-of-funnel):**
+
 - Personal Social SSOT 6 archetypes — Brinkmanship + JOLT FOMU hooks stay
 - LinkedIn cold outreach openers
 - Conference 1:1 openers
 - Cold-context bridges in the discovery toolkit
 
 **PIVOT to external-mandate / cover frame in (mid-funnel onward):**
+
 - AUDIENCE_PITCHES (Sales Toolkit) — discovery-call+ phase only
 - Closing Lab role-playbooks — discovery-call+ phase
 - Sparring Room scenarios — discovery-call+ phase
@@ -412,10 +433,12 @@ The H1 + immediate body stay untouched — they already do the right work ("...b
 The 11-call gate stays, but the test scope tightens. Set 1 + Set 2 should now specifically test the LP-governance-pressure / active-acquirer signal:
 
 **Set 1 (5 Heads of Corp Dev at $500M-$2B scale-ups via Mr. Reiner) — REVISED Q to add:**
+
 - New Q6: "How many acquisitions has your team executed in the past 24 months? How many do you have in active pipeline for the next 12 months?" (Tests deal-volume signal — disqualify <3 deals/year)
 - New Q7: "Does your audit committee or board demand reasoning-defensibility documentation on M&A votes?" (Tests regulatory-urgency signal)
 
 **Set 2 (3 GPs at £50M-£500M AUM funds via Mr. Gabe) — REVISED Q to add:**
+
 - New Q5: "Do your LPs require any decision-quality / governance reporting in their LP agreements? Are LP demands increasing on this dimension?" (Tests LP-pressure signal — disqualify funds where LPs don't demand it)
 
 **Set 3 (3 GCs at FTSE 250 firms) — STAYS.**
@@ -439,7 +462,6 @@ This means: **before any cascade ships, I should re-read the Sankore brief and s
 - 2026-05-20: v3.4 LOCK decision based on call signal + Sankore stress-test
 - 2026-05-20 → 2026-05-24: cascade across product + positioning (4-6 hour shipment)
 - 2026-05-25: v3.4 published as canonical GTM plan; master KB updated; CLAUDE.md refreshed; investor narrative refreshed
-
 
 ---
 

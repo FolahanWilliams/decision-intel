@@ -56,9 +56,7 @@ export default async function globalSetup(config: FullConfig) {
   }
 
   const baseURL =
-    config.projects[0]?.use?.baseURL ||
-    process.env.PLAYWRIGHT_BASE_URL ||
-    'http://localhost:3000';
+    config.projects[0]?.use?.baseURL || process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 
   // Ensure target directory exists.
   mkdirSync(dirname(STORAGE_STATE_PATH), { recursive: true });
@@ -87,9 +85,7 @@ export default async function globalSetup(config: FullConfig) {
       await passwordField.fill(password);
     }
 
-    const signInButton = page
-      .getByRole('button', { name: /sign in|log in|continue/i })
-      .first();
+    const signInButton = page.getByRole('button', { name: /sign in|log in|continue/i }).first();
     await signInButton.click();
 
     // Wait for redirect to /dashboard. If it doesn't happen within 30s,
@@ -100,10 +96,7 @@ export default async function globalSetup(config: FullConfig) {
     await context.storageState({ path: STORAGE_STATE_PATH });
     console.log(`[e2e/global-setup] signed in successfully; storage-state saved.`);
   } catch (err) {
-    console.error(
-      `[e2e/global-setup] sign-in failed:`,
-      err instanceof Error ? err.message : err
-    );
+    console.error(`[e2e/global-setup] sign-in failed:`, err instanceof Error ? err.message : err);
     throw err;
   } finally {
     await browser.close();

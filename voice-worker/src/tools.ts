@@ -60,7 +60,7 @@ async function callVoiceTool(
     const elapsed = Date.now() - t0;
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-       
+
       console.error(
         `[voice-worker] tool ${toolName} HTTP error: ${res.status} ${res.statusText} elapsedMs=${elapsed} body=${body.slice(0, 200)}`
       );
@@ -69,7 +69,7 @@ async function callVoiceTool(
       return `Tool error (${res.status}): ${body.slice(0, 150) || res.statusText}`;
     }
     const data = (await res.json()) as { ok?: boolean; result?: unknown };
-     
+
     console.log(
       `[voice-worker] tool ${toolName} ok=${data.ok} elapsedMs=${elapsed} args=${JSON.stringify(args).slice(0, 200)}`
     );
@@ -78,7 +78,6 @@ async function callVoiceTool(
     // shape.
     return JSON.stringify(data.result ?? data);
   } catch (err) {
-     
     console.error(`[voice-worker] tool ${toolName} threw:`, err);
     return `Tool error: ${(err as Error).message}`;
   }
@@ -100,11 +99,13 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         properties: {
           title: {
             type: 'string',
-            description: 'Short, action-oriented todo title (e.g., "Email Mr. Reiner re: Sankore intro by Thursday")',
+            description:
+              'Short, action-oriented todo title (e.g., "Email Mr. Reiner re: Sankore intro by Thursday")',
           },
           dueDate: {
             type: 'string',
-            description: 'Optional ISO date string (YYYY-MM-DD) if the founder named a specific deadline',
+            description:
+              'Optional ISO date string (YYYY-MM-DD) if the founder named a specific deadline',
           },
           notes: {
             type: 'string',
@@ -113,7 +114,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         },
         required: ['title'],
       },
-      execute: (args) => callVoiceTool('add_todo', args, ctx),
+      execute: args => callVoiceTool('add_todo', args, ctx),
     }),
 
     track_demo_conversion: llm.tool({
@@ -128,17 +129,26 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
           status: {
             type: 'string',
-            enum: ['interested', 'qualified', 'objection_raised', 'not_a_fit', 'next_step_set', 'converted', 'lost'],
+            enum: [
+              'interested',
+              'qualified',
+              'objection_raised',
+              'not_a_fit',
+              'next_step_set',
+              'converted',
+              'lost',
+            ],
             description: 'The outcome / signal level of this demo or conversation',
           },
           note: {
             type: 'string',
-            description: 'Brief note — what specifically did the prospect say or do that maps to this status?',
+            description:
+              'Brief note — what specifically did the prospect say or do that maps to this status?',
           },
         },
         required: ['prospectName', 'status'],
       },
-      execute: (args) => callVoiceTool('track_demo_conversion', args, ctx),
+      execute: args => callVoiceTool('track_demo_conversion', args, ctx),
     }),
 
     log_positioning_note: llm.tool({
@@ -153,12 +163,13 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
           context: {
             type: 'string',
-            description: 'What was the previous (less-sharp) version, or what triggered the realisation?',
+            description:
+              'What was the previous (less-sharp) version, or what triggered the realisation?',
           },
         },
         required: ['articulation'],
       },
-      execute: (args) => callVoiceTool('log_positioning_note', args, ctx),
+      execute: args => callVoiceTool('log_positioning_note', args, ctx),
     }),
 
     lookup_decision_log: llm.tool({
@@ -169,7 +180,8 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         properties: {
           query: {
             type: 'string',
-            description: 'Optional search string — keywords from the title (e.g., "Sankore", "Series A")',
+            description:
+              'Optional search string — keywords from the title (e.g., "Sankore", "Series A")',
           },
           limit: {
             type: 'number',
@@ -177,7 +189,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
         },
       },
-      execute: (args) => callVoiceTool('lookup_decision_log', args, ctx),
+      execute: args => callVoiceTool('lookup_decision_log', args, ctx),
     }),
 
     lookup_recent_meetings: llm.tool({
@@ -192,7 +204,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
         },
       },
-      execute: (args) => callVoiceTool('lookup_recent_meetings', args, ctx),
+      execute: args => callVoiceTool('lookup_recent_meetings', args, ctx),
     }),
 
     lookup_design_partners: llm.tool({
@@ -202,7 +214,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         type: 'object',
         properties: {},
       },
-      execute: (args) => callVoiceTool('lookup_design_partners', args, ctx),
+      execute: args => callVoiceTool('lookup_design_partners', args, ctx),
     }),
 
     // ─── Phase-2-extended write tools ─────────────────────────────────
@@ -218,7 +230,15 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
           eventType: {
             type: 'string',
-            enum: ['intro_made', 'replied', 'met', 'no_response', 'rescheduled', 'lost_contact', 'note'],
+            enum: [
+              'intro_made',
+              'replied',
+              'met',
+              'no_response',
+              'rescheduled',
+              'lost_contact',
+              'note',
+            ],
             description: 'What happened in this outreach interaction',
           },
           note: {
@@ -228,18 +248,19 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         },
         required: ['personName', 'eventType'],
       },
-      execute: (args) => callVoiceTool('log_outreach_event', args, ctx),
+      execute: args => callVoiceTool('log_outreach_event', args, ctx),
     }),
 
     log_meeting: llm.tool({
       description:
-        "Log a meeting that just happened or that the founder is recapping. Use when the founder narrates a meeting they had — captures the title, attendees, free-form notes, and any high-stakes decisions raised so the meetings log + decision archaeology stay current.",
+        'Log a meeting that just happened or that the founder is recapping. Use when the founder narrates a meeting they had — captures the title, attendees, free-form notes, and any high-stakes decisions raised so the meetings log + decision archaeology stay current.',
       parameters: {
         type: 'object',
         properties: {
           title: {
             type: 'string',
-            description: "Short title (e.g., 'Sankore investment scoping call', 'Mr. Reiner advisor sync')",
+            description:
+              "Short title (e.g., 'Sankore investment scoping call', 'Mr. Reiner advisor sync')",
           },
           attendees: {
             type: 'array',
@@ -253,12 +274,13 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           decisionsRaised: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Strategic decisions that came up that should be added to the decision log',
+            description:
+              'Strategic decisions that came up that should be added to the decision log',
           },
         },
         required: ['title'],
       },
-      execute: (args) => callVoiceTool('log_meeting', args, ctx),
+      execute: args => callVoiceTool('log_meeting', args, ctx),
     }),
 
     log_lesson_learned: llm.tool({
@@ -269,7 +291,8 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         properties: {
           category: {
             type: 'string',
-            description: "Category for the lesson (e.g., 'sales', 'fundraise', 'product', 'positioning', 'general')",
+            description:
+              "Category for the lesson (e.g., 'sales', 'fundraise', 'product', 'positioning', 'general')",
           },
           learning: {
             type: 'string',
@@ -278,7 +301,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         },
         required: ['learning'],
       },
-      execute: (args) => callVoiceTool('log_lesson_learned', args, ctx),
+      execute: args => callVoiceTool('log_lesson_learned', args, ctx),
     }),
 
     schedule_followup: llm.tool({
@@ -302,7 +325,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
         },
         required: ['personName', 'dueDate'],
       },
-      execute: (args) => callVoiceTool('schedule_followup', args, ctx),
+      execute: args => callVoiceTool('schedule_followup', args, ctx),
     }),
 
     // ─── Phase-2-extended read tools ──────────────────────────────────
@@ -322,12 +345,12 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
         },
       },
-      execute: (args) => callVoiceTool('lookup_outreach_status', args, ctx),
+      execute: args => callVoiceTool('lookup_outreach_status', args, ctx),
     }),
 
     lookup_sparring_history: llm.tool({
       description:
-        "Get recent Sparring Room rep history (sales DQI scores, dimensions, persona+mode). Use when founder asks about their pitching practice trends. Note: sparring history is currently stored client-side; this tool returns a placeholder until server-side persistence ships.",
+        'Get recent Sparring Room rep history (sales DQI scores, dimensions, persona+mode). Use when founder asks about their pitching practice trends. Note: sparring history is currently stored client-side; this tool returns a placeholder until server-side persistence ships.',
       parameters: {
         type: 'object',
         properties: {
@@ -337,7 +360,7 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
         },
       },
-      execute: (args) => callVoiceTool('lookup_sparring_history', args, ctx),
+      execute: args => callVoiceTool('lookup_sparring_history', args, ctx),
     }),
 
     lookup_recent_audits: llm.tool({
@@ -352,40 +375,53 @@ export function buildTools(ctx: ToolCallContext): llm.ToolContext {
           },
         },
       },
-      execute: (args) => callVoiceTool('lookup_recent_audits', args, ctx),
+      execute: args => callVoiceTool('lookup_recent_audits', args, ctx),
     }),
 
     capture_novel_idea: llm.tool({
       description:
-        "AUTONOMOUS — fire when the conversation has produced a genuinely novel idea, mechanism, analogy, or falsifier the founder should review later. Do NOT ask permission; capture and tell him you did. Reserve for: (a) a causal mechanism articulated for the first time in this conversation, (b) a cross-domain analogy that opened a non-obvious next step, (c) a steelman/red-team that surfaced a real falsifier, (d) a reintegration candidate worth shipping back into Decision Intel as a feature / new bias detector / positioning shift / new persona. Do NOT capture summaries of things the founder already knows, restatements of locked positioning, or generic encouragement. Three or four genuine captures per week is the right cadence; thirty is noise. The founder reviews captures on the Voice Activity dashboard.",
+        'AUTONOMOUS — fire when the conversation has produced a genuinely novel idea, mechanism, analogy, or falsifier the founder should review later. Do NOT ask permission; capture and tell him you did. Reserve for: (a) a causal mechanism articulated for the first time in this conversation, (b) a cross-domain analogy that opened a non-obvious next step, (c) a steelman/red-team that surfaced a real falsifier, (d) a reintegration candidate worth shipping back into Decision Intel as a feature / new bias detector / positioning shift / new persona. Do NOT capture summaries of things the founder already knows, restatements of locked positioning, or generic encouragement. Three or four genuine captures per week is the right cadence; thirty is noise. The founder reviews captures on the Voice Activity dashboard.',
       parameters: {
         type: 'object',
         properties: {
           title: {
             type: 'string',
-            description: 'Tight idea title, 6-12 words, action-oriented (e.g., "DI-B-023 candidate: anchor-shift bias in cross-currency comparables")',
+            description:
+              'Tight idea title, 6-12 words, action-oriented (e.g., "DI-B-023 candidate: anchor-shift bias in cross-currency comparables")',
           },
           mechanism: {
             type: 'string',
-            description: 'The causal chain in one sentence — X causes Y because of intermediate steps A and B. The mechanism IS the captured insight; without it the capture is decorative.',
+            description:
+              'The causal chain in one sentence — X causes Y because of intermediate steps A and B. The mechanism IS the captured insight; without it the capture is decorative.',
           },
           summary: {
             type: 'string',
-            description: 'Brief context — what the founder was working through when this surfaced, and why it qualified for capture.',
+            description:
+              'Brief context — what the founder was working through when this surfaced, and why it qualified for capture.',
           },
           reintegrationVerdict: {
             type: 'string',
-            enum: ['ship_to_di', 'shift_positioning', 'new_bias_detector', 'new_persona', 'side_bet_outside_di', 'falsifier_to_test', 'discard_after_review'],
-            description: 'Where this idea lives next. ship_to_di = becomes a feature in Decision Intel. shift_positioning = changes how DI is described to buyers. new_bias_detector = candidate for the bias taxonomy (DI-B-023+). new_persona = candidate for a new voice persona / chat persona. side_bet_outside_di = explore on its own track, not part of DI. falsifier_to_test = a specific test that would validate or kill an existing claim. discard_after_review = capture for memory but the founder will likely drop it.',
+            enum: [
+              'ship_to_di',
+              'shift_positioning',
+              'new_bias_detector',
+              'new_persona',
+              'side_bet_outside_di',
+              'falsifier_to_test',
+              'discard_after_review',
+            ],
+            description:
+              'Where this idea lives next. ship_to_di = becomes a feature in Decision Intel. shift_positioning = changes how DI is described to buyers. new_bias_detector = candidate for the bias taxonomy (DI-B-023+). new_persona = candidate for a new voice persona / chat persona. side_bet_outside_di = explore on its own track, not part of DI. falsifier_to_test = a specific test that would validate or kill an existing claim. discard_after_review = capture for memory but the founder will likely drop it.',
           },
           falsifier: {
             type: 'string',
-            description: 'Optional — what evidence in the next 90 days would prove this idea wrong? A capture without a falsifier is a story; a capture WITH one is a hypothesis.',
+            description:
+              'Optional — what evidence in the next 90 days would prove this idea wrong? A capture without a falsifier is a story; a capture WITH one is a hypothesis.',
           },
         },
         required: ['title', 'mechanism', 'reintegrationVerdict'],
       },
-      execute: (args) => callVoiceTool('capture_novel_idea', args, ctx),
+      execute: args => callVoiceTool('capture_novel_idea', args, ctx),
     }),
   };
 }

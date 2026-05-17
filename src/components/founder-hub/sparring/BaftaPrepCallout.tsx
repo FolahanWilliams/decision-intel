@@ -24,11 +24,7 @@ import {
   BUYER_PERSONAS,
   GRADING_DIMENSIONS,
 } from '@/components/founder-hub/sparring/sparring-room-data';
-import {
-  getHighestPriorityUpcomingEvent,
-  daysUntil,
-  ACTION_CADENCE,
-} from '@/lib/data/event-prep';
+import { getHighestPriorityUpcomingEvent, daysUntil, ACTION_CADENCE } from '@/lib/data/event-prep';
 
 /** Minimal structural contract — the full HistoryEntry lives (twice) in
  *  SparringRoomTab + SparringTrendViz; this is a read-only subset so we
@@ -149,8 +145,7 @@ export function BaftaPrepCallout({ history }: Props) {
     const mean = agg.sum / agg.n;
     if (mean < weakestDimMean) {
       weakestDimMean = mean;
-      weakestDimLabel =
-        GRADING_DIMENSIONS.find(d => d.id === dimId)?.label ?? dimId;
+      weakestDimLabel = GRADING_DIMENSIONS.find(d => d.id === dimId)?.label ?? dimId;
     }
   }
 
@@ -158,10 +153,8 @@ export function BaftaPrepCallout({ history }: Props) {
   // event-primary personas first; then lowest latest DQI (undrilled =
   // highest need); then stalest last-rep.
   const recommended = [...rows].sort((a, b) => {
-    if (a.drilledThisWeek !== b.drilledThisWeek)
-      return a.drilledThisWeek - b.drilledThisWeek;
-    if (a.isPrimaryAtEvent !== b.isPrimaryAtEvent)
-      return a.isPrimaryAtEvent ? -1 : 1;
+    if (a.drilledThisWeek !== b.drilledThisWeek) return a.drilledThisWeek - b.drilledThisWeek;
+    if (a.isPrimaryAtEvent !== b.isPrimaryAtEvent) return a.isPrimaryAtEvent ? -1 : 1;
     const aDqi = a.latestDqi ?? -1;
     const bDqi = b.latestDqi ?? -1;
     if (aDqi !== bDqi) return aDqi - bDqi;
@@ -169,18 +162,13 @@ export function BaftaPrepCallout({ history }: Props) {
   })[0];
 
   const prepStep = ACTION_CADENCE.prepArc.reduce((best, cur) =>
-    Math.abs(cur.weeksBeforeEvent - weeksUntil) <
-    Math.abs(best.weeksBeforeEvent - weeksUntil)
+    Math.abs(cur.weeksBeforeEvent - weeksUntil) < Math.abs(best.weeksBeforeEvent - weeksUntil)
       ? cur
       : best
   );
 
   const urgencyColor =
-    days <= 7
-      ? 'var(--error)'
-      : days <= 21
-        ? 'var(--warning)'
-        : 'var(--text-secondary)';
+    days <= 7 ? 'var(--error)' : days <= 21 ? 'var(--warning)' : 'var(--text-secondary)';
 
   return (
     <div
@@ -214,9 +202,7 @@ export function BaftaPrepCallout({ history }: Props) {
           >
             Event prep · rehearsal cadence
           </div>
-          <div
-            style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}
-          >
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
             {event.name}
           </div>
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -226,8 +212,7 @@ export function BaftaPrepCallout({ history }: Props) {
         <div style={{ textAlign: 'right' }}>
           <div
             style={{
-              fontFamily:
-                'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
               fontSize: 28,
               fontWeight: 700,
               color: urgencyColor,
@@ -253,9 +238,7 @@ export function BaftaPrepCallout({ history }: Props) {
           lineHeight: 1.45,
         }}
       >
-        <strong style={{ color: 'var(--text-primary)' }}>
-          This week (T-{weeksUntil}w):
-        </strong>{' '}
+        <strong style={{ color: 'var(--text-primary)' }}>This week (T-{weeksUntil}w):</strong>{' '}
         {prepStep.action}
       </div>
 
@@ -274,14 +257,10 @@ export function BaftaPrepCallout({ history }: Props) {
             <div
               key={r.id}
               style={{
-                border: `1px solid ${
-                  drilled ? 'var(--border-color)' : 'var(--warning)'
-                }`,
+                border: `1px solid ${drilled ? 'var(--border-color)' : 'var(--warning)'}`,
                 borderRadius: 'var(--radius-sm)',
                 padding: '10px 12px',
-                background: drilled
-                  ? 'var(--bg-secondary)'
-                  : 'rgba(245, 158, 11, 0.06)',
+                background: drilled ? 'var(--bg-secondary)' : 'rgba(245, 158, 11, 0.06)',
               }}
             >
               <div
@@ -321,15 +300,11 @@ export function BaftaPrepCallout({ history }: Props) {
               <div
                 style={{
                   fontSize: 11.5,
-                  color: drilled
-                    ? 'var(--text-secondary)'
-                    : 'var(--warning)',
+                  color: drilled ? 'var(--text-secondary)' : 'var(--warning)',
                   marginBottom: 4,
                 }}
               >
-                {drilled
-                  ? `Drilled ${r.drilledThisWeek}× this week`
-                  : 'Not drilled this week'}
+                {drilled ? `Drilled ${r.drilledThisWeek}× this week` : 'Not drilled this week'}
               </div>
               <div
                 style={{
@@ -344,15 +319,10 @@ export function BaftaPrepCallout({ history }: Props) {
                   <>
                     <span>
                       Last DQI{' '}
-                      <strong style={{ color: 'var(--text-primary)' }}>
-                        {r.latestDqi}
-                      </strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>{r.latestDqi}</strong>
                       {r.lastGrade ? ` · ${r.lastGrade}` : ''}
                     </span>
-                    <span
-                      title={t.label}
-                      style={{ color: t.color, fontWeight: 700 }}
-                    >
+                    <span title={t.label} style={{ color: t.color, fontWeight: 700 }}>
                       {t.glyph}
                     </span>
                   </>
@@ -382,23 +352,23 @@ export function BaftaPrepCallout({ history }: Props) {
           <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
             {recommended.label}
           </span>{' '}
-          ({recommended.drilledThisWeek === 0
+          (
+          {recommended.drilledThisWeek === 0
             ? 'not drilled this week'
             : `lowest recent DQI of the wedge`}
-          ){weakestDimLabel ? (
+          )
+          {weakestDimLabel ? (
             <>
               {' '}
               — weakest dimension across the wedge this fortnight is{' '}
-              <strong>{weakestDimLabel}</strong>; run the{' '}
-              <em>networking-event · in-person</em> mode and target it under
-              30-second-hook pressure.
+              <strong>{weakestDimLabel}</strong>; run the <em>networking-event · in-person</em> mode
+              and target it under 30-second-hook pressure.
             </>
           ) : (
             <>
               {' '}
-              — run the <em>networking-event · in-person</em> mode (BAFTA is a
-              cocktail-hour event; the verbatim phrasing has to fire under
-              30-second-hook pressure).
+              — run the <em>networking-event · in-person</em> mode (BAFTA is a cocktail-hour event;
+              the verbatim phrasing has to fire under 30-second-hook pressure).
             </>
           )}
         </div>

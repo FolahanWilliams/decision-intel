@@ -315,7 +315,6 @@ export default function DemoPage() {
         }
       };
 
-       
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;

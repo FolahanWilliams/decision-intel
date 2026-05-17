@@ -87,11 +87,7 @@ export default function DecisionsPage() {
   // whether the user has a mode chip active on the kanban. Without this,
   // filtering down to "Acquisitions" would silently hide a critical
   // investment-mode signal that the reader still needs to act on.
-  const { containers: portfolioContainers } = useContainers(
-    { status: 'active' },
-    1,
-    200
-  );
+  const { containers: portfolioContainers } = useContainers({ status: 'active' }, 1, 200);
 
   const heroSubtitle = useMemo(() => {
     if (view === 'log') {
@@ -133,9 +129,7 @@ export default function DecisionsPage() {
           null on empty input so cold-start users see the kanban empty
           state below instead of a stack of skeleton cards). */}
       {portfolioContainers.length > 0 && (
-        <div
-          style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}
-        >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
           <ErrorBoundary sectionName="Portfolio verdict band">
             <PortfolioVerdictBand containers={portfolioContainers} />
           </ErrorBoundary>

@@ -528,15 +528,16 @@ export interface StageTransitionResult {
  *     same-stage no-ops stay ALLOWED — rigidity must not block sending a
  *     decision back for more work.
  */
-export function validateStageTransition(
-  input: StageTransitionInput
-): StageTransitionResult {
+export function validateStageTransition(input: StageTransitionInput): StageTransitionResult {
   const { kind, fromStageId, toStageId, attachedDocTypes } = input;
   const mode = getContainerMode(kind);
 
   const toStage = mode.stages.find(s => s.id === toStageId);
   if (!toStage) {
-    return { allowed: false, reason: `"${toStageId}" is not a valid stage for a ${mode.label.toLowerCase()}.` };
+    return {
+      allowed: false,
+      reason: `"${toStageId}" is not a valid stage for a ${mode.label.toLowerCase()}.`,
+    };
   }
 
   // No-op move is always fine.
@@ -546,10 +547,7 @@ export function validateStageTransition(
 
   // Committee-gate doc requirement: entering the committee stage OR any
   // post-committee stage requires the full required-doc set.
-  if (
-    toStage.phase === 'committee_gate' ||
-    toStage.phase === 'post_committee'
-  ) {
+  if (toStage.phase === 'committee_gate' || toStage.phase === 'post_committee') {
     const attached = new Set(attachedDocTypes);
     const missing = mode.requiredDocsForCommittee.filter(d => !attached.has(d));
     if (missing.length > 0) {
@@ -561,11 +559,7 @@ export function validateStageTransition(
   }
 
   // The committee gate cannot be skipped (even with docs present).
-  if (
-    fromStage &&
-    fromStage.phase === 'pre_committee' &&
-    toStage.phase === 'post_committee'
-  ) {
+  if (fromStage && fromStage.phase === 'pre_committee' && toStage.phase === 'post_committee') {
     return {
       allowed: false,
       reason: `Cannot skip ${mode.committeeLabel} — move through the committee stage before ${toStage.label}.`,

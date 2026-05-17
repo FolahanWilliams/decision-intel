@@ -21,7 +21,15 @@
 
 import { useState } from 'react';
 import { AccentCard } from '@/components/ui/AccentCard';
-import { ShieldQuestion, Loader2, AlertCircle, CheckCircle2, Target, TrendingDown, Sparkles } from 'lucide-react';
+import {
+  ShieldQuestion,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Target,
+  TrendingDown,
+  Sparkles,
+} from 'lucide-react';
 import { MIN_DEFENCE_CHARS } from '@/lib/containers/premortem-defence';
 import type { ContainerDetail } from '@/types/containers';
 
@@ -140,7 +148,13 @@ export function PremortemDefenceCaptureCard({
                 >
                   {a.question}
                 </div>
-                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-primary)', lineHeight: 1.5 }}>
+                <div
+                  style={{
+                    fontSize: 'var(--fs-sm)',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.5,
+                  }}
+                >
                   {a.writtenDefence}
                 </div>
               </div>
@@ -369,7 +383,11 @@ export function PremortemDefenceCaptureCard({
               cursor: submitting ? 'wait' : 'pointer',
             }}
           >
-            {submitting ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+            {submitting ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <CheckCircle2 size={14} />
+            )}
             {submitting ? 'Recording…' : 'Record defence — unlock outcome logging'}
           </button>
         </div>

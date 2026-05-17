@@ -41,11 +41,13 @@ The canonical framework is the **Sean Ellis test**, operationalised by **Rahul V
 For high-stakes-decision-audit SaaS, individual-tier validation predicts team-tier success only when early users represent the vanguard of the eventual enterprise buying committee.
 
 **Leading indicators** (Phase 1 metrics):
+
 - High frequency of logging critical decisions
 - High ratio of completed audits per active user
 - Organic, unsolicited usage of the output artefact in external communications (board decks, regulatory filings)
 
 **Lagging indicators (ignore in Phase 1):**
+
 - Aggregate revenue
 - Net Promoter Score
 - Standard churn metrics
@@ -58,14 +60,14 @@ For high-stakes-decision-audit SaaS, individual-tier validation predicts team-ti
 
 ### Graduation matrix
 
-| Company | Individual / Prosumer Wedge | Enterprise Catalyst | Key Graduation Signal |
-|---------|------------------------------|---------------------|------------------------|
-| Notion | Personal Wiki / Notes | Team collaboration thresholds | Template sharing across internal corporate domains |
-| Figma | Browser-based design | Developer/PM handoff friction | Multi-disciplinary doc access + SAML SSO needs |
-| Linear | High-speed issue tracking | Git integration + sprint cycles | Codebase connection + PR workflow automation |
-| Calendly | Personal scheduling link | Calendar integration limits | Corporate domain density + multi-user routing |
-| Vercel | Hobbyist frontend hosting | Team deployment pipelines | Next.js collaboration + enterprise edge security |
-| Airtable | Individual relational databases | Cross-department data silos | Base sharing across distinct organisational units |
+| Company  | Individual / Prosumer Wedge     | Enterprise Catalyst             | Key Graduation Signal                              |
+| -------- | ------------------------------- | ------------------------------- | -------------------------------------------------- |
+| Notion   | Personal Wiki / Notes           | Team collaboration thresholds   | Template sharing across internal corporate domains |
+| Figma    | Browser-based design            | Developer/PM handoff friction   | Multi-disciplinary doc access + SAML SSO needs     |
+| Linear   | High-speed issue tracking       | Git integration + sprint cycles | Codebase connection + PR workflow automation       |
+| Calendly | Personal scheduling link        | Calendar integration limits     | Corporate domain density + multi-user routing      |
+| Vercel   | Hobbyist frontend hosting       | Team deployment pipelines       | Next.js collaboration + enterprise edge security   |
+| Airtable | Individual relational databases | Cross-department data silos     | Base sharing across distinct organisational units  |
 
 ### Detailed case findings
 
@@ -99,12 +101,12 @@ ChartMogul analysis of 2,100+ SaaS companies: top-decile venture-backed startups
 
 ### Empirical pacing for solo-founder vertical B2B SaaS
 
-| Months | ARR Band | Primary Goal |
-|--------|----------|--------------|
-| 1-6 | Zero → $10K MRR | 40% PMF threshold, founder-led sales only, NOT top-line revenue |
-| 6-18 | $10K → $83K MRR ($1M ARR) | Repeatable distribution + upfront annual payments (negative working capital). **Only 3.3% hit $1M in <12 months; 2-5 years is median.** |
-| 18-36 | $1M → $3M ARR | Top quartile grows 60-70% annually. Capital raised here only to pour fuel on validated distribution. |
-| 36-72 | $3M → $10M ARR | 40-50% of net new revenue from expansion; NRR >110% required |
+| Months | ARR Band                  | Primary Goal                                                                                                                            |
+| ------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 1-6    | Zero → $10K MRR           | 40% PMF threshold, founder-led sales only, NOT top-line revenue                                                                         |
+| 6-18   | $10K → $83K MRR ($1M ARR) | Repeatable distribution + upfront annual payments (negative working capital). **Only 3.3% hit $1M in <12 months; 2-5 years is median.** |
+| 18-36  | $1M → $3M ARR             | Top quartile grows 60-70% annually. Capital raised here only to pour fuel on validated distribution.                                    |
+| 36-72  | $3M → $10M ARR            | 40-50% of net new revenue from expansion; NRR >110% required                                                                            |
 
 ---
 
@@ -129,6 +131,7 @@ Diluting the initial user base with non-decision-makers artificially inflates to
 Empirical record strongly supports 12-week structured design-partner engagements as the optimal bridge to generate reference architectures and validate team-level workflows.
 
 Early infrastructure APIs relied on direct, embedded partnerships:
+
 - **Plaid** integrated deeply with early fintechs to map edge cases in financial-institution connectivity, turning beta partners into public case studies
 - **Stripe** used early developer cohorts to refine API documentation and error handling
 - **Snowflake** $200M partnership with OpenAI uses design partners (Canva, WHOOP) to test LLM integration with proprietary enterprise data in secure governed environments
@@ -166,6 +169,7 @@ Healthy referral architecture targets **0.2-0.5 qualified introductions per acti
 **Burn Multiple = Net Burn / Net New ARR.** Exceptional <1.0× (one dollar new ARR per dollar burned).
 
 A startup is justified in remaining in PMF discovery — burning minimal capital — until:
+
 - Superhuman PMF score consistently exceeds 40%
 - Gross churn drops below 5% annually
 - CAC payback period drops below 12 months
@@ -184,16 +188,16 @@ Empirical: **SEO and content marketing average ROI 702%, breaking even ~7 months
 
 ## §8 6-year compounding model to £10M ARR
 
-| Phase / Year | Target ARR | Empirical Growth Rate | Key Focus / Milestone | Mortality Cause |
-|--------------|------------|-----------------------|------------------------|------------------|
-| Year 1 | £0 - £100K | N/A | PMF Validation, Individual Wedge | False positive PMF signals |
-| Year 2 | £100K - £1M | 150-200% | Distribution channel established, design partner conversion | Founder burnout, runway depletion |
-| Year 3 | £1M - £3M | 80-120% | Mid-Market Team Tier scaling, 100%+ NDR | Churn outpacing acquisition |
-| Year 4 | £3M - £5M | 60-80% | GTM formalisation, hiring sales/CS | Inefficient S&M spend |
-| Year 5 | £5M - £7.5M | 40-60% | Expansion ARR (>40% of net new) | Failure to expand existing accounts |
-| Year 6 | £7.5M - £10M+ | 30-40% | Enterprise ceiling penetration, Rule of 40 | Stagnant product catalogues |
+| Phase / Year | Target ARR    | Empirical Growth Rate | Key Focus / Milestone                                       | Mortality Cause                     |
+| ------------ | ------------- | --------------------- | ----------------------------------------------------------- | ----------------------------------- |
+| Year 1       | £0 - £100K    | N/A                   | PMF Validation, Individual Wedge                            | False positive PMF signals          |
+| Year 2       | £100K - £1M   | 150-200%              | Distribution channel established, design partner conversion | Founder burnout, runway depletion   |
+| Year 3       | £1M - £3M     | 80-120%               | Mid-Market Team Tier scaling, 100%+ NDR                     | Churn outpacing acquisition         |
+| Year 4       | £3M - £5M     | 60-80%                | GTM formalisation, hiring sales/CS                          | Inefficient S&M spend               |
+| Year 5       | £5M - £7.5M   | 40-60%                | Expansion ARR (>40% of net new)                             | Failure to expand existing accounts |
+| Year 6       | £7.5M - £10M+ | 30-40%                | Enterprise ceiling penetration, Rule of 40                  | Stagnant product catalogues         |
 
-*Data synthesised from ChartMogul, OpenView, Bessemer State of the Cloud reports.*
+_Data synthesised from ChartMogul, OpenView, Bessemer State of the Cloud reports._
 
 ### Empirical parameters at £1M-£10M
 
@@ -210,6 +214,7 @@ Empirical: **SEO and content marketing average ROI 702%, breaking even ~7 months
 **Motion:** Prosumer SaaS at £249/month targeting strictly continuous buyer-classes (fractional CSOs, mid-market Corp Dev, active PE GPs).
 
 **Milestones:**
+
 - 40 active paid customers (£10K MRR) to sustain server costs and hit breakeven on $200K runway
 - Execute the Vohra PMF Engine 2× in the period
 - 5 documented ROI case studies
@@ -221,6 +226,7 @@ Empirical: **SEO and content marketing average ROI 702%, breaking even ~7 months
 **Motion:** Use the scheduled summer 2026 Sankore engagement as the ultimate sandbox to validate team-tier feature set.
 
 **Deliverables:**
+
 - Fully hashed tamper-evident DPR used to clear a live IC audit
 - Per-organisation Brier-scored outcome calibration loops
 
@@ -231,6 +237,7 @@ Empirical: **SEO and content marketing average ROI 702%, breaking even ~7 months
 **Motion:** Leverage Sankore artefacts to execute team-tier motion at £1,999-£4,999/month. Coincides with founder's US relocation (Nov 2027) and EU AI Act enforcement (Aug 2026), generating massive procurement pull.
 
 **Milestones:**
+
 - 40 Team-tier customers (£1M-£2M ARR)
 - Maintain >110% NRR + CAC payback period <6 months
 - Activate Mr. Gabe (UK investor) + Mr. Reiner (US enterprise) connections only after 5+ mid-market success stories compiled
@@ -258,6 +265,7 @@ Empirical: **SEO and content marketing average ROI 702%, breaking even ~7 months
 ### Metrics dashboard recommendation
 
 Per Individual customer, track:
+
 - **Acquisition Source:** filter by continuous vs non-continuous buyer class
 - **Usage Frequency:** audits initiated per week
 - **Outcomes Logged:** Brier-scores generated and regulatory frameworks triggered

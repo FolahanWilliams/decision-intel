@@ -69,12 +69,11 @@ export default function TermsOfServicePage() {
             </h2>
             <p>
               Decision Intel is the reasoning audit platform. The Platform runs the
-              Recognition-Rigor Framework (R²F) audit pipeline over strategic documents —
-              detecting cognitive biases, scoring decision noise, computing a Decision Quality
-              Index (DQI), producing a Decision Provenance Record (DPR), and tracking outcomes
-              for calibration. Analysis results are generated with the assistance of
-              machine-learning models and should be used as a supplement to, not a replacement
-              for, professional judgment.
+              Recognition-Rigor Framework (R²F) audit pipeline over strategic documents — detecting
+              cognitive biases, scoring decision noise, computing a Decision Quality Index (DQI),
+              producing a Decision Provenance Record (DPR), and tracking outcomes for calibration.
+              Analysis results are generated with the assistance of machine-learning models and
+              should be used as a supplement to, not a replacement for, professional judgment.
             </p>
           </section>
 

@@ -138,18 +138,21 @@ describe('parseExtractionResponse — defensive parsing', () => {
   });
 
   it('strips markdown code-fence noise', () => {
-    const fenced = '```json\n' + JSON.stringify({
-      signals: [
-        {
-          key: 'synergy_realisation_pct',
-          quote: 'fenced quote',
-          proxy: 'fenced proxy',
-          horizonDays: 180,
-          predictedConfidence: 0.7,
-          rationale: 'r',
-        },
-      ],
-    }) + '\n```';
+    const fenced =
+      '```json\n' +
+      JSON.stringify({
+        signals: [
+          {
+            key: 'synergy_realisation_pct',
+            quote: 'fenced quote',
+            proxy: 'fenced proxy',
+            horizonDays: 180,
+            predictedConfidence: 0.7,
+            rationale: 'r',
+          },
+        ],
+      }) +
+      '\n```';
     const signals = parseExtractionResponse(fenced);
     expect(signals).toHaveLength(1);
     expect(signals[0].quote).toBe('fenced quote');

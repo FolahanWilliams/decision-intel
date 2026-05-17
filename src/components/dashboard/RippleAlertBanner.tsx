@@ -251,11 +251,7 @@ export function RippleAlertBanner() {
                 alignItems: 'flex-start',
               }}
             >
-              <Icon
-                size={16}
-                style={{ color, flexShrink: 0, marginTop: 2 }}
-                aria-hidden="true"
-              />
+              <Icon size={16} style={{ color, flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
               <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                 <div
                   style={{
@@ -306,8 +302,9 @@ export function RippleAlertBanner() {
                     lineHeight: 1.5,
                   }}
                 >
-                  {group.dependents.length} active decision{group.dependents.length !== 1 ? 's' : ''}{' '}
-                  rest{group.dependents.length === 1 ? 's' : ''} on this anchor — review whether the
+                  {group.dependents.length} active decision
+                  {group.dependents.length !== 1 ? 's' : ''} rest
+                  {group.dependents.length === 1 ? 's' : ''} on this anchor — review whether the
                   assumption still holds before the next committee gate.
                 </p>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -385,8 +382,8 @@ export function RippleAlertBanner() {
             ripple
             {totalRemaining - visibleGroups.reduce((acc, g) => acc + g.dependents.length, 0) !== 1
               ? 's'
-              : ''}
-            {' '}across other anchors
+              : ''}{' '}
+            across other anchors
           </span>
           <button
             type="button"
@@ -409,7 +406,6 @@ export function RippleAlertBanner() {
           </button>
         </footer>
       )}
-
     </div>
   );
 }

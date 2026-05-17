@@ -148,7 +148,7 @@ describe('getStrongestInteractions', () => {
     expect(top[0]?.bias).toBe('planning_fallacy');
     expect(top[0]?.weight).toBe(1.6);
     // No self in results.
-    expect(top.find((t) => t.bias === 'inside_view_dominance')).toBeUndefined();
+    expect(top.find(t => t.bias === 'inside_view_dominance')).toBeUndefined();
     // Sorted by descending |weight - 1|.
     for (let i = 1; i < top.length; i++) {
       const prev = Math.abs((top[i - 1]?.weight ?? 1) - 1);

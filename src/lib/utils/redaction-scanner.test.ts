@@ -92,9 +92,7 @@ describe('applyRedactions — stable numbering + index safety', () => {
     expect(redactedText).not.toContain('bob@y.com');
     expect(redactedText.match(/\[EMAIL_1\]/g)?.length).toBe(2); // alice appears twice
     expect(redactedText).toContain('[EMAIL_2]'); // bob once
-    expect(Object.keys(placeholderMap)).toEqual(
-      expect.arrayContaining(['[EMAIL_1]', '[EMAIL_2]'])
-    );
+    expect(Object.keys(placeholderMap)).toEqual(expect.arrayContaining(['[EMAIL_1]', '[EMAIL_2]']));
     expect(placeholderMap['[EMAIL_1]']).toBe('alice@x.com');
   });
 

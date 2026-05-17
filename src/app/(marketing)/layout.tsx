@@ -114,8 +114,7 @@ const jsonLd = [
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
-        description:
-          `For the high-stakes strategist. 15 audits/month, ${BIAS_COUNT} bias types, forgotten-question prediction, and your Personal Decision History.`,
+        description: `For the high-stakes strategist. 15 audits/month, ${BIAS_COUNT} bias types, forgotten-question prediction, and your Personal Decision History.`,
       },
       {
         '@type': 'Offer',

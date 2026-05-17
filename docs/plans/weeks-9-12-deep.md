@@ -103,7 +103,7 @@ model DecisionRoomBlindPrior {               // new
 
 ## 4.4 Decision Package
 
-**Concept:** A *Decision Package* is a named bundle of related documents (memo + model + counsel review + IC deck) that constitutes a single decision. Cross-reference + composite DQI already runs at the **Deal** level (3.1 deep) — the Decision Package generalises this to non-Deal decisions (board recommendations, market-entry recs, RFP responses) where there's no Deal row to anchor on.
+**Concept:** A _Decision Package_ is a named bundle of related documents (memo + model + counsel review + IC deck) that constitutes a single decision. Cross-reference + composite DQI already runs at the **Deal** level (3.1 deep) — the Decision Package generalises this to non-Deal decisions (board recommendations, market-entry recs, RFP responses) where there's no Deal row to anchor on.
 
 **Why this is the depth move:** Today, a CSO uploading a board recommendation has no concept of "this is one decision composed of three documents" — they upload three docs separately, the audit runs per-doc, and there's no aggregation. The Deal page solves this for M&A; Decision Package solves it for everyone else.
 

@@ -26,7 +26,7 @@ type Response = { veryDisappointed: string | null; phase1PersonaAtTime: string |
 function mkResponses(
   spec: Array<{ pmf: 'vd' | 'sd' | 'nd' | 'pending'; persona?: string }>
 ): Response[] {
-  const map: Record<typeof spec[number]['pmf'], string | null> = {
+  const map: Record<(typeof spec)[number]['pmf'], string | null> = {
     vd: 'very_disappointed',
     sd: 'somewhat_disappointed',
     nd: 'not_disappointed',
@@ -93,7 +93,10 @@ describe('aggregateHxcCohortMetrics — graduation gate (≥40% on N ≥ 5)', ()
     // 39/100 → still rounds to 39. Use 39:61 split with N=100.
     const responses: Response[] = [];
     for (let i = 0; i < 39; i++)
-      responses.push({ veryDisappointed: 'very_disappointed', phase1PersonaAtTime: 'fractional_cso' });
+      responses.push({
+        veryDisappointed: 'very_disappointed',
+        phase1PersonaAtTime: 'fractional_cso',
+      });
     for (let i = 0; i < 61; i++)
       responses.push({
         veryDisappointed: 'somewhat_disappointed',
@@ -132,9 +135,15 @@ describe('aggregateHxcCohortMetrics — kill threshold (<30% on N ≥ 5)', () =>
   it('fires when 5/20 → 25% < 30%', () => {
     const responses: Response[] = [];
     for (let i = 0; i < 5; i++)
-      responses.push({ veryDisappointed: 'very_disappointed', phase1PersonaAtTime: 'fractional_cso' });
+      responses.push({
+        veryDisappointed: 'very_disappointed',
+        phase1PersonaAtTime: 'fractional_cso',
+      });
     for (let i = 0; i < 15; i++)
-      responses.push({ veryDisappointed: 'not_disappointed', phase1PersonaAtTime: 'fractional_cso' });
+      responses.push({
+        veryDisappointed: 'not_disappointed',
+        phase1PersonaAtTime: 'fractional_cso',
+      });
     const m = aggregateHxcCohortMetrics(responses, WINDOW_START, WINDOW_END);
     expect(m.veryDisappointedPct).toBe(25);
     expect(m.killThresholdHit).toBe(true);
@@ -144,9 +153,15 @@ describe('aggregateHxcCohortMetrics — kill threshold (<30% on N ≥ 5)', () =>
   it('does NOT fire at exactly 30%', () => {
     const responses: Response[] = [];
     for (let i = 0; i < 3; i++)
-      responses.push({ veryDisappointed: 'very_disappointed', phase1PersonaAtTime: 'fractional_cso' });
+      responses.push({
+        veryDisappointed: 'very_disappointed',
+        phase1PersonaAtTime: 'fractional_cso',
+      });
     for (let i = 0; i < 7; i++)
-      responses.push({ veryDisappointed: 'not_disappointed', phase1PersonaAtTime: 'fractional_cso' });
+      responses.push({
+        veryDisappointed: 'not_disappointed',
+        phase1PersonaAtTime: 'fractional_cso',
+      });
     const m = aggregateHxcCohortMetrics(responses, WINDOW_START, WINDOW_END);
     expect(m.veryDisappointedPct).toBe(30);
     expect(m.killThresholdHit).toBe(false);

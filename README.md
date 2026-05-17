@@ -183,14 +183,14 @@ The 12-node pipeline runs both halves in parallel and arbitrates them in the met
 
 **Six paper-anchored signals on every Decision Provenance Record (locked 2026-04-30):**
 
-| Signal                       | Anchor                                          | What it measures                                                                                                                                                                            |
-| :--------------------------- | :---------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Validity Classification**  | Kahneman & Klein 2009 (1st condition)           | High / medium / low / zero validity band per documentType + industry. Drives DQI methodology v2.1.0 structural weight shift in low-validity domains.                                        |
-| **Org Calibration**          | Brier scoring over historical outcomes          | Whether the DQI shown is calibrated against THIS organization's outcome history (Cloverpop-defense move). Falls back to platform seed baseline (Brier 0.258 over 143 cases) on cold start.  |
-| **Feedback Adequacy**        | Kahneman & Klein 2009 (2nd condition)           | Closed-loop feedback verdict for the user (adequate / sparse / cold_start). Per the 2009 paper, intuitive expertise requires repeated rapid feedback in the relevant domain.                |
-| **Reference Class Forecast** | Kahneman & Lovallo 2003 HBR                     | Top-5 historical analogs from the 143-case library + matched-class baseline failure rate + four-band predicted-outcome verdict. The outside-view benchmark to the memo's inside-view story. |
-| **Counterfactual Impact**    | Wilson confidence over historical outcome data  | Top-3 bias-specific scenarios with expected DQI improvement %, sample size, and monetary anchor where the DecisionFrame carries a deal value.                                               |
-| **Recommended Action**       | Highest-priority mitigation from biasDetective  | The single forward-looking action the GC or audit committee can take before signing.                                                                                                        |
+| Signal                       | Anchor                                         | What it measures                                                                                                                                                                            |
+| :--------------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Validity Classification**  | Kahneman & Klein 2009 (1st condition)          | High / medium / low / zero validity band per documentType + industry. Drives DQI methodology v2.1.0 structural weight shift in low-validity domains.                                        |
+| **Org Calibration**          | Brier scoring over historical outcomes         | Whether the DQI shown is calibrated against THIS organization's outcome history (Cloverpop-defense move). Falls back to platform seed baseline (Brier 0.258 over 143 cases) on cold start.  |
+| **Feedback Adequacy**        | Kahneman & Klein 2009 (2nd condition)          | Closed-loop feedback verdict for the user (adequate / sparse / cold_start). Per the 2009 paper, intuitive expertise requires repeated rapid feedback in the relevant domain.                |
+| **Reference Class Forecast** | Kahneman & Lovallo 2003 HBR                    | Top-5 historical analogs from the 143-case library + matched-class baseline failure rate + four-band predicted-outcome verdict. The outside-view benchmark to the memo's inside-view story. |
+| **Counterfactual Impact**    | Wilson confidence over historical outcome data | Top-3 bias-specific scenarios with expected DQI improvement %, sample size, and monetary anchor where the DecisionFrame carries a deal value.                                               |
+| **Recommended Action**       | Highest-priority mitigation from biasDetective | The single forward-looking action the GC or audit committee can take before signing.                                                                                                        |
 
 **Two new bias detectors (locked 2026-04-30, items #3 + #9 of the paper-application sprint):**
 
@@ -207,14 +207,14 @@ The platform's core differentiator: a deterministic, mathematically rigorous sco
 
 A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions. **Methodology v2.1.0 (locked 2026-04-30)** — adds Kahneman & Klein 2009 first-condition validity-aware structural weight shift; legacy inputs (no `validityClass`) report `2.0.0-no-validity` so the procurement reader can tell which methodology produced a given DQI.
 
-| Component                | Default Weight | Measures                                                                              |
-| :----------------------- | :------------- | :------------------------------------------------------------------------------------ |
-| **Bias Load**            | 28%            | Severity-weighted bias count over the 22-bias taxonomy (DI-B-001 through DI-B-022)    |
-| **Noise Level**          | 18%            | Inter-judge variance from triple-judge noise measurement                              |
-| **Evidence Quality**     | 18%            | Fact-check verification rate and source reliability                                   |
-| **Process Maturity**     | 13%            | Prior submitted, outcomes tracked, dissent present, System 1 ratio                    |
-| **Compliance Risk**      | 13%            | Regulatory framework violation score                                                  |
-| **Historical Alignment** | 10%            | Correlation with 143-case database failure/success patterns                           |
+| Component                | Default Weight | Measures                                                                           |
+| :----------------------- | :------------- | :--------------------------------------------------------------------------------- |
+| **Bias Load**            | 28%            | Severity-weighted bias count over the 22-bias taxonomy (DI-B-001 through DI-B-022) |
+| **Noise Level**          | 18%            | Inter-judge variance from triple-judge noise measurement                           |
+| **Evidence Quality**     | 18%            | Fact-check verification rate and source reliability                                |
+| **Process Maturity**     | 13%            | Prior submitted, outcomes tracked, dissent present, System 1 ratio                 |
+| **Compliance Risk**      | 13%            | Regulatory framework violation score                                               |
+| **Historical Alignment** | 10%            | Correlation with 143-case database failure/success patterns                        |
 
 **Validity-aware shift** (locked 2026-04-30): in **low-validity** environments (M&A, market entry, long-horizon strategy) the engine reweights `+0.10 historicalAlignment, +0.02 biasLoad, −0.05 evidenceQuality, −0.04 processMaturity, −0.03 complianceRisk` (re-normalized to sum 1.0). In **zero-validity** environments (5+ year forecasts, novel-market predictions): `+0.20 historicalAlignment, +0.04 biasLoad, −0.08 evidenceQuality, −0.10 processMaturity, −0.06 complianceRisk`. The reference-class signal becomes the dominant DQI driver where verifiable facts about the present don't predict outcomes.
 

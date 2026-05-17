@@ -469,11 +469,7 @@ export async function pollDriveInstallationForSignals(install: {
 
   let listed: AmbientDriveFile[];
   try {
-    const files = await listRecentFilesInFolders(
-      drive,
-      install.monitoredFolders,
-      modifiedAfterIso
-    );
+    const files = await listRecentFilesInFolders(drive, install.monitoredFolders, modifiedAfterIso);
     listed = files.map(f => ({
       id: f.id,
       name: f.name,

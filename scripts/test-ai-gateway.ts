@@ -45,7 +45,8 @@ process.on('unhandledRejection', () => {
 
 import { generateText, streamText } from '../src/lib/ai/providers/gateway';
 
-const PROMPT = 'In 2-3 sentences, explain the Recognition-Rigor Framework (R²F) — Decision Intel\'s synthesis of Kahneman & Klein. Be specific.';
+const PROMPT =
+  "In 2-3 sentences, explain the Recognition-Rigor Framework (R²F) — Decision Intel's synthesis of Kahneman & Klein. Be specific.";
 
 /**
  * Classify gateway errors into actionable categories so a one-off run
@@ -193,9 +194,7 @@ async function runGenerateTest(model: string): Promise<{
 
 async function main() {
   if (!process.env.AI_GATEWAY_API_KEY) {
-    process.stderr.write(
-      '✗ AI_GATEWAY_API_KEY is not set after loading .env.local.\n'
-    );
+    process.stderr.write('✗ AI_GATEWAY_API_KEY is not set after loading .env.local.\n');
 
     // Common failure mode: case-sensitivity typo when the var was added in
     // the Vercel dashboard (e.g. `Ai_GATEWAY_API_KEY` with lowercase i).
@@ -209,9 +208,7 @@ async function main() {
     });
 
     if (similar.length > 0) {
-      process.stderr.write(
-        '\n  Possible typo — these similarly-named env vars ARE set:\n'
-      );
+      process.stderr.write('\n  Possible typo — these similarly-named env vars ARE set:\n');
       for (const k of similar) {
         process.stderr.write(`    · ${k}\n`);
       }
@@ -231,9 +228,7 @@ async function main() {
     process.exit(1);
   }
 
-  process.stdout.write(
-    'Vercel AI Gateway smoke test · Phase 1 of the multi-model migration\n'
-  );
+  process.stdout.write('Vercel AI Gateway smoke test · Phase 1 of the multi-model migration\n');
   process.stdout.write(
     `Key length: ${process.env.AI_GATEWAY_API_KEY.length} chars (not echoed for safety)\n`
   );
@@ -289,7 +284,7 @@ async function main() {
         '  1. Top up credits (immediate fix · recommended for production):\n' +
         '     https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dtop-up\n' +
         '     ($5–$20 typically enough for development + staged migration).\n' +
-        '  2. Wait for Vercel\'s resolution (no ETA published).\n' +
+        "  2. Wait for Vercel's resolution (no ETA published).\n" +
         '\nOnce credits land, re-run `npm run test:gateway` to confirm. The\n' +
         'integration is otherwise ready for Phase 2 staged migration.\n'
     );

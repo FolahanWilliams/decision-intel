@@ -539,8 +539,7 @@ export default function LandingPage() {
                     <strong style={{ color: C.slate900, fontWeight: 700 }}>
                       Conglomerate Fallacy
                     </strong>
-                    :{' '}
-                    far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
+                    : far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
                   </li>
                   <li
                     style={{
@@ -552,8 +551,7 @@ export default function LandingPage() {
                     <strong style={{ color: C.slate900, fontWeight: 700 }}>
                       Winner&rsquo;s Curse
                     </strong>
-                    :{' '}
-                    auction-dynamic anchoring above intrinsic value.
+                    : auction-dynamic anchoring above intrinsic value.
                   </li>
                 </ul>
                 <p

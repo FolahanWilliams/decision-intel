@@ -94,7 +94,12 @@
 
 .dpr-document-root {
   font-family:
-    'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    'Inter Variable',
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-feature-settings: 'cv11', 'ss01', 'ss03';
   font-variant-numeric: tabular-nums;
   font-size: var(--dpr-type-body);
@@ -810,8 +815,7 @@
 
 .dpr-risk-strip-foot-val {
   text-align: right;
-  font-family:
-    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
   letter-spacing: -0.005em;
 }
 
@@ -936,8 +940,7 @@
   text-transform: uppercase;
   color: var(--dpr-grey-500);
   margin-bottom: var(--dpr-space-1);
-  font-family:
-    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-family: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 .dpr-finding-title {

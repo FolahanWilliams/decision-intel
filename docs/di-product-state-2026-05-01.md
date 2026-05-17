@@ -58,6 +58,7 @@ A decision intelligence audit platform for corporate strategy + corp dev + M&A t
 **GTM wedge (next 6 months):** Individual buyers @ £249/mo — UK + US
 
 Personas:
+
 - **CSOs at FTSE 250 / mid-market scale-ups** + S&P 500 sub-segments where the CSO has discretionary tooling spend
 - **Heads of M&A / Corporate Development at scale-ups and PE-backed mid-market**
 - **Heads of Strategic Planning** reporting up to a CSO

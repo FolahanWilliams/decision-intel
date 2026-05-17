@@ -34,7 +34,10 @@ export class SessionMetrics {
   private llmOutputTokens = 0;
   private turnCount = 0;
 
-  constructor(public readonly sessionId: string, public readonly personaId: string) {}
+  constructor(
+    public readonly sessionId: string,
+    public readonly personaId: string
+  ) {}
 
   recordSttSeconds(seconds: number): void {
     this.sttSeconds += seconds;
@@ -76,7 +79,6 @@ export class SessionMetrics {
   }
 
   log(prefix = 'session'): void {
-     
     console.log(`[voice-worker:${prefix}]`, JSON.stringify(this.summary()));
   }
 }

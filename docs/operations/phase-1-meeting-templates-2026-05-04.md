@@ -69,7 +69,7 @@ NotebookLM Q2 finding (2026-05-04) was load-bearing: the 4-page DPR is procureme
 
 > Hi [First Name],
 >
-> I read your post on [their specific recent topic — e.g. "the strategy-bandwidth gap for CSOs" / "scenario planning under tariff volatility"]. The one Kahneman called *illusion of validity* lands hardest in that exact context — confident strategic narratives that look coherent but aren't backed by base rates from comparable situations. Most fractional CSOs catch this in their clients' memos; far fewer catch it in their own.
+> I read your post on [their specific recent topic — e.g. "the strategy-bandwidth gap for CSOs" / "scenario planning under tariff volatility"]. The one Kahneman called _illusion of validity_ lands hardest in that exact context — confident strategic narratives that look coherent but aren't backed by base rates from comparable situations. Most fractional CSOs catch this in their clients' memos; far fewer catch it in their own.
 >
 > I run a small platform that audits strategic memos for these patterns in 60 seconds. Most fractional CSOs run 3-5 client engagements at any time; the Individual tier (£249/mo) tends to absorb into existing retainer billing without procurement.
 >
@@ -81,7 +81,7 @@ NotebookLM Q2 finding (2026-05-04) was load-bearing: the 4-page DPR is procureme
 
 > Hi [First Name],
 >
-> I noticed [their firm] just announced [recent acquisition / strategic move]. The bias pattern Lovallo & Kahneman called *inside-view dominance* — projecting forward without grounded comparables from a reference class — shows up in 60-70% of mid-market M&A memos in our 143-case library. Even when the deal is right, the case for it usually isn't built the way the audit committee will eventually want to see.
+> I noticed [their firm] just announced [recent acquisition / strategic move]. The bias pattern Lovallo & Kahneman called _inside-view dominance_ — projecting forward without grounded comparables from a reference class — shows up in 60-70% of mid-market M&A memos in our 143-case library. Even when the deal is right, the case for it usually isn't built the way the audit committee will eventually want to see.
 >
 > I run a platform that audits IC memos for these patterns in 60 seconds, surfaces the predicted committee pushback questions, and lays out the rough cost-of-getting-it-wrong against deals of comparable size. Most Heads of Corp Dev at $50M-$500M revenue scale-ups are running on personal-card budget for tooling like this — the Individual tier (£249/mo) sits below most procurement gates.
 >
@@ -105,7 +105,7 @@ NotebookLM Q2 finding (2026-05-04) was load-bearing: the 4-page DPR is procureme
 
 > Hi [First Name],
 >
-> Saw your most recent investor letter / strategic update on [topic]. The pattern most PE-backed founders run into when the board reviews strategic plays is *coherent confidence* — overconfident narratives that look airtight but skip the base rates from comparable strategic moves. Doesn't mean the play is wrong; it means the case for it usually doesn't survive the toughest board question.
+> Saw your most recent investor letter / strategic update on [topic]. The pattern most PE-backed founders run into when the board reviews strategic plays is _coherent confidence_ — overconfident narratives that look airtight but skip the base rates from comparable strategic moves. Doesn't mean the play is wrong; it means the case for it usually doesn't survive the toughest board question.
 >
 > I run a platform that audits strategic memos for exactly this in 60 seconds. The Individual tier (£249/mo) sits on personal-card budget — well below board reporting thresholds. Useful before the next quarterly board meeting or any major capital-allocation review.
 >

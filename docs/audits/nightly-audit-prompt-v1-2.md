@@ -221,7 +221,7 @@ archetypes, mix of Phase 1 HXC + expansion):
   Phase 1 HXC) + **Riya** (pre-seed VC associate). Fresh wedge focus.
 - **Potomac** (boutique M&A advisor) + **Damien** (mid-market corp dev,
   Phase 1 HXC) + **Adaeze** (Pan-African fund partner). Fresh ceiling
-  + expansion mix.
+  - expansion mix.
 - **Margaret** (F500 CSO) + **Aisha** (smaller-fund GP, Phase 1 HXC) +
   **Henrik** (PE-backed founder, Phase 1 HXC). Cycles back to F500 with
   fresh HXC partners.

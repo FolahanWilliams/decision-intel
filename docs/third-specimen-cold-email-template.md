@@ -59,6 +59,7 @@
 **Conversion expectation:** ~30-40% reply rate (the ask is unusual + low-friction; people enjoy nominating cases). ~10% follow through with a nominated case. Each followed-through case = 1 new specimen DPR = the moat extends one sector.
 
 **What to do with the nominated case:**
+
 1. Verify it's publicly known (no NDA risk; the recipient suggested it precisely because it's public)
 2. Pull the publicly-available pre-decision artefacts (S-1, board memo, IPO prospectus, public IC summary)
 3. Run the audit pipeline end-to-end

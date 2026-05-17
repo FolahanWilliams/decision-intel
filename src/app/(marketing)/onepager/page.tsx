@@ -26,10 +26,7 @@ import Image from 'next/image';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
-import {
-  PROCUREMENT_CONTACT_EMAIL,
-  FOUNDED_YEAR,
-} from '@/lib/constants/company-info';
+import { PROCUREMENT_CONTACT_EMAIL, FOUNDED_YEAR } from '@/lib/constants/company-info';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
@@ -67,8 +64,7 @@ export default function OnepagerPage() {
         background: C.bg,
         minHeight: '100vh',
         padding: '64px 16px',
-        fontFamily:
-          'var(--font-serif, "Times New Roman", Georgia, serif)',
+        fontFamily: 'var(--font-serif, "Times New Roman", Georgia, serif)',
       }}
     >
       <article
@@ -142,14 +138,14 @@ export default function OnepagerPage() {
             <p style={bodyParaStyle}>
               McKinsey: only <strong>8% of corporate strategies</strong> deliver against their
               stated objectives. KPMG: <strong>70-90% of M&amp;A deals</strong> fail to realize
-              projected synergies. The reasoning behind those memos arrives at the audit
-              committee with none of the discipline applied to the underlying data.
+              projected synergies. The reasoning behind those memos arrives at the audit committee
+              with none of the discipline applied to the underlying data.
             </p>
             <p style={bodyParaStyle}>
-              When the EU AI Act Article 14 record-keeping obligation hits in August 2026,
-              Fortune 500 GCs need an artifact that documents not just what was decided, but
-              the reasoning that produced it. None of the incumbent platforms (Cloverpop,
-              IBM watsonx.governance, Palantir Foundry) produce that artifact today.
+              When the EU AI Act Article 14 record-keeping obligation hits in August 2026, Fortune
+              500 GCs need an artifact that documents not just what was decided, but the reasoning
+              that produced it. None of the incumbent platforms (Cloverpop, IBM watsonx.governance,
+              Palantir Foundry) produce that artifact today.
             </p>
           </section>
 
@@ -163,11 +159,10 @@ export default function OnepagerPage() {
               composite Decision Quality Index, and emits a hashed Decision Provenance Record.
             </p>
             <p style={bodyParaStyle}>
-              The DPR is the artifact your audit committee defends — mapped onto EU AI Act Art
-              14, Basel III ICAAP, SEC AI disclosure, plus {FRAMEWORK_COUNT} regulatory
-              frameworks covering G7, EU, GCC, and African markets (NDPR, CBN, WAEMU, PoPIA,
-              SARB, ISA Nigeria 2007). Every confirmed outcome compounds back into per-org
-              Brier-scored calibration.
+              The DPR is the artifact your audit committee defends — mapped onto EU AI Act Art 14,
+              Basel III ICAAP, SEC AI disclosure, plus {FRAMEWORK_COUNT} regulatory frameworks
+              covering G7, EU, GCC, and African markets (NDPR, CBN, WAEMU, PoPIA, SARB, ISA Nigeria
+              2007). Every confirmed outcome compounds back into per-org Brier-scored calibration.
             </p>
           </section>
         </div>
@@ -191,11 +186,7 @@ export default function OnepagerPage() {
             label="audited corporate decisions"
             sub="reference library"
           />
-          <Stat
-            value={String(BIAS_COUNT)}
-            label="cognitive biases detected"
-            sub="R²F taxonomy"
-          />
+          <Stat value={String(BIAS_COUNT)} label="cognitive biases detected" sub="R²F taxonomy" />
           <Stat
             value={String(FRAMEWORK_COUNT)}
             label="regulatory frameworks"
@@ -209,21 +200,22 @@ export default function OnepagerPage() {
         {/* 03 — team */}
         <section>
           <SectionLabel index="03" title="Team" />
-          <h3 style={sectionHeadingStyle}>Technical founder. Audited methodology. Senior advisor.</h3>
+          <h3 style={sectionHeadingStyle}>
+            Technical founder. Audited methodology. Senior advisor.
+          </h3>
           <p style={bodyParaStyle}>
             Decision Intel is built by Folahan Williams — Lagos-raised, UK-resident, US-bound for
-            university. Published research on the cognitive-bias mechanics behind the 2008
-            financial crisis. Runs a financial-literacy initiative teaching finance +
-            psychological principles to middle-school students. The Lagos perspective on
-            cross-border capital allocation is the anchor behind the cross-border M&amp;A
-            coverage built into the product.
+            university. Published research on the cognitive-bias mechanics behind the 2008 financial
+            crisis. Runs a financial-literacy initiative teaching finance + psychological principles
+            to middle-school students. The Lagos perspective on cross-border capital allocation is
+            the anchor behind the cross-border M&amp;A coverage built into the product.
           </p>
           <p style={bodyParaStyle}>
             Advised by a senior cybersecurity-and-governance operator who took a venture-stage
-            company through a $32B strategic acquisition. The codebase IS the company — any
-            senior full-stack engineer can onboard in weeks; the R²F pipeline, the
-            {BIAS_COUNT}-bias taxonomy, and the {FRAMEWORK_COUNT}-framework regulatory registry
-            are all inspectable in the GitHub repo on request.
+            company through a $32B strategic acquisition. The codebase IS the company — any senior
+            full-stack engineer can onboard in weeks; the R²F pipeline, the
+            {BIAS_COUNT}-bias taxonomy, and the {FRAMEWORK_COUNT}-framework regulatory registry are
+            all inspectable in the GitHub repo on request.
           </p>
         </section>
 
@@ -231,9 +223,7 @@ export default function OnepagerPage() {
         <hr style={{ border: 0, borderTop: `1px solid ${C.rule}`, margin: '48px 0' }} />
 
         {/* Sources strip */}
-        <section
-          style={{ fontSize: 12, color: C.meta, lineHeight: 1.8, letterSpacing: '0.02em' }}
-        >
+        <section style={{ fontSize: 12, color: C.meta, lineHeight: 1.8, letterSpacing: '0.02em' }}>
           <div
             style={{
               fontSize: 11,
@@ -282,10 +272,7 @@ export default function OnepagerPage() {
             textTransform: 'uppercase',
           }}
         >
-          <Link
-            href="/"
-            style={{ color: C.text, textDecoration: 'none', fontWeight: 600 }}
-          >
+          <Link href="/" style={{ color: C.text, textDecoration: 'none', fontWeight: 600 }}>
             decision-intel.com
           </Link>
           <a
@@ -345,15 +332,7 @@ function SectionLabel({ index, title }: { index: string; title: string }) {
   );
 }
 
-function Stat({
-  value,
-  label,
-  sub,
-}: {
-  value: string;
-  label: string;
-  sub: string;
-}) {
+function Stat({ value, label, sub }: { value: string; label: string; sub: string }) {
   return (
     <div>
       <div

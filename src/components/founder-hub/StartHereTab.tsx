@@ -178,13 +178,7 @@ export function StartHereTab({ onNavigateToTab }: Props) {
     if (!hydrated) return [];
     const candidates: TabId[] = activeJourney
       ? activeJourney.path
-      : [
-          'unicorn_roadmap',
-          'path_to_100m',
-          'overview',
-          'positioning_hub',
-          'outreach_hub',
-        ];
+      : ['unicorn_roadmap', 'path_to_100m', 'overview', 'positioning_hub', 'outreach_hub'];
     const unvisited = candidates.filter(id => !visited.has(id));
     return unvisited
       .slice(0, 4)

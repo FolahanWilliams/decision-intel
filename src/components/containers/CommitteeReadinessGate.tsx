@@ -271,8 +271,8 @@ export function CommitteeReadinessGate({ container }: CommitteeReadinessGateProp
           }}
         >
           Required documents (gate 1) is a hard gate: the decision cannot enter the committee stage
-          until they&apos;re attached. Gates 2&ndash;5 are advisory &mdash; they surface friction the
-          committee will see; they don&apos;t block the decision.
+          until they&apos;re attached. Gates 2&ndash;5 are advisory &mdash; they surface friction
+          the committee will see; they don&apos;t block the decision.
         </div>
       )}
     </div>

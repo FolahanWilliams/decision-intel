@@ -79,9 +79,7 @@ test.describe('Money path · upload → analyze → DPR export', () => {
     await memoInput.fill(SAMPLE_MEMO);
 
     // ── Step 3: hit submit / analyze ──
-    const submitButton = page
-      .getByRole('button', { name: /audit|analyze|submit|run/i })
-      .first();
+    const submitButton = page.getByRole('button', { name: /audit|analyze|submit|run/i }).first();
     if (await submitButton.isVisible().catch(() => false)) {
       await submitButton.click();
     }
@@ -140,10 +138,7 @@ test.describe('Money path · upload → analyze → DPR export', () => {
     expect(reachable.length).toBeGreaterThanOrEqual(4);
   });
 
-  test('DPR export route gates correctly + returns a PDF for owners', async ({
-    page,
-    request,
-  }) => {
+  test('DPR export route gates correctly + returns a PDF for owners', async ({ page, request }) => {
     await page.goto('/dashboard?view=browse');
     await page.waitForLoadState('networkidle');
 
@@ -177,10 +172,7 @@ test.describe('Money path · upload → analyze → DPR export', () => {
 });
 
 test.describe('Money path · deal archive contract', () => {
-  test.skip(
-    !hasAuth,
-    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated archive checks.'
-  );
+  test.skip(!hasAuth, 'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated archive checks.');
 
   test.use({
     storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
@@ -210,10 +202,7 @@ test.describe('Money path · deal archive auth gate', () => {
 /* ────────────────────────────────────────────────────────────── */
 
 test.describe('Money path · deal detail v2 shell', () => {
-  test.skip(
-    !hasAuth,
-    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated deal detail.'
-  );
+  test.skip(!hasAuth, 'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated deal detail.');
 
   test.use({
     storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
@@ -250,10 +239,7 @@ test.describe('Money path · deal detail v2 shell', () => {
 });
 
 test.describe('Money path · package detail v2 shell', () => {
-  test.skip(
-    !hasAuth,
-    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated package detail.'
-  );
+  test.skip(!hasAuth, 'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated package detail.');
 
   test.use({
     storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
@@ -286,10 +272,7 @@ test.describe('Money path · package detail v2 shell', () => {
 });
 
 test.describe('Home dashboard · unified decisions feed', () => {
-  test.skip(
-    !hasAuth,
-    'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated home dashboard.'
-  );
+  test.skip(!hasAuth, 'Skipped: needs PLAYWRIGHT_STORAGE_STATE for authenticated home dashboard.');
 
   test.use({
     storageState: process.env.PLAYWRIGHT_STORAGE_STATE || undefined,
@@ -310,13 +293,21 @@ test.describe('Home dashboard · unified decisions feed', () => {
     const allDeals = page.getByRole('link', { name: /^all deals/i });
     const allPkgs = page.getByRole('link', { name: /^all packages/i });
 
-    const hasAllDocs = await allDocs.first().isVisible().catch(() => false);
-    const hasAllDeals = await allDeals.first().isVisible().catch(() => false);
-    const hasAllPkgs = await allPkgs.first().isVisible().catch(() => false);
+    const hasAllDocs = await allDocs
+      .first()
+      .isVisible()
+      .catch(() => false);
+    const hasAllDeals = await allDeals
+      .first()
+      .isVisible()
+      .catch(() => false);
+    const hasAllPkgs = await allPkgs
+      .first()
+      .isVisible()
+      .catch(() => false);
 
     // All three rails should surface (even on an empty account, the
     // links render so the user knows where to go).
     expect(hasAllDocs && hasAllDeals && hasAllPkgs).toBe(true);
   });
 });
-

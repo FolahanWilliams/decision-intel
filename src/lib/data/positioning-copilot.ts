@@ -467,8 +467,7 @@ export const PITCH_SLIDES: PitchSlide[] = [
     index: 2,
     title: 'Insight',
     purpose: 'Share a fresh perspective',
-    decisionIntelAnswer:
-      `Strategic failure is not a data problem. It's a bias problem. The ${BIAS_COUNT}-bias R²F taxonomy, well-studied since Kahneman, has never been operationalized at the C-suite. We did it in 60 seconds per memo.`,
+    decisionIntelAnswer: `Strategic failure is not a data problem. It's a bias problem. The ${BIAS_COUNT}-bias R²F taxonomy, well-studied since Kahneman, has never been operationalized at the C-suite. We did it in 60 seconds per memo.`,
     kind: 'hook',
   },
   {
@@ -641,8 +640,7 @@ export const POSITIONING_NODES: PositioningNode[] = [
     id: 'bias',
     label: 'Memo Bias',
     kind: 'problem',
-    detail:
-      `Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. ${BIAS_COUNT}-bias R²F taxonomy. Uncaught in most peer review.`,
+    detail: `Cognitive bias in strategic memos — confirmation, anchoring, sunk cost, etc. ${BIAS_COUNT}-bias R²F taxonomy. Uncaught in most peer review.`,
   },
   {
     id: 'tenure',

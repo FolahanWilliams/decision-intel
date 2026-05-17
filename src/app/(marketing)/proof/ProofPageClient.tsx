@@ -242,8 +242,8 @@ export function ProofPageClient() {
                 }}
               >
                 Across these {deepCases.length} pre-decision documents, hundreds of billions in
-                market capitalization were destroyed after bias-laden reasoning made it through
-                the audit committee.
+                market capitalization were destroyed after bias-laden reasoning made it through the
+                audit committee.
               </h3>
               <p
                 style={{
@@ -254,9 +254,9 @@ export function ProofPageClient() {
                 }}
               >
                 Every flag below was visible in writing <strong>before</strong> the outcome was
-                known. The DPR your audit committee defends is the artifact that catches the
-                same reasoning patterns on your next strategic memo — for £249/mo per seat,
-                not the McKinsey bill.
+                known. The DPR your audit committee defends is the artifact that catches the same
+                reasoning patterns on your next strategic memo — for £249/mo per seat, not the
+                McKinsey bill.
               </p>
             </div>
           </div>
@@ -411,8 +411,7 @@ export function ProofPageClient() {
                 marginBottom: 8,
               }}
             >
-              What the {evidence.documentType ?? 'document'} carried, in writing, before the
-              outcome
+              What the {evidence.documentType ?? 'document'} carried, in writing, before the outcome
             </div>
             <h3
               style={{
@@ -437,9 +436,9 @@ export function ProofPageClient() {
                 maxWidth: 720,
               }}
             >
-              The original auditors signed off. The audit committee approved. A 60-second R²F
-              audit on the same {evidence.documentType ?? 'document'} would have surfaced every
-              item below before any of this {Math.abs(yearsElapsed) > 0 ? `${yearsElapsed}-year` : '12-month'}{' '}
+              The original auditors signed off. The audit committee approved. A 60-second R²F audit
+              on the same {evidence.documentType ?? 'document'} would have surfaced every item below
+              before any of this {Math.abs(yearsElapsed) > 0 ? `${yearsElapsed}-year` : '12-month'}{' '}
               outcome could unfold.
             </p>
           </div>

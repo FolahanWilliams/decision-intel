@@ -514,12 +514,12 @@ export function HowItWorksClient() {
             title="Individual biases are features. Combinations are catastrophic."
             body={
               <>
-                Our {MATRIX_DIMENSION}×{MATRIX_DIMENSION} interaction matrix scores every bias pair against the others.
-                Context amplifiers multiply the score when monetary stakes are high, dissent is
-                absent, or time pressure is active. False-positive damping kicks in when a pattern
-                gets flagged but the outcome succeeded. Over time, each organization calibrates its
-                own weights from its own outcomes, which is why this section of the engine is the
-                hardest to replicate.
+                Our {MATRIX_DIMENSION}×{MATRIX_DIMENSION} interaction matrix scores every bias pair
+                against the others. Context amplifiers multiply the score when monetary stakes are
+                high, dissent is absent, or time pressure is active. False-positive damping kicks in
+                when a pattern gets flagged but the outcome succeeded. Over time, each organization
+                calibrates its own weights from its own outcomes, which is why this section of the
+                engine is the hardest to replicate.
               </>
             }
           />

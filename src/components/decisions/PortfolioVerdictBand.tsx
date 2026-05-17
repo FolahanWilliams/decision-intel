@@ -22,14 +22,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import {
-  ShieldCheck,
-  AlertTriangle,
-  AlertOctagon,
-  Clock,
-  Hash,
-  CalendarClock,
-} from 'lucide-react';
+import { ShieldCheck, AlertTriangle, AlertOctagon, Clock, Hash, CalendarClock } from 'lucide-react';
 import type { ContainerSummary } from '@/types/containers';
 import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 import { gradeMetaFromScore } from '@/lib/utils/grade';
@@ -248,11 +241,7 @@ export function PortfolioVerdictBand({ containers }: Props) {
         <StatTile
           label="Active decisions"
           value={String(metrics.activeCount)}
-          hint={
-            metrics.worstGrade
-              ? `worst grade · ${metrics.worstGrade}`
-              : 'no composite DQI yet'
-          }
+          hint={metrics.worstGrade ? `worst grade · ${metrics.worstGrade}` : 'no composite DQI yet'}
         />
         <StatTile
           label="Documents audited"
@@ -267,9 +256,7 @@ export function PortfolioVerdictBand({ containers }: Props) {
           label="Next committee gate"
           value={metrics.nextGate ? `T-${metrics.nextGate.daysOut}d` : '—'}
           hint={metrics.nextGate ? metrics.nextGate.name : 'no gates set'}
-          accent={
-            metrics.nextGate && metrics.nextGate.daysOut <= 7 ? 'var(--warning)' : undefined
-          }
+          accent={metrics.nextGate && metrics.nextGate.daysOut <= 7 ? 'var(--warning)' : undefined}
           icon={<CalendarClock size={11} />}
         />
       </div>
@@ -362,13 +349,7 @@ function StatTile({
   );
 }
 
-function MetaChip({
-  children,
-  icon,
-}: {
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-}) {
+function MetaChip({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
       {icon}

@@ -46,7 +46,7 @@ describe('computeAlgorithmAversion — dismissive language', () => {
         b(
           'overconfidence_bias',
           'critical',
-          'The numbers don\'t tell the whole story. This is more art than science, ' +
+          "The numbers don't tell the whole story. This is more art than science, " +
             'and I trust my gut here.'
         ),
       ],
@@ -69,7 +69,11 @@ describe('computeAlgorithmAversion — dismissive language', () => {
   it('compound authority/illusion bias hits elevate the band', () => {
     const withCompound = computeAlgorithmAversion({
       biases: [
-        b('illusion_of_validity', 'critical', 'Despite what the data says, experience tells me otherwise.'),
+        b(
+          'illusion_of_validity',
+          'critical',
+          'Despite what the data says, experience tells me otherwise.'
+        ),
         b('authority_bias', 'high', 'The senior partner is certain.'),
       ],
       summary: null,

@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import { Check, Network, Lock, Loader2, AlertCircle } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface KGMergeConsentModalProps {
   open: boolean;

@@ -3,6 +3,7 @@
 **Use this file for the manual end-to-end Decision Intel diagnostic.**
 
 Two artefacts combined into one paste-ready corpus:
+
 1. **Boeing's July 1, 2024 press release** announcing the $8.3B Spirit AeroSystems re-acquisition.
 2. **Boeing's July 31, 2024 Q2 2024 earnings call** transcript — the Spirit-specific portions (CEO Dave Calhoun + CFO Brian West prepared remarks + the one analyst Q&A exchange that touched Spirit).
 
@@ -45,6 +46,7 @@ The Reference Class Forecast block on the DPR cover should ideally surface re-ac
 --- BEGIN PASTE ---
 
 # Boeing to Acquire Spirit AeroSystems
+
 ## Boeing press release · July 1, 2024
 
 Boeing has entered into a definitive agreement to acquire Spirit AeroSystems in an all-stock transaction valued at approximately $4.7 billion in equity, or $37.25 per share. The total transaction value is approximately $8.3 billion, including Spirit's net debt.
@@ -92,6 +94,7 @@ Forward-looking statements speak only as of the date made. The company assumes n
 ---
 
 # Boeing Q2 2024 Earnings Call · July 31, 2024
+
 ## Spirit AeroSystems-specific portions
 
 ### Prepared remarks · Dave Calhoun, President and CEO

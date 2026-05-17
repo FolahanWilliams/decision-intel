@@ -26,13 +26,13 @@ the worker.
 
 ## Stack
 
-| Layer        | Provider                       | Cost                       |
-| ------------ | ------------------------------ | -------------------------- |
-| Transport    | LiveKit Cloud                  | Free tier covers single user |
-| STT          | Deepgram Nova-3                | ~$0.35 / hour              |
-| LLM          | Grok 4.3 via Vercel AI Gateway | ~$0.50-1.50 / hour         |
-| TTS          | Cartesia Sonic-2               | ~$0.50-1 / hour            |
-| Worker host  | Railway                        | $5/mo                      |
+| Layer       | Provider                       | Cost                         |
+| ----------- | ------------------------------ | ---------------------------- |
+| Transport   | LiveKit Cloud                  | Free tier covers single user |
+| STT         | Deepgram Nova-3                | ~$0.35 / hour                |
+| LLM         | Grok 4.3 via Vercel AI Gateway | ~$0.50-1.50 / hour           |
+| TTS         | Cartesia Sonic-2               | ~$0.50-1 / hour              |
+| Worker host | Railway                        | $5/mo                        |
 
 Realistic monthly spend at 1.5–2 hours/day: **$80-180/mo**.
 
@@ -115,13 +115,13 @@ without live LiveKit + Deepgram + Cartesia + Grok credentials, so:
 
 ## Cost guardrails
 
-| Guard                  | Where                                                  |
-| ---------------------- | ------------------------------------------------------ |
-| Per-session 30-min cap | JWT TTL (token endpoint) + worker `setTimeout`         |
+| Guard                  | Where                                                        |
+| ---------------------- | ------------------------------------------------------------ |
+| Per-session 30-min cap | JWT TTL (token endpoint) + worker `setTimeout`               |
 | Per-turn word cap      | Voice mode addendum (per-persona, in `thinking-partners.ts`) |
-| Citation shortening    | Voice mode addendum                                    |
-| Spend dashboard        | DEFERRED — Prisma model needed; founder approval first |
-| Monthly kill switch    | DEFERRED — admin setting needed                        |
+| Citation shortening    | Voice mode addendum                                          |
+| Spend dashboard        | DEFERRED — Prisma model needed; founder approval first       |
+| Monthly kill switch    | DEFERRED — admin setting needed                              |
 
 In-memory per-session metrics log to stdout in JSON (grep
 `[voice-worker:end]` in Railway logs to see per-session cost

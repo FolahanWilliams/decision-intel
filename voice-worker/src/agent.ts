@@ -68,7 +68,7 @@ function parseRoomMetadata(raw: string | undefined | null): RoomMetadata {
     // Bad metadata JSON should never happen — token endpoint always
     // produces valid stringified JSON. Log loudly if it does so we can
     // diagnose without falling back silently.
-     
+
     console.warn('[voice-worker] room metadata not valid JSON, falling back to defaults:', err);
     return {};
   }
@@ -129,13 +129,12 @@ export default defineAgent({
     //   - anthropic/claude-haiku-4-5 (likely; not yet tested in voice)
     const knownBrokenLlmPrefixes = ['xai/', 'deepseek/'];
     if (knownBrokenLlmPrefixes.some(p => config.llm.model.startsWith(p))) {
-       
       console.warn(
         '\n' +
           '═══════════════════════════════════════════════════════════════════\n' +
           `[voice-worker] ⚠ LLM model ${config.llm.model} is in the known-broken list.\n` +
-          '  The LiveKit OpenAI plugin\'s streaming parser does not match this\n' +
-          '  provider\'s OpenAI-compat format via Vercel AI Gateway. Symptom:\n' +
+          "  The LiveKit OpenAI plugin's streaming parser does not match this\n" +
+          "  provider's OpenAI-compat format via Vercel AI Gateway. Symptom:\n" +
           '  "TTS stream stalled" + "Cartesia returned error" mid-reply.\n' +
           '  FIX: in Railway Variables, set VOICE_LLM_MODEL=openai/gpt-4o-mini\n' +
           '  (or remove VOICE_LLM_MODEL/GROK_MODEL so the default kicks in).\n' +
@@ -163,18 +162,23 @@ export default defineAgent({
         signal: AbortSignal.timeout(8000),
       });
       const body = await res.text();
-       
+
       console.log(
         `[voice-worker] connectivity probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
       );
     } catch (probeErr) {
       const e = probeErr as { name?: string; message?: string; cause?: unknown };
-       
+
       console.error(
         '[voice-worker] connectivity probe FAILED — Node fetch cannot reach LiveKit regions endpoint',
-        '\n  name:', e?.name,
-        '\n  message:', e?.message,
-        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause
+        '\n  name:',
+        e?.name,
+        '\n  message:',
+        e?.message,
+        '\n  cause:',
+        typeof e?.cause === 'object'
+          ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object))
+          : e?.cause
       );
       // Don't throw — let the worker continue to boot so we can compare
       // probe failure vs ctx.connect failure for the same session. If the
@@ -206,7 +210,7 @@ export default defineAgent({
             method: 'HEAD',
             signal: AbortSignal.timeout(3000),
           });
-           
+
           console.log(
             `[voice-worker] api prewarm ${name} — url=${url} status=${res.status} elapsedMs=${Date.now() - t0}`
           );
@@ -215,7 +219,7 @@ export default defineAgent({
           // the actual session call but blocks HEAD requests (some do),
           // session-time TLS still has to handshake. Logged so we know
           // which provider didn't warm.
-           
+
           console.warn(
             `[voice-worker] api prewarm ${name} skipped — ${(warmErr as Error).message} (session-time will pay full TLS cost for this provider)`
           );
@@ -235,9 +239,9 @@ export default defineAgent({
     // to capture (a) the URL in case it's malformed, (b) the FULL error
     // chain (message + stack + cause) ourselves before re-throwing.
     const assignedUrl = (ctx.info as { url?: string } | undefined)?.url ?? '<no-url-in-ctx.info>';
-     
+
     console.log(
-      `[voice-worker] entry start — jobId=${ctx.job.id} room=${(ctx.room.name ?? 'unknown-room')} assignedUrl=${assignedUrl}`
+      `[voice-worker] entry start — jobId=${ctx.job.id} room=${ctx.room.name ?? 'unknown-room'} assignedUrl=${assignedUrl}`
     );
 
     // Re-run the connectivity probe HERE in the entry function. The
@@ -254,18 +258,23 @@ export default defineAgent({
         signal: AbortSignal.timeout(8000),
       });
       const body = await res.text();
-       
+
       console.log(
         `[voice-worker] entry-process probe — url=${probeUrl} status=${res.status} bodyBytes=${body.length} elapsedMs=${Date.now() - t0}`
       );
     } catch (probeErr) {
       const e = probeErr as { name?: string; message?: string; cause?: unknown };
-       
+
       console.error(
         '[voice-worker] entry-process probe FAILED — Node fetch cannot reach LiveKit regions endpoint from job process',
-        '\n  name:', e?.name,
-        '\n  message:', e?.message,
-        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause
+        '\n  name:',
+        e?.name,
+        '\n  message:',
+        e?.message,
+        '\n  cause:',
+        typeof e?.cause === 'object'
+          ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object))
+          : e?.cause
       );
     }
 
@@ -299,14 +308,21 @@ export default defineAgent({
       // underlying region-fetch / signaling cause that pino truncates
       // when the worker harness logs the bare exception.
       const e = err as { message?: string; stack?: string; cause?: unknown; name?: string };
-       
+
       console.error(
         '[voice-worker] ctx.connect failed — full error chain follows',
-        '\n  name:', e?.name,
-        '\n  message:', e?.message,
-        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
-        '\n  assignedUrl:', assignedUrl,
-        '\n  stack:', e?.stack
+        '\n  name:',
+        e?.name,
+        '\n  message:',
+        e?.message,
+        '\n  cause:',
+        typeof e?.cause === 'object'
+          ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object))
+          : e?.cause,
+        '\n  assignedUrl:',
+        assignedUrl,
+        '\n  stack:',
+        e?.stack
       );
       throw err; // re-throw so the worker harness still records the failure
     }
@@ -326,7 +342,6 @@ export default defineAgent({
     try {
       voiceContext = await loadVoiceContext(personaId);
     } catch (err) {
-       
       console.error('[voice-worker] failed to load voice context:', err);
       await ctx.room.disconnect();
       return;
@@ -334,9 +349,8 @@ export default defineAgent({
 
     const voiceId = resolveVoiceId(voiceContext.voiceProfile);
 
-     
     console.log(
-      `[voice-worker] session start — room=${(ctx.room.name ?? 'unknown-room')} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity} llmModel=${config.llm.model} cartesiaModel=${config.cartesia.model}`
+      `[voice-worker] session start — room=${ctx.room.name ?? 'unknown-room'} persona=${voiceContext.label} voiceId=${voiceId} participant=${participant.identity} llmModel=${config.llm.model} cartesiaModel=${config.cartesia.model}`
     );
 
     // Latency instrumentation: log the size of system prompts being
@@ -347,7 +361,7 @@ export default defineAgent({
       (sum, p) => sum + (p.content?.length ?? 0),
       0
     );
-     
+
     console.log(
       `[voice-worker] system prompt size — ${promptBytes} chars (~${Math.round(promptBytes / 1024)}KB) across ${voiceContext.systemPromptParts.length} blocks`
     );
@@ -357,9 +371,7 @@ export default defineAgent({
     // `instructions` string for the v1.3.x Agent API. The previous
     // ChatContext.append pattern was 0.7.x-only; v1.3.x prefers
     // `instructions` on the Agent + an optional ChatContext seed.
-    const instructions = voiceContext.systemPromptParts
-      .map(p => p.content)
-      .join('\n\n');
+    const instructions = voiceContext.systemPromptParts.map(p => p.content).join('\n\n');
 
     // Initial chat context — seed with recent text-chat history (if
     // provided in room metadata) so voice mode picks up where the
@@ -381,15 +393,12 @@ export default defineAgent({
           content: turn.content,
         });
       }
-       
+
       console.log(
         `[voice-worker] seeded chatCtx with ${seedHistory.length} prior messages — memory continuity active`
       );
     } else {
-       
-      console.log(
-        `[voice-worker] no prior chat history — voice session starts cold`
-      );
+      console.log(`[voice-worker] no prior chat history — voice session starts cold`);
     }
 
     // STT endpointing tuning (revised AGAIN 2026-05-04 PM after the
@@ -567,14 +576,16 @@ export default defineAgent({
     // for LLM errors when AI Gateway rejects the model slug.
     type SessionErrorPayload = {
       type?: string;
-      error?: {
-        name?: string;
-        message?: string;
-        cause?: unknown;
-        stack?: string;
-        body?: unknown;
-        status?: number;
-      } | unknown;
+      error?:
+        | {
+            name?: string;
+            message?: string;
+            cause?: unknown;
+            stack?: string;
+            body?: unknown;
+            status?: number;
+          }
+        | unknown;
     };
     // 'error' is the enum value of voice.AgentSessionEventTypes.Error
     // (string literal). Cast through `as never` because the typed-emitter
@@ -586,43 +597,61 @@ export default defineAgent({
     // listening → thinking → speaking; SpeechCreated fires when a
     // TTS speech handle is created. Comparing these timestamps shows
     // STT-end → LLM-start → first-audio gap per turn.
-    session.on('user_input_transcribed' as never, ((ev: { transcript?: string; isFinal?: boolean }) => {
-      if (ev.isFinal) {
-         
+    session.on(
+      'user_input_transcribed' as never,
+      ((ev: { transcript?: string; isFinal?: boolean }) => {
+        if (ev.isFinal) {
+          console.log(
+            `[voice-worker] turn — STT FINAL — t=${Date.now()} transcript="${(ev.transcript ?? '').slice(0, 200)}"`
+          );
+        }
+      }) as never
+    );
+    session.on(
+      'agent_state_changed' as never,
+      ((ev: { oldState?: string; newState?: string }) => {
         console.log(
-          `[voice-worker] turn — STT FINAL — t=${Date.now()} transcript="${(ev.transcript ?? '').slice(0, 200)}"`
+          `[voice-worker] turn — AGENT STATE — t=${Date.now()} ${ev.oldState} → ${ev.newState}`
         );
-      }
-    }) as never);
-    session.on('agent_state_changed' as never, ((ev: { oldState?: string; newState?: string }) => {
-       
-      console.log(
-        `[voice-worker] turn — AGENT STATE — t=${Date.now()} ${ev.oldState} → ${ev.newState}`
-      );
-    }) as never);
-    session.on('speech_created' as never, ((ev: { source?: string; userInitiated?: boolean }) => {
-       
-      console.log(
-        `[voice-worker] turn — SPEECH CREATED — t=${Date.now()} source=${ev.source} userInitiated=${ev.userInitiated}`
-      );
-    }) as never);
+      }) as never
+    );
+    session.on(
+      'speech_created' as never,
+      ((ev: { source?: string; userInitiated?: boolean }) => {
+        console.log(
+          `[voice-worker] turn — SPEECH CREATED — t=${Date.now()} source=${ev.source} userInitiated=${ev.userInitiated}`
+        );
+      }) as never
+    );
 
-    session.on('error' as never, ((payload: SessionErrorPayload) => {
-      const err = payload?.error as Record<string, unknown> | undefined;
-       
-      console.error(
-        '[voice-worker] session error event —',
-        '\n  type:', payload?.type,
-        '\n  errorName:', err?.name,
-        '\n  errorMessage:', err?.message,
-        '\n  errorBody:', err?.body !== undefined ? JSON.stringify(err.body) : undefined,
-        '\n  errorStatus:', err?.status,
-        '\n  errorCause:', err?.cause !== undefined ?
-          (typeof err.cause === 'object' ? JSON.stringify(err.cause, Object.getOwnPropertyNames(err.cause as object)) : String(err.cause))
-          : undefined,
-        '\n  errorStack:', err?.stack
-      );
-    }) as never);
+    session.on(
+      'error' as never,
+      ((payload: SessionErrorPayload) => {
+        const err = payload?.error as Record<string, unknown> | undefined;
+
+        console.error(
+          '[voice-worker] session error event —',
+          '\n  type:',
+          payload?.type,
+          '\n  errorName:',
+          err?.name,
+          '\n  errorMessage:',
+          err?.message,
+          '\n  errorBody:',
+          err?.body !== undefined ? JSON.stringify(err.body) : undefined,
+          '\n  errorStatus:',
+          err?.status,
+          '\n  errorCause:',
+          err?.cause !== undefined
+            ? typeof err.cause === 'object'
+              ? JSON.stringify(err.cause, Object.getOwnPropertyNames(err.cause as object))
+              : String(err.cause)
+            : undefined,
+          '\n  errorStack:',
+          err?.stack
+        );
+      }) as never
+    );
 
     // Build the tool registry — agent can now READ and WRITE on the
     // founder's behalf (add todos, log demo conversions, look up
@@ -637,10 +666,8 @@ export default defineAgent({
       sessionId: ctx.room.name ?? 'unknown-room',
       personaId: voiceContext.personaId,
     });
-     
-    console.log(
-      `[voice-worker] tools registered — ${Object.keys(tools).join(', ')}`
-    );
+
+    console.log(`[voice-worker] tools registered — ${Object.keys(tools).join(', ')}`);
 
     const agent = new voice.Agent({
       instructions,
@@ -648,14 +675,15 @@ export default defineAgent({
       tools,
     });
 
-    const metrics = new SessionMetrics((ctx.room.name ?? 'unknown-room'), voiceContext.personaId);
+    const metrics = new SessionMetrics(ctx.room.name ?? 'unknown-room', voiceContext.personaId);
 
     // Hard session timeout — safety net if the JWT TTL is somehow
     // bypassed. Disconnects the room cleanly at 30 min and logs the
     // final session metrics for the Railway log stream.
     const sessionTimeout = setTimeout(() => {
-       
-      console.log(`[voice-worker] hard timeout reached — disconnecting room=${(ctx.room.name ?? 'unknown-room')}`);
+      console.log(
+        `[voice-worker] hard timeout reached — disconnecting room=${ctx.room.name ?? 'unknown-room'}`
+      );
       metrics.log('hard-timeout');
       void ctx.room.disconnect();
     }, config.sessionTimeoutMs);
@@ -666,9 +694,9 @@ export default defineAgent({
     ctx.room.once('disconnected', () => {
       clearTimeout(sessionTimeout);
       const elapsed = Math.round((Date.now() - startedAt) / 1000);
-       
+
       console.log(
-        `[voice-worker] session end — room=${(ctx.room.name ?? 'unknown-room')} elapsedSec=${elapsed}`
+        `[voice-worker] session end — room=${ctx.room.name ?? 'unknown-room'} elapsedSec=${elapsed}`
       );
       metrics.log('end');
     });
@@ -682,19 +710,20 @@ export default defineAgent({
     type TrackPubInfo = { sid?: string; name?: string; kind?: number };
     type ParticipantInfo = { identity?: string; trackPublications?: Map<string, TrackPubInfo> };
     ctx.room.on('trackPublished', (publication: TrackPubInfo, participant: ParticipantInfo) => {
-       
       console.log(
         `[voice-worker] trackPublished — participantIdentity=${participant.identity} ` +
           `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
       );
     });
-    ctx.room.on('trackSubscribed', (_track: unknown, publication: TrackPubInfo, participant: ParticipantInfo) => {
-       
-      console.log(
-        `[voice-worker] trackSubscribed — participantIdentity=${participant.identity} ` +
-          `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
-      );
-    });
+    ctx.room.on(
+      'trackSubscribed',
+      (_track: unknown, publication: TrackPubInfo, participant: ParticipantInfo) => {
+        console.log(
+          `[voice-worker] trackSubscribed — participantIdentity=${participant.identity} ` +
+            `trackSid=${publication.sid} trackName=${publication.name} kind=${publication.kind}`
+        );
+      }
+    );
 
     // Snapshot of remote participants + their tracks RIGHT NOW so we
     // know the room state at session-start time. If founder's mic
@@ -709,7 +738,7 @@ export default defineAgent({
         subscribed: pub.subscribed,
       })),
     }));
-     
+
     console.log(
       `[voice-worker] room snapshot at session.start — ${JSON.stringify(remoteSnapshot)}`
     );
@@ -723,24 +752,34 @@ export default defineAgent({
         agent,
         room: ctx.room,
       });
-       
+
       console.log(
-        `[voice-worker] session.start completed — pipeline ready (vad+stt+llm+tts wired). room=${(ctx.room.name ?? 'unknown-room')}`
+        `[voice-worker] session.start completed — pipeline ready (vad+stt+llm+tts wired). room=${ctx.room.name ?? 'unknown-room'}`
       );
     } catch (startErr) {
       const e = startErr as { name?: string; message?: string; stack?: string; cause?: unknown };
-       
+
       console.error(
         '[voice-worker] session.start FAILED — pipeline never initialized',
-        '\n  name:', e?.name,
-        '\n  message:', e?.message,
-        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
-        '\n  cartesiaModel:', config.cartesia.model,
-        '\n  cartesiaVoiceId:', voiceId,
-        '\n  llmModel:', config.llm.model,
-        '\n  llmProvider:', config.llm.model.startsWith('google/') ? 'google-native' : 'ai-gateway',
+        '\n  name:',
+        e?.name,
+        '\n  message:',
+        e?.message,
+        '\n  cause:',
+        typeof e?.cause === 'object'
+          ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object))
+          : e?.cause,
+        '\n  cartesiaModel:',
+        config.cartesia.model,
+        '\n  cartesiaVoiceId:',
+        voiceId,
+        '\n  llmModel:',
+        config.llm.model,
+        '\n  llmProvider:',
+        config.llm.model.startsWith('google/') ? 'google-native' : 'ai-gateway',
         '\n  sttModel: nova-3',
-        '\n  stack:', e?.stack
+        '\n  stack:',
+        e?.stack
       );
       // Disconnect so the browser sees a clean error instead of a
       // silent-empty-room timeout.
@@ -759,18 +798,18 @@ export default defineAgent({
     const hasMemory = seedHistory.length > 0;
     const greetingText = hasMemory
       ? personaId === 'skeptical_investor'
-        ? "Picking up where we left off. Where do you want to push?"
+        ? 'Picking up where we left off. Where do you want to push?'
         : personaId === 'cognitive_psychologist'
           ? "I've got our prior thread. What are we examining now?"
           : personaId === 'business_strategist'
-            ? "Carrying over what we were working on. Where do you want to go?"
+            ? 'Carrying over what we were working on. Where do you want to go?'
             : personaId === 'pitch_sharpener'
               ? "Carrying over what you were sharpening. What's the next angle you want me to push on?"
               : "Picking up where we left off. What's next?"
       : personaId === 'skeptical_investor'
         ? "I've read your context. What are we pressure-testing?"
         : personaId === 'cognitive_psychologist'
-          ? "I have your context loaded. What decision are we examining?"
+          ? 'I have your context loaded. What decision are we examining?'
           : personaId === 'business_strategist'
             ? "I've reviewed the context. What strategic question are we testing?"
             : personaId === 'pitch_sharpener'
@@ -801,18 +840,27 @@ export default defineAgent({
     // the greeting failure was the immediately blocking symptom.
     try {
       session.say(greetingText, { addToChatCtx: true });
-       
-      console.log(`[voice-worker] greeting dispatched via session.say() — text="${greetingText}" room=${(ctx.room.name ?? 'unknown-room')}`);
+
+      console.log(
+        `[voice-worker] greeting dispatched via session.say() — text="${greetingText}" room=${ctx.room.name ?? 'unknown-room'}`
+      );
     } catch (sayErr) {
       const e = sayErr as { name?: string; message?: string; stack?: string; cause?: unknown };
-       
+
       console.error(
         '[voice-worker] session.say FAILED — greeting never synthesized.',
-        '\n  name:', e?.name,
-        '\n  message:', e?.message,
-        '\n  cause:', typeof e?.cause === 'object' ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object)) : e?.cause,
-        '\n  cartesiaVoiceId:', voiceId,
-        '\n  stack:', e?.stack
+        '\n  name:',
+        e?.name,
+        '\n  message:',
+        e?.message,
+        '\n  cause:',
+        typeof e?.cause === 'object'
+          ? JSON.stringify(e.cause, Object.getOwnPropertyNames(e.cause as object))
+          : e?.cause,
+        '\n  cartesiaVoiceId:',
+        voiceId,
+        '\n  stack:',
+        e?.stack
       );
     }
   },

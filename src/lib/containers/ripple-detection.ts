@@ -67,10 +67,7 @@ export interface DependsOnEdge {
 
 export type RippleSeverity = 'high' | 'medium';
 
-export type RippleReason =
-  | 'anchor_archived'
-  | 'anchor_outcome_failure'
-  | 'anchor_outcome_partial';
+export type RippleReason = 'anchor_archived' | 'anchor_outcome_failure' | 'anchor_outcome_partial';
 
 export interface RippleAlert {
   /** Stable id for dismissal tracking — derived from anchor+dependent. */
@@ -115,7 +112,8 @@ export interface RippleAlert {
 }
 
 /** Regex matching failure-class language in the anchor outcome summary. */
-const FAILURE_LANGUAGE = /\b(failed|missed|did not achieve|below target|did not deliver|underperformed|destroyed value|wrote down|writedown|wrote off)\b/i;
+const FAILURE_LANGUAGE =
+  /\b(failed|missed|did not achieve|below target|did not deliver|underperformed|destroyed value|wrote down|writedown|wrote off)\b/i;
 
 const BRIER_FAILURE_THRESHOLD = 0.2;
 const BRIER_PARTIAL_THRESHOLD = 0.1;
@@ -140,8 +138,7 @@ function classifyAnchor(
 
   // 2) Outcome row exists — check Brier + summary for failure signal.
   if (anchor.outcome) {
-    const brier =
-      typeof anchor.outcome.brierScore === 'number' ? anchor.outcome.brierScore : null;
+    const brier = typeof anchor.outcome.brierScore === 'number' ? anchor.outcome.brierScore : null;
     const summary = anchor.outcome.summary ?? '';
     const failureBySummary = FAILURE_LANGUAGE.test(summary);
     const failureByBrier = brier !== null && brier >= BRIER_FAILURE_THRESHOLD;

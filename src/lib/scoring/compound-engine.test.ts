@@ -169,9 +169,7 @@ describe('computeCompoundScore — interaction compounding', () => {
 
   it('caps per-bias interaction multiplier at 3.0×', () => {
     // Many heavily-interacting biases with an extreme caller weight.
-    const many = ['a_bias', 'b_bias', 'c_bias', 'd_bias', 'e_bias'].map(t =>
-      bias(t, 'critical')
-    );
+    const many = ['a_bias', 'b_bias', 'c_bias', 'd_bias', 'e_bias'].map(t => bias(t, 'critical'));
     const weights: Record<string, number> = {};
     for (const x of many) for (const y of many) weights[`${x.type}::${y.type}`] = 5;
     const r = computeCompoundScore(80, many, ctx(), { interactionWeights: weights });
@@ -253,7 +251,11 @@ describe('computeCompoundScore — biological signals from rawContent', () => {
 describe('computeCompoundScore — clamps & determinism', () => {
   it('clamps the calibrated score into [0, 100]', () => {
     const heavy = Array.from({ length: 8 }, (_, i) => bias(`bias_${i}`, 'critical'));
-    const r = computeCompoundScore(20, heavy, ctx({ monetaryStakes: 'very_high', dissentPresent: false }));
+    const r = computeCompoundScore(
+      20,
+      heavy,
+      ctx({ monetaryStakes: 'very_high', dissentPresent: false })
+    );
     expect(r.calibratedScore).toBeGreaterThanOrEqual(0);
     expect(r.calibratedScore).toBeLessThanOrEqual(100);
   });

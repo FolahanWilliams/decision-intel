@@ -473,8 +473,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     id: 'voc_30_biases',
     deckId: 'di_vocabulary',
     prompt: 'How many cognitive biases does DI claim, and where does the taxonomy live?',
-    canonicalAnswer:
-      `The canonical claim is the PRECISE count: ${BIAS_COUNT} cognitive biases (${BIAS_ID_RANGE}). "30+ cognitive biases" is DEPRECATED as of CR-3 (2026-05-13) — the "+" was a hedge against a stale count and it conflicts with the precise audit-trail discipline procurement readers expect; never say "30+" to a buyer. There is NO "20 base + 11 strategy-specific extensions" split — that framing was fictional; the taxonomy is one contiguous run of ${BIAS_COUNT} stable IDs (${BIAS_ID_RANGE}), PERMANENT and published at /taxonomy, growing only with the Kahneman-Klein paper-application sprint (never renumbered). Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts — every surface derives the count from there, never hardcodes it.`,
+    canonicalAnswer: `The canonical claim is the PRECISE count: ${BIAS_COUNT} cognitive biases (${BIAS_ID_RANGE}). "30+ cognitive biases" is DEPRECATED as of CR-3 (2026-05-13) — the "+" was a hedge against a stale count and it conflicts with the precise audit-trail discipline procurement readers expect; never say "30+" to a buyer. There is NO "20 base + 11 strategy-specific extensions" split — that framing was fictional; the taxonomy is one contiguous run of ${BIAS_COUNT} stable IDs (${BIAS_ID_RANGE}), PERMANENT and published at /taxonomy, growing only with the Kahneman-Klein paper-application sprint (never renumbered). Biases referenced by snake_case keys (confirmation_bias, anchoring_bias). Defined in src/lib/constants/bias-education.ts — every surface derives the count from there, never hardcodes it.`,
     difficulty: 'foundation',
     applicationContext: 'Investor asks: "how do you scope cognitive bias detection?"',
     source: 'CLAUDE.md Bias Taxonomy section',
@@ -1347,8 +1346,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     id: 'pipeline_bias_detective',
     deckId: 'pipeline_nodes',
     prompt: 'What does the biasDetective node do and what taxonomy does it use?',
-    canonicalAnswer:
-      `Detects cognitive biases in the memo against the ${BIAS_COUNT}-bias DI taxonomy (${BIAS_ID_RANGE}, one contiguous run of stable IDs — no "+ extended strategy-specific set"; that split was fictional). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.`,
+    canonicalAnswer: `Detects cognitive biases in the memo against the ${BIAS_COUNT}-bias DI taxonomy (${BIAS_ID_RANGE}, one contiguous run of stable IDs — no "+ extended strategy-specific set"; that split was fictional). Returns flagged passages with bias name, severity (high/medium/low), confidence, and explanation. Academic anchor: Kahneman & Tversky's heuristics-and-biases program. The bias names use snake_case keys (confirmation_bias, anchoring_bias). Definitions live in src/lib/constants/bias-education.ts. The flagged passages are what surface in the InlineAnalysisResultCard top-3 biases list.`,
     difficulty: 'foundation',
     applicationContext: 'Demoing the 60-second audit — what runs first?',
     source: 'src/lib/agents/nodes.ts',

@@ -162,9 +162,7 @@ export async function listRecentFilesInFolders(
   pageSize = 50
 ): Promise<RecentDriveFile[]> {
   if (folderIds.length === 0) return [];
-  const parentsClause = folderIds
-    .map(id => `'${id.replace(/'/g, "\\'")}' in parents`)
-    .join(' or ');
+  const parentsClause = folderIds.map(id => `'${id.replace(/'/g, "\\'")}' in parents`).join(' or ');
   const q = `(${parentsClause}) and modifiedTime > '${modifiedAfterIso}' and trashed = false`;
   const res = await drive.files.list({
     q,

@@ -212,9 +212,9 @@ export function TaxonomyClient() {
                   maxWidth: 620,
                 }}
               >
-                Every bias the Decision Intel pipeline detects has a stable, permanent ID ({biasIdMin}{' '}
-                through {biasIdMax}), a named historical failure, and a primary academic citation. Cite
-                these IDs in research, audits, and regulatory filings.
+                Every bias the Decision Intel pipeline detects has a stable, permanent ID (
+                {biasIdMin} through {biasIdMax}), a named historical failure, and a primary academic
+                citation. Cite these IDs in research, audits, and regulatory filings.
               </p>
               <p style={{ fontSize: 14, color: C.slate500, margin: 0, maxWidth: 620 }}>
                 Once assigned, an ID never changes. This is the published contract.

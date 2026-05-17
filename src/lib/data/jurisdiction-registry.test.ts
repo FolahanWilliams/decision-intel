@@ -99,7 +99,7 @@ describe('matchJurisdictions — WAEMU multi-country', () => {
     expect(matchJurisdictions(['Guinea-Bissau'])[0].id).toBe('waemu');
   });
 
-  it('matches Côte d\'Ivoire in both apostrophe styles', () => {
+  it("matches Côte d'Ivoire in both apostrophe styles", () => {
     expect(matchJurisdictions(['Côte d’Ivoire'])[0].id).toBe('waemu');
     expect(matchJurisdictions(["Côte d'Ivoire"])[0].id).toBe('waemu');
   });

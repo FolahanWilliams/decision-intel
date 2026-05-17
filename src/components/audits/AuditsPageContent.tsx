@@ -16,12 +16,7 @@ import {
   PenLine,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { createClientLogger } from '@/lib/utils/logger';
 import {
   SOURCE_ICONS,
@@ -617,8 +612,8 @@ export function AuditsPageContent() {
                 lineHeight: 1.6,
               }}
             >
-              Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will
-              remove the decision, its cognitive audit, and all nudges.
+              Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will remove
+              the decision, its cognitive audit, and all nudges.
             </DialogDescription>
             <div className="flex items-center gap-md justify-end">
               <button

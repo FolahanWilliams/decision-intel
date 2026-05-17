@@ -778,12 +778,18 @@ const LOCKED_COUNT_DRIFT_FILES = [
 // Stale-count patterns the count-drift lint regex is structurally blind
 // to (`×` is not whitespace; "cognitive" sits between number + "biases").
 const LOCKED_COUNT_PATTERNS = [
-  { re: /\b2[01]\s*[×x]\s*2[01]\b/, what: 'stale matrix dimension (canonical: 22×22 via MATRIX_DIMENSION)' },
+  {
+    re: /\b2[01]\s*[×x]\s*2[01]\b/,
+    what: 'stale matrix dimension (canonical: 22×22 via MATRIX_DIMENSION)',
+  },
   {
     re: /\b30\+\s*(cognitive\s+)?(biases|bias|taxonomy)\b/i,
     what: 'deprecated "30+ bias(es)/taxonomy" (canonical: ${BIAS_COUNT}-bias via BIAS_EDUCATION)',
   },
-  { re: /twenty\s+biases\s+plus/i, what: 'fictional "Twenty biases plus N" split (no such split exists)' },
+  {
+    re: /twenty\s+biases\s+plus/i,
+    what: 'fictional "Twenty biases plus N" split (no such split exists)',
+  },
   { re: /\b20-base\b/i, what: 'fictional "20-base + extra-scope" split (no such split exists)' },
 ];
 

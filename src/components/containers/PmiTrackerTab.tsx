@@ -217,7 +217,10 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
         method: 'POST',
         credentials: 'include',
       });
-      const body = (await res.json().catch(() => null)) as ExtractResponse | { error?: string } | null;
+      const body = (await res.json().catch(() => null)) as
+        | ExtractResponse
+        | { error?: string }
+        | null;
       if (!res.ok) {
         const errMsg =
           body && 'error' in body && typeof body.error === 'string'
@@ -232,9 +235,7 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
         // LLM ran but found no committed PMI metrics — surface this
         // honestly so the user knows manual entry is needed (and that
         // their memo may need more concrete commitments).
-        setError(
-          'No concrete PMI commitments found in the memo. Add signals manually below.'
-        );
+        setError('No concrete PMI commitments found in the memo. Add signals manually below.');
       } else if (data.signals.length === 0 && !data.llmSucceeded) {
         // Gateway error or parse failure — fall back to manual.
         setError('Auto-extraction unavailable right now. Add signals manually below.');
@@ -557,9 +558,9 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
                 Auto-extract PMI signals from IC memo
               </div>
               <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
-                Reads the latest analyzed IC memo / synergy model / integration plan and
-                proposes signals to track. Every suggestion needs your accept &mdash; nothing
-                persists until you confirm.
+                Reads the latest analyzed IC memo / synergy model / integration plan and proposes
+                signals to track. Every suggestion needs your accept &mdash; nothing persists until
+                you confirm.
               </div>
             </div>
           </div>
@@ -702,8 +703,7 @@ export function PmiTrackerTab({ containerId, containerName }: PmiTrackerTabProps
                         borderRadius: 'var(--radius-sm)',
                         fontSize: 'var(--fs-2xs)',
                         fontWeight: 600,
-                        color:
-                          isAccepting || acceptingKey !== null ? 'var(--text-muted)' : '#fff',
+                        color: isAccepting || acceptingKey !== null ? 'var(--text-muted)' : '#fff',
                         cursor: isAccepting || acceptingKey !== null ? 'wait' : 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',

@@ -38,9 +38,7 @@ describe('resolveDriveParseMimeType', () => {
   });
 
   it('maps Google Sheets → text/csv (export target)', () => {
-    expect(resolveDriveParseMimeType('application/vnd.google-apps.spreadsheet')).toBe(
-      'text/csv'
-    );
+    expect(resolveDriveParseMimeType('application/vnd.google-apps.spreadsheet')).toBe('text/csv');
   });
 
   it('maps Google Slides → application/pdf (export target)', () => {
@@ -74,10 +72,7 @@ describe('selectParsableDriveFiles', () => {
   ): AmbientDriveFile => ({ id, name, mimeType, parents });
 
   it('keeps a Google Doc (resolves to parsable pdf) with the export parseMimeType', () => {
-    const out = selectParsableDriveFiles(
-      [mk('a', 'application/vnd.google-apps.document')],
-      25
-    );
+    const out = selectParsableDriveFiles([mk('a', 'application/vnd.google-apps.document')], 25);
     expect(out).toHaveLength(1);
     expect(out[0].id).toBe('a');
     expect(out[0].parseMimeType).toBe('application/pdf');

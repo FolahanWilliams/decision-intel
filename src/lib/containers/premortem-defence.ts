@@ -32,11 +32,7 @@ export interface PremortemDefence {
   answeredAt: string;
 }
 
-const PATTERNS: ReadonlySet<string> = new Set([
-  'deal_fever',
-  'winners_curse',
-  'synergy_mirage',
-]);
+const PATTERNS: ReadonlySet<string> = new Set(['deal_fever', 'winners_curse', 'synergy_mirage']);
 
 /** Min characters for a written defence to count as a real answer —
  *  prevents "ok"/"." from satisfying the gate. */

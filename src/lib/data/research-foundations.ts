@@ -681,8 +681,7 @@ export const STREBULAEV_PRINCIPLES: StrebulaevPrinciple[] = [
       'The most important investment factor is team quality, not business model. The "jockey" matters more than the "horse" in most cases.',
     product:
       'Management Halo Effect is already detected. Go deeper: build a Jockey/Horse Balance Score — flag when a memo is 80% team pedigree / 20% fundamentals.',
-    startup:
-      `Your codebase IS your jockey credibility: causal learning service, ${BIAS_COUNT}-bias taxonomy, ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. In technical DD, depth signals you\u2019re the right founder.`,
+    startup: `Your codebase IS your jockey credibility: causal learning service, ${BIAS_COUNT}-bias taxonomy, ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. In technical DD, depth signals you\u2019re the right founder.`,
     actions: [
       'Add Jockey/Horse Balance Score to bias detection',
       'Track ratio of team vs. fundamentals language in memos',
@@ -1082,8 +1081,7 @@ export const DQ_CHAIN: DQChainLink[] = [
     num: 5,
     label: 'Logical reasoning',
     question: 'Does the reasoning hold?',
-    diCoverage:
-      `The ${BIAS_COUNT}-bias taxonomy + ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. Toxic combinations detected. Causal vs. correlational claims classified.`,
+    diCoverage: `The ${BIAS_COUNT}-bias taxonomy + ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} interaction matrix. Toxic combinations detected. Causal vs. correlational claims classified.`,
     shipped: true,
   },
   {

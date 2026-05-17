@@ -36,8 +36,9 @@ import { PLANS } from '@/lib/stripe';
 
 const isAdmin = isAdminUserId as unknown as ReturnType<typeof vi.fn>;
 const subFind = prisma.subscription.findFirst as unknown as ReturnType<typeof vi.fn>;
-const purchaseFind = prisma.decisionContainerAuditPurchase
-  .findFirst as unknown as ReturnType<typeof vi.fn>;
+const purchaseFind = prisma.decisionContainerAuditPurchase.findFirst as unknown as ReturnType<
+  typeof vi.fn
+>;
 const analysisCount = prisma.analysis.count as unknown as ReturnType<typeof vi.fn>;
 const memberCount = prisma.teamMember.count as unknown as ReturnType<typeof vi.fn>;
 const inviteCount = prisma.teamInvite.count as unknown as ReturnType<typeof vi.fn>;

@@ -216,11 +216,7 @@ function buildDpaTemplate() {
 
   y = pageIfNeeded(doc, y);
   y = H2(doc, '5. Retention and deletion', y);
-  y = P(
-    doc,
-    'Default retention windows by tier (subject to the Order Form):',
-    y
-  );
+  y = P(doc, 'Default retention windows by tier (subject to the Order Form):', y);
   y = Bullet(
     doc,
     [
@@ -241,7 +237,7 @@ function buildDpaTemplate() {
   y = H2(doc, '6. Data subject rights', y);
   y = P(
     doc,
-    'Processor will, at Controller\'s reasonable request and cost, assist Controller in responding to data-subject rights requests under GDPR Articles 15-22 (access, rectification, erasure, restriction, portability, objection, and automated-decision rights). The Decision Provenance Record serves as the meaningful-information-about-the-logic artefact required by Article 22.',
+    "Processor will, at Controller's reasonable request and cost, assist Controller in responding to data-subject rights requests under GDPR Articles 15-22 (access, rectification, erasure, restriction, portability, objection, and automated-decision rights). The Decision Provenance Record serves as the meaningful-information-about-the-logic artefact required by Article 22.",
     y
   );
 
@@ -249,7 +245,7 @@ function buildDpaTemplate() {
   y = H2(doc, '7. Data residency and international transfers', y);
   y = P(
     doc,
-    'Processor\'s primary processing region is the United States. Application hosting (Vercel) and database / file storage (Supabase) operate from US-region infrastructure. There is no EU-region or African-region processing option in production today; Controllers requiring a specific regional processing commitment should contact privacy@decision-intel.com before contract execution to discuss feasibility.',
+    "Processor's primary processing region is the United States. Application hosting (Vercel) and database / file storage (Supabase) operate from US-region infrastructure. There is no EU-region or African-region processing option in production today; Controllers requiring a specific regional processing commitment should contact privacy@decision-intel.com before contract execution to discuss feasibility.",
     y
   );
   y = P(
@@ -354,11 +350,7 @@ function buildDprSample() {
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139);
-  doc.text(
-    'Anonymised from a 2019 Form S-1 that was withdrawn 33 days after filing.',
-    20,
-    y
-  );
+  doc.text('Anonymised from a 2019 Form S-1 that was withdrawn 33 days after filing.', 20, y);
   y += 8;
 
   y = H2(doc, 'Record identity', y);
@@ -655,14 +647,14 @@ function buildDprDangote() {
       quote:
         'Uniform 5% country-risk premium applied across markets whose sovereign-credit spreads vary 3-5x.',
       harden:
-        'What does a per-market discount-rate model produce when each market\'s sovereign-spread, FX-volatility, and repatriation-risk components are measured independently?',
+        "What does a per-market discount-rate model produce when each market's sovereign-spread, FX-volatility, and repatriation-risk components are measured independently?",
     },
     {
       label: 'Availability heuristic (high)',
       quote:
         'African infrastructure-spend trajectory 2010-2014 used as the demand-projection baseline through the capex-amortisation window.',
       harden:
-        'Which targeted markets\' infrastructure spend is cycle-dependent on Chinese commodity demand, and what is the plan if that cycle peaks before the Year-7 amortisation midpoint?',
+        "Which targeted markets' infrastructure spend is cycle-dependent on Chinese commodity demand, and what is the plan if that cycle peaks before the Year-7 amortisation midpoint?",
     },
     {
       label: 'Planning fallacy (medium)',
@@ -811,9 +803,7 @@ function xmlEscape(s) {
  */
 function docxParagraph(text, style = 'Normal') {
   const safe = xmlEscape(text);
-  const styleRef = style && style !== 'Normal'
-    ? `<w:pPr><w:pStyle w:val="${style}"/></w:pPr>`
-    : '';
+  const styleRef = style && style !== 'Normal' ? `<w:pPr><w:pStyle w:val="${style}"/></w:pPr>` : '';
   return `<w:p>${styleRef}<w:r><w:t xml:space="preserve">${safe}</w:t></w:r></w:p>`;
 }
 
@@ -919,7 +909,9 @@ function buildDpaDocx() {
   );
 
   body.push(docxParagraph('3. Sub-processors', 'Heading2'));
-  body.push(docxParagraph('Controller authorises Processor to engage the following Sub-processors:'));
+  body.push(
+    docxParagraph('Controller authorises Processor to engage the following Sub-processors:')
+  );
   body.push(
     docxBullet(
       'Google LLC (Gemini API) — LLM inference for bias and structural-assumption detection. Google commits not to use customer inputs or outputs to train its models under its Vertex AI terms.'
@@ -931,11 +923,21 @@ function buildDpaDocx() {
     )
   );
   body.push(
-    docxBullet('Supabase Inc. — PostgreSQL database, authentication and file storage. SOC 2 Type II certified.')
+    docxBullet(
+      'Supabase Inc. — PostgreSQL database, authentication and file storage. SOC 2 Type II certified.'
+    )
   );
-  body.push(docxBullet('Vercel Inc. — application hosting and edge compute. SOC 2 Type II certified.'));
-  body.push(docxBullet('Resend (transactional email) — notifications and session-management flows only.'));
-  body.push(docxBullet('Cloudflare — DNS, inbound email routing, and edge security. SOC 2 Type II certified.'));
+  body.push(
+    docxBullet('Vercel Inc. — application hosting and edge compute. SOC 2 Type II certified.')
+  );
+  body.push(
+    docxBullet('Resend (transactional email) — notifications and session-management flows only.')
+  );
+  body.push(
+    docxBullet(
+      'Cloudflare — DNS, inbound email routing, and edge security. SOC 2 Type II certified.'
+    )
+  );
   body.push(
     docxParagraph(
       'Processor will notify Controller at least 30 days before adding or replacing a Sub-processor. Controller may object in writing; the parties will in good faith work to resolve the objection or, failing agreement, Controller may terminate the affected Services.'
@@ -960,7 +962,9 @@ function buildDpaDocx() {
     )
   );
   body.push(docxBullet('Per-user and per-organisation access scoping with audit-log retention.'));
-  body.push(docxBullet('Role-based access to production systems with SSO and least-privilege grants.'));
+  body.push(
+    docxBullet('Role-based access to production systems with SSO and least-privilege grants.')
+  );
   body.push(
     docxBullet(
       'Incident response plan with 72-hour notification commitment for confirmed Personal Data breaches.'
@@ -1020,10 +1024,26 @@ function buildDpaDocx() {
   );
 
   body.push(docxParagraph('Signatures', 'Heading2'));
-  body.push(docxParagraph('Controller: _______________________________________   Date: _____________________'));
-  body.push(docxParagraph('Name / Title: ____________________________________________________________________'));
-  body.push(docxParagraph('Processor (Decision Intel Ltd.): _________________________   Date: __________________'));
-  body.push(docxParagraph('Name / Title: ____________________________________________________________________'));
+  body.push(
+    docxParagraph(
+      'Controller: _______________________________________   Date: _____________________'
+    )
+  );
+  body.push(
+    docxParagraph(
+      'Name / Title: ____________________________________________________________________'
+    )
+  );
+  body.push(
+    docxParagraph(
+      'Processor (Decision Intel Ltd.): _________________________   Date: __________________'
+    )
+  );
+  body.push(
+    docxParagraph(
+      'Name / Title: ____________________________________________________________________'
+    )
+  );
   body.push(
     docxParagraph(
       'This template is provided for evaluation by Controller procurement. Executed version is governed by the Order Form and any negotiated addenda.',
@@ -1083,4 +1103,6 @@ function buildDpaDocx() {
 
 buildDpaTemplate();
 await buildDpaDocx();
-console.log('done. (DPR samples now generated via /dpr-render + Puppeteer; see scripts/dev-dpr-preview.mjs)');
+console.log(
+  'done. (DPR samples now generated via /dpr-render + Puppeteer; see scripts/dev-dpr-preview.mjs)'
+);
