@@ -35,6 +35,20 @@ interface ParsedArticle {
   feedCategory: FeedCategory;
 }
 
+type ClassifiedArticle = ParsedArticle & {
+  extractedTopics: string[];
+  biasTypes: string[];
+  industrySector: string | null;
+  relevanceScore: number;
+};
+
+// Bounded concurrency for the two formerly-sequential sync stages.
+// 11 Gemini classification batches were run one-at-a-time (~30s+ wall);
+// 210 article upserts were one-at-a-time DB round-trips. Caps chosen to
+// stay under the Gemini Flash-lite rate ceiling and the Supabase pooler.
+const CLASSIFY_CONCURRENCY = 4;
+const STORE_CONCURRENCY = 8;
+
 export interface SyncResult {
   feedsProcessed: number;
   articlesAdded: number;
@@ -44,6 +58,20 @@ export interface SyncResult {
 }
 
 // ─── Feed Fetching ───────────────────────────────────────────────────────────
+
+/**
+ * Parse an RSS pubDate defensively. Several feeds (notably FCA) emit
+ * non-standard date strings that `new Date()` resolves to `Invalid Date`,
+ * which then throws inside the Prisma upsert ("Invalid value for argument
+ * publishedAt") and crash-spams the log with a full object per article —
+ * serially slowing the whole sync. Fall back to "now" so a single bad
+ * date can never break or slow the feed sync.
+ */
+export function parseFeedDate(raw: string | undefined): Date {
+  if (!raw) return new Date();
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? new Date() : d;
+}
 
 async function fetchFeed(feed: FeedConfig): Promise<ParsedArticle[]> {
   try {
@@ -59,7 +87,7 @@ async function fetchFeed(feed: FeedConfig): Promise<ParsedArticle[]> {
         title: item.title!.slice(0, 500),
         link: item.link!,
         description: (item.contentSnippet || item.content || '').slice(0, 2000),
-        publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+        publishedAt: parseFeedDate(item.pubDate),
         source: feed.name,
         feedCategory: feed.category,
       }));
@@ -73,16 +101,17 @@ async function fetchFeed(feed: FeedConfig): Promise<ParsedArticle[]> {
 
 // ─── Gemini Classification ───────────────────────────────────────────────────
 
-async function classifyArticles(articles: ParsedArticle[]): Promise<
-  Array<
-    ParsedArticle & {
-      extractedTopics: string[];
-      biasTypes: string[];
-      industrySector: string | null;
-      relevanceScore: number;
-    }
-  >
-> {
+function defaultClassification(articles: ParsedArticle[]): ClassifiedArticle[] {
+  return articles.map(a => ({
+    ...a,
+    extractedTopics: [],
+    biasTypes: [],
+    industrySector: null,
+    relevanceScore: 0.5,
+  }));
+}
+
+async function classifyArticles(articles: ParsedArticle[]): Promise<ClassifiedArticle[]> {
   if (articles.length === 0) return [];
 
   try {
@@ -98,16 +127,9 @@ async function classifyArticles(articles: ParsedArticle[]): Promise<
       batches.push(articles.slice(i, i + 20));
     }
 
-    const classified: Array<
-      ParsedArticle & {
-        extractedTopics: string[];
-        biasTypes: string[];
-        industrySector: string | null;
-        relevanceScore: number;
-      }
-    > = [];
-
-    for (const batch of batches) {
+    // Classify batches with bounded concurrency (was a sequential
+    // for-loop — 11 batches × up to 30s each on the sync wall clock).
+    const classifyBatch = async (batch: ParsedArticle[]): Promise<ClassifiedArticle[]> => {
       const prompt = `Classify each article for a decision-intelligence platform.
 For each article, provide:
 - topics: string[] (key decision-making / business topics)
@@ -134,9 +156,9 @@ Return a JSON array of objects in the same order.`;
             .trim()
         );
 
-        batch.forEach((article, i) => {
+        return batch.map((article, i) => {
           const c = classifications[i] || {};
-          classified.push({
+          return {
             ...article,
             extractedTopics: Array.isArray(c.topics) ? c.topics.slice(0, 10) : [],
             biasTypes: Array.isArray(c.biasTypes) ? c.biasTypes.slice(0, 5) : [],
@@ -145,53 +167,31 @@ Return a JSON array of objects in the same order.`;
               typeof c.relevanceScore === 'number'
                 ? Math.min(1, Math.max(0, c.relevanceScore))
                 : 0.5,
-          });
+          };
         });
       } catch (classErr) {
         log.warn(
           'Classification failed for batch, using defaults:',
           classErr instanceof Error ? classErr.message : String(classErr)
         );
-        batch.forEach(article => {
-          classified.push({
-            ...article,
-            extractedTopics: [],
-            biasTypes: [],
-            industrySector: null,
-            relevanceScore: 0.5,
-          });
-        });
+        return defaultClassification(batch);
       }
-    }
+    };
 
-    return classified;
+    const batchResults = await batchProcess(batches, classifyBatch, CLASSIFY_CONCURRENCY);
+    return batchResults.flat();
   } catch {
     // If Gemini is unavailable, store articles with default classification
-    return articles.map(a => ({
-      ...a,
-      extractedTopics: [],
-      biasTypes: [],
-      industrySector: null,
-      relevanceScore: 0.5,
-    }));
+    return defaultClassification(articles);
   }
 }
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
 
-async function storeArticles(
-  articles: Array<
-    ParsedArticle & {
-      extractedTopics: string[];
-      biasTypes: string[];
-      industrySector: string | null;
-      relevanceScore: number;
-    }
-  >
-): Promise<number> {
-  let added = 0;
-
-  for (const article of articles) {
+async function storeArticles(articles: ClassifiedArticle[]): Promise<number> {
+  // Upsert with bounded concurrency (was 210 sequential DB round-trips).
+  // Cap stays well under the Supabase connection-pooler limit.
+  const upsertOne = async (article: ClassifiedArticle): Promise<number> => {
     try {
       await prisma.newsArticle.upsert({
         where: { link: article.link },
@@ -210,7 +210,7 @@ async function storeArticles(
           relevanceScore: article.relevanceScore,
         },
       });
-      added++;
+      return 1;
     } catch (err) {
       // Unique constraint or other DB error — skip this article
       const code = (err as { code?: string }).code;
@@ -219,10 +219,12 @@ async function storeArticles(
           `Failed to store article "${article.title.slice(0, 50)}": ${err instanceof Error ? err.message : String(err)}`
         );
       }
+      return 0;
     }
-  }
+  };
 
-  return added;
+  const results = await batchProcess(articles, upsertOne, STORE_CONCURRENCY);
+  return results.reduce((sum, n) => sum + n, 0);
 }
 
 // ─── Cleanup ─────────────────────────────────────────────────────────────────

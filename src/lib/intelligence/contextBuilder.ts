@@ -18,7 +18,7 @@ import {
   type MacroSnapshot,
   type IndustryBenchmark,
 } from '@/lib/tools/macroContext';
-import { withTimeout as utilTimeout } from '@/lib/utils/resilience';
+import { withTimeout as utilTimeout, sleep } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 import { prisma } from '@/lib/prisma';
 
@@ -80,6 +80,9 @@ export interface IntelligenceContext {
 const STALE_THRESHOLD_MS = 12 * 60 * 60 * 1000; // 12 hours — triggers lazy sync halfway between daily crons
 let lastLazySyncAttempt = 0; // Prevent hammering — at most once per 30 min per process
 const LAZY_SYNC_COOLDOWN_MS = 30 * 60 * 1000;
+// The audit pipeline must NEVER block more than this on RSS sync. News is
+// non-fatal enrichment; the daily cron is the real refresh mechanism.
+const ON_DEMAND_NEWS_MAX_WAIT_MS = 5_000;
 
 async function ensureFreshNews(): Promise<void> {
   // Cooldown: don't attempt lazy sync more than once per 30 minutes
@@ -94,16 +97,33 @@ async function ensureFreshNews(): Promise<void> {
 
     if (recentArticle) return; // Data is fresh enough
 
-    log.info('News data is stale or empty — triggering on-demand sync...');
+    log.info('News data is stale or empty — kicking off background on-demand sync...');
     lastLazySyncAttempt = Date.now();
 
-    // Run sync with timeout — generous enough for slow RSS feeds
-    await utilTimeout(() => syncAllFeeds(), 60_000, 'On-demand news sync timeout');
-    log.info('On-demand news sync completed');
+    // News is NON-FATAL enrichment and must NEVER block the audit
+    // pipeline. This exact code path runs on /demo (a stranger pasting a
+    // memo, watching real SSE) AND every authed /api/analyze/stream
+    // audit — a 60s blocking RSS+Gemini sync here froze the pipeline
+    // platform-wide on any cold/stale-DB process (the demo just made it
+    // visible). The daily cron is the real refresh mechanism; this is
+    // only a between-crons safety net. Kick the sync off and let it run
+    // in the background — Promise.race does NOT cancel it, so its writes
+    // still land for subsequent audits within this process. Wait only a
+    // small budget so a fast sync still benefits THIS audit; otherwise
+    // proceed immediately with whatever news is cached (often none on a
+    // cold DB — fine; bias detection and DQI never depend on RSS news).
+    const syncPromise = syncAllFeeds().catch(err => {
+      log.warn(
+        'Background news sync failed (non-fatal):',
+        err instanceof Error ? err.message : String(err)
+      );
+    });
+    await Promise.race([syncPromise, sleep(ON_DEMAND_NEWS_MAX_WAIT_MS)]);
+    log.info('On-demand news sync kicked off (audit not blocked)');
   } catch (err) {
-    // Non-fatal: if lazy sync fails, we proceed with whatever cached data exists
+    // Non-fatal: if the staleness check itself fails, proceed with cached data
     log.warn(
-      'On-demand news sync failed (non-fatal):',
+      'On-demand news sync setup failed (non-fatal):',
       err instanceof Error ? err.message : String(err)
     );
   }
