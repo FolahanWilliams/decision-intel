@@ -279,7 +279,20 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
           minHeight: 'calc(100vh - 200px)',
         }}
       >
-        {/* Left pane — PDF / text / empty */}
+        {/* Left pane — PDF / text / empty.
+            Was a hard `maxHeight: calc(100vh-100px)` + sticky island: in
+            the 2-col grid the right column (verdict cluster + long R²F
+            tab body) runs much taller, so the capped left card left a
+            big "dead space" void below it (the 2026-05-17 screenshot).
+            Now the card hugs its content (`align-self:start`, no forced
+            viewport cap) so it ends exactly where the PDF ends — no
+            empty fixed box. Still scroll-follows naturally because the
+            grid item is top-aligned; deals/packages (short doc-list /
+            text leftPanes) are unaffected — they hugged their content
+            before too. A fuller sticky-sidebar-with-reflow restructure
+            of the shared shell is the deeper option, deferred for
+            founder sign-off (blast radius: documents + deals + packages
+            + the Item-1 above-fold IA lock). */}
         <section
           className={`doc-detail-v2-left ${styles.left}`}
           style={{
@@ -287,9 +300,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-md, 8px)',
             overflow: 'hidden',
-            position: 'sticky',
-            top: 80,
-            maxHeight: 'calc(100vh - 100px)',
+            alignSelf: 'start',
             display: 'flex',
             flexDirection: 'column',
             marginRight: 16,

@@ -44,17 +44,21 @@ interface BriefMetrics {
   loopClosureRate?: number;
 }
 
+// Inline CSS-var colours, NOT Tailwind text-*-400 classes. The platform
+// is light-theme only; those utilities wash out / clip against the light
+// card (the exact drift the EnhancedEmptyState redesign fixed for the
+// sibling primitive — see that file's header). 2026-05-17 fix.
 const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
-  documents: <Target size={16} className="text-blue-400" />,
-  deals: <AlertTriangle size={16} className="text-orange-400" />,
-  nudges: <Zap size={16} className="text-purple-400" />,
-  effectiveness: <TrendingUp size={16} className="text-emerald-400" />,
-  meetings: <Target size={16} className="text-blue-400" />,
-  rooms: <AlertTriangle size={16} className="text-orange-400" />,
-  playbooks: <Zap size={16} className="text-purple-400" />,
-  journal: <TrendingUp size={16} className="text-emerald-400" />,
-  analytics: <TrendingUp size={16} className="text-blue-400" />,
-  outcomes: <TrendingUp size={16} className="text-emerald-400" />,
+  documents: <Target size={16} style={{ color: 'var(--info)' }} />,
+  deals: <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />,
+  nudges: <Zap size={16} style={{ color: 'var(--accent-secondary)' }} />,
+  effectiveness: <TrendingUp size={16} style={{ color: 'var(--success)' }} />,
+  meetings: <Target size={16} style={{ color: 'var(--info)' }} />,
+  rooms: <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />,
+  playbooks: <Zap size={16} style={{ color: 'var(--accent-secondary)' }} />,
+  journal: <TrendingUp size={16} style={{ color: 'var(--success)' }} />,
+  analytics: <TrendingUp size={16} style={{ color: 'var(--info)' }} />,
+  outcomes: <TrendingUp size={16} style={{ color: 'var(--success)' }} />,
 };
 
 function getContextualTip(
@@ -171,9 +175,15 @@ export function IntelligenceBrief({ context, metrics }: IntelligenceBriefProps) 
 
   if (loading) {
     return (
-      <div className="mt-4 animate-pulse">
-        <div className="h-20 rounded-lg bg-muted/30" />
-      </div>
+      <div
+        style={{
+          marginTop: 16,
+          height: 72,
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-color)',
+        }}
+      />
     );
   }
 
@@ -187,58 +197,97 @@ export function IntelligenceBrief({ context, metrics }: IntelligenceBriefProps) 
   const profile = data.profile;
   const maturity = data.maturityScore;
 
+  const statItem = (label: React.ReactNode) => (
+    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)' }}>{label}</div>
+  );
+  const strong = (v: React.ReactNode) => (
+    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{v}</span>
+  );
+
   return (
-    <div className="mt-4 rounded-lg border border-border/60 bg-secondary/20 p-4">
-      <div className="flex items-center gap-2 mb-3">
+    <div
+      style={{
+        marginTop: 16,
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-color)',
+        background: 'var(--bg-secondary)',
+        padding: 14,
+        textAlign: 'left',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         {CONTEXT_ICONS[context]}
-        <span className="text-xs font-bold uppercase tracking-wider text-muted">
+        <span
+          style={{
+            fontSize: 'var(--fs-2xs)',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--text-muted)',
+          }}
+        >
           Intelligence Brief
         </span>
       </div>
 
       {/* Contextual tip */}
-      <p className="text-sm text-foreground/80 mb-3">{tip}</p>
+      <p
+        style={{
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text-secondary)',
+          margin: '0 0 10px',
+          lineHeight: 1.55,
+        }}
+      >
+        {tip}
+      </p>
 
       {/* Stats row */}
-      <div className="flex flex-wrap gap-4 text-xs text-muted">
-        {profile && profile.totalDecisions > 0 && (
-          <div>
-            <span className="font-bold text-foreground">{profile.totalDecisions}</span> decisions
-            tracked
-          </div>
-        )}
-        {profile && profile.avgDecisionQuality > 0 && (
-          <div>
-            Avg quality:{' '}
-            <span className="font-bold text-foreground">
-              {Math.round(profile.avgDecisionQuality)}/100
-            </span>
-          </div>
-        )}
-        {maturity && (
-          <div>
-            Maturity:{' '}
-            <span className="font-bold text-foreground">
-              {maturity.grade} ({maturity.score}/100)
-            </span>
-          </div>
-        )}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+        {profile && profile.totalDecisions > 0 && statItem(<>{strong(profile.totalDecisions)} decisions tracked</>)}
+        {profile &&
+          profile.avgDecisionQuality > 0 &&
+          statItem(<>Avg quality: {strong(`${Math.round(profile.avgDecisionQuality)}/100`)}</>)}
+        {maturity &&
+          statItem(<>Maturity: {strong(`${maturity.grade} (${maturity.score}/100)`)}</>)}
       </div>
 
       {/* Top risk biases */}
       {topBiases.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-border/40">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted mb-2">
+        <div
+          style={{
+            marginTop: 12,
+            paddingTop: 12,
+            borderTop: '1px solid var(--border-color)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 'var(--fs-2xs)',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--text-muted)',
+              marginBottom: 8,
+            }}
+          >
             Top Risk Biases
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {topBiases.map(b => (
               <span
                 key={b.biasType}
-                className="text-[11px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20"
+                style={{
+                  fontSize: 'var(--fs-2xs)',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+                  color: 'var(--error)',
+                  border: '1px solid color-mix(in srgb, var(--error) 25%, transparent)',
+                }}
               >
                 {formatBiasName(b.biasType)}{' '}
-                <span className="text-red-500/60">{b.dangerMultiplier.toFixed(1)}x</span>
+                <span style={{ opacity: 0.7 }}>{b.dangerMultiplier.toFixed(1)}x</span>
               </span>
             ))}
           </div>

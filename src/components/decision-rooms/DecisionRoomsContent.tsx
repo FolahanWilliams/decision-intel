@@ -79,22 +79,21 @@ export function DecisionRoomsContent() {
 
   return (
     <ErrorBoundary sectionName="Decision Rooms">
-      <div style={{ padding: 'var(--spacing-xl)', maxWidth: 1200, margin: '0 auto' }}>
-        {/* Header */}
+      {/* maxWidth wrapper only — the page wrapper (decision-rooms/page.tsx)
+          already supplies the canonical .page-header with the h1 +
+          subtitle, so this component must NOT render its own duplicate
+          title block (the doubled "Decision Rooms" the screenshot showed).
+          It's a content component mounted under a page that owns the
+          chrome — same discipline as the Decision DNA fold. */}
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        {/* Slim action row: room count (left) + Create Room (right) */}
         <div
           className="flex items-center justify-between"
-          style={{ marginBottom: 'var(--spacing-xl)' }}
+          style={{ marginBottom: 'var(--spacing-lg)', flexWrap: 'wrap', gap: 12 }}
         >
-          <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-              Decision Rooms
-            </h1>
-            {!isLoading && (
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                {totalRooms} room{totalRooms !== 1 ? 's' : ''} total
-              </p>
-            )}
-          </div>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+            {isLoading ? 'Loading rooms…' : `${totalRooms} room${totalRooms !== 1 ? 's' : ''} total`}
+          </span>
           <a
             href="/dashboard?view=browse"
             className="flex items-center gap-sm"
@@ -116,7 +115,7 @@ export function DecisionRoomsContent() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-lg)' }}>
           {tabs.map(tab => (
             <button
               key={tab.key}

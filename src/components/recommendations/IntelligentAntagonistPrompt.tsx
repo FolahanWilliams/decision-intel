@@ -25,7 +25,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, ShieldQuestion, ArrowRight } from 'lucide-react';
+import { Loader2, ShieldQuestion, ArrowRight, ChevronDown } from 'lucide-react';
 
 interface IntelligentAntagonistPromptProps {
   /// Called with the user-typed text. Component handles its own
@@ -45,15 +45,74 @@ export function IntelligentAntagonistPrompt({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hidden, setHidden] = useState(initiallyHidden);
+  // Collapsed by default so the prompt is a single slim bar instead of
+  // a ~10-row block that dominates the Decisions page. The discipline
+  // (name your priority before the ranking) is preserved — it's one
+  // click to expand and the strip below still doesn't pre-empt it.
+  const [collapsed, setCollapsed] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!hidden && textareaRef.current) {
+    if (!hidden && !collapsed && textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [hidden]);
+  }, [hidden, collapsed]);
 
   if (hidden) return null;
+
+  // ── Collapsed: a single-line prompt bar (default) ──────────────────
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setCollapsed(false)}
+        style={{
+          width: '100%',
+          textAlign: 'left',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderLeft: '3px solid var(--accent-primary)',
+          borderRadius: 'var(--radius-md)',
+          padding: '10px 14px',
+          marginBottom: 16,
+          cursor: 'pointer',
+        }}
+      >
+        <ShieldQuestion size={15} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+        <span
+          style={{
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--text-secondary)',
+            flex: 1,
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <strong style={{ color: 'var(--text-primary)' }}>Name your priority first</strong> — the
+          antagonist that costs no political capital
+        </span>
+        <span
+          style={{
+            fontSize: 'var(--fs-2xs)',
+            fontWeight: 600,
+            color: 'var(--accent-primary)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 3,
+            flexShrink: 0,
+          }}
+        >
+          Expand
+          <ChevronDown size={13} />
+        </span>
+      </button>
+    );
+  }
 
   const handleSubmit = async () => {
     const trimmed = text.trim();
@@ -91,7 +150,7 @@ export function IntelligentAntagonistPrompt({
         border: '1px solid var(--border-color)',
         borderTop: '3px solid var(--accent-primary)',
         borderRadius: 'var(--radius-lg)',
-        padding: '20px 24px',
+        padding: '16px 18px',
         marginBottom: 16,
         boxShadow: 'var(--shadow-sm)',
       }}
@@ -132,15 +191,13 @@ export function IntelligentAntagonistPrompt({
         style={{
           fontSize: 'var(--fs-xs)',
           color: 'var(--text-muted)',
-          margin: '0 0 12px',
+          margin: '0 0 10px',
           lineHeight: 1.5,
         }}
       >
-        Naming your priority before seeing the algorithm&rsquo;s output is the discipline that
-        protects you from automation bias. The gap between your read and the system&rsquo;s read is
-        the recommendation&rsquo;s actual value &mdash; and the audit log fires before the IC memo
-        can hide what the deal sponsor doesn&rsquo;t want to see. Same dissent, zero political
-        capital spent.
+        Naming it before the algorithm&rsquo;s output is the discipline that protects you from
+        automation bias; the gap between your read and the system&rsquo;s is the recommendation&rsquo;s
+        real value.
       </p>
       <textarea
         ref={textareaRef}
