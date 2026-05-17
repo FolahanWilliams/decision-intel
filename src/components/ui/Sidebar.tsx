@@ -367,8 +367,9 @@ export default function Sidebar() {
              cognitive-load problem on first-login is solved without
              breaking URLs. Each list keeps its workflow-specific shape
              (deal kanban, package grid, document table); the home
-             dashboard's UnifiedDecisionsFeed is the cross-list entry
-             point. Sub-items always render when expanded so the user
+             dashboard's ContainersWidget is the cross-list entry
+             point (UnifiedDecisionsFeed was retired in the Phase 3
+             P3.5 unification). Sub-items always render when expanded so the user
              learns the grouping once. */}
           <CollapsibleSection
             label="Decisions"
