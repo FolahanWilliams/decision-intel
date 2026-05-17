@@ -17,6 +17,7 @@ import { logAudit } from '@/lib/audit';
 import { getContainerMode, type DecisionContainerKind } from '@/lib/data/decision-container-modes';
 import { recomputeContainerMetrics } from '@/lib/scoring/container-aggregation';
 import { checkPremortemDefenceGate } from '@/lib/containers/premortem-defence';
+import { checkOperationalProxyGate } from '@/lib/containers/operational-proxy-gate';
 
 const log = createLogger('ContainerOutcomeRoute');
 
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         compositeDqi: true,
         analyzedDocCount: true,
         premortemDefence: true,
+        priors: true,
       },
     });
     if (!container) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -62,10 +64,20 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       premortemDefence: container.premortemDefence,
     });
     if (!gate.allowed) {
-      return NextResponse.json(
-        { error: gate.reason, code: gate.code },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: gate.reason, code: gate.code }, { status: 400 });
+    }
+
+    // Vector 1 — forced-at-vote 90-day operational-proxy gate (locked
+    // 2026-05-17). ALL kinds with an analyzed decision must carry ≥1
+    // falsifiable ≤90-day proxy (captured via the priors mechanism)
+    // before an outcome can be logged. Shared pure predicate —
+    // identical to the detail-page client guard. Empty containers pass.
+    const proxyGate = checkOperationalProxyGate({
+      analyzedDocCount: container.analyzedDocCount,
+      priors: container.priors,
+    });
+    if (!proxyGate.allowed) {
+      return NextResponse.json({ error: proxyGate.reason, code: proxyGate.code }, { status: 400 });
     }
 
     const body = (await request.json().catch(() => null)) as OutcomeBody | null;

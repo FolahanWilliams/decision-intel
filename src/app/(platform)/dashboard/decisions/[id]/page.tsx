@@ -21,9 +21,11 @@ import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
 import { PmiTrackerTab } from '@/components/containers/PmiTrackerTab';
 import { DealFeverPremortemCard } from '@/components/containers/DealFeverPremortemCard';
 import { PremortemDefenceCaptureCard } from '@/components/containers/PremortemDefenceCaptureCard';
+import { OperationalProxyResolutionCard } from '@/components/containers/OperationalProxyResolutionCard';
 import { CulturalPairingRiskCard } from '@/components/containers/CulturalPairingRiskCard';
 import { ContainerOutcomeCaptureModal } from '@/components/containers/ContainerOutcomeCaptureModal';
 import { checkPremortemDefenceGate } from '@/lib/containers/premortem-defence';
+import { checkOperationalProxyGate } from '@/lib/containers/operational-proxy-gate';
 import { ContainerCrossReferenceCard } from '@/components/containers/ContainerCrossReferenceCard';
 import { ContainerLinksPanel } from '@/components/containers/ContainerLinksPanel';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
@@ -197,6 +199,20 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
               containerId={container.id}
               containerName={container.name}
               premortemDefence={container.premortemDefence}
+              onSaved={() => mutate()}
+            />
+          )}
+
+          {/* Defensibility Vector 1 — forced-at-vote 90-day proxy loop
+              (locked 2026-05-17). ALL kinds once a decision exists
+              (analyzed docs). Capture-if-missing → resolve-when-due →
+              on-record; the gate blocks outcome logging until a
+              falsifiable ≤90-day proxy is captured. */}
+          {container.analyzedDocCount > 0 && (
+            <OperationalProxyResolutionCard
+              containerId={container.id}
+              analyzedDocCount={container.analyzedDocCount}
+              priors={container.priors}
               onSaved={() => mutate()}
             />
           )}
@@ -415,8 +431,19 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
                 premortemDefence: container.premortemDefence,
               });
               if (!gate.allowed) {
+                showToast(gate.reason ?? 'Record the pre-mortem defence first.', 'warning');
+                return;
+              }
+              // Vector 1 client guard — same shared pure predicate as
+              // the server hard-gate so the sponsor gets a clear nudge,
+              // not a raw 400. Empty containers pass.
+              const proxyGate = checkOperationalProxyGate({
+                analyzedDocCount: container.analyzedDocCount,
+                priors: container.priors,
+              });
+              if (!proxyGate.allowed) {
                 showToast(
-                  gate.reason ?? 'Record the pre-mortem defence first.',
+                  proxyGate.reason ?? 'Log a falsifiable 90-day operational proxy first.',
                   'warning'
                 );
                 return;

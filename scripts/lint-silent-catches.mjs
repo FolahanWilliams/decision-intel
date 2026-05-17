@@ -168,7 +168,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // 182 → 183 (Outreach 1-pager / Phase C 2026-05-17): IntelBriefPanel
 // generateOnepager res.json().catch(() => null) error-body parse —
 // canonical req.json()/res.json() body-parse exception class.
-const SILENT_CATCH_BASELINE = 183;
+// 183 → 187 (Defensibility Vector 1 / 2026-05-17): OperationalProxy
+// ResolutionCard captureProxy + resolveProxy res.json() body-parse
+// (×2) + proxy-resolution route request.json() body-parse + the
+// teamMember orgId fail-soft lookup (mirrors the outcome route
+// verbatim). All canonical body-parse / orgId-resolve exception
+// classes — no delivery/audit/flywheel path swallowed.
+const SILENT_CATCH_BASELINE = 187;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

@@ -101,7 +101,9 @@ export type AuditAction =
   // M-3 — Auto-extract PMI signals from IC memo content (locked 2026-05-13)
   | 'PMI_SIGNAL_EXTRACT_ATTEMPTED'
   // V2 — mandatory pre-mortem dissent gate (locked 2026-05-16)
-  | 'PREMORTEM_DEFENCE_RECORDED';
+  | 'PREMORTEM_DEFENCE_RECORDED'
+  // Defensibility Vector 1 — forced-at-vote 90-day proxy loop (locked 2026-05-17)
+  | 'OPERATIONAL_PROXY_RESOLVED';
 
 export interface AuditLogParams {
   action: AuditAction;

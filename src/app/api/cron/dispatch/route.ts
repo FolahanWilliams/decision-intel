@@ -99,6 +99,9 @@ export async function GET() {
     // before the brief synthesizes the day's corp-dev / M&A signal.
     '/api/cron/outreach-intel',
     '/api/cron/detect-outcomes',
+    // Vector 1 — day-90 operational-proxy Brier backfill (pure;
+    // surfaces due proxies via the detail card + the outcome gate).
+    '/api/cron/proxy-resolution',
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
     '/api/cron/google-drive-sync',
