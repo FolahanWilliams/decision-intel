@@ -199,10 +199,7 @@ function StatCard({
 
 function LoadingSkeleton() {
   return (
-    <div
-      className="container"
-      style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}
-    >
+    <div style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)' }}>
       {/* Header skeleton */}
       <div
         style={{
@@ -330,7 +327,7 @@ export function InsightsPageContent() {
   // Error state
   if (error) {
     return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+      <div style={{ paddingTop: 'var(--spacing-2xl)' }}>
         <AccentCard accent="danger" bodyStyle={{ padding: 0 }}>
           <div className="card-body" style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>
             <AlertTriangle size={32} style={{ color: 'var(--error)', margin: '0 auto 12px' }} />
@@ -356,7 +353,7 @@ export function InsightsPageContent() {
   // Empty state
   if (!insights || insights.empty) {
     return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+      <div style={{ paddingTop: 'var(--spacing-2xl)' }}>
         <EnhancedEmptyState type="insights" showBrief briefContext="analytics" />
       </div>
     );
@@ -403,9 +400,12 @@ export function InsightsPageContent() {
     },
   ];
 
+  // Content component — analytics/page.tsx owns the .page-header h1 +
+  // breadcrumbs + page container. No self page chrome here (the
+  // Decision-DNA-fold precedent: a component mounted under a
+  // chrome-owning page must not double the h1/container).
   return (
     <div
-      className="container"
       style={{
         paddingTop: 'var(--spacing-lg)',
         paddingBottom: 'var(--spacing-2xl)',
@@ -435,9 +435,9 @@ export function InsightsPageContent() {
             }}
           >
             <Zap size={18} style={{ color: 'var(--accent-primary)' }} />
-            <h1 style={{ fontSize: '1.25rem', border: 'none', padding: 0, margin: 0 }}>
+            <h2 style={{ fontSize: '1.25rem', border: 'none', padding: 0, margin: 0 }}>
               Visual Insights
-            </h1>
+            </h2>
           </div>
           <div
             style={{
