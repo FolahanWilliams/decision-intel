@@ -70,6 +70,13 @@ Cognitive-entrenchment wedge asset — the one net-new signal extracted from the
 - [x] NAMED_PATTERNS promotion deliberately deferred + surfaced as a founder-routed decision (pipeline-gated 10-surface cascade; already structurally caught by DI-B-022 + the Reference-Class Blindness toxic combo).
 - [x] Gates green: tsc clean · 5 lint gates · slop-scan under trip-wire.
 
+/demo cold-paste conversion-surface friction polish (the surface every wedge DM points a stranger at; no pipeline/copy-meaning/flow change).
+
+- [x] Live word counter on the paste textarea + Run-button gate now mirrors the real /api/demo/run server bounds exactly (50–4000 words) — removes two silent post-round-trip dead-ends (a sub-50 400 and an over-4000 413) on the conversion surface; the client previously only gated `<15 chars`.
+- [x] PasteAuditResults: Sparkles → trust icons (BookmarkPlus on the Save eyebrow, Swords on the hostile-objections section) per the locked Sparkles-discipline on the cold-conversion surface; local `titleCase` → canonical `formatBiasName` so wow-moment bias names match the taxonomy (drift-class fix, META #5).
+- [x] CLAUDE.md C4 lock RE-CORRECTED: grep-proved DiscoveryGradeImpactCard is live on /demo:573 + /dashboard:1616 (the 2026-05-17 "ZERO mounts / dead code" claim was itself a false-negative grep — multi-line import evaded the single-line pattern). Forward rule sharpened to cover both directions + multi-line imports. decision-roi.ts:8 stale comment flagged for back-fill on next touch.
+- [ ] Founder decision surfaced (not shipped): /demo hero subhead leads with DQI/Knowledge-Graph jargon on the coldest surface (violates the locked cold-context vocabulary rule); + the section-order tradeoff for DM-warmed traffic. See session notes.
+
 ## Recently Completed (2026-05-16)
 
 Test-coverage cascade — full prose in CLAUDE.md "Coverage-gap cascade + threshold ratchet (locked 2026-05-16)".

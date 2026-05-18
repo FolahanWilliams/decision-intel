@@ -341,7 +341,10 @@ export default function DemoPage() {
   // Click handler — gates the run on the redaction modal when PII is detected.
   const handlePasteAnalyze = useCallback(() => {
     const trimmed = pasteText.trim();
-    if (trimmed.length < 15) return;
+    // Bounds mirror /api/demo/run (MIN_WORDS 50 · MAX_WORDS 4000) so the
+    // button gate and the server agree — no post-round-trip 400/413.
+    const words = trimmed ? trimmed.split(/\s+/).filter(Boolean).length : 0;
+    if (words < 50 || words > 4000) return;
     const scan = scanForPii(trimmed);
     if (scan.hits.length > 0) {
       setRedactPending(trimmed);
@@ -454,6 +457,20 @@ export default function DemoPage() {
   }, [showResults]);
 
   const idleState = !isSimulating && !showResults && !pasteAuditing && !pasteAudit && !pasteError;
+
+  // Word-count gate mirrors the /api/demo/run server bounds EXACTLY
+  // (MIN_WORDS 50 · MAX_WORDS 4000 · same split(/\s+/).filter(Boolean)).
+  // Pre-this, the client only gated `<15 chars`, so a stranger pasting a
+  // short snippet OR an over-cap memo hit a 400/413 AFTER the round-trip —
+  // a silent dead-end on the single most important conversion surface.
+  const PASTE_MIN_WORDS = 50;
+  const PASTE_MAX_WORDS = 4000;
+  const pasteWordCount = pasteText.trim()
+    ? pasteText.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+  const pasteUnderMin = pasteWordCount > 0 && pasteWordCount < PASTE_MIN_WORDS;
+  const pasteOverMax = pasteWordCount > PASTE_MAX_WORDS;
+  const pasteCanRun = pasteWordCount >= PASTE_MIN_WORDS && pasteWordCount <= PASTE_MAX_WORDS;
 
   return (
     <div style={{ minHeight: '100vh', background: C.white, color: C.slate900 }}>
@@ -707,8 +724,8 @@ export default function DemoPage() {
                   flexWrap: 'wrap',
                 }}
               >
-                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                  {['1 audit per day', '4,000-word cap', 'Never stored'].map(chip => (
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+                  {['1 audit per day', 'Never stored'].map(chip => (
                     <span
                       key={chip}
                       style={{
@@ -724,10 +741,44 @@ export default function DemoPage() {
                       {chip}
                     </span>
                   ))}
+                  {/* Live word counter — mirrors the real server bounds so a
+                      stranger never hits a post-submit 400 (<50) / 413 (>4000)
+                      dead-end on the conversion surface. */}
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: pasteOverMax ? '#DC2626' : pasteUnderMin ? '#D97706' : C.slate500,
+                    }}
+                  >
+                    <CheckCircle2
+                      size={12}
+                      style={{
+                        color: pasteOverMax ? '#DC2626' : pasteUnderMin ? '#D97706' : C.green,
+                      }}
+                    />
+                    {pasteWordCount === 0
+                      ? '4,000-word cap'
+                      : pasteUnderMin
+                        ? `${pasteWordCount}/${PASTE_MIN_WORDS} words minimum`
+                        : pasteOverMax
+                          ? `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} — trim ${(pasteWordCount - PASTE_MAX_WORDS).toLocaleString()}`
+                          : `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} words`}
+                  </span>
                 </div>
                 <button
                   onClick={handlePasteAnalyze}
-                  disabled={pasteText.trim().length < 15}
+                  disabled={!pasteCanRun}
+                  title={
+                    pasteUnderMin
+                      ? `Add at least ${PASTE_MIN_WORDS} words so the audit has something to work with`
+                      : pasteOverMax
+                        ? `Trim to ${PASTE_MAX_WORDS.toLocaleString()} words or fewer`
+                        : undefined
+                  }
                   style={{
                     padding: '11px 22px',
                     borderRadius: 10,
@@ -735,11 +786,10 @@ export default function DemoPage() {
                     color: C.white,
                     fontSize: 14,
                     fontWeight: 700,
-                    cursor: pasteText.trim().length < 15 ? 'not-allowed' : 'pointer',
-                    opacity: pasteText.trim().length < 15 ? 0.45 : 1,
+                    cursor: !pasteCanRun ? 'not-allowed' : 'pointer',
+                    opacity: !pasteCanRun ? 0.45 : 1,
                     border: 'none',
-                    boxShadow:
-                      pasteText.trim().length < 15 ? 'none' : '0 6px 20px rgba(22,163,74,0.3)',
+                    boxShadow: !pasteCanRun ? 'none' : '0 6px 20px rgba(22,163,74,0.3)',
                     transition: 'all 0.15s',
                     display: 'inline-flex',
                     alignItems: 'center',

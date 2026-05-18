@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Brain, Users, Sparkles, Clock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Brain, Users, BookmarkPlus, Swords, Clock, CheckCircle2 } from 'lucide-react';
 import type { AnalysisResult, BiasDetectionResult, DecisionTwin } from '@/types';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesisLine';
 import { trackEvent } from '@/lib/analytics/track';
 import { buildSaveAuditHref } from '@/lib/utils/demo-claim-url';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const C = {
   white: '#FFFFFF',
@@ -32,13 +33,6 @@ function severityColor(severity: string): string {
   if (severity === 'high') return '#EA580C';
   if (severity === 'medium') return '#D97706';
   return '#16A34A';
-}
-
-function titleCase(snake: string): string {
-  return snake
-    .split(/[_-]/)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ');
 }
 
 interface PasteAuditResultsProps {
@@ -377,7 +371,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
                         color: C.slate900,
                       }}
                     >
-                      {titleCase(b.biasType)}
+                      {formatBiasName(b.biasType)}
                     </span>
                     <span
                       style={{
@@ -571,7 +565,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
                 justifyContent: 'center',
               }}
             >
-              <Sparkles size={16} style={{ color: '#D97706' }} />
+              <Swords size={16} style={{ color: '#D97706' }} />
             </div>
             <div>
               <h3
@@ -656,7 +650,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
             letterSpacing: '0.14em',
           }}
         >
-          <Sparkles size={12} /> Save this audit
+          <BookmarkPlus size={12} /> Save this audit
         </div>
         <h3
           style={{
