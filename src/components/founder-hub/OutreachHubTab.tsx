@@ -30,6 +30,7 @@ import { OutreachCommandCenterTab } from './OutreachCommandCenterTab';
 import { OutreachAndMeetingsTab } from './OutreachAndMeetingsTab';
 import { DesignPartnersTab } from './DesignPartnersTab';
 import { IntelBriefPanel } from './outreach/IntelBriefPanel';
+import { ConversionLedgerPanel } from './outreach/ConversionLedgerPanel';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Section = 'pipeline' | 'messages' | 'design_partners';
@@ -188,6 +189,9 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
       <div role="tabpanel">
         {section === 'pipeline' && (
           <>
+            <ErrorBoundary sectionName="Wedge Conversion Ledger">
+              <ConversionLedgerPanel founderPass={founderPass} />
+            </ErrorBoundary>
             <ErrorBoundary sectionName="Outreach Intel Brief">
               <IntelBriefPanel founderPass={founderPass} />
             </ErrorBoundary>

@@ -2789,6 +2789,46 @@ model OutreachIntelBrief {
   @@index([createdAt])
 }
 
+// Wedge conversion ledger (locked 2026-05-18). The GTM v3.5 Phase-1
+// motion mandates "track conversion religiously — DMs sent, replies,
+// audit booked, audit completed, conversion." OutreachArtifact is an
+// artifact-of-a-moment (the generated DM); this is the FUNNEL ENTITY —
+// a prospect moving through stages with per-stage timestamps. It is the
+// instrument that turns the month-4 kill checkpoint (<5 paid Individuals
+// = halt-and-pivot, regardless of every other metric) from a cliff the
+// founder discovers into a dashboard the founder steers. Founder-only
+// surface (founder-pass), one row per tracked prospect. `persona` /
+// `source` / `stage` are stored as validated strings (forward-compat;
+// the API validates against WEDGE_PERSONAS + the FUNNEL_STAGES SSOT).
+// Per-stage timestamps are nullable + stamped on transition. `artifactId`
+// is a SOFT link to OutreachArtifact (no hard FK — decoupled +
+// schema-drift-tolerant, same discipline as the soft links elsewhere).
+model WedgeProspect {
+  id              String    @id @default(cuid())
+  userId          String
+  name            String
+  company         String?
+  title           String?
+  persona         String // WedgePersonaId | 'other' (validated at API boundary)
+  source          String    @default("linkedin_dm") // linkedin_dm | event | warm_intro | inbound | intel_brief | other
+  stage           String    @default("dm_sent") // FUNNEL_STAGES SSOT — dm_sent | replied | audit_booked | audit_completed | converted | lost
+  anchorCaseSlug  String? // the 143-case bias anchor used in the opener (v3.5 motion discipline)
+  artifactId      String? // soft link to OutreachArtifact.id (no FK by design)
+  notes           String?   @db.Text
+  lostReason      String?   @db.Text
+  dmSentAt        DateTime?
+  repliedAt       DateTime?
+  auditBookedAt   DateTime?
+  auditCompletedAt DateTime?
+  convertedAt     DateTime?
+  lostAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, stage])
+  @@index([userId, updatedAt])
+}
+
 // ─── Decision Provenance Record ───────────────────────────────────────────
 //
 // Renamed from AuditDefensePacket on 2026-04-22. "Provenance" maps directly

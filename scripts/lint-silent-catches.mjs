@@ -178,7 +178,12 @@ const SCAN_DIR = join(ROOT, 'src');
 // `res.json().catch(() => null)` body-parse on the /api/analytics/roi
 // fetch — canonical res.json() body-parse exception class; the card
 // degrades to not-rendered, no delivery/audit/flywheel path swallowed.
-const SILENT_CATCH_BASELINE = 188;
+// → 193 (Wedge conversion ledger · 2026-05-18): +5 ALL canonical
+// req.json()/res.json() body-parse exception class — 2 req.json() in
+// the prospects API routes (POST + PATCH) + 3 res.json() in
+// ConversionLedgerPanel (load/transition/submitAdd); each annotated
+// inline, no delivery/audit/flywheel path swallowed.
+const SILENT_CATCH_BASELINE = 193;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

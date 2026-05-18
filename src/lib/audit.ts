@@ -103,7 +103,13 @@ export type AuditAction =
   // V2 — mandatory pre-mortem dissent gate (locked 2026-05-16)
   | 'PREMORTEM_DEFENCE_RECORDED'
   // Defensibility Vector 1 — forced-at-vote 90-day proxy loop (locked 2026-05-17)
-  | 'OPERATIONAL_PROXY_RESOLVED';
+  | 'OPERATIONAL_PROXY_RESOLVED'
+  // Wedge conversion ledger (locked 2026-05-18)
+  | 'PROSPECT_CREATED'
+  | 'PROSPECT_STAGE_ADVANCED'
+  | 'PROSPECT_CONVERTED'
+  | 'PROSPECT_LOST'
+  | 'PROSPECT_DELETED';
 
 export interface AuditLogParams {
   action: AuditAction;
