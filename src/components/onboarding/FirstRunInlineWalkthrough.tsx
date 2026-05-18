@@ -31,6 +31,7 @@ import {
   Play,
 } from 'lucide-react';
 import { bundlesForRole, type SampleBundle, type SampleRole } from '@/lib/data/sample-bundles';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const STORAGE_DISMISSED = 'di-first-run-walkthrough-dismissed';
 
@@ -270,18 +271,82 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
               >
                 {b.title}
               </div>
+              {/* The value line: WHY you'd run this (hookCopy), not the
+                  raw memo description (summary, which truncated mid-word
+                  on the card and told the user nothing about the
+                  payoff). Then the concrete payoff: the exact biases the
+                  audit will flag + the likely grade — so the user knows
+                  what they get BEFORE clicking, from existing bundle
+                  data. (founder ask 2026-05-18) */}
               <div
                 style={{
                   fontSize: 12,
-                  color: 'var(--text-muted)',
+                  color: 'var(--text-secondary)',
                   lineHeight: 1.45,
                   display: '-webkit-box',
-                  WebkitLineClamp: 3,
+                  WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical',
                   overflow: 'hidden',
                 }}
               >
-                {b.summary}
+                {b.hookCopy}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 4,
+                  alignItems: 'center',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  Audit flags
+                </span>
+                {b.expectedBiases.slice(0, 4).map(bias => (
+                  <span
+                    key={bias}
+                    style={{
+                      fontSize: 10,
+                      padding: '2px 7px',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-secondary)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {formatBiasName(bias)}
+                  </span>
+                ))}
+                {b.expectedBiases.length > 4 && (
+                  <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                    +{b.expectedBiases.length - 4}
+                  </span>
+                )}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Likely grade on this memo:{' '}
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  ~{b.expectedDqi}/100
+                </span>
               </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                 <button

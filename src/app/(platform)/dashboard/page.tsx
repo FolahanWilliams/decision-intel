@@ -53,7 +53,6 @@ import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { AccentCard } from '@/components/ui/AccentCard';
-import { usePlanLabels } from '@/hooks/usePlanLabels';
 import { KGMergeConsentModal } from '@/components/pricing/KGMergeConsentModal';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
@@ -175,7 +174,6 @@ const ROLE_DASHBOARD_HEADLINE: Record<EmptyStateRole, string> = {
 };
 
 export default function Dashboard() {
-  const { knowledgeGraphLabel, isTeamPlan } = usePlanLabels();
   const onboardingRole = useOnboardingRole();
   const dashboardSubtitle = onboardingRole
     ? ROLE_DASHBOARD_SUBTITLE[onboardingRole]
@@ -2153,53 +2151,19 @@ export default function Dashboard() {
               )}
             </ErrorBoundary>
 
-            {/* Empty state - cold-prospect first impression after sign-up.
-              Migrated to AccentCard 2026-05-10 (audit batch 2 #4): this
-              is the conversion-driving CTA card for new HXC users; per
-              the AccentCard discipline lock the lead/hero card on a tab
-              gets `accent='primary'` for visual hierarchy. The
-              retrospective callout below uses `accent='info'` (data /
-              alternative-path surface) so the two stacked cards render
-              with semantic top-stripe distinction. */}
-            {uploadedDocs.length === 0 && !loadingDocs && (
-              <>
-                <AccentCard accent="primary" bodyStyle={{ padding: 0 }}>
-                  <EnhancedEmptyState
-                    type="documents"
-                    title={`Start your ${knowledgeGraphLabel}`}
-                    description={
-                      isTeamPlan
-                        ? 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your org’s reasoning layer — bias audit, steering-committee objection simulation, and your first Knowledge Graph node in 60 seconds.'
-                        : 'Drop a strategic memo, board deck, or market-entry recommendation in the upload zone. Every memo you upload joins your reasoning layer — bias audit, the questions your CEO will ask, and your first entry in your Personal Decision History in 60 seconds.'
-                    }
-                    showBrief
-                    briefContext="documents"
-                    actions={[
-                      {
-                        label: 'Choose a File',
-                        onClick: () => document.getElementById('file-input')?.click(),
-                        variant: 'primary' as const,
-                      },
-                    ]}
-                  />
-                </AccentCard>
-                <AccentCard
-                  accent="info"
-                  style={{ marginTop: 12 }}
-                  bodyStyle={{ padding: '16px 20px', textAlign: 'center' }}
-                >
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>
-                    Or start with a retrospective
-                  </p>
-                  <p
-                    style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 0 }}
-                  >
-                    Upload a past strategic memo to close the loop your team never closed.
-                    Post-mortem audit in 60 seconds.
-                  </p>
-                </AccentCard>
-              </>
-            )}
+            {/* De-duplicated 2026-05-18 (founder screenshot): the empty
+              upload view previously rendered a SECOND upload CTA here —
+              an EnhancedEmptyState "Start your <KG>" card whose
+              "Choose a File" fired the same #file-input as the real
+              dropzone above (#onborda-upload). Two stacked ways to do
+              the identical thing read as confusing. The dropzone is the
+              single canonical upload surface (drag + multi-file +
+              format list + the onborda tour anchor + its own value
+              copy); FirstRunInlineWalkthrough is the try-a-sample path;
+              the four-doors row is paste/meeting/email. The retrospective
+              nudge that lived in this block is a marketing nuance, not a
+              third upload affordance — re-add as ONE line in the
+              dropzone copy if wanted, never a separate card. */}
           </>
         )}
 
