@@ -2045,7 +2045,7 @@ export default function Dashboard() {
                       className="section-header flex items-center gap-2"
                       style={{ marginBottom: 0 }}
                     >
-                      <CheckCircle size={18} className="text-green-500" />
+                      <CheckCircle size={18} style={{ color: 'var(--success)' }} />
                       Recent Analyses
                     </h2>
                     <button

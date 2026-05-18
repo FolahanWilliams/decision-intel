@@ -529,7 +529,14 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
             >
               <div className="flex flex-col gap-lg">
                 {!emailConfigured && (
-                  <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+                  <div
+                    className="flex items-start gap-sm rounded-md px-3 py-2 text-xs"
+                    style={{
+                      border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)',
+                      background: 'color-mix(in srgb, var(--warning) 10%, transparent)',
+                      color: 'var(--warning)',
+                    }}
+                  >
                     <AlertTriangle size={14} className="mt-0.5 shrink-0" />
                     <span>
                       Email delivery is not configured. Toggling these settings will save your

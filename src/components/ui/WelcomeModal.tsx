@@ -360,7 +360,14 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     <div className="mt-auto pt-8 border-t border-[var(--border-color)]">
                       <div className="flex flex-col gap-3">
                         {sampleError && (
-                          <div className="w-full p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-[var(--fs-xs)] text-red-600 font-medium">
+                          <div
+                            className="w-full p-3 rounded-xl text-[var(--fs-xs)] font-medium"
+                            style={{
+                              background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+                              border: '1px solid color-mix(in srgb, var(--error) 20%, transparent)',
+                              color: 'var(--error)',
+                            }}
+                          >
                             {sampleError}
                           </div>
                         )}
