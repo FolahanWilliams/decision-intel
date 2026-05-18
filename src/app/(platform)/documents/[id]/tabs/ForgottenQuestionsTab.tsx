@@ -11,28 +11,35 @@ interface ForgottenQuestionsTabProps {
   analysisId?: string;
 }
 
+// Canonical light-theme severity tokens (opacity suffixes preserved via
+// color-mix %). Severity→intent unchanged: low=muted · medium=warning ·
+// high=severity-high · critical=error.
 const SEVERITY_STYLES: Record<
   'low' | 'medium' | 'high' | 'critical',
-  { border: string; badge: string; label: string }
+  { borderColor: string; badgeColor: string; badgeBg: string; label: string }
 > = {
   low: {
-    border: 'border-l-zinc-500/50',
-    badge: 'bg-zinc-500/10 text-muted-foreground',
+    borderColor: 'color-mix(in srgb, var(--text-muted) 50%, transparent)',
+    badgeColor: 'var(--text-muted)',
+    badgeBg: 'color-mix(in srgb, var(--text-muted) 10%, transparent)',
     label: 'Low',
   },
   medium: {
-    border: 'border-l-amber-500/50',
-    badge: 'bg-amber-500/10 text-amber-400',
+    borderColor: 'color-mix(in srgb, var(--warning) 50%, transparent)',
+    badgeColor: 'var(--warning)',
+    badgeBg: 'color-mix(in srgb, var(--warning) 10%, transparent)',
     label: 'Medium',
   },
   high: {
-    border: 'border-l-orange-500/60',
-    badge: 'bg-orange-500/10 text-orange-400',
+    borderColor: 'color-mix(in srgb, var(--severity-high) 60%, transparent)',
+    badgeColor: 'var(--severity-high)',
+    badgeBg: 'color-mix(in srgb, var(--severity-high) 10%, transparent)',
     label: 'High',
   },
   critical: {
-    border: 'border-l-red-500/70',
-    badge: 'bg-red-500/10 text-red-400',
+    borderColor: 'color-mix(in srgb, var(--error) 70%, transparent)',
+    badgeColor: 'var(--error)',
+    badgeBg: 'color-mix(in srgb, var(--error) 10%, transparent)',
     label: 'Critical',
   },
 };
@@ -145,28 +152,40 @@ export function ForgottenQuestionsTab({
             return (
               <div
                 key={i}
-                className={`card border-l-4 ${styles.border} ${isAddressed ? 'opacity-60' : ''}`}
+                className={`card border-l-4 ${isAddressed ? 'opacity-60' : ''}`}
+                style={{ borderLeftColor: styles.borderColor }}
               >
                 <div className="card-body">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2">
                       <AlertTriangle
                         size={14}
-                        className={
-                          severity === 'critical' || severity === 'high'
-                            ? 'text-red-400'
-                            : severity === 'medium'
-                              ? 'text-amber-400'
-                              : 'text-muted-foreground'
-                        }
+                        style={{
+                          color:
+                            severity === 'critical' || severity === 'high'
+                              ? 'var(--error)'
+                              : severity === 'medium'
+                                ? 'var(--warning)'
+                                : 'var(--text-muted)',
+                        }}
                       />
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 font-medium uppercase tracking-wide ${styles.badge}`}
+                        className="text-[10px] px-1.5 py-0.5 font-medium uppercase tracking-wide"
+                        style={{ color: styles.badgeColor, background: styles.badgeBg }}
                       >
                         {styles.label}
                       </span>
                       {q.biasGuarded && (
-                        <span className="text-[10px] px-1.5 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 border flex items-center gap-1"
+                          style={{
+                            color: 'var(--accent-secondary)',
+                            background:
+                              'color-mix(in srgb, var(--accent-secondary) 10%, transparent)',
+                            borderColor:
+                              'color-mix(in srgb, var(--accent-secondary) 20%, transparent)',
+                          }}
+                        >
                           <Shield size={10} />
                           {q.biasGuarded}
                         </span>
@@ -176,9 +195,20 @@ export function ForgottenQuestionsTab({
                       onClick={() => toggleAddressed(i, q.question)}
                       className={`text-[11px] px-2 py-1 border transition-colors ${
                         isAddressed
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          ? ''
                           : 'border-border text-muted hover:text-foreground hover:border-foreground/30'
                       }`}
+                      style={
+                        isAddressed
+                          ? {
+                              background:
+                                'color-mix(in srgb, var(--success) 10%, transparent)',
+                              color: 'var(--success)',
+                              borderColor:
+                                'color-mix(in srgb, var(--success) 30%, transparent)',
+                            }
+                          : undefined
+                      }
                       aria-pressed={isAddressed}
                     >
                       {isAddressed ? 'Addressed' : 'Mark addressed'}

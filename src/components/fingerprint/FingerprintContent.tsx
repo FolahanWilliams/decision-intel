@@ -28,19 +28,29 @@ import {
 } from 'recharts';
 
 function TrendIcon({ trend }: { trend: string | null }) {
-  if (trend === 'decreasing') return <TrendingDown size={12} className="text-emerald-400" />;
-  if (trend === 'increasing') return <TrendingUp size={12} className="text-red-400" />;
+  if (trend === 'decreasing')
+    return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
+  if (trend === 'increasing') return <TrendingUp size={12} style={{ color: 'var(--error)' }} />;
   return <Minus size={12} className="text-muted-foreground" />;
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
-  const colors: Record<string, string> = {
-    critical: 'bg-red-500/10 text-red-400 border-red-500/20',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    info: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  };
+  // Canonical light-theme tokens. critical=error · warning=warning · info=info.
+  const v =
+    severity === 'critical'
+      ? 'var(--error)'
+      : severity === 'warning'
+        ? 'var(--warning)'
+        : 'var(--info)';
   return (
-    <span className={`text-[10px] px-2 py-0.5 border ${colors[severity] || colors.info}`}>
+    <span
+      className="text-[10px] px-2 py-0.5 border"
+      style={{
+        color: v,
+        background: `color-mix(in srgb, ${v} 10%, transparent)`,
+        borderColor: `color-mix(in srgb, ${v} 20%, transparent)`,
+      }}
+    >
       {severity}
     </span>
   );
@@ -48,13 +58,14 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function PrevalenceBar({ rate }: { rate: number }) {
   const pct = Math.round(rate * 100);
-  const color = pct >= 70 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-blue-500';
+  const color =
+    pct >= 70 ? 'var(--error)' : pct >= 50 ? 'var(--warning)' : 'var(--info)';
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-2 bg-muted/20 overflow-hidden">
         <div
-          className={`h-full ${color} transition-all duration-500`}
-          style={{ width: `${pct}%` }}
+          className="h-full transition-all duration-500"
+          style={{ width: `${pct}%`, background: color }}
         />
       </div>
       <span className="text-[10px] font-mono text-muted w-8 text-right">{pct}%</span>
@@ -108,9 +119,9 @@ export function FingerprintContent() {
 
   if (error) {
     return (
-      <div className="card border-l-4 border-l-red-500">
+      <div className="card border-l-4" style={{ borderLeftColor: 'var(--error)' }}>
         <div className="card-body">
-          <p className="text-sm text-red-400">
+          <p className="text-sm" style={{ color: 'var(--error)' }}>
             {error instanceof Error ? error.message : 'Failed to load fingerprint data'}
           </p>
         </div>
@@ -144,10 +155,10 @@ export function FingerprintContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Total Decisions</h4>
-            <Brain size={16} className="text-blue-400" />
+            <Brain size={16} style={{ color: 'var(--info)' }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-blue-400">
+            <div className="text-3xl font-bold" style={{ color: 'var(--info)' }}>
               {fingerprint.totalAnalysesAllTime}
             </div>
             <p className="text-xs text-muted">All time</p>
@@ -157,10 +168,12 @@ export function FingerprintContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Quarters Tracked</h4>
-            <BarChart3 size={16} className="text-violet-400" />
+            <BarChart3 size={16} style={{ color: 'var(--accent-secondary)' }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-violet-400">{fingerprint.quartersSpanned}</div>
+            <div className="text-3xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+              {fingerprint.quartersSpanned}
+            </div>
             <p className="text-xs text-muted">Longitudinal span</p>
           </div>
         </div>
@@ -168,10 +181,12 @@ export function FingerprintContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Top Patterns</h4>
-            <Fingerprint size={16} className="text-cyan-400" />
+            <Fingerprint size={16} style={{ color: 'var(--info)' }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-cyan-400">{fingerprint.topPatterns.length}</div>
+            <div className="text-3xl font-bold" style={{ color: 'var(--info)' }}>
+              {fingerprint.topPatterns.length}
+            </div>
             <p className="text-xs text-muted">Contextual bias patterns</p>
           </div>
         </div>
@@ -179,10 +194,10 @@ export function FingerprintContent() {
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between pb-2">
             <h4 className="text-sm font-medium">Active Warnings</h4>
-            <ShieldAlert size={16} className="text-orange-400" />
+            <ShieldAlert size={16} style={{ color: 'var(--severity-high)' }} />
           </div>
           <div className="card-body">
-            <div className="text-3xl font-bold text-orange-400">
+            <div className="text-3xl font-bold" style={{ color: 'var(--severity-high)' }}>
               {fingerprint.activeWarnings.length}
             </div>
             <p className="text-xs text-muted">Predictive alerts</p>
@@ -221,12 +236,28 @@ export function FingerprintContent() {
                       <PrevalenceBar rate={pattern.prevalenceRate} />
                       <div className="flex gap-2 mt-1">
                         {pattern.documentType && (
-                          <span className="text-[10px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          <span
+                            className="text-[10px] px-1.5 py-0.5 border"
+                            style={{
+                              color: 'var(--info)',
+                              background: 'color-mix(in srgb, var(--info) 10%, transparent)',
+                              borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+                            }}
+                          >
                             {pattern.documentType}
                           </span>
                         )}
                         {pattern.dealType && (
-                          <span className="text-[10px] px-1.5 py-0.5 bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                          <span
+                            className="text-[10px] px-1.5 py-0.5 border"
+                            style={{
+                              color: 'var(--accent-secondary)',
+                              background:
+                                'color-mix(in srgb, var(--accent-secondary) 10%, transparent)',
+                              borderColor:
+                                'color-mix(in srgb, var(--accent-secondary) 20%, transparent)',
+                            }}
+                          >
                             {pattern.dealType}
                           </span>
                         )}
@@ -247,7 +278,7 @@ export function FingerprintContent() {
           <div className="card">
             <div className="card-header">
               <h4 className="flex items-center gap-2 text-sm font-semibold">
-                <AlertTriangle size={14} className="text-orange-400" />
+                <AlertTriangle size={14} style={{ color: 'var(--severity-high)' }} />
                 Predictive Warnings
               </h4>
               <p className="text-xs text-muted mt-1">

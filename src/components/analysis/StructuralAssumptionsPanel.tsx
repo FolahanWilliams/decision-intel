@@ -41,29 +41,36 @@ interface Props {
   };
 }
 
+// Canonical light-theme tokens (opacity suffixes preserved via
+// color-mix %). critical=error · high=severity-high · medium=warning ·
+// low=info (the original `low` was blue/informational, not green).
 const SEVERITY_STYLES: Record<
   StructuralAssumption['severity'],
-  { badge: string; border: string; dot: string }
+  { badgeColor: string; badgeBg: string; borderColor: string; dot: string }
 > = {
   critical: {
-    badge: 'bg-red-500/15 text-red-300',
-    border: 'border-red-500/40',
-    dot: 'bg-red-400',
+    badgeColor: 'var(--error)',
+    badgeBg: 'color-mix(in srgb, var(--error) 15%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--error) 40%, transparent)',
+    dot: 'var(--error)',
   },
   high: {
-    badge: 'bg-orange-500/15 text-orange-300',
-    border: 'border-orange-500/30',
-    dot: 'bg-orange-400',
+    badgeColor: 'var(--severity-high)',
+    badgeBg: 'color-mix(in srgb, var(--severity-high) 15%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--severity-high) 30%, transparent)',
+    dot: 'var(--severity-high)',
   },
   medium: {
-    badge: 'bg-amber-500/15 text-amber-300',
-    border: 'border-amber-500/30',
-    dot: 'bg-amber-400',
+    badgeColor: 'var(--warning)',
+    badgeBg: 'color-mix(in srgb, var(--warning) 15%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--warning) 30%, transparent)',
+    dot: 'var(--warning)',
   },
   low: {
-    badge: 'bg-blue-500/10 text-blue-300',
-    border: 'border-blue-500/20',
-    dot: 'bg-blue-400',
+    badgeColor: 'var(--info)',
+    badgeBg: 'color-mix(in srgb, var(--info) 10%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+    dot: 'var(--info)',
   },
 };
 
@@ -175,7 +182,13 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
             <h3 className="text-base flex items-center gap-2 flex-wrap">
               Structural Assumptions
               {state.status === 'ready' && hasFindings && (
-                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300">
+                <span
+                  className="text-xs font-normal px-2 py-0.5 rounded-full"
+                  style={{
+                    color: 'var(--warning)',
+                    background: 'color-mix(in srgb, var(--warning) 15%, transparent)',
+                  }}
+                >
                   {assumptions.length} flagged
                 </span>
               )}
@@ -278,16 +291,21 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
                     return (
                       <div
                         key={`${a.determinantId}-${i}`}
-                        className={`liquid-glass p-4 border ${styles.border}`}
+                        className="liquid-glass p-4 border"
+                        style={{ borderColor: styles.borderColor }}
                       >
                         <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span
-                              className={`text-xs font-bold uppercase px-2 py-0.5 ${styles.badge}`}
+                              className="text-xs font-bold uppercase px-2 py-0.5"
+                              style={{ color: styles.badgeColor, background: styles.badgeBg }}
                             >
                               {a.determinantLabel ?? a.determinantId}
                             </span>
-                            <span className={`text-xs capitalize ${styles.badge} px-1.5 py-0.5`}>
+                            <span
+                              className="text-xs capitalize px-1.5 py-0.5"
+                              style={{ color: styles.badgeColor, background: styles.badgeBg }}
+                            >
                               {a.severity}
                             </span>
                             {a.category && (
@@ -327,7 +345,8 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
                           >
                             <AlertTriangle
                               size={12}
-                              className={`mt-0.5 ${styles.dot.replace('bg-', 'text-')}`}
+                              className="mt-0.5"
+                              style={{ color: styles.dot }}
                             />
                             <div>
                               <span className="font-medium">Harden with: </span>

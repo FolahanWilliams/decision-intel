@@ -100,11 +100,11 @@ export default function ComparePage() {
 
   const scoreDelta = (a: number, b: number) => {
     const diff = a - b;
-    if (Math.abs(diff) < 1)
-      return { icon: Minus, label: 'Same', color: 'text-[var(--text-muted)]' };
+    // color is a CSS-var value (consumed via inline style, not a class).
+    if (Math.abs(diff) < 1) return { icon: Minus, label: 'Same', color: 'var(--text-muted)' };
     if (diff > 0)
-      return { icon: TrendingUp, label: `+${diff.toFixed(0)}`, color: 'text-green-400' };
-    return { icon: TrendingDown, label: `${diff.toFixed(0)}`, color: 'text-red-400' };
+      return { icon: TrendingUp, label: `+${diff.toFixed(0)}`, color: 'var(--success)' };
+    return { icon: TrendingDown, label: `${diff.toFixed(0)}`, color: 'var(--error)' };
   };
 
   return (
@@ -150,7 +150,7 @@ export default function ComparePage() {
                       {doc?.filename || id.slice(0, 8)}
                       <button
                         onClick={() => removeSelection(id)}
-                        className="hover:text-red-400 transition-colors"
+                        className="hover:text-[var(--error)] transition-colors"
                         aria-label={`Remove ${doc?.filename}`}
                       >
                         <X size={14} />
@@ -264,14 +264,15 @@ export default function ComparePage() {
                       {analyses.map(a => (
                         <td key={a.id} className="text-center py-3 px-4">
                           <span
-                            className={cn(
-                              'text-lg font-bold',
-                              a.overallScore >= 70
-                                ? 'text-green-400'
-                                : a.overallScore >= 40
-                                  ? 'text-yellow-400'
-                                  : 'text-red-400'
-                            )}
+                            className="text-lg font-bold"
+                            style={{
+                              color:
+                                a.overallScore >= 70
+                                  ? 'var(--success)'
+                                  : a.overallScore >= 40
+                                    ? 'var(--warning)'
+                                    : 'var(--error)',
+                            }}
                           >
                             {a.overallScore}
                           </span>
@@ -282,7 +283,7 @@ export default function ComparePage() {
                           const d = scoreDelta(analyses[0].overallScore, analyses[1].overallScore);
                           const Icon = d.icon;
                           return (
-                            <td className={cn('text-center py-3 px-4', d.color)}>
+                            <td className="text-center py-3 px-4" style={{ color: d.color }}>
                               <span className="inline-flex items-center gap-1">
                                 <Icon size={14} /> {d.label}
                               </span>
@@ -304,7 +305,7 @@ export default function ComparePage() {
                           const d = scoreDelta(analyses[1].noiseScore, analyses[0].noiseScore);
                           const Icon = d.icon;
                           return (
-                            <td className={cn('text-center py-3 px-4', d.color)}>
+                            <td className="text-center py-3 px-4" style={{ color: d.color }}>
                               <span className="inline-flex items-center gap-1">
                                 <Icon size={14} /> {d.label}
                               </span>
@@ -346,7 +347,7 @@ export default function ComparePage() {
                           );
                           const Icon = d.icon;
                           return (
-                            <td className={cn('text-center py-3 px-4', d.color)}>
+                            <td className="text-center py-3 px-4" style={{ color: d.color }}>
                               <span className="inline-flex items-center gap-1">
                                 <Icon size={14} /> {d.label}
                               </span>
@@ -379,7 +380,13 @@ export default function ComparePage() {
                               key={i}
                               className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5"
                             >
-                              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400/60 flex-shrink-0" />
+                              <span
+                                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                style={{
+                                  background:
+                                    'color-mix(in srgb, var(--warning) 60%, transparent)',
+                                }}
+                              />
                               {bias.replace(/_/g, ' ')}
                             </li>
                           ))}
@@ -400,11 +407,23 @@ export default function ComparePage() {
                     );
                     if (common.length === 0) return null;
                     return (
-                      <div className="mt-4 p-3 rounded-lg bg-yellow-400/10 border border-yellow-400/20">
-                        <p className="text-xs font-medium text-yellow-400 mb-1">
+                      <div
+                        className="mt-4 p-3 rounded-lg border"
+                        style={{
+                          background: 'color-mix(in srgb, var(--warning) 10%, transparent)',
+                          borderColor: 'color-mix(in srgb, var(--warning) 20%, transparent)',
+                        }}
+                      >
+                        <p
+                          className="text-xs font-medium mb-1"
+                          style={{ color: 'var(--warning)' }}
+                        >
                           Common biases across all selected:
                         </p>
-                        <p className="text-xs text-yellow-300/80">
+                        <p
+                          className="text-xs"
+                          style={{ color: 'color-mix(in srgb, var(--warning) 80%, transparent)' }}
+                        >
                           {common.map(b => b.replace(/_/g, ' ')).join(', ')}
                         </p>
                       </div>

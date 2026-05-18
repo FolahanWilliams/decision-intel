@@ -76,10 +76,10 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
 
   const gapColor =
     blindSpotGap < 50
-      ? 'text-red-600 dark:text-red-400'
+      ? 'var(--error)'
       : blindSpotGap < 80
-        ? 'text-amber-600 dark:text-amber-400'
-        : 'text-emerald-600 dark:text-emerald-400';
+        ? 'var(--warning)'
+        : 'var(--success)';
   const gapLabel =
     blindSpotGap < 50
       ? 'Tunnel Vision Detected'
@@ -127,11 +127,20 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                   <button
                     key={view.id}
                     onClick={() => setActiveView(view.id)}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all duration-150 whitespace-nowrap border ${
                       isActive
-                        ? 'bg-red-500/15 text-red-400 border border-red-500/30'
-                        : 'text-muted hover:text-foreground hover:bg-muted/10 border border-transparent'
+                        ? ''
+                        : 'text-muted hover:text-foreground hover:bg-muted/10 border-transparent'
                     }`}
+                    style={
+                      isActive
+                        ? {
+                            background: 'color-mix(in srgb, var(--error) 15%, transparent)',
+                            color: 'var(--error)',
+                            borderColor: 'color-mix(in srgb, var(--error) 30%, transparent)',
+                          }
+                        : undefined
+                    }
                     aria-pressed={isActive}
                   >
                     <Icon size={14} />
@@ -152,21 +161,25 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                 <div className="card">
                   <div className="card-header flex flex-row items-center justify-between pb-2">
                     <h4 className="text-sm font-medium">Cognitive Diversity</h4>
-                    <ShieldAlert size={16} className={gapColor} />
+                    <ShieldAlert size={16} style={{ color: gapColor }} />
                   </div>
                   <div className="card-body">
-                    <div className={`text-2xl font-bold ${gapColor}`}>{blindSpotGap}/100</div>
+                    <div className="text-2xl font-bold" style={{ color: gapColor }}>
+                      {blindSpotGap}/100
+                    </div>
                     <p className="text-xs text-muted">{gapLabel}</p>
                     <div className="mt-2 h-2 bg-muted/20 overflow-hidden">
                       <div
-                        className={`h-full transition-all duration-700 ${
-                          blindSpotGap < 50
-                            ? 'bg-red-500'
-                            : blindSpotGap < 80
-                              ? 'bg-amber-500'
-                              : 'bg-emerald-500'
-                        }`}
-                        style={{ width: `${blindSpotGap}%` }}
+                        className="h-full transition-all duration-700"
+                        style={{
+                          width: `${blindSpotGap}%`,
+                          background:
+                            blindSpotGap < 50
+                              ? 'var(--error)'
+                              : blindSpotGap < 80
+                                ? 'var(--warning)'
+                                : 'var(--success)',
+                        }}
                       />
                     </div>
                   </div>
@@ -175,10 +188,12 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                 <div className="card">
                   <div className="card-header flex flex-row items-center justify-between pb-2">
                     <h4 className="text-sm font-medium">Blind Spots</h4>
-                    <EyeOff size={16} className="text-orange-400" />
+                    <EyeOff size={16} style={{ color: 'var(--warning)' }} />
                   </div>
                   <div className="card-body">
-                    <div className="text-2xl font-bold text-orange-400">{blindSpots.length}</div>
+                    <div className="text-2xl font-bold" style={{ color: 'var(--warning)' }}>
+                      {blindSpots.length}
+                    </div>
                     <p className="text-xs text-muted">Missing perspectives</p>
                   </div>
                 </div>
@@ -186,10 +201,12 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                 <div className="card">
                   <div className="card-header flex flex-row items-center justify-between pb-2">
                     <h4 className="text-sm font-medium">Challenges</h4>
-                    <AlertTriangle size={16} className="text-red-400" />
+                    <AlertTriangle size={16} style={{ color: 'var(--error)' }} />
                   </div>
                   <div className="card-body">
-                    <div className="text-2xl font-bold text-red-400">{counterArguments.length}</div>
+                    <div className="text-2xl font-bold" style={{ color: 'var(--error)' }}>
+                      {counterArguments.length}
+                    </div>
                     <p className="text-xs text-muted">
                       Avg strength:{' '}
                       {counterArguments.length > 0
@@ -211,14 +228,20 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
               <div className="card">
                 <div className="card-header">
                   <h4 className="flex items-center gap-2">
-                    <EyeOff size={14} className="text-orange-400" />
+                    <EyeOff size={14} style={{ color: 'var(--warning)' }} />
                     Blind Spots
                   </h4>
                 </div>
                 <div className="card-body grid gap-3 md:grid-cols-2">
                   {blindSpots.map((spot, i) => (
-                    <div key={i} className="p-3 border border-border bg-orange-500/5">
-                      <span className="text-xs font-semibold text-orange-400">{spot.name}</span>
+                    <div
+                      key={i}
+                      className="p-3 border border-border"
+                      style={{ background: 'color-mix(in srgb, var(--warning) 5%, transparent)' }}
+                    >
+                      <span className="text-xs font-semibold" style={{ color: 'var(--warning)' }}>
+                        {spot.name}
+                      </span>
                       <p className="text-[11px] text-muted mt-1">{spot.description}</p>
                     </div>
                   ))}
@@ -231,7 +254,7 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
               <div className="card">
                 <div className="card-header">
                   <h4 className="flex items-center gap-2">
-                    <AlertTriangle size={14} className="text-red-400" />
+                    <AlertTriangle size={14} style={{ color: 'var(--error)' }} />
                     Top Challenges
                   </h4>
                 </div>
@@ -253,14 +276,16 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <div className="w-16 h-1.5 bg-muted/20 overflow-hidden">
                             <div
-                              className={`h-full ${
-                                arg.confidence >= 0.7
-                                  ? 'bg-red-500'
-                                  : arg.confidence >= 0.4
-                                    ? 'bg-amber-500'
-                                    : 'bg-blue-500'
-                              }`}
-                              style={{ width: `${arg.confidence * 100}%` }}
+                              className="h-full"
+                              style={{
+                                width: `${arg.confidence * 100}%`,
+                                background:
+                                  arg.confidence >= 0.7
+                                    ? 'var(--error)'
+                                    : arg.confidence >= 0.4
+                                      ? 'var(--warning)'
+                                      : 'var(--info)',
+                              }}
                             />
                           </div>
                           <span className="text-[10px] font-bold tabular-nums text-muted">
@@ -344,11 +369,20 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     disabled={isSubmittingFeedback || feedbackGiven !== null}
                     className={`btn btn-sm flex items-center gap-1 transition-colors ${
                       feedbackGiven === 'helpful'
-                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                        ? ''
                         : feedbackGiven === 'unhelpful'
                           ? 'opacity-50'
                           : 'btn-secondary'
                     }`}
+                    style={
+                      feedbackGiven === 'helpful'
+                        ? {
+                            background: 'color-mix(in srgb, var(--success) 20%, transparent)',
+                            color: 'var(--success)',
+                            borderColor: 'color-mix(in srgb, var(--success) 30%, transparent)',
+                          }
+                        : undefined
+                    }
                   >
                     {isSubmittingFeedback && feedbackGiven === null ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -365,11 +399,20 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     disabled={isSubmittingFeedback || feedbackGiven !== null}
                     className={`btn btn-sm flex items-center gap-1 transition-colors ${
                       feedbackGiven === 'unhelpful'
-                        ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                        ? ''
                         : feedbackGiven === 'helpful'
                           ? 'opacity-50'
                           : 'btn-secondary'
                     }`}
+                    style={
+                      feedbackGiven === 'unhelpful'
+                        ? {
+                            background: 'color-mix(in srgb, var(--error) 20%, transparent)',
+                            color: 'var(--error)',
+                            borderColor: 'color-mix(in srgb, var(--error) 30%, transparent)',
+                          }
+                        : undefined
+                    }
                   >
                     {isSubmittingFeedback && feedbackGiven === null ? (
                       <Loader2 size={14} className="animate-spin" />
