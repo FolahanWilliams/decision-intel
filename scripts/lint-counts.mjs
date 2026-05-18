@@ -79,7 +79,11 @@ const SCAN_PATHS = [join(ROOT, 'src'), join(ROOT, 'CLAUDE.md'), join(ROOT, 'TODO
 // literals were migrated to ${FRAMEWORK_COUNT} interpolation across
 // lessons.ts + competitive-positioning.ts; two fewer hardcoded counts
 // the regex catches. Reducing is encouraged.
-const COUNT_BASELINE = 75;
+// 2026-05-18: 75 → 74 — founder-context.ts staleness fix migrated the
+// stale DQI-weights / 20x20 / v2.0.0 literals to canonical
+// ${MATRIX_DIMENSION} / ${METHODOLOGY_VERSION} / ${DQI_WEIGHTS_LINE}
+// interpolation; one fewer hardcoded count the regex catches.
+const COUNT_BASELINE = 74;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical

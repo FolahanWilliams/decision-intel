@@ -577,25 +577,6 @@ export default function DemoPage() {
         )}
       </header>
 
-      {/* ─── Idle: Discovery-grade Impact Card (empathic-mode-first) ──
-          Lands BEFORE the paste hero so a cold reader (Pan-African fund
-          partner, F500 CSO at first meeting) sees the dollar anchor +
-          the one fix BEFORE any platform vocabulary. Per CLAUDE.md
-          "Marketing Voice" + memory `feedback-empathic-mode-first`.
-          The static anchor uses the canonical $50M / 45% sample so the
-          number is defensible against a quick fact-check. */}
-      {idleState && (
-        <SectionBand bg={C.slate50} paddingY={56} maxWidth={780}>
-          <Reveal>
-            <DiscoveryGradeImpactCard
-              variant="static"
-              anchor={STATIC_DEMO_ANCHOR}
-              ctaHref="#paste-hero"
-              ctaLabel="Run this on your own memo →"
-            />
-          </Reveal>
-        </SectionBand>
-      )}
       {/* ─── Idle: PASTE HERO — primary conversion mechanic ─────────── */}
       {idleState && (
         <SectionBand bg={C.white} paddingY={72} maxWidth={920}>
@@ -827,6 +808,30 @@ export default function DemoPage() {
         </SectionBand>
       )}
 
+      {/* ─── Idle: Discovery-grade Impact Card ($-anchor reinforcement) ──
+          Moved BELOW the paste hero 2026-05-18 (founder-directed). Rationale:
+          /demo's actual traffic is DM-warmed — the wedge DM already made the
+          empathic sell ("paste your memo, 60-second audit"), so the visitor
+          arrives to DO the thing, not to be re-sold. The paste box is now the
+          first idle element. The empathic-mode-first principle is NOT dropped
+          — the $-anchor card stays on the page as a below-the-fold
+          reinforcement for anyone who scrolled without pasting. The
+          empathic-mode-first META rule governs COLD UNAWARE traffic; DM-warmed
+          /demo traffic is a different shape, so this surface-specific reorder
+          honours the rule's intent rather than violating it. ctaHref still
+          points at #paste-hero (scrolls the reader back up to the box). */}
+      {idleState && (
+        <SectionBand bg={C.slate50} paddingY={56} maxWidth={780}>
+          <Reveal>
+            <DiscoveryGradeImpactCard
+              variant="static"
+              anchor={STATIC_DEMO_ANCHOR}
+              ctaHref="#paste-hero"
+              ctaLabel="Run this on your own memo →"
+            />
+          </Reveal>
+        </SectionBand>
+      )}
       {/* ─── Idle: Secondary — Sample decisions ──────────────────────── */}
       {idleState && (
         <SectionBand bg={C.slate50} borderTop paddingY={64}>

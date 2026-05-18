@@ -8,10 +8,10 @@
   <img src="https://img.shields.io/badge/Slack-Integration-4A154B?style=for-the-badge&logo=slack&logoColor=white" alt="Slack" />
 </p>
 
-# Decision Intelligence Platform
+# Decision Intel — the reasoning audit platform
 
-> **The Decision Performance OS for Corporate Strategy & M&A Teams.**
-> Audit every strategic decision for cognitive bias and decision noise. Protect business outcomes.
+> **Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in strategic memos before the committee does.**
+> The problem is capital eroded by unaudited reasoning in strategic decisions. The answer is a 60-second audit over a 22-bias taxonomy, scored as a Decision Quality Index, with a hashed and tamper-evident Decision Provenance Record on every run.
 
 [![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
 
@@ -41,9 +41,9 @@ Most deal teams have no way to:
 
 ## The Solution
 
-**Decision Intel** is an AI-powered decision performance platform for corporate strategy teams, M&A departments, and executive committees. Upload a strategy memo, M&A proposal, diligence report, board paper, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **20+ cognitive biases** with 11 additional domain-specific overlays for M&A, corporate strategy, and deal diligence.
+**Decision Intel** is the reasoning audit platform for corporate strategy teams, M&A / corp-dev departments, funds, and the committees they answer to. Upload a strategy memo, M&A proposal, diligence report, IC deck, or board paper and get a full reasoning audit in under 60 seconds — scored against the **22-bias R²F taxonomy (DI-B-001 → DI-B-022)**, including the corporate-strategy and M&A failure patterns (anchoring to entry price, thesis confirmation, sunk-cost holds, the winner's curse, the management halo, illusion of validity, inside-view dominance).
 
-The platform runs documents through an **12-node analysis pipeline** with deal-stage-specific overlays (screening → due diligence → committee review → closing → monitoring → post-close) to detect bias, measure noise, simulate executive deliberations, and generate actionable intelligence that protects strategic outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
+The platform runs documents through a **LangGraph analysis pipeline** — sequential anonymise → structure → gather, then a parallel fan-out of bias detection, the noise jury, verification, deep analysis, executive simulation, Klein RPD recognition, and forgotten-questions, arbitrated by a meta-judge and risk-scorer — with deal-stage overlays (screening → diligence → committee review → closing → monitoring → post-close). The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — the Recognition-Rigor Framework (R²F) — suppressing bias while amplifying expert intuition. No competitor runs both traditions in one pipeline.
 
 ---
 
@@ -51,13 +51,13 @@ The platform runs documents through an **12-node analysis pipeline** with deal-s
 
 | For                          | Pain Point                                                            | What We Deliver                                                                    |
 | :--------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------------- |
-| **Corporate Strategy Teams** | Strategic proposals anchored to initial assumptions, not fundamentals | 20+ cognitive biases detected with exact excerpts and coaching suggestions         |
-| **M&A / Corp Dev Teams**     | Due diligence rubber-stamps thesis instead of stress-testing it       | 11 domain-specific bias overlays, deal-stage analysis from screening to post-close |
+| **Corporate Strategy Teams** | Strategic proposals anchored to initial assumptions, not fundamentals | 22-bias R²F taxonomy scored with exact memo excerpts and coaching suggestions       |
+| **M&A / Corp Dev Teams**     | Due diligence rubber-stamps thesis instead of stress-testing it       | M&A failure-pattern detection (Synergy Mirage, Conglomerate Fallacy, Winner's Curse), deal-stage analysis from screening to post-close |
 | **Executive Committees**     | Authority bias and groupthink silence genuine debate                  | Blind committee voting, noise measurement across members, decision calibration     |
 | **Post-Merger Integration**  | Integration plans tainted by sunk cost and overconfidence             | Executive simulation with custom personas, blind voting, and dissent tracking      |
 | **Portfolio / BizOps Teams** | Disposition effect and sunk cost drive hold/divest decisions          | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics      |
 
-**ROI**: A single avoided bad strategic decision saves **millions in value**. The platform pays for itself after one corrected recommendation. Research shows systematic decision hygiene reduces decision variance significantly (Kahneman, _Noise_, 2021).
+**ROI**: A single fatal blind spot caught before the committee commits capital pays for the platform many times over. Reasoning is never objectively sound — it is either audited or unaudited; the audit is the structural friction that catches bias before capital is committed (anchored in Kahneman & Klein 2009, _Conditions for Intuitive Expertise_, and Kahneman, _Noise_, 2021).
 
 ---
 
@@ -66,8 +66,8 @@ The platform runs documents through an **12-node analysis pipeline** with deal-s
 | Plan             | Price               | Best For                                                                                                   |
 | :--------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
 | **Free**         | $0                  | 4 audits/month — see what the engine flags on any strategic memo                                           |
-| **Professional** | $149/mo ($1,499/yr) | The high-stakes strategist: 15 audits/mo, 30+ biases, Personal Decision History                            |
-| **Strategy**     | $2,499/mo           | Corporate strategy teams — unlimited audits, shared Decision Knowledge Graph, Decision Rooms, integrations |
+| **Individual**   | $249/mo             | The high-stakes strategist: 15 audits/mo, full 22-bias R²F taxonomy, Personal Decision History             |
+| **Strategy**     | $2,499/mo           | Corporate strategy teams — fair-use 250 audits/mo, shared Decision Knowledge Graph, Decision Rooms, integrations |
 | **Enterprise**   | Custom              | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support                           |
 
 All paid plans include a 14-day free trial. No credit card required to start.
@@ -92,7 +92,7 @@ One-time deal audit purchases scale with investment size — no subscription req
 For corporate strategy and M&A teams, we offer a guided pilot:
 
 - **Guided onboarding** — we configure deal-specific taxonomies, strategy bias profiles, and noise benchmarks for your team
-- **50 deal analyses** — run your actual strategy memos and diligence reports through the 12-node pipeline
+- **50 deal analyses** — run your actual strategy memos and diligence reports through the full R²F audit pipeline
 - **Outcome tracking setup** — connect your deal pipeline so the system starts learning from decision outcomes immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
@@ -121,7 +121,7 @@ Each bias finding includes a scientific explanation, real-world research citatio
 
 #### Decision Noise Measurement
 
-Implements Kahneman's noise audit methodology using a **Statistical Jury** — three independent AI judges score the same document, and the platform measures:
+Implements Kahneman's noise audit methodology using a **3-frame noise jury** — the same scoring rubric run through three different professional lenses (analyst-skeptical, regulator-hostile, contrarian-strategist) across two model families. These are decorrelated samples, not formally independent judges; the disagreement across frames + architectures + random seed is the noise signal. The platform measures:
 
 - **Mean quality score** (0-100)
 - **Standard deviation** across judges
@@ -179,13 +179,13 @@ Complements Kahneman-style debiasing with Gary Klein's Recognition-Primed Decisi
 
 The category-defining framework. R²F is the productized synthesis of two decision-research traditions that the field had treated as opposed: **Kahneman's debiasing** (System 2 — bias detection, noise measurement, evidence verification) and **Klein's Recognition-Primed Decision framework** (System 1 — pattern matching against historical analogs, expert intuition amplification, prospective hindsight). Anchor citation: **Kahneman & Klein (2009) "Conditions for Intuitive Expertise: A Failure to Disagree"**, _American Psychologist_ 64(6), 515–526.
 
-The 12-node pipeline runs both halves in parallel and arbitrates them in the metaJudge. No competitor (Cloverpop, Aera, IBM watsonx, Quantellia, Palantir) runs both traditions in one pipeline.
+The pipeline runs both halves in parallel and arbitrates them in the metaJudge. No competitor (Cloverpop, Aera, IBM watsonx, Quantellia, Palantir) runs both traditions in one pipeline.
 
 **Six paper-anchored signals on every Decision Provenance Record (locked 2026-04-30):**
 
 | Signal                       | Anchor                                         | What it measures                                                                                                                                                                            |
 | :--------------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Validity Classification**  | Kahneman & Klein 2009 (1st condition)          | High / medium / low / zero validity band per documentType + industry. Drives DQI methodology v2.1.0 structural weight shift in low-validity domains.                                        |
+| **Validity Classification**  | Kahneman & Klein 2009 (1st condition)          | High / medium / low / zero validity band per documentType + industry. Drives the DQI structural weight shift in low-validity domains (methodology v2.4.0).                                  |
 | **Org Calibration**          | Brier scoring over historical outcomes         | Whether the DQI shown is calibrated against THIS organization's outcome history (Cloverpop-defense move). Falls back to platform seed baseline (Brier 0.258 over 143 cases) on cold start.  |
 | **Feedback Adequacy**        | Kahneman & Klein 2009 (2nd condition)          | Closed-loop feedback verdict for the user (adequate / sparse / cold_start). Per the 2009 paper, intuitive expertise requires repeated rapid feedback in the relevant domain.                |
 | **Reference Class Forecast** | Kahneman & Lovallo 2003 HBR                    | Top-5 historical analogs from the 143-case library + matched-class baseline failure rate + four-band predicted-outcome verdict. The outside-view benchmark to the memo's inside-view story. |
@@ -205,7 +205,7 @@ The platform's core differentiator: a deterministic, mathematically rigorous sco
 
 #### Decision Quality Index (DQI)
 
-A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions. **Methodology v2.1.0 (locked 2026-04-30)** — adds Kahneman & Klein 2009 first-condition validity-aware structural weight shift; legacy inputs (no `validityClass`) report `2.0.0-no-validity` so the procurement reader can tell which methodology produced a given DQI.
+A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 7 weighted dimensions (Bias Load, Noise Level, Evidence Quality, Process Maturity, Compliance Risk, Historical Alignment, Compound Risk). **Methodology v2.4.0** — the 22×22 interaction-matrix epoch; layered on a versioned lineage (Kahneman & Klein 2009 validity-aware weight shift, the M&A compound-risk component, and user-adjustable weight resolution), with the methodology version stamped on every audit so a procurement reader can tell which methodology produced a given DQI.
 
 | Component                | Default Weight | Measures                                                                           |
 | :----------------------- | :------------- | :--------------------------------------------------------------------------------- |
@@ -224,7 +224,7 @@ Grades: **A** (85-100), **B** (70-84), **C** (55-69), **D** (40-54), **F** (0-39
 
 Deterministic post-LLM scoring that transforms raw bias detections into calibrated, context-adjusted risk scores:
 
-- **20x20 Interaction Matrix** — 400 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
+- **22×22 Interaction Matrix** — 484 empirically-grounded pairwise interaction weights across the full 22-bias taxonomy (e.g., confirmation_bias + groupthink = 1.35x amplification), extended to 22×22 in the M-1 methodology-2.4.0 ship
 - **Context Multipliers** — Monetary stakes (1.0-1.6x), absent dissent (+0.25), time pressure (+0.15), group size effects
 - **Detectability Weighting** — Hard-to-detect biases (low detectability in the ontology) get 3-8% severity boost when found at high confidence — finding them is more meaningful
 - **Historical Correlation** — Cross-references detected bias combinations against the 143-case study database to compute empirical amplification ratios
