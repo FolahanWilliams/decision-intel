@@ -280,27 +280,38 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
         }}
       >
         {/* Left pane — PDF / text / empty.
-            Was a hard `maxHeight: calc(100vh-100px)` + sticky island: in
-            the 2-col grid the right column (verdict cluster + long R²F
-            tab body) runs much taller, so the capped left card left a
-            big "dead space" void below it (the 2026-05-17 screenshot).
-            Now the card hugs its content (`align-self:start`, no forced
-            viewport cap) so it ends exactly where the PDF ends — no
-            empty fixed box. Still scroll-follows naturally because the
-            grid item is top-aligned; deals/packages (short doc-list /
-            text leftPanes) are unaffected — they hugged their content
-            before too. A fuller sticky-sidebar-with-reflow restructure
-            of the shared shell is the deeper option, deferred for
-            founder sign-off (blast radius: documents + deals + packages
-            + the Item-1 above-fold IA lock). */}
+            History: (1) original had a hard `maxHeight:calc(100vh-100px)`
+            + sticky + `overflow:hidden` → CLIPPED tall PDFs and left a
+            fixed void below the capped card. (2) 2026-05-17 dropped the
+            cap → card hugged content, but in the 2-col grid the right
+            column (verdict cluster + long R²F tab body) is much taller,
+            so a short doc left a SCREEN of dead space beside it (the
+            2026-05-18 founder screenshot). (3) THIS is the deferred
+            fuller fix, founder-signed-off 2026-05-18: the pane is
+            sticky-follow — it pins just below the sticky header and
+            stays beside whatever R²F card you scroll to, so there is no
+            dead space; `overflow:auto` (not hidden) means a PDF taller
+            than the viewport scrolls INSIDE the pane instead of being
+            clipped. Safe on the SHARED shell (documents + deals +
+            packages) because DocumentDetailShell.module.css already
+            force-overrides `.left` to `position:static !important` +
+            `max-height:70vh/60vh !important` at ≤1100px / ≤640px — so
+            mobile/tablet stacks normally and the desktop sticky never
+            applies there. deals/packages (short doc-list / text
+            leftPanes) simply pin in place — strictly better than
+            scrolling away. The Item-1 above-fold IA lock is in the
+            RIGHT pane and is untouched. */}
         <section
           className={`doc-detail-v2-left ${styles.left}`}
           style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-md, 8px)',
-            overflow: 'hidden',
+            overflow: 'auto',
             alignSelf: 'start',
+            position: 'sticky',
+            top: 72,
+            maxHeight: 'calc(100vh - 96px)',
             display: 'flex',
             flexDirection: 'column',
             marginRight: 16,
