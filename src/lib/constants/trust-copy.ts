@@ -83,6 +83,57 @@ export const DPR_PROVENANCE_CARD_LABEL = 'Decision Provenance Record';
 export const DPR_PROVENANCE_CARD_SUB = 'hashed + tamper-evident on every audit';
 
 /**
+ * Evidentiary Standard — Defensibility Vector #4 ("Methodology-as-
+ * standard", the switching-cost / FICO-GAAP-of-decision-quality moat).
+ * Locked 2026-05-18.
+ *
+ * The DPR already carries the individual cryptographic pieces; Vector #4
+ * is the BINDING of them into one citable construct + the legal-evidence
+ * framing (per the CLAUDE.md Defensibility lock: "bind the hashes into
+ * the legal-evidence framing, not just the PDF footer"). The composed
+ * token itself is produced by the pure helper
+ * `composeEvidentiaryStandardFingerprint` in
+ * src/lib/reports/evidentiary-standard.ts; THIS file owns the canonical
+ * COPY that the contractual + procurement surfaces render verbatim.
+ *
+ * Honesty discipline: the switching cost is requires-scale (it
+ * materialises once a GC has YEARS of trail) — the copy states the
+ * MECHANISM by which a method change becomes a documented, regulator-
+ * visible event, never that lock-in already exists today. "Hashed +
+ * tamper-evident", never "signed" (private-key signing is Q3 2026
+ * roadmap — same vocabulary lock as DPR_PROVENANCE_*).
+ *
+ * Consumers (keep in lockstep — drift here is a procurement-reader
+ * red-circle, same class as the SOC 2 / framework-count discipline):
+ *   - src/components/dpr/pages/DprPageOneCover.tsx       (cover strap + row)
+ *   - src/app/(marketing)/terms/page.tsx                 (§10I, imports the clause)
+ *   - scripts/generate-legal-pdfs.mjs                    (DPA PDF + DOCX, verbatim mirror)
+ *   - src/app/(marketing)/security/page.tsx              (procurement section)
+ *   - src/app/(marketing)/trust/page.tsx                 (procurement bundle)
+ *   - src/app/api/founder-hub/founder-context.ts         (chat coach)
+ */
+export const EVIDENTIARY_STANDARD_LABEL = 'Evidentiary standard';
+
+export const EVIDENTIARY_STANDARD_FINGERPRINT_BODY =
+  'Every Decision Provenance Record carries a single evidentiary-standard fingerprint that binds, in one citable token, the DQI methodology version, the SHA-256 hash of the audited document, the prompt fingerprint, the DQI weight-resolution hash, and the record schema. The fingerprint is deterministic: the same decision audited under the same standard produces the same token, so two DPRs are provably from the same engine state by comparing one string.';
+
+export const EVIDENTIARY_STANDARD_CONTINUITY_BODY =
+  'Your EU AI Act Article 14 and Basel III Pillar 2 ICAAP audit trail is constructed on these fingerprints. Any change to the audit standard — methodology version, weight resolution, or scoring engine — produces a different fingerprint and is versioned and disclosed against the prior records. The continuity is the point: once an audit committee has built a multi-year reasoning-provenance trail on a consistent evidentiary standard, moving the same decisions to a different audit method is not a silent switch — it is a documented change of evidentiary standard a regulator can see across the record series.';
+
+export const EVIDENTIARY_STANDARD_DPR_STRAP =
+  'This fingerprint is the evidentiary standard your reasoning-audit trail is built on. Methodology + input + prompt + weights + schema, bound into one citable token — see the Evidentiary Standard & Audit-Trail Continuity clause in the Terms / DPA.';
+
+/**
+ * The verbatim Terms §10I / DPA clause. Terms imports this constant;
+ * scripts/generate-legal-pdfs.mjs mirrors it WORD-FOR-WORD with a
+ * lockstep comment (the .mjs script cannot import a .ts const — the
+ * format-divergence between the two artefacts is the bug class per the
+ * existing DPA lockstep lock).
+ */
+export const EVIDENTIARY_STANDARD_DPA_CLAUSE =
+  'Each Decision Provenance Record we produce carries a deterministic evidentiary-standard fingerprint binding the DQI methodology version, the SHA-256 hash of the input document, the prompt fingerprint, the DQI weight-resolution hash, and the record schema. We will not change the evidentiary standard underlying your records without versioning the change and preserving the prior fingerprint series, so that a multi-year reasoning-provenance trail built for EU AI Act Article 14, Basel III Pillar 2 ICAAP, SOX §404, or SEC AI-disclosure purposes remains internally consistent and any change of standard is a disclosed, reconstructable event rather than a silent substitution. On termination, the fingerprint series is included in the data export under §10A so the trail remains independently verifiable after the engagement ends.';
+
+/**
  * AI Verify disclaimer — locked 2026-04-30 (B2 lock, James persona ask).
  * AI Verify is a SELF-ASSESSMENT framework codified by the AI Verify
  * Foundation (Singapore IMDA, aligned with EU + OECD). The Foundation

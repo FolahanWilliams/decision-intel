@@ -31,6 +31,8 @@ import {
   LIABILITY_SHIFT_COMPULSION_HEADLINE,
   LIABILITY_SHIFT_COMPULSION_BODY,
   LIABILITY_SHIFT_COMPULSION_CLOSE,
+  EVIDENTIARY_STANDARD_LABEL,
+  EVIDENTIARY_STANDARD_CONTINUITY_BODY,
 } from '@/lib/constants/trust-copy';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
@@ -1206,6 +1208,27 @@ export default function SecurityPage() {
             }}
           >
             {LIABILITY_SHIFT_COMPULSION_CLOSE}
+          </p>
+
+          <p
+            style={{
+              fontSize: 13.5,
+              color: 'rgba(255, 255, 255, 0.78)',
+              lineHeight: 1.6,
+              margin: 0,
+              maxWidth: 820,
+              paddingTop: 16,
+            }}
+          >
+            <strong style={{ color: C.white }}>{EVIDENTIARY_STANDARD_LABEL} · </strong>
+            {EVIDENTIARY_STANDARD_CONTINUITY_BODY}{' '}
+            <Link
+              href="/trust#evidentiary-standard"
+              style={{ color: C.white, textDecoration: 'underline' }}
+            >
+              See the fingerprint construction
+            </Link>{' '}
+            (also bound contractually as Terms §10I + the DPA template).
           </p>
         </div>
       </section>

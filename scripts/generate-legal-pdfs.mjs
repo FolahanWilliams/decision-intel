@@ -279,6 +279,18 @@ function buildDpaTemplate() {
   );
 
   y = pageIfNeeded(doc, y);
+  y = H2(doc, '11. Evidentiary standard & audit-trail continuity', y);
+  // SSOT: EVIDENTIARY_STANDARD_DPA_CLAUSE in src/lib/constants/trust-copy.ts.
+  // The .mjs script cannot import a .ts const — keep this string VERBATIM
+  // in lockstep with that constant + Terms §10I (the format-divergence
+  // between the two artefacts is the bug class per the DPA lockstep lock).
+  y = P(
+    doc,
+    'Each Decision Provenance Record we produce carries a deterministic evidentiary-standard fingerprint binding the DQI methodology version, the SHA-256 hash of the input document, the prompt fingerprint, the DQI weight-resolution hash, and the record schema. We will not change the evidentiary standard underlying your records without versioning the change and preserving the prior fingerprint series, so that a multi-year reasoning-provenance trail built for EU AI Act Article 14, Basel III Pillar 2 ICAAP, SOX §404, or SEC AI-disclosure purposes remains internally consistent and any change of standard is a disclosed, reconstructable event rather than a silent substitution. On termination, the fingerprint series is included in the data export under §10A so the trail remains independently verifiable after the engagement ends.',
+    y
+  );
+
+  y = pageIfNeeded(doc, y);
   y = H2(doc, 'Signatures', y);
   y = P(
     doc,
@@ -1020,6 +1032,18 @@ function buildDpaDocx() {
   body.push(
     docxParagraph(
       'This DPA is governed by the law specified in the Subscription Agreement. Notices under this DPA are sent to the respective contacts listed in the Order Form. For Processor: privacy@decision-intel.com.'
+    )
+  );
+
+  body.push(
+    docxParagraph('11. Evidentiary standard & audit-trail continuity', 'Heading2')
+  );
+  // SSOT: EVIDENTIARY_STANDARD_DPA_CLAUSE in src/lib/constants/trust-copy.ts.
+  // VERBATIM lockstep with buildDpaTemplate() §11 + Terms §10I — the
+  // PDF↔DOCX format-divergence is the bug class per the DPA lockstep lock.
+  body.push(
+    docxParagraph(
+      'Each Decision Provenance Record we produce carries a deterministic evidentiary-standard fingerprint binding the DQI methodology version, the SHA-256 hash of the input document, the prompt fingerprint, the DQI weight-resolution hash, and the record schema. We will not change the evidentiary standard underlying your records without versioning the change and preserving the prior fingerprint series, so that a multi-year reasoning-provenance trail built for EU AI Act Article 14, Basel III Pillar 2 ICAAP, SOX §404, or SEC AI-disclosure purposes remains internally consistent and any change of standard is a disclosed, reconstructable event rather than a silent substitution. On termination, the fingerprint series is included in the data export under §10A so the trail remains independently verifiable after the engagement ends.'
     )
   );
 

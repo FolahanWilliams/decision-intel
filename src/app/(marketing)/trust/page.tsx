@@ -38,6 +38,7 @@ import {
   ClipboardList,
   ArrowRight,
   Layers,
+  Fingerprint,
   Mail,
 } from 'lucide-react';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
@@ -47,6 +48,9 @@ import {
   AI_VERIFY_DISCLAIMER_LONG,
   DPR_PROVENANCE_CARD_LABEL,
   DPR_PROVENANCE_CLAIM_LONG,
+  EVIDENTIARY_STANDARD_LABEL,
+  EVIDENTIARY_STANDARD_FINGERPRINT_BODY,
+  EVIDENTIARY_STANDARD_CONTINUITY_BODY,
   INDEMNIFICATION_LABEL,
   INDEMNIFICATION_VALUE,
   INDEMNIFICATION_BODY,
@@ -653,10 +657,35 @@ export default function TrustPage() {
         </div>
       </Section>
 
-      {/* ── 8. Procurement contact ─────────────────────────── */}
+      {/* ── 8. Evidentiary standard · audit-trail continuity ── */}
+      <Section
+        id="evidentiary-standard"
+        eyebrow="8 · Evidentiary standard"
+        title={`${EVIDENTIARY_STANDARD_LABEL} · audit-trail continuity`}
+        body={EVIDENTIARY_STANDARD_FINGERPRINT_BODY}
+        icon={<Fingerprint size={18} />}
+        toneAccent={C.green}
+      >
+        <div
+          style={{
+            background: 'rgba(22, 163, 74, 0.06)',
+            border: `1px solid rgba(22, 163, 74, 0.22)`,
+            borderRadius: 10,
+            padding: '12px 14px',
+            fontSize: 12.5,
+            color: C.slate700,
+            lineHeight: 1.55,
+          }}
+        >
+          <strong style={{ color: C.green }}>Continuity · </strong>
+          {EVIDENTIARY_STANDARD_CONTINUITY_BODY}
+        </div>
+      </Section>
+
+      {/* ── 9. Procurement contact ─────────────────────────── */}
       <Section
         id="contact"
-        eyebrow="8 · Procurement contact"
+        eyebrow="9 · Procurement contact"
         title="Direct line to the security + procurement inbox"
         body="For SOC 2 reports under NDA, additional sub-processor questions, custom DPA redlines, or vendor-risk-register pre-fill requests."
         icon={<Mail size={18} />}

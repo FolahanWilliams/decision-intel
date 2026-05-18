@@ -77,11 +77,12 @@ export const DEFENSIBILITY_VECTORS: ReadonlyArray<DefensibilityVector> = [
     name: 'Methodology-as-standard',
     moatClass: 'Switching cost (the FICO/GAAP of decision quality)',
     buildability: 'hybrid',
-    status: 'next',
+    status: 'partial',
+    ref: 'Vector 4 — evidentiary-standard fingerprint bound into the legal trail (2026-05-18). The scattered hashes are now composed into ONE citable token (composeEvidentiaryStandardFingerprint) on the DPR cover + bound contractually as Terms §10I + DPA §11 + surfaced on /trust + /security, all from the trust-copy SSOT. Status stays `partial`: the switching cost itself is requires-scale — it only materialises once a GC has a multi-year trail.',
     claim:
       'Methodology version + SHA-256 input hashes hardcoded into the DPR. Once a GC builds a 3-year EU AI Act Art 14 / Basel III ICAAP audit trail on those hashes, switching to a cheaper wrapper means explaining to a regulator why they downgraded their evidentiary standard.',
     sharpening:
-      'The hashing is immediately-buildable (the DPR already carries SHA-256 + methodology version); the switching cost is requires-scale (materialises once a GC has years of trail). Bind the hashes into the legal-evidence framing, not just the PDF footer.',
+      'SHIPPED the immediately-buildable half: the scattered cryptographic pieces are composed into ONE deterministic citable evidentiary-standard fingerprint, bound into the legal-evidence framing (Terms §10I + DPA §11), not just a PDF footer — exactly the "bind, not footer" instruction. The switching cost is requires-scale: it materialises once a GC has years of trail, so the vector stays `partial`, not `shipped`.',
   },
   {
     n: 5,

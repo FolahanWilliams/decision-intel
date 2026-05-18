@@ -24,6 +24,10 @@ import { DprPageShell } from '../primitives/DprPageShell';
 import { DprSection } from '../primitives/DprSection';
 import { DprKvGrid } from '../primitives/DprKvGrid';
 import { DprVerificationBlock } from '../primitives/DprVerificationBlock';
+import {
+  EVIDENTIARY_STANDARD_LABEL,
+  EVIDENTIARY_STANDARD_DPR_STRAP,
+} from '@/lib/constants/trust-copy';
 
 export interface DprDocumentIdentity {
   /** "Strategic memo" / "IC memo" / "Investor letter" / etc. */
@@ -78,6 +82,17 @@ export interface DprPageOneCoverProps {
     /** Max absolute delta vs canonical baseline (0.0 = canonical). */
     maxDelta?: number;
   };
+  /**
+   * Composed evidentiary-standard fingerprint (Defensibility Vector #4,
+   * locked 2026-05-18). The single citable token a GC pins their
+   * EU AI Act Art 14 / Basel III ICAAP audit trail to — produced by
+   * `composeEvidentiaryStandardFingerprint` in
+   * src/lib/reports/evidentiary-standard.ts from the methodology
+   * version + input hash + prompt fingerprint + weights hash + schema.
+   * When omitted the row + strap are suppressed (legacy records that
+   * pre-date the binding).
+   */
+  evidentiaryStandardToken?: string;
   /** Where to verify this record online. */
   verifyUrl: string;
   /** Document classification — drives the header band flag. */
@@ -106,6 +121,7 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
     pipelineVersion,
     methodologyVersion,
     weightsResolution,
+    evidentiaryStandardToken,
     verifyUrl,
     classification = 'confidential',
     totalPages,
@@ -184,6 +200,19 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
       mono: true,
       mark: { kind: 'info' as const, label: 'Forward-compatible' },
     },
+    ...(evidentiaryStandardToken
+      ? [
+          {
+            // Rendered in FULL (not shortened) — the token is designed
+            // compact + citable; a GC pins their audit trail to this
+            // exact string, so it must be copy-able verbatim.
+            k: EVIDENTIARY_STANDARD_LABEL,
+            v: <span title={evidentiaryStandardToken}>{evidentiaryStandardToken}</span>,
+            mono: true,
+            mark: { kind: 'ok' as const, label: 'Bound' },
+          },
+        ]
+      : []),
     {
       k: 'Tamper-evidence',
       v: 'SHA-256 input hash + record fingerprint',
@@ -231,6 +260,12 @@ export function DprPageOneCover(props: DprPageOneCoverProps) {
         strap="The cryptographic provenance below is the audit committee's first read. Every field is independently verifiable; the verification URL below resolves to the same hashes."
       >
         <DprKvGrid rows={integrityRows} />
+        {evidentiaryStandardToken && (
+          <div className="dpr-honest-disclosure" style={{ marginTop: 14 }}>
+            <span className="dpr-honest-disclosure-mark">{EVIDENTIARY_STANDARD_LABEL}</span>
+            {EVIDENTIARY_STANDARD_DPR_STRAP}
+          </div>
+        )}
       </DprSection>
 
       {/* Verification block */}

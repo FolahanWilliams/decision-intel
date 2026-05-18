@@ -39,6 +39,7 @@ import {
 } from '@/lib/reports/sample-dpr';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
+import { composeEvidentiaryStandardFingerprint } from '@/lib/reports/evidentiary-standard';
 import { DprPageOneCover } from '@/components/dpr/pages/DprPageOneCover';
 import { DprPageTwoMethodology } from '@/components/dpr/pages/DprPageTwoMethodology';
 import { DprPageThreeR2fStrips } from '@/components/dpr/pages/DprPageThreeR2fStrips';
@@ -122,6 +123,20 @@ export default async function DprRenderPage({
   // matches what the cover declares.
   const totalPages = 6 + (renderEngagementAppendix ? 1 : 0);
 
+  // Defensibility Vector #4 (locked 2026-05-18) — compose the scattered
+  // cryptographic pieces into ONE citable evidentiary-standard token a
+  // GC pins their EU AI Act Art 14 / Basel III ICAAP audit trail to.
+  // Pure + deterministic; surfaces existing persisted values, recomputes
+  // no score. schemaVersion is the raw number here (e.g. 2 → `s2`), not
+  // the `${n}.1.0` display string the cover renders for the schema row.
+  const evidentiaryStandard = composeEvidentiaryStandardFingerprint({
+    methodologyVersion: METHODOLOGY_VERSION,
+    inputHash: data.inputHash,
+    promptFingerprint: data.promptFingerprint,
+    weightsHash: data.weightsResolution?.hash,
+    schemaVersion: data.schemaVersion,
+  });
+
   return (
     <>
       <DprPageOneCover
@@ -135,6 +150,7 @@ export default async function DprRenderPage({
         pipelineVersion={pipelineVersionFromLineage(data)}
         methodologyVersion={METHODOLOGY_VERSION}
         weightsResolution={data.weightsResolution}
+        evidentiaryStandardToken={evidentiaryStandard.token}
         verifyUrl={verifyUrl}
         classification={classification}
         totalPages={totalPages}

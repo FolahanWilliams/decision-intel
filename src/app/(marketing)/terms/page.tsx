@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { EVIDENTIARY_STANDARD_DPA_CLAUSE } from '@/lib/constants/trust-copy';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | Decision Intel',
@@ -424,6 +425,30 @@ export default function TermsOfServicePage() {
               and updated within thirty (30) days of any provider-policy change. Where a customer
               elects sovereign-AI routing (Enterprise tier, executed Order Form), the same
               no-training commitment applies to the routed alternative provider.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '12px' }}>
+              10I. Evidentiary Standard &amp; Audit-Trail Continuity
+            </h2>
+            <p>{EVIDENTIARY_STANDARD_DPA_CLAUSE}</p>
+            <p style={{ marginTop: '12px' }}>
+              The fingerprint construction and continuity posture are documented at{' '}
+              <Link
+                href="/trust#evidentiary-standard"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /trust
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="/security"
+                style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}
+              >
+                /security
+              </Link>
+              . This clause is mirrored verbatim in the downloadable DPA template.
             </p>
           </section>
 
