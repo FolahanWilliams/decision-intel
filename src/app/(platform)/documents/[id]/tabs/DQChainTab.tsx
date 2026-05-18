@@ -35,27 +35,29 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
           : chainScore >= 35
             ? 'D'
             : 'F';
+  // Canonical light-theme tokens (thresholds unchanged). emerald=success
+  // · blue=info · amber=warning · orange=severity-high · red=error.
   const gradeColor =
     chainScore >= 80
-      ? 'text-emerald-400'
+      ? 'var(--success)'
       : chainScore >= 65
-        ? 'text-blue-400'
+        ? 'var(--info)'
         : chainScore >= 50
-          ? 'text-amber-400'
+          ? 'var(--warning)'
           : chainScore >= 35
-            ? 'text-orange-400'
-            : 'text-red-400';
+            ? 'var(--severity-high)'
+            : 'var(--error)';
 
   const barColor = (score: number): string =>
     score >= 80
-      ? 'bg-emerald-500'
+      ? 'var(--success)'
       : score >= 65
-        ? 'bg-blue-500'
+        ? 'var(--info)'
         : score >= 50
-          ? 'bg-amber-500'
+          ? 'var(--warning)'
           : score >= 35
-            ? 'bg-orange-500'
-            : 'bg-red-500';
+            ? 'var(--severity-high)'
+            : 'var(--error)';
 
   return (
     <div className="space-y-4">
@@ -65,7 +67,7 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
           <div className="flex items-start justify-between gap-4 mb-3">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <GraduationCap size={16} className="text-indigo-400" />
+                <GraduationCap size={16} style={{ color: 'var(--accent-secondary)' }} />
                 <span className="text-[10px] font-bold uppercase tracking-wide text-muted">
                   Howard &amp; Matheson Decision Quality Chain
                 </span>
@@ -78,12 +80,29 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
               </p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className={`text-4xl font-bold tabular-nums ${gradeColor}`}>{chainScore}</div>
-              <div className={`text-xs font-bold ${gradeColor}`}>Grade {grade}</div>
+              <div
+                className="text-4xl font-bold tabular-nums"
+                style={{ color: gradeColor }}
+              >
+                {chainScore}
+              </div>
+              <div className="text-xs font-bold" style={{ color: gradeColor }}>
+                Grade {grade}
+              </div>
             </div>
           </div>
-          <div className="p-3 border border-indigo-500/20 bg-indigo-500/5 text-xs text-foreground/80 leading-relaxed flex items-start gap-2">
-            <Link2 size={14} className="text-indigo-400 flex-shrink-0 mt-0.5" />
+          <div
+            className="p-3 border text-xs text-foreground/80 leading-relaxed flex items-start gap-2"
+            style={{
+              borderColor: 'color-mix(in srgb, var(--accent-secondary) 20%, transparent)',
+              background: 'color-mix(in srgb, var(--accent-secondary) 5%, transparent)',
+            }}
+          >
+            <Link2
+              size={14}
+              className="flex-shrink-0 mt-0.5"
+              style={{ color: 'var(--accent-secondary)' }}
+            />
             <span>{summary}</span>
           </div>
         </div>
@@ -97,15 +116,24 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
             return (
               <div
                 key={el.id}
-                className={`p-3 border ${
-                  isWeakest ? 'border-red-500/30 bg-red-500/5' : 'border-border bg-card/50'
-                }`}
+                className={`p-3 border ${isWeakest ? '' : 'border-border bg-card/50'}`}
+                style={
+                  isWeakest
+                    ? {
+                        borderColor: 'color-mix(in srgb, var(--error) 30%, transparent)',
+                        background: 'color-mix(in srgb, var(--error) 5%, transparent)',
+                      }
+                    : undefined
+                }
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-foreground">{el.label}</span>
                     {isWeakest && (
-                      <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-400">
+                      <span
+                        className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide"
+                        style={{ color: 'var(--error)' }}
+                      >
                         <AlertTriangle size={10} />
                         Weakest link
                       </span>
@@ -115,8 +143,8 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
                 </div>
                 <div className="h-2 bg-muted/20 overflow-hidden mb-2">
                   <div
-                    className={`h-full transition-all duration-500 ${barColor(el.score)}`}
-                    style={{ width: `${el.score}%` }}
+                    className="h-full transition-all duration-500"
+                    style={{ width: `${el.score}%`, background: barColor(el.score) }}
                   />
                 </div>
                 <p className="text-xs text-foreground/70 leading-relaxed mb-2">{el.rationale}</p>

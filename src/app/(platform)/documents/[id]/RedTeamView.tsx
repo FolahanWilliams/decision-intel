@@ -61,7 +61,11 @@ export function RedTeamView({
 
   // Color logic for blind spot gap
   const gapColor =
-    blindSpotGap < 50 ? 'text-red-500' : blindSpotGap < 80 ? 'text-yellow-500' : 'text-green-500';
+    blindSpotGap < 50
+      ? 'var(--error)'
+      : blindSpotGap < 80
+        ? 'var(--warning)'
+        : 'var(--success)';
   const gapLabel =
     blindSpotGap < 50
       ? 'Tunnel Vision Detected'
@@ -78,10 +82,12 @@ export function RedTeamView({
             <div className="card">
               <div className="card-header flex flex-row items-center justify-between space-y-0 pb-2">
                 <h3 className="text-sm font-medium">Cognitive Diversity Score</h3>
-                <ShieldAlert className={`h-4 w-4 ${gapColor}`} />
+                <ShieldAlert className="h-4 w-4" style={{ color: gapColor }} />
               </div>
               <div className="card-body">
-                <div className={`text-2xl font-bold ${gapColor}`}>{blindSpotGap}/100</div>
+                <div className="text-2xl font-bold" style={{ color: gapColor }}>
+                  {blindSpotGap}/100
+                </div>
                 <p className="text-xs text-muted-foreground">{gapLabel}</p>
                 {/* Simple Progress Bar */}
                 <div
@@ -89,7 +95,7 @@ export function RedTeamView({
                   style={{ background: 'var(--bg-secondary)' }}
                 >
                   <div
-                    className={`h-full ${blindSpotGap < 50 ? 'bg-red-500' : blindSpotGap < 80 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                    className="h-full"
                     style={{
                       width: `${blindSpotGap}%`,
                       background:
@@ -110,7 +116,7 @@ export function RedTeamView({
             <div className="card">
               <div className="card-header">
                 <div className="flex items-center gap-2">
-                  <EyeOff className="h-5 w-5 text-orange-500" />
+                  <EyeOff className="h-5 w-5" style={{ color: 'var(--warning)' }} />
                   <h3 className="card-title">Blind Spots Identified</h3>
                 </div>
                 <p className="text-sm text-muted">
@@ -121,13 +127,13 @@ export function RedTeamView({
                 {blindSpots.map((spot, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-1 p-3 border bg-orange-500/10 border-orange-200 dark:border-orange-900"
+                    className="flex flex-col gap-1 p-3 border"
                     style={{
                       borderColor: 'var(--border-color)',
                       background: 'var(--bg-secondary)',
                     }}
                   >
-                    <span className="font-semibold text-orange-700 dark:text-orange-300">
+                    <span className="font-semibold" style={{ color: 'var(--warning)' }}>
                       {spot.name}
                     </span>
                     <span className="text-sm text-muted-foreground">{spot.description}</span>
@@ -139,7 +145,7 @@ export function RedTeamView({
 
           {/* Counter Arguments */}
           <h3 className="text-lg font-semibold flex items-center gap-2 mt-8 mb-4">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <AlertTriangle className="h-5 w-5" style={{ color: 'var(--error)' }} />
             Red Team Challenges
             <span
               className="badge ml-2"
@@ -153,13 +159,13 @@ export function RedTeamView({
             {counterArguments.map((arg, i) => (
               <div
                 key={i}
-                className="card border-l-4 border-l-red-500"
+                className="card border-l-4"
                 style={{ borderLeft: '4px solid var(--error)' }}
               >
                 <div className="card-body pt-6">
                   <div className="flex justify-between items-start gap-4">
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-red-600 dark:text-red-400">
+                      <h4 className="font-semibold" style={{ color: 'var(--error)' }}>
                         {arg.perspective}
                       </h4>
                       <p className="text-sm text-foreground">{arg.argument}</p>
@@ -179,7 +185,7 @@ export function RedTeamView({
                           href={arg.sourceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs flex items-center gap-1 text-blue-500 hover:underline"
+                          className="text-xs flex items-center gap-1 hover:underline"
                           style={{ color: 'var(--accent-primary)' }}
                         >
                           View Source <ExternalLink size={12} />
@@ -197,10 +203,7 @@ export function RedTeamView({
       {preMortem && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-            <ShieldAlert
-              className="h-5 w-5 text-purple-500"
-              style={{ color: 'var(--accent-primary)' }}
-            />
+            <ShieldAlert className="h-5 w-5" style={{ color: 'var(--accent-primary)' }} />
             Pre-Mortem Failure Scenarios
           </h3>
 

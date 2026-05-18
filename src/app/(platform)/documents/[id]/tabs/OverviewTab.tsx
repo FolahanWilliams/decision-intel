@@ -87,19 +87,40 @@ interface OverviewTabProps {
   isOwner?: boolean;
 }
 
-const SEVERITY_BADGE_STYLES: Record<string, string> = {
-  critical: 'bg-red-500/20 text-red-400',
-  high: 'bg-orange-500/20 text-orange-400',
-  medium: 'bg-yellow-500/20 text-yellow-400',
-  low: 'bg-blue-500/20 text-blue-400',
+// Canonical light-theme severity tokens (opacity suffixes preserved via
+// color-mix %). critical=error · high=severity-high · medium=warning ·
+// low=info (the original `low` was blue/informational, not green).
+type SevBadge = { color: string; bg: string };
+type SevBorder = { borderColor: string; bg: string };
+const SEVERITY_BADGE_STYLES: Record<string, SevBadge> = {
+  critical: { color: 'var(--error)', bg: 'color-mix(in srgb, var(--error) 20%, transparent)' },
+  high: {
+    color: 'var(--severity-high)',
+    bg: 'color-mix(in srgb, var(--severity-high) 20%, transparent)',
+  },
+  medium: { color: 'var(--warning)', bg: 'color-mix(in srgb, var(--warning) 20%, transparent)' },
+  low: { color: 'var(--info)', bg: 'color-mix(in srgb, var(--info) 20%, transparent)' },
 };
-
-const SEVERITY_BORDER_STYLES: Record<string, string> = {
-  critical: 'border-red-500/20 bg-red-500/5',
-  high: 'border-orange-500/20 bg-orange-500/5',
-  medium: 'border-yellow-500/20 bg-yellow-500/5',
-  low: 'border-border',
+const SEVERITY_BORDER_STYLES: Record<string, SevBorder> = {
+  critical: {
+    borderColor: 'color-mix(in srgb, var(--error) 20%, transparent)',
+    bg: 'color-mix(in srgb, var(--error) 5%, transparent)',
+  },
+  high: {
+    borderColor: 'color-mix(in srgb, var(--severity-high) 20%, transparent)',
+    bg: 'color-mix(in srgb, var(--severity-high) 5%, transparent)',
+  },
+  medium: {
+    borderColor: 'color-mix(in srgb, var(--warning) 20%, transparent)',
+    bg: 'color-mix(in srgb, var(--warning) 5%, transparent)',
+  },
+  low: { borderColor: 'var(--border-color)', bg: 'transparent' },
 };
+const FALLBACK_BADGE: SevBadge = {
+  color: 'var(--text-muted)',
+  bg: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
+};
+const FALLBACK_BORDER: SevBorder = { borderColor: 'var(--border-color)', bg: 'transparent' };
 
 export function OverviewTab({
   documentContent,
@@ -229,8 +250,17 @@ export function OverviewTab({
                     </div>
                   )}
                   {dqiData.topImprovement && (
-                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
-                      <div className="text-xs font-semibold text-blue-300 mb-1">
+                    <div
+                      className="p-3 border rounded"
+                      style={{
+                        background: 'color-mix(in srgb, var(--info) 10%, transparent)',
+                        borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+                      }}
+                    >
+                      <div
+                        className="text-xs font-semibold mb-1"
+                        style={{ color: 'var(--info)' }}
+                      >
                         Top Improvement: {dqiData.topImprovement.component} (+
                         {dqiData.topImprovement.potentialGain.toFixed(1)} pts potential)
                       </div>
@@ -422,17 +452,27 @@ export function OverviewTab({
             <div className="space-y-4">
               {biases.map((bias, i) => {
                 const severityKey = bias.severity.toLowerCase();
-                const badgeStyle = SEVERITY_BADGE_STYLES[severityKey] ?? 'bg-muted/30 text-muted';
-                const borderStyle = SEVERITY_BORDER_STYLES[severityKey] ?? 'border-border';
+                const badgeStyle = SEVERITY_BADGE_STYLES[severityKey] ?? FALLBACK_BADGE;
+                const borderStyle = SEVERITY_BORDER_STYLES[severityKey] ?? FALLBACK_BORDER;
 
                 return (
-                  <div key={i} className={`liquid-glass p-4 border ${borderStyle}`}>
+                  <div
+                    key={i}
+                    className="liquid-glass p-4 border"
+                    style={{ borderColor: borderStyle.borderColor, background: borderStyle.bg }}
+                  >
                     <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-bold uppercase px-2 py-0.5 ${badgeStyle}`}>
+                        <span
+                          className="text-xs font-bold uppercase px-2 py-0.5"
+                          style={{ color: badgeStyle.color, background: badgeStyle.bg }}
+                        >
                           {formatBiasName(bias.biasType)}
                         </span>
-                        <span className={`text-xs capitalize ${badgeStyle} px-1.5 py-0.5`}>
+                        <span
+                          className="text-xs capitalize px-1.5 py-0.5"
+                          style={{ color: badgeStyle.color, background: badgeStyle.bg }}
+                        >
                           {bias.severity}
                         </span>
                         {bias.confidence != null && (
@@ -456,10 +496,19 @@ export function OverviewTab({
                     <p className="text-sm text-muted mb-3">{bias.explanation}</p>
 
                     {(bias as unknown as ExtendedBiasInstance).researchInsight && (
-                      <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20">
+                      <div
+                        className="mt-3 p-3 border"
+                        style={{
+                          background: 'color-mix(in srgb, var(--info) 10%, transparent)',
+                          borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+                        }}
+                      >
                         <div className="flex items-center gap-2 mb-1">
-                          <Lightbulb className="w-4 h-4 text-blue-400" />
-                          <span className="text-xs font-semibold text-blue-300">
+                          <Lightbulb className="w-4 h-4" style={{ color: 'var(--info)' }} />
+                          <span
+                            className="text-xs font-semibold"
+                            style={{ color: 'var(--info)' }}
+                          >
                             Scientific Insight
                           </span>
                         </div>
@@ -467,7 +516,8 @@ export function OverviewTab({
                           href={(bias as unknown as ExtendedBiasInstance).researchInsight.sourceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
+                          className="text-sm font-medium block mb-1 hover:underline"
+                          style={{ color: 'var(--info)' }}
                         >
                           {(bias as unknown as ExtendedBiasInstance).researchInsight.title}{' '}
                           <ExternalLink size={10} className="inline ml-1" />
@@ -584,13 +634,27 @@ export function OverviewTab({
                       {recognitionCues.cues.map((cue, i) => (
                         <div
                           key={i}
-                          className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg"
+                          className="p-3 border rounded-lg"
+                          style={{
+                            background: 'color-mix(in srgb, var(--info) 5%, transparent)',
+                            borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+                          }}
                         >
-                          <div className="text-sm font-medium text-blue-300">{cue.title}</div>
+                          <div className="text-sm font-medium" style={{ color: 'var(--info)' }}>
+                            {cue.title}
+                          </div>
                           <p className="text-xs text-muted mt-1">{cue.description}</p>
                           {cue.outcome && (
                             <span
-                              className={`text-xs mt-1 inline-block ${cue.outcome === 'SUCCESS' ? 'text-emerald-400' : cue.outcome === 'FAILURE' ? 'text-red-400' : 'text-amber-400'}`}
+                              className="text-xs mt-1 inline-block"
+                              style={{
+                                color:
+                                  cue.outcome === 'SUCCESS'
+                                    ? 'var(--success)'
+                                    : cue.outcome === 'FAILURE'
+                                      ? 'var(--error)'
+                                      : 'var(--warning)',
+                              }}
                             >
                               Historical outcome: {cue.outcome}
                             </span>
@@ -618,16 +682,22 @@ export function OverviewTab({
                       {narrativePreMortem.warStories.map((story, i) => (
                         <div
                           key={i}
-                          className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg"
+                          className="p-3 border rounded-lg"
+                          style={{
+                            background: 'color-mix(in srgb, var(--warning) 5%, transparent)',
+                            borderColor: 'color-mix(in srgb, var(--warning) 20%, transparent)',
+                          }}
                         >
-                          <div className="text-sm font-medium text-amber-300">{story.title}</div>
+                          <div className="text-sm font-medium" style={{ color: 'var(--warning)' }}>
+                            {story.title}
+                          </div>
                           <p className="text-xs text-muted mt-1">{story.narrative}</p>
                           <div className="flex items-center gap-md mt-1">
                             <span className="text-xs text-muted">
                               Probability: {story.probability}
                             </span>
                             {story.keyTakeaway && (
-                              <span className="text-xs text-emerald-400">
+                              <span className="text-xs" style={{ color: 'var(--success)' }}>
                                 Takeaway: {story.keyTakeaway}
                               </span>
                             )}

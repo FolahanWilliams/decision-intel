@@ -94,7 +94,7 @@ export function RegulatoryHorizonWidget({ compliance }: RegulatoryHorizonWidgetP
             {compliance.regulations.map((reg, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-4 p-3 bg-surface border border-border hover:border-cyan-500/30 transition-colors"
+                className="flex items-start gap-4 p-3 bg-surface border border-border hover:border-[color-mix(in_srgb,var(--info)_30%,transparent)] transition-colors"
               >
                 <div className="mt-1">
                   {reg.status === 'COMPLIANT' ? (

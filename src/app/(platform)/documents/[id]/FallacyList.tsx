@@ -7,8 +7,11 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
   if (!data || data.fallacies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-border">
-        <div className="w-12 h-12 bg-emerald-500/10 flex items-center justify-center mb-3">
-          <Info className="w-6 h-6 text-emerald-500" />
+        <div
+          className="w-12 h-12 flex items-center justify-center mb-3"
+          style={{ background: 'color-mix(in srgb, var(--success) 10%, transparent)' }}
+        >
+          <Info className="w-6 h-6" style={{ color: 'var(--success)' }} />
         </div>
         <h4 className="font-medium">No Fallacies Detected</h4>
         <p className="text-sm text-muted-foreground">
@@ -18,18 +21,24 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
     );
   }
 
-  // canonical-exception — returns Tailwind utility classnames, not CSS-var expressions.
-  const severityColor = (s: string) => {
-    switch (s) {
-      case 'critical':
-        return 'text-red-500 bg-red-500/10 border-red-500/20';
-      case 'high':
-        return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
-      case 'medium':
-        return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
-      default:
-        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
-    }
+  // Canonical light-theme severity tokens. Severity→intent preserved:
+  // critical=error · high=severity-high · medium=warning · other=info
+  // (the original `default` branch was blue/informational, not green —
+  // mapped to var(--info) to preserve the visual intent, not var(--success)).
+  const severityStyle = (s: string): { text: string; bg: string; border: string } => {
+    const v =
+      s === 'critical'
+        ? 'var(--error)'
+        : s === 'high'
+          ? 'var(--severity-high)'
+          : s === 'medium'
+            ? 'var(--warning)'
+            : 'var(--info)';
+    return {
+      text: v,
+      bg: `color-mix(in srgb, ${v} 10%, transparent)`,
+      border: `color-mix(in srgb, ${v} 20%, transparent)`,
+    };
   };
 
   return (
@@ -39,25 +48,29 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Logic Score:</span>
           <span
-            className={`text-lg font-bold ${data.score > 80 ? 'text-emerald-500' : 'text-amber-500'}`}
+            className="text-lg font-bold"
+            style={{ color: data.score > 80 ? 'var(--success)' : 'var(--warning)' }}
           >
             {data.score}/100
           </span>
         </div>
       </div>
 
-      {data.fallacies.map((f, i) => (
-        <div key={i} className={`p-4 border ${severityColor(f.severity).split(' ')[2]} bg-card`}>
+      {data.fallacies.map((f, i) => {
+        const sc = severityStyle(f.severity);
+        return (
+        <div key={i} className="p-4 border bg-card" style={{ borderColor: sc.border }}>
           <div className="flex items-start justify-between gap-4 mb-2">
             <div>
               <span
-                className={`inline-block px-2 py-0.5 text-xs font-medium mb-1 ${severityColor(f.severity)}`}
+                className="inline-block px-2 py-0.5 text-xs font-medium mb-1"
+                style={{ color: sc.text, background: sc.bg }}
               >
                 {f.severity}
               </span>
               <h4 className="font-semibold text-foreground">{f.name}</h4>
             </div>
-            <AlertOctagon className={`w-5 h-5 ${severityColor(f.severity).split(' ')[0]}`} />
+            <AlertOctagon className="w-5 h-5" style={{ color: sc.text }} />
           </div>
 
           <div className="pl-4 border-l-2 border-border my-3 italic text-muted-foreground text-sm">
@@ -69,7 +82,8 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
             {f.explanation}
           </p>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

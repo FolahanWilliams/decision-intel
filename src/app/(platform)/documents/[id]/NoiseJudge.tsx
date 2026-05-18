@@ -12,9 +12,9 @@ export function NoiseJudge({
   const score = analysis.score;
   const benchmarks = analysis.benchmarks || [];
 
-  // Color logic
+  // Color logic — canonical light-theme tokens (thresholds unchanged).
   const scoreColor =
-    score > 80 ? 'text-green-500' : score > 50 ? 'text-yellow-500' : 'text-red-500';
+    score > 80 ? 'var(--success)' : score > 50 ? 'var(--warning)' : 'var(--error)';
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -23,10 +23,12 @@ export function NoiseJudge({
         <div className="card">
           <div className="card-header flex flex-row items-center justify-between space-y-0 pb-2">
             <h3 className="text-sm font-medium">Noise Score (Consistency)</h3>
-            <Activity className={`h-4 w-4 ${scoreColor}`} />
+            <Activity className="h-4 w-4" style={{ color: scoreColor }} />
           </div>
           <div className="card-body">
-            <div className={`text-2xl font-bold ${scoreColor}`}>{score}/100</div>
+            <div className="text-2xl font-bold" style={{ color: scoreColor }}>
+              {score}/100
+            </div>
             <p className="text-xs text-muted-foreground">Standard Deviation: {stdDev}</p>
             <div className="mt-2 text-xs text-muted-foreground">Based on 3 parallel AI audits</div>
           </div>
