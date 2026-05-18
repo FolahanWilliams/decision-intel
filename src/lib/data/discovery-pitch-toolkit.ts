@@ -217,7 +217,11 @@ export const PERSONA_OPENERS: PersonaOpener[] = [
       "I'm researching how mid-market deal teams audit IC packs pre-vote. Could I ask you about the last diligence process you ran?",
     discoveryQuestion:
       "In your last M&A diligence process, how did you formally document the deal team's dissenting views before the investment committee vote?",
-    painSignalCue: ["We didn't really", 'Everyone just nodded along once the sponsor liked it'],
+    painSignalCue: [
+      "We didn't really",
+      'Everyone just nodded along once the sponsor liked it',
+      "Every deal is different but we run the same diligence template / my team's been doing this 20 years, they don't miss this",
+    ],
     bridgeSentence:
       'Because you mentioned the team acting like an echo chamber, we run reasoning audits on M&A diligence packs to formalize that dissent — the technical name is a reasoning layer, scored as a Decision Quality Index.',
     kbAnchor:
@@ -320,6 +324,14 @@ export const PITCH_TRIGGERS: PitchTrigger[] = [
       "Decision Intel audits the reasoning, whether a human or an agent produced it. Same R²F architecture, same DPR output. The 12-node pipeline accepts any structured artefact — agent prompts + outputs map onto the same audit shape. This is where we're heading; if your team is already there, you're the design partner conversation I want to have.",
     avoid:
       'Do not undersell the architectural fit — agent-generated memos ARE in scope; emphasise that.',
+  },
+  {
+    ifRevealed:
+      'Every deal looks unique to us, but we reach for the same playbook each time / our team has seen hundreds of these, the experience IS the process',
+    pitch:
+      'That is the most expensive pattern in M&A and it has a name. Kahneman & Klein (2009) showed practitioner intuition is sharpest in high-validity, repeat-game environments and weakest in exactly the low-validity, single-N decisions a strategic acquisition is — the "this one is special" instinct and the rigid playbook are the same reasoning failing in two directions at once. Decision Intel does not second-guess your team\'s experience; it makes the inside-view dominance visible at draft time and anchors the "this case is different" claim against the historical reference class, so the experience is applied where it actually has validity and audited where it does not.',
+    avoid:
+      'Do not call their team biased or inexperienced — that is the ego-threat that kills the deal. Name the PATTERN (cognitive entrenchment / inside-view dominance), cite the 2009 paper, and frame the audit as protecting the experience, not overruling it.',
   },
 ];
 

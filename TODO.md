@@ -61,6 +61,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-05-18)
+
+Cognitive-entrenchment wedge asset — the one net-new signal extracted from the external Grok corp-dev/M&A market-research eval (its "evolve to Deal Lifecycle Orchestrator / narrowness is a weakness" headline was evaluated and rejected as the incumbent graveyard). Full prose in CLAUDE.md "Cognitive-entrenchment wedge asset (locked 2026-05-18)".
+
+- [x] 5-surface founder-facing wedge cascade, NO pipeline/schema/taxonomy change: event-prep.ts BiasHook (GE–Alstom anchor) + discovery-pitch-toolkit.ts PitchTrigger + painSignalCue + sparring-room-data.ts midmarket_corp_dev objection scenario + education-room-data.ts bias_cognitive_entrenchment flashcard + founder-context.ts key-objection + routing rule.
+- [x] Ego-threat discipline locked into every surface (never call the team biased; agree experience is real → name the pattern + cite Kahneman & Klein 2009 → flip to "the audit protects the experience").
+- [x] NAMED_PATTERNS promotion deliberately deferred + surfaced as a founder-routed decision (pipeline-gated 10-surface cascade; already structurally caught by DI-B-022 + the Reference-Class Blindness toxic combo).
+- [x] Gates green: tsc clean · 5 lint gates · slop-scan under trip-wire.
+
 ## Recently Completed (2026-05-16)
 
 Test-coverage cascade — full prose in CLAUDE.md "Coverage-gap cascade + threshold ratchet (locked 2026-05-16)".
@@ -70,15 +79,4 @@ Test-coverage cascade — full prose in CLAUDE.md "Coverage-gap cascade + thresh
 - [x] Ratcheted vitest coverage thresholds 30 → 50/40/48/50 (stmts/branch/funcs/lines) against measured 53.08/43.30/51.23/53.67.
 - [x] Gates green: tsc clean · lint:positioning/silent-catches(175)/counts(77)/canonical-imports all pass.
 
-## Recently Completed (2026-05-11)
-
-Six commits in one session — full prose lives in CLAUDE.md "Session locks 2026-05-11" + `docs/CLAUDE-archive-2026-Q2.md` (when split).
-
-- [x] `1a752cb7` — shortcuts fix (?-gating to non-input contexts) + constellation band-label-clipping fix
-- [x] `ac8e74e3` — Constellation SVG viz retired + Decisions page refactor (PortfolioVerdictBand + PortfolioSignalTiles + NextMoveContainer canonical-antagonist promotion)
-- [x] `9c22ffc7` — DQI gauge needle math fix + /terms refresh + /about "What you get" tiles + NewDecisionModal refresh + audit-platform.mjs script shipped
-- [x] `4f39a0a9` — /onepager Arden-style artifact + /proof ROI banner + per-case ROI callout + footer 3-column split (Platform/Proof/Trust) + modal Dialog migration (6 modals)
-- [x] `74861f3d` — dark-mode token sweep (72→0) + ExperimentsContent.tsx deletion + /pricing count-drift fix
-- [x] `9ddf13f6` — CLAUDE.md updated with 14 numbered locks from the session
-
-Audit-platform.mjs state post-session: CRITICAL 2 (admin-tolerated) · MODAL 0 · VISUAL 766 (low-severity hex) · STALE 2 (legitimate historical refs). Quality gates: tsc + 5 lints + 793/793 vitest + slop-scan all clean.
+Older entries trimmed per the ~7-day discipline. Full prose lives in CLAUDE.md session locks + git log.

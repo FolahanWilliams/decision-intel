@@ -1233,6 +1233,21 @@ const COGNITIVE_BIASES_CARDS: EducationCard[] = [
     tag: 'kahneman_klein',
   },
   {
+    id: 'bias_cognitive_entrenchment',
+    deckId: 'cognitive_biases',
+    prompt:
+      "What is cognitive entrenchment (the experienced-operator paradox), why is it NOT a new bias, and how do you counter it without ego-threat when a corp-dev head raises it?",
+    canonicalAnswer:
+      "Cognitive entrenchment is the seasoned operator who treats every deal as a snowflake ('this one is special, the comparables don't apply') YET reaches for the same rigid playbook every time — the inside-view instinct and the over-applied template are the same reasoning failing in two directions at once. It is NOT a new bias and must never be added to the 22-bias taxonomy (the narrowness is the moat): it is the practitioner-vocabulary deployment of DI-B-022 inside-view dominance + overconfidence as it manifests in experienced acquirers. The literature anchor is Kahneman & Klein 2009 'Conditions for Intuitive Expertise': intuition is calibrated in high-validity, repeat-game environments (tech tuck-ins, programmatic roll-ups) and UNRELIABLE in low-validity, single-N decisions (cross-border strategic acquisitions) — the very deals where experienced operators are most confident. The ego-safe 3-beat counter: (1) AGREE — '200 deals built real pattern recognition; experienced operators do not have a bias problem'; (2) NAME the pattern + cite 2009 — the snowflake instinct and the rigid playbook are the same reasoning failing opposite directions; DI flags it by name at draft time; (3) FLIP — the audit protects the experience by applying it where it has validity and pressure-testing it where the reference class says it does not; IC gets faster because the snowflake-vs-template argument is settled in the memo, not relitigated every meeting. NEVER call their team biased or inexperienced — that is the ego-threat that kills the deal. Deployed across: event-prep.ts midmarket_corp_dev BiasHook (GE–Alstom anchor), discovery-pitch-toolkit.ts PitchTrigger + painSignalCue, Sparring Room midmarket_corp_dev objection scenario.",
+    hint: "Snowflake + rigid playbook = the same reasoning failing both ways. Not a new bias — it's DI-B-022 in practitioner language. Kahneman & Klein 2009 = the experience penalty in low-validity.",
+    difficulty: 'advanced',
+    applicationContext:
+      "A Damien-class mid-market corp-dev head says 'my team has closed 200 deals, they don't have a bias problem — they have pattern recognition, and every deal genuinely is different.' This is the validated experience-penalty objection. The counter is ego-safe pattern-naming, never a competence challenge.",
+    source:
+      'External market-research triangulation 2026-05-18 (Grok corp-dev/M&A pain eval) + Kahneman & Klein 2009 + DI-B-022 inside-view dominance + CLAUDE.md experience-penalty lock',
+    tag: 'kahneman_klein',
+  },
+  {
     id: 'bias_fractionation_of_expertise',
     deckId: 'cognitive_biases',
     prompt:

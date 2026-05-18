@@ -248,6 +248,12 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
         case: 'AOL-Time Warner merger (2000)',
         whatItDid: 'synergy estimates assumed convergence economics that were already breaking',
       },
+      {
+        bias: 'Inside-View Dominance',
+        case: 'GE–Alstom power acquisition (2015)',
+        whatItDid:
+          'the seasoned deal machine applied its proven roll-up playbook to a target the reference class flagged as structurally different — "we have integrated a hundred of these" overrode "this one is not those"',
+      },
     ],
   },
   {

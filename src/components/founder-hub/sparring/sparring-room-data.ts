@@ -1242,6 +1242,20 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     generatorHint:
       'Aisha just said: "My LP is going to look at this and say it\'s ChatGPT with extra steps. How do I defend the line item?" The LP-pressure flavour of the wrapper challenge. You have 30 seconds. Three beats: (1) ADMIT plainly — "Your LP is half right: the analysis itself is a model with specialised prompts. Don\'t oversell that part to them." (2) REFRAME to the LP\'s actual question — "What the LP really audits after a deal goes wrong is: did the IC memo flag the risk and the team ignore it, or did you never see it? A prompt can\'t answer that. A tamper-evident record where the proxy was logged at the vote and scored at 90 days can — that\'s the artefact that protects YOU in the LP letter." (3) CLOSE on the switching cost — "Once three years of your IC trail is hashed on this methodology, ripping it out means explaining to the LP why you downgraded your evidentiary standard. The line item isn\'t the audit — it\'s the defensible record." Don\'t deny the engine is a wrapper. Don\'t quote calibration numbers. Don\'t say "great question."',
   },
+
+  // ── Cognitive-entrenchment / experience-penalty objection (locked 2026-05-18) ──
+  // The validated mid-market corp-dev pain triangulated from external market
+  // research: the experienced operator who treats every deal as a snowflake
+  // YET reaches for the same rigid playbook. Distinct from the false-precision
+  // objection (Dawes/Meehl, line ~1195) and the wrapper objection (FH-5.2, line
+  // ~1234). 3-beat counter anchored on Kahneman & Klein 2009 (the experience
+  // penalty in low-validity environments) + DI-B-022 inside-view dominance.
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'objection_handler',
+    generatorHint:
+      'Damien just said: "My deal team has closed 200 acquisitions. They don\'t have a bias problem — they have pattern recognition. And every deal genuinely IS different. Your audit is going to flag 20 years of hard-won judgment as \'bias\' and slow my IC down." The cognitive-entrenchment / experience-penalty objection (validated mid-market corp-dev pain). You have 30 seconds. The right counter has three beats: (1) AGREE with the experience, refuse the false binary ("you\'re right — 200 deals built real pattern recognition, and I am not going to tell you experienced operators have a bias problem"), (2) NAME the actual claim with the citation, ego-safe ("Kahneman & Klein 2009 — intuition is sharpest in high-validity, repeat-game environments and weakest in low-validity, single-N decisions. A tech tuck-in is the first kind; a cross-border strategic acquisition is the second. The expensive pattern is that \'this one is special\' and the 200-deal playbook are the SAME reasoning failing in opposite directions — DI flags exactly that, by name, at draft time"), (3) FLIP the frame ("the audit doesn\'t overrule the judgment — it applies it where it has validity and pressure-tests it where the reference class says it doesn\'t. Your IC gets FASTER because the snowflake-vs-template argument is settled in the memo, not relitigated every Thursday"). Don\'t call his team biased or inexperienced — that is the ego-threat that kills the deal. Don\'t quote the Kahneman & Klein paper by title to his face — let the procurement reader find it in the DPR. Don\'t say "great question."',
+  },
 ];
 
 // ─── Mock fallbacks for when GOOGLE_API_KEY is missing ───────────
