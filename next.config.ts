@@ -165,6 +165,23 @@ const nextConfig: NextConfig = {
         destination: '/proof',
         permanent: true,
       },
+      // Legacy static-site index path. Google Search Console (2026-05-18)
+      // reported `/index.html` 404ing on both www + apex http variants
+      // (old links / pre-Next static-deploy crawl artefacts). A Next.js
+      // app serves the homepage at `/`, never `/index.html`, so the path
+      // can only ever mean "the homepage" — 308 consolidates the legacy
+      // path's signal into the canonical root. `source` matches on path
+      // regardless of scheme/host, so this one rule covers every variant.
+      // NOTE: the GSC "/100" 404 is deliberately NOT redirected — it has
+      // zero intended route + zero inbound value; a clean 404 is the
+      // correct response, and a soft-404 redirect would dilute relevance
+      // (and any $100M-coded destination would violate the CLAUDE.md
+      // exit-arc-containment lock).
+      {
+        source: '/index.html',
+        destination: '/',
+        permanent: true,
+      },
     ];
   },
   async headers() {
