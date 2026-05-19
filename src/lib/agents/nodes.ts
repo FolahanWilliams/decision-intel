@@ -83,6 +83,16 @@ interface ModelOptions {
   temperature?: number;
   /** Override model name (for multi-model jury). Defaults to GEMINI_MODEL_NAME env var. */
   modelName?: string;
+  /**
+   * Force `responseMimeType: 'application/json'`. Defaults to `true` (every
+   * legacy caller is byte-identical). Set `false` for nodes whose prompt asks
+   * for prose AND/OR that are `grounded` on gemini-2.5-pro: that model returns
+   * `400 — Tool use with a response mime type: 'application/json' is
+   * unsupported` when grounding + JSON-mime are combined. The metaJudge is
+   * both (its prompt literally ends "Return ONLY the text of the verdict. No
+   * JSON." and it consumes `.text()` raw), so it MUST pass `false`.
+   */
+  jsonResponse?: boolean;
 }
 
 function createModelInstance(options: ModelOptions = {}): GenerativeModel {
@@ -137,7 +147,11 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
     model: modelName,
     ...(tools ? { tools } : {}),
     generationConfig: {
-      responseMimeType: 'application/json',
+      // JSON-mime is the default, but it is INCOMPATIBLE with grounding on
+      // gemini-2.5-pro (400 Bad Request). Callers whose prompt wants prose
+      // (e.g. metaJudge) pass jsonResponse:false. Default true keeps every
+      // legacy caller byte-identical.
+      ...(options.jsonResponse === false ? {} : { responseMimeType: 'application/json' }),
       maxOutputTokens: 16384,
       ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
     },
@@ -178,6 +192,11 @@ function getProStandardSafetyGroundedModel(): GenerativeModel {
       grounded: true,
       safetyLevel: 'standard',
       modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-2.5-pro'),
+      // metaJudge prompt ends "Return ONLY the text of the verdict. No JSON."
+      // and the node consumes .text() raw. JSON-mime here is both unwanted
+      // AND fatal (grounding + JSON-mime = 400 on gemini-2.5-pro). This is
+      // THE fix for the Meta Judge failing on every audit.
+      jsonResponse: false,
     });
   }
   return proStandardSafetyGroundedInstance;
