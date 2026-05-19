@@ -43,8 +43,8 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
         'Upload a pre-IC memo, source memo, growth-round CIM, or pre-commitment review. The audit catches the patterns that kill fund returns — anchoring on a single comparable transaction, overconfidence on growth-curve extrapolation, narrative-fallacy on regulatory tailwinds — and produces a hashed, tamper-evident Decision Provenance Record your LPs (including NDPR / WAEMU / CMA Kenya-regulated LPs) can read.',
     },
     other: {
-      title: 'Run your first audit',
-      description: `Upload a strategic memo, board deck, or market-entry recommendation. We surface the ${BIAS_COUNT}-bias R²F taxonomy, predicted committee questions, and a hashed, tamper-evident Decision Provenance Record.`,
+      title: 'Audit something you actually wrote',
+      description: `Paste or upload anything strategic you have in front of you — a fundraise deck, a board update, a strategy memo, a market-entry recommendation, an investor email. Sixty seconds later you'll see the ${BIAS_COUNT}-bias R²F audit on YOUR text, the questions a committee would ask, and a hashed, tamper-evident Decision Provenance Record. The wow lands harder on your own content than on a canned sample.`,
     },
   },
   deals: {

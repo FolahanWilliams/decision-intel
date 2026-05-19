@@ -67,7 +67,7 @@ const ROLE_PITCH: Record<SampleRole, string> = {
   pe_vc:
     'Two IC-grade memos: a Pan-African consumer-staples roll-up with FX-cycle exposure, and a Series-B growth round into a Nairobi neo-bank with multi-jurisdiction regulatory risk. Decision-grade memos of the shape your IC actually reads.',
   other:
-    'A handful of decision-grade memos picked from across the buyer-personas — pick the closest to a decision your team makes.',
+    'Paste or upload something you actually wrote — a fundraise deck, a board update, a strategy memo, an investor email — and watch a real reasoning audit run on it in 60 seconds. The samples below are a fallback if you want to see one first, but the wow lands harder on your own content.',
 };
 
 interface Props {
