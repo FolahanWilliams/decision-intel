@@ -9,6 +9,7 @@ import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesis
 import { trackEvent } from '@/lib/analytics/track';
 import { buildSaveAuditHref } from '@/lib/utils/demo-claim-url';
 import { formatBiasName } from '@/lib/utils/labels';
+import { ReferralAffordanceCard } from '@/components/referral/ReferralAffordanceCard';
 
 const C = {
   white: '#FFFFFF',
@@ -737,6 +738,21 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
           )}
         </div>
       </motion.section>
+
+      {/* Referral affordance — peak-intent referral surface (locked 2026-05-19,
+          follow-up to the access-amendment 1fd98ce9). Mounts AFTER the
+          Save+Unlock CTA so the conversion priority is right: save your own
+          audit first, then refer if you found it useful. /demo is anonymous,
+          so userId is null and the ?ref attribution is a no-op for now —
+          the share motion still works. Mount on the authenticated reveal is
+          a deliberate follow-up. */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <ReferralAffordanceCard userId={null} analysisId={analysisId} source="demo_paste" />
+      </motion.div>
 
       {/* Mobile stack — CTA row collapses cleanly below 520px so the
           Save Audit button never crushes the loss-aversion copy. Locked
