@@ -383,8 +383,7 @@ export default function ComparePage() {
                               <span
                                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                                 style={{
-                                  background:
-                                    'color-mix(in srgb, var(--warning) 60%, transparent)',
+                                  background: 'color-mix(in srgb, var(--warning) 60%, transparent)',
                                 }}
                               />
                               {bias.replace(/_/g, ' ')}
@@ -414,10 +413,7 @@ export default function ComparePage() {
                           borderColor: 'color-mix(in srgb, var(--warning) 20%, transparent)',
                         }}
                       >
-                        <p
-                          className="text-xs font-medium mb-1"
-                          style={{ color: 'var(--warning)' }}
-                        >
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--warning)' }}>
                           Common biases across all selected:
                         </p>
                         <p

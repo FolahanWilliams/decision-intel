@@ -65,11 +65,9 @@ function tailLine(out) {
 const findings = { p0: [], p1: [], green: [] };
 
 // ── 1. tsc — any error is P0 ────────────────────────────────────────
-const tsc = run(
-  'tsc --noEmit',
-  "NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit",
-  { timeoutMs: 480_000 }
-);
+const tsc = run('tsc --noEmit', "NODE_OPTIONS='--max-old-space-size=3584' npx tsc --noEmit", {
+  timeoutMs: 480_000,
+});
 if (tsc.ok) {
   findings.green.push('`tsc --noEmit` — clean (0 type errors).');
 } else {
@@ -112,7 +110,9 @@ let apSummary = '';
 if (!ap.ok && !/findings\./.test(ap.out)) {
   // audit-platform exits non-zero only in --strict; default run prints
   // a summary and exits 0. A hard failure here = runner-side problem.
-  findings.p1.push(`audit:platform did not produce a summary — investigate: \`${tailLine(ap.out)}\``);
+  findings.p1.push(
+    `audit:platform did not produce a summary — investigate: \`${tailLine(ap.out)}\``
+  );
 } else {
   // Capture the per-rule count block + total.
   const lines = String(ap.out).split('\n');
@@ -145,7 +145,9 @@ const status =
 const lines = [];
 lines.push(`# Nightly audit · ${date} · \`${head}\``);
 lines.push('');
-lines.push(`**Status: ${status}** — ${findings.p0.length} P0 · ${findings.p1.length} P1 · ${findings.green.length} green.`);
+lines.push(
+  `**Status: ${status}** — ${findings.p0.length} P0 · ${findings.p1.length} P1 · ${findings.green.length} green.`
+);
 lines.push('');
 lines.push(
   '_Report-only deterministic auditor. No code was changed or pushed. ' +
@@ -190,7 +192,9 @@ if (process.env.GITHUB_STEP_SUMMARY) {
 }
 
 if (findings.p0.length > 0) {
-  process.stdout.write(`::error::Nightly audit P0 — ${findings.p0.length} regression(s) on ${head}\n`);
+  process.stdout.write(
+    `::error::Nightly audit P0 — ${findings.p0.length} regression(s) on ${head}\n`
+  );
   process.exit(1);
 }
 process.stdout.write(`::notice::Nightly audit clean on ${head}\n`);

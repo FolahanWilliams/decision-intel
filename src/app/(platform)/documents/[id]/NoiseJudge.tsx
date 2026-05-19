@@ -13,8 +13,7 @@ export function NoiseJudge({
   const benchmarks = analysis.benchmarks || [];
 
   // Color logic — canonical light-theme tokens (thresholds unchanged).
-  const scoreColor =
-    score > 80 ? 'var(--success)' : score > 50 ? 'var(--warning)' : 'var(--error)';
+  const scoreColor = score > 80 ? 'var(--success)' : score > 50 ? 'var(--warning)' : 'var(--error)';
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

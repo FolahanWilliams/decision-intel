@@ -19,7 +19,7 @@ Startup advisor based in Palo Alto, CA. Advises early-stage (Seed → Series A) 
 **Disambiguation (important — three distinct advisor nodes):**
 
 - **Roy Eitan** — US/global GTM + scaling + warm-intro connector (this doc).
-- **Mr. Reiner** — the Wiz ($32B) advisor; US enterprise / cyber / governance. *Not* "Roy Reznik" (a recurring name-confusion guard) and *not* Roy Eitan.
+- **Mr. Reiner** — the Wiz ($32B) advisor; US enterprise / cyber / governance. _Not_ "Roy Reznik" (a recurring name-confusion guard) and _not_ Roy Eitan.
 - **Mr. Gabe (Gabriel Osamor, Megasuto)** — UK investor-side network.
 
 ---
@@ -37,12 +37,12 @@ This was the substance of the call and the reason it was worth capturing.
 Roy's framing, in his words and sharpened:
 
 - The product is **"truly amazing."** He was not damning it.
-- **But it is "a sophisticated wrapper"** — input → specialized prompts → output. In today's world *anyone can copy a product*, and the better the idea, the faster it gets copied (even YC-backed companies get copied left and right; AI compresses cloning to days/hours).
+- **But it is "a sophisticated wrapper"** — input → specialized prompts → output. In today's world _anyone can copy a product_, and the better the idea, the faster it gets copied (even YC-backed companies get copied left and right; AI compresses cloning to days/hours).
 - A wrapper is **categorically different from a $100–200M-ARR company.** What separates a £200–300K-ARR "nice" company from a $100–200M company is **the moat + brand + distribution + the ability to scale without having the smartest engineers in the world.**
-- On the wrapper specifically: he is **"perfect for an acqui-hire IF that's the goal,"** but the *scale* path needs a unique differentiator / IP.
+- On the wrapper specifically: he is **"perfect for an acqui-hire IF that's the goal,"** but the _scale_ path needs a unique differentiator / IP.
 - His recurring meta-line, delivered as a discipline: **"Don't let anyone put you in a box — including me."**
 
-This is not new pushback in isolation — it is the **convergent advisor signal** (see §4). Roy independently validated the exact thesis the strategy is already built around: the moat is *not* the copyable product surface.
+This is not new pushback in isolation — it is the **convergent advisor signal** (see §4). Roy independently validated the exact thesis the strategy is already built around: the moat is _not_ the copyable product surface.
 
 ---
 
@@ -50,7 +50,7 @@ This is not new pushback in isolation — it is the **convergent advisor signal*
 
 The "the product isn't the moat; moat = data flywheel + brand + distribution + embeddedness" message has now arrived from **multiple independent advisors** — Roy, "Mr. Cheese" (a separate recent conversation), and the general YC framing the founder has absorbed. The convergence is itself the signal: this should **reinforce, not re-litigate**, the existing strategy priorities (the moat is the accumulating record + enforced process + standard + distribution, not the prompt pipeline).
 
-The "don't let anyone box you in — including me" line cuts **both ways**: Roy's own "you're perfect for an acqui-hire" is *itself* a box. Don't accept it or reject it on ego; treat it as one hypothesis to test, not a verdict.
+The "don't let anyone box you in — including me" line cuts **both ways**: Roy's own "you're perfect for an acqui-hire" is _itself_ a box. Don't accept it or reject it on ego; treat it as one hypothesis to test, not a verdict.
 
 ---
 
@@ -58,7 +58,7 @@ The "don't let anyone box you in — including me" line cuts **both ways**: Roy'
 
 The disciplined answer — **do not deny the wrapper; concede it, then relocate where the company actually is:**
 
-> "You're right — the audit engine is a wrapper any competent team rebuilds in weeks. That's not where the company is. A prompt produces an opinion; what compounds is the *system of record for how high-stakes decisions were reasoned* — the enforced process, the tamper-evident institutional record, and the per-organisation calibration data. The wrapper is the **wedge** that buys entry into the workflow. The company is the accumulating decision → outcome graph + the standard the audit committee runs on. That asset only exists once embedded — so the next 12 months are embeddedness in 1–2 orgs with measurable ROI, not more product."
+> "You're right — the audit engine is a wrapper any competent team rebuilds in weeks. That's not where the company is. A prompt produces an opinion; what compounds is the _system of record for how high-stakes decisions were reasoned_ — the enforced process, the tamper-evident institutional record, and the per-organisation calibration data. The wrapper is the **wedge** that buys entry into the workflow. The company is the accumulating decision → outcome graph + the standard the audit committee runs on. That asset only exists once embedded — so the next 12 months are embeddedness in 1–2 orgs with measurable ROI, not more product."
 
 This is honest (it concedes the true part rather than flattering a non-moat), and it maps directly to the summer SMART goal (§8). The verbatim version of this answer was subsequently shipped into the product's founder-facing playbook (see §12).
 
@@ -68,8 +68,8 @@ This is honest (it concedes the true part rather than flattering a non-moat), an
 
 Acqui-hire-path **vs.** scale-company-path is **NOT a decision to make now.** The single most useful output of the call:
 
-- The **same 12-month motion** — get deeply embedded in 1–2 orgs, prove measurable ROI, accumulate calibration data — is the **dominant strategy under uncertainty**: it *maximises* the acqui-hire outcome **and** is the only way to discover whether the scale-company asset (cross-org data network / the standard) is real.
-- The fork only becomes a real decision *once embeddedness is proven or not.* Choosing now is premature optimisation.
+- The **same 12-month motion** — get deeply embedded in 1–2 orgs, prove measurable ROI, accumulate calibration data — is the **dominant strategy under uncertainty**: it _maximises_ the acqui-hire outcome **and** is the only way to discover whether the scale-company asset (cross-org data network / the standard) is real.
+- The fork only becomes a real decision _once embeddedness is proven or not._ Choosing now is premature optimisation.
 - The differentiator is **not invented in the abstract before the wedge — it is constructed by the embeddedness.**
 - Run the 12-month motion as an **experiment with explicit tripwires** (see open questions, §13): the cannibalisation delta, the calibration-latency proof, and the embeddedness test.
 
@@ -102,7 +102,7 @@ Ask both, then build to that answer. This is the operational near-term target ev
 
 ## 9. IP & safeguarding posture (mom-driven, founder agreed)
 
-- **Trademark the R²F "session."** Specifically the *unique combination of two psychologists' frameworks* — Kahneman rigor × Klein recognition. ~£200 for a global/UK mark. **Planned after release, not now.** Beyond protection, "I trademarked the process" is itself a credibility signal in advisor/investor rooms.
+- **Trademark the R²F "session."** Specifically the _unique combination of two psychologists' frameworks_ — Kahneman rigor × Klein recognition. ~£200 for a global/UK mark. **Planned after release, not now.** Beyond protection, "I trademarked the process" is itself a credibility signal in advisor/investor rooms.
 - **NDA when a company wants to deploy** / let staff try the tool — **not** at a first meeting (an NDA at first contact reads as friction; it belongs at the deploy stage).
 - **Vet inbound speaking / VC invitations** — who are they, do they actually deploy capital, are they real — **and keep a parent in the loop.** The founder is a minor; "let me also talk to my parents" is a **legitimate, non-weak** beat in the response sequence, not a credibility cost.
 
@@ -129,12 +129,12 @@ Ask both, then build to that answer. This is the operational near-term target ev
 
 The call directly triggered a substantial body of work:
 
-- **Two Gemini Deep Research passes** were commissioned right after the call ("Structural Realities of Defensibility" v1 + "The Illusion of Defensibility" v2, 2026-05-16). They **independently triangulated** the same reframing — no structural moat pre-users for a solo replicable-product founder; the only buildable pre-scale defensibility is workflow embeddedness / switching cost, transient counter-positioning, and founder expertise *once converted into software-enforced methodology.* They added three refinements: **category ENTRY not category CREATION**; **hardcode the methodology so the software enforces it** (that *is* the switching cost); and a **shorter counter-positioning clock** (treat it as a months-to-~24-month countdown, not 18–36-month comfort).
-- Both papers + the master-KB synthesis were folded into the **"Defensibility — the 'is it just a wrapper?' answer" lock** in the project's canonical strategy doc, including **7 ranked non-wrapper build vectors** (all of which compound *only* with embedded users — that is the throughline).
+- **Two Gemini Deep Research passes** were commissioned right after the call ("Structural Realities of Defensibility" v1 + "The Illusion of Defensibility" v2, 2026-05-16). They **independently triangulated** the same reframing — no structural moat pre-users for a solo replicable-product founder; the only buildable pre-scale defensibility is workflow embeddedness / switching cost, transient counter-positioning, and founder expertise _once converted into software-enforced methodology._ They added three refinements: **category ENTRY not category CREATION**; **hardcode the methodology so the software enforces it** (that _is_ the switching cost); and a **shorter counter-positioning clock** (treat it as a months-to-~24-month countdown, not 18–36-month comfort).
+- Both papers + the master-KB synthesis were folded into the **"Defensibility — the 'is it just a wrapper?' answer" lock** in the project's canonical strategy doc, including **7 ranked non-wrapper build vectors** (all of which compound _only_ with embedded users — that is the throughline).
 - The verbatim "is it just a wrapper" answer (§5) shipped into the founder-facing playbook as a rehearsable response, plus pressure-drill rehearsal scenarios.
 - **Vector 1 (the forced-at-vote 90-day operational-proxy calibration loop)** — the founder-approved immediate next ship — was built and shipped 2026-05-17. The mandatory pre-mortem dissent gate (V2) and the rigid stage-gate (V5) shipped 2026-05-16.
 
-**Discipline note on the research:** most of the precise statistics in those papers are LLM-confabulated or over-precise (same class as the "Brier 0.258" / "~97% margin" numbers that fail diligence). Reason from the *mechanisms* (Kahneman & Lovallo planning-fallacy / inside-view; the solo-founder survival premium; product-quality-over-network-effects; M&A majority-value-destruction as directional). **Never quote the precise figures in an advisor/investor room.** Also: both papers over-rotate into "weaponise the incumbent's optimism for an overpriced acquisition" — that is the *outcome* of winning the embeddedness race, **not a strategy to optimise directly.** Building *for* the exit produces neither the exit nor the company.
+**Discipline note on the research:** most of the precise statistics in those papers are LLM-confabulated or over-precise (same class as the "Brier 0.258" / "~97% margin" numbers that fail diligence). Reason from the _mechanisms_ (Kahneman & Lovallo planning-fallacy / inside-view; the solo-founder survival premium; product-quality-over-network-effects; M&A majority-value-destruction as directional). **Never quote the precise figures in an advisor/investor room.** Also: both papers over-rotate into "weaponise the incumbent's optimism for an overpriced acquisition" — that is the _outcome_ of winning the embeddedness race, **not a strategy to optimise directly.** Building _for_ the exit produces neither the exit nor the company.
 
 ---
 
@@ -151,8 +151,8 @@ The call directly triggered a substantial body of work:
 **Open questions the post-call research forces the founder to answer (the experiment's tripwires):**
 
 1. **The cannibalisation delta** — how many billable advisory hours does the tool kill at a target org? If it kills >50%, the incumbent treats it as an existential threat, not an acquisition target — that changes the whole counter-positioning calculus.
-2. **The calibration-latency problem** — how do you *prove* the audit improves outcomes when the real decision → outcome feedback loop is 12–36 months? (Vector 1's 90-day operational proxies are the built answer to this — validate it works in the field.)
-3. **Founder-as-single-point-of-failure** — how do you transfer "the reference" / "the standard" from the *person* to the *company* so the equity is valuable without him? Un-converted founder expertise is an unscalable consultancy.
+2. **The calibration-latency problem** — how do you _prove_ the audit improves outcomes when the real decision → outcome feedback loop is 12–36 months? (Vector 1's 90-day operational proxies are the built answer to this — validate it works in the field.)
+3. **Founder-as-single-point-of-failure** — how do you transfer "the reference" / "the standard" from the _person_ to the _company_ so the equity is valuable without him? Un-converted founder expertise is an unscalable consultancy.
 
 ---
 

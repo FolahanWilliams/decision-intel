@@ -28,8 +28,7 @@ import {
 } from 'recharts';
 
 function TrendIcon({ trend }: { trend: string | null }) {
-  if (trend === 'decreasing')
-    return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
+  if (trend === 'decreasing') return <TrendingDown size={12} style={{ color: 'var(--success)' }} />;
   if (trend === 'increasing') return <TrendingUp size={12} style={{ color: 'var(--error)' }} />;
   return <Minus size={12} className="text-muted-foreground" />;
 }
@@ -58,8 +57,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function PrevalenceBar({ rate }: { rate: number }) {
   const pct = Math.round(rate * 100);
-  const color =
-    pct >= 70 ? 'var(--error)' : pct >= 50 ? 'var(--warning)' : 'var(--info)';
+  const color = pct >= 70 ? 'var(--error)' : pct >= 50 ? 'var(--warning)' : 'var(--info)';
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-2 bg-muted/20 overflow-hidden">

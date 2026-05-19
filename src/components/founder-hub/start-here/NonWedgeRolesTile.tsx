@@ -87,8 +87,7 @@ export function NonWedgeRolesTile() {
   }
 
   const { totalNonWedge, withRoleDetail, topRoles, recent } = data;
-  const fillRatePct =
-    totalNonWedge > 0 ? Math.round((withRoleDetail / totalNonWedge) * 100) : 0;
+  const fillRatePct = totalNonWedge > 0 ? Math.round((withRoleDetail / totalNonWedge) * 100) : 0;
 
   return (
     <section
@@ -147,8 +146,8 @@ export function NonWedgeRolesTile() {
           </h3>
           <p style={{ fontSize: 12.5, color: C.slate500, margin: '4px 0 0', lineHeight: 1.5 }}>
             {withRoleDetail} of them ({fillRatePct}%) self-described their role. Tagged
-            phase1HxcEligible=false — excluded from the Vohra cohort by design, but a real
-            discovery signal if a pattern emerges.
+            phase1HxcEligible=false — excluded from the Vohra cohort by design, but a real discovery
+            signal if a pattern emerges.
           </p>
         </div>
       </div>

@@ -61,9 +61,9 @@ describe('composeEvidentiaryStandardFingerprint', () => {
     }).token;
     expect(noWeights).toBe('ES·m2.4.0·in:1a2b3c4d·pf:5e6f7a8b·s2');
     expect(noWeights).not.toContain('·w:');
-    expect(composeEvidentiaryStandardFingerprint({ ...FULL, weightsHash: null }).token).not.toContain(
-      '·w:'
-    );
+    expect(
+      composeEvidentiaryStandardFingerprint({ ...FULL, weightsHash: null }).token
+    ).not.toContain('·w:');
     expect(composeEvidentiaryStandardFingerprint({ ...FULL, weightsHash: '' }).token).not.toContain(
       '·w:'
     );

@@ -92,7 +92,9 @@ export function DecisionRoomsContent() {
           style={{ marginBottom: 'var(--spacing-lg)', flexWrap: 'wrap', gap: 12 }}
         >
           <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-            {isLoading ? 'Loading rooms…' : `${totalRooms} room${totalRooms !== 1 ? 's' : ''} total`}
+            {isLoading
+              ? 'Loading rooms…'
+              : `${totalRooms} room${totalRooms !== 1 ? 's' : ''} total`}
           </span>
           <a
             href="/dashboard?view=browse"

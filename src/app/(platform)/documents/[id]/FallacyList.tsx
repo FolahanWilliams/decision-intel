@@ -59,29 +59,29 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
       {data.fallacies.map((f, i) => {
         const sc = severityStyle(f.severity);
         return (
-        <div key={i} className="p-4 border bg-card" style={{ borderColor: sc.border }}>
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div>
-              <span
-                className="inline-block px-2 py-0.5 text-xs font-medium mb-1"
-                style={{ color: sc.text, background: sc.bg }}
-              >
-                {f.severity}
-              </span>
-              <h4 className="font-semibold text-foreground">{f.name}</h4>
+          <div key={i} className="p-4 border bg-card" style={{ borderColor: sc.border }}>
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <div>
+                <span
+                  className="inline-block px-2 py-0.5 text-xs font-medium mb-1"
+                  style={{ color: sc.text, background: sc.bg }}
+                >
+                  {f.severity}
+                </span>
+                <h4 className="font-semibold text-foreground">{f.name}</h4>
+              </div>
+              <AlertOctagon className="w-5 h-5" style={{ color: sc.text }} />
             </div>
-            <AlertOctagon className="w-5 h-5" style={{ color: sc.text }} />
-          </div>
 
-          <div className="pl-4 border-l-2 border-border my-3 italic text-muted-foreground text-sm">
-            &quot;{f.excerpt}&quot;
-          </div>
+            <div className="pl-4 border-l-2 border-border my-3 italic text-muted-foreground text-sm">
+              &quot;{f.excerpt}&quot;
+            </div>
 
-          <p className="text-sm">
-            <span className="font-medium text-foreground">Why it&apos;s fallacious: </span>
-            {f.explanation}
-          </p>
-        </div>
+            <p className="text-sm">
+              <span className="font-medium text-foreground">Why it&apos;s fallacious: </span>
+              {f.explanation}
+            </p>
+          </div>
         );
       })}
     </div>

@@ -1036,10 +1036,7 @@ export default function DemoPage() {
                 PIPELINE_NODES[
                   Math.min(
                     PIPELINE_NODES.length - 1,
-                    Math.max(
-                      0,
-                      Math.floor((pasteProgress / 100) * PIPELINE_NODES.length)
-                    )
+                    Math.max(0, Math.floor((pasteProgress / 100) * PIPELINE_NODES.length))
                   )
                 ]?.id ?? null
               }
@@ -1232,7 +1229,10 @@ export default function DemoPage() {
                         PIPELINE_NODES.length - 1,
                         Math.max(
                           0,
-                          Math.floor((currentStage / Math.max(1, PIPELINE_STAGES.length)) * PIPELINE_NODES.length)
+                          Math.floor(
+                            (currentStage / Math.max(1, PIPELINE_STAGES.length)) *
+                              PIPELINE_NODES.length
+                          )
                         )
                       )
                     ]?.id ?? null)

@@ -169,10 +169,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
                   <div className="text-sm text-foreground truncate">{node.label}</div>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                     {edgeStyle && (
-                      <span
-                        className="flex items-center gap-1"
-                        style={{ color: edgeStyle.color }}
-                      >
+                      <span className="flex items-center gap-1" style={{ color: edgeStyle.color }}>
                         <Link2 size={10} />
                         {edgeStyle.label}
                       </span>

@@ -100,9 +100,7 @@ export function isFunnelStageId(v: unknown): v is FunnelStageId {
 }
 
 export function isProspectSource(v: unknown): v is ProspectSource {
-  return (
-    typeof v === 'string' && PROSPECT_SOURCES.some(s => s.id === (v as ProspectSource))
-  );
+  return typeof v === 'string' && PROSPECT_SOURCES.some(s => s.id === (v as ProspectSource));
 }
 
 export function stageTimestampField(stage: FunnelStageId): FunnelStage['timestampField'] {

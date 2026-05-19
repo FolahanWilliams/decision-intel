@@ -251,31 +251,31 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         showCloseButton
       >
         <div className="flex flex-col md:grid md:grid-cols-2 min-h-[600px] animate-in fade-in duration-300">
-            {/* LEFT COLUMN: Header & Personas */}
-            <div className="p-6 sm:p-10 flex flex-col overflow-y-auto">
-              <DialogHeader className="mb-6 text-left">
-                {headerIcon}
-                <DialogTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-                  Welcome to Decision Intel
-                </DialogTitle>
-                <DialogDescription className="text-[var(--fs-md)] text-[var(--text-secondary)] mt-3 leading-relaxed">
-                  Which of these best describes your work? We&apos;re currently optimised for four
-                  specific roles — picking one tunes the audit, the case studies we surface, and the
-                  network we point you at.
-                </DialogDescription>
-              </DialogHeader>
+          {/* LEFT COLUMN: Header & Personas */}
+          <div className="p-6 sm:p-10 flex flex-col overflow-y-auto">
+            <DialogHeader className="mb-6 text-left">
+              {headerIcon}
+              <DialogTitle className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+                Welcome to Decision Intel
+              </DialogTitle>
+              <DialogDescription className="text-[var(--fs-md)] text-[var(--text-secondary)] mt-3 leading-relaxed">
+                Which of these best describes your work? We&apos;re currently optimised for four
+                specific roles — picking one tunes the audit, the case studies we surface, and the
+                network we point you at.
+              </DialogDescription>
+            </DialogHeader>
 
-              <div className="grid grid-cols-1 gap-3 mt-auto p-1 -m-1">
-                {PHASE_1_PERSONAS.map((persona, idx) => {
-                  const PersonaIcon = PERSONA_ICON[persona.id];
-                  const isSelected = selectedPersona === persona.id;
+            <div className="grid grid-cols-1 gap-3 mt-auto p-1 -m-1">
+              {PHASE_1_PERSONAS.map((persona, idx) => {
+                const PersonaIcon = PERSONA_ICON[persona.id];
+                const isSelected = selectedPersona === persona.id;
 
-                  return (
-                    <button
-                      key={persona.id}
-                      type="button"
-                      onClick={() => setSelectedPersona(persona.id)}
-                      className={`
+                return (
+                  <button
+                    key={persona.id}
+                    type="button"
+                    onClick={() => setSelectedPersona(persona.id)}
+                    className={`
                         flex items-start gap-4 p-4 rounded-2xl text-left transition-all duration-300
                         border active:scale-[0.98] animate-in fade-in slide-in-from-bottom-2 fill-mode-both
                         ${
@@ -284,179 +284,177 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                             : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:-translate-y-[2px] hover:shadow-md hover:border-[rgba(22,163,74,0.3)] shadow-sm'
                         }
                       `}
-                      style={{ animationDelay: `${idx * 75}ms` }}
-                    >
-                      <div
-                        className={`
+                    style={{ animationDelay: `${idx * 75}ms` }}
+                  >
+                    <div
+                      className={`
                           w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-200
                           ${isSelected ? 'bg-[var(--accent-primary)]' : 'bg-[var(--bg-tertiary)]'}
                         `}
-                      >
-                        <PersonaIcon
-                          size={18}
-                          color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] tracking-tight truncate">
-                          {persona.label}
-                        </div>
-                        <div className="text-[var(--fs-xs)] text-[var(--text-secondary)] mt-1 leading-snug">
-                          {persona.description}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: Value Prop, CTAs & Privacy */}
-            <div className="bg-[var(--bg-secondary)] border-t md:border-t-0 md:border-l border-[var(--border-color)] relative flex flex-col overflow-hidden">
-              {/* Premium colored top strip */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-primary)] opacity-90 shadow-[0_2px_10px_rgba(22,163,74,0.4)] z-20"></div>
-
-              <div className="p-6 sm:p-10 sm:pt-14 sm:pr-14 flex flex-col h-full justify-center relative z-10">
-                {!selectedPersona && (
-                  <div className="text-center text-[var(--text-muted)] animate-in fade-in flex flex-col items-center justify-center h-full gap-4">
-                    <Compass size={48} className="opacity-20" />
-                    <p className="text-[var(--fs-md)] font-medium max-w-[280px]">
-                      Select your role to see how Decision Intel is tuned for your workflow.
-                    </p>
-                  </div>
-                )}
-
-                {valueProp && (
-                  <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="mb-8 mt-4">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-3">
-                        {valueProp.eyebrow}
-                      </div>
-                      <div className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] leading-tight mb-5">
-                        {valueProp.headline}
-                      </div>
-                      <ul className="m-0 pl-5 text-[var(--fs-sm)] sm:text-[var(--fs-md)] text-[var(--text-secondary)] leading-relaxed space-y-3 list-outside list-disc marker:text-[var(--accent-primary)]">
-                        {valueProp.bullets.map(b => (
-                          <li key={b} className="pl-1">
-                            {b}
-                          </li>
-                        ))}
-                      </ul>
+                    >
+                      <PersonaIcon
+                        size={18}
+                        color={isSelected ? '#FFFFFF' : 'var(--text-secondary)'}
+                      />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[var(--fs-md)] font-semibold text-[var(--text-primary)] tracking-tight truncate">
+                        {persona.label}
+                      </div>
+                      <div className="text-[var(--fs-xs)] text-[var(--text-secondary)] mt-1 leading-snug">
+                        {persona.description}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                    {isOther && (
-                      <label className="flex flex-col gap-2 mb-6">
-                        <span className="text-[var(--fs-sm)] font-medium text-[var(--text-secondary)]">
-                          Optional — your role, so we can sharpen the experience for people like
-                          you:
-                        </span>
-                        <input
-                          type="text"
-                          value={otherRoleDetail}
-                          onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
-                          placeholder="e.g. Risk officer at a Tier-1 bank"
-                          className="w-full p-4 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-md)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all shadow-inner"
-                        />
-                      </label>
-                    )}
+          {/* RIGHT COLUMN: Value Prop, CTAs & Privacy */}
+          <div className="bg-[var(--bg-secondary)] border-t md:border-t-0 md:border-l border-[var(--border-color)] relative flex flex-col overflow-hidden">
+            {/* Premium colored top strip */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent-primary)] opacity-90 shadow-[0_2px_10px_rgba(22,163,74,0.4)] z-20"></div>
 
-                    <div className="mt-auto pt-8 border-t border-[var(--border-color)]">
-                      <div className="flex flex-col gap-3">
-                        {sampleError && (
-                          <div
-                            className="w-full p-3 rounded-xl text-[var(--fs-xs)] font-medium"
-                            style={{
-                              background: 'color-mix(in srgb, var(--error) 10%, transparent)',
-                              border: '1px solid color-mix(in srgb, var(--error) 20%, transparent)',
-                              color: 'var(--error)',
-                            }}
-                          >
-                            {sampleError}
-                          </div>
-                        )}
+            <div className="p-6 sm:p-10 sm:pt-14 sm:pr-14 flex flex-col h-full justify-center relative z-10">
+              {!selectedPersona && (
+                <div className="text-center text-[var(--text-muted)] animate-in fade-in flex flex-col items-center justify-center h-full gap-4">
+                  <Compass size={48} className="opacity-20" />
+                  <p className="text-[var(--fs-md)] font-medium max-w-[280px]">
+                    Select your role to see how Decision Intel is tuned for your workflow.
+                  </p>
+                </div>
+              )}
 
-                        <button
-                          onClick={() => completeOnboarding({ launchTour: true })}
-                          className="w-full flex items-center gap-4 p-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
+              {valueProp && (
+                <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="mb-8 mt-4">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-3">
+                      {valueProp.eyebrow}
+                    </div>
+                    <div className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] leading-tight mb-5">
+                      {valueProp.headline}
+                    </div>
+                    <ul className="m-0 pl-5 text-[var(--fs-sm)] sm:text-[var(--fs-md)] text-[var(--text-secondary)] leading-relaxed space-y-3 list-outside list-disc marker:text-[var(--accent-primary)]">
+                      {valueProp.bullets.map(b => (
+                        <li key={b} className="pl-1">
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {isOther && (
+                    <label className="flex flex-col gap-2 mb-6">
+                      <span className="text-[var(--fs-sm)] font-medium text-[var(--text-secondary)]">
+                        Optional — your role, so we can sharpen the experience for people like you:
+                      </span>
+                      <input
+                        type="text"
+                        value={otherRoleDetail}
+                        onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
+                        placeholder="e.g. Risk officer at a Tier-1 bank"
+                        className="w-full p-4 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-md)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all shadow-inner"
+                      />
+                    </label>
+                  )}
+
+                  <div className="mt-auto pt-8 border-t border-[var(--border-color)]">
+                    <div className="flex flex-col gap-3">
+                      {sampleError && (
+                        <div
+                          className="w-full p-3 rounded-xl text-[var(--fs-xs)] font-medium"
+                          style={{
+                            background: 'color-mix(in srgb, var(--error) 10%, transparent)',
+                            border: '1px solid color-mix(in srgb, var(--error) 20%, transparent)',
+                            color: 'var(--error)',
+                          }}
                         >
-                          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                            <Compass size={18} color="#fff" />
+                          {sampleError}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => completeOnboarding({ launchTour: true })}
+                        className="w-full flex items-center gap-4 p-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-2xl text-white text-left hover:-translate-y-[2px] shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.25)] active:scale-[0.98]"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                          <Compass size={18} color="#fff" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[var(--fs-sm)] font-semibold truncate">
+                            Take the 60-second tour
+                          </div>
+                          <div className="text-[11px] opacity-90 mt-0.5 leading-snug truncate">
+                            Spotlight the upload zone, audit tabs, Knowledge Graph.
+                          </div>
+                        </div>
+                      </button>
+
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          onClick={() => completeOnboarding()}
+                          className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                            <Upload
+                              size={18}
+                              className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-[var(--fs-sm)] font-semibold truncate">
-                              Take the 60-second tour
-                            </div>
-                            <div className="text-[11px] opacity-90 mt-0.5 leading-snug truncate">
-                              Spotlight the upload zone, audit tabs, Knowledge Graph.
+                            <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
+                              Upload a memo
                             </div>
                           </div>
                         </button>
 
-                        <div className="flex flex-col sm:flex-row gap-3">
-                          <button
-                            onClick={() => completeOnboarding()}
-                            className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group active:scale-[0.98]"
-                          >
-                            <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
-                              <Upload
+                        <button
+                          onClick={handleTrySample}
+                          disabled={loadingSample}
+                          className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait active:scale-[0.98] disabled:active:scale-100"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
+                            {loadingSample ? (
+                              <div className="w-4 h-4 border-2 border-[var(--text-secondary)] border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <FileText
                                 size={18}
                                 className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors"
                               />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
+                              {loadingSample ? 'Loading...' : 'Try sample'}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
-                                Upload a memo
-                              </div>
-                            </div>
-                          </button>
-
-                          <button
-                            onClick={handleTrySample}
-                            disabled={loadingSample}
-                            className="flex-1 flex sm:flex-col items-center sm:items-start gap-3 p-4 bg-[var(--bg-card)] hover:bg-[var(--bg-secondary)] transition-all duration-300 border border-[var(--border-color)] rounded-2xl text-left hover:-translate-y-[2px] shadow-sm hover:shadow-md group disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:cursor-wait active:scale-[0.98] disabled:active:scale-100"
-                          >
-                            <div className="w-10 h-10 rounded-xl bg-[var(--bg-tertiary)] flex items-center justify-center shrink-0 group-hover:bg-[var(--border-color)] transition-colors">
-                              {loadingSample ? (
-                                <div className="w-4 h-4 border-2 border-[var(--text-secondary)] border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <FileText
-                                  size={18}
-                                  className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors"
-                                />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-[var(--fs-sm)] font-semibold text-[var(--text-primary)] truncate">
-                                {loadingSample ? 'Loading...' : 'Try sample'}
-                              </div>
-                            </div>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Art 13 privacy notice */}
-                      <div className="mt-6 text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        <strong className="text-[var(--text-secondary)] font-medium">
-                          Before you upload:
-                        </strong>{' '}
-                        documents are encrypted with AES-256-GCM at rest, transit-encrypted with TLS
-                        1.2+, and a GDPR / NDPR anonymizer strips PII before analysis — no LLM ever
-                        sees raw personal data.{' '}
-                        <a
-                          href="/privacy"
-                          className="text-[var(--accent-primary)] font-medium hover:underline"
-                        >
-                          See /privacy
-                        </a>
-                        .
+                          </div>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                )}
 
-              </div>
+                    {/* Art 13 privacy notice */}
+                    <div className="mt-6 text-[11px] text-[var(--text-muted)] leading-relaxed">
+                      <strong className="text-[var(--text-secondary)] font-medium">
+                        Before you upload:
+                      </strong>{' '}
+                      documents are encrypted with AES-256-GCM at rest, transit-encrypted with TLS
+                      1.2+, and a GDPR / NDPR anonymizer strips PII before analysis — no LLM ever
+                      sees raw personal data.{' '}
+                      <a
+                        href="/privacy"
+                        className="text-[var(--accent-primary)] font-medium hover:underline"
+                      >
+                        See /privacy
+                      </a>
+                      .
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

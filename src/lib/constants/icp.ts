@@ -686,7 +686,8 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
       'No HXC graduation path — excluded from the Vohra graduation-gate cohort by hxcEligible:false (signal-integrity, not an access restriction). Platform access is unrestricted.',
     preferredSpecimen: 'either',
     budgetSignal: 'Not part of the Phase 1 buyer-wedge cohort (full platform access regardless).',
-    dealVolumeSignal: 'Not part of the Phase 1 buyer-wedge cohort (full platform access regardless).',
+    dealVolumeSignal:
+      'Not part of the Phase 1 buyer-wedge cohort (full platform access regardless).',
   },
 ];
 

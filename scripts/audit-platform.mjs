@@ -997,7 +997,11 @@ function checkSequentialIoLoopOnPipelinePath(files) {
       const head = lines[i].match(LOOP_HEAD);
       if (!head || FOR_AWAIT_HEAD.test(lines[i]) || SAFE_CONCURRENCY.test(lines[i])) continue;
       // Inline opt-out: a deliberately-sequential loop annotates itself.
-      if (/audit-allow-sequential/.test(lines[i]) || (i > 0 && /audit-allow-sequential/.test(lines[i - 1]))) continue;
+      if (
+        /audit-allow-sequential/.test(lines[i]) ||
+        (i > 0 && /audit-allow-sequential/.test(lines[i - 1]))
+      )
+        continue;
       const headIndent = head[1].length;
       // Walk the loop body by indentation (prettier-normalised 2-space).
       for (let j = i + 1; j < Math.min(i + 80, lines.length); j++) {

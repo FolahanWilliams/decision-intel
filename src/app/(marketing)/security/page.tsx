@@ -1789,8 +1789,7 @@ export default function SecurityPage() {
                 disclosure, and Basel III ICAAP already require. Includes input-document SHA-256
                 hash, prompt fingerprint, model lineage, academic citations across the{' '}
                 {BIAS_TAXONOMY_SIZE}-bias taxonomy, regulatory mapping across all{' '}
-                {FRAMEWORKS.length} frameworks, and full
-                pipeline lineage.
+                {FRAMEWORKS.length} frameworks, and full pipeline lineage.
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

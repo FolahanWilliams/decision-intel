@@ -186,7 +186,9 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
           Wedge conversion ledger
         </h3>
       </div>
-      <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: '0 0 14px', lineHeight: 1.5 }}>
+      <p
+        style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: '0 0 14px', lineHeight: 1.5 }}
+      >
         Track every prospect DM → reply → audit → £249. The month-4 Phase-1 floor is{' '}
         {metrics.killFloor} paid Individuals; below it the wedge motion halts and pivots.
       </p>
@@ -196,10 +198,7 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
         <div className="cl-metric" style={{ borderColor: killColor }}>
           <span className="cl-metric-num" style={{ color: killColor }}>
             {metrics.converted}
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-              {' '}
-              / {metrics.killFloor}
-            </span>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}> / {metrics.killFloor}</span>
           </span>
           <span className="cl-metric-lbl">Converted · month-4 floor</span>
         </div>
@@ -239,11 +238,7 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
       {/* Add prospect */}
       <div style={{ margin: '14px 0' }}>
         {!showAdd ? (
-          <button
-            type="button"
-            onClick={() => setShowAdd(true)}
-            className="cl-btn cl-btn-primary"
-          >
+          <button type="button" onClick={() => setShowAdd(true)} className="cl-btn cl-btn-primary">
             <Plus size={14} /> Log a prospect
           </button>
         ) : (
@@ -341,19 +336,16 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
         </div>
       ) : prospects.length === 0 ? (
         <p style={{ color: 'var(--text-muted)', fontSize: 13, padding: '8px 0' }}>
-          No prospects logged yet. The first 5-10 personalised DMs/week is the GTM v3.5 motion —
-          log them here as you send them so the month-4 checkpoint is a dashboard, not a surprise.
+          No prospects logged yet. The first 5-10 personalised DMs/week is the GTM v3.5 motion — log
+          them here as you send them so the month-4 checkpoint is a dashboard, not a surprise.
         </p>
       ) : (
         <div className="cl-list">
           {prospects.map(p => {
             const targets = FUNNEL_STAGES.filter(
-              s =>
-                s.id !== p.stage &&
-                isValidStageTransition(p.stage as FunnelStageId, s.id)
+              s => s.id !== p.stage && isValidStageTransition(p.stage as FunnelStageId, s.id)
             );
-            const personaLabel =
-              PERSONA_OPTIONS.find(o => o.id === p.persona)?.label ?? p.persona;
+            const personaLabel = PERSONA_OPTIONS.find(o => o.id === p.persona)?.label ?? p.persona;
             return (
               <div key={p.id} className="cl-row">
                 <div className="cl-row-main">

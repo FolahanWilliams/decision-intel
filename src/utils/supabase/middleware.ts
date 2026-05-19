@@ -72,7 +72,35 @@ export async function updateSession(request: NextRequest) {
       // Voice tool dispatch endpoint — same shared-secret bearer pattern.
       // The agent calls this when LLM tool use fires (add_todo,
       // track_demo_conversion, lookup_decision_log, etc).
-      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-tools'));
+      !request.nextUrl.pathname.startsWith('/api/founder-hub/voice-tools') &&
+      // Public-by-design routes — each handles its own auth (none, or
+      // x-extension-key, or IP rate-limit) and was being silently
+      // redirected to /login. Same drift-class as /api/demo (2026-05-19
+      // fix). Each handler carries its own abuse guard (rate-limit /
+      // header bearer / static cache).
+      //
+      // sso/initiate: pre-login domain probe; runs BEFORE the user is
+      //   authenticated, so an auth check here is a logical impossibility.
+      //   sso/admin/* deliberately NOT exempted — admin endpoints need
+      //   the Supabase session.
+      !request.nextUrl.pathname.startsWith('/api/sso/initiate') &&
+      // simulate-ceo: public anonymous CEO-question generator, 3/IP/24h.
+      !request.nextUrl.pathname.startsWith('/api/simulate-ceo') &&
+      // public/*: explicit public-namespace (sample-dpr, case-studies,
+      //   outcome-stats) — every handler says "No auth required".
+      !request.nextUrl.pathname.startsWith('/api/public/') &&
+      // og-case-study/*: OpenGraph social-unfurl card generator. Called
+      //   by Twitter/LinkedIn/Slack crawlers — never authenticated.
+      !request.nextUrl.pathname.startsWith('/api/og-case-study/') &&
+      // extension/*: browser extension calls its own dedicated routes
+      //   with x-extension-key (validated in authenticateApiRequest).
+      //   The legacy /api/analyze + x-extension-key path stays handled
+      //   by isExtensionAnalyzeRequest below for back-compat.
+      !request.nextUrl.pathname.startsWith('/api/extension/') &&
+      // intelligence/calibration-baseline: force-static public endpoint
+      //   (platform Brier 0.258 baseline). The rest of /api/intelligence/*
+      //   is per-user/per-org and stays protected.
+      !request.nextUrl.pathname.startsWith('/api/intelligence/calibration-baseline'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.

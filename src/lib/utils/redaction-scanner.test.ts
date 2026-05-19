@@ -118,13 +118,9 @@ describe('scanForPii — person-name PRECISION (2026-05-17 false-positive fix)',
   it('honorific / role signal rescues a name whose token is a common word', () => {
     // "Cash" is in COMMON_WORD; without the honorific it would be dropped.
     const withTitle = scanForPii('Prepared by Dr. Helen Cash for the committee.');
-    expect(
-      withTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')
-    ).toBe(true);
+    expect(withTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')).toBe(true);
     const noTitle = scanForPii('The annual Helen Cash reserve was set aside.');
-    expect(
-      noTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')
-    ).toBe(false);
+    expect(noTitle.hits.some(h => h.category === 'name' && h.value === 'Helen Cash')).toBe(false);
   });
 
   it('the canonical demo memo no longer produces a wall of name garbage', () => {

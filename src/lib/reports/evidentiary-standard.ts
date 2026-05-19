@@ -60,7 +60,7 @@ function short8(hash: string | null | undefined): string {
   // Hashes are hex; defensively strip non-hex so a stray prefix can't
   // leak into the citable token. Lowercased for stable comparison.
   const hex = h.toLowerCase().replace(/[^0-9a-f]/g, '');
-  return hex.length >= 8 ? hex.slice(0, 8) : (hex || 'na');
+  return hex.length >= 8 ? hex.slice(0, 8) : hex || 'na';
 }
 
 /**

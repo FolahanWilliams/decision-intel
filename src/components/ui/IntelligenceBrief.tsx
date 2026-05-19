@@ -244,12 +244,13 @@ export function IntelligenceBrief({ context, metrics }: IntelligenceBriefProps) 
 
       {/* Stats row */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-        {profile && profile.totalDecisions > 0 && statItem(<>{strong(profile.totalDecisions)} decisions tracked</>)}
+        {profile &&
+          profile.totalDecisions > 0 &&
+          statItem(<>{strong(profile.totalDecisions)} decisions tracked</>)}
         {profile &&
           profile.avgDecisionQuality > 0 &&
           statItem(<>Avg quality: {strong(`${Math.round(profile.avgDecisionQuality)}/100`)}</>)}
-        {maturity &&
-          statItem(<>Maturity: {strong(`${maturity.grade} (${maturity.score}/100)`)}</>)}
+        {maturity && statItem(<>Maturity: {strong(`${maturity.grade} (${maturity.score}/100)`)}</>)}
       </div>
 
       {/* Top risk biases */}

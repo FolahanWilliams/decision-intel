@@ -186,7 +186,9 @@ export default async function AuditLogPage({
                         {log.action === 'VIEW_DOCUMENT' && (
                           <FileText size={14} style={{ color: 'var(--warning)' }} />
                         )}
-                        {log.action === 'LOGIN' && <LogIn size={14} style={{ color: 'var(--accent-secondary)' }} />}
+                        {log.action === 'LOGIN' && (
+                          <LogIn size={14} style={{ color: 'var(--accent-secondary)' }} />
+                        )}
                         <span className="font-medium text-sm">{log.action}</span>
                       </div>
                       <span className="badge badge-secondary text-xs">{log.resource}</span>

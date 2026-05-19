@@ -80,10 +80,7 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
               </p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div
-                className="text-4xl font-bold tabular-nums"
-                style={{ color: gradeColor }}
-              >
+              <div className="text-4xl font-bold tabular-nums" style={{ color: gradeColor }}>
                 {chainScore}
               </div>
               <div className="text-xs font-bold" style={{ color: gradeColor }}>

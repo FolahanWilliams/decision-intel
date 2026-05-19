@@ -61,11 +61,7 @@ export function RedTeamView({
 
   // Color logic for blind spot gap
   const gapColor =
-    blindSpotGap < 50
-      ? 'var(--error)'
-      : blindSpotGap < 80
-        ? 'var(--warning)'
-        : 'var(--success)';
+    blindSpotGap < 50 ? 'var(--error)' : blindSpotGap < 80 ? 'var(--warning)' : 'var(--success)';
   const gapLabel =
     blindSpotGap < 50
       ? 'Tunnel Vision Detected'

@@ -257,10 +257,7 @@ export function OverviewTab({
                         borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
                       }}
                     >
-                      <div
-                        className="text-xs font-semibold mb-1"
-                        style={{ color: 'var(--info)' }}
-                      >
+                      <div className="text-xs font-semibold mb-1" style={{ color: 'var(--info)' }}>
                         Top Improvement: {dqiData.topImprovement.component} (+
                         {dqiData.topImprovement.potentialGain.toFixed(1)} pts potential)
                       </div>
@@ -505,10 +502,7 @@ export function OverviewTab({
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <Lightbulb className="w-4 h-4" style={{ color: 'var(--info)' }} />
-                          <span
-                            className="text-xs font-semibold"
-                            style={{ color: 'var(--info)' }}
-                          >
+                          <span className="text-xs font-semibold" style={{ color: 'var(--info)' }}>
                             Scientific Insight
                           </span>
                         </div>

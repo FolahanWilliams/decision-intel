@@ -140,10 +140,7 @@ function AlertCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <Icon size={14} style={{ color: accentSeed }} />
-            <span
-              className="text-xs font-semibold capitalize"
-              style={{ color: accentSeed }}
-            >
+            <span className="text-xs font-semibold capitalize" style={{ color: accentSeed }}>
               {config.label}
             </span>
             <span className="text-[10px] text-muted-foreground ml-auto">

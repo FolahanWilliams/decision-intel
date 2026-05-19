@@ -49,13 +49,13 @@ The platform runs documents through a **LangGraph analysis pipeline** — sequen
 
 ## Value Proposition
 
-| For                          | Pain Point                                                            | What We Deliver                                                                    |
-| :--------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------------- |
-| **Corporate Strategy Teams** | Strategic proposals anchored to initial assumptions, not fundamentals | 22-bias R²F taxonomy scored with exact memo excerpts and coaching suggestions       |
+| For                          | Pain Point                                                            | What We Deliver                                                                                                                        |
+| :--------------------------- | :-------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| **Corporate Strategy Teams** | Strategic proposals anchored to initial assumptions, not fundamentals | 22-bias R²F taxonomy scored with exact memo excerpts and coaching suggestions                                                          |
 | **M&A / Corp Dev Teams**     | Due diligence rubber-stamps thesis instead of stress-testing it       | M&A failure-pattern detection (Synergy Mirage, Conglomerate Fallacy, Winner's Curse), deal-stage analysis from screening to post-close |
-| **Executive Committees**     | Authority bias and groupthink silence genuine debate                  | Blind committee voting, noise measurement across members, decision calibration     |
-| **Post-Merger Integration**  | Integration plans tainted by sunk cost and overconfidence             | Executive simulation with custom personas, blind voting, and dissent tracking      |
-| **Portfolio / BizOps Teams** | Disposition effect and sunk cost drive hold/divest decisions          | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics      |
+| **Executive Committees**     | Authority bias and groupthink silence genuine debate                  | Blind committee voting, noise measurement across members, decision calibration                                                         |
+| **Post-Merger Integration**  | Integration plans tainted by sunk cost and overconfidence             | Executive simulation with custom personas, blind voting, and dissent tracking                                                          |
+| **Portfolio / BizOps Teams** | Disposition effect and sunk cost drive hold/divest decisions          | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics                                                          |
 
 **ROI**: A single fatal blind spot caught before the committee commits capital pays for the platform many times over. Reasoning is never objectively sound — it is either audited or unaudited; the audit is the structural friction that catches bias before capital is committed (anchored in Kahneman & Klein 2009, _Conditions for Intuitive Expertise_, and Kahneman, _Noise_, 2021).
 
@@ -63,12 +63,12 @@ The platform runs documents through a **LangGraph analysis pipeline** — sequen
 
 ## Pricing
 
-| Plan             | Price               | Best For                                                                                                   |
-| :--------------- | :------------------ | :--------------------------------------------------------------------------------------------------------- |
-| **Free**         | $0                  | 4 audits/month — see what the engine flags on any strategic memo                                           |
-| **Individual**   | $249/mo             | The high-stakes strategist: 15 audits/mo, full 22-bias R²F taxonomy, Personal Decision History             |
-| **Strategy**     | $2,499/mo           | Corporate strategy teams — fair-use 250 audits/mo, shared Decision Knowledge Graph, Decision Rooms, integrations |
-| **Enterprise**   | Custom              | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support                           |
+| Plan           | Price     | Best For                                                                                                         |
+| :------------- | :-------- | :--------------------------------------------------------------------------------------------------------------- |
+| **Free**       | $0        | 4 audits/month — see what the engine flags on any strategic memo                                                 |
+| **Individual** | $249/mo   | The high-stakes strategist: 15 audits/mo, full 22-bias R²F taxonomy, Personal Decision History                   |
+| **Strategy**   | $2,499/mo | Corporate strategy teams — fair-use 250 audits/mo, shared Decision Knowledge Graph, Decision Rooms, integrations |
+| **Enterprise** | Custom    | Fortune 500 strategy functions with SSO, custom taxonomy, SLA, dedicated support                                 |
 
 All paid plans include a 14-day free trial. No credit card required to start.
 

@@ -29,8 +29,7 @@ function verifyFounderPass(req: NextRequest): boolean {
 
 function isSchemaDrift(e: unknown): boolean {
   return (
-    e instanceof Prisma.PrismaClientKnownRequestError &&
-    (e.code === 'P2021' || e.code === 'P2022')
+    e instanceof Prisma.PrismaClientKnownRequestError && (e.code === 'P2021' || e.code === 'P2022')
   );
 }
 
@@ -41,10 +40,7 @@ function auditActionForStage(stage: FunnelStageId): AuditAction {
   return 'PROSPECT_STAGE_ADVANCED';
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!verifyFounderPass(req)) {
     return apiError({ error: 'Unauthorized', status: 401 });
   }
@@ -129,10 +125,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!verifyFounderPass(req)) {
     return apiError({ error: 'Unauthorized', status: 401 });
   }

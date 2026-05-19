@@ -201,11 +201,9 @@ export function ForgottenQuestionsTab({
                       style={
                         isAddressed
                           ? {
-                              background:
-                                'color-mix(in srgb, var(--success) 10%, transparent)',
+                              background: 'color-mix(in srgb, var(--success) 10%, transparent)',
                               color: 'var(--success)',
-                              borderColor:
-                                'color-mix(in srgb, var(--success) 30%, transparent)',
+                              borderColor: 'color-mix(in srgb, var(--success) 30%, transparent)',
                             }
                           : undefined
                       }

@@ -196,8 +196,8 @@ export function IntelligentAntagonistPrompt({
         }}
       >
         Naming it before the algorithm&rsquo;s output is the discipline that protects you from
-        automation bias; the gap between your read and the system&rsquo;s is the recommendation&rsquo;s
-        real value.
+        automation bias; the gap between your read and the system&rsquo;s is the
+        recommendation&rsquo;s real value.
       </p>
       <textarea
         ref={textareaRef}

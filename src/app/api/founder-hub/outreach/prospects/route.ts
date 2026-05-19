@@ -36,8 +36,7 @@ const VALID_PERSONAS = new Set<string>([...WEDGE_PERSONAS.map(p => p.id), 'other
 /** True for the Prisma "table/column not migrated yet" error codes. */
 function isSchemaDrift(e: unknown): boolean {
   return (
-    e instanceof Prisma.PrismaClientKnownRequestError &&
-    (e.code === 'P2021' || e.code === 'P2022')
+    e instanceof Prisma.PrismaClientKnownRequestError && (e.code === 'P2021' || e.code === 'P2022')
   );
 }
 
@@ -100,8 +99,7 @@ export async function POST(req: NextRequest) {
         stage,
         anchorCaseSlug:
           typeof body.anchorCaseSlug === 'string' ? body.anchorCaseSlug.trim() || null : null,
-        artifactId:
-          typeof body.artifactId === 'string' ? body.artifactId.trim() || null : null,
+        artifactId: typeof body.artifactId === 'string' ? body.artifactId.trim() || null : null,
         notes: typeof body.notes === 'string' ? body.notes.trim() || null : null,
         // Stamp the entry-stage timestamp at create time.
         [tsField]: now,

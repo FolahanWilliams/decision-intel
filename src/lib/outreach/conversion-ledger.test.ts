@@ -117,14 +117,9 @@ describe('computeFunnelMetrics', () => {
 
   it('killBand tracks converted vs the v3.5 month-4 floor', () => {
     expect(computeFunnelMetrics([], NOW).killBand).toBe('at_risk');
+    expect(computeFunnelMetrics([p('converted'), p('converted')], NOW).killBand).toBe('at_risk'); // 2 < ceil(5/2)=3
     expect(
-      computeFunnelMetrics([p('converted'), p('converted')], NOW).killBand
-    ).toBe('at_risk'); // 2 < ceil(5/2)=3
-    expect(
-      computeFunnelMetrics(
-        [p('converted'), p('converted'), p('converted')],
-        NOW
-      ).killBand
+      computeFunnelMetrics([p('converted'), p('converted'), p('converted')], NOW).killBand
     ).toBe('approaching'); // 3 ∈ [3,5)
     const five = Array.from({ length: 5 }, () => p('converted'));
     const m = computeFunnelMetrics(five, NOW);

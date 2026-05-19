@@ -1035,9 +1035,7 @@ function buildDpaDocx() {
     )
   );
 
-  body.push(
-    docxParagraph('11. Evidentiary standard & audit-trail continuity', 'Heading2')
-  );
+  body.push(docxParagraph('11. Evidentiary standard & audit-trail continuity', 'Heading2'));
   // SSOT: EVIDENTIARY_STANDARD_DPA_CLAUSE in src/lib/constants/trust-copy.ts.
   // VERBATIM lockstep with buildDpaTemplate() §11 + Terms §10I — the
   // PDF↔DOCX format-divergence is the bug class per the DPA lockstep lock.
