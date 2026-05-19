@@ -71,3 +71,15 @@ sample_decision.txt
 e2e/.auth/
 auth.json
 playwright/.auth/
+
+# Playwright run artifacts (regenerated on every test run; never commit)
+playwright-report/
+test-results/
+
+# Per-user dev-tool / agent state — accidentally committed 2026-05-19
+# (SessionStart hook pre-staged these). Mirrors the saved-memory
+# feedback-git-add-scope discipline: per-user state, not per-repo.
+.serena/
+.codex/
+.claude/commands/
+.claude/skills/

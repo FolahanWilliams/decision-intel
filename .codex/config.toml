@@ -1,4 +1,0 @@
-[mcp_servers.vercel]
-args = ["@vercel/mcp-server"]
-command = "npx"
-env_vars = ["VERCEL_API_TOKEN"]
