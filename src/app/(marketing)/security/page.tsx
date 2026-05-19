@@ -34,8 +34,17 @@ import {
   EVIDENTIARY_STANDARD_LABEL,
   EVIDENTIARY_STANDARD_CONTINUITY_BODY,
 } from '@/lib/constants/trust-copy';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
+
+// Bias taxonomy size — derived from BIAS_EDUCATION per the canonical
+// count-discipline pattern (mirrors {FRAMEWORKS.length} used in the same
+// DPR-export copy below). The legacy "30+ cognitive biases" hedge was
+// deprecated 2026-05-13 (CR-3): the taxonomy is 22 IDs (DI-B-001 →
+// DI-B-022); the "+" conflicts with the precise audit-trail discipline a
+// procurement reader expects on /security.
+const BIAS_TAXONOMY_SIZE = Object.keys(BIAS_EDUCATION).length;
 
 export const metadata: Metadata = {
   title: 'Security · Decision Intel',
@@ -1778,8 +1787,9 @@ export default function SecurityPage() {
                 A hashed, tamper-evident 4-page artifact your General Counsel hands to the audit
                 committee or regulator of record, built to the shape EU AI Act Article 14, SEC AI
                 disclosure, and Basel III ICAAP already require. Includes input-document SHA-256
-                hash, prompt fingerprint, model lineage, academic citations across the 30+ bias
-                taxonomy, regulatory mapping across all {FRAMEWORKS.length} frameworks, and full
+                hash, prompt fingerprint, model lineage, academic citations across the{' '}
+                {BIAS_TAXONOMY_SIZE}-bias taxonomy, regulatory mapping across all{' '}
+                {FRAMEWORKS.length} frameworks, and full
                 pipeline lineage.
               </div>
             </div>

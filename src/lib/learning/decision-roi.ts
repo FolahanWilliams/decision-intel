@@ -4,15 +4,21 @@
  *
  * The retention/moat thesis is "embeddedness with MEASURABLE ROI";
  * Phase-1 graduation is literally scored on the pilot seeing it. The
- * 2026-05-17 audit found the product had NO live ROI surface — the
- * only $-at-risk component (DiscoveryGradeImpactCard) was dead code,
- * and every steady-state analytics surface rendered metrics, never a
- * value narrative.
+ * 2026-05-17 audit found the product had NO PERSISTENT steady-state
+ * per-org ROI surface — DiscoveryGradeImpactCard is a single cold
+ * one-slide ($-at-risk on a $50M decision) live on /demo + /dashboard,
+ * not a persistent value narrative; every steady-state analytics
+ * surface rendered metrics, never the narrative. (NB: the original
+ * 2026-05-17 "dead code" framing was itself a false-negative grep —
+ * the card is live-mounted; corrected per the CLAUDE.md C4 lock
+ * 2026-05-18. This file's job is the STEADY-STATE surface, distinct
+ * from that cold one-slide.)
  *
  * This SSOT composes — never duplicates — the canonical computations:
  *   • value-at-stake (DAY-1, NOT outcome-gated): the per-decision
- *     `ticket × historicalFailRate/100` math (the DiscoveryGradeImpact
- *     formula, now the only prior art since that card is unmounted).
+ *     `ticket × historicalFailRate/100` math (shared with the
+ *     DiscoveryGradeImpact cold one-slide; this is the steady-state
+ *     home for the same formula).
  *     Computable from the first audited decision with a ticket size +
  *     a flagged pattern. This is what makes the surface honest on a
  *     pilot's day one WITHOUT longitudinal data — the founder
