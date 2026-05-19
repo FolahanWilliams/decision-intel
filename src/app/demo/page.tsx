@@ -26,6 +26,7 @@ import {
 import dynamic from 'next/dynamic';
 import { DEMO_ANALYSES } from './data';
 import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
+import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
 import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiComponentBars';
 import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
@@ -192,6 +193,10 @@ export default function DemoPage() {
   } | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
   const [pasteStageIdx, setPasteStageIdx] = useState(0);
+  // Raw 0-100 progress from the SSE stream — drives the 12-node pipeline viz
+  // (PipelineFlowDiagram activeNodeId mapping). The existing pasteStageIdx is
+  // the local 8-stage UI grouping; pasteProgress is the canonical engine value.
+  const [pasteProgress, setPasteProgress] = useState(0);
   // Redaction gate (3.2) — opens the modal when a paste contains PII.
   const [redactScan, setRedactScan] = useState<ScanResult | null>(null);
   const [redactPending, setRedactPending] = useState<string | null>(null);
@@ -240,6 +245,7 @@ export default function DemoPage() {
     setPasteError(null);
     setPasteAudit(null);
     setPasteStageIdx(0);
+    setPasteProgress(0);
 
     try {
       const res = await fetch('/api/demo/run', {
@@ -281,6 +287,8 @@ export default function DemoPage() {
             Math.max(0, Math.floor((m.progress / 100) * PIPELINE_STAGES.length))
           );
           setPasteStageIdx(idx);
+          // Raw 0-100 for the 12-node pipeline viz (PipelineFlowDiagram).
+          setPasteProgress(Math.min(100, Math.max(0, m.progress)));
         }
         if (m.type === 'error') {
           settled = true;
@@ -307,6 +315,7 @@ export default function DemoPage() {
             }
           }
           setPasteStageIdx(PIPELINE_STAGES.length - 1);
+          setPasteProgress(100);
           setPasteAudit(data);
           setPasteAuditing(false);
           setTimeout(() => {
@@ -1003,6 +1012,38 @@ export default function DemoPage() {
               Running the real Decision Intel pipeline. This takes 30&ndash;60&nbsp;seconds on a
               strategic memo.
             </p>
+          </div>
+          {/* 12-node pipeline viz — drives the live "watch the real pipeline
+              run" moment from REAL SSE progress. Mirrors the /how-it-works
+              hero so a cold stranger recognises the brand visual AND watches
+              the actual audit light up node-by-node instead of just reading
+              a checklist. PIPELINE_NODES is the canonical 12-node manifest;
+              the same one /how-it-works renders. Locked 2026-05-19
+              (founder-directed). The 8-stage list below stays as the
+              supporting detail. */}
+          <div
+            style={{
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              padding: '18px 8px 4px',
+              marginBottom: 18,
+              overflow: 'hidden',
+            }}
+          >
+            <PipelineFlowDiagram
+              activeNodeId={
+                PIPELINE_NODES[
+                  Math.min(
+                    PIPELINE_NODES.length - 1,
+                    Math.max(
+                      0,
+                      Math.floor((pasteProgress / 100) * PIPELINE_NODES.length)
+                    )
+                  )
+                ]?.id ?? null
+              }
+            />
           </div>
           <div style={{ ...cardStyle, padding: '22px 26px' }}>
             {PIPELINE_STAGES.map((stage, idx) => {
