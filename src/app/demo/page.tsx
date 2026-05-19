@@ -1204,6 +1204,42 @@ export default function DemoPage() {
             </p>
           </div>
 
+          {/* 12-node pipeline viz — same canonical PIPELINE_NODES manifest the
+              /how-it-works hero renders + the paste-audit flow shows. Sample
+              flow drives activeNodeId from currentStage (0..PIPELINE_STAGES.length-1)
+              mapped to PIPELINE_NODES so a cold stranger watching the canned
+              WeWork S-1 demo sees the same brand visual light up node-by-node
+              as a paying user's real audit. Locked 2026-05-19 (founder-directed,
+              "still shows the old loading instead of true sequential with the
+              12 node pipeline viz" fix). 8-stage list below stays as supporting
+              detail. */}
+          <div
+            style={{
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 16,
+              padding: '18px 8px 4px',
+              marginBottom: 18,
+              overflow: 'hidden',
+            }}
+          >
+            <PipelineFlowDiagram
+              activeNodeId={
+                currentStage < 0
+                  ? null
+                  : (PIPELINE_NODES[
+                      Math.min(
+                        PIPELINE_NODES.length - 1,
+                        Math.max(
+                          0,
+                          Math.floor((currentStage / Math.max(1, PIPELINE_STAGES.length)) * PIPELINE_NODES.length)
+                        )
+                      )
+                    ]?.id ?? null)
+              }
+            />
+          </div>
+
           <div style={{ ...cardStyle, padding: '24px 28px' }}>
             {PIPELINE_STAGES.map((stage, idx) => {
               const StageIcon = stage.icon;

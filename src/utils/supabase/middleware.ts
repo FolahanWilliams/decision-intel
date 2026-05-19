@@ -55,6 +55,13 @@ export async function updateSession(request: NextRequest) {
       !request.nextUrl.pathname.startsWith('/api/health') &&
       !request.nextUrl.pathname.startsWith('/api/integrations/slack') &&
       !request.nextUrl.pathname.startsWith('/api/pilot-interest') &&
+      // Public demo audit endpoint — POST /api/demo/run is the highest-leverage
+      // acquisition surface (a stranger pasting a memo). Auth-redirecting to
+      // /login turned the POST into a 307 → 405 on the cold conversion door.
+      // Owns its own IP+global rate limit (1/IP/24h + 50/day global) inside the
+      // route handler; same server-to-server-style exemption as the slack/cron
+      // routes above but with IP-bound rate-limit as the abuse guard.
+      !request.nextUrl.pathname.startsWith('/api/demo') &&
       // Voice mode worker calls /api/founder-hub/voice-context with its own
       // shared-secret bearer (VOICE_WORKER_SECRET, validated inside the
       // route). The Railway worker has no Supabase session — auth-redirecting
