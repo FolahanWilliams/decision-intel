@@ -37,9 +37,15 @@ async function searchSemanticScholar(query: string, limit: number = 5): Promise<
       fields: 'title,authors,year,abstract,externalIds,citationCount,url',
     });
 
-    // Retry with backoff on 429 (rate limit) responses
+    // Retry with backoff on 429 (rate limit) responses.
+    // Semantic Scholar's free tier 429s chronically; this is a NON-FATAL
+    // enrichment call on the synchronous audit path. 3× exponential backoff
+    // (1s→2s→4s) just guarantees ~7s of dead time per call before the
+    // inevitable failure. One quick retry is the right ceiling — if it 429s
+    // twice it will not succeed on attempt 3/4. Tightened from 3 → 1 with
+    // the Meta-Judge P0 hardening sweep (demo dead-time reduction).
     let response: Response | null = null;
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 1;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       response = await withTimeout(
         () =>

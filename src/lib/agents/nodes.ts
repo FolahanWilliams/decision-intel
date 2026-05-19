@@ -143,6 +143,22 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
 
   const tools = options.grounded ? [{ googleSearch: {} } as Tool] : undefined;
 
+  // Observability guard for the bug CLASS that killed the metaJudge on every
+  // audit: grounding + responseMimeType:'application/json' is the fragile
+  // combination — gemini-2.5-pro rejects it outright (400), and the Flash
+  // grounded nodes (verification / simulation / benchmarks) only work today
+  // because Flash currently tolerates it. If Gemini tightens Flash the way it
+  // tightened 2.5-pro, this warn is the early signal in the logs BEFORE the
+  // whole grounded layer goes dark. Pure logging — zero behavior change.
+  if (tools && options.jsonResponse !== false) {
+    log.warn(
+      `[ModelInstance] FRAGILE COMBO: grounded + JSON-mime on ${modelName}. ` +
+        `This is the metaJudge P0 bug class — if this model starts 400ing ` +
+        `"Tool use with a response mime type is unsupported", the fix is ` +
+        `jsonResponse:false on its getter + tolerant text-parse on its consumer.`
+    );
+  }
+
   return genAI.getGenerativeModel({
     model: modelName,
     ...(tools ? { tools } : {}),

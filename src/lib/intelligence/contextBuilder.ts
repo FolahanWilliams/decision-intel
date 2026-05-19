@@ -153,7 +153,13 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
 
       // 2. Research: find papers for each detected bias type
       biasTypes.length > 0
-        ? utilTimeout(() => findResearchForBiases(biasTypes, 2), 25_000, 'Research lookup timeout')
+        ? // friction discipline (per the friction-#4 non-fatal-enrichment lock):
+          // research is prompt-context enrichment, NEVER feeds numeric DQI, and
+          // Semantic Scholar's free tier 429s chronically (research=0 is the
+          // reliable outcome). A 25s critical-path ceiling on a reliably-failing
+          // non-fatal lookup = ~25s of dead demo time every audit. Bound it
+          // tight: it either resolves fast or is correctly abandoned.
+          utilTimeout(() => findResearchForBiases(biasTypes, 2), 6_000, 'Research lookup timeout')
         : Promise.resolve({} as Record<string, ResearchPaper[]>),
 
       // 3. Case studies: match by bias pattern + industry
