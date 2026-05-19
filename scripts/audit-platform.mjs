@@ -707,8 +707,11 @@ function checkDeletedReferences(files) {
 // 2026-05-11 audit found WelcomeModal had stayed on the pre-v3.5 broad role
 // taxonomy (cso / ma / bizops / pe_vc / other) for ~7 days after v3.5
 // shipped the HXC narrowing (fractional_cso / midmarket_corp_dev /
-// smaller_fund_gp / pe_backed_founder / other → waitlist) in PHASE_1_PERSONAS
-// at src/lib/constants/icp.ts.
+// smaller_fund_gp / pe_backed_founder / other) in PHASE_1_PERSONAS at
+// src/lib/constants/icp.ts. ("other" is full-access + generic overview,
+// cohort-tagged out of Vohra — NOT waitlisted; access-policy amended
+// 2026-05-19. This check verifies HXC-persona references in gate files;
+// it does not assert any waitlist behaviour.)
 //
 // The fix shape: for any file that LIVES IN an onboarding / welcome /
 // sign-up directory AND defines a role/persona taxonomy (enum, array of

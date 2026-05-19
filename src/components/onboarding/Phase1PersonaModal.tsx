@@ -16,18 +16,20 @@
  * next dashboard visit.
  *
  * Captures one of the four HXC personas (fractional CSO / mid-market Corp Dev /
- * smaller-fund GP / PE-backed founder) OR "other" for waitlist routing.
+ * smaller-fund GP / PE-backed founder) OR "other" (FULL platform access with
+ * the generic overview — cohort-tagged out of the Vohra measurement, NOT
+ * access-gated).
  *
- * Why the HXC gate exists at all: the Vohra "very disappointed" PMF metric is
- * meaningful ONLY on the HXC cohort. Without persona gating, the score gets
- * diluted by non-buyer-class users (e.g., junior analysts trialing on a
- * personal card) and the Phase 1 graduation gate becomes noise. Strict ICP
- * gating in Phase 1 is mitigation #1 for the Continuity Chasm risk surfaced
- * in the cross-source synthesis.
+ * Why the HXC COHORT TAG exists at all: the Vohra "very disappointed" PMF
+ * metric is meaningful ONLY on the HXC cohort. Without cohort tagging the
+ * score gets diluted by non-buyer-class users (e.g. junior analysts trialing
+ * on a personal card) and the Phase 1 graduation gate becomes noise. This is
+ * mitigation #1 for the Continuity Chasm risk in the cross-source synthesis.
+ * It is SIGNAL INTEGRITY, not an access restriction — "other" gets in fully.
  *
- * The "other" path captures the role free-text and surfaces a friendly waitlist
- * card — DI is currently optimised for the four roles above; we'll reach out
- * when the platform extends to the user's use case.
+ * The "other" path captures the optional role free-text and enters the app
+ * with full access. The four roles are the marketed COLD-CONTEXT wedge;
+ * warm / referral traffic gets the generic overview + every feature.
  *
  * SAFE TO DELETE once production user count with phase1Persona=null is zero.
  * Run: SELECT COUNT(*) FROM "UserSettings" WHERE "onboardingCompleted" = true
@@ -54,7 +56,6 @@ export function Phase1PersonaModal() {
   const [selected, setSelected] = useState<Phase1PersonaId | null>(null);
   const [otherRoleDetail, setOtherRoleDetail] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState<'pick' | 'other_thanks'>('pick');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -100,12 +101,10 @@ export function Phase1PersonaModal() {
 
   const handleConfirm = async () => {
     if (!selected) return;
-    if (selected === 'other') {
-      await persist('other', otherRoleDetail.trim());
-      setStep('other_thanks');
-      return;
-    }
-    await persist(selected);
+    // 'other' gets FULL access like every persona — persist (the server tags
+    // phase1HxcEligible=false for Vohra-cohort integrity, NOT an access gate)
+    // and enter the app. No waitlist interstitial. Mirrors WelcomeModal.
+    await persist(selected, selected === 'other' ? otherRoleDetail.trim() : undefined);
     setOpen(false);
   };
 
@@ -126,8 +125,7 @@ export function Phase1PersonaModal() {
       }}
     >
       <DialogContent className="sm:max-w-lg">
-        {step === 'pick' ? (
-          <>
+        <>
             <DialogHeader>
               <DialogTitle>Which of these best describes your work?</DialogTitle>
               <DialogDescription>
@@ -275,31 +273,7 @@ export function Phase1PersonaModal() {
                 {submitting ? 'Saving…' : 'Continue'}
               </Button>
             </DialogFooter>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle>Thanks — we&apos;ll keep you posted.</DialogTitle>
-              <DialogDescription>
-                Decision Intel is currently optimised for fractional CSOs, mid-market Heads of Corp
-                Dev, GPs at smaller funds, and PE-backed founders. You&apos;ll still be able to use
-                the platform, but the Phase 1 experience may not be tuned for your use case yet.
-                We&apos;ll reach out when the platform extends.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                onClick={() => setOpen(false)}
-                style={{
-                  background: 'var(--accent-primary)',
-                  color: '#FFFFFF',
-                }}
-              >
-                Got it
-              </Button>
-            </DialogFooter>
-          </>
-        )}
+        </>
       </DialogContent>
     </Dialog>
   );

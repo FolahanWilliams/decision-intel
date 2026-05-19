@@ -674,13 +674,19 @@ export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
     id: 'other',
     label: 'Other (tell us your role)',
     description:
-      'Decision Intel is currently optimised for the four roles above. If your role is different, we will reach out when the platform extends to your use case.',
+      'Full platform access with the generic reasoning-audit overview — every feature, no gate. The four roles above are the marketed COLD-CONTEXT wedge, not an access wall: warm / referral traffic (founders trying it, potential referrers) gets in fully.',
+    // hxcEligible:false is LOAD-BEARING and intentionally UNCHANGED. It is a
+    // COHORT discriminator, not an access gate — it excludes this persona from
+    // the Vohra >=40% HXC graduation-gate measurement so the v3.5 wedge PMF
+    // signal stays uncontaminated. Access != cohort. Do NOT flip this to true
+    // to "let them in" — they are already fully in; flipping it would pollute
+    // the graduation metric.
     hxcEligible: false,
     graduationPath:
-      'No graduation path during Phase 1; sign-up captured for waitlist only. Auto-redirect to a "thank you, we will reach out" page.',
+      'No HXC graduation path — excluded from the Vohra graduation-gate cohort by hxcEligible:false (signal-integrity, not an access restriction). Platform access is unrestricted.',
     preferredSpecimen: 'either',
-    budgetSignal: 'Out of scope for Phase 1.',
-    dealVolumeSignal: 'Out of scope for Phase 1.',
+    budgetSignal: 'Not part of the Phase 1 buyer-wedge cohort (full platform access regardless).',
+    dealVolumeSignal: 'Not part of the Phase 1 buyer-wedge cohort (full platform access regardless).',
   },
 ];
 

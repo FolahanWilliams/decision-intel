@@ -9,9 +9,11 @@ const log = createLogger('OnboardingRoute');
 
 const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'other'] as const;
 
-// GTM v3.5 — Phase 1 buyer-class-continuous persona gating.
-// 'other' is captured for waitlist routing; the four continuous personas
-// are HXC-eligible.
+// GTM v3.5 — Phase 1 buyer-class-continuous persona COHORT tagging (not an
+// access gate). 'other' gets FULL platform access with the generic overview;
+// it is tagged phase1HxcEligible=false so it is EXCLUDED from the Vohra
+// graduation-gate cohort (signal integrity), NOT from the platform. The four
+// continuous personas are HXC-eligible. Access != cohort.
 const PHASE_1_PERSONA_VALUES = [
   'fractional_cso',
   'midmarket_corp_dev',

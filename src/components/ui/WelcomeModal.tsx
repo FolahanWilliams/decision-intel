@@ -50,7 +50,7 @@ interface WelcomeModalProps {
  *   midmarket_corp_dev → Briefcase  (deal-flow operator)
  *   smaller_fund_gp    → Landmark   (institutional capital allocator)
  *   pe_backed_founder  → Building2  (operating CEO inside a portfolio company)
- *   other              → Users      (waitlist / catch-all)
+ *   other              → Users      (generic / catch-all — FULL access, not gated)
  */
 const PERSONA_ICON: Record<Phase1PersonaId, typeof Compass> = {
   fractional_cso: Compass,
@@ -112,9 +112,13 @@ const VALUE_PROPS_BY_PERSONA: Record<
     ],
   },
   other: {
-    eyebrow: 'Decision Intel is currently optimised for four roles',
-    headline: "Tell us your role — we'll reach out when the platform extends to it.",
-    bullets: [],
+    eyebrow: 'The reasoning audit platform',
+    headline: 'Audit any strategic decision in 60 seconds. Full access, every feature.',
+    bullets: [
+      '22-bias R²F detection on any memo, board deck, or strategy doc, with the exact passages flagged',
+      'A hashed, tamper-evident Decision Provenance Record on every audit',
+      'Your Decision Knowledge Graph compounds across every decision your team makes',
+    ],
   },
 };
 
@@ -123,7 +127,6 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   const [open, setOpen] = useState(false);
   const [selectedPersona, setSelectedPersona] = useState<Phase1PersonaId | null>(null);
   const [otherRoleDetail, setOtherRoleDetail] = useState('');
-  const [step, setStep] = useState<'pick' | 'other_thanks'>('pick');
   const [loadingSample, setLoadingSample] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
 
@@ -192,21 +195,6 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
     [onClose, otherRoleDetail, persistState, selectedPersona]
   );
 
-  const handleOtherSubmit = useCallback(() => {
-    if (selectedPersona !== 'other') return;
-    // Persist with phase1Persona='other' + the free-text role detail, then
-    // surface the friendly waitlist confirmation. We mark onboardingCompleted
-    // here so the modal never re-fires for this user, even though they didn't
-    // pick a HXC persona — the waitlist IS their onboarding completion.
-    localStorage.setItem(STORAGE_KEY, 'true');
-    persistState({
-      onboardingCompleted: true,
-      phase1Persona: 'other',
-      phase1PersonaRoleDetail: otherRoleDetail.trim().slice(0, 200),
-    });
-    setStep('other_thanks');
-  }, [otherRoleDetail, persistState, selectedPersona]);
-
   const handleTrySample = useCallback(async () => {
     setLoadingSample(true);
     setSampleError(null);
@@ -262,8 +250,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
         className="sm:max-w-[950px] p-0 overflow-hidden bg-[var(--bg-primary)] shadow-2xl rounded-2xl"
         showCloseButton
       >
-        {step === 'pick' ? (
-          <div className="flex flex-col md:grid md:grid-cols-2 min-h-[600px] animate-in fade-in duration-300">
+        <div className="flex flex-col md:grid md:grid-cols-2 min-h-[600px] animate-in fade-in duration-300">
             {/* LEFT COLUMN: Header & Personas */}
             <div className="p-6 sm:p-10 flex flex-col overflow-y-auto">
               <DialogHeader className="mb-6 text-left">
@@ -339,7 +326,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   </div>
                 )}
 
-                {valueProp && !isOther && (
+                {valueProp && (
                   <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500">
                     <div className="mb-8 mt-4">
                       <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-3">
@@ -356,6 +343,22 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                         ))}
                       </ul>
                     </div>
+
+                    {isOther && (
+                      <label className="flex flex-col gap-2 mb-6">
+                        <span className="text-[var(--fs-sm)] font-medium text-[var(--text-secondary)]">
+                          Optional — your role, so we can sharpen the experience for people like
+                          you:
+                        </span>
+                        <input
+                          type="text"
+                          value={otherRoleDetail}
+                          onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
+                          placeholder="e.g. Risk officer at a Tier-1 bank"
+                          className="w-full p-4 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-md)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all shadow-inner"
+                        />
+                      </label>
+                    )}
 
                     <div className="mt-auto pt-8 border-t border-[var(--border-color)]">
                       <div className="flex flex-col gap-3">
@@ -451,63 +454,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   </div>
                 )}
 
-                {/* "Other" path: inline waitlist capture */}
-                {isOther && (
-                  <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 justify-center">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-3">
-                      {VALUE_PROPS_BY_PERSONA.other.eyebrow}
-                    </div>
-                    <div className="text-xl font-semibold text-[var(--text-primary)] leading-tight mb-6">
-                      {VALUE_PROPS_BY_PERSONA.other.headline}
-                    </div>
-                    <label className="flex flex-col gap-2">
-                      <span className="text-[var(--fs-sm)] font-medium text-[var(--text-secondary)]">
-                        Your role (we&apos;ll keep you posted as the platform extends):
-                      </span>
-                      <input
-                        type="text"
-                        value={otherRoleDetail}
-                        onChange={e => setOtherRoleDetail(e.target.value.slice(0, 200))}
-                        placeholder="e.g. Risk officer at a Tier-1 bank"
-                        className="w-full p-4 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-[var(--fs-md)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-all shadow-inner"
-                      />
-                    </label>
-                    <button
-                      onClick={handleOtherSubmit}
-                      className="mt-6 w-full py-4 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-md)] font-semibold active:scale-[0.98] hover:shadow-lg"
-                    >
-                      Add me to the waitlist
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
-        ) : (
-          <div className="flex flex-col animate-in fade-in slide-in-from-bottom-2 duration-300 p-6 sm:p-10">
-            <DialogHeader className="mb-2">
-              {headerIcon}
-              <DialogTitle className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-                Thanks — we&apos;ll keep you posted.
-              </DialogTitle>
-              <DialogDescription className="text-[var(--fs-sm)] text-[var(--text-secondary)] leading-relaxed mt-2">
-                Decision Intel is currently optimised for fractional CSOs, mid-market Heads of Corp
-                Dev, GPs at smaller funds, and PE-backed founders. You&apos;ll still be able to use
-                the platform, but the Phase 1 experience may not be tuned for your use case yet.
-                We&apos;ll reach out when the platform extends.
-              </DialogDescription>
-            </DialogHeader>
-            <button
-              onClick={() => {
-                setOpen(false);
-                onClose();
-              }}
-              className="mt-6 w-full py-3 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] transition-all duration-300 border border-[var(--accent-primary)] rounded-xl text-white text-[var(--fs-sm)] font-semibold hover:shadow-lg active:scale-[0.98]"
-            >
-              Got it
-            </button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

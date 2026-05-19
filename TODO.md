@@ -61,6 +61,12 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-05-19)
+
+Meta Judge P0 + demo-hardening sweep (commits `2e570aa8` + `55420f24`): grounded+JSON-mime 400 on gemini-2.5-pro killed the metaJudge on every audit (masked by the 200+fallback) — fixed scoped, grep-verified zero-DQI. Plus scholar dead-time 25s→6s + retry-storm 3→1 + grounded+JSON-mime observability guard.
+
+Onboarding access amendment (founder-directed, "boil the ocean") — full prose in CLAUDE.md "WelcomeModal v3.5 HXC-first merge → AMENDMENT 2026-05-19". `Other`/non-wedge sign-ups NO LONGER waitlisted: they get FULL platform access + a real generic-overview value-prop, via the SAME completion flow as HXC personas. `WelcomeModal` + legacy `Phase1PersonaModal` collapsed (deleted `handleOtherSubmit` / `other_thanks` step / `step` machine). `hxcEligible:false` tag UNCHANGED (cohort discriminator preserving Vohra ≥40%-HXC graduation integrity — access ≠ cohort; the strategy/wedge/Vohra gate are all unchanged). Lockstep cascade: icp.ts + onboarding-route comment + founder-context.ts (5 chat-coaching clauses) + CLAUDE.md (4 clause fixes + dated amendment) + audit-platform comment. No migration (plumbing was already correct). tsc clean.
+
 ## Recently Completed (2026-05-18)
 
 Cognitive-entrenchment wedge asset — the one net-new signal extracted from the external Grok corp-dev/M&A market-research eval (its "evolve to Deal Lifecycle Orchestrator / narrowness is a weakness" headline was evaluated and rejected as the incumbent graveyard). Full prose in CLAUDE.md "Cognitive-entrenchment wedge asset (locked 2026-05-18)".
