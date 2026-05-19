@@ -53,6 +53,7 @@ import { FounderHubMap } from './start-here/FounderHubMap';
 import { JourneySelector } from './start-here/JourneySelector';
 import { JourneyDetailStrip } from './start-here/JourneyDetailStrip';
 import { VohraHxcPmfTile } from './start-here/VohraHxcPmfTile';
+import { NonWedgeRolesTile } from './start-here/NonWedgeRolesTile';
 import { ThreeLayerModel } from './path-to-100m/ThreeLayerModel';
 import { JOURNEYS, NODES, type Journey, type TabId } from './start-here/founder-hub-map-data';
 
@@ -196,6 +197,10 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           each morning. /api/founder-hub/metrics endpoint shipped
           2026-05-04 with all the underlying data. */}
       <VohraHxcPmfTile onNavigateToMetrics={() => onNavigateToTab('metrics')} />
+      {/* Non-wedge sign-ups discovery tile (locked 2026-05-19, follow-up to
+          the access-amendment). Self-hides when totalNonWedge=0 so it never
+          renders noise pre-launch. Reads /api/founder-hub/non-wedge-roles. */}
+      <NonWedgeRolesTile />
       {renderPositioningAnchor()}
       {/* 3-Layer architectural frame — promoted to Start Here 2026-05-10
           (founder ask: "add the three layer frame to my founder's hub.
