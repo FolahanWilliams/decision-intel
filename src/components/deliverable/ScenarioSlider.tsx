@@ -17,7 +17,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ArrowUp, Check } from 'lucide-react';
 import type { CounterfactualScenario } from '@/lib/deliverable/types';
 import { gradeFromScore, dqiColorFor } from '@/lib/utils/grade';
@@ -25,10 +25,19 @@ import { gradeFromScore, dqiColorFor } from '@/lib/utils/grade';
 interface ScenarioSliderProps {
   currentDqi: number;
   scenarios: CounterfactualScenario[];
+  /** Optional callback so a parent can subscribe to the enabled set
+   *  for chart syncing. The CounterfactualLiftChart is the canonical
+   *  consumer — it visualizes which bars fill as the user toggles. */
+  onEnabledChange?: (enabled: Set<string>) => void;
 }
 
-export function ScenarioSlider({ currentDqi, scenarios }: ScenarioSliderProps) {
+export function ScenarioSlider({ currentDqi, scenarios, onEnabledChange }: ScenarioSliderProps) {
   const [enabled, setEnabled] = useState<Set<string>>(new Set());
+
+  // Notify parent on every change (chart sync)
+  useEffect(() => {
+    onEnabledChange?.(enabled);
+  }, [enabled, onEnabledChange]);
 
   const projectedDqi = useMemo(() => {
     const liftSum = scenarios.reduce(

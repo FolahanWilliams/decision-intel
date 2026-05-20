@@ -12,10 +12,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Hash, Cpu, Layers, Library, ShieldCheck, ExternalLink } from 'lucide-react';
+import { Hash, Cpu, ShieldCheck, ExternalLink } from 'lucide-react';
 import type { ProvenanceBucket as ProvenanceBucketType } from '@/lib/deliverable/types';
 import { ActionTitle } from '../ActionTitle';
 import { ProgressiveDrawer } from '../ProgressiveDrawer';
+import { CalibrationBaselineChart } from '../charts/CalibrationBaselineChart';
+import { RegulatoryFrameworkHeatmap } from '../charts/RegulatoryFrameworkHeatmap';
 
 interface ProvenanceBucketProps {
   bucket: ProvenanceBucketType;
@@ -28,11 +30,20 @@ export function ProvenanceBucket({ bucket }: ProvenanceBucketProps) {
     <section style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <ActionTitle eyebrow="How we know">{bucket.actionTitle}</ActionTitle>
 
-      {/* 3-card row — methodology, corpus calibration, audit trail */}
+      {/* Visual: Tetlock-band calibration chart — positions our Brier
+          against published forecasting benchmarks. */}
+      <CalibrationBaselineChart
+        meanBrier={bucket.calibrationBaseline.meanBrier}
+        sampleSize={bucket.calibrationBaseline.sampleSize}
+        classificationAccuracy={bucket.calibrationBaseline.classificationAccuracy}
+      />
+
+      {/* Methodology + audit-trail strip (2 cards instead of 3 — the
+          calibration card was replaced by the chart above). */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           gap: 12,
         }}
       >
@@ -43,12 +54,6 @@ export function ProvenanceBucket({ bucket }: ProvenanceBucketProps) {
           body={`${bucket.pipelineNodeCount}-node pipeline · ${bucket.matrixDimension}×${bucket.matrixDimension} interaction matrix`}
         />
         <ProvenanceCard
-          icon={<Library size={14} />}
-          eyebrow="Calibration baseline"
-          headline={`Brier ${bucket.calibrationBaseline.meanBrier.toFixed(3)}`}
-          body={`${bucket.calibrationBaseline.sampleSize}-decision reference corpus · ${Math.round(bucket.calibrationBaseline.classificationAccuracy * 100)}% classification accuracy`}
-        />
-        <ProvenanceCard
           icon={<Hash size={14} />}
           eyebrow="Audit trail"
           headline={bucket.auditHashPrefix}
@@ -57,57 +62,9 @@ export function ProvenanceBucket({ bucket }: ProvenanceBucketProps) {
         />
       </div>
 
-      {/* Regulatory frameworks strip */}
+      {/* Visual: regulatory framework regional heatmap. */}
       {bucket.regulatoryFrameworks.length > 0 ? (
-        <div
-          style={{
-            background: 'var(--bg-card, #FFFFFF)',
-            border: '1px solid var(--border-color, #E2E8F0)',
-            borderRadius: 10,
-            padding: '12px 16px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              color: 'var(--text-muted, #64748B)',
-              marginBottom: 8,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <Layers size={11} />
-            Regulatory frameworks mapped
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {bucket.regulatoryFrameworks.map(f => (
-              <span
-                key={f.id}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  padding: '4px 10px',
-                  background: 'var(--bg-secondary, #F8FAFC)',
-                  border: '1px solid var(--border-color, #E2E8F0)',
-                  borderRadius: 999,
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: 'var(--text-secondary, #475569)',
-                }}
-              >
-                {f.label}
-                <span style={{ color: 'var(--text-muted, #64748B)', fontSize: 10.5 }}>
-                  {f.region}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
+        <RegulatoryFrameworkHeatmap frameworks={bucket.regulatoryFrameworks} />
       ) : null}
 
       {/* Claim verifications — drawer trigger when present */}

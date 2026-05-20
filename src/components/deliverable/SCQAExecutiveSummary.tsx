@@ -15,8 +15,8 @@
 
 import { ShieldCheck } from 'lucide-react';
 import type { SCQAExecutiveSummary as SCQAType } from '@/lib/deliverable/types';
-import { dqiColorFor } from '@/lib/utils/grade';
 import { ActionTitle } from './ActionTitle';
+import { DqiRadialGauge } from './charts/DqiRadialGauge';
 
 interface SCQAExecutiveSummaryProps {
   cover: SCQAType;
@@ -33,9 +33,6 @@ export function SCQAExecutiveSummary({
   primaryCta,
   eyebrow = 'Audit deliverable',
 }: SCQAExecutiveSummaryProps) {
-  const score = Math.round(cover.dqi.score);
-  const color = dqiColorFor(cover.dqi.score);
-
   return (
     <section
       style={{
@@ -49,13 +46,13 @@ export function SCQAExecutiveSummary({
         gap: 20,
       }}
     >
-      {/* Top row — action title + DQI gauge */}
+      {/* Top row — action title + real radial DQI gauge */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1fr) auto',
           gap: 24,
-          alignItems: 'flex-start',
+          alignItems: 'center',
         }}
         className="scqa-top-row"
       >
@@ -63,59 +60,10 @@ export function SCQAExecutiveSummary({
           {cover.actionTitle}
         </ActionTitle>
 
-        {/* DQI Gauge — replaces the prior badge with a 92×92 circular
-            score + grade ring. The color band wraps the gauge edge so
-            the reader sees severity even when score is unread. */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 4,
-            minWidth: 100,
-          }}
-        >
-          <div
-            style={{
-              position: 'relative',
-              width: 96,
-              height: 96,
-              borderRadius: '50%',
-              background: 'var(--bg-card, #FFFFFF)',
-              border: `4px solid ${color}`,
-              boxShadow: `0 0 0 1px ${color}33`,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontSize: 28,
-                fontWeight: 800,
-                color,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.025em',
-                lineHeight: 1,
-              }}
-            >
-              {score}
-            </div>
-            <div
-              style={{
-                fontSize: 9.5,
-                color: 'var(--text-muted, #64748B)',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-                marginTop: 2,
-              }}
-            >
-              DQI · {cover.dqi.grade}
-            </div>
-          </div>
-        </div>
+        {/* Real radial-arc DQI gauge — score plotted along a 270° arc
+            with severity bands as the track background. Replaces the
+            prior circle-with-a-number per the 2026-05-20 visual rebuild. */}
+        <DqiRadialGauge score={cover.dqi.score} size={180} />
       </div>
 
       {/* SCQA 4-line grid — the Pyramid apex narrative */}

@@ -22,6 +22,7 @@ import { ActionTitle } from '../ActionTitle';
 import { FindingCard } from '../FindingCard';
 import { ProgressiveDrawer } from '../ProgressiveDrawer';
 import { ValueSuppressingPalette } from '../ValueSuppressingPalette';
+import { BiasSeverityScatter } from '../charts/BiasSeverityScatter';
 
 interface ReasoningRisksBucketProps {
   bucket: ReasoningRisksBucketType;
@@ -44,6 +45,10 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
       <ActionTitle eyebrow="What the audit found" accessory={<CountStrip bucket={bucket} />}>
         {bucket.actionTitle}
       </ActionTitle>
+
+      {/* Visual: severity × confidence scatter — interactive, click a
+          bubble to open the same drawer as the cards below. */}
+      <BiasSeverityScatter findings={bucket.findings} onSelect={f => setActive(f)} />
 
       <div
         className="deliverable-finding-grid"

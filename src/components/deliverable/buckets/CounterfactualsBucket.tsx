@@ -10,16 +10,21 @@
 
 'use client';
 
+import { useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import type { CounterfactualsBucket as CounterfactualsBucketType } from '@/lib/deliverable/types';
 import { ActionTitle } from '../ActionTitle';
 import { ScenarioSlider } from '../ScenarioSlider';
+import { CounterfactualLiftChart } from '../charts/CounterfactualLiftChart';
 
 interface CounterfactualsBucketProps {
   bucket: CounterfactualsBucketType;
 }
 
 export function CounterfactualsBucket({ bucket }: CounterfactualsBucketProps) {
+  // Lifted state — slider toggles drive the chart fill in real time
+  const [enabledIds, setEnabledIds] = useState<Set<string>>(new Set());
+
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <ActionTitle
@@ -42,7 +47,21 @@ export function CounterfactualsBucket({ bucket }: CounterfactualsBucketProps) {
         {bucket.actionTitle}
       </ActionTitle>
 
-      <ScenarioSlider currentDqi={bucket.currentDqi} scenarios={bucket.scenarios} />
+      {/* Visual: per-scenario lift bar chart, synced with the
+          toggles below via the lifted enabledIds state. */}
+      {bucket.scenarios.length > 0 ? (
+        <CounterfactualLiftChart
+          currentDqi={bucket.currentDqi}
+          scenarios={bucket.scenarios}
+          enabledIds={enabledIds}
+        />
+      ) : null}
+
+      <ScenarioSlider
+        currentDqi={bucket.currentDqi}
+        scenarios={bucket.scenarios}
+        onEnabledChange={setEnabledIds}
+      />
 
       {bucket.inversionFailureModes.length > 0 ? (
         <div

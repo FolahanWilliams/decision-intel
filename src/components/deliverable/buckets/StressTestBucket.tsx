@@ -22,6 +22,7 @@ import type {
 import { ActionTitle } from '../ActionTitle';
 import { ComparativeMatrix } from '../ComparativeMatrix';
 import { ProgressiveDrawer } from '../ProgressiveDrawer';
+import { BoardroomVerdictChart } from '../charts/BoardroomVerdictChart';
 
 interface StressTestBucketProps {
   bucket: StressTestBucketType;
@@ -116,6 +117,9 @@ export function StressTestBucket({ bucket, density = 'standard' }: StressTestBuc
       <ActionTitle eyebrow="How the room will react" accessory={<VerdictStrip bucket={bucket} />}>
         {bucket.actionTitle}
       </ActionTitle>
+
+      {/* Visual: donut of vote distribution + red-team load side panel. */}
+      <BoardroomVerdictChart counts={bucket.counts} overallVerdict={bucket.overallVerdict} />
 
       <ComparativeMatrix
         columns={columns}

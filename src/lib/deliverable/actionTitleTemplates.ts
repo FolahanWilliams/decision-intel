@@ -400,8 +400,16 @@ export function scqaQuestion(): string {
 }
 
 export function scqaAnswer(input: SCQATemplateInput): string {
-  if (input.criticalRisks > 0 && input.topMitigation) {
-    return `Revise before committee — address ${shortLabel(input.topMitigation, 6)} first.`;
+  // FIX 2026-05-20: previous version called `shortLabel(input.topMitigation, 6)`
+  // and inlined the truncated mitigation suggestion. This produced cut-off
+  // fragments like "address The Board should demand a 'Base first." that
+  // read as broken English. The Answer line is too important to truncate
+  // mid-sentence. Now we reference the top concern by NAME instead.
+  if (input.criticalRisks > 0 && input.topConcern) {
+    return `Revise before committee — address ${shortLabel(input.topConcern, 4)} first.`;
+  }
+  if (input.criticalRisks > 0) {
+    return 'Revise before committee — close the critical-severity findings first.';
   }
   if (input.totalRisks > 0) {
     return 'Advance with documented mitigations for the surfaced risks.';
