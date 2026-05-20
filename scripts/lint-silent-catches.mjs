@@ -183,7 +183,14 @@ const SCAN_DIR = join(ROOT, 'src');
 // the prospects API routes (POST + PATCH) + 3 res.json() in
 // ConversionLedgerPanel (load/transition/submitAdd); each annotated
 // inline, no delivery/audit/flywheel path swallowed.
-const SILENT_CATCH_BASELINE = 193;
+// → 195 (Universal Audit Deliverable · 2026-05-20): +2 ALL canonical
+// req.json()/res.json() body-parse exception class — 1 req.json() in
+// /api/audit/action-titles (body parse on the LLM endpoint) + 1
+// res.json() in DemoDeliverableHost (LLM action-title response parse
+// with deterministic fallback). Both annotated inline; the deliverable
+// always renders deterministic templates first — no delivery/audit/
+// flywheel path swallowed.
+const SILENT_CATCH_BASELINE = 195;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

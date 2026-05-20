@@ -70,6 +70,10 @@ import { ReferenceClassChip } from '@/components/documents/ReferenceClassChip';
 import { PaperApplicationsCard } from '@/components/analysis/PaperApplicationsCard';
 import { RemediationChecklist } from '@/components/analysis/RemediationChecklist';
 import { VerdictBand } from '@/components/documents/detail/VerdictBand';
+import { AuditDeliverable } from '@/components/deliverable/AuditDeliverable';
+import { ViewModeToggle, type InProductViewMode } from '@/components/deliverable/ViewModeToggle';
+import { buildAuditDeliverable } from '@/lib/deliverable/buildAuditDeliverable';
+import type { AnalysisResult } from '@/types';
 import { SovereignContextStrip } from '@/components/documents/detail/SovereignContextStrip';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { VersionHistoryStrip } from '@/components/analysis/VersionHistoryStrip';
@@ -236,6 +240,20 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<DocDetailTab>('findings');
+  // View mode — Executive (deliverable) default, Analyst preserves the
+  // legacy tabbed layout. Locked 2026-05-20 from the Deep Research
+  // synthesis (cross-context format calibration). Persisted in
+  // localStorage so the user's choice survives navigation.
+  const [viewMode, setViewMode] = useState<InProductViewMode>(() => {
+    if (typeof window === 'undefined') return 'executive';
+    const stored = window.localStorage.getItem('di-doc-view-mode-v2');
+    return stored === 'analyst' ? 'analyst' : 'executive';
+  });
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('di-doc-view-mode-v2', viewMode);
+    }
+  }, [viewMode]);
   const [activeBiasId, setActiveBiasId] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -762,6 +780,23 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
     </>
   );
 
+  /* AuditDeliverable composition — Executive view replaces the tabbed
+     Analyst layout when viewMode === 'executive'. Same underlying
+     AnalysisResult feeds both views (deliverable = composed MECE
+     buckets + action titles; analyst = the legacy 5-tab structure).
+     Per the 2026-05-20 universal-deliverable lock. */
+  const executiveDeliverable =
+    analysis && viewMode === 'executive'
+      ? buildAuditDeliverable(analysis as unknown as AnalysisResult, {
+          documentId: document.id,
+          analysisId: analysis.id,
+        })
+      : null;
+
+  const viewModeToggleEl = analysis ? (
+    <ViewModeToggle value={viewMode} onChange={setViewMode} />
+  ) : null;
+
   return (
     <>
       <DocumentDetailShell
@@ -780,24 +815,24 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         onTabChange={handleTabChange}
         activeBiasId={activeBiasId}
         leftPane={leftPane}
-        rightPaneContent={tabBody}
+        viewModeToggle={viewModeToggleEl}
+        hideTabBar={viewMode === 'executive'}
+        rightPaneContent={
+          executiveDeliverable ? (
+            <ErrorBoundary sectionName="Executive deliverable">
+              <AuditDeliverable deliverable={executiveDeliverable} mode="executive" />
+            </ErrorBoundary>
+          ) : (
+            tabBody
+          )
+        }
         rightPaneAboveTabs={
-          analysis ? (
+          analysis && viewMode === 'analyst' ? (
             /* Persona-validated above-fold cluster (DESIGN.md universal
-               points #1, #2, #9 + Item 1 lock 2026-05-07):
-                 1. VerdictBand — status pill + adversarial verdict +
-                    cross-doc conflict chip (deal context) + monospace
-                    audit metadata strip (SHA-256 + methodology version
-                    + audit log link).
-                 2. RemediationChecklist — Top-3 Fix Tiles, sorted by
-                    severity × confidence with verbs (Fix / Address /
-                    Review).
-                 3. PaperApplicationsCard — R²F Signal Strip with
-                    plain-language eyebrows (Validity / Outside View /
-                    Author Calibration). Stays visible regardless of
-                    which tab is active so the procurement-grade signal
-                    surface doesn't get hidden behind a tab swap.
-            */
+               points #1, #2, #9 + Item 1 lock 2026-05-07).
+               Executive mode swaps this entire cluster for the
+               AuditDeliverable cover + 5 MECE buckets. Analyst mode
+               preserves the legacy layout verbatim. */
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <ErrorBoundary sectionName="Verdict band">
                 <VerdictBand
@@ -820,12 +855,6 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   <RemediationChecklist biases={biases} documentId={document.id} />
                 </ErrorBoundary>
               )}
-              {/* Sovereign-context strip — Item A lock 2026-05-07 (Adaeze
-                  persona ask). Renders only when the audit picked up
-                  emerging-market jurisdictions; the data is already
-                  populated by the structuralAssumptions pipeline node.
-                  Renders null gracefully on developed-market deals so
-                  it's safe to mount unconditionally. */}
               <ErrorBoundary sectionName="Sovereign context">
                 <SovereignContextStrip
                   marketContext={marketContext}

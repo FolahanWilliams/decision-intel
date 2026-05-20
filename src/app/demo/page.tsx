@@ -32,7 +32,8 @@ import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiCompone
 import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
-import { PasteAuditResults } from '@/components/marketing/demo/PasteAuditResults';
+import { DemoDeliverableHost } from '@/components/marketing/demo/DemoDeliverableHost';
+import { parseTicketAmount } from '@/lib/deliverable/valueAtStake';
 import {
   DiscoveryGradeImpactCard,
   STATIC_DEMO_ANCHOR,
@@ -204,6 +205,14 @@ export default function DemoPage() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('pipeline');
   const [showAllBiases, setShowAllBiases] = useState(false);
+  // Optional ticket size for per-finding exposure math. When unset,
+  // the deliverable falls back to DQI-lift + base-rate framing (no
+  // fabricated dollar figures — honest math discipline).
+  const [ticketOpen, setTicketOpen] = useState(false);
+  const [ticketAmountInput, setTicketAmountInput] = useState('');
+  const [ticketCurrency, setTicketCurrency] = useState<'USD' | 'GBP' | 'EUR'>('USD');
+  // Parsed ticket amount in absolute units (accepts shorthand: "50M", "2.5B", "500K").
+  const ticketAmount = parseTicketAmount(ticketAmountInput);
   const [activePipelineNodeId, setActivePipelineNodeId] = useState<string | null>(null);
 
   const analysis = selectedIdx !== null ? DEMO_ANALYSES[selectedIdx] : null;
@@ -754,6 +763,31 @@ export default function DemoPage() {
                           ? `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} — trim ${(pasteWordCount - PASTE_MAX_WORDS).toLocaleString()}`
                           : `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} words`}
                   </span>
+                  {/* Optional ticket-size input. Closed by default; opens
+                      on click. When filled, the audit deliverable surfaces
+                      per-finding exposure (ticket × historical base rate).
+                      Empty → DQI-lift + base-rate framing on every card.
+                      Honest math discipline — no fabricated dollar
+                      figures when the ticket is absent. */}
+                  <button
+                    type="button"
+                    onClick={() => setTicketOpen(open => !open)}
+                    aria-expanded={ticketOpen}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: ticketOpen ? C.green : C.slate500,
+                      background: 'transparent',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {ticketOpen ? '−' : '+'} Optional: deal size for exposure
+                  </button>
                 </div>
                 <button
                   onClick={handlePasteAnalyze}
@@ -785,6 +819,74 @@ export default function DemoPage() {
                   Run the audit <ArrowRight size={14} />
                 </button>
               </div>
+
+              {ticketOpen && (
+                <div
+                  style={{
+                    marginTop: 12,
+                    padding: '12px 14px',
+                    background: C.slate50,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 10,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      color: C.slate600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    Deal size
+                  </span>
+                  <select
+                    value={ticketCurrency}
+                    onChange={e => setTicketCurrency(e.target.value as 'USD' | 'GBP' | 'EUR')}
+                    style={{
+                      padding: '6px 8px',
+                      borderRadius: 6,
+                      border: `1px solid ${C.slate200}`,
+                      background: C.white,
+                      fontSize: 12.5,
+                      fontWeight: 600,
+                      color: C.slate900,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <option value="USD">USD ($)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="EUR">EUR (€)</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="e.g. 50M or 250000000"
+                    value={ticketAmountInput}
+                    onChange={e => setTicketAmountInput(e.target.value)}
+                    style={{
+                      flex: '1 1 200px',
+                      minWidth: 0,
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: `1px solid ${C.slate200}`,
+                      background: C.white,
+                      fontSize: 13,
+                      color: C.slate900,
+                      fontFamily: 'var(--font-mono, monospace)',
+                    }}
+                  />
+                  <span style={{ fontSize: 11.5, color: C.slate500, lineHeight: 1.5 }}>
+                    {ticketAmount !== null
+                      ? 'Exposure renders on every finding.'
+                      : 'Leave blank for DQI-lift framing instead.'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Cross-link: lighter-surface alternative */}
@@ -1088,14 +1190,27 @@ export default function DemoPage() {
         </SectionBand>
       )}
 
-      {/* Paste audit: wow-sequence result */}
+      {/* Paste audit: wow-sequence result — McKinsey-grade interactive
+          deliverable replaces the prior text-stack (locked 2026-05-20
+          from the Deep Research synthesis + the founder's "boil the
+          ocean" approval). MECE-structured: SCQA cover → 5 buckets
+          (reasoning risks / stress test / historical analogs /
+          counterfactuals / provenance). Each finding card opens a
+          progressive-disclosure drawer with the verbatim audit trail.
+          Per DR §9 cross-context calibration: /demo uses the 'demo'
+          mode (constrained, single CTA, no view toggle). */}
       {pasteAudit && !pasteAuditing && (
-        <SectionBand bg={C.slate50} borderTop paddingY={64} maxWidth={920}>
+        <SectionBand bg={C.slate50} borderTop paddingY={64} maxWidth={1180}>
           <div ref={resultsRef}>
-            <PasteAuditResults
+            <DemoDeliverableHost
               documentId={pasteAudit.documentId}
               analysisId={pasteAudit.analysisId}
               result={pasteAudit.result}
+              ticket={
+                ticketAmount !== null
+                  ? { amount: ticketAmount, currency: ticketCurrency }
+                  : undefined
+              }
             />
           </div>
         </SectionBand>

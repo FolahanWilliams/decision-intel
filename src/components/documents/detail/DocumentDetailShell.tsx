@@ -82,6 +82,15 @@ export interface DecisionDetailShellProps {
    *  Tiles + R²F signal strip) per DESIGN.md universal points #1 + #2.
    *  Item 1 lock 2026-05-07. */
   rightPaneAboveTabs?: ReactNode;
+  /** When true, the tab bar is fully suppressed and only
+   *  `rightPaneAboveTabs` + `rightPaneContent` render. Used by the
+   *  document-detail page when running in 'executive' view mode where
+   *  the AuditDeliverable replaces the tabbed Analyst layout per the
+   *  2026-05-20 universal-deliverable lock. */
+  hideTabBar?: boolean;
+  /** Optional view-mode toggle slot rendered to the right of the
+   *  header's primary action. The page owns the toggle state. */
+  viewModeToggle?: ReactNode;
   /** Whether the active surface supports inline preview. False renders the empty-preview placeholder. */
   hasPreview?: boolean;
   /** Settings drawer trigger — parent owns drawer state. */
@@ -156,6 +165,8 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
     leftPane,
     rightPaneContent,
     rightPaneAboveTabs,
+    hideTabBar = false,
+    viewModeToggle,
     hasPreview = true,
     onOpenSettings,
     outcomeStrip,
@@ -263,6 +274,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
             {primaryAction.label}
           </button>
         )}
+        {viewModeToggle ? <div style={{ marginLeft: 4 }}>{viewModeToggle}</div> : null}
       </header>
 
       {outcomeStrip && <div style={{ padding: '12px 24px 0' }}>{outcomeStrip}</div>}
@@ -336,108 +348,112 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
               pane reads as before-tab-bar with no extra spacing. */}
           {rightPaneAboveTabs && <div style={{ marginBottom: 16 }}>{rightPaneAboveTabs}</div>}
 
-          {/* Tab bar with corner settings gear */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '0 4px',
-              borderBottom: '1px solid var(--border-color)',
-              marginBottom: 18,
-            }}
-          >
-            {resolvedTabs.map(t => {
-              const active = t.id === activeTab;
-              const disabled = t.available === false;
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => !disabled && onTabChange(t.id)}
-                  title={disabled ? `${t.label} — no data on this surface yet.` : t.label}
-                  style={{
-                    padding: '10px 14px',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: active
-                      ? '2px solid var(--accent-primary)'
-                      : '2px solid transparent',
-                    marginBottom: -1,
-                    color: disabled
-                      ? 'var(--text-muted)'
-                      : active
-                        ? 'var(--text-primary)'
-                        : 'var(--text-secondary)',
-                    fontSize: 13,
-                    fontWeight: active ? 600 : 500,
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    opacity: disabled ? 0.55 : 1,
-                    transition: 'color 0.15s ease, border-color 0.15s ease',
-                    letterSpacing: '-0.005em',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                  onMouseEnter={e => {
-                    if (!active && !disabled) e.currentTarget.style.color = 'var(--text-primary)';
-                  }}
-                  onMouseLeave={e => {
-                    if (!active && !disabled) e.currentTarget.style.color = 'var(--text-secondary)';
-                  }}
-                >
-                  {t.label}
-                  {t.badge != null && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: '1px 6px',
-                        borderRadius: 999,
-                        background: active ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                        color: active ? '#fff' : 'var(--text-muted)',
-                        minWidth: 16,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {t.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-            <span style={{ flex: 1 }} />
-            <button
-              type="button"
-              onClick={onOpenSettings}
-              aria-label={settingsLabel}
-              title={settingsLabel}
+          {/* Tab bar with corner settings gear. Suppressed entirely
+              when `hideTabBar` is set (executive deliverable view). */}
+          {!hideTabBar && (
+            <div
               style={{
-                width: 28,
-                height: 28,
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                borderRadius: 4,
-                transition: 'color 0.15s ease, background 0.15s ease',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = 'var(--text-primary)';
-                e.currentTarget.style.background = 'var(--bg-tertiary)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.background = 'transparent';
+                gap: 4,
+                padding: '0 4px',
+                borderBottom: '1px solid var(--border-color)',
+                marginBottom: 18,
               }}
             >
-              <SettingsIcon size={15} />
-            </button>
-          </div>
+              {resolvedTabs.map(t => {
+                const active = t.id === activeTab;
+                const disabled = t.available === false;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => !disabled && onTabChange(t.id)}
+                    title={disabled ? `${t.label} — no data on this surface yet.` : t.label}
+                    style={{
+                      padding: '10px 14px',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: active
+                        ? '2px solid var(--accent-primary)'
+                        : '2px solid transparent',
+                      marginBottom: -1,
+                      color: disabled
+                        ? 'var(--text-muted)'
+                        : active
+                          ? 'var(--text-primary)'
+                          : 'var(--text-secondary)',
+                      fontSize: 13,
+                      fontWeight: active ? 600 : 500,
+                      cursor: disabled ? 'not-allowed' : 'pointer',
+                      opacity: disabled ? 0.55 : 1,
+                      transition: 'color 0.15s ease, border-color 0.15s ease',
+                      letterSpacing: '-0.005em',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                    onMouseEnter={e => {
+                      if (!active && !disabled) e.currentTarget.style.color = 'var(--text-primary)';
+                    }}
+                    onMouseLeave={e => {
+                      if (!active && !disabled)
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                    }}
+                  >
+                    {t.label}
+                    {t.badge != null && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: '1px 6px',
+                          borderRadius: 999,
+                          background: active ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+                          color: active ? '#fff' : 'var(--text-muted)',
+                          minWidth: 16,
+                          textAlign: 'center',
+                        }}
+                      >
+                        {t.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+              <span style={{ flex: 1 }} />
+              <button
+                type="button"
+                onClick={onOpenSettings}
+                aria-label={settingsLabel}
+                title={settingsLabel}
+                style={{
+                  width: 28,
+                  height: 28,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  borderRadius: 4,
+                  transition: 'color 0.15s ease, background 0.15s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.background = 'var(--bg-tertiary)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                <SettingsIcon size={15} />
+              </button>
+            </div>
+          )}
 
           {/* Tab content */}
           <div
