@@ -1933,400 +1933,89 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     };
   }
 
-  // Load calibrated bias severity weights (behavioral data flywheel)
-  // Falls back to static defaults if no calibration exists
+  // riskScorerNode refactored 2026-05-20 — orchestration only. Each step
+  // lives as a typed helper in src/lib/scoring/risk-compiler.ts. The math
+  // + fallback paths + default values are byte-identical to the prior
+  // inline ~537-line implementation. The dqi-distribution-check.ts
+  // regression suite is the parity gate (same scores before + after).
+  const {
+    loadSeverityWeights,
+    loadCausalMultipliers,
+    computeBiasDeductions,
+    applyBayesianAdjustment,
+    calculateNoisePenalty,
+    calculateTrustPenalty,
+    calculateLogicPenalty,
+    calculateEchoChamberPenalty,
+    calculateOutcomeFeedbackAdjustment,
+    countCalibrationSamples,
+    composeOverallScore,
+    buildCalibrationInsight,
+  } = await import('@/lib/scoring/risk-compiler');
+
   const effectiveOrgId = state.orgId || null;
-  let severityWeights: Record<string, number> = {
-    low: 5,
-    medium: 15,
-    high: 30,
-    critical: 50,
-  };
 
-  try {
-    const { loadBiasSeverityWeights } = await import('@/lib/learning/feedback-loop');
-    severityWeights = await loadBiasSeverityWeights(effectiveOrgId, state.userId);
-    log.debug('Using calibrated bias severity weights');
-  } catch {
-    // feedback-loop module or CalibrationProfile table may not exist yet
-    log.debug('Using default bias severity weights (calibration unavailable)');
-  }
+  // Step 1 — load severity weights (calibrated or default fallback)
+  const severityWeights = await loadSeverityWeights(effectiveOrgId, state.userId);
 
-  // Load causal danger multipliers from org outcome data (Moat 1: Causal AI Layer)
-  // If a bias type is causally linked to poor outcomes, amplify its deduction.
-  // If a bias type is mostly benign, reduce its deduction.
-  let causalMultipliers: Map<string, number> = new Map();
-  let causalWeightsForReport: Array<{
-    biasType: string;
-    dangerMultiplier: number;
-    failureCount: number;
-    successCount: number;
-    sampleSize: number;
-  }> = [];
-  try {
-    const { computeOrgCausalWeights } = await import('@/lib/learning/causal-learning');
-    const causalWeights = await computeOrgCausalWeights(effectiveOrgId || state.userId || '');
-    if (causalWeights.length > 0) {
-      causalMultipliers = new Map(
-        causalWeights.map(w => [w.biasType.toLowerCase().replace(/\s+/g, '_'), w.dangerMultiplier])
-      );
-      causalWeightsForReport = causalWeights;
-      log.debug(
-        `Causal AI active: ${causalWeights.length} bias-outcome edges loaded (org: ${effectiveOrgId || 'user-level'})`
-      );
-    }
-  } catch {
-    log.debug('Causal weights unavailable — using static severity only');
-  }
+  // Step 2 — load causal danger multipliers (Moat 1: Causal AI Layer)
+  const { multipliers: causalMultipliers, weightsForReport: causalWeightsForReport } =
+    await loadCausalMultipliers(effectiveOrgId || state.userId || '');
 
-  // 1. Bias Deductions (Compound Scoring with Ontology Interaction Weights)
-  //    Uses the proprietary compound scoring engine for interaction-weighted
-  //    bias severity instead of simple additive penalties.
-  //
-  //    M10 — we compute twice: once WITH org calibration (the headline score
-  //    users see) and once WITHOUT (the industry baseline). The delta between
-  //    them is the visible flywheel surface.
-  let compoundScoreResult: Awaited<
-    ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>
-  > | null = null;
-  let staticCompoundResult: Awaited<
-    ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>
-  > | null = null;
-  let biasDeductions = 0;
-  let staticBiasDeductions = 0;
+  // Step 3 — compound bias deductions (calibrated headline + M10 baseline)
+  const {
+    biasDeductions: rawBiasDeductions,
+    staticBiasDeductions,
+    compoundScoreResult,
+  } = await computeBiasDeductions({ state, severityWeights, causalMultipliers });
 
-  try {
-    const { computeCompoundScore } = await import('@/lib/scoring/compound-engine');
-    const detectedBiases = (state.biasAnalysis || []).map(
-      (b: { biasType?: string; severity?: string; confidence?: number; excerpt?: string }) => ({
-        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
-        severity: (b.severity || 'low').toLowerCase() as 'low' | 'medium' | 'high' | 'critical',
-        confidence: b.confidence || 0.5,
-        excerpt: b.excerpt,
-      })
-    );
+  // Step 4 — Bayesian prior adjustment (80/20 blend if a prior exists)
+  const { adjustedBiasDeductions: biasDeductions, bayesianResult } = await applyBayesianAdjustment({
+    state,
+    biasDeductions: rawBiasDeductions,
+  });
 
-    // Build org calibration from causal multipliers
-    const orgCalibration: Record<string, number> = {};
-    for (const [key, val] of causalMultipliers.entries()) {
-      orgCalibration[key] =
-        Math.max(0.3, Math.min(2.5, val)) *
-        (severityWeights[detectedBiases.find(b => b.type === key)?.severity || 'medium'] || 15);
-    }
+  // Step 5 — pure-math penalty components
+  const noisePenalty = calculateNoisePenalty(state.noiseStats?.stdDev);
+  const { trustScore, trustPenalty } = calculateTrustPenalty(state.factCheckResult);
+  const logicPenalty = calculateLogicPenalty(state.logicalAnalysis?.score);
+  const diversityPenalty = calculateEchoChamberPenalty(state.cognitiveAnalysis?.blindSpotGap);
 
-    // Estimate document context from state
-    const wordCount = (state.structuredContent || '').split(/\s+/).length;
-    const hasDissent =
-      state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
-    const speakers = state.speakers || [];
+  // Step 6 — outcome feedback loop (cap 25, prisma-backed)
+  const feedbackAdjustment = await calculateOutcomeFeedbackAdjustment(
+    (state.biasAnalysis || []).map(b => b.biasType || '')
+  );
 
-    // Corporate Strategy / M&A Vertical: Auto-set very_high stakes for deal-linked documents
-    // Committee review and closing stages get additional weight via the compound engine
-    const monetaryStakes: 'unknown' | 'low' | 'medium' | 'high' | 'very_high' =
-      state.dealType || isInvestmentDocument(state.documentType) ? 'very_high' : 'unknown';
-    if (monetaryStakes === 'very_high') {
-      log.info(
-        'Strategy/M&A context: auto-setting monetary stakes to very_high for compound scoring'
-      );
-    }
-
-    const compoundContext = {
-      monetaryStakes,
-      participantCount: speakers.length,
-      dissentPresent: hasDissent,
-      timelineWeeks: null,
-      documentAgeWeeks: 0,
-      wordCount,
-      rawContent: state.structuredContent || undefined,
-    };
-
-    // Pipeline activation of firedPatternLabels (locked 2026-05-09 evening,
-    // M&A cascade follow-through). Pure-function pattern matcher runs the
-    // NAMED_PATTERNS catalogue against in-flight detected biases + context
-    // BEFORE compound-engine fires, so PATTERN_PAIR_OVERRIDES amplifications
-    // (Synergy Mirage 1.75× / Winner's Curse 1.55× / Conglomerate Fallacy
-    // 1.65× / Sunk Ship 1.55× / Yes Committee 1.55×) actually fire on live
-    // audits. Previously the engine had the override map but no caller was
-    // passing firedPatternLabels — the M&A signal flowed through to the
-    // compoundRisk DQI component (-25/-12/-5/-1 per severity) but bias-pair
-    // amplification was dormant. Now both paths are armed.
-    //
-    // Context shape derived from the pipeline-side compoundContext above:
-    //   - monetaryStakes: same value (high/very_high for deal contexts)
-    //   - dissentAbsent: !hasDissent (cognitiveAnalysis.blindSpotGap signal)
-    //   - timePressure / unanimousConsensus: not derivable from the pipeline
-    //     today — left undefined so patterns requiring them won't false-fire.
-    //     The persisted detector in toxic-combinations.ts has access to
-    //     decision-room data + frame timeline; the in-flight matcher does
-    //     not, by design (we deliberately under-fire rather than fabricate).
-    const { matchNamedPatterns } = await import('@/lib/learning/named-patterns');
-    const firedPatternLabels = matchNamedPatterns({
-      biasTypes: detectedBiases.map(b => b.type),
-      context: {
-        monetaryStakes,
-        dissentAbsent: !hasDissent,
-        // Other ContextFactors fields stay undefined — the matcher reads
-        // conservatively (any required-field that isn't in the input fails
-        // the match), so context-gated patterns like Yes Committee that
-        // require unanimousConsensus won't fire here. They're still detected
-        // post-audit by toxic-combinations.ts:detectToxicCombinations which
-        // has the full Prisma context.
-      },
-    });
-    if (firedPatternLabels.length > 0) {
-      log.info(
-        `Named patterns fired in-pipeline: ${firedPatternLabels.join(', ')} — passing to compound-engine for amplification.`
-      );
-    }
-
-    compoundScoreResult = computeCompoundScore(100, detectedBiases, compoundContext, {
-      orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
-      firedPatternLabels: firedPatternLabels.length > 0 ? firedPatternLabels : undefined,
-    });
-
-    // M10: compute the baseline (industry default) score alongside, so the
-    // UI can render a delta that shows how much this org's calibration has
-    // shifted the assessment. Only actually differs when orgCalibration is
-    // present — otherwise the two results are identical and delta = 0.
-    // Note: staticCompoundResult also receives firedPatternLabels — pattern
-    // amplification is part of the methodology, not org calibration, so
-    // both the calibrated + baseline tracks see the same amplification.
-    staticCompoundResult =
-      Object.keys(orgCalibration).length > 0
-        ? computeCompoundScore(100, detectedBiases, compoundContext, {
-            firedPatternLabels: firedPatternLabels.length > 0 ? firedPatternLabels : undefined,
-          })
-        : compoundScoreResult;
-
-    // Use compound-adjusted deduction (difference between raw and calibrated)
-    biasDeductions = Math.round(100 - compoundScoreResult.calibratedScore);
-    staticBiasDeductions = Math.round(100 - staticCompoundResult.calibratedScore);
-    log.info(
-      `Compound scoring: raw_penalty=${compoundScoreResult.rawScore - compoundScoreResult.calibratedScore}, ` +
-        `multiplier=${compoundScoreResult.compoundMultiplier}, ` +
-        `context=${compoundScoreResult.contextAdjustment}, ` +
-        `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}, ` +
-        `calibration_delta=${biasDeductions - staticBiasDeductions}`
-    );
-  } catch {
-    // Fallback to simple additive scoring if compound engine fails
-    log.warn('Compound scoring unavailable — using simple additive penalties');
-    biasDeductions = (state.biasAnalysis || []).reduce(
-      (acc: number, b: { severity?: string; biasType?: string }) => {
-        const severity = (b.severity || 'low').toLowerCase();
-        const basePenalty = severityWeights[severity] || 5;
-        const biasKey = (b.biasType || '').toLowerCase().replace(/\s+/g, '_');
-        const multiplier = causalMultipliers.get(biasKey) ?? 1.0;
-        const clampedMultiplier = Math.max(0.3, Math.min(2.5, multiplier));
-        return acc + Math.round(basePenalty * clampedMultiplier);
-      },
-      0
-    );
-    // M10: in the fallback path the baseline is the same math without
-    // the causal multiplier — produces an honest delta even when the
-    // compound engine isn't available.
-    staticBiasDeductions = (state.biasAnalysis || []).reduce(
-      (acc: number, b: { severity?: string }) => {
-        const severity = (b.severity || 'low').toLowerCase();
-        const basePenalty = severityWeights[severity] || 5;
-        return acc + basePenalty;
-      },
-      0
-    );
-  }
-
-  // 1b. Bayesian Prior Integration
-  // If a DecisionPrior exists for this analysis, apply Bayesian updating to
-  // adjust bias confidence scores using the user's pre-analysis belief.
-  let bayesianResult: Awaited<
-    ReturnType<typeof import('@/lib/scoring/bayesian-priors').applyBayesianPriors>
-  > | null = null;
-  try {
-    // Look up the most recent prior for this user+document combination
-    // Priors are linked to analyses, so find any prior for analyses of this document
-    const priorRecord = await prisma.decisionPrior.findFirst({
-      where: {
-        userId: state.userId,
-        analysis: { documentId: state.documentId },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (priorRecord) {
-      const { applyBayesianPriors } = await import('@/lib/scoring/bayesian-priors');
-      const detectedBiasesForBayes = (state.biasAnalysis || []).map(
-        (b: { biasType?: string; confidence?: number; severity?: string }) => ({
-          type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
-          confidence: b.confidence || 0.5,
-          severity: (b.severity || 'medium').toLowerCase(),
-        })
-      );
-
-      bayesianResult = applyBayesianPriors(
-        100 - biasDeductions, // raw score after bias deductions
-        detectedBiasesForBayes,
-        {
-          beliefScore: (priorRecord.confidence ?? 50) / 100,
-          confidence: (priorRecord.confidence ?? 50) / 100,
-          flaggedConcerns: priorRecord.evidenceToChange
-            ? [priorRecord.evidenceToChange]
-            : undefined,
-        }
-      );
-
-      // Apply Bayesian-adjusted score influence (blend 80% compound + 20% Bayesian)
-      if (bayesianResult) {
-        const bayesianDeduction = Math.round(100 - bayesianResult.adjustedScore);
-        biasDeductions = Math.round(biasDeductions * 0.8 + bayesianDeduction * 0.2);
-        log.info(
-          `Bayesian priors applied: belief_delta=${bayesianResult.beliefDelta}, ` +
-            `info_gain=${bayesianResult.informationGain}, adjusted=${bayesianResult.adjustedScore}`
-        );
-      }
-    }
-  } catch (bayesErr) {
-    const code = (bayesErr as { code?: string })?.code;
-    if (code === 'P2021' || code === 'P2022') {
-      log.debug('DecisionPrior schema drift — continuing without prior integration');
-    } else {
-      log.debug(
-        'Bayesian priors unavailable — continuing without prior integration:',
-        bayesErr instanceof Error ? bayesErr.message : String(bayesErr)
-      );
-    }
-  }
-
-  // 2. Noise Penalty (StdDev * 5)
-  // If Judges disagree (High Variance), confidence drops.
-  const noisePenalty = (state.noiseStats?.stdDev || 0) * 5;
-
-  // 3. Trust Penalty (Fact Check)
-  // Distinguish between successful check (use score) and error/null (neutral penalty).
-  const factCheck = state.factCheckResult;
-  let trustScore: number;
-  if (!factCheck || factCheck.status === 'error') {
-    // Unknown trust — apply moderate penalty instead of assuming perfect (100)
-    trustScore = 50;
-  } else {
-    trustScore = factCheck.score ?? 50;
-  }
-  const trustPenalty = (100 - trustScore) * 0.3;
-
-  // 4. Logic Penalty
-  // Use ?? so that a genuine score of 0 is respected; default to 100 (no
-  // penalty) when the analysis is missing — absence of data should not
-  // artificially lower the overall score.
-  const logicScore = state.logicalAnalysis?.score ?? 100;
-  const logicPenalty = (100 - logicScore) * 0.4;
-
-  // 5. Echo Chamber Penalty (Cognitive Diversity)
-  // If blindSpotGap is low (0 = Tunnel Vision), penalty increases.
-  // Default to 100 when missing — absence of data should not penalise.
-  const diversityScore = state.cognitiveAnalysis?.blindSpotGap ?? 100;
-  const diversityPenalty = (100 - diversityScore) * 0.3;
-
-  // 6. Outcome Feedback Loop — penalize biases historically linked to failures
-  let feedbackAdjustment = 0;
-  try {
-    const detectedBiasTypes = (state.biasAnalysis || []).map(b => normalizeBiasType(b.biasType));
-    if (detectedBiasTypes.length > 0) {
-      // Find edges where the detected biases overlap with historically failed patterns
-      const failedEdges = await prisma.decisionEdge.findMany({
-        where: {
-          edgeType: 'shared_bias',
-          strength: { gte: 0.5 },
-          confidence: { gte: 0.3 },
-        },
-        select: { strength: true, confidence: true, metadata: true },
-        take: 50,
-      });
-
-      // Sum weighted penalty from failed edges (strength * confidence)
-      for (const edge of failedEdges) {
-        const meta = edge.metadata as Record<string, unknown> | null;
-        if (meta?.outcomeResult === 'negative' || meta?.outcomeResult === 'failure') {
-          feedbackAdjustment += edge.strength * edge.confidence * 3;
-        }
-      }
-      feedbackAdjustment = Math.min(feedbackAdjustment, 25); // Cap at 25 points
-    }
-  } catch (feedbackErr) {
-    log.debug(
-      'Outcome feedback query failed (non-fatal):',
-      feedbackErr instanceof Error ? feedbackErr.message : String(feedbackErr)
-    );
-  }
-
-  // Calculate Base
-  const baseScore = 100;
-  let overallScore =
-    baseScore -
-    biasDeductions -
-    noisePenalty -
-    trustPenalty -
-    logicPenalty -
-    diversityPenalty -
-    feedbackAdjustment;
-
-  // Clamp 0-100
-  overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
-
-  // M10 — industry-baseline variant of the same formula. Only the bias
-  // deduction differs (no causal weights applied). Everything else (noise,
-  // trust, logic, diversity, feedback) is identical so we get a clean
-  // apples-to-apples delta that isolates the flywheel's contribution.
-  let staticOverallScore =
-    baseScore -
-    staticBiasDeductions -
-    noisePenalty -
-    trustPenalty -
-    logicPenalty -
-    diversityPenalty -
-    feedbackAdjustment;
-  staticOverallScore = Math.max(0, Math.min(100, Math.round(staticOverallScore)));
+  // Step 7 — compose overall + M10 static-baseline scores
+  const overallScore = composeOverallScore({
+    biasDeductions,
+    noisePenalty,
+    trustPenalty,
+    logicPenalty,
+    diversityPenalty,
+    feedbackAdjustment,
+  });
+  const staticOverallScore = composeOverallScore({
+    biasDeductions: staticBiasDeductions,
+    noisePenalty,
+    trustPenalty,
+    logicPenalty,
+    diversityPenalty,
+    feedbackAdjustment,
+  });
 
   log.info(
     `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) = ${overallScore} (static=${staticOverallScore}, Δ=${overallScore - staticOverallScore})`
   );
 
-  // M10 — build the calibration insight object. Sample size = confirmed
-  // decision outcomes for the scope. Gated by the UI at sampleSize >= 5.
-  const CALIBRATION_UNLOCK = 5;
-  let calibrationSampleSize = 0;
-  try {
-    calibrationSampleSize = await prisma.decisionOutcome.count({
-      where: effectiveOrgId
-        ? { orgId: effectiveOrgId, outcome: { in: ['success', 'partial_success', 'failure'] } }
-        : { userId: state.userId, outcome: { in: ['success', 'partial_success', 'failure'] } },
-    });
-  } catch (calErr) {
-    // DecisionOutcome table may not exist — treat as cold start
-    const code = (calErr as { code?: string })?.code;
-    if (code !== 'P2021' && code !== 'P2022') {
-      log.debug(
-        'Calibration sample count failed (non-fatal):',
-        calErr instanceof Error ? calErr.message : String(calErr)
-      );
-    }
-  }
-  const calibrationSource: 'causal' | 'default' =
-    causalWeightsForReport.length > 0 ? 'causal' : 'default';
-  const calibrationDelta = overallScore - staticOverallScore;
-  const calibrationHeadline = buildCalibrationHeadline(
-    calibrationDelta,
-    calibrationSampleSize,
-    calibrationSource,
-    causalWeightsForReport
-  );
-  const calibrationInsight = {
-    calibratedOverallScore: overallScore,
+  // Step 8 — calibration insight (M10 flywheel surface)
+  const calibrationSampleSize = await countCalibrationSamples(effectiveOrgId, state.userId);
+  const calibrationInsight = buildCalibrationInsight({
+    overallScore,
     staticOverallScore,
-    calibrationDelta,
-    calibrationSource,
+    causalWeightsForReport,
     sampleSize: calibrationSampleSize,
-    unlockThreshold: CALIBRATION_UNLOCK,
-    headline: calibrationHeadline,
-  };
+  });
 
   return {
     finalReport: {
@@ -2447,56 +2136,13 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 }
 
 // ============================================================
-// CALIBRATION HEADLINE BUILDER (M10)
+// CALIBRATION HEADLINE BUILDER (M10) — MOVED 2026-05-20
 // ============================================================
-
-/**
- * Generate a one-line human-readable summary of how the org's calibration
- * has shifted the risk score away from the industry baseline. Rendered by
- * the UI next to the dual score display. Server-side generation ensures
- * tone / translation changes happen in one place.
- */
-function buildCalibrationHeadline(
-  delta: number,
-  sampleSize: number,
-  source: 'causal' | 'default',
-  causalWeights: Array<{
-    biasType: string;
-    dangerMultiplier: number;
-    sampleSize: number;
-  }>
-): string {
-  // Cold start — the calibrated score is hidden in the UI, but we still
-  // return a useful hint for the "unlock" affordance.
-  if (sampleSize < 5) {
-    const remaining = 5 - sampleSize;
-    return `Your calibrated score unlocks at 5 confirmed outcomes — ${remaining} more to go.`;
-  }
-
-  if (source === 'default' || causalWeights.length === 0) {
-    return `Based on ${sampleSize} confirmed outcomes — no bias-outcome patterns detected yet. Baseline severity weights still apply.`;
-  }
-
-  // Pick the single bias with the largest deviation from baseline (1.0)
-  // to surface in the headline — users remember one concrete thing.
-  const dominant = [...causalWeights].sort(
-    (a, b) => Math.abs(b.dangerMultiplier - 1) - Math.abs(a.dangerMultiplier - 1)
-  )[0];
-
-  const dominantName = dominant?.biasType.replace(/_/g, ' ') ?? 'bias patterns';
-  const dominantMultiplier = dominant?.dangerMultiplier ?? 1;
-
-  if (Math.abs(delta) < 1) {
-    return `Based on ${sampleSize} confirmed outcomes — your org's bias profile matches industry baseline closely.`;
-  }
-
-  if (delta < 0) {
-    // Calibrated score is LOWER (more risky) than baseline
-    return `Based on ${sampleSize} outcomes, your org rates ${dominantName} ${dominantMultiplier.toFixed(1)}x heavier than industry baseline. This decision is ${Math.abs(delta)} points riskier than it looks.`;
-  }
-  // Calibrated score is HIGHER (safer) than baseline
-  return `Based on ${sampleSize} outcomes, your org has absorbed similar ${dominantName} patterns before. This decision scores ${delta} points better than industry baseline.`;
-}
+//
+// `buildCalibrationHeadline` now lives in src/lib/scoring/risk-compiler.ts
+// (extracted alongside the rest of the riskScorerNode helpers in the
+// 2026-05-20 refactor). Same math. Import from the canonical source if a
+// future surface needs the headline string outside the audit pipeline.
 
 // ============================================================
 // CAUSAL INTELLIGENCE REPORT BUILDER
