@@ -27,8 +27,53 @@
 'use client';
 
 import { useState } from 'react';
-import { Share2, Link as LinkIcon, FileText, Check } from 'lucide-react';
+import { Share2, Link as LinkIcon, FileText, Check, AlertCircle } from 'lucide-react';
 import { trackEvent } from '@/lib/analytics/track';
+
+/**
+ * Resilient clipboard copy with two fallbacks:
+ *  1. navigator.clipboard.writeText (modern, requires secure context)
+ *  2. document.execCommand('copy') via a temporary textarea (legacy fallback
+ *     for incognito-tab edge cases, sandboxed iframes, and the rare browser
+ *     where the Clipboard API resolves but silently writes nothing)
+ * Returns 'clipboard' | 'execCommand' on success, 'failed' otherwise.
+ *
+ * Closes the 2026-05-20 bug where the silent catch on `navigator.clipboard`
+ * meant the button gave ZERO feedback on failure — the founder's screenshot
+ * showed "Copy share link" not working on the live /demo surface.
+ */
+async function copyToClipboard(text: string): Promise<'clipboard' | 'execCommand' | 'failed'> {
+  if (typeof window === 'undefined') return 'failed';
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return 'clipboard';
+    } catch {
+      // canonical clipboard-failure exception class — fall through to the
+      // execCommand fallback (the Clipboard API can fail on iframe-sandbox
+      // origins / certain Safari incognito contexts even on HTTPS).
+    }
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.focus({ preventScroll: true });
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok ? 'execCommand' : 'failed';
+  } catch {
+    // canonical clipboard-failure exception class — execCommand also blocked
+    return 'failed';
+  }
+}
 
 const C = {
   white: '#FFFFFF',
@@ -60,27 +105,44 @@ export function ReferralAffordanceCard({
   source,
 }: ReferralAffordanceCardProps) {
   const [copiedKind, setCopiedKind] = useState<'ref' | 'specimen' | null>(null);
+  const [failedKind, setFailedKind] = useState<'ref' | 'specimen' | null>(null);
 
   const refLink = userId ? `${ORIGIN}/?ref=${encodeURIComponent(userId)}` : `${ORIGIN}/`;
   const specimenLink = `${ORIGIN}/demo`;
 
   const copy = async (text: string, kind: 'ref' | 'specimen') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedKind(kind);
-      setTimeout(() => setCopiedKind(null), 2000);
-      trackEvent('referral_link_copied', {
+    const result = await copyToClipboard(text);
+    if (result === 'failed') {
+      setFailedKind(kind);
+      // Auto-clear the failure state after a few seconds so the next click
+      // can re-try cleanly. The readonly URL preview below stays visible
+      // so the user can select + copy it manually in the meantime.
+      setTimeout(() => setFailedKind(null), 4000);
+      trackEvent('referral_link_copy_failed', {
         kind,
         source,
         analysisId: analysisId ?? undefined,
         hasUserId: Boolean(userId),
       });
-    } catch {
-      // canonical clipboard-failure exception class — clipboard can be blocked
-      // by the browser; the link is still selectable in the UI so the user can
-      // copy manually. Non-fatal.
+      return;
     }
+    setCopiedKind(kind);
+    setFailedKind(null);
+    setTimeout(() => setCopiedKind(null), 2000);
+    trackEvent('referral_link_copied', {
+      kind,
+      source,
+      method: result,
+      analysisId: analysisId ?? undefined,
+      hasUserId: Boolean(userId),
+    });
   };
+
+  // Always-visible link preview so the URL is selectable + copyable even if
+  // both clipboard paths fail (e.g. an aggressively-locked-down browser).
+  // Doubles as a trust signal — the share link is the real thing, visible.
+  const previewLink =
+    copiedKind === 'specimen' || failedKind === 'specimen' ? specimenLink : refLink;
 
   return (
     <section
@@ -202,6 +264,63 @@ export function ReferralAffordanceCard({
           )}
         </button>
       </div>
+
+      {/* Always-visible URL preview — selectable readonly input so the
+          user can manually copy when both clipboard paths fail (locked-down
+          browser / sandboxed iframe / Safari edge cases). Doubles as a
+          trust signal: the share link is the real URL, no shortener. */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 10px',
+          background: C.slate100,
+          border: `1px solid ${C.slate200}`,
+          borderRadius: 8,
+        }}
+      >
+        <LinkIcon size={12} style={{ color: C.slate500, flexShrink: 0 }} />
+        <input
+          type="text"
+          readOnly
+          value={previewLink}
+          onFocus={e => e.currentTarget.select()}
+          aria-label="Share link — select to copy manually"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            fontFamily: 'var(--font-mono, monospace)',
+            fontSize: 12,
+            color: C.slate700,
+            padding: 0,
+          }}
+        />
+      </div>
+
+      {failedKind && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px',
+            background: '#FEF3C7',
+            border: '1px solid #FDE68A',
+            borderRadius: 8,
+            fontSize: 12,
+            color: '#92400E',
+            lineHeight: 1.5,
+          }}
+          role="alert"
+        >
+          <AlertCircle size={14} style={{ flexShrink: 0 }} />
+          Your browser blocked the clipboard. Select the link above to copy it manually.
+        </div>
+      )}
 
       <p style={{ fontSize: 11.5, color: C.slate500, margin: 0, lineHeight: 1.5 }}>
         The share link tracks who referred them so we know your network is the source.

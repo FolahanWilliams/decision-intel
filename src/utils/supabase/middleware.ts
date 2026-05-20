@@ -100,7 +100,19 @@ export async function updateSession(request: NextRequest) {
       // intelligence/calibration-baseline: force-static public endpoint
       //   (platform Brier 0.258 baseline). The rest of /api/intelligence/*
       //   is per-user/per-org and stays protected.
-      !request.nextUrl.pathname.startsWith('/api/intelligence/calibration-baseline'));
+      !request.nextUrl.pathname.startsWith('/api/intelligence/calibration-baseline') &&
+      // analytics/events POST is auth-optional by route contract — events
+      //   from anonymous /demo visitors (paste audits, save-CTA clicks)
+      //   are first-party conversion telemetry; the route handler decides
+      //   what to persist based on session presence. GET still requires
+      //   auth and is gated inside the handler.
+      !request.nextUrl.pathname.startsWith('/api/analytics/events') &&
+      // redaction/log POST is the fire-and-forget audit trail emitted by
+      //   the redaction modal on /demo + /dashboard. Handler does its own
+      //   auth check (returns 401 cleanly for anonymous) — middleware
+      //   redirect to /login was producing a 307 → 405 cascade in the
+      //   browser console on every /demo redact action.
+      !request.nextUrl.pathname.startsWith('/api/redaction/log'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.

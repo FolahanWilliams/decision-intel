@@ -59,9 +59,24 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const serverFetched = useRef(false);
 
-  // Hydrate from server-persisted NotificationLog on first mount
+  // Hydrate from server-persisted NotificationLog on first mount.
+  //
+  // Skip the fetch on public marketing routes — /api/notifications requires
+  // a Supabase session, so calling it from /demo / / / /login / case-studies
+  // produces a 307 → /login HTML response that fails JSON.parse and spams the
+  // browser console. The provider is mounted in the root layout (covers ALL
+  // routes); the gate below restricts the network call to authenticated
+  // surfaces (the /dashboard and /documents prefixes match the middleware
+  // `isProtectedRoute` page-route definition).
   useEffect(() => {
     if (serverFetched.current) return;
+    if (typeof window === 'undefined') return;
+    const p = window.location.pathname;
+    const isAuthedSurface = p.startsWith('/dashboard') || p.startsWith('/documents');
+    if (!isAuthedSurface) {
+      serverFetched.current = true;
+      return;
+    }
     serverFetched.current = true;
     fetch('/api/notifications')
       .then(r => (r.ok ? r.json() : null))

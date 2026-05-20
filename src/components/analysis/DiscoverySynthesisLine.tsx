@@ -72,6 +72,15 @@ export function DiscoverySynthesisLine({
 
   useEffect(() => {
     if (!analysisId) return;
+    // /api/counterfactual requires a Supabase session + verifies the analysis
+    // belongs to the caller. On /demo the analysis is owned by DEMO_USER_ID
+    // (anonymous visitor has no session), so the fetch always fails through
+    // a 307 → /login HTML cascade that spams the browser console. Skip the
+    // call entirely on the demo variant — the bias-count + clock chips on
+    // the synthesis line carry the procurement-grade signal without the
+    // monetary anchor (which is the only piece the counterfactual fetch
+    // would have added). Locked 2026-05-20.
+    if (variant === 'demo') return;
     let cancelled = false;
     async function fetchTopImpact() {
       try {
@@ -100,7 +109,7 @@ export function DiscoverySynthesisLine({
     return () => {
       cancelled = true;
     };
-  }, [analysisId]);
+  }, [analysisId, variant]);
 
   // Empty state: nothing useful to render. Caller decides whether to omit
   // the line entirely OR render their own fallback. We render the bias-count
