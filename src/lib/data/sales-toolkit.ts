@@ -70,7 +70,7 @@ export const SALES_OBJECTIONS: SalesObjection[] = [
     id: 'tried_ai',
     objection: '"We tried AI tools before and they weren\'t useful."',
     response:
-      "Were they general-purpose AI or purpose-built for high-stakes decisions? We have 20 cognitive biases including domain-specific ones like anchoring to initial estimates, sunk cost in failing initiatives, and groupthink in committee decisions that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR organization's actual decision patterns — not generic advice.",
+      `Were they general-purpose AI or purpose-built for high-stakes decisions? We have ${BIAS_COUNT} cognitive biases including domain-specific ones like anchoring to initial estimates, sunk cost in failing initiatives, and groupthink in committee decisions that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR organization's actual decision patterns — not generic advice.`,
     tone: 'Specificity wins',
   },
   {
@@ -121,7 +121,7 @@ export const DEMO_STEPS: DemoStep[] = [
     title: 'Upload & Analyze',
     timing: '60 sec',
     action:
-      'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 12 pipeline nodes are doing: "Right now, our noise judge is scoring this document for variance, while our bias detective is scanning for 20 cognitive biases..."',
+      `Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 12 pipeline nodes are doing: "Right now, our noise judge is scoring this document for variance, while our bias detective is scanning for ${BIAS_COUNT} cognitive biases..."`,
     tip: 'The streaming progress bar is your friend — it creates anticipation.',
   },
   {

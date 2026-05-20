@@ -73,7 +73,7 @@ export function CorePipelineTab() {
   [GDPR Anonymizer] ──> [Data Structurer] ──> [Intelligence Gatherer]
 
 ANALYSIS (Parallel Fan-Out — 7 nodes)
-  ├── [Bias Detective]         ── 20 cognitive biases + 11 investment-specific
+  ├── [Bias Detective]         ── ${BIAS_COUNT} cognitive biases + 11 investment-specific
   ├── [Noise Judge]            ── Statistical noise & variance scoring
   ├── [Verification]           ── Fact checking + compliance mapping
   ├── [Deep Analysis]          ── Linguistic, strategic & cognitive diversity

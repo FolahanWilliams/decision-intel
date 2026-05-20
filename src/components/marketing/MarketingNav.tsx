@@ -47,6 +47,11 @@ import {
 } from 'lucide-react';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Canonical bias count — derived per the count-drift discipline (CLAUDE.md
+// "Bias Taxonomy" cascade rule: never literal "20" or "22"; always derive).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const C = {
   navy: '#0F172A',
@@ -119,7 +124,7 @@ const MENUS: MegaMenu[] = [
           {
             icon: ListTree,
             label: 'Bias taxonomy',
-            description: '20 corporate-strategy biases, stable IDs, academic citations.',
+            description: `${BIAS_COUNT} corporate-strategy biases, stable IDs, academic citations.`,
             href: '/taxonomy',
           },
           {

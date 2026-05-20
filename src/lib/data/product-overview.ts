@@ -160,7 +160,7 @@ export const PERSONA_ROWS: PersonaRow[] = [
     id: 'ma',
     persona: 'M&A / Decision Owners',
     pain: 'Memos anchored to initial assumptions.',
-    deliverable: '20 cognitive biases detected with exact excerpts + coaching guidance.',
+    deliverable: `${BIAS_COUNT} cognitive biases detected with exact excerpts + coaching guidance.`,
     icon: 'ma',
   },
   {
