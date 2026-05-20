@@ -83,7 +83,15 @@ const SCAN_PATHS = [join(ROOT, 'src'), join(ROOT, 'CLAUDE.md'), join(ROOT, 'TODO
 // stale DQI-weights / 20x20 / v2.0.0 literals to canonical
 // ${MATRIX_DIMENSION} / ${METHODOLOGY_VERSION} / ${DQI_WEIGHTS_LINE}
 // interpolation; one fewer hardcoded count the regex catches.
-const COUNT_BASELINE = 74;
+// 2026-05-20: 74 → 73 — bias-count drift cleanup (8 surfaces) migrated
+// "20 corporate-strategy biases" in MarketingNav.tsx + 7 other surfaces
+// to ${BIAS_COUNT} interpolation. MarketingNav was the one site the
+// regex pattern caught (others used "cognitive biases" with a word
+// between number + noun that the lint-counts regex is blind to — those
+// surfaces are caught by the new audit-platform locked-count-drift
+// SEMANTIC check at audit time). See the 2026-05-20 deep-audit log
+// in founder-context.ts for the full 8-surface enumeration.
+const COUNT_BASELINE = 73;
 
 // Plural nouns we audit. Each must have a canonical source-of-truth in
 // the codebase; adding a new noun here requires adding the canonical

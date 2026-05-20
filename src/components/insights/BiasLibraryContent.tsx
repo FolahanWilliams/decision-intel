@@ -3,8 +3,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Search, Filter, BookOpen, Brain } from 'lucide-react';
 import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { BiasEducationCard } from '@/components/ui/BiasEducationCard';
 import { useDocuments } from '@/hooks/useDocuments';
+
+// Canonical bias count — derived per the count-drift discipline.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 /**
  * Bias Library content component. Originally a standalone page at
@@ -124,8 +128,8 @@ export function BiasLibraryContent() {
           <h2 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Bias Library</h2>
         </div>
         <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '600px' }}>
-          Learn about the 20 cognitive biases our AI detects, with real-world examples, debiasing
-          techniques, and the peer-reviewed research behind each one.
+          Learn about the {BIAS_COUNT} cognitive biases our AI detects, with real-world examples,
+          debiasing techniques, and the peer-reviewed research behind each one.
         </p>
       </div>
 

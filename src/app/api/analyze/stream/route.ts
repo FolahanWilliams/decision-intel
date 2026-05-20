@@ -3,6 +3,7 @@ import { getGraph, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE, formatSSEHeartbeat } from '@/lib/sse';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { Prisma } from '@prisma/client';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
@@ -35,6 +36,10 @@ import {
 
 const log = createLogger('StreamRoute');
 
+// Canonical bias count — derived from BIAS_EDUCATION per the count-drift discipline.
+// CLAUDE.md "Bias Taxonomy cascade" rule: never literal "20" or "22"; always derive.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+
 // Allow up to 240 seconds for the streaming analysis pipeline.
 // Without this, Vercel defaults to 25s which is far too short for
 // multi-agent LLM pipelines.
@@ -52,7 +57,7 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
   },
   biasDetective: {
     label: 'Bias Detection',
-    description: 'Analyzing for 20 cognitive biases with research verification…',
+    description: `Analyzing for ${BIAS_COUNT} cognitive biases with research verification…`,
   },
   noiseJudge: {
     label: 'Noise Analysis',
