@@ -6,11 +6,24 @@
  * The centerpiece visualization of /how-it-works — a full-width
  * animated flow diagram of the 12-node LangGraph pipeline.
  *
- * - Three zones (preprocessing / analysis / synthesis)
- * - A "pulse" packet travels along the flow paths on an infinite loop:
- *   preprocessing → fan-out (7 analysis lines light up) → fan-in → synthesis → DQI
- * - Each node chip is clickable; selecting drives the external detail drawer.
- * - Respects prefers-reduced-motion (static layout, no pulse).
+ * Two modes:
+ *
+ * (1) MARKETING (default) — zones cycle every 1.8s to create a
+ *     breathing "alive" feel. Each node chip is clickable; selecting
+ *     drives the external detail drawer. Used on /how-it-works.
+ *
+ * (2) LIVE (liveMode={true}) — the viz tracks REAL audit progress.
+ *     `activeNodeId` becomes the currently-running pipeline node;
+ *     per-node state is derived from its position in the canonical
+ *     PIPELINE_NODES order: nodes before activeNodeId render as DONE
+ *     (green check + dim), the active node renders as RUNNING (full
+ *     accent + pulse), nodes after render as PENDING (gray, opacity
+ *     0.4). The analysis zone runs in parallel by construction — so
+ *     when ANY analysis node is active, ALL 7 are shown running
+ *     (matches the pipeline's real fan-out semantics). Used on /demo
+ *     paste-audit + sample-flow above the SSE stream.
+ *
+ * Respects prefers-reduced-motion (static layout, no pulse / cycle).
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -126,13 +139,68 @@ function edgePath(from: string, to: string): string {
 // ─── Component ───────────────────────────────────────────────────────────
 
 interface PipelineFlowDiagramProps {
-  /** If provided, drives external state (e.g. a node-detail drawer). */
+  /**
+   * In MARKETING mode: drives external state (e.g. node-detail drawer
+   * on /how-it-works).
+   * In LIVE mode: the currently-running pipeline node; derives per-node
+   * done / running / pending state and the active-zone highlight.
+   */
   activeNodeId?: string | null;
   onSelectNode?: (id: string) => void;
+  /**
+   * When true: derives per-node + per-zone + per-edge state from
+   * `activeNodeId` instead of auto-cycling. Hides marketing footer
+   * caption + disables node-click selection (the audit is running,
+   * not a sandbox). Used on /demo above the SSE stream.
+   */
+  liveMode?: boolean;
 }
 
-export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlowDiagramProps) {
-  const [activeZone, setActiveZone] = useState<PipelineZone>('preprocessing');
+type NodeState = 'done' | 'running' | 'pending' | 'idle';
+
+// Canonical pipeline order — index of each node in the run sequence.
+// Analysis zone is parallel by construction so all 7 share the same
+// running window; preprocessing + synthesis are strictly sequential.
+const NODE_INDEX: Record<string, number> = (() => {
+  const m: Record<string, number> = {};
+  PIPELINE_NODES.forEach((n, i) => {
+    m[n.id] = i;
+  });
+  return m;
+})();
+
+const PREP_LAST_INDEX = 2; // intelligenceGatherer
+const ANALYSIS_LAST_INDEX = 9; // rpdRecognitionNode
+
+function deriveActiveZoneFromIndex(idx: number): PipelineZone | null {
+  if (idx < 0) return null;
+  if (idx <= PREP_LAST_INDEX) return 'preprocessing';
+  if (idx <= ANALYSIS_LAST_INDEX) return 'analysis';
+  return 'synthesis';
+}
+
+function deriveNodeState(
+  node: PipelineNode,
+  activeIdx: number,
+  activeZone: PipelineZone | null
+): NodeState {
+  if (activeIdx < 0 || !activeZone) return 'idle';
+  const nodeIdx = NODE_INDEX[node.id];
+  // Analysis zone is PARALLEL: when any analysis node is the SSE-active
+  // node, ALL 7 analysis nodes are running together by definition (the
+  // pipeline fires them as one batch after intelligenceGatherer).
+  if (node.zone === 'analysis' && activeZone === 'analysis') return 'running';
+  if (nodeIdx < activeIdx) return 'done';
+  if (nodeIdx === activeIdx) return 'running';
+  return 'pending';
+}
+
+export function PipelineFlowDiagram({
+  activeNodeId,
+  onSelectNode,
+  liveMode = false,
+}: PipelineFlowDiagramProps) {
+  const [marketingZone, setMarketingZone] = useState<PipelineZone>('preprocessing');
   const reducedMotion = useReducedMotion();
   // Single IntersectionObserver on the outer container — `whileInView` on
   // SVG child elements fires unreliably on iOS Safari, leaving every
@@ -141,23 +209,52 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
   const containerRef = useRef<HTMLDivElement>(null);
   const inView = useInView(containerRef, { once: true, margin: '-80px' });
 
-  // Loop through the three zones to create a breathing "alive" feel
+  // Marketing mode only: loop zones every 1.8s for the "alive" feel.
+  // Live mode skips this entirely — activeZone is derived from the real
+  // SSE-driven activeNodeId so the viz tracks the actual audit.
   useEffect(() => {
-    if (reducedMotion) return;
+    if (liveMode || reducedMotion) return;
     const order: PipelineZone[] = ['preprocessing', 'analysis', 'synthesis'];
     let i = 0;
     const id = setInterval(() => {
       i = (i + 1) % order.length;
-      setActiveZone(order[i]);
+      setMarketingZone(order[i]);
     }, 1800);
     return () => clearInterval(id);
-  }, [reducedMotion]);
+  }, [liveMode, reducedMotion]);
 
   const nodeById = useMemo(() => {
     const m = new Map<string, PipelineNode>();
     for (const n of PIPELINE_NODES) m.set(n.id, n);
     return m;
   }, []);
+
+  // Live mode: derive activeIdx + activeZone from activeNodeId.
+  // Marketing mode: activeZone cycles via setMarketingZone; activeIdx
+  // stays -1 so deriveNodeState returns 'idle' for every node and the
+  // legacy "zoneActive" highlighting governs visuals.
+  const activeIdx = liveMode && activeNodeId != null ? (NODE_INDEX[activeNodeId] ?? -1) : -1;
+  const liveActiveZone = liveMode ? deriveActiveZoneFromIndex(activeIdx) : null;
+  const activeZone: PipelineZone = liveMode ? (liveActiveZone ?? 'preprocessing') : marketingZone;
+
+  // Live-mode status caption — replaces the marketing footer prose.
+  const liveStatus = useMemo(() => {
+    if (!liveMode) return null;
+    if (activeIdx < 0) return { label: 'Ready', sub: 'Pipeline initialising…', pct: 0 };
+    const activeNode = activeNodeId ? nodeById.get(activeNodeId) : null;
+    const pct = Math.round(((activeIdx + 1) / PIPELINE_NODES.length) * 100);
+    return {
+      label: activeNode?.label ?? 'Running',
+      sub: `Stage ${activeIdx + 1} of ${PIPELINE_NODES.length}`,
+      pct,
+    };
+  }, [liveMode, activeIdx, activeNodeId, nodeById]);
+
+  // DQI output lights up only when synthesis is the active zone in
+  // live mode (or when the marketing zone cycles to synthesis).
+  const dqiLit = liveMode ? activeZone === 'synthesis' : activeZone === 'synthesis';
+  // In live mode, DQI shows "complete" state once we're past riskScorer.
+  const dqiComplete = liveMode && activeIdx >= PIPELINE_NODES.length - 1;
 
   return (
     <div
@@ -226,14 +323,21 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
         {EDGES.map(e => {
           const d = edgePath(e.from, e.to);
           const zoneActive = activeZone === e.zone;
+          // Live mode: edge state mirrors its target-zone state — DONE
+          // edges feed nodes the audit has already finished with; PENDING
+          // edges feed downstream stages.
+          const fromIdx = NODE_INDEX[e.from] ?? -1;
+          const isDoneEdge = liveMode && activeIdx > fromIdx && !zoneActive;
+          const stroke = zoneActive ? ZONE_COLOR[e.zone].accent : isDoneEdge ? C.green : C.slate300;
+          const opacity = zoneActive ? 0.75 : isDoneEdge ? 0.45 : 0.35;
           return (
             <motion.path
               key={`${e.from}->${e.to}`}
               d={d}
               fill="none"
-              stroke={zoneActive ? ZONE_COLOR[e.zone].accent : C.slate300}
+              stroke={stroke}
               strokeWidth={zoneActive ? 2 : 1.3}
-              strokeOpacity={zoneActive ? 0.7 : 0.45}
+              strokeOpacity={opacity}
               initial={{ pathLength: 0, opacity: 0 }}
               animate={inView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
@@ -248,8 +352,8 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
           y1={SYN_Y[1] + CHIP_H}
           x2={DQI_X + CHIP_W / 2}
           y2={DQI_Y}
-          stroke={activeZone === 'synthesis' ? C.green : C.slate300}
-          strokeWidth={activeZone === 'synthesis' ? 2 : 1.3}
+          stroke={dqiLit ? C.green : C.slate300}
+          strokeWidth={dqiLit ? 2 : 1.3}
           strokeOpacity={0.7}
           initial={{ pathLength: 0 }}
           animate={inView ? { pathLength: 1 } : { pathLength: 0 }}
@@ -270,8 +374,9 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
             height={CHIP_H}
             rx={12}
             fill={C.slate900}
-            stroke={C.green}
-            strokeWidth={2}
+            stroke={dqiComplete || dqiLit ? C.green : C.slate600}
+            strokeWidth={dqiComplete ? 3 : 2}
+            style={{ transition: 'stroke 0.4s, stroke-width 0.4s' }}
           />
           <text
             x={DQI_X + CHIP_W / 2}
@@ -279,10 +384,14 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
             textAnchor="middle"
             fontSize={10}
             fontWeight={700}
-            fill={C.green}
-            style={{ textTransform: 'uppercase', letterSpacing: '0.12em' }}
+            fill={dqiComplete || dqiLit ? C.green : C.slate400}
+            style={{
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              transition: 'fill 0.4s',
+            }}
           >
-            Output
+            {dqiComplete ? 'Output · ready' : 'Output'}
           </text>
           <text
             x={DQI_X + CHIP_W / 2}
@@ -303,17 +412,74 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
           if (!node) return null;
           const zone = node.zone;
           const zoneActive = activeZone === zone;
-          const isSelected = activeNodeId === node.id;
+          const isSelected = !liveMode && activeNodeId === node.id;
           const accent = ZONE_COLOR[zone].accent;
+
+          // Live-mode per-node state. In marketing mode this stays 'idle'
+          // and the original zoneActive highlighting governs visuals.
+          const state: NodeState = liveMode
+            ? deriveNodeState(node, activeIdx, liveActiveZone)
+            : 'idle';
+          const isRunning = state === 'running';
+          const isDone = state === 'done';
+          const isPending = state === 'pending';
+
+          // Chip stroke + glow: running gets the strongest treatment.
+          const chipStroke = isSelected
+            ? accent
+            : isRunning
+              ? accent
+              : isDone
+                ? C.green
+                : zoneActive && !liveMode
+                  ? accent
+                  : isPending
+                    ? C.slate200
+                    : C.slate200;
+          const chipStrokeWidth = isSelected
+            ? 2.5
+            : isRunning
+              ? 2.5
+              : isDone
+                ? 1.5
+                : zoneActive && !liveMode
+                  ? 1.8
+                  : 1;
+          const chipOpacity = isPending ? 0.42 : 1;
+          const showGlow = !reducedMotion && (isRunning || (!liveMode && zoneActive));
+
+          // Icon background: running = full accent fill, done = soft green,
+          // pending = soft slate, marketing-zone-active = full accent.
+          const iconBg = isRunning
+            ? accent
+            : isDone
+              ? 'rgba(22, 163, 74, 0.12)'
+              : isPending
+                ? C.slate100
+                : zoneActive && !liveMode
+                  ? accent
+                  : ZONE_COLOR[zone].soft;
+          const iconColor = isRunning
+            ? C.white
+            : isDone
+              ? C.green
+              : isPending
+                ? C.slate400
+                : zoneActive && !liveMode
+                  ? C.white
+                  : accent;
 
           return (
             <motion.g
               key={node.id}
               initial={{ opacity: 0, y: 12 }}
-              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+              animate={inView ? { opacity: chipOpacity, y: 0 } : { opacity: 0, y: 12 }}
               transition={{ duration: 0.4, delay: 0.15 + i * 0.04 }}
-              onClick={() => onSelectNode?.(node.id)}
-              style={{ cursor: onSelectNode ? 'pointer' : 'default' }}
+              onClick={() => !liveMode && onSelectNode?.(node.id)}
+              style={{
+                cursor: !liveMode && onSelectNode ? 'pointer' : 'default',
+                transition: 'opacity 0.4s',
+              }}
             >
               {/* Chip background */}
               <rect
@@ -323,11 +489,11 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                 height={CHIP_H}
                 rx={12}
                 fill={C.white}
-                stroke={isSelected ? accent : zoneActive ? accent : C.slate200}
-                strokeWidth={isSelected ? 2.5 : zoneActive ? 1.8 : 1}
+                stroke={chipStroke}
+                strokeWidth={chipStrokeWidth}
                 style={{
                   transition: 'stroke 0.35s, stroke-width 0.35s',
-                  filter: zoneActive && !reducedMotion ? `url(#glow-${zone})` : 'none',
+                  filter: showGlow ? `url(#glow-${zone})` : 'none',
                 }}
               />
               {/* Icon background */}
@@ -337,7 +503,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                 width={46}
                 height={46}
                 rx={10}
-                fill={zoneActive ? accent : ZONE_COLOR[zone].soft}
+                fill={iconBg}
                 style={{ transition: 'fill 0.35s' }}
               />
               {/* Glyph — bespoke SVG set (see PipelineNodeGlyph). foreignObject
@@ -353,11 +519,7 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                   }}
                   aria-hidden
                 >
-                  <PipelineNodeGlyph
-                    nodeId={node.id}
-                    size={22}
-                    color={zoneActive ? C.white : accent}
-                  />
+                  <PipelineNodeGlyph nodeId={node.id} size={22} color={iconColor} />
                 </div>
               </foreignObject>
               {/* Label */}
@@ -366,17 +528,50 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
                 y={pos.y + 30}
                 fontSize={13}
                 fontWeight={700}
-                fill={C.slate900}
-                style={{ letterSpacing: '-0.01em' }}
+                fill={isPending ? C.slate500 : C.slate900}
+                style={{ letterSpacing: '-0.01em', transition: 'fill 0.35s' }}
               >
                 {node.label}
               </text>
               {/* Tagline */}
-              <text x={pos.x + 68} y={pos.y + 50} fontSize={11} fontWeight={500} fill={C.slate500}>
+              <text
+                x={pos.x + 68}
+                y={pos.y + 50}
+                fontSize={11}
+                fontWeight={500}
+                fill={isPending ? C.slate400 : C.slate500}
+                style={{ transition: 'fill 0.35s' }}
+              >
                 {truncate(node.tagline, 32)}
               </text>
-              {/* Active pulse dot */}
-              {!reducedMotion && zoneActive && (
+              {/* Status indicator — running gets a pulsing accent dot, done
+                  gets a green check, pending gets nothing. Marketing-mode
+                  zoneActive nodes retain the legacy pulse dot. */}
+              {!reducedMotion && isRunning && (
+                <motion.circle
+                  cx={pos.x + CHIP_W - 14}
+                  cy={pos.y + 14}
+                  r={5}
+                  fill={accent}
+                  initial={{ opacity: 0.4, scale: 1 }}
+                  animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.6, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              )}
+              {isDone && (
+                <g>
+                  <circle cx={pos.x + CHIP_W - 14} cy={pos.y + 14} r={7} fill={C.green} />
+                  <path
+                    d={`M ${pos.x + CHIP_W - 17} ${pos.y + 14} L ${pos.x + CHIP_W - 15} ${pos.y + 16} L ${pos.x + CHIP_W - 11} ${pos.y + 12}`}
+                    stroke={C.white}
+                    strokeWidth={1.6}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </g>
+              )}
+              {!reducedMotion && !liveMode && zoneActive && (
                 <motion.circle
                   cx={pos.x + CHIP_W - 14}
                   cy={pos.y + 14}
@@ -406,20 +601,122 @@ export function PipelineFlowDiagram({ activeNodeId, onSelectNode }: PipelineFlow
         />
         <ZoneLabel x={1050} y={90} text="03 · Synthesis" accent={ZONE_COLOR.synthesis.accent} />
 
-        {/* Footer caption — the loop */}
-        <text
-          x={VB_W / 2}
-          y={VB_H - 12}
-          textAnchor="middle"
-          fontSize={11}
-          fontWeight={600}
-          fill={C.slate400}
-          style={{ letterSpacing: '0.04em' }}
-        >
-          Each zone runs in order. Inside Analysis, all seven agents run simultaneously against the
-          same shared context.
-        </text>
+        {/* Footer caption — marketing only. Live mode renders the live
+            status bar OUTSIDE the SVG (below) so it can use full HTML
+            for the animated progress bar + dynamic text. */}
+        {!liveMode && (
+          <text
+            x={VB_W / 2}
+            y={VB_H - 12}
+            textAnchor="middle"
+            fontSize={11}
+            fontWeight={600}
+            fill={C.slate400}
+            style={{ letterSpacing: '0.04em' }}
+          >
+            Each zone runs in order. Inside Analysis, all seven agents run simultaneously against
+            the same shared context.
+          </text>
+        )}
       </svg>
+
+      {/* Live-mode status bar — full-width HTML strip below the SVG with
+          dynamic stage label + animated progress fill. Mirrors the
+          per-node done/running/pending state in a single one-line
+          summary so a reader scanning quickly can see where the audit is
+          without parsing the diagram. */}
+      {liveMode && liveStatus && (
+        <div
+          style={{
+            marginTop: 8,
+            padding: '14px 18px',
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 14,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+          }}
+        >
+          <div
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 999,
+              background: dqiComplete ? C.green : ZONE_COLOR[activeZone].accent,
+              flexShrink: 0,
+              animation:
+                !reducedMotion && !dqiComplete
+                  ? 'di-pipeline-live-pulse 1.2s ease-in-out infinite'
+                  : undefined,
+            }}
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: C.slate900,
+                letterSpacing: '-0.005em',
+              }}
+            >
+              {dqiComplete ? 'Audit complete' : liveStatus.label}
+            </div>
+            <div style={{ fontSize: 11, color: C.slate500, marginTop: 2 }}>
+              {dqiComplete ? 'DQI ready · scroll for the result' : liveStatus.sub}
+            </div>
+          </div>
+          <div
+            style={{
+              minWidth: 120,
+              height: 6,
+              borderRadius: 999,
+              background: C.slate100,
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: `${liveStatus.pct}%`,
+                background: dqiComplete ? C.green : ZONE_COLOR[activeZone].accent,
+                borderRadius: 999,
+                transition: 'width 0.6s ease-out, background 0.4s',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: C.slate600,
+              fontFamily: 'var(--font-mono, monospace)',
+              fontVariantNumeric: 'tabular-nums',
+              minWidth: 36,
+              textAlign: 'right',
+            }}
+          >
+            {liveStatus.pct}%
+          </div>
+          <style jsx>{`
+            @keyframes di-pipeline-live-pulse {
+              0%,
+              100% {
+                opacity: 0.55;
+                transform: scale(1);
+              }
+              50% {
+                opacity: 1;
+                transform: scale(1.4);
+              }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }

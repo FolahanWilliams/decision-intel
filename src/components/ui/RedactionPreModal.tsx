@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { ShieldAlert, Check, X, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Check, ChevronDown, Lock } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -68,6 +68,17 @@ const CATEGORY_HEX: Record<RedactionCategory, string> = {
   amount: '#D97706',
   entity: '#7C3AED',
   name: '#16A34A',
+};
+
+// Plain-language sub-labels so a stranger pasting their first memo can
+// recognise the category without parsing the example placeholder.
+const CATEGORY_SUB: Record<RedactionCategory, string> = {
+  ssn: 'Government IDs — replaced with [SSN_N]',
+  email: 'Email addresses — replaced with [EMAIL_N]',
+  phone: 'Phone numbers — replaced with [PHONE_N]',
+  amount: 'Currency + financial totals — replaced with [AMOUNT_N]',
+  entity: 'Company + organisation names — replaced with [ENTITY_N]',
+  name: 'Person names — replaced with [NAME_N]',
 };
 
 export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCancel }: Props) {
@@ -199,43 +210,104 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onCancel()}>
       <DialogContent
-        className="card w-full sm:max-w-lg"
-        style={{ maxHeight: '85vh', overflowY: 'auto' }}
+        className="w-full sm:max-w-[560px]"
+        style={{
+          maxHeight: '88vh',
+          overflowY: 'auto',
+          padding: 0,
+          borderRadius: 20,
+          border: '1px solid var(--border-color)',
+          background: 'var(--bg-card)',
+          boxShadow: '0 24px 48px -12px rgba(15, 23, 42, 0.18)',
+        }}
         showCloseButton
       >
-        <DialogHeader>
-          <DialogTitle
+        {/* Hero header — prominent shield in a green-tinted square, large
+            title, plain-language subtitle. Replaces the prior dense
+            inline title/paragraph pair. */}
+        <DialogHeader style={{ padding: '24px 26px 0', gap: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--accent-primary) 22%, transparent)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+              aria-hidden
+            >
+              <ShieldCheck size={22} style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <DialogTitle
+                style={{
+                  fontSize: 18,
+                  fontWeight: 800,
+                  letterSpacing: '-0.015em',
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  lineHeight: 1.25,
+                }}
+              >
+                Redact before audit?
+              </DialogTitle>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  margin: '6px 0 0',
+                  lineHeight: 1.55,
+                }}
+              >
+                We scanned your paste for likely identifying details. Choose which to replace with
+                stable placeholders before the audit runs.
+              </p>
+            </div>
+          </div>
+
+          {/* Trust strip — anchors the "on-device, nothing has left yet"
+              promise so a procurement reader leans forward instead of
+              closing the tab. */}
+          <div
             style={{
-              fontSize: 15,
-              fontWeight: 700,
+              marginTop: 16,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
+              padding: '10px 12px',
+              background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--accent-primary) 18%, transparent)',
+              borderRadius: 10,
             }}
           >
-            <ShieldAlert size={16} style={{ color: 'var(--accent-primary)' }} />
-            Redact before audit?
-          </DialogTitle>
-          <p
-            style={{
-              fontSize: 12.5,
-              color: 'var(--text-muted)',
-              margin: 0,
-              lineHeight: 1.55,
-            }}
-          >
-            We scanned your paste for likely identifying details. Pick which to replace with stable
-            placeholders (e.g. <code>[NAME_1]</code>,<code> [AMOUNT_2]</code>). Heuristic only —
-            uncheck any false hit.
-          </p>
+            <Lock size={13} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+            <span
+              style={{
+                fontSize: 11.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4,
+              }}
+            >
+              Heuristic scan ran on this device — your paste has not left the browser yet. Uncheck
+              any false positive before you submit.
+            </span>
+          </div>
         </DialogHeader>
 
+        {/* Category list — fuller rows with a coloured severity rail, a
+            category label, a plain-language sub-label, a count chip, and
+            a chevron that expands the per-hit list inline. */}
         <div
           style={{
-            marginTop: 12,
+            padding: '18px 26px 0',
             display: 'flex',
             flexDirection: 'column',
-            gap: 8,
+            gap: 10,
           }}
         >
           {CATEGORY_ORDER.map(cat => {
@@ -243,6 +315,9 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
             if (count === 0) return null;
             const catHits = scan.hits.filter(h => h.category === cat);
             const allExcluded = catHits.every(h => excluded.has(hitKey(h)));
+            const someExcluded =
+              catHits.some(h => excluded.has(hitKey(h))) &&
+              !catHits.every(h => excluded.has(hitKey(h)));
             const expanded = expandedCat === cat;
             const colour = CATEGORY_HEX[cat];
 
@@ -250,87 +325,142 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
               <div
                 key={cat}
                 style={{
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--bg-card)',
+                  border: `1px solid ${
+                    allExcluded
+                      ? 'var(--border-color)'
+                      : `color-mix(in srgb, ${colour} 22%, transparent)`
+                  }`,
+                  borderRadius: 14,
+                  background: 'var(--bg-primary)',
+                  overflow: 'hidden',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                  boxShadow: allExcluded
+                    ? 'none'
+                    : `inset 4px 0 0 0 ${colour}, 0 1px 2px rgba(15, 23, 42, 0.03)`,
                 }}
               >
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 12px',
+                    gap: 12,
+                    padding: '14px 16px',
                   }}
                 >
                   <button
                     onClick={() => toggleCategory(cat)}
                     aria-pressed={!allExcluded}
+                    aria-label={`Toggle redaction for ${REDACTION_CATEGORY_LABEL[cat]}`}
                     style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: 4,
+                      width: 20,
+                      height: 20,
+                      borderRadius: 5,
                       border: `1.5px solid ${allExcluded ? 'var(--border-color)' : colour}`,
-                      background: allExcluded ? 'transparent' : colour,
+                      background: allExcluded
+                        ? 'transparent'
+                        : someExcluded
+                          ? `color-mix(in srgb, ${colour} 50%, transparent)`
+                          : colour,
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       flexShrink: 0,
+                      transition: 'background 0.2s, border-color 0.2s',
                     }}
                   >
-                    {!allExcluded && <Check size={12} style={{ color: 'white' }} />}
+                    {!allExcluded && (
+                      <Check size={13} strokeWidth={2.6} style={{ color: 'white' }} />
+                    )}
                   </button>
+
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: 'var(--text-primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
                       }}
                     >
-                      {REDACTION_CATEGORY_LABEL[cat]}
+                      <span
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: 'var(--text-primary)',
+                          letterSpacing: '-0.005em',
+                        }}
+                      >
+                        {REDACTION_CATEGORY_LABEL[cat]}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: colour,
+                          background: `color-mix(in srgb, ${colour} 10%, transparent)`,
+                          border: `1px solid color-mix(in srgb, ${colour} 22%, transparent)`,
+                          padding: '1px 7px',
+                          borderRadius: 999,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {count}
+                      </span>
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 11.5,
                         color: 'var(--text-muted)',
-                        marginTop: 1,
+                        marginTop: 3,
+                        lineHeight: 1.4,
                       }}
                     >
-                      {count} detected
+                      {CATEGORY_SUB[cat]}
                     </div>
                   </div>
+
                   <button
                     onClick={() => setExpandedCat(expanded ? null : cat)}
+                    aria-label={expanded ? 'Hide detected items' : 'Review detected items'}
                     style={{
                       background: 'transparent',
                       border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '4px 8px',
-                      fontSize: 11,
+                      borderRadius: 999,
+                      padding: '6px 11px',
+                      fontSize: 11.5,
+                      fontWeight: 600,
                       color: 'var(--text-secondary)',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 4,
+                      gap: 5,
+                      flexShrink: 0,
+                      transition: 'background 0.15s, border-color 0.15s',
                     }}
                   >
-                    {expanded ? <EyeOff size={11} /> : <Eye size={11} />}
                     {expanded ? 'Hide' : 'Review'}
+                    <ChevronDown
+                      size={12}
+                      style={{
+                        transform: expanded ? 'rotate(180deg)' : 'rotate(0)',
+                        transition: 'transform 0.2s',
+                      }}
+                    />
                   </button>
                 </div>
 
                 {expanded && (
                   <div
                     style={{
-                      padding: '8px 12px 12px 38px',
+                      padding: '0 16px 14px 48px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 4,
-                      borderTop: '1px solid var(--border-color)',
-                      maxHeight: 220,
+                      gap: 2,
+                      maxHeight: 240,
                       overflowY: 'auto',
+                      borderTop: '1px solid var(--border-color)',
+                      paddingTop: 10,
+                      marginTop: -2,
                     }}
                   >
                     {catHits.map(h => {
@@ -342,19 +472,25 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 8,
+                            gap: 10,
                             background: 'transparent',
                             border: 'none',
-                            padding: '4px 0',
+                            padding: '6px 4px',
                             cursor: 'pointer',
                             textAlign: 'left',
+                            borderRadius: 6,
+                            transition: 'background 0.12s',
                           }}
+                          onMouseEnter={e =>
+                            (e.currentTarget.style.background = 'var(--bg-secondary)')
+                          }
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                         >
                           <span
                             style={{
-                              width: 14,
-                              height: 14,
-                              borderRadius: 3,
+                              width: 16,
+                              height: 16,
+                              borderRadius: 4,
                               border: `1.5px solid ${isExcluded ? 'var(--border-color)' : colour}`,
                               background: isExcluded ? 'transparent' : colour,
                               display: 'inline-flex',
@@ -363,14 +499,19 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
                               flexShrink: 0,
                             }}
                           >
-                            {!isExcluded && <Check size={10} style={{ color: 'white' }} />}
+                            {!isExcluded && (
+                              <Check size={11} strokeWidth={2.6} style={{ color: 'white' }} />
+                            )}
                           </span>
                           <span
                             style={{
-                              fontSize: 12,
+                              fontSize: 12.5,
                               color: isExcluded ? 'var(--text-muted)' : 'var(--text-primary)',
                               fontFamily: 'var(--font-mono, monospace)',
                               textDecoration: isExcluded ? 'line-through' : 'none',
+                              wordBreak: 'break-word',
+                              minWidth: 0,
+                              flex: 1,
                             }}
                           >
                             {h.value}
@@ -387,13 +528,13 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
           {totalHits === 0 && (
             <div
               style={{
-                padding: '16px',
-                fontSize: 12.5,
-                color: 'var(--text-muted)',
+                padding: '20px 16px',
+                fontSize: 13,
+                color: 'var(--text-secondary)',
                 textAlign: 'center',
-                background: 'var(--bg-card)',
+                background: 'var(--bg-primary)',
                 border: '1px dashed var(--border-color)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 14,
               }}
             >
               No identifying tokens detected. Safe to submit.
@@ -401,81 +542,107 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
           )}
         </div>
 
+        {/* Footer — single dominant primary action; skip-redaction is a
+            quiet tertiary text link below; cancel lives in the X close
+            button at top-right. Replaces the prior three-equal-buttons
+            row where the visual hierarchy got lost. */}
         <div
           style={{
-            marginTop: 16,
-            paddingTop: 12,
+            marginTop: 20,
+            padding: '16px 26px 22px',
             borderTop: '1px solid var(--border-color)',
+            background: 'var(--bg-card)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 10,
+            gap: 12,
           }}
         >
           <div
             style={{
-              fontSize: 11.5,
-              color: 'var(--text-muted)',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
               textAlign: 'center',
               fontVariantNumeric: 'tabular-nums',
+              fontWeight: 500,
             }}
           >
             {totalHits === 0 ? (
               'Nothing flagged — safe to submit'
             ) : (
               <>
-                <strong style={{ color: 'var(--text-secondary)' }}>{selected.length}</strong> of{' '}
-                {totalHits} flagged {totalHits === 1 ? 'item' : 'items'} will be replaced with
-                placeholders
+                <strong style={{ color: 'var(--text-primary)' }}>{selected.length}</strong>
+                {' of '}
+                <strong style={{ color: 'var(--text-primary)' }}>{totalHits}</strong>
+                {' flagged '}
+                {totalHits === 1 ? 'item' : 'items'} will be replaced with placeholders
               </>
             )}
           </div>
-          {/* Three actions spread full-width and equal-weight; colour, not
-              size, carries the primary/secondary/tertiary hierarchy. */}
-          <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+
+          {totalHits === 0 ? (
             <Button
-              variant="outline"
-              onClick={onCancel}
-              style={{
-                flex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-              }}
-            >
-              <X size={13} /> Cancel
-            </Button>
-            <Button
-              variant="outline"
               onClick={handleSkip}
               style={{
-                flex: 1,
-                fontSize: 12,
+                width: '100%',
+                background: 'var(--accent-primary)',
+                color: 'white',
+                fontWeight: 700,
+                fontSize: 14,
+                padding: '12px 18px',
+                borderRadius: 12,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                gap: 8,
               }}
             >
-              Skip redaction
+              <Check size={15} strokeWidth={2.5} />
+              Submit memo for audit
             </Button>
+          ) : (
             <Button
               onClick={handleRedact}
               disabled={selected.length === 0}
               style={{
-                flex: 1.4,
+                width: '100%',
                 background: 'var(--accent-primary)',
                 color: 'white',
+                fontWeight: 700,
+                fontSize: 14,
+                padding: '12px 18px',
+                borderRadius: 12,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 6,
-                fontWeight: 700,
+                gap: 8,
+                opacity: selected.length === 0 ? 0.55 : 1,
               }}
             >
-              <Check size={13} />
-              Redact &amp; submit
+              <ShieldCheck size={15} strokeWidth={2.4} />
+              Redact {selected.length} {selected.length === 1 ? 'item' : 'items'} and submit
             </Button>
-          </div>
+          )}
+
+          {totalHits > 0 && (
+            <button
+              onClick={handleSkip}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontSize: 12.5,
+                fontWeight: 500,
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '4px 0',
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+                textDecorationColor: 'var(--border-color)',
+                alignSelf: 'center',
+              }}
+            >
+              Submit without redacting
+            </button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

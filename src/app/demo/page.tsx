@@ -192,10 +192,11 @@ export default function DemoPage() {
     result: AnalysisResult;
   } | null>(null);
   const [pasteError, setPasteError] = useState<string | null>(null);
-  const [pasteStageIdx, setPasteStageIdx] = useState(0);
-  // Raw 0-100 progress from the SSE stream — drives the 12-node pipeline viz
-  // (PipelineFlowDiagram activeNodeId mapping). The existing pasteStageIdx is
-  // the local 8-stage UI grouping; pasteProgress is the canonical engine value.
+  // Raw 0-100 progress from the SSE stream — drives the 12-node
+  // PipelineFlowDiagram `activeNodeId` mapping in live mode. The
+  // legacy `pasteStageIdx` (8-stage checklist) was retired 2026-05-20:
+  // per-node done / running / pending state is now expressed inside
+  // the viz itself, so the supporting text checklist became redundant.
   const [pasteProgress, setPasteProgress] = useState(0);
   // Redaction gate (3.2) — opens the modal when a paste contains PII.
   const [redactScan, setRedactScan] = useState<ScanResult | null>(null);
@@ -244,7 +245,6 @@ export default function DemoPage() {
     setPasteAuditing(true);
     setPasteError(null);
     setPasteAudit(null);
-    setPasteStageIdx(0);
     setPasteProgress(0);
 
     try {
@@ -282,12 +282,9 @@ export default function DemoPage() {
       const handle = (raw: unknown) => {
         const m = raw as DemoMsg;
         if (typeof m.progress === 'number') {
-          const idx = Math.min(
-            PIPELINE_STAGES.length - 1,
-            Math.max(0, Math.floor((m.progress / 100) * PIPELINE_STAGES.length))
-          );
-          setPasteStageIdx(idx);
-          // Raw 0-100 for the 12-node pipeline viz (PipelineFlowDiagram).
+          // Raw 0-100 for the 12-node pipeline viz (PipelineFlowDiagram
+          // in liveMode). Per-node done / running / pending state is
+          // derived inside the viz from this progress value.
           setPasteProgress(Math.min(100, Math.max(0, m.progress)));
         }
         if (m.type === 'error') {
@@ -314,7 +311,6 @@ export default function DemoPage() {
               savePlaceholderMap(idForTrail, placeholderEntries);
             }
           }
-          setPasteStageIdx(PIPELINE_STAGES.length - 1);
           setPasteProgress(100);
           setPasteAudit(data);
           setPasteAuditing(false);
@@ -1013,25 +1009,28 @@ export default function DemoPage() {
               strategic memo.
             </p>
           </div>
-          {/* 12-node pipeline viz — drives the live "watch the real pipeline
-              run" moment from REAL SSE progress. Mirrors the /how-it-works
-              hero so a cold stranger recognises the brand visual AND watches
-              the actual audit light up node-by-node instead of just reading
-              a checklist. PIPELINE_NODES is the canonical 12-node manifest;
-              the same one /how-it-works renders. Locked 2026-05-19
-              (founder-directed). The 8-stage list below stays as the
-              supporting detail. */}
+          {/* 12-node pipeline viz · liveMode — drives the live "watch the
+              real pipeline run" moment from REAL SSE progress. Mirrors the
+              /how-it-works hero so a cold stranger recognises the brand
+              visual AND watches the actual audit light up node-by-node.
+              PIPELINE_NODES is the canonical 12-node manifest; the viz
+              derives per-node done / running / pending state + per-zone
+              highlights + a live progress strip from `activeNodeId`. The
+              legacy 8-stage checklist below was removed 2026-05-20
+              (founder-directed: "remove the underneath text, as it will
+              be conveyed through the viz updating in real time"). */}
           <div
             style={{
               background: C.white,
               border: `1px solid ${C.slate200}`,
               borderRadius: 16,
-              padding: '18px 8px 4px',
-              marginBottom: 18,
+              padding: '18px 8px 18px',
+              marginBottom: 0,
               overflow: 'hidden',
             }}
           >
             <PipelineFlowDiagram
+              liveMode
               activeNodeId={
                 PIPELINE_NODES[
                   Math.min(
@@ -1041,69 +1040,6 @@ export default function DemoPage() {
                 ]?.id ?? null
               }
             />
-          </div>
-          <div style={{ ...cardStyle, padding: '22px 26px' }}>
-            {PIPELINE_STAGES.map((stage, idx) => {
-              const Icon = stage.icon;
-              const state =
-                idx < pasteStageIdx
-                  ? ('done' as const)
-                  : idx === pasteStageIdx
-                    ? ('running' as const)
-                    : ('pending' as const);
-              return (
-                <div
-                  key={stage.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '10px 0',
-                    borderBottom:
-                      idx === PIPELINE_STAGES.length - 1 ? 'none' : `1px solid ${C.slate100}`,
-                    opacity: state === 'pending' ? 0.42 : 1,
-                    transition: 'opacity 0.3s',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 8,
-                      background:
-                        state === 'done'
-                          ? C.greenLight
-                          : state === 'running'
-                            ? C.greenSoft
-                            : C.slate50,
-                      color:
-                        state === 'done' ? C.green : state === 'running' ? C.green : C.slate400,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {state === 'running' ? (
-                      <Loader2 size={13} className="animate-spin" />
-                    ) : state === 'done' ? (
-                      <CheckCircle2 size={14} strokeWidth={2.4} />
-                    ) : (
-                      <Icon size={13} />
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 13.5,
-                      fontWeight: state === 'pending' ? 500 : 600,
-                      color: state === 'pending' ? C.slate500 : C.slate900,
-                    }}
-                  >
-                    {stage.label}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </SectionBand>
       )}
@@ -1239,113 +1175,11 @@ export default function DemoPage() {
               }
             />
           </div>
-
-          <div style={{ ...cardStyle, padding: '24px 28px' }}>
-            {PIPELINE_STAGES.map((stage, idx) => {
-              const StageIcon = stage.icon;
-              const isComplete = idx < currentStage;
-              const isActive = idx === currentStage;
-              const isPending = idx > currentStage;
-
-              return (
-                <div
-                  key={stage.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 14,
-                    padding: '10px 0',
-                    opacity: isPending ? 0.35 : 1,
-                    transition: 'opacity 0.3s',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      position: 'relative',
-                      background: isComplete ? C.greenSoft : isActive ? C.slate50 : C.white,
-                      border: `1px solid ${isComplete ? C.greenLight : isActive ? C.slate200 : C.slate100}`,
-                      transition: 'background 0.4s, border-color 0.4s',
-                    }}
-                  >
-                    {/* Crossfaded icon stack — three layered icons at different
-                       opacities prevent the jarring instant icon swap. */}
-                    <span
-                      style={{
-                        position: 'absolute',
-                        opacity: isPending ? 1 : 0,
-                        transition: 'opacity 0.35s',
-                      }}
-                    >
-                      <StageIcon size={16} style={{ color: C.slate500 }} />
-                    </span>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        opacity: isActive ? 1 : 0,
-                        transition: 'opacity 0.35s',
-                      }}
-                    >
-                      <Loader2 size={16} style={{ color: C.green }} className="animate-spin" />
-                    </span>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        opacity: isComplete ? 1 : 0,
-                        transition: 'opacity 0.35s',
-                      }}
-                    >
-                      <CheckCircle2 size={16} style={{ color: C.green }} />
-                    </span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: isActive ? 600 : 500,
-                      color: isComplete ? C.green : isActive ? C.slate900 : C.slate500,
-                    }}
-                  >
-                    {stage.label}
-                    {isActive && (
-                      <span style={{ color: C.slate400, marginLeft: 6 }} className="animate-pulse">
-                        …
-                      </span>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
-
-            <div style={{ marginTop: 20 }}>
-              <div
-                style={{
-                  height: 4,
-                  borderRadius: 2,
-                  background: C.slate100,
-                  overflow: 'hidden',
-                }}
-              >
-                <div
-                  style={{
-                    height: '100%',
-                    borderRadius: 2,
-                    background: C.green,
-                    width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%`,
-                    transition: 'width 0.5s',
-                  }}
-                />
-              </div>
-              <div style={{ fontSize: 11, color: C.slate500, marginTop: 8, textAlign: 'center' }}>
-                Step {currentStage + 1} of {PIPELINE_STAGES.length}
-              </div>
-            </div>
-          </div>
+          {/* The legacy 8-stage checklist + linear progress bar were retired
+              2026-05-20 (founder-directed) — per-node done / running /
+              pending state + the live progress strip are now expressed
+              inside PipelineFlowDiagram itself in liveMode, so the
+              underneath text became redundant duplicate signal. */}
         </SectionBand>
       )}
 
