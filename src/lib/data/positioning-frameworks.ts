@@ -12,17 +12,19 @@
 
 import type { Status } from './positioning-copilot';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
-import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+import { MATRIX_COMBINATIONS, MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 // Derived — "30+ biases" + "DI-B-001–020" deprecated/stale per CR-3 +
 // the Kahneman-Klein sprint (DI-B-021/022). Founder-rehearsal surface.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 const BIAS_ID_RANGE = `DI-B-001–${String(BIAS_COUNT).padStart(3, '0')}`;
-// Derive the matrix dimension + combination count from the engine so
-// the demo script can never drift (the M-1 regression: "20×20 / 400"
-// while the engine ran 22×22 / 484). MATRIX_DIMENSION = 22 today.
+// Derive the matrix dimension from the engine so the demo script can
+// never drift (the M-1 regression: "20×20 / 400" while the engine ran
+// 22×22 / 484). MATRIX_DIMENSION = 22 today; MATRIX_COMBINATIONS = 484.
+// Both come from the canonical interaction-matrix module — the local
+// copy was promoted to canonical 2026-05-21 (audit Section 1) to
+// close the duplicate-constant drift class.
 const MATRIX = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
-const MATRIX_COMBINATIONS = MATRIX_DIMENSION * MATRIX_DIMENSION;
 
 // ─── Framework 1 — 5 Levels of Entrepreneurship Thinking ───────────────────
 

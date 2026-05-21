@@ -703,3 +703,15 @@ export const MATRIX_BIAS_KEYS = [
 
 /** Convenience: matrix dimension (22 as of 2026-05-13). */
 export const MATRIX_DIMENSION = MATRIX_BIAS_KEYS.length;
+
+/**
+ * Total pairwise weights in the matrix (MATRIX_DIMENSION²). Used in
+ * founder-rehearsal surfaces ("484 empirically-grounded pairwise
+ * weights" instead of stale literal 400 / 441). Derive — never literal —
+ * so a 23rd bias landing in BIAS_EDUCATION + MATRIX_BIAS_KEYS lifts
+ * every consumer automatically (per the M-1 / U-3.1 cascade
+ * discipline). Previously redefined locally in
+ * src/lib/data/positioning-frameworks.ts; promoted to canonical
+ * 2026-05-21 to close the drift class.
+ */
+export const MATRIX_COMBINATIONS = MATRIX_DIMENSION * MATRIX_DIMENSION;

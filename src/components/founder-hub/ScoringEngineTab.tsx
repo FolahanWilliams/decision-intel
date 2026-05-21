@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { BarChart3, Zap, AlertTriangle, Brain, Network, HelpCircle } from 'lucide-react';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { MATRIX_COMBINATIONS, MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { card, sectionTitle, badge, tableRow } from '@/components/founder-hub/shared-styles';
+
+// Derive the matrix dimension + combination count so the founder-rehearsed
+// tab can never drift (M-1 / U-3.1 / 2026-05-21 audit cascade).
+const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 // ─── Toxic Pattern Knowledge Base ──────────────────────────────────────────
 
@@ -262,8 +267,8 @@ export function ScoringEngineTab() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[
             {
-              title: '20x20 Interaction Matrix',
-              desc: '400 empirically-grounded pairwise weights (e.g., confirmation + groupthink = 1.35x amplification)',
+              title: `${MATRIX_LABEL} Interaction Matrix`,
+              desc: `${MATRIX_COMBINATIONS} empirically-grounded pairwise weights (e.g., confirmation + groupthink = 1.35x amplification)`,
             },
             {
               title: 'Context Multipliers',

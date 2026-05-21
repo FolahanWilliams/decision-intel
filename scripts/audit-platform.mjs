@@ -809,6 +809,15 @@ const LOCKED_COUNT_DRIFT_FILES = [
   'src/lib/data/founder-school/visualizations.ts',
   'src/lib/data/founder-school/research-foundations.ts',
   'src/components/founder-hub/path-to-100m/data/category-pitch.ts',
+  // Added 2026-05-21 (audit Section 1) — these 3 founder-USED tabs
+  // were OUTSIDE the original M-1 / U-3.1 scope and silently hardcoded
+  // '20×20' / '20x20' / '400' for 8+ days. The lock's narrow allowlist
+  // was the structural reason the U-3.1b "checkLockedCountDrift returns
+  // ZERO" claim was a false-negative for this class — same shape as
+  // the lock the M-1 cascade was already meant to close.
+  'src/components/founder-hub/ScoringEngineTab.tsx',
+  'src/components/founder-hub/CorePipelineTab.tsx',
+  'src/components/founder-hub/start-here/founder-hub-map-data.ts',
   // NOTE: education-room-data.ts is deliberately NOT here. It's a
   // deprecation-TEACHING flashcard deck — its cards already derive
   // ${BIAS_COUNT} and quote "30+ cognitive biases" precisely to drill

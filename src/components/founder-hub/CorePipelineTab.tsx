@@ -4,12 +4,16 @@ import { Fragment } from 'react';
 import { Zap, Brain, Target, CheckCircle, FileText, Users, Cpu } from 'lucide-react';
 import { card, sectionTitle, label, badge } from '@/components/founder-hub/shared-styles';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 
 // Canonical taxonomy count — derives from BIAS_EDUCATION so DI-B-023+ updates
 // automatically (CLAUDE.md "Bias Taxonomy" cascade discipline). BIAS_EDUCATION
 // is a Record<BiasCategory, ...>, NOT an array — use Object.keys().length per
 // the canonical pattern in onepager / how-it-works / bias-genome / pricing.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+// Matrix dimension — derives from interaction-matrix so M-1/DI-B-023+
+// extensions lift this surface automatically (founder-USED rehearsal tab).
+const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 type ModelTier = 'cheap' | 'main' | 'none';
 
@@ -413,8 +417,7 @@ SYNTHESIS (Sequential)
             },
             {
               label: 'Scoring Layer',
-              value:
-                'Deterministic compound scoring POST-LLM — 20x20 bias interaction matrix, context multipliers, biological signal detection',
+              value: `Deterministic compound scoring POST-LLM — ${MATRIX_LABEL} bias interaction matrix, context multipliers, biological signal detection`,
             },
             {
               label: 'Noise Measurement',
