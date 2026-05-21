@@ -23,6 +23,13 @@
  *    flow handoff.
  */
 
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+
+// Matrix dimension for the product_deep node payoff line. Derived so a
+// 23rd bias landing in BIAS_EDUCATION lifts the founder-rehearsed
+// description automatically (M-1 / U-3.1 / 2026-05-21 audit cascade).
+const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
+
 export type TabId =
   // Start (5)
   | 'unicorn_roadmap'
@@ -169,7 +176,7 @@ export const NODES: MapNode[] = [
     y: 0.5,
     whatItsFor:
       '12-node LangGraph pipeline, scoring engine with toxic-combination detection, DQI methodology.',
-    payoff: 'Technical depth for a CTO call. Scoring weights, calibration, the 20×20 matrix.',
+    payoff: `Technical depth for a CTO call. Scoring weights, calibration, the ${MATRIX_LABEL} matrix.`,
     minutes: 30,
     prerequisites: ['overview'],
     iconName: 'Brain',
