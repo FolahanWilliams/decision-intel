@@ -18,6 +18,15 @@
  * only — every section in ClosingLabTab pulls from these typed exports.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+// Derived — every framework-count claim in this file MUST interpolate
+// FRAMEWORK_COUNT, never literal a number. Three stale "17/18-framework"
+// sites were caught by the 2026-05-22 nightly audit; hyphenated forms
+// escape the lint-counts regex (`/(\d+)\s+frameworks/`), so derivation
+// is the only structural defence.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 // ─── Types ──────────────────────────────────────────────────────────
 
 export type ConverterId = 'mid_market_associate' | 'boutique_ma_advisor' | 'fractional_cso';
@@ -278,14 +287,14 @@ export const TRAP_PERSONAS: TrapPersona[] = [
     whyTheyAreATrap:
       'Enterprise PE/VC sales cycles take 9-18 months. Selling to the partner requires proving ROI across multiple deals + satisfying strict regional regulatory frameworks (Nigerian SEC ISA 2007, NDPR, FRC Nigeria current code). Waiting for them to sign a $30K/year contract drains your immediate 30-day momentum. The partnership is real but it is not a 30-day close.',
     whenToRevisit:
-      'After the Sankore design partnership produces a published reference case AND the 18-framework regulatory map closes the ISA 2007 gap. Then bundle with adjacent Pan-African funds for a multi-deal close motion.',
+      `After the Sankore design partnership produces a published reference case AND the ${FRAMEWORK_COUNT}-framework regulatory map is procurement-validated. Then bundle with adjacent Pan-African funds for a multi-deal close motion.`,
     color: '#475569',
   },
   {
     id: 'gc_audit_committee',
     label: 'General Counsels / Audit Committees',
     whyTheyLookAttractive:
-      'Your 18-framework compliance map (post-ISA 2007 fix) makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.',
+      `Your ${FRAMEWORK_COUNT}-framework compliance map makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.`,
     whyTheyAreATrap:
       'GCs are gatekeepers, not early adopters. Their literal job on any enterprise contract is to find reasons NOT to sign. They will relentlessly scrutinize your data retention windows, NDA compliance, lack of statistical confidence intervals on DQI, and your continuity-of-vendor risk as a 16-year-old solo founder. Pitching them directly at pre-seed is corporate suicide.',
     whenToRevisit:
@@ -548,7 +557,7 @@ export const CUT_LIST: CutListItem[] = [
     rationale: 'Solo advisors and individual associates do not have teams to benchmark.',
   },
   {
-    feature: '17/18-framework Compliance Mapping (SOX, EU AI Act, etc.)',
+    feature: `${FRAMEWORK_COUNT}-framework Compliance Mapping (SOX, EU AI Act, etc.)`,
     verdict: 'enterprise_only',
     rationale:
       'A 24-year-old associate and a boutique M&A advisor do not care about EU AI Act. Only Fortune 500 GCs care, and they take 12 months to close.',

@@ -818,17 +818,30 @@ const LOCKED_COUNT_DRIFT_FILES = [
   'src/components/founder-hub/ScoringEngineTab.tsx',
   'src/components/founder-hub/CorePipelineTab.tsx',
   'src/components/founder-hub/start-here/founder-hub-map-data.ts',
-  // NOTE: education-room-data.ts is deliberately NOT here. It's a
-  // deprecation-TEACHING flashcard deck — its cards already derive
-  // ${BIAS_COUNT} and quote "30+ cognitive biases" precisely to drill
-  // the founder OFF it. Flagging a corrective surface for containing
-  // the string it teaches against is noise (the V-4.1 false-positive-
-  // cluster anti-pattern). The M-1 risk is ASSERT-the-count surfaces,
-  // which a "this phrasing is DEPRECATED" card is the opposite of.
+  // Added 2026-05-22 (nightly audit Section 1) — hyphenated framework-
+  // count literals ('17-framework', '18-framework') escape the
+  // lint-counts regex (which requires whitespace between digit and
+  // noun, like '17 frameworks'). Four founder-USED files silently
+  // carried stale 17/18-framework moat claims after FRC Nigeria lifted
+  // the canonical count to 19 — same regex-blind class as bias-count
+  // hyphens. SEMANTIC check is the only structural defence.
+  'src/components/founder-hub/closing-lab/closing-lab-data.ts',
+  'src/components/founder-hub/path-to-100m/data/failure-modes.ts',
+  'src/components/founder-hub/path-to-100m/data/ninety-day-actions.ts',
+  'src/components/founder-hub/education/education-room-data.ts',
+  // NOTE: education-room-data.ts IS deliberately INCLUDED here for the
+  // hyphenated-framework class — those are ASSERT-the-count flashcard
+  // canonicalAnswers (the founder rehearses "17-framework regulatory
+  // map" verbatim in investor meetings). The '30+ cognitive biases' /
+  // bias-count carve-out below the file pattern set was specifically
+  // for the deprecation-TEACHING bias-deck cards; framework prose is
+  // not a deprecation-teaching surface — it's literal moat assertion.
 ];
 
 // Stale-count patterns the count-drift lint regex is structurally blind
-// to (`×` is not whitespace; "cognitive" sits between number + "biases").
+// to (`×` is not whitespace; "cognitive" sits between number + "biases";
+// hyphens between number + noun like '17-framework' are structurally
+// blind to /\d+\s+frameworks/ too).
 const LOCKED_COUNT_PATTERNS = [
   {
     re: /\b2[01]\s*[×x]\s*2[01]\b/,
@@ -843,6 +856,16 @@ const LOCKED_COUNT_PATTERNS = [
     what: 'fictional "Twenty biases plus N" split (no such split exists)',
   },
   { re: /\b20-base\b/i, what: 'fictional "20-base + extra-scope" split (no such split exists)' },
+  // Hyphenated framework-count drift (locked 2026-05-22 nightly audit).
+  // Canonical = getAllRegisteredFrameworks().length (currently 19, was 17
+  // before the 2026-04-29 ISA 2007 ship + FRC Nigeria addition). Both
+  // 17-framework and 18-framework are now historically stale. Skip the
+  // canonical phrasing '${FRAMEWORK_COUNT}-framework' via the standard
+  // comment/derivation marker pattern below.
+  {
+    re: /\b1[78]-framework[s]?\b/i,
+    what: 'stale framework count (canonical: ${FRAMEWORK_COUNT}-framework via getAllRegisteredFrameworks)',
+  },
 ];
 
 // Lines that legitimately mention the stale strings: derivation /
@@ -859,6 +882,13 @@ const LOCKED_COUNT_SKIP_MARKERS = [
   'methodology-version',
   '2.2.0',
   'deprecated',
+  // 2026-05-22 nightly audit — comment markers explaining the hyphenated
+  // framework-count drift class. Skip lines that EXPLAIN why a literal
+  // exists (audit trail) rather than ASSERT a stale count.
+  'hyphenated framework',
+  'stale 17',
+  '17→18',
+  'lift the canonical',
 ];
 
 function checkLockedCountDrift(files) {
@@ -872,11 +902,17 @@ function checkLockedCountDrift(files) {
       const raw = lines[i];
       const trimmed = raw.trim();
       // Skip comment lines + documented history/derivation markers.
+      // SKIP_MARKERS match is case-INSENSITIVE because the deprecation-
+      // teaching flashcard uses 'DEPRECATED' (uppercase) verbatim — the
+      // 2026-05-22 nightly audit caught this false-positive class when
+      // education-room-data.ts was added to LOCKED_COUNT_DRIFT_FILES for
+      // the hyphenated-framework class.
+      const rawLower = raw.toLowerCase();
       if (
         trimmed.startsWith('//') ||
         trimmed.startsWith('*') ||
         trimmed.startsWith('/*') ||
-        LOCKED_COUNT_SKIP_MARKERS.some(m => raw.includes(m))
+        LOCKED_COUNT_SKIP_MARKERS.some(m => rawLower.includes(m.toLowerCase()))
       ) {
         continue;
       }
