@@ -7,6 +7,16 @@
  * Attack Vectors) + internal-execution pre-mortems from CLAUDE.md.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+
+// Derived — defensive-move prose cites the regulatory-map moat count
+// AND the interaction-matrix dimension; both MUST interpolate so
+// additions ripple. Hyphenated '17-framework' and '20×20' literals
+// escape the lint-counts regex (the 2026-05-22 audit caught stale
+// literals here while canonical was 19 frameworks / 22×22 matrix).
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type FailureMode = {
   id: string;
   trap: string;
@@ -87,7 +97,7 @@ export const FAILURE_MODES: FailureMode[] = [
     countermove: [
       'Outcome Gate Enforcement accelerates outcome-data accumulation for design-partner orgs — every gated audit forces the loop closure that builds OUR data moat',
       'Pan-African specimen library (WeWork + Dangote + future co-authored sectoral specimens) compounds in dimensions Cloverpop cannot easily extend',
-      'The 17-framework regulatory map across G7 / EU / GCC / African markets is structurally something a US-incumbent would need 12-18 months to match',
+      `The ${FRAMEWORK_COUNT}-framework regulatory map across G7 / EU / GCC / African markets is structurally something a US-incumbent would need 12-18 months to match`,
     ],
     tripwire:
       'If Clearbox launches "Cloverpop AI Audit" with bias-detection capability before Q3 2026, they have closed the gap. Track Clearbox Decisions press releases monthly.',
@@ -125,7 +135,7 @@ export const FAILURE_MODES: FailureMode[] = [
     countermove: [
       'Authorship-agnostic R²F · the 22-bias DI-B-001 → DI-B-022 taxonomy fires on REASONING PATTERNS inside artefacts, not on artefact format. DI-B-021 (illusion_of_validity) detects narrative coherence not backed by base rates — fires HARDER on agent outputs because LLM auto-regression prioritises coherence by construction. As agent-authored artefacts proliferate, R²F becomes MORE valuable, not less. The moat compounds.',
       'DPR is the contractual artefact regardless of input source · EU AI Act Art 14 + Basel III ICAAP + SEC AI disclosure require auditable records for HIGH-STAKES decisions, not for human-authored decisions specifically. The hashed + tamper-evident provenance with six R²F cover signals + 19-framework regulatory mapping is the contractual answer the F500 GC needs whether the input was a memo or an agent decision-chain log.',
-      'Structurer node accepts arbitrary structured input · extending the input schema from "uploaded document" to "agent decision-chain log" or "agent system prompt + output trace" is an INPUT-LAYER change, not a pipeline rewrite. The 12-node pipeline + 20×20 toxic-combinations matrix + 143-case reference-class engine work the same way once the input is structured.',
+      `Structurer node accepts arbitrary structured input · extending the input schema from "uploaded document" to "agent decision-chain log" or "agent system prompt + output trace" is an INPUT-LAYER change, not a pipeline rewrite. The 12-node pipeline + ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} toxic-combinations matrix + 143-case reference-class engine work the same way once the input is structured.`,
       'The 7-minute live audit motion on specimens (Founder School es_10) does NOT depend on memo format — bias-detection IP is applicable to ANY structured artefact.',
       '30-day investigation in flight · scaffolded 2026-05-02 at docs/agentic-shift-investigation-q2-2026.md. 10 prospect conversations, end-of-June 2026 synthesis memo, three forward paths: Path A (>70% human-authored → wedge holds, pivot stays Q1 2027 reserve), Path B (40-70% AI-assisted → ship AI-assistance signature detector as next R²F paper application), Path C (>30% agent-generated → extend structurer for agent decision-chain logs in 2026 H2).',
     ],

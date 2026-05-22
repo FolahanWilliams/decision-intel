@@ -8,6 +8,14 @@
  * When the sprint plan rolls forward (next 90-day window), update HERE.
  */
 
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+
+// Derived — action prose cites the regulatory-map moat count; MUST
+// interpolate FRAMEWORK_COUNT so additions ripple. ISA 2007 ship is
+// COMPLETE (post-2026-04-29) so the action prose now refers to the
+// canonical-derived current count, not the historical 17→18 transition.
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+
 export type NinetyDayAction = {
   id: string;
   week: string;
@@ -101,7 +109,7 @@ export const NINETY_DAY_ACTIONS: NinetyDayAction[] = [
     weekNumber: 1,
     category: 'product',
     action: 'Ship ISA 2007 (Nigerian Investment & Securities Act 2007) framework module',
-    why: 'Sankore-class deal-killer. The Pan-African 17-framework map drops to 18 with this. CLAUDE.md Enterprise Friction Matrix lock 2026-04-26.',
+    why: `Sankore-class deal-killer. The Pan-African ${FRAMEWORK_COUNT}-framework map covers NDPR / CBN / WAEMU / PoPIA / SARB / ISA Nigeria 2007 — the Cloverpop + IBM watsonx incumbents do not. CLAUDE.md Enterprise Friction Matrix lock 2026-04-26.`,
     successCriterion:
       'ISA 2007 framework live in getAllRegisteredFrameworks() · DPR specimens regenerated · /security page updated',
     blocker: 'Solo dev time. ISA 2007 statute reading time.',
