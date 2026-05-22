@@ -19,6 +19,7 @@ import {
 } from '@/lib/data/decision-container-modes';
 import type { ContainerSummary } from '@/types/containers';
 import { logAudit } from '@/lib/audit';
+import { recomputeContainerMetrics } from '@/lib/scoring/container-aggregation';
 
 const log = createLogger('ContainersRoute');
 
@@ -206,6 +207,27 @@ interface CreateBody {
   sector?: string | null;
   committeeDate?: string | null;
   visibility?: 'private' | 'team' | 'specific';
+  /** Adaptation #1 — retroactive audit mode (locked 2026-05-21). When
+   *  true, the container represents a historical closed decision; the
+   *  caller MUST also supply retroactiveMetadata + outcomeOnCreate. */
+  isRetroactive?: boolean;
+  /** Per-container metadata for retroactive containers. */
+  retroactiveMetadata?: {
+    decidedAt: string;
+    outcomeKnownAt: string;
+    sourceProvenance?: string;
+    bulkUploadBatchId?: string;
+    pairingConfidence?: number;
+    pairingMethod?: 'manual' | 'auto_high' | 'auto_medium' | 'auto_low';
+  };
+  /** Outcome to record at creation time — required when isRetroactive
+   *  is true. The pipeline runs and immediately triggers Bias Genome /
+   *  Decision DNA / Knowledge Graph updates (no 90-day wait). */
+  outcomeOnCreate?: {
+    summary: string;
+    metrics?: Record<string, unknown>;
+    realisedDqi?: number;
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -234,12 +256,55 @@ export async function POST(request: NextRequest) {
     }
 
     const mode = getContainerMode(body.kind);
+    // Retroactive containers land on the FINAL committee-gate stage by
+    // default — they represent decisions that are already past every
+    // pre-committee gate (sourcing → diligence → IC review). Forward
+    // containers use the mode's default starting stage.
+    const isRetro = body.isRetroactive === true;
+    const requestedStage =
+      body.stageId && mode.stages.find(s => s.id === body.stageId) ? body.stageId : null;
     const stageId =
-      body.stageId && mode.stages.find(s => s.id === body.stageId)
-        ? body.stageId
-        : mode.defaultStageId;
+      requestedStage ?? (isRetro ? mode.stages[mode.stages.length - 1].id : mode.defaultStageId);
+
+    // Retroactive integrity gate — both metadata + outcomeOnCreate are
+    // mandatory when isRetroactive is true. The pipeline cannot honour
+    // "no 90-day wait" without (a) the historical decidedAt to stamp,
+    // (b) the outcomeKnownAt for outcome-detection lag analytics, and
+    // (c) the outcome summary to create the DecisionContainerOutcome
+    // row in the same transaction.
+    if (isRetro) {
+      const meta = body.retroactiveMetadata;
+      if (!meta || typeof meta !== 'object') {
+        return NextResponse.json(
+          { error: 'retroactiveMetadata required when isRetroactive is true' },
+          { status: 400 }
+        );
+      }
+      if (!meta.decidedAt || !meta.outcomeKnownAt) {
+        return NextResponse.json(
+          { error: 'retroactiveMetadata.decidedAt + outcomeKnownAt required' },
+          { status: 400 }
+        );
+      }
+      if (
+        !body.outcomeOnCreate ||
+        typeof body.outcomeOnCreate !== 'object' ||
+        typeof body.outcomeOnCreate.summary !== 'string' ||
+        body.outcomeOnCreate.summary.trim().length < 10
+      ) {
+        return NextResponse.json(
+          { error: 'outcomeOnCreate.summary required (min 10 chars) when isRetroactive is true' },
+          { status: 400 }
+        );
+      }
+    }
 
     const orgId = await resolveOrgId(user.id);
+
+    const historicalDecidedAt =
+      isRetro && body.retroactiveMetadata?.decidedAt
+        ? new Date(body.retroactiveMetadata.decidedAt)
+        : null;
 
     const created = await prisma.decisionContainer.create({
       data: {
@@ -259,14 +324,82 @@ export async function POST(request: NextRequest) {
         currency: body.currency ?? 'USD',
         targetCompany: body.targetCompany?.trim() || null,
         sector: body.sector?.trim() || null,
+        // Retroactive mode (locked 2026-05-21). On forward containers
+        // these default to false / null and behave as before — the
+        // additive migration is schema-drift-tolerant.
+        isRetroactive: isRetro,
+        retroactiveMetadata: isRetro
+          ? (body.retroactiveMetadata as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
+        // Stamp decidedAt from the historical record so the container
+        // represents the moment the decision was made, not the moment
+        // the user uploaded it. Forward containers leave decidedAt null
+        // until the outcome route stamps it.
+        decidedAt: historicalDecidedAt,
       },
     });
 
+    // Retroactive containers ship with the outcome already known — the
+    // founder's "no 90-day wait" requirement. Stamp the outcome row in
+    // the same flow, validate metrics against the SSOT outcomeShape,
+    // then recompute container metrics so the calibration loop fires
+    // immediately rather than at some future outcome-logging moment.
+    let outcomeId: string | null = null;
+    if (isRetro && body.outcomeOnCreate) {
+      const validKeys = new Set(mode.outcomeShape.fields.map(f => f.key));
+      const metricsBlob: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(body.outcomeOnCreate.metrics ?? {})) {
+        if (!validKeys.has(key)) continue;
+        metricsBlob[key] = value;
+      }
+
+      const outcomeRow = await prisma.decisionContainerOutcome.create({
+        data: {
+          containerId: created.id,
+          summary: body.outcomeOnCreate.summary.trim(),
+          metrics: metricsBlob as Prisma.InputJsonValue,
+          realisedDqi: body.outcomeOnCreate.realisedDqi ?? null,
+          reportedByUserId: user.id,
+        },
+      });
+      outcomeId = outcomeRow.id;
+
+      // Container-level aggregation refresh. Per-analysis Brier scoring
+      // + Bias Genome / Decision DNA / Knowledge Graph propagation fire
+      // when documents land on the container and complete the audit
+      // pipeline — the recalibration trigger on /api/analyze/stream
+      // reads the outcome row that was just created here, so when the
+      // memo doc is attached + audited (next step in the retroactive
+      // flow), recalibration sharpens against KNOWN reality, not a
+      // 90-day-old assumption. Non-fatal — drift-tolerant.
+      await recomputeContainerMetrics(created.id).catch(err =>
+        log.warn(
+          `Retroactive recompute failed (non-fatal) for container ${created.id}: ${String(err)}`
+        )
+      );
+    }
+
     await logAudit({
-      action: 'CONTAINER_CREATED',
+      action: isRetro ? 'CONTAINER_RETROACTIVE_CREATED' : 'CONTAINER_CREATED',
       resource: 'decision_container',
       resourceId: created.id,
-      details: { kind: created.kind, stageId: created.stageId, name: created.name },
+      details: {
+        kind: created.kind,
+        stageId: created.stageId,
+        name: created.name,
+        ...(isRetro
+          ? {
+              isRetroactive: true,
+              decidedAt: historicalDecidedAt?.toISOString() ?? null,
+              outcomeKnownAt: body.retroactiveMetadata?.outcomeKnownAt ?? null,
+              sourceProvenance: body.retroactiveMetadata?.sourceProvenance ?? null,
+              bulkUploadBatchId: body.retroactiveMetadata?.bulkUploadBatchId ?? null,
+              pairingMethod: body.retroactiveMetadata?.pairingMethod ?? null,
+              pairingConfidence: body.retroactiveMetadata?.pairingConfidence ?? null,
+              outcomeId,
+            }
+          : {}),
+      },
     }).catch(err => log.warn('Audit log for container create failed:', err));
 
     return NextResponse.json({
@@ -274,6 +407,9 @@ export async function POST(request: NextRequest) {
       kind: created.kind,
       name: created.name,
       stageId: created.stageId,
+      isRetroactive: created.isRetroactive,
+      decidedAt: created.decidedAt?.toISOString() ?? null,
+      outcomeId,
     });
   } catch (error) {
     log.error('POST /api/containers failed:', error);

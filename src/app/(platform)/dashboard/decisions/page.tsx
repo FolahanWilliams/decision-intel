@@ -37,7 +37,7 @@
 import { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Plus, Filter, Layout, BookOpen, BrainCircuit, XCircle } from 'lucide-react';
+import { Plus, Filter, Layout, BookOpen, BrainCircuit, XCircle, Clock3 } from 'lucide-react';
 import { useContainers, defaultContainerKindForRole } from '@/hooks/useContainers';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
@@ -259,6 +259,31 @@ function KanbanView({
             onClick={() => setStatusFilter('archived')}
           />
         </div>
+        {/* Retroactive bulk-upload entry (Adaptation #1, locked 2026-05-21)
+            — sibling CTA to "New decision" so the historical-backfill path
+            is discoverable to anyone working out of the kanban, not just
+            founder-hub readers. */}
+        <Link
+          href="/dashboard/decisions/retroactive"
+          style={{
+            padding: '8px 14px',
+            borderRadius: 'var(--radius-md)',
+            background: 'transparent',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)',
+            fontSize: 'var(--fs-sm)',
+            fontWeight: 500,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            textDecoration: 'none',
+          }}
+          title="Bulk-upload historical CLOSED decisions and reconstruct them as retroactive containers."
+        >
+          <Clock3 size={14} />
+          Backfill historical
+        </Link>
         {/* New decision routes to the canonical hybrid create surface
             at /dashboard/decisions/new — same destination ContainerKanban
             empty-state, ContainersWidget, and CommandPalette already use.

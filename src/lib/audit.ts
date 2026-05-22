@@ -84,6 +84,9 @@ export type AuditAction =
   | 'CONTAINER_DOCUMENT_REMOVED'
   | 'CONTAINER_CROSS_REFERENCE_RUN'
   | 'CONTAINER_OUTCOME_LOGGED'
+  // Retroactive audit mode (Adaptation #1 lock 2026-05-21)
+  | 'CONTAINER_RETROACTIVE_CREATED'
+  | 'CONTAINER_RETROACTIVE_BULK_UPLOAD'
   // Decision Pipeline Constellation (Phase 3.5 lock 2026-05-09 evening)
   | 'CONTAINER_LINK_CREATED'
   | 'CONTAINER_LINK_DELETED'

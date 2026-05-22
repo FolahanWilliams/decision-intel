@@ -386,6 +386,39 @@ model DecisionContainer {
   /// @schema-drift-tolerant — null on pre-V2 rows + non-acquisition.
   premortemDefence Json?
 
+  /// Adaptation #1 — Retroactive audit mode (locked 2026-05-21).
+  /// When true, the container represents a HISTORICAL closed decision
+  /// loaded with its outcome already known. Skips priors-capture
+  /// (cannot fabricate pre-decision conviction retroactively — integrity
+  /// boundary) and skips the 90-day forward proxy gate. Immediately
+  /// triggers Bias Genome + Decision DNA + Knowledge Graph updates the
+  /// moment the audit completes (because the outcome is already linked).
+  ///
+  /// The audit pipeline itself is identical to forward mode — same 12
+  /// nodes, same kind-specific overlays (Synergy Mirage on
+  /// acquisitions, etc.). Only the WORKFLOW changes.
+  ///
+  /// Compresses 12+ months of forward calibration into days of
+  /// retroactive backfill — the Sankore-killer feature.
+  /// @schema-drift-tolerant — defaults false; pre-2026-05-21 rows
+  /// behave as forward containers.
+  isRetroactive Boolean @default(false)
+
+  /// Metadata for retroactive containers — when the original decision
+  /// was made, when the outcome became known, the source of the
+  /// historical record, and an optional bulk-upload batch grouping.
+  /// Shape (Json):
+  /// {
+  ///   decidedAt: string,         // ISO — when the original decision was committed
+  ///   outcomeKnownAt: string,    // ISO — when the outcome became known
+  ///   sourceProvenance?: string, // e.g. "Sankore IC archive 2018"
+  ///   bulkUploadBatchId?: string,// groups bulk-uploaded entries
+  ///   pairingConfidence?: number,// 0-1, from the bulk-pairing engine
+  ///   pairingMethod?: 'manual' | 'auto_high' | 'auto_medium' | 'auto_low',
+  /// }
+  /// @schema-drift-tolerant — null on non-retroactive containers.
+  retroactiveMetadata Json?
+
   // ─── Timestamps ──────────────────────────────────────────────────
 
   createdAt DateTime @default(now())

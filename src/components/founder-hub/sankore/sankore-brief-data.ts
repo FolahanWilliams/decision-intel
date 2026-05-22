@@ -1284,6 +1284,9 @@ export interface ProductAdaptation {
   buildCost: string;
   status: 'queued' | 'in-progress' | 'shipped';
   disciplineNote: string;
+  /** Optional live route — when the adaptation has shipped, link
+   *  the founder straight to the surface from the brief. */
+  liveRoute?: string;
 }
 
 export const FIVE_ADAPTATIONS: ReadonlyArray<ProductAdaptation> = [
@@ -1291,14 +1294,15 @@ export const FIVE_ADAPTATIONS: ReadonlyArray<ProductAdaptation> = [
     n: 1,
     title: 'Retroactive audit mode',
     description:
-      'New container mode: `retroactive`. Runs DI against historical closed decisions where the outcome is known. Populates the Bias Genome with REAL Sankore data immediately — not over 12 months of forward use. TT gets to see her own historical decisions audited; DI gets the longitudinal calibration data nobody else can fabricate.',
+      'Boolean flag (`isRetroactive`) on existing DecisionContainer composes with all 3 kinds. Bulk-upload entry at /dashboard/decisions/retroactive accepts up to 30 historical docs in one batch; pairing engine reconstructs memo+outcome pairs by entity overlap + temporal proximity + content similarity. Per-pair finalizer creates the container with isRetroactive=true + retroactiveMetadata + the DecisionContainerOutcome row in one transaction — no 90-day forward-calibration wait. Populates Bias Genome / Decision DNA / Knowledge Graph against REAL Sankore data immediately.',
     whyForSankore:
       "Sankore has 14 years of decisions. This is the single highest-leverage adaptation — compresses 12 months of forward calibration into 12 weeks of retroactive work. Also the foundation for the 'Brier-against-real-Sankore-outcomes' procurement claim.",
     buildCost:
-      '~600 LOC. New container mode + retro-mode pipeline flag + outcome-prefilled flow. 1-2 sessions.',
-    status: 'in-progress',
+      '~600 LOC shipped: Prisma migration + 2-tier outcome extractor (regex + deepseek-v4-flash) + pure pairing engine (49 vitest) + 2 routes (extract-outcome + bulk-upload) + 3 UI components (BulkUploadDropzone + RetroactivePairingReview + RetroactiveContainerForm) + 3-step wizard route at /dashboard/decisions/retroactive + container API extension.',
+    status: 'shipped',
+    liveRoute: '/dashboard/decisions/retroactive',
     disciplineNote:
-      'Founder-approved as the first of 5 adaptations to build (2026-05-21). Aligned with V1 calibration loop deepening (base shipped 2026-05-17, this extends it).',
+      'SHIPPED 2026-05-21. Entry: /dashboard/decisions/retroactive. Extends Vector 1 (operational-proxy calibration loop, shipped 2026-05-17) by closing the loop on day one — the outcome row is created at container-create time, so when the memo is then attached and audited, recalibration grounds against KNOWN reality rather than forecasted priors.',
   },
   {
     n: 2,

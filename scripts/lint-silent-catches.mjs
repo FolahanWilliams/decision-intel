@@ -190,7 +190,17 @@ const SCAN_DIR = join(ROOT, 'src');
 // with deterministic fallback). Both annotated inline; the deliverable
 // always renders deterministic templates first — no delivery/audit/
 // flywheel path swallowed.
-const SILENT_CATCH_BASELINE = 195;
+// Retroactive audit mode (Adaptation #1, locked 2026-05-21): +3 ALL
+// canonical req.json()/res.json() body-parse exception class. 1
+// `req.json().catch(() => null)` in /api/retroactive/extract-outcome
+// (already commented inline as "canonical req.json() body-parse
+// exception class — falls through to 400"). 2 `res.json().catch(() =>
+// null)` in BulkUploadDropzone + RetroactiveContainerForm — both
+// surface the API's diagnostic when present before throwing, otherwise
+// the HTTP status. Each annotated inline; no delivery/audit/flywheel
+// path swallowed (the container-create write itself does NOT catch
+// silently — it fails-closed with a 500 + dev-mode diagnostic).
+const SILENT_CATCH_BASELINE = 198;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

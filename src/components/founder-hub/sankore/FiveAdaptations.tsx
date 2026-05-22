@@ -10,6 +10,7 @@
  * gated behind founder approval on the CONTAINER_MODES cascade.
  */
 
+import Link from 'next/link';
 import { Wrench, ArrowRight } from 'lucide-react';
 import { FIVE_ADAPTATIONS } from './sankore-brief-data';
 
@@ -247,6 +248,28 @@ export function FiveAdaptations() {
                 <ArrowRight size={10} style={{ marginTop: 2, flexShrink: 0 }} />
                 {a.disciplineNote}
               </div>
+              {a.liveRoute && (
+                <div style={{ marginTop: 10 }}>
+                  <Link
+                    href={a.liveRoute}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '6px 12px',
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--accent-primary)',
+                      color: '#fff',
+                      fontSize: 'var(--fs-xs)',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <ArrowRight size={12} />
+                    Open live surface
+                  </Link>
+                </div>
+              )}
             </li>
           );
         })}

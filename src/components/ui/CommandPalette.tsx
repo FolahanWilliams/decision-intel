@@ -34,6 +34,7 @@ import {
   Compass,
   Plus,
   Briefcase,
+  Clock3,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';
@@ -323,6 +324,30 @@ export function CommandPalette() {
           'compose',
           'composite dqi',
           'committee gate',
+        ],
+      },
+      // Retroactive bulk-upload entry (Adaptation #1, locked 2026-05-21).
+      // Bulk-upload historical CLOSED decisions, run the pairing engine,
+      // and create retroactive containers with the outcome already known
+      // — populates Bias Genome / Decision DNA / Knowledge Graph against
+      // REAL data immediately. Discoverable via ⌘K so a user who has
+      // collapsed the Reflect cluster can still reach the surface.
+      {
+        id: 'decisions-retroactive',
+        label: 'Backfill Historical Decisions',
+        description: 'Bulk-upload closed decisions — pair memos with outcomes, populate the moat',
+        icon: <Clock3 size={16} />,
+        action: () => navigate('/dashboard/decisions/retroactive'),
+        keywords: [
+          'retroactive',
+          'historical',
+          'backfill',
+          'bulk upload',
+          'closed decisions',
+          'past decisions',
+          'sankore retroactive',
+          'bias genome populate',
+          'no 90 day wait',
         ],
       },
       {
