@@ -14,12 +14,24 @@
  * can never drift from the CLAUDE.md lock.
  */
 
-import { CheckCircle2, CircleDot, Circle, CircleDashed, AlertTriangle, Quote } from 'lucide-react';
+import {
+  CheckCircle2,
+  CircleDot,
+  Circle,
+  CircleDashed,
+  AlertTriangle,
+  Quote,
+  Layers,
+  Lock,
+} from 'lucide-react';
 import {
   DEFENSIBILITY_VECTORS,
   ACQUIHIRE_BINARY_REFRAME,
   DO_NOT_QUOTE,
   WRAPPER_ANSWER_POINTER,
+  COMBINATION_INGREDIENTS,
+  COMBINATION_HEADLINE,
+  SANKORE_AS_LINCHPIN,
   type VectorStatus,
   type Buildability,
 } from './data/defensibility-vectors';
@@ -55,6 +67,148 @@ export function DefensibilityVectorsCard() {
         tamper-evident institutional record, and the per-org calibration data. The wrapper is the
         wedge; the accumulating decision→outcome graph is the company.
       </p>
+
+      {/* COMBINATION INGREDIENTS — the load-bearing 5-ingredient bundle.
+          Sharpens the prior "engine vs accumulating asset" framing by
+          naming exactly how many bundle layers sit beyond competitor reach. */}
+      <div
+        style={{
+          padding: '12px 14px',
+          borderRadius: 'var(--radius-md)',
+          background: 'rgba(22, 163, 74, 0.06)',
+          border: '1px solid var(--accent-primary)',
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 'var(--fs-2xs)',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--accent-primary)',
+            marginBottom: 8,
+          }}
+        >
+          <Layers size={12} />
+          The combination moat · 5-ingredient bundle
+        </div>
+        <p
+          style={{
+            margin: '0 0 12px',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--text-primary)',
+            fontWeight: 600,
+            lineHeight: 1.55,
+          }}
+        >
+          {COMBINATION_HEADLINE}
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {COMBINATION_INGREDIENTS.map(c => (
+            <div
+              key={c.n}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '24px 1fr auto',
+                gap: 10,
+                alignItems: 'flex-start',
+                padding: '8px 10px',
+                borderRadius: 'var(--radius-sm)',
+                background: c.replicable
+                  ? 'color-mix(in srgb, var(--text-muted) 8%, transparent)'
+                  : 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 'var(--fs-sm)',
+                  fontWeight: 800,
+                  color: c.replicable ? 'var(--text-muted)' : 'var(--accent-primary)',
+                  textAlign: 'center',
+                }}
+              >
+                {c.n}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 'var(--fs-xs)',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: 3,
+                  }}
+                >
+                  {c.ingredient}
+                </div>
+                <div
+                  style={{
+                    fontSize: 'var(--fs-2xs)',
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {c.whyUnrepeatable}
+                </div>
+              </div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 'var(--fs-3xs)',
+                  fontWeight: 700,
+                  color: c.replicable ? 'var(--text-muted)' : 'var(--success)',
+                  background: c.replicable
+                    ? 'color-mix(in srgb, var(--text-muted) 12%, transparent)'
+                    : 'color-mix(in srgb, var(--success) 14%, transparent)',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-full)',
+                  whiteSpace: 'nowrap',
+                  alignSelf: 'flex-start',
+                }}
+              >
+                {c.replicable ? <Circle size={10} /> : <Lock size={10} />}
+                {c.replicable ? 'Replicable' : 'Unrepeatable'}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            marginTop: 10,
+            padding: '10px 12px',
+            borderRadius: 'var(--radius-sm)',
+            background: 'var(--bg-card)',
+            border: '1px dashed var(--accent-primary)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 'var(--fs-3xs)',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--accent-primary)',
+              marginBottom: 4,
+            }}
+          >
+            Sankore is the linchpin
+          </div>
+          <div
+            style={{
+              fontSize: 'var(--fs-xs)',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+            }}
+          >
+            {SANKORE_AS_LINCHPIN.body}
+          </div>
+        </div>
+      </div>
 
       {/* Acqui-hire binary reframe */}
       <div

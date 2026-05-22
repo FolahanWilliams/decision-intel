@@ -957,3 +957,397 @@ export const HONEST_GAPS = [
       'Plain-English portfolio insights above the DKG graph still need real cross-org consenting data before we can ship them honestly. The Bias Genome page already runs on real data when n is large enough; the cross-tenant aggregation activates at the third paid pilot.',
   },
 ];
+
+// =========================================================================
+// PARTNERSHIP SHAPE — what I get / what they get / how to frame it
+// Locked 2026-05-21 after the TT-meeting reframe conversation. The
+// engagement is NOT a £1,999/mo founding-pilot; it's a 12-week in-person
+// embed at the London office where the trade is custom internal product
+// in exchange for reference + access + network + retroactive calibration.
+// =========================================================================
+
+export interface PartnershipExchange {
+  side: 'me' | 'them';
+  ingredient: string;
+  detail: string;
+  /** Why this ingredient is unrepeatable for a competitor (the 5-ingredient
+   *  bundle framing — see CLAUDE.md Defensibility lock + combination
+   *  moat section). */
+  unrepeatability: string;
+}
+
+export const PARTNERSHIP_SHAPE: ReadonlyArray<PartnershipExchange> = [
+  {
+    side: 'me',
+    ingredient: 'Access to the 14-year decision archive',
+    detail:
+      'Investment committees, real-estate developments, fund launches, M&A (Diamond Capital, DBSL, Centurion), venture investments (5th Harvest, Wealth.ng, Saunders, Juno) — a decision-volume firm that has been building companies from minimal AUM since 2010.',
+    unrepeatability:
+      'A competitor with $20M of funding can rebuild the audit engine in 6 months. They cannot rebuild a 14-year archive of real Pan-African institutional decisions with known outcomes.',
+  },
+  {
+    side: 'me',
+    ingredient: 'Embedded use across 6+ business lines',
+    detail:
+      'Wealth Management (Private Banking as a Service), Fund Management (₦120B AUM), Real Estate (Lotus, Juno, Laird Place mixed-use), Brokerage, Trustee, Fintech (Wealth.ng / Kada / Astro / Ligare).',
+    unrepeatability:
+      'A 12-week multi-business-line embed produces calibration data + workflow integration data + persona-specific UX feedback no remote vendor can approximate. Linear time the competitor cannot compress.',
+  },
+  {
+    side: 'me',
+    ingredient: 'Retroactive Bias Genome seed (30-50 closed decisions)',
+    detail:
+      'Run DI against historical Sankore decisions where outcomes are known (Agriculture Fund 15-17% target vs actual; Real Wealth Fund track record; 2010-2023 acquisition outcomes). Compresses 12 months of forward calibration into 12 weeks of retroactive work.',
+    unrepeatability:
+      'The single highest-leverage moat-building move — produces a Brier-against-real-Sankore-outcomes claim no competitor can fabricate without an equivalent partner relationship.',
+  },
+  {
+    side: 'me',
+    ingredient: 'Founder-level relationship with TT',
+    detail:
+      'Harvard MBA, ex-Goldman Sachs (NY), ex-Zenith Capital (Head of Investment Strategy). Active angel investor. CPA Gold Award. FT 2023 fastest-growing recognition. Founded Sankore in 2010 during the global financial crisis.',
+    unrepeatability:
+      'Founder-level access at a firm of this calibre is the kind of relationship Mr. Reiner + Mr. Gabe spent careers building. Not transactional — a strategic relationship with someone who shapes Pan-African finance.',
+  },
+  {
+    side: 'me',
+    ingredient: 'Network access to her board',
+    detail:
+      'Tokunbo Ishmael (Alithia Capital, chair), Adia Sowho (Mines, ex-MTN), Ngozi Dozie (Carbon / Paylater), Bolaji Adeoye (Cardinal Stone), Bisola Fatokun (Standard Chartered), Tunde Sarumi, Gerri Lazarre. 6-7 board-level executives with their own networks across Pan-African capital markets.',
+    unrepeatability:
+      'Cold outreach to any one of these would take months. Warm intro via TT to all 6-7 is the wedge motion accelerator the GTM v3.5 Phase 1 → Phase 3 sequencing depends on.',
+  },
+  {
+    side: 'me',
+    ingredient: 'Pan-African regulatory ground-truth validation',
+    detail:
+      "Sankore holds 7 SEC Nigeria licenses (Investment Adviser, Portfolio Manager, Fund Manager, Broker/Dealer, Registrar, Issuing House, Trustee). Working inside that compliance posture validates DI's 19-framework registry against real regulated-entity operating context.",
+    unrepeatability:
+      'The 19-framework registry stops being theoretical and becomes "the framework Sankore Investments runs decisions through." Procurement-grade reference for every other Pan-African institutional buyer.',
+  },
+  {
+    side: 'me',
+    ingredient: 'The brand of being Sankore-embedded',
+    detail:
+      '"The platform Sankore Investments uses to audit its decisions" is an unrepeatable reference for the GTM v3.5 ceiling (cross-border M&A leaders at FTSE 250 / S&P 500). Sankore is the Pan-African anchor that makes the cross-border M&A wedge defensible.',
+    unrepeatability:
+      'Brand reference compounds with every other persona conversation. The Phase 3 mid-market warm-intro motion needs ONE reference customer; Sankore is structurally the right one.',
+  },
+  {
+    side: 'them',
+    ingredient: 'Custom-built internal decision-intelligence platform',
+    detail:
+      'Free for 12+ months. Built INTO their workflow across IC + Real Estate + Fund Management + Ventures + Wealth Management + Trustee. Not a generic SaaS install — a custom product line tuned to Sankore-specific decision classes.',
+    unrepeatability:
+      'No off-the-shelf vendor builds custom decision infrastructure for a single client without a 7-figure engagement contract. The founder embed is what makes the economics work — and Sankore becomes the design partner the next 10 customers inherit.',
+  },
+  {
+    side: 'them',
+    ingredient: 'A co-branded methodology ("Sankore Decision Standard")',
+    detail:
+      "Vector 4 (methodology-as-standard) applied to a single anchor partner. Sankore publicly owns the methodology alongside Decision Intel. Their clients see 'audited per the Sankore Decision Standard'. Their fund LPs see it on every IC artefact.",
+    unrepeatability:
+      "Standards compound through use. Sankore's clients adopting the Sankore Standard makes the standard the regional default — making Sankore the keeper of the Pan-African decision-quality standard, not just a wealth manager.",
+  },
+  {
+    side: 'them',
+    ingredient: 'Founder physically embedded in the London office',
+    detail:
+      '12 weeks. Not a remote vendor. In-person at the newly opened London office. Shadowing IC meetings, sitting in on portfolio reviews, joining real-estate development discussions. The product gets built next to the actual users.',
+    unrepeatability:
+      'Most enterprise software is built remotely and installed once. Decision Intel as built-with-Sankore by a founder who lives in the office for 12 weeks is structurally different — the product that emerges fits Sankore the way no vendor product does.',
+  },
+  {
+    side: 'them',
+    ingredient: 'Optional equity-warrant participation',
+    detail:
+      'Same structure as the existing £20-25K founding-pilot bundle (12-month commitment with optional warrant + outcome-share). For Sankore specifically: the bundle is the relationship + the access + the early position in DI as it grows.',
+    unrepeatability:
+      "TT is an active venture and angel investor. Taking an early position in a Pan-African-rooted decision-intelligence company they helped shape is structurally aligned with Sankore's existing investment thesis (Wealth.ng, Saunders, Juno — they build companies from scratch).",
+  },
+  {
+    side: 'them',
+    ingredient: 'Ligare integration roadmap (optional)',
+    detail:
+      "If TT is interested: prototype an API layer that wraps DI inside Sankore's Wealth-as-Service (Ligare) offering, so every downstream bank/fintech customer of Ligare gets audit-in-the-loop for their advisory recommendations.",
+    unrepeatability:
+      "Distribution moat through partnership. DI rides Sankore's existing B2B2C distribution to every Ligare customer. Sankore's Wealth-as-Service becomes structurally differentiated from generic wealth APIs.",
+  },
+];
+
+// =========================================================================
+// LONGITUDINAL GOALS — 12-week embed + 12-month outcome arc
+// =========================================================================
+
+export interface LongitudinalGoal {
+  horizon: '12-week' | '6-month' | '12-month' | '24-month';
+  goal: string;
+  whyItMatters: string;
+  successSignal: string;
+}
+
+export const LONGITUDINAL_GOALS: ReadonlyArray<LongitudinalGoal> = [
+  {
+    horizon: '12-week',
+    goal: '30-50 retroactive Sankore decisions audited; Bias Genome populated with real Pan-African institutional data.',
+    whyItMatters:
+      'Compresses 12 months of forward-calibration accumulation into 12 weeks. By week 12, "Brier X against 50 closed Sankore decisions" is a procurement-grade claim.',
+    successSignal:
+      'A handoff document — Sankore-specific calibration baseline + per-bias outcome correlations + named pattern frequencies — that TT can show her board.',
+  },
+  {
+    horizon: '12-week',
+    goal: 'Custom decision-intelligence dashboard live across 6 Sankore business lines.',
+    whyItMatters:
+      "TT sees ALL active reasoning risks across IC + Real Estate + Fund Management + Ventures + Wealth Management + Trustee in one screen. CEO-grade view, not analyst tool. The genuinely-novel surface that doesn't exist anywhere else.",
+    successSignal:
+      'TT (or her COO) actually opens the dashboard 3× per week without prompting. Used in the Monday morning leadership meeting.',
+  },
+  {
+    horizon: '12-week',
+    goal: 'Stage-gated IC workflow installed and ENFORCED for one fund (smallest-stakes first).',
+    whyItMatters:
+      "V5 (rigid schema enforcement) goes from documented capability to running infrastructure. Sankore's IC literally cannot vote on a memo without the DI audit attached.",
+    successSignal:
+      "One closed IC decision made through the new workflow, with the DPR attached to Sankore's board package.",
+  },
+  {
+    horizon: '6-month',
+    goal: 'Sankore methodology co-branded and surfaced externally.',
+    whyItMatters:
+      'Vector 4 — Methodology-as-standard. Sankore website + investor letters + fund prospectuses cite the Sankore Decision Standard. Other Pan-African firms start asking what it is.',
+    successSignal:
+      "At least one of Sankore's clients or fund LPs asks for the same standard on their own decisions, opening the second pilot conversation.",
+  },
+  {
+    horizon: '6-month',
+    goal: 'V1 calibration loop validated against real Sankore IRR/MOIC outcomes.',
+    whyItMatters:
+      "Forced-at-vote 90-day operational proxies have been live for 12 weeks. Some have resolved. Brier scoring is now Sankore-specific, not synthetic. The procurement claim survives a sophisticated investor's diligence.",
+    successSignal:
+      'At least 5 closed proxies with Brier scores. The platform-baseline 0.258 becomes "0.X against the Sankore corpus" — the genuine flywheel signal.',
+  },
+  {
+    horizon: '12-month',
+    goal: 'Sankore network warm-intros activated → 3-5 second pilots in conversation.',
+    whyItMatters:
+      "Phase 3 of GTM v3.5 (mid-market warm-intro motion) activates. TT's network — and her board members' networks — provide the credibility ramp the founder cannot manufacture cold.",
+    successSignal:
+      '3-5 conversations active with Pan-African institutional firms TT introduced. At least 1 converts to a second paid pilot at the post-Sankore Phase 3 mid-market rate (£4,999/mo).',
+  },
+  {
+    horizon: '12-month',
+    goal: 'Ligare integration shipped (if TT opens that door).',
+    whyItMatters:
+      "DI becomes a layer in Sankore's existing distribution. Every Ligare downstream customer gets audit-in-the-loop. Distribution moat through partnership.",
+    successSignal:
+      'API layer live; 1-2 Ligare downstream customers using DI through Sankore branding.',
+  },
+  {
+    horizon: '24-month',
+    goal: 'Sankore-anchored Pan-African case library — 100+ closed decisions with outcomes.',
+    whyItMatters:
+      'By month 24, the Pan-African regulatory + Pan-African calibration data + Pan-African case corpus are the moat layer Cloverpop / Aera / IBM watsonx cannot match from the US. The cross-border M&A ceiling buyer recognizes the depth.',
+    successSignal:
+      'The first F500 cross-border M&A team buys DI specifically because of the Pan-African data depth. The ceiling unlocks.',
+  },
+];
+
+// =========================================================================
+// TT MEETING PREP — the tactical playbook
+// =========================================================================
+
+export interface MeetingOption {
+  letter: 'A' | 'B' | 'C';
+  duration: string;
+  title: string;
+  description: string;
+  rationale: string;
+  compoundsToward: string[];
+}
+
+export const TT_MEETING_OPTIONS: ReadonlyArray<MeetingOption> = [
+  {
+    letter: 'A',
+    duration: '4 weeks',
+    title: 'IC Decision Audit Installation',
+    description:
+      "Install DI as the audit layer on every IC memo Sankore's team produces, calibrated to their decision history. Forward-looking: every new IC vote runs through DI first.",
+    rationale:
+      'Fastest-to-value. Within 4 weeks every new Sankore IC decision is audited. The workflow integration is shallow but enforced — V5 (rigid schema) goes live in one fund. Best if TT wants concrete, immediate operational change.',
+    compoundsToward: [
+      '12-week: Stage-gated IC workflow installed and ENFORCED for one fund',
+      '6-month: V1 calibration loop validated against real Sankore IRR/MOIC outcomes',
+    ],
+  },
+  {
+    letter: 'B',
+    duration: '4 weeks',
+    title: 'Retroactive Bias Genome Seed',
+    description:
+      "Run DI against 30-50 of Sankore's historical closed decisions where outcomes are known. Produces a Sankore-specific calibration baseline that becomes their reference framework going forward.",
+    rationale:
+      "Highest moat-building leverage. Compresses 12 months of forward calibration into 4 weeks. By the end, Brier-against-real-Sankore-outcomes is a procurement claim that survives diligence. Best if TT wants to understand DI's depth before committing to forward workflow change.",
+    compoundsToward: [
+      '12-week: 30-50 retroactive Sankore decisions audited',
+      '6-month: Sankore methodology co-branded',
+      '12-month: Sankore network warm-intros activated',
+    ],
+  },
+  {
+    letter: 'C',
+    duration: '8 weeks',
+    title: 'Cross-Business-Line Decision Dashboard',
+    description:
+      'Build a unified decision-intelligence view across IC + Real Estate + Fund Management + Ventures + Wealth Management + Trustee. CEO-grade dashboard of all active reasoning risks in one screen.',
+    rationale:
+      'Strongest strategic differentiation. The genuinely-novel surface — a multi-asset-class decision intelligence dashboard. Best if TT wants Sankore to have a structural differentiator nobody else has (and willing to invest 8 weeks of access, not 4).',
+    compoundsToward: [
+      '12-week: Custom dashboard live across 6 business lines',
+      '6-month: Sankore methodology co-branded',
+      '24-month: Sankore-anchored Pan-African case library',
+    ],
+  },
+];
+
+export interface StrongQuestion {
+  question: string;
+  whyItWorks: string;
+  listenFor: string;
+}
+
+export const TT_STRONG_QUESTIONS: ReadonlyArray<StrongQuestion> = [
+  {
+    question:
+      'Across the 14 years of building Sankore, which closed decision do you still think about — not because the outcome was bad, but because you suspect the reasoning was wrong even though it worked?',
+    whyItWorks:
+      'Earns a 30-minute conversation extension. Surfaces the deepest layer of decision-quality thinking — the right-for-the-wrong-reason category most founders never let themselves articulate. TT is sophisticated enough to have one of these stored away.',
+    listenFor:
+      'Whether the answer reveals an INDIVIDUAL bias (anchoring, sunk-cost) or an INSTITUTIONAL pattern (IC dynamics, board pressure). If institutional, the partnership shape leans toward Option C (dashboard); if individual, Option B (retroactive seed).',
+  },
+  {
+    question:
+      "When the FT named Sankore one of Africa's fastest-growing investment firms in 2023 — what decision in the prior 18 months made that recognition possible? And what decision almost prevented it?",
+    whyItWorks:
+      'Two-part question forces a contrast. Most founders only tell the success story; the "almost-prevented-it" angle surfaces the highest-stakes near-miss — exactly the decision-quality territory DI is built for.',
+    listenFor:
+      'The shape of the near-miss. If a capital-allocation call (fund launch, acquisition), Option A is the natural fit. If a strategic-positioning call, Option C. If an investment-thesis call, Option B.',
+  },
+  {
+    question:
+      'If you could go back to 2019 — when Sankore had ₦25B AUM — and add ONE structural process to how the firm makes its biggest decisions, what would it be? And what stopped you from adding it then?',
+    whyItWorks:
+      "Backward-projection elicits process-design intuition. 'What stopped you' surfaces the institutional constraints — politics, time, cost — that DI has to design around if it's going to be adopted.",
+    listenFor:
+      "The constraints she names are EXACTLY what DI's UX has to overcome. If 'time' — V5 stage-gates are the answer. If 'political will' — V2 mandatory dissent gate. If 'data infrastructure' — Option B (retroactive seed). Use her answer to validate which of the 3 options to lead with.",
+  },
+  {
+    question:
+      "Sankore's 5 Cs framework — Credit, Capital, Cities, Communities, Culture — was built to address Nigeria's specific structural gaps. If we were to add a 6th C — Cognition — what would the gap-it-addresses be?",
+    whyItWorks:
+      "Engages with her actual intellectual framework, not a generic pitch. Shows you've read deeply. Invites her to co-design the positioning. If she takes the question seriously, you're past vendor-evaluation and into partnership.",
+    listenFor:
+      "If she engages: foundation for the 'Sankore Decision Standard' methodology co-brand. If she deflects: don't push — the partnership is still possible but the co-brand piece is premature.",
+  },
+];
+
+export const TT_MEETING_DISCIPLINE = {
+  doDoList: [
+    'Listen first. Ask about her hardest decision in the last 12 months. Let her talk for 10+ minutes before you say anything about DI.',
+    'Show you have done the work — name the 5 Cs framework, the recent acquisitions (Diamond Capital, DBSL, Centurion), the Wealth.ng / Ligare / Kada architecture.',
+    'Position yourself as someone who can extend Sankore reach — DI rides Sankore distribution, Sankore rides DI IP — not as a vendor selling them software.',
+    'Bring a specimen audit relevant to her work. Dangote DPR (Pan-African industrial expansion) AND a fresh specimen audit of a recent Pan-African investment decision researched before the meeting.',
+    'Have a specific 12-week plan ready. Not "I would love to work with you." A timeline. Concrete = serious.',
+    'Be honest about what you do not know. You are 16. You have never worked inside a fund. Saying that explicitly + framing the 12 weeks as your apprenticeship + their custom product = builds trust faster than confidence ever could.',
+  ],
+  doNotList: [
+    'Do NOT pitch the £249 individual tier. Wrong category — TT is not the persona this is built for.',
+    'Do NOT pitch the £1,999/mo founding-pilot rate. Wrong shape — this engagement is bigger than a commercial pilot.',
+    'Do NOT lead with the 60-second audit. She is not a cold-traffic visitor.',
+    'Do NOT mention any other prospect by name. Confidentiality is procurement-grade.',
+    'Do NOT lead with the agentic-shift defense / Cloverpop graveyard analysis. Too inside-baseball for first meeting.',
+    'Do NOT ask for money. If she offers, take it. The relationship + embedded access is worth 100x any £1,999/mo line item over 12 months.',
+  ],
+  framing:
+    'Reverse the dynamic. You are not selling. You are offering to spend 12 weeks at her firm at your own expense building something custom. She is evaluating whether you are worth the desk space + the access. The ask is implicit; the offer is explicit. First meeting is value-show + listen + see what happens. No commercial.',
+};
+
+// =========================================================================
+// FIVE PRODUCT ADAPTATIONS — the roadmap to maximize Sankore leverage
+// =========================================================================
+
+export interface ProductAdaptation {
+  n: number;
+  title: string;
+  description: string;
+  whyForSankore: string;
+  buildCost: string;
+  status: 'queued' | 'in-progress' | 'shipped';
+  disciplineNote: string;
+}
+
+export const FIVE_ADAPTATIONS: ReadonlyArray<ProductAdaptation> = [
+  {
+    n: 1,
+    title: 'Retroactive audit mode',
+    description:
+      'New container mode: `retroactive`. Runs DI against historical closed decisions where the outcome is known. Populates the Bias Genome with REAL Sankore data immediately — not over 12 months of forward use. TT gets to see her own historical decisions audited; DI gets the longitudinal calibration data nobody else can fabricate.',
+    whyForSankore:
+      "Sankore has 14 years of decisions. This is the single highest-leverage adaptation — compresses 12 months of forward calibration into 12 weeks of retroactive work. Also the foundation for the 'Brier-against-real-Sankore-outcomes' procurement claim.",
+    buildCost:
+      '~600 LOC. New container mode + retro-mode pipeline flag + outcome-prefilled flow. 1-2 sessions.',
+    status: 'in-progress',
+    disciplineNote:
+      'Founder-approved as the first of 5 adaptations to build (2026-05-21). Aligned with V1 calibration loop deepening (base shipped 2026-05-17, this extends it).',
+  },
+  {
+    n: 2,
+    title: 'Fourth DecisionContainer mode: real_estate_development',
+    description:
+      'New container kind alongside investment / acquisition / strategic. Stage progression: site_acquisition → entitlement → financing → construction → leasing → stabilization. Required-doc gates: site analysis, financial pro forma, regulatory checklist, contractor selection.',
+    whyForSankore:
+      'Sankore has at least 3 active real-estate projects (Lotus, Juno, Laird Place mixed-use). The existing 3 container modes do not fit a mixed-use development proposal.',
+    buildCost:
+      '~800 LOC. New mode in CONTAINER_MODES + stage definitions + 4-5 new document subtypes + overlays. 2 sessions.',
+    status: 'queued',
+    disciplineNote:
+      'Founder-gated per the CLAUDE.md "Modifying CONTAINER_MODES" cascade discipline.',
+  },
+  {
+    n: 3,
+    title: 'Fifth DecisionContainer mode: fund_launch',
+    description:
+      'New container kind for fund-launch decisions. Stage progression: thesis_development → target_market_sizing → fee_structure → anchor_LP_commitments → regulatory_filing → go_to_market. Document subtypes: thesis memo, fund prospectus, LP-ask deck, regulatory filing.',
+    whyForSankore:
+      'Sankore launches funds repeatedly (Agriculture Fund, Real Wealth Fund). Distinct decision class with its own bias patterns (overconfidence on AUM ramp, anchoring on prior-fund returns, confirmation bias on target sectors).',
+    buildCost: '~700 LOC. Same cascade shape as adaptation #2. 2 sessions.',
+    status: 'queued',
+    disciplineNote: 'Same founder-gated cascade as adaptation #2.',
+  },
+  {
+    n: 4,
+    title: 'Pan-African regulatory deep-extension',
+    description:
+      'Extend the 19-framework registry with: SEC Nigeria Investment Adviser regulations (Sankore has the license), Lagos State property law for real-estate decisions, AML/KYC frameworks for client advisory, FATF Travel Rule for cross-border movements, Nigerian Investment & Securities Act 2007 for fund management.',
+    whyForSankore:
+      'Sankore holds 7 SEC Nigeria licenses. Working inside their compliance posture validates the 19-framework registry against real regulated-entity operating context. Pan-African moat becomes Sankore-validated, not theoretical.',
+    buildCost:
+      '~500 LOC + research time. 5-6 new framework entries with named provisions + per-decision-class regulatory checklists. 1-2 sessions.',
+    status: 'queued',
+    disciplineNote:
+      'Follows the existing africa-frameworks.ts pattern. Framework count lifts; canonical-import discipline catches every consumer that uses getAllRegisteredFrameworks().length.',
+  },
+  {
+    n: 5,
+    title: 'Multi-decision-class portfolio dashboard',
+    description:
+      'New in-product view showing all active decisions across all 6 Sankore business lines in one dashboard. IC pipeline + real-estate development pipeline + fund-launch pipeline + venture investments + client advisory portfolio + trustee decisions. TT (or her COO) sees ALL active reasoning risks in one screen.',
+    whyForSankore:
+      "The genuinely-novel surface that does not exist anywhere else. CEO/CIO-grade dashboard, not an analyst tool. Makes DI structurally different for Sankore from any other vendor — and makes the 'Sankore Decision Standard' brand believable.",
+    buildCost:
+      '~1200 LOC. New /dashboard route + cross-container aggregation API + 6 business-line views + permissions model. 3-4 sessions.',
+    status: 'queued',
+    disciplineNote:
+      'Built on top of adaptations #1-4. Sequence matters: cannot build the dashboard before the underlying container modes exist.',
+  },
+];

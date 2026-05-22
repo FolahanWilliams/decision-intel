@@ -4,6 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { HeroPanel } from '@/components/founder-hub/sankore/HeroPanel';
+import { PartnershipShape } from '@/components/founder-hub/sankore/PartnershipShape';
+import { TtMeetingPrep } from '@/components/founder-hub/sankore/TtMeetingPrep';
+import { LongitudinalGoals } from '@/components/founder-hub/sankore/LongitudinalGoals';
+import { FiveAdaptations } from '@/components/founder-hub/sankore/FiveAdaptations';
 import { HoleClosureMatrix } from '@/components/founder-hub/sankore/HoleClosureMatrix';
 import { DalioConstellation } from '@/components/founder-hub/sankore/DalioConstellation';
 import { RegulatoryBridge } from '@/components/founder-hub/sankore/RegulatoryBridge';
@@ -153,6 +157,19 @@ export function SankoreBriefClient() {
       </Link>
 
       <HeroPanel />
+
+      {/* TT-meeting prep + partnership-shape cluster — locked
+          2026-05-21. The engagement is a 12-week in-person embed at
+          the London office (partnership, not £1,999/mo pilot). These
+          four panels are the founder's daily reference for the meeting
+          + the longitudinal arc + the 5 product adaptations. */}
+      <PartnershipShape />
+      <TtMeetingPrep />
+      <LongitudinalGoals />
+      <FiveAdaptations />
+
+      {/* Capability brief — the original 9-panel reference for what's
+          shipped, what's scaffolded, what's scheduled, what's deferred. */}
       <HoleClosureMatrix />
       <DalioConstellation />
       <RegulatoryBridge />

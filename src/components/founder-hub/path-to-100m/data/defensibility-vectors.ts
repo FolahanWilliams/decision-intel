@@ -161,3 +161,84 @@ export const DO_NOT_QUOTE = [
  *  the spoken script. */
 export const WRAPPER_ANSWER_POINTER =
   'Rehearse the verbatim answer: KillerResponsesPlaybook → "How are you different?" → different_prompt_wrapper.';
+
+// =========================================================================
+// COMBINATION INGREDIENTS — locked 2026-05-21 after the TT-meeting reframe.
+//
+// The honest sharpening to the wrapper question: software alone is never
+// the moat at solo-founder scale. The moat is the BUNDLE of 5 ingredients,
+// only one of which is replicable in time. The wrapper rebuttal in
+// killer-responses leads with this table.
+// =========================================================================
+
+export interface CombinationIngredient {
+  n: number;
+  ingredient: string;
+  replicable: boolean;
+  replicableNote: string;
+  whyUnrepeatable: string;
+}
+
+export const COMBINATION_INGREDIENTS: ReadonlyArray<CombinationIngredient> = [
+  {
+    n: 1,
+    ingredient: 'Pipeline + UI + ontology + DPR',
+    replicable: true,
+    replicableNote: 'Yes, in 6-12 months. Code is code.',
+    whyUnrepeatable:
+      'This is the wrapper. Concede it; do not defend it. The category-grade enterprise version of every system layer is rebuildable by any competent team — including the 22-bias taxonomy, the 19-framework registry, the 12-node pipeline.',
+  },
+  {
+    n: 2,
+    ingredient: 'Founder narrative (16 + Lagos + Kahneman research + financial-literacy program)',
+    replicable: false,
+    replicableNote: 'Identity. Cannot be copied.',
+    whyUnrepeatable:
+      'The 16-year-old solo founder + Lagos-rooted + published research at 16 on behavioral finance + active middle-school financial-literacy program is structurally unique. A 35-year-old McKinsey alum cannot rebuild this story. Generational change asset.',
+  },
+  {
+    n: 3,
+    ingredient: 'Time embedded at a specific firm',
+    replicable: false,
+    replicableNote: 'Linear time. The competitor cannot compress it.',
+    whyUnrepeatable:
+      'A 12-week in-person embed at one firm in summer 2026 cannot be replayed by a competitor starting in summer 2027. The relationship, the workflow context, the calibration data — all linear-time accumulating. Sankore (or whoever lands first) is the linchpin.',
+  },
+  {
+    n: 4,
+    ingredient: 'Embedded use-cases producing real calibrated data',
+    replicable: false,
+    replicableNote: 'Requires that specific firm + that specific time. Compounds with #3.',
+    whyUnrepeatable:
+      "Brier-against-real-firm-outcomes is a procurement claim that requires the firm to have used DI for 6+ months with closed proxies. No amount of synthetic data or scraped published cases substitutes. The platform's value flips from 'theoretical engine' to 'calibrated against a regulated entity' only here.",
+  },
+  {
+    n: 5,
+    ingredient: 'Network access via the firm leadership',
+    replicable: false,
+    replicableNote: 'Relationship capital. Compounds with #3.',
+    whyUnrepeatable:
+      'Founder-level relationship with a Harvard MBA / ex-Goldman / Pan-African finance leader + her board members (Alithia, Mines, Carbon, Cardinal Stone, Standard Chartered) is the wedge-motion accelerator. Cold outreach to any one would take months; warm-via-anchor-partner is structurally unrepeatable.',
+  },
+];
+
+/** The single load-bearing claim the COMBINATION_INGREDIENTS table makes:
+ *  4 of 5 ingredients are unrepeatable. A competitor with $20M can build
+ *  the 1 replicable layer. They cannot build the bundle.
+ *
+ *  This sharpens the prior "engine vs accumulating asset" framing —
+ *  conceding the engine was correct; what we missed was naming exactly
+ *  HOW MANY layers below the engine are also outside competitor reach. */
+export const COMBINATION_HEADLINE =
+  'The moat is the COMBINATION. Software alone is never the moat at solo-founder scale. 4 of 5 ingredients are unrepeatable — the bundle is what compounds.';
+
+/** The Sankore engagement specifically — why it is the single highest-
+ *  leverage move toward locking in ingredients #3, #4, and #5
+ *  simultaneously. The London-office in-person embed is the linchpin. */
+export const SANKORE_AS_LINCHPIN = {
+  headline:
+    'Sankore is the single highest-leverage move toward locking 3 of 5 unrepeatable ingredients simultaneously',
+  body: 'A 12-week in-person embed at Sankore activates ingredient #3 (time embedded), #4 (real calibrated data from the retroactive Bias Genome seed against 30-50 closed Sankore decisions), and #5 (network access to TT + her board). Combined with the existing ingredient #2 (founder narrative), four of five bundle pieces lock in by month 12. Ingredient #1 (the wrapper) was already shipped. The bundle becomes hard to replicate the moment Sankore lands.',
+  forwardRule:
+    "When a future advisor / VC / corp-dev counter argues 'the engine is a wrapper, that's not a moat' — lead with the COMBINATION_INGREDIENTS table, not with engine defence. The wrapper is ingredient #1; the moat is the bundle.",
+};
