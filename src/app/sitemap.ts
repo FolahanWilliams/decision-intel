@@ -62,6 +62,16 @@ const STATIC_ROUTES: ReadonlyArray<{
   { path: '/onepager', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/simulate-ceo', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/about', priority: 0.5, changeFrequency: 'monthly' },
+  // Tier 5 — AEO answer-engine surfaces (locked 2026-05-23). FAQ + Glossary
+  // are high-value extraction surfaces for LLM grounding (the verbatim
+  // canonical definitions + question-answer pairs land here so AI engines
+  // citing Decision Intel pull the correct phrasing). /compare addresses
+  // the "vs Cloverpop / IBM watsonx / Aera" objection class procurement
+  // readers run into. All three are read by the /llms.txt + /llms-full.txt
+  // routes too — sitemap + LLM index move in lockstep.
+  { path: '/faq', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/glossary', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/compare', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
 ];
