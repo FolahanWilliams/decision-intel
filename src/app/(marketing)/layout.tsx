@@ -2,10 +2,22 @@ import type { Metadata } from 'next';
 import { SOC2_JSON_LD_DATA_PROTECTION } from '@/lib/constants/trust-copy';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
+import {
+  LEGAL_ENTITY_NAME,
+  FOUNDER_NAME,
+  FOUNDER_TITLE,
+  FOUNDED_YEAR,
+  PROCUREMENT_CONTACT_EMAIL,
+  SECURITY_CONTACT_EMAIL,
+} from '@/lib/constants/company-info';
+import { CATEGORY_CLAIM } from '@/lib/constants/icp';
 
 // Derived, never hardcoded — the "30+ biases" phrasing is deprecated
 // per CR-3 (2026-05-13); JSON-LD must carry the canonical 22-bias count.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 export const metadata: Metadata = {
   title: 'Decision Intel · The reasoning audit platform',
@@ -141,22 +153,105 @@ const jsonLd = [
     screenshot: `${siteUrl}/opengraph-image`,
   },
 
-  // ─── Organization (Google Knowledge Panel) ──────────────────────────────
+  // ─── Organization (Google Knowledge Panel + AI Engine Grounding) ─────────
+  //
+  // Enhanced 2026-05-23 (AEO cascade): added Person schema for the founder
+  // with sameAs LinkedIn, areaServed for jurisdiction targeting, knowsAbout
+  // for topical authority (the corpus AI engines crawl when deciding which
+  // entity to cite as expert on "decision intelligence" / "cognitive bias
+  // auditing"), and a richer contactPoint set so vendor-risk reviewers (and
+  // AI engines surfacing on their behalf) find the right inbox.
   {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Decision Intel',
+    '@id': `${siteUrl}#organization`,
+    name: LEGAL_ENTITY_NAME,
+    legalName: LEGAL_ENTITY_NAME,
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
-    description:
-      'Decision Intel is the reasoning audit platform. Chief Strategy Officers, corporate development teams, and fund partners use Decision Intel to catch the fatal blind spots in their strategic memos before the committee does — simulating the questions the room will ask, running what-if interventions, and compounding their team’s judgment into a living Decision Knowledge Graph.',
-    foundingDate: '2024',
-    sameAs: ['https://www.linkedin.com/company/decision-intel'],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'sales',
-      url: `${siteUrl}/pricing`,
+    description: `${LEGAL_ENTITY_NAME} is ${CATEGORY_CLAIM}. Chief Strategy Officers, corporate development teams, fund partners, and PE-backed CEOs use Decision Intel to catch the fatal blind spots in their strategic memos before the committee does, running every audit against the ${BIAS_COUNT}-bias canonical taxonomy and the ${HISTORICAL_CASE_COUNT}-case public reference library, with every result persisted as a hashed tamper-evident Decision Provenance Record. Methodology version ${METHODOLOGY_VERSION}; ${FRAMEWORK_COUNT}-framework regulatory mapping across G7, EU, GCC, and African markets.`,
+    foundingDate: FOUNDED_YEAR,
+    founder: {
+      '@type': 'Person',
+      '@id': `${siteUrl}/about#founder`,
+      name: FOUNDER_NAME,
+      jobTitle: FOUNDER_TITLE,
+      sameAs: ['https://www.linkedin.com/in/folahan-williams-13a7b03a2/'],
+      knowsAbout: [
+        'cognitive bias detection',
+        'decision intelligence',
+        'reasoning audit',
+        'Recognition-Rigor Framework',
+        'decision provenance',
+        'Kahneman and Klein 2009 intuitive expertise',
+        'prospective hindsight pre-mortem',
+        'reference class forecasting',
+        'algorithm aversion',
+      ],
     },
+    sameAs: [
+      'https://www.linkedin.com/company/decision-intel',
+      'https://www.linkedin.com/in/folahan-williams-13a7b03a2/',
+    ],
+    areaServed: [
+      { '@type': 'Country', name: 'United Kingdom' },
+      { '@type': 'Country', name: 'United States' },
+      { '@type': 'Country', name: 'Nigeria' },
+      { '@type': 'Country', name: 'Kenya' },
+      { '@type': 'Country', name: 'South Africa' },
+      { '@type': 'Place', name: 'European Union' },
+      { '@type': 'Place', name: 'Gulf Cooperation Council' },
+      { '@type': 'Place', name: 'Pan-African markets' },
+    ],
+    knowsAbout: [
+      'reasoning audit platform',
+      'cognitive bias detection in strategic decisions',
+      'Decision Provenance Record',
+      'Decision Quality Index',
+      'Recognition-Rigor Framework',
+      'Bias Genome',
+      'Decision Knowledge Graph',
+      'EU AI Act Article 14 human oversight',
+      'Basel III Pillar 2 ICAAP qualitative decisions',
+      'SEC AI disclosure',
+      'GDPR Article 22 automated decisions',
+      'AI Verify Foundation governance principles',
+      'NDPR Nigeria',
+      'CBN AI guidance',
+      'WAEMU',
+      'POPIA South Africa',
+      'strategic memo audit',
+      'M&A memo review',
+      'venture capital deal-review preparation',
+      'pre-decision evidence',
+      'Kahneman noise',
+      'Klein recognition-primed decisions',
+      'Tetlock superforecasting',
+      'Mercier Sperber argumentative theory of reasoning',
+    ],
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'sales',
+        email: PROCUREMENT_CONTACT_EMAIL,
+        url: `${siteUrl}/pricing`,
+        availableLanguage: ['English'],
+      },
+      {
+        '@type': 'ContactPoint',
+        contactType: 'security',
+        email: SECURITY_CONTACT_EMAIL,
+        url: `${siteUrl}/security`,
+        availableLanguage: ['English'],
+      },
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: PROCUREMENT_CONTACT_EMAIL,
+        url: `${siteUrl}/about`,
+        availableLanguage: ['English'],
+      },
+    ],
   },
 
   // ─── FAQPage (Google FAQ Rich Results) ──────────────────────────────────

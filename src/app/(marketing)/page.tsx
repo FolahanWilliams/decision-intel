@@ -1464,6 +1464,7 @@ export default function LandingPage() {
               { label: 'How It Works', href: '/how-it-works' },
               { label: 'R²F Standard', href: '/r2f-standard' },
               { label: 'Bias Genome', href: '/bias-genome' },
+              { label: 'Glossary', href: '/glossary' },
               { label: 'Pricing', href: '/pricing' },
             ]}
           />
@@ -1473,6 +1474,8 @@ export default function LandingPage() {
             links={[
               { label: 'Case Studies', href: '/case-studies' },
               { label: 'Proof', href: '/proof' },
+              { label: 'FAQ', href: '/faq' },
+              { label: 'Compare', href: '/compare' },
               { label: 'One-pager', href: '/onepager' },
               { label: 'Demo', href: '/demo' },
             ]}

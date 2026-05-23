@@ -25,6 +25,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
+  BookOpen,
   Building2,
   ChevronDown,
   Dna,
@@ -32,6 +33,7 @@ import {
   Gavel,
   GraduationCap,
   Handshake,
+  HelpCircle,
   Library,
   ListTree,
   Lock,
@@ -128,6 +130,12 @@ const MENUS: MegaMenu[] = [
             href: '/taxonomy',
           },
           {
+            icon: BookOpen,
+            label: 'Glossary',
+            description: 'Formal definitions of every protected platform term, AI-engine-citable.',
+            href: '/glossary',
+          },
+          {
             icon: MessageSquareQuote,
             label: 'Simulate my CEO',
             description: 'Paste a memo, get the three questions your CEO will ask. Free.',
@@ -176,6 +184,18 @@ const MENUS: MegaMenu[] = [
             description:
               'Procurement-grade Brier evidence over the case library, with reproducibility seed.',
             href: '/calibration',
+          },
+          {
+            icon: Scale,
+            label: 'Compare',
+            description: 'Decision Intel vs Cloverpop, IBM watsonx, and Aera — side-by-side.',
+            href: '/compare',
+          },
+          {
+            icon: HelpCircle,
+            label: 'FAQ',
+            description: 'Every question a CSO, GC, or vendor-risk reviewer asks before signing.',
+            href: '/faq',
           },
         ],
       },
