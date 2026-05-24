@@ -1,9 +1,10 @@
 /**
  * SWR hooks for DecisionContainer surfaces (Phase 2 — replaces deleted
- * src/hooks/useDeals.ts). One hook fits all three modes (investment /
- * acquisition / strategic) — UI consumers pass a `kind` filter when
- * they want a mode-scoped view (e.g. ContainerKanban defaulting to
- * acquisition mode for a mid-market corp dev user).
+ * src/hooks/useDeals.ts). One hook fits all four modes (investment /
+ * acquisition / strategic / real_estate_development) — UI consumers
+ * pass a `kind` filter when they want a mode-scoped view (e.g.
+ * ContainerKanban defaulting to acquisition mode for a mid-market
+ * corp dev user).
  */
 
 import useSWR from 'swr';

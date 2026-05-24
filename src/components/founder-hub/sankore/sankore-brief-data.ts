@@ -1308,14 +1308,15 @@ export const FIVE_ADAPTATIONS: ReadonlyArray<ProductAdaptation> = [
     n: 2,
     title: 'Fourth DecisionContainer mode: real_estate_development',
     description:
-      'New container kind alongside investment / acquisition / strategic. Stage progression: site_acquisition → entitlement → financing → construction → leasing → stabilization. Required-doc gates: site analysis, financial pro forma, regulatory checklist, contractor selection.',
+      'New container kind alongside investment / acquisition / strategic. 6-stage progression: site_acquisition → entitlement → financing (committee gate) → construction → leasing → stabilization. Required docs for the Financing-Close committee gate: site_analysis + financial_pro_forma + regulatory_checklist. New outcome shape "dev_yield" with realised project IRR (primary) + equity multiple + cost-overrun-% + schedule-overrun-months + stabilized NOI + months-to-stabilization. 5 new doc subtypes added to INVESTMENT_DOCUMENT_TYPES with bias-detective DOC_TYPE_OVERLAYS for each: site_analysis, financial_pro_forma, regulatory_checklist, contractor_selection, appraisal. Sample bundle for the pe_vc role: PE_LAGOS_MIXED_USE_DEVELOPMENT (synthetic Lagos VI mixed-use development memo with embedded Anchoring / Optimism / Sunk Cost / Recency biases).',
     whyForSankore:
-      'Sankore has at least 3 active real-estate projects (Lotus, Juno, Laird Place mixed-use). The existing 3 container modes do not fit a mixed-use development proposal.',
+      'Sankore has multiple active real-estate projects across the portfolio. The existing 3 container modes do not fit a mixed-use development proposal — financing-close gate is structurally different from an IC vote on a portfolio investment or an M&A board review.',
     buildCost:
-      '~800 LOC. New mode in CONTAINER_MODES + stage definitions + 4-5 new document subtypes + overlays. 2 sessions.',
-    status: 'queued',
+      '~600 LOC shipped: SSOT extension + 5 new doc types + 5 DOC_TYPE_OVERLAYS + 22 new vitest assertions (3-mode contract → 4-mode, 36 → 58 total) + sample bundle + founder-context.ts chat preamble.',
+    status: 'shipped',
+    liveRoute: '/dashboard/decisions/new',
     disciplineNote:
-      'Founder-gated per the CLAUDE.md "Modifying CONTAINER_MODES" cascade discipline.',
+      'SHIPPED 2026-05-24. Founder-approved as the 4th CONTAINER_MODES kind (boil-the-ocean ship alongside the AEO audit em-dash sweep). The kind picker on /dashboard/decisions/new automatically surfaces Real-Estate Development as a 4th option (CONTAINER_KINDS auto-extends).',
   },
   {
     n: 3,

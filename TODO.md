@@ -61,6 +61,26 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-05-24)
+
+**Sankore Adaptation #2 — real_estate_development container mode (founder-approved boil-the-ocean follow-up to Adaptation #1; full prose in CLAUDE.md "Real-estate development container mode — Adaptation #2 lock 2026-05-24").**
+
+- [x] SSOT: `DecisionContainerKind` union extended to 4 kinds + REAL_ESTATE_DEVELOPMENT_MODE entry + `CONTAINER_KINDS` array + `ContainerOutcomeShape.shape` union extended with `dev_yield`. Pure additive; no Prisma migration.
+- [x] 6-stage lifecycle: site_acquisition → entitlement → financing (committee gate) → construction → leasing → stabilization. Required docs for financing-close: site_analysis + financial_pro_forma + regulatory_checklist.
+- [x] New `dev_yield` outcome shape: realised_irr (primary) + equity_multiple + cost_overrun_pct + schedule_overrun_months + stabilized_noi + months_to_stabilization + verdict.
+- [x] 5 new doc subtypes added to INVESTMENT_DOCUMENT_TYPES + DOC_TYPE_OVERLAYS for each: site_analysis, financial_pro_forma, regulatory_checklist, contractor_selection, appraisal. Each overlay names canonical failure patterns (Optimism Trap, Anchoring Trap, Sunk Ship, Yes Committee).
+- [x] 58/58 vitest assertions lock the 4-mode contract (was 36 at 3-mode lock; +22 new assertions for real-estate-development shape, helpers, cross-mode invariants).
+- [x] Sample bundle: PE_LAGOS_MIXED_USE_DEVELOPMENT (synthetic anonymised 14-storey Victoria Island development memo with embedded Anchoring / Optimism / Sunk Cost / Recency biases, expected DQI 47).
+- [x] 3-mode → 4-mode drift sweep: founder-context.ts chat preamble + Sankore brief FiveAdaptations status flip (queued → shipped, liveRoute added) + useContainers.ts JSDoc + AiNativeMatrix.tsx diSource + RejectedDecisionsTab.tsx kind state type.
+- [x] Gates green: tsc clean · 1268/1268 vitest · 4 lints clean (positioning + silent-catches 198 + counts 73 + canonical-imports) · prettier clean · slop-scan under 4.0 trip-wire.
+
+**AEO audit em-dash discipline sweep (follow-up to commit fcc8ad62).**
+
+- [x] FAQ page: 9 user-visible em-dashes → 1 (kept canonical positioning beat at line 115). Swept to commas/colons/periods.
+- [x] Glossary page: 5 user-visible em-dashes → 1 (kept bias-interaction-matrix definition at line 145).
+- [x] Compare page: 3 user-visible em-dashes → 1 (kept IBM differentiator at line 154).
+- [x] All other AEO checks clean: counts derive from canonical exports, robots.ts 18-bot allow-list internally consistent with disallow paths, JSON-LD validates, sitemap aligned, MarketingNav structure preserved.
+
 ## Recently Completed (2026-05-23)
 
 **Retroactive audit mode — Adaptation #1, the Sankore-killer (founder-approved boil-the-ocean ship 2026-05-21; full prose in CLAUDE.md "Retroactive audit mode — Adaptation #1 lock 2026-05-21").**

@@ -1164,6 +1164,82 @@ We recommend the IC approve a $30M Series-B participation with the following con
 Recommendation: APPROVE WITH CONDITIONS.`,
 };
 
+// ─── Real-estate development bundle (1) ──────────────────────────────
+// Adaptation #2 lock 2026-05-24. Mixed-use development pro forma —
+// embeds the canonical real-estate failure patterns the audit should
+// fire on: lease-up optimism, exit-cap anchoring, sunk-cost
+// entitlement spend, hot-cycle comparable cherry-picking.
+
+const PE_LAGOS_MIXED_USE_DEVELOPMENT: SampleBundle = {
+  slug: 'pe-lagos-mixed-use-development',
+  role: 'pe_vc',
+  title: 'Lagos mixed-use development — financing-close memo',
+  summary:
+    'Ground-up mixed-use development on Victoria Island — 14-storey residential + ground-floor retail at $32M total cost, financing close 2026 Q3.',
+  hookCopy:
+    'Real-estate sponsors paste this when the IC is anchoring on a 2024-vintage comp set and assuming 18-month lease-up in a sub-market that historically averages 24-30.',
+  marketContext: 'emerging_market',
+  expectedBiases: [
+    'anchoring_bias',
+    'optimism_bias',
+    'sunk_cost_fallacy',
+    'recency_bias',
+    'confirmation_bias',
+  ],
+  expectedDqi: 47,
+  content: `# Project Marigold · Lagos Mixed-Use Development — Financing-Close Memo
+
+**Prepared by:** Sponsor Development Partners — Lagos Office
+**Date:** 18 May 2026
+**IC Date:** 8 June 2026
+**Recommendation:** Approve construction financing close — $19M senior debt + $13M equity for 14-storey mixed-use development at Victoria Island, Lagos.
+
+## Executive Summary
+
+We recommend the IC approve financing close for Project Marigold: a 14-storey mixed-use building (96 residential units + 2,400 sqm ground-floor retail) on a 0.9-acre Victoria Island parcel. Total project cost $32M; 30-month construction timeline; 18-month lease-up assumed to stabilization in Q1 2030. Pro forma project IRR of 23.4%, equity multiple 2.1x over 5 years. We have already invested $1.2M on entitlement and design — the regulatory work is materially complete and the site cannot be re-tendered without significant write-off.
+
+## Site + Use
+
+**Site:** 0.9-acre parcel at intersection of Adeola Odeku and Akin Adesola, Victoria Island. Site control via 99-year leasehold; ground rent $180K/year escalating 4% annually.
+
+**Use:** 14 storeys total. Ground floor: 2,400 sqm premium retail (anchored by a Lebanese-restaurant operator in advanced LOI discussions). Levels 2-13: 96 residential units (mix of 2-bed and 3-bed apartments targeting expat + senior-banker tenant base). Level 14: penthouse + amenity floor (gym, residents' lounge, rooftop terrace).
+
+## Comparable Set
+
+We anchor the residential pricing on three recent Victoria Island transactions:
+
+1. **The Maple, 2024:** Stabilized 11 months post-CO at $42/sqm/month average. 18-storey, 142 units.
+2. **Adeola Court, 2023:** Stabilized 13 months post-CO at $39/sqm/month. 16-storey, 88 units.
+3. **Ocean Tower, 2024:** Stabilized 9 months post-CO at $44/sqm/month. 22-storey, 168 units.
+
+Project Marigold's pro-forma stabilized rent is set at $40/sqm/month, mid-range against this comp set.
+
+## Pro Forma Highlights
+
+- **Total project cost:** $32M ($28M hard cost + $4M soft cost including the $1.2M entitlement spent to date)
+- **Financing structure:** $19M senior construction loan at 9.5% (24-month term, interest-only), $13M sponsor equity
+- **Stabilized NOI Year 5:** $3.4M (gross potential $4.1M, less 8% vacancy + opex)
+- **Exit cap rate (Year 5):** 7.5% — matches recent Victoria Island stabilized-asset transactions
+- **Stabilized value:** $45.3M; refinancing window in Year 5 frees $11M of equity for redeployment
+- **Project IRR:** 23.4%; equity multiple 2.1x over 5 years
+
+## Why This Site, Why Now
+
+Victoria Island has been the most consistently absorbed sub-market in Lagos over the past three years. The Lebanese restaurant LOI alone covers 50% of the ground-floor retail. The Nigerian Central Bank's June 2025 monetary easing has compressed mortgage rates by 250bps, materially expanding the affordability pool for the residential units. Construction inputs are at a 12-month cyclical low after the H2 2025 import-tariff adjustment.
+
+## Construction + Timeline
+
+GC selection complete: 23-year-old Lagos firm with 3 prior Victoria-Island high-rise completions in the past 6 years. Lump-sum fixed-price contract at $26.8M including a 5% contingency. The 30-month construction schedule is the GC's stated number; we have not stress-tested against their historical actuals on the three prior Victoria Island projects (two of which slipped by 4-7 months).
+
+## Risk Section
+
+Standard real-estate risks: cost overruns, lease-up delays, FX exposure on imported finishes. The naira has stabilized post-FX-liberalisation. Construction is naira-priced (90%) with only fit-out finishes USD-exposed. Lease-up risk is mitigated by the Lebanese restaurant LOI + strong sub-market absorption.
+
+## Recommendation
+
+APPROVE construction financing close. The $1.2M entitlement investment cannot be re-tendered; the comp set strongly supports stabilized rents; the GC selection is complete; the FX environment is favourable. We have done the work and the deal is ready to close.`,
+};
+
 // ─── Public exports ─────────────────────────────────────────────────
 
 export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
@@ -1181,6 +1257,7 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   BIZOPS_EMEA_SHUTTER,
   PE_LAGOS_CONSUMER_ROLLUP,
   PE_KENYA_FINTECH_GROWTH,
+  PE_LAGOS_MIXED_USE_DEVELOPMENT,
 ] as const;
 
 export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> = Object.fromEntries(

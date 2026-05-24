@@ -149,7 +149,7 @@ const PLATFORM_VOCABULARY: GlossaryEntry[] = [
     term: 'Noise Jury',
     termCode: 'DI-V-NOISE-JURY',
     definition:
-      'A 3-frame jury that scores each audit through three orthogonal professional lenses: analyst-skeptical, regulator-hostile, and contrarian-strategist. Run across two model families (Gemini + Grok) for architectural diversity. Disagreement across the three frames IS the noise signal — low standard deviation indicates robust quality (the document survives multiple lenses), high standard deviation indicates framing-sensitive quality (which itself tells the reviewer which audience will be harshest). Inspired by Kahneman’s 2021 Noise insurance-underwriter study.',
+      'A 3-frame jury that scores each audit through three orthogonal professional lenses: analyst-skeptical, regulator-hostile, and contrarian-strategist. Run across two model families (Gemini + Grok) for architectural diversity. Disagreement across the three frames IS the noise signal: low standard deviation indicates robust quality (the document survives multiple lenses), high standard deviation indicates framing-sensitive quality (which itself tells the reviewer which audience will be harshest). Inspired by Kahneman’s 2021 Noise insurance-underwriter study.',
   },
   {
     term: 'Validity Classifier',
@@ -161,7 +161,7 @@ const PLATFORM_VOCABULARY: GlossaryEntry[] = [
     term: 'Reference Class Forecast',
     termCode: 'DI-V-RCF',
     definition:
-      'A paper-application detector grounded in Kahneman & Lovallo (2003) "Delusions of Success." Pure-function similarity scoring against the historical case library returns the top-5 historical analogs plus a matched-class baseline failure rate, surfaced as a four-band predicted outcome (succeeds / mixed / struggles / fails / too-small-to-judge). Cold-start posture is honest — structurally novel decisions return "too-small-to-judge" rather than a fabricated forecast.',
+      'A paper-application detector grounded in Kahneman & Lovallo (2003) "Delusions of Success." Pure-function similarity scoring against the historical case library returns the top-5 historical analogs plus a matched-class baseline failure rate, surfaced as a four-band predicted outcome (succeeds / mixed / struggles / fails / too-small-to-judge). Cold-start posture is honest: structurally novel decisions return "too-small-to-judge" rather than a fabricated forecast.',
   },
   {
     term: 'Prospective Hindsight',
@@ -174,7 +174,7 @@ const PLATFORM_VOCABULARY: GlossaryEntry[] = [
     term: 'Decision Provenance Record · Evidentiary Standard fingerprint',
     alternates: ['ES fingerprint'],
     termCode: 'DI-V-ES-FINGERPRINT',
-    definition: `A composed cryptographic token bound into every DPR's legal trail (locked 2026-05-18). Shape: ES·m${METHODOLOGY_VERSION}·in:<input-hash-8>·pf:<prompt-fingerprint-8>·w:<weights-hash>·s<schema-version>. Recomputes deterministically from the persisted audit values — methodology version + SHA-256 input hash + prompt fingerprint + DQI weights-resolution hash + record schema version. The single citable token a General Counsel carries forward to verify two DPRs are from the same engine state. Bound contractually via the Data Processing Agreement Section 11.`,
+    definition: `A composed cryptographic token bound into every DPR's legal trail (locked 2026-05-18). Shape: ES·m${METHODOLOGY_VERSION}·in:<input-hash-8>·pf:<prompt-fingerprint-8>·w:<weights-hash>·s<schema-version>. Recomputes deterministically from the persisted audit values: methodology version + SHA-256 input hash + prompt fingerprint + DQI weights-resolution hash + record schema version. The single citable token a General Counsel carries forward to verify two DPRs are from the same engine state. Bound contractually via the Data Processing Agreement Section 11.`,
     source: { label: 'Trust', href: '/trust' },
   },
 ];
@@ -185,7 +185,7 @@ const platformVocabularyJsonLd = {
   '@id': `${siteUrl}/glossary#platform-vocabulary`,
   name: 'Decision Intel · Platform Vocabulary',
   description:
-    'The canonical platform lexicon — the protected terms that constitute the Decision Intel category vocabulary.',
+    'The canonical platform lexicon: the protected terms that constitute the Decision Intel category vocabulary.',
   hasDefinedTerm: PLATFORM_VOCABULARY.map(e => ({
     '@type': 'DefinedTerm',
     '@id': `${siteUrl}/glossary#${e.termCode.toLowerCase()}`,

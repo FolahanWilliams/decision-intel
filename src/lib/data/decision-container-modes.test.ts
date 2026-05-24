@@ -1,11 +1,13 @@
 /**
  * SSOT lock for DecisionContainer modes. Mirrors the discipline of
  * NAMED_PATTERNS + INVESTMENT_DOCUMENT_TYPES + scoring/dqi.test.ts —
- * locks the 3-mode contract so adding a 4th mode (or breaking an
+ * locks the 4-mode contract so adding a 5th mode (or breaking an
  * existing one) is a deliberate, type-system-loud change.
  *
- * The 3 modes (investment / acquisition / strategic) are the unified
- * replacement for the prior Deal + DecisionPackage split. See
+ * The 4 modes (investment / acquisition / strategic /
+ * real_estate_development) are the unified replacement for the prior
+ * Deal + DecisionPackage split. real_estate_development added in
+ * Adaptation #2 (locked 2026-05-24, Sankore-killer follow-up). See
  * decision-container-modes.ts header for the architecture lock.
  */
 
@@ -24,8 +26,13 @@ import {
 } from './decision-container-modes';
 
 describe('CONTAINER_KINDS', () => {
-  it('has exactly 3 modes — investment / acquisition / strategic', () => {
-    expect(CONTAINER_KINDS).toEqual(['investment', 'acquisition', 'strategic']);
+  it('has exactly 4 modes — investment / acquisition / strategic / real_estate_development', () => {
+    expect(CONTAINER_KINDS).toEqual([
+      'investment',
+      'acquisition',
+      'strategic',
+      'real_estate_development',
+    ]);
   });
 
   it('every kind has a mode definition in CONTAINER_MODES', () => {
@@ -219,11 +226,78 @@ describe('CONTAINER_MODES — strategic shape', () => {
   });
 });
 
+describe('CONTAINER_MODES — real_estate_development shape (Adaptation #2)', () => {
+  it('uses real-estate-canonical 6-stage progression', () => {
+    const mode = CONTAINER_MODES.real_estate_development;
+    const ids = mode.stages.map(s => s.id);
+    expect(ids).toEqual([
+      'site_acquisition',
+      'entitlement',
+      'financing',
+      'construction',
+      'leasing',
+      'stabilization',
+    ]);
+  });
+
+  it('committee gate is Financing Close', () => {
+    expect(CONTAINER_MODES.real_estate_development.committeeStageId).toBe('financing');
+    expect(CONTAINER_MODES.real_estate_development.committeeLabel).toBe(
+      'Investment Committee · Financing Close'
+    );
+  });
+
+  it('outcome shape is dev_yield with realised_irr primary', () => {
+    expect(CONTAINER_MODES.real_estate_development.outcomeShape.shape).toBe('dev_yield');
+    const primary = CONTAINER_MODES.real_estate_development.outcomeShape.fields.find(
+      f => f.primary
+    );
+    expect(primary!.key).toBe('realised_irr');
+  });
+
+  it('Financing Close stage names canonical real-estate toxic patterns', () => {
+    const stage = getContainerStage('real_estate_development', 'financing')!;
+    expect(stage.likelyPatternLabels).toContain('The Yes Committee');
+    expect(stage.likelyPatternLabels).toContain('The Optimism Trap');
+  });
+
+  it('requiredDocsForCommittee enforces site_analysis + financial_pro_forma + regulatory_checklist', () => {
+    const required = CONTAINER_MODES.real_estate_development.requiredDocsForCommittee;
+    expect(required).toContain('site_analysis');
+    expect(required).toContain('financial_pro_forma');
+    expect(required).toContain('regulatory_checklist');
+  });
+
+  it('expected docs at Financing Close include financial_pro_forma + ic_memo + appraisal', () => {
+    const stage = getContainerStage('real_estate_development', 'financing')!;
+    expect(stage.expectedDocTypes).toContain('financial_pro_forma');
+    expect(stage.expectedDocTypes).toContain('ic_memo');
+    expect(stage.expectedDocTypes).toContain('appraisal');
+  });
+
+  it('outcome shape captures cost overrun + schedule overrun + stabilized NOI', () => {
+    const fieldKeys = CONTAINER_MODES.real_estate_development.outcomeShape.fields.map(f => f.key);
+    expect(fieldKeys).toContain('cost_overrun_pct');
+    expect(fieldKeys).toContain('schedule_overrun_months');
+    expect(fieldKeys).toContain('stabilized_noi');
+    expect(fieldKeys).toContain('months_to_stabilization');
+  });
+
+  it('primaryDocType is financial_pro_forma — the IC vote artefact', () => {
+    expect(CONTAINER_MODES.real_estate_development.primaryDocType).toBe('financial_pro_forma');
+  });
+
+  it('default stage is site_acquisition (start of lifecycle)', () => {
+    expect(CONTAINER_MODES.real_estate_development.defaultStageId).toBe('site_acquisition');
+  });
+});
+
 describe('helpers', () => {
   it('getContainerMode returns mode for valid kind', () => {
     expect(getContainerMode('investment').label).toBe('Investment');
     expect(getContainerMode('acquisition').label).toBe('Acquisition');
     expect(getContainerMode('strategic').label).toBe('Strategic Decision');
+    expect(getContainerMode('real_estate_development').label).toBe('Real-Estate Development');
   });
 
   it('getContainerMode throws on unknown kind', () => {
@@ -248,6 +322,11 @@ describe('helpers', () => {
     expect(isRequiredCommitteeDoc('acquisition', 'pitch_deck')).toBe(false);
     expect(isRequiredCommitteeDoc('strategic', 'memo')).toBe(true);
     expect(isRequiredCommitteeDoc('strategic', 'cim')).toBe(false);
+    expect(isRequiredCommitteeDoc('real_estate_development', 'site_analysis')).toBe(true);
+    expect(isRequiredCommitteeDoc('real_estate_development', 'financial_pro_forma')).toBe(true);
+    expect(isRequiredCommitteeDoc('real_estate_development', 'regulatory_checklist')).toBe(true);
+    expect(isRequiredCommitteeDoc('real_estate_development', 'contractor_selection')).toBe(false);
+    expect(isRequiredCommitteeDoc('real_estate_development', 'ic_memo')).toBe(false);
   });
 
   it('isRequiredCommitteeDoc handles null/undefined gracefully', () => {
@@ -255,7 +334,7 @@ describe('helpers', () => {
     expect(isRequiredCommitteeDoc('acquisition', undefined)).toBe(false);
   });
 
-  it('isKnownContainerDocType accepts INVESTMENT_DOCUMENT_TYPES + memo/deck/model/other', () => {
+  it('isKnownContainerDocType accepts INVESTMENT_DOCUMENT_TYPES + memo/deck/model/other + RE doc types', () => {
     expect(isKnownContainerDocType('ic_memo')).toBe(true);
     expect(isKnownContainerDocType('cim')).toBe(true);
     expect(isKnownContainerDocType('qofe')).toBe(true);
@@ -264,6 +343,12 @@ describe('helpers', () => {
     expect(isKnownContainerDocType('deck')).toBe(true);
     expect(isKnownContainerDocType('other')).toBe(true);
     expect(isKnownContainerDocType('made_up_type')).toBe(false);
+    // Real-estate development doc types (Adaptation #2)
+    expect(isKnownContainerDocType('site_analysis')).toBe(true);
+    expect(isKnownContainerDocType('financial_pro_forma')).toBe(true);
+    expect(isKnownContainerDocType('regulatory_checklist')).toBe(true);
+    expect(isKnownContainerDocType('contractor_selection')).toBe(true);
+    expect(isKnownContainerDocType('appraisal')).toBe(true);
   });
 });
 
@@ -287,7 +372,12 @@ describe('cross-mode invariants', () => {
   });
 
   it('every kind appears in CONTAINER_KINDS exactly once', () => {
-    const allKinds: DecisionContainerKind[] = ['investment', 'acquisition', 'strategic'];
+    const allKinds: DecisionContainerKind[] = [
+      'investment',
+      'acquisition',
+      'strategic',
+      'real_estate_development',
+    ];
     expect(CONTAINER_KINDS).toEqual(allKinds);
     expect(new Set(CONTAINER_KINDS).size).toBe(CONTAINER_KINDS.length);
   });

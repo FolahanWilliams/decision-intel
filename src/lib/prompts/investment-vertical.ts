@@ -36,6 +36,16 @@ export const INVESTMENT_DOCUMENT_TYPES = [
   // memos / models / DPRs).
   'meeting_minutes', // Structured minutes — agenda, attendees, decisions made, action items
   'meeting_transcript', // Verbatim transcript with speaker turns
+  // Real-estate development extensions (Adaptation #2 lock 2026-05-24).
+  // Anchored on Sankore-style mixed-use development workflow: site
+  // acquisition → entitlement → financing → construction → leasing →
+  // stabilization. The 5 doc types map onto the canonical real-estate
+  // decision artefacts the audit fires hardest on.
+  'site_analysis', // Site demographics, demand study, comparables, market analysis
+  'financial_pro_forma', // Development pro forma — sources & uses, IRR, equity multiple, debt sizing
+  'regulatory_checklist', // Zoning, permits, environmental review, building-code compliance
+  'contractor_selection', // GC bids, construction contracts, schedule analysis, change-order log
+  'appraisal', // Third-party valuation (residual land value, as-stabilized value)
 ] as const;
 
 export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
@@ -279,6 +289,72 @@ NAMED TOXIC COMBINATIONS to flag:
 - "The Coherent Confidence" pattern — fires when the transcript shows narrative coherence (Illusion of Validity) being received without challenge despite weak base-rate grounding.
 
 Cross-reference the transcript against any related strategic memo, IC deck, or minutes attached to the same Decision Container — flag where the spoken record contradicts the written one.`,
+
+  // ─── Real-estate development overlays (Adaptation #2, locked 2026-05-24) ───
+
+  site_analysis: `DOCUMENT TYPE: SITE ANALYSIS / MARKET STUDY
+This is a real-estate site analysis: demographics, demand study, comparable transactions, zoning context, and absorption assumptions. Real-estate site analyses are inherently optimistic because they are typically prepared by the developer's own team or a commissioned broker working for the seller. Apply the Seller-Halo Filter throughout and watch for:
+- ANCHORING TO RECENT COMPARABLES: are the comparables drawn from a hot market window (last 12-24 months) without adjustment for cycle position? Flag if every comp is from a single up-cycle vintage.
+- DEMAND-ABSORPTION OPTIMISM: are projected lease-up / sell-out periods materially faster than recent local cycle data? Flag projections that exceed historical absorption rates without specific named drivers.
+- DEMOGRAPHIC EXTRAPOLATION: are population / income / employment growth projected forward using survivorship-biased recent trends? Flag straight-line projections of demographic momentum into 5+ year horizons.
+- COMPARABLE CHERRY-PICKING: are the named comps representative of the actual subject property (use, scale, vintage, sub-market) or selectively chosen to support a higher rent / lower cap-rate conclusion?
+- MISSING DOWNSIDE SUB-MARKET DATA: is there any honest treatment of recent failures or troubled developments in the same sub-market? An analysis that names only winners is a survivorship-bias red flag.
+
+NAMED TOXIC COMBINATIONS to flag when constituent biases co-occur:
+- "The Optimism Trap" — Overconfidence + Confirmation: lease-up projections exceeding cycle-base-rate absorption without specific demand drivers.
+- "The Recency Spiral" — Recency + Availability: comparable-set composed entirely of last-cycle hot-market transactions without down-cycle reference.`,
+
+  financial_pro_forma: `DOCUMENT TYPE: REAL-ESTATE DEVELOPMENT PRO FORMA
+This is the load-bearing financial artefact for a real-estate development decision — sources & uses, project IRR, equity multiple, debt sizing, sensitivity analysis, and the residual land value or stabilized value calculation. The IC votes on THIS document. Scrutinize with maximum rigor:
+- TERMINAL CAP-RATE ANCHORING: is the exit cap rate assumed at current cycle lows projected forward 3-5 years? Flag if the exit cap is anchored to today's compressed cap rates without a cycle-mean reversion adjustment.
+- LEASE-UP TIMING OPTIMISM: are the months-to-stabilization assumptions faster than recent local-cycle averages? Flag if the pro forma assumes 12-month stabilization in a market that historically averages 18-24.
+- CONSTRUCTION-COST INFLATION UNDER-RESERVED: does the construction-cost line include explicit contingency reserves (typically 5-10% hard cost + 3-5% soft cost) or is it priced as a fixed number? Flag any pro forma that prices construction at "today's bids" without a contingency line.
+- INTEREST-RATE / FINANCING ASSUMPTIONS: is the construction-loan rate fixed-rate or floating? What's the assumed take-out refinance rate? Flag if the take-out rate is assumed at today's compressed spreads through to stabilization.
+- SENSITIVITY-TABLE COMPLETENESS: are the sensitivities run on the load-bearing variables (cap rate, rent, lease-up timing, construction cost) or only on cosmetic ones? Flag if the document shows IRR sensitivity to a 1% rent change but no sensitivity to a 50-bps cap-rate shift.
+- HIDDEN PROMOTE / WATERFALL STRUCTURE: are the GP-promote / waterfall mechanics surfaced, or buried? Misaligned promote structures destroy LP returns.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Optimism Trap" — Overconfidence + Planning Fallacy: rent + absorption + exit-cap assumptions all set at best-case without sensitivity-table evidence the IC reviewed downside.
+- "The Anchoring Trap" — Anchoring + Halo: exit cap anchored to today's market without cycle-mean adjustment.
+- "The Yes Committee" — Authority + Groupthink: pro forma supports a sponsor's pet site without documented dissent or alternative-site comparison.`,
+
+  regulatory_checklist: `DOCUMENT TYPE: REAL-ESTATE REGULATORY CHECKLIST
+This is the regulatory / entitlement gate for a development project: zoning, building permits, environmental review, code compliance, community engagement records, and any jurisdiction-specific approvals (Lagos State property law, Nigerian environmental regulation, Pan-African market-specific approvals where applicable). Failures here can kill projects after substantial pre-development capital has been committed. Watch for:
+- ZONING / ENTITLEMENT RISK MINIMISATION: are conditional-use permits, variances, or rezonings required? Flag if the document treats a not-yet-granted approval as a foregone conclusion. The base rate for community-opposed variance denials is materially higher than developers assume.
+- ENVIRONMENTAL REVIEW SHORTCUTS: are environmental assessments completed or pending? Flag any "environmental review expected to be straightforward" framing without evidence — Phase I / Phase II ESA outcomes have a non-trivial base rate of surfacing material findings.
+- COMMUNITY-OPPOSITION UNDERWEIGHTING: is community sentiment treated as a risk factor or waved off? Real-estate development projects fail more often on community + political opposition than on financing in many jurisdictions.
+- TIMELINE OPTIMISM ON APPROVALS: are entitlement timelines projected at the median or the optimistic tail of the distribution? Flag if the project schedule assumes approvals in fewer months than the local jurisdiction's historical median.
+- MISSING JURISDICTION-SPECIFIC GATES: in Pan-African or emerging-market contexts, are state / local / federal regulatory layers all named? Flag any checklist that treats the regulatory environment as a single homogeneous layer.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Optimism Trap" — Overconfidence + Planning Fallacy: entitlement timelines assumed at best-case without comparable-project evidence.
+- "The Sunk Ship" — Sunk Cost + Anchoring: project escalation language ("we have already spent $X on entitlement") justifying continued spend past the point where the regulatory risk should trigger reassessment.`,
+
+  contractor_selection: `DOCUMENT TYPE: CONTRACTOR SELECTION / CONSTRUCTION BIDS
+This document covers general-contractor selection, bid analysis, construction contract structure, schedule analysis, and the change-order management framework. The construction phase is where real-estate developments most commonly slip on cost and schedule. Watch for:
+- BID-COMPARISON CHERRY-PICKING: are bids compared on a like-for-like scope basis? Flag if the cheapest bid wins without a scope-normalisation analysis showing equal coverage.
+- LOWEST-BIDDER ANCHORING: is the contractor selected because they were the lowest bid, even when the contractor's portfolio shows specialty in different building types? Flag if the GC has no portfolio match for the proposed project type.
+- SCHEDULE-OPTIMISM ON GC TIMELINES: are GC-promised timelines assumed at the contractor's stated number, or stress-tested against comparable-project actuals? Flag if no comparable-project timeline data is referenced.
+- CHANGE-ORDER GOVERNANCE: is the change-order approval threshold + cap explicitly defined in the contract? Flag any contract that lacks an explicit change-order governance section — this is where construction cost overruns originate.
+- CONTINGENCY USE RULES: are the project contingency reserves clearly bound by usage rules (who can authorise drawdown, on what evidence)? Unconstrained contingency is consumed by the GC, not protected for the owner.
+- FIXED-PRICE vs GMP vs COST-PLUS: is the contract structure explicit, and matched to the project risk profile? Cost-plus contracts on novel building types are a known cost-overrun pattern.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Sunk Ship" — Sunk Cost + Anchoring: continued contractor engagement past the point where cost overruns should trigger renegotiation.
+- "The Optimism Trap" — Overconfidence + Planning Fallacy: GC timelines accepted without comparable-project evidence.
+- "The Yes Committee" — Authority + Groupthink: contractor selected without documented alternative-bid analysis.`,
+
+  appraisal: `DOCUMENT TYPE: REAL-ESTATE APPRAISAL / VALUATION
+This is a third-party appraisal — residual land value, as-is value, or as-stabilized value — typically required by lenders or governance committees. Appraisals are commissioned by a specific party and that party's incentive shapes the methodology. Watch for:
+- COMMISSIONING-PARTY BIAS: who commissioned the appraisal — the lender, the developer, the seller, or a neutral third party? Flag if the appraisal is commissioned by a party whose financial interest is served by a high valuation conclusion.
+- COMPARABLE-SELECTION BIAS: are the comparables drawn from a representative cross-section of the local market, or selectively chosen to support the conclusion? Flag if the comp set has fewer than 3 like-for-like transactions OR includes outlier comps without normalisation.
+- CAP-RATE ANCHORING: is the cap rate applied to the stabilized NOI anchored to today's market or to a cycle-adjusted mean? Flag any appraisal using current cycle-low cap rates as the basis for 3-5 year forward valuations.
+- INCOME-APPROACH OPTIMISM: are the projected stabilized rents / occupancy supported by independent demand evidence or pulled from the developer's pro forma without verification? Appraisers who simply restate the developer's pro forma forfeit their independence.
+- HIGHEST-AND-BEST-USE ASSUMPTIONS: is the appraised value premised on a use the property is not yet entitled for? Flag if the highest-and-best-use conclusion depends on regulatory approvals not yet granted.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Anchoring Trap" — Anchoring + Halo: cap rate anchored to today's market in a forward-stabilized valuation.
+- "The Optimism Trap" — Overconfidence + Confirmation: rents + occupancy parroted from developer pro forma without independent verification.`,
 };
 
 // ─── Corporate Executive Personas for Simulation ─────────────────────────────

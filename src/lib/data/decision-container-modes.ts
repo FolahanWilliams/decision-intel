@@ -2,14 +2,18 @@
  * DecisionContainer modes — the canonical SSOT for the unified
  * capital-allocation-decision surface. Replaces the prior split between
  * `Deal` (M&A-coded) and `DecisionPackage` (generic-coded) with one
- * model + three workflow modes:
+ * model + four workflow modes:
  *
- *   - investment   → VC / growth / late-stage portfolio commitments
- *   - acquisition  → corporate development / M&A buy-side
- *   - strategic    → non-investment strategic decisions (market entry,
- *                    product bet, org restructure, etc.)
+ *   - investment              → VC / growth / late-stage portfolio commitments
+ *   - acquisition             → corporate development / M&A buy-side
+ *   - strategic               → non-investment strategic decisions (market entry,
+ *                               product bet, org restructure, etc.)
+ *   - real_estate_development → ground-up or major-reposition development
+ *                               (Adaptation #2, locked 2026-05-24): site
+ *                               acquisition → entitlement → financing →
+ *                               construction → leasing → stabilization
  *
- * All three share the same R²F audit pipeline, DPR, composite DQI,
+ * All four share the same R²F audit pipeline, DPR, composite DQI,
  * cross-doc conflict detection, and Brier-scored outcome calibration.
  * They diverge only on (a) stage labels, (b) required docs at the
  * committee gate, (c) outcome metric shape, (d) committee label.
@@ -46,7 +50,14 @@ import {
 
 // ─── Type surface ────────────────────────────────────────────────────────────
 
-export type DecisionContainerKind = 'investment' | 'acquisition' | 'strategic';
+export type DecisionContainerKind =
+  | 'investment'
+  | 'acquisition'
+  | 'strategic'
+  // Real-estate development (Adaptation #2, locked 2026-05-24). The 4th
+  // mode in the canonical container taxonomy — site acquisition →
+  // entitlement → financing → construction → leasing → stabilization.
+  | 'real_estate_development';
 
 /**
  * The three universal lifecycle phases. Stage IDs are mode-specific
@@ -89,7 +100,7 @@ export interface OutcomeMetricField {
 
 export interface ContainerOutcomeShape {
   /** The shape category — used by Brier-scoring + DPR. */
-  shape: 'irr_moic' | 'synergy_realisation' | 'forecast_hit_rate';
+  shape: 'irr_moic' | 'synergy_realisation' | 'forecast_hit_rate' | 'dev_yield';
   /** Procurement-grade name for the success metric. */
   primaryMetricLabel: string;
   /** Ordered fields rendered in the outcome capture UI. */
@@ -119,6 +130,11 @@ export interface ContainerMode {
   /** Outcome capture shape (mode-specific metric fields). */
   outcomeShape: ContainerOutcomeShape;
 }
+
+// Outcome shape names — extended from 3 to 4 with the real-estate
+// `dev_yield` shape (Adaptation #2, 2026-05-24).
+// Note: kept inline in ContainerOutcomeShape.shape's union below — the
+// shape names are downstream Brier-scoring / DPR consumers' keys.
 
 // ─── Mode definitions ────────────────────────────────────────────────────────
 
@@ -418,16 +434,134 @@ const STRATEGIC_MODE: ContainerMode = {
   },
 };
 
+const REAL_ESTATE_DEVELOPMENT_MODE: ContainerMode = {
+  kind: 'real_estate_development',
+  label: 'Real-Estate Development',
+  pluralLabel: 'Real-Estate Developments',
+  description:
+    'Ground-up or major-reposition real-estate project — site acquisition through stabilization, equity + debt structured around a project IRR + cost-on-completion target.',
+  stages: [
+    {
+      id: 'site_acquisition',
+      label: 'Site acquisition',
+      eyebrow: '01',
+      description:
+        'Site or parcel identified; LOI / option-to-purchase negotiated; initial market study + zoning scan.',
+      phase: 'pre_committee',
+      expectedDocTypes: ['site_analysis', 'memo'],
+      likelyPatternLabels: ['The Optimism Trap', 'The Recency Spiral'],
+    },
+    {
+      id: 'entitlement',
+      label: 'Entitlement',
+      eyebrow: '02',
+      description:
+        'Zoning approval, planning permission, environmental review, community engagement, design approvals.',
+      phase: 'pre_committee',
+      expectedDocTypes: ['regulatory_checklist', 'site_analysis', 'memo'],
+      likelyPatternLabels: ['The Status Quo Lock', 'The Blind Sprint', 'The Optimism Trap'],
+    },
+    {
+      id: 'financing',
+      label: 'Financing close',
+      eyebrow: '03',
+      description:
+        'Investment committee approves the project — construction financing committed, equity raised, pro forma signed off. The audit moment R²F fires hardest on.',
+      phase: 'committee_gate',
+      expectedDocTypes: ['financial_pro_forma', 'ic_memo', 'appraisal'],
+      likelyPatternLabels: [
+        'The Yes Committee',
+        'The Echo Chamber',
+        'The Optimism Trap',
+        "The Winner's Curse",
+      ],
+    },
+    {
+      id: 'construction',
+      label: 'Construction',
+      eyebrow: '04',
+      description:
+        'Active construction — site work, structural, MEP, fit-out; contractor management + budget tracking.',
+      phase: 'post_committee',
+      expectedDocTypes: ['contractor_selection', 'memo'],
+      likelyPatternLabels: ['The Sunk Ship', 'The Doubling Down', 'The Deadline Panic'],
+    },
+    {
+      id: 'leasing',
+      label: 'Leasing',
+      eyebrow: '05',
+      description:
+        'Pre-leasing, marketing, lease execution, tenant fit-out toward stabilized occupancy.',
+      phase: 'post_committee',
+      expectedDocTypes: ['memo'],
+      likelyPatternLabels: ['The Optimism Trap', 'The Recency Spiral'],
+    },
+    {
+      id: 'stabilization',
+      label: 'Stabilization',
+      eyebrow: '06',
+      description:
+        'Full occupancy reached; stabilized NOI; refinancing or hold/sell decision window.',
+      phase: 'post_committee',
+      expectedDocTypes: ['memo'],
+      likelyPatternLabels: ['The Doubling Down', 'The Sunk Ship'],
+    },
+  ],
+  defaultStageId: 'site_acquisition',
+  committeeStageId: 'financing',
+  committeeLabel: 'Investment Committee · Financing Close',
+  requiredDocsForCommittee: ['site_analysis', 'financial_pro_forma', 'regulatory_checklist'],
+  primaryDocType: 'financial_pro_forma',
+  outcomeShape: {
+    shape: 'dev_yield',
+    primaryMetricLabel: 'Realised project IRR',
+    fields: [
+      {
+        key: 'realised_irr',
+        label: 'Realised IRR (project-level)',
+        type: 'percent',
+        primary: true,
+      },
+      { key: 'equity_multiple', label: 'Equity multiple', type: 'number' },
+      {
+        key: 'cost_overrun_pct',
+        label: 'Cost overrun (% vs financing-close budget)',
+        type: 'percent',
+      },
+      {
+        key: 'schedule_overrun_months',
+        label: 'Schedule overrun (months vs financing-close plan)',
+        type: 'months',
+      },
+      { key: 'stabilized_noi', label: 'Stabilized NOI', type: 'currency' },
+      {
+        key: 'months_to_stabilization',
+        label: 'Months from financing close to stabilization',
+        type: 'months',
+      },
+      {
+        key: 'verdict',
+        label: 'Verdict',
+        type: 'enum',
+        options: ['value_created', 'value_neutral', 'value_destroyed', 'too_early_to_tell'],
+      },
+      { key: 'notes', label: 'What worked / what missed', type: 'text' },
+    ],
+  },
+};
+
 export const CONTAINER_MODES: Record<DecisionContainerKind, ContainerMode> = {
   investment: INVESTMENT_MODE,
   acquisition: ACQUISITION_MODE,
   strategic: STRATEGIC_MODE,
+  real_estate_development: REAL_ESTATE_DEVELOPMENT_MODE,
 };
 
 export const CONTAINER_KINDS: ReadonlyArray<DecisionContainerKind> = [
   'investment',
   'acquisition',
   'strategic',
+  'real_estate_development',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

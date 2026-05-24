@@ -70,7 +70,7 @@ const MATRIX_ROWS: ReadonlyArray<MatrixRow> = [
       'Single feature (bias detection or summarisation). One vulnerability — one user-research finding can collapse the wedge.',
     decisionIntel:
       'Multiple ANGLES on the SAME audit moment: 13-node pipeline + DPR + 3-frame noise jury + 5-gate Committee Readiness + named-pattern aggregation + structural-assumptions Dalio overlay + cross-doc cross-reference + Brier-scored outcome gate. Each angle reinforces the reasoning-audit category, not separate products.',
-    diSource: 'Phase 2 DecisionContainer surface — 3 modes × shared audit pipeline',
+    diSource: 'Phase 2 DecisionContainer surface — 4 modes × shared audit pipeline',
   },
   {
     vector: 'Cross-border M&A defensibility',

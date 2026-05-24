@@ -22,7 +22,11 @@ import {
   Briefcase,
   TrendingUp,
 } from 'lucide-react';
-import { CONTAINER_KINDS, CONTAINER_MODES } from '@/lib/data/decision-container-modes';
+import {
+  CONTAINER_KINDS,
+  CONTAINER_MODES,
+  type DecisionContainerKind,
+} from '@/lib/data/decision-container-modes';
 
 interface RejectedDecisionRow {
   id: string;
@@ -424,7 +428,7 @@ function RejectedDecisionCard({
 function RejectDecisionModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [name, setName] = useState('');
   const [decisionFrame, setDecisionFrame] = useState('');
-  const [kind, setKind] = useState<'investment' | 'acquisition' | 'strategic'>('investment');
+  const [kind, setKind] = useState<DecisionContainerKind>('investment');
   const [sector, setSector] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [passedToCompetitor, setPassedToCompetitor] = useState(false);

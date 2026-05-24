@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${siteUrl}/faq` },
   openGraph: {
     title: 'Frequently Asked Questions · Decision Intel',
-    description: 'Category, methodology, security, procurement — answered in one place.',
+    description: 'Category, methodology, security, procurement, answered in one place.',
     url: `${siteUrl}/faq`,
   },
   robots: { index: true, follow: true },
@@ -117,7 +117,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         question: 'What does "reasoning audit platform" mean?',
-        answer: `It is the protected category noun. BI tools audit your data. Model-risk-management tools audit your algorithms. ${CATEGORY_CLAIM} audits the human reasoning chain that produced the recommendation — the ${BIAS_COUNT}-bias canonical taxonomy fires on the memo text, the ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} bias-interaction matrix surfaces compound failure patterns, and the procurement-grade Decision Provenance Record carries the audit trail into the legal record.`,
+        answer: `It is the protected category noun. BI tools audit your data. Model-risk-management tools audit your algorithms. ${CATEGORY_CLAIM} audits the human reasoning chain that produced the recommendation. The ${BIAS_COUNT}-bias canonical taxonomy fires on the memo text, the ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} bias-interaction matrix surfaces compound failure patterns, and the procurement-grade Decision Provenance Record carries the audit trail into the legal record.`,
         source: { label: 'R²F Standard', href: '/r2f-standard' },
       },
       {
@@ -128,7 +128,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         question: 'What is the pain Decision Intel solves?',
-        answer: `${POSITIONING_PAIN_FRAMING} Reasoning is never objectively sound; it is either audited or unaudited. Capital is not destroyed because executives have cognitive biases — biases are the operating system of the human mind. Capital is destroyed because organisations lack the structural friction required to catch and neutralise bias before capital is committed.`,
+        answer: `${POSITIONING_PAIN_FRAMING} Reasoning is never objectively sound; it is either audited or unaudited. Capital is not destroyed because executives have cognitive biases; biases are the operating system of the human mind. Capital is destroyed because organisations lack the structural friction required to catch and neutralise bias before capital is committed.`,
         source: { label: 'Proof', href: '/proof' },
       },
       {
@@ -149,7 +149,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       {
         question: 'How is this different from a red-team workshop?',
         answer:
-          'Red teams fail structurally because the political cost of dissent in sponsor-driven environments is unsustainable. The antagonist that costs you no political capital fires before the IC memo can hide what the deal sponsor does not want to see — the audit surfaces the dissent algorithmically, so the corp-dev professional shifts from antagonist trying to kill the sponsor’s deal to facilitator surfacing a system-generated risk flag. Same dissent, zero ego cost.',
+          'Red teams fail structurally because the political cost of dissent in sponsor-driven environments is unsustainable. The antagonist that costs you no political capital fires before the IC memo can hide what the deal sponsor does not want to see. The audit surfaces the dissent algorithmically, so the corp-dev professional shifts from antagonist trying to kill the sponsor’s deal to facilitator surfacing a system-generated risk flag. Same dissent, zero ego cost.',
       },
     ],
   },
@@ -157,7 +157,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     eyebrow: 'Methodology + IP',
     heading: 'How the audit works, and the academic anchors behind it',
     intro:
-      'The Recognition-Rigor Framework, the bias taxonomy, the Decision Provenance Record, the Decision Quality Index — every claim traceable to a primary source.',
+      'The Recognition-Rigor Framework, the bias taxonomy, the Decision Provenance Record, the Decision Quality Index. Every claim traceable to a primary source.',
     entries: [
       {
         question: 'What is the Recognition-Rigor Framework (R²F)?',
@@ -167,7 +167,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         question: 'How many cognitive biases does the platform detect?',
-        answer: `${BIAS_COUNT} biases in the canonical taxonomy, stable IDs DI-B-001 through DI-B-0${String(BIAS_COUNT).padStart(2, '0')}. Each carries a real-world example, debiasing techniques, related biases, and a primary academic citation with DOI. The narrowness is the moat — every detector is paper-grounded, not heuristically added.`,
+        answer: `${BIAS_COUNT} biases in the canonical taxonomy, stable IDs DI-B-001 through DI-B-0${String(BIAS_COUNT).padStart(2, '0')}. Each carries a real-world example, debiasing techniques, related biases, and a primary academic citation with DOI. The narrowness is the moat. Every detector is paper-grounded, not heuristically added.`,
         source: { label: 'Bias taxonomy', href: '/taxonomy' },
       },
       {
@@ -240,7 +240,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       {
         question: 'Does the platform train on customer data?',
         answer:
-          'No. Customer content is not used to train models — contractually locked in the DPA and reinforced via the vendor agreement with every AI sub-processor (Anthropic and Google both honour no-training enterprise contracts). The cross-org Bias Genome aggregates outcome metadata only, never raw content, and only across consenting accounts.',
+          'No. Customer content is not used to train models, contractually locked in the DPA and reinforced via the vendor agreement with every AI sub-processor (Anthropic and Google both honour no-training enterprise contracts). The cross-org Bias Genome aggregates outcome metadata only, never raw content, and only across consenting accounts.',
         source: { label: 'Privacy', href: '/privacy' },
       },
       {
@@ -339,7 +339,7 @@ export default function FaqPage() {
               maxWidth: 760,
             }}
           >
-            Category, methodology, security, procurement — answered in one place, with the canonical
+            Category, methodology, security, procurement, answered in one place with the canonical
             sources one click away. Updated whenever the methodology version, framework registry, or
             taxonomy ships an extension.
           </p>

@@ -150,7 +150,7 @@ const COMPARISONS: Comparison[] = [
     competitor: 'IBM watsonx.governance',
     oneLiner: COMPETITIVE_DEFENSIVE_LINES[1].line,
     competitorStrength:
-      'IBM watsonx.governance audits AI model behaviour: lineage tracking, fairness metrics, drift detection, model risk management. Massive Q1 2026 product updates explicitly targeting EU AI Act readiness for high-risk AI systems. Bundled with the broader IBM enterprise stack — a strong incumbency advantage at Fortune 500 procurement.',
+      'IBM watsonx.governance audits AI model behaviour: lineage tracking, fairness metrics, drift detection, model risk management. Massive Q1 2026 product updates explicitly targeting EU AI Act readiness for high-risk AI systems. Bundled with the broader IBM enterprise stack, a strong incumbency advantage at Fortune 500 procurement.',
     diDifferentiator: `IBM audits AI MODELS. Decision Intel audits HUMAN REASONING — the chain of analysis a human author produced before a recommendation reached the committee. The strategic-memo authorship is human (or AI-assisted by the human); watsonx has no detector for cognitive bias in human reasoning, no Recognition-Rigor Framework, and no public reference-class corpus. The two products are not substitutes; they are complementary layers of governance.`,
     rows: [
       {
@@ -208,7 +208,7 @@ const COMPARISONS: Comparison[] = [
     competitor: 'Aera Technology',
     oneLiner: 'Aera automates supply-chain decisions; Decision Intel audits strategic ones.',
     competitorStrength:
-      'Aera Technology is positioned as a "decision intelligence" platform with autonomous agents that execute supply-chain decisions directly — replenishment, pricing, logistics. Strong fit for operations-heavy enterprises with high-volume, low-judgment-density decision flow. Aera Decision Cloud excels where the decision can be automated end-to-end.',
+      'Aera Technology is positioned as a "decision intelligence" platform with autonomous agents that execute supply-chain decisions directly: replenishment, pricing, logistics. Strong fit for operations-heavy enterprises with high-volume, low-judgment-density decision flow. Aera Decision Cloud excels where the decision can be automated end-to-end.',
     diDifferentiator: `Decision Intel and Aera occupy different ends of the decision-stakes spectrum. Aera automates the high-volume, low-stakes operational decisions; Decision Intel audits the low-volume, high-stakes STRATEGIC decisions where the decision must remain a human call but the reasoning needs to be reviewed before commitment. M&A memos, market-entry recommendations, capital-allocation IC artefacts. Where Aera reduces operator load via automation, Decision Intel reduces decision risk via auditing.`,
     rows: [
       {
@@ -284,7 +284,10 @@ const breadcrumbJsonLd = {
 };
 
 function slugify(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 function VerdictIcon({ v }: { v: 'yes' | 'partial' | 'no' }) {
@@ -551,9 +554,7 @@ export default function ComparePage() {
                           verticalAlign: 'top',
                         }}
                       >
-                        <div
-                          style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}
-                        >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                           <span style={{ marginTop: 2 }}>
                             <VerdictIcon v={r.diVerdict} />
                           </span>
@@ -569,9 +570,7 @@ export default function ComparePage() {
                           verticalAlign: 'top',
                         }}
                       >
-                        <div
-                          style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}
-                        >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                           <span style={{ marginTop: 2 }}>
                             <VerdictIcon v={r.competitorVerdict} />
                           </span>
@@ -611,8 +610,8 @@ export default function ComparePage() {
               color: '#CBD5E1',
             }}
           >
-            The category claim is the H1. The category proof is the artefact. Paste a strategic
-            memo and see the audit run end-to-end, free.
+            The category claim is the H1. The category proof is the artefact. Paste a strategic memo
+            and see the audit run end-to-end, free.
           </p>
           <div
             style={{
