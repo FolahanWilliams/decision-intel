@@ -1322,12 +1322,15 @@ export const FIVE_ADAPTATIONS: ReadonlyArray<ProductAdaptation> = [
     n: 3,
     title: 'Fifth DecisionContainer mode: fund_launch',
     description:
-      'New container kind for fund-launch decisions. Stage progression: thesis_development → target_market_sizing → fee_structure → anchor_LP_commitments → regulatory_filing → go_to_market. Document subtypes: thesis memo, fund prospectus, LP-ask deck, regulatory filing.',
+      'New container kind for fund-launch decisions. 6-stage progression: thesis_development → target_market_sizing → fee_structure → anchor_lp_commitments (committee gate) → regulatory_filing → go_to_market. Required docs for the Anchor-LP-Commitments committee gate: thesis_memo + fund_prospectus + lp_ask_deck. New outcome shape "fund_realisation" with realised AUM % vs target (primary) + final-close months + anchor-LP count + total LP count + realised fund IRR + DPI + TVPI + verdict. 4 new doc subtypes added to INVESTMENT_DOCUMENT_TYPES with bias-detective DOC_TYPE_OVERLAYS for each: thesis_memo, fund_prospectus, lp_ask_deck, regulatory_filing. Sample bundle for the pe_vc role: PE_PAN_AFRICAN_AGRICULTURE_FUND_LAUNCH (synthetic anonymised Sub-Saharan agriculture-vintage fund-launch thesis memo with embedded Anchoring / Optimism / Recency / Confirmation / Halo biases).',
     whyForSankore:
-      'Sankore launches funds repeatedly (Agriculture Fund, Real Wealth Fund). Distinct decision class with its own bias patterns (overconfidence on AUM ramp, anchoring on prior-fund returns, confirmation bias on target sectors).',
-    buildCost: '~700 LOC. Same cascade shape as adaptation #2. 2 sessions.',
-    status: 'queued',
-    disciplineNote: 'Same founder-gated cascade as adaptation #2.',
+      'Sankore launches funds repeatedly (Agriculture Fund, Real Wealth Fund). Distinct decision class with its own bias patterns (overconfidence on AUM ramp, anchoring on prior-fund returns, confirmation bias on target sectors, anchor-LP halo on the LP-ask deck).',
+    buildCost:
+      '~700 LOC shipped: SSOT extension + 4 new doc types + 4 DOC_TYPE_OVERLAYS + 10 new vitest assertions (4-mode contract → 5-mode, 58 → 68 total) + sample bundle + founder-context.ts chat preamble + 4→5-mode drift sweep.',
+    status: 'shipped',
+    liveRoute: '/dashboard/decisions/new',
+    disciplineNote:
+      'SHIPPED 2026-05-24. Founder-approved as the 5th CONTAINER_MODES kind, same-day follow-up to Adaptation #2 (boil-the-ocean). The kind picker on /dashboard/decisions/new automatically surfaces Fund Launch as a 5th option (CONTAINER_KINDS auto-extends).',
   },
   {
     n: 4,

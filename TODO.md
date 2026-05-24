@@ -63,6 +63,17 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-05-24)
 
+**Sankore Adaptation #3 — fund_launch container mode (founder-approved same-day follow-up to Adaptation #2; full prose in CLAUDE.md "Fund-launch container mode — Adaptation #3 lock 2026-05-24").**
+
+- [x] SSOT: `DecisionContainerKind` union extended to 5 kinds + FUND_LAUNCH_MODE entry + `CONTAINER_KINDS` array + `ContainerOutcomeShape.shape` union extended with `fund_realisation`. Pure additive; no Prisma migration.
+- [x] 6-stage lifecycle: thesis_development → target_market_sizing → fee_structure → anchor_lp_commitments (committee gate) → regulatory_filing → go_to_market. Required docs for anchor-LP-commitments gate: thesis_memo + fund_prospectus + lp_ask_deck.
+- [x] New `fund_realisation` outcome shape: realised_aum_pct (primary) + final_close_months + anchor_lp_count + total_lp_count + realised_fund_irr + realised_dpi + realised_tvpi + verdict.
+- [x] 4 new doc subtypes added to INVESTMENT_DOCUMENT_TYPES + DOC_TYPE_OVERLAYS for each: thesis_memo, fund_prospectus, lp_ask_deck, regulatory_filing. Each overlay names canonical failure patterns (Optimism Trap, Anchoring Trap, Echo Chamber, Halo Effect, Yes Committee, Sunk Ship, Deadline Panic).
+- [x] 68/68 vitest assertions lock the 5-mode contract (was 58 at 4-mode lock; +10 new assertions for fund_launch shape, helpers, cross-mode invariants).
+- [x] Sample bundle: PE_PAN_AFRICAN_AGRICULTURE_FUND_LAUNCH (synthetic anonymised Sub-Saharan agriculture-vintage fund-launch thesis memo with embedded Anchoring / Optimism / Recency / Confirmation / Halo biases, expected DQI 46).
+- [x] 4-mode → 5-mode drift sweep: founder-context.ts chat preamble + Sankore brief FiveAdaptations #3 status flip (queued → shipped, liveRoute added) + useContainers.ts JSDoc + AiNativeMatrix.tsx diSource.
+- [x] Gates green: tsc clean · 1278/1278 vitest · 4 lints clean (positioning + silent-catches 198 + counts 73 + canonical-imports) · prettier clean · slop-scan under 4.0 trip-wire.
+
 **Sankore Adaptation #2 — real_estate_development container mode (founder-approved boil-the-ocean follow-up to Adaptation #1; full prose in CLAUDE.md "Real-estate development container mode — Adaptation #2 lock 2026-05-24").**
 
 - [x] SSOT: `DecisionContainerKind` union extended to 4 kinds + REAL_ESTATE_DEVELOPMENT_MODE entry + `CONTAINER_KINDS` array + `ContainerOutcomeShape.shape` union extended with `dev_yield`. Pure additive; no Prisma migration.

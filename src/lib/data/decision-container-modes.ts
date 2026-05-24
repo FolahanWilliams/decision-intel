@@ -2,7 +2,7 @@
  * DecisionContainer modes — the canonical SSOT for the unified
  * capital-allocation-decision surface. Replaces the prior split between
  * `Deal` (M&A-coded) and `DecisionPackage` (generic-coded) with one
- * model + four workflow modes:
+ * model + five workflow modes:
  *
  *   - investment              → VC / growth / late-stage portfolio commitments
  *   - acquisition             → corporate development / M&A buy-side
@@ -12,8 +12,12 @@
  *                               (Adaptation #2, locked 2026-05-24): site
  *                               acquisition → entitlement → financing →
  *                               construction → leasing → stabilization
+ *   - fund_launch             → launching a new fund vehicle (Adaptation #3,
+ *                               locked 2026-05-24): thesis → market sizing →
+ *                               fee structure → anchor LP commitments →
+ *                               regulatory filing → GTM
  *
- * All four share the same R²F audit pipeline, DPR, composite DQI,
+ * All five share the same R²F audit pipeline, DPR, composite DQI,
  * cross-doc conflict detection, and Brier-scored outcome calibration.
  * They diverge only on (a) stage labels, (b) required docs at the
  * committee gate, (c) outcome metric shape, (d) committee label.
@@ -57,7 +61,11 @@ export type DecisionContainerKind =
   // Real-estate development (Adaptation #2, locked 2026-05-24). The 4th
   // mode in the canonical container taxonomy — site acquisition →
   // entitlement → financing → construction → leasing → stabilization.
-  | 'real_estate_development';
+  | 'real_estate_development'
+  // Fund launch (Adaptation #3, locked 2026-05-24). The 5th mode —
+  // thesis → market sizing → fee structure → anchor LP commitments →
+  // regulatory filing → GTM.
+  | 'fund_launch';
 
 /**
  * The three universal lifecycle phases. Stage IDs are mode-specific
@@ -100,7 +108,12 @@ export interface OutcomeMetricField {
 
 export interface ContainerOutcomeShape {
   /** The shape category — used by Brier-scoring + DPR. */
-  shape: 'irr_moic' | 'synergy_realisation' | 'forecast_hit_rate' | 'dev_yield';
+  shape:
+    | 'irr_moic'
+    | 'synergy_realisation'
+    | 'forecast_hit_rate'
+    | 'dev_yield'
+    | 'fund_realisation';
   /** Procurement-grade name for the success metric. */
   primaryMetricLabel: string;
   /** Ordered fields rendered in the outcome capture UI. */
@@ -131,10 +144,11 @@ export interface ContainerMode {
   outcomeShape: ContainerOutcomeShape;
 }
 
-// Outcome shape names — extended from 3 to 4 with the real-estate
-// `dev_yield` shape (Adaptation #2, 2026-05-24).
-// Note: kept inline in ContainerOutcomeShape.shape's union below — the
-// shape names are downstream Brier-scoring / DPR consumers' keys.
+// Outcome shape names — extended from 3 to 5 with the real-estate
+// `dev_yield` shape (Adaptation #2, 2026-05-24) and the fund-launch
+// `fund_realisation` shape (Adaptation #3, 2026-05-24). Note: kept
+// inline in ContainerOutcomeShape.shape's union above — the shape
+// names are downstream Brier-scoring / DPR consumers' keys.
 
 // ─── Mode definitions ────────────────────────────────────────────────────────
 
@@ -550,11 +564,121 @@ const REAL_ESTATE_DEVELOPMENT_MODE: ContainerMode = {
   },
 };
 
+const FUND_LAUNCH_MODE: ContainerMode = {
+  kind: 'fund_launch',
+  label: 'Fund Launch',
+  pluralLabel: 'Fund Launches',
+  description:
+    'Launching a new fund vehicle — thesis development through GTM, with anchor LP commitments at the committee gate.',
+  stages: [
+    {
+      id: 'thesis_development',
+      label: 'Thesis development',
+      eyebrow: '01',
+      description:
+        'Investment thesis defined: target sector, geography, vintage, vehicle type, return target. Founding GP team forming.',
+      phase: 'pre_committee',
+      expectedDocTypes: ['thesis_memo', 'memo'],
+      likelyPatternLabels: ['The Optimism Trap', 'The Echo Chamber', 'The Recency Spiral'],
+    },
+    {
+      id: 'target_market_sizing',
+      label: 'Target market sizing',
+      eyebrow: '02',
+      description:
+        'TAM/SAM/SOM modelled; target LP universe defined; competitive fund landscape mapped.',
+      phase: 'pre_committee',
+      expectedDocTypes: ['thesis_memo', 'fund_prospectus', 'memo'],
+      likelyPatternLabels: ['The Optimism Trap', 'The Conglomerate Fallacy', 'The Recency Spiral'],
+    },
+    {
+      id: 'fee_structure',
+      label: 'Fee structure',
+      eyebrow: '03',
+      description:
+        'GP economics finalised: management fee, carry, hurdle rate, GP commit. Promote + waterfall mechanics defined.',
+      phase: 'pre_committee',
+      expectedDocTypes: ['fund_prospectus', 'memo'],
+      likelyPatternLabels: ['The Anchoring Trap', 'The Echo Chamber'],
+    },
+    {
+      id: 'anchor_lp_commitments',
+      label: 'Anchor LP commitments',
+      eyebrow: '04',
+      description:
+        'First-close anchor LP commitments — the audit moment R²F fires hardest on. Each anchor LP commit validates the fund thesis under real procurement scrutiny.',
+      phase: 'committee_gate',
+      expectedDocTypes: ['lp_ask_deck', 'fund_prospectus', 'thesis_memo'],
+      likelyPatternLabels: [
+        'The Yes Committee',
+        'The Echo Chamber',
+        'The Optimism Trap',
+        "The Winner's Curse",
+      ],
+    },
+    {
+      id: 'regulatory_filing',
+      label: 'Regulatory filing',
+      eyebrow: '05',
+      description:
+        'Regulatory submissions filed (SEC Form ADV, AIFMD, fund-domicile-specific). Legal structure operational.',
+      phase: 'post_committee',
+      expectedDocTypes: ['regulatory_filing'],
+      likelyPatternLabels: ['The Sunk Ship', 'The Deadline Panic'],
+    },
+    {
+      id: 'go_to_market',
+      label: 'Go to market',
+      eyebrow: '06',
+      description:
+        'Fund operational — open to outside LP commitments; deal-sourcing engine running toward final close.',
+      phase: 'post_committee',
+      expectedDocTypes: ['memo'],
+      likelyPatternLabels: ['The Doubling Down', 'The Optimism Trap'],
+    },
+  ],
+  defaultStageId: 'thesis_development',
+  committeeStageId: 'anchor_lp_commitments',
+  committeeLabel: 'Anchor LP Commitment',
+  requiredDocsForCommittee: ['thesis_memo', 'fund_prospectus', 'lp_ask_deck'],
+  primaryDocType: 'thesis_memo',
+  outcomeShape: {
+    shape: 'fund_realisation',
+    primaryMetricLabel: 'Realised AUM vs target',
+    fields: [
+      {
+        key: 'realised_aum_pct',
+        label: 'Realised AUM (% of target at final close)',
+        type: 'percent',
+        primary: true,
+      },
+      {
+        key: 'final_close_months',
+        label: 'Months from first close to final close',
+        type: 'months',
+      },
+      { key: 'anchor_lp_count', label: 'Anchor LP count (at first close)', type: 'number' },
+      { key: 'total_lp_count', label: 'Total LP count (at final close)', type: 'number' },
+      { key: 'realised_fund_irr', label: 'Realised fund IRR (long-horizon)', type: 'percent' },
+      { key: 'realised_dpi', label: 'DPI (distributions to paid-in)', type: 'number' },
+      { key: 'realised_tvpi', label: 'TVPI (total value to paid-in)', type: 'number' },
+      {
+        key: 'verdict',
+        label: 'Verdict',
+        type: 'enum',
+        options: ['value_created', 'value_neutral', 'value_destroyed', 'too_early_to_tell'],
+      },
+      { key: 'notes', label: 'What worked / what missed', type: 'text' },
+    ],
+  },
+};
+
 export const CONTAINER_MODES: Record<DecisionContainerKind, ContainerMode> = {
   investment: INVESTMENT_MODE,
   acquisition: ACQUISITION_MODE,
   strategic: STRATEGIC_MODE,
   real_estate_development: REAL_ESTATE_DEVELOPMENT_MODE,
+  fund_launch: FUND_LAUNCH_MODE,
 };
 
 export const CONTAINER_KINDS: ReadonlyArray<DecisionContainerKind> = [
@@ -562,6 +686,7 @@ export const CONTAINER_KINDS: ReadonlyArray<DecisionContainerKind> = [
   'acquisition',
   'strategic',
   'real_estate_development',
+  'fund_launch',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

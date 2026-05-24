@@ -1240,6 +1240,94 @@ Standard real-estate risks: cost overruns, lease-up delays, FX exposure on impor
 APPROVE construction financing close. The $1.2M entitlement investment cannot be re-tendered; the comp set strongly supports stabilized rents; the GC selection is complete; the FX environment is favourable. We have done the work and the deal is ready to close.`,
 };
 
+// ─── Fund-launch bundle (1) ──────────────────────────────────────────
+// Adaptation #3 lock 2026-05-24. Pan-African agriculture-vintage fund
+// launch — embeds the canonical fund-launch failure patterns: prior-fund
+// anchoring, TAM extrapolation, sourcing-edge claims without specific
+// evidence, comparable-fund blindspot, anchor-LP halo.
+
+const PE_PAN_AFRICAN_AGRICULTURE_FUND_LAUNCH: SampleBundle = {
+  slug: 'pe-pan-african-agriculture-fund-launch',
+  role: 'pe_vc',
+  title: 'Pan-African agriculture-fund launch — thesis memo',
+  summary:
+    'Sub-Saharan agriculture-and-food-systems fund (Vintage I), target $120M AUM with first close mid-2026 and anchor commitments from two DFI LPs.',
+  hookCopy:
+    'Emerging-manager GPs paste this when the thesis memo anchors on prior-fund returns without acknowledging vintage / fund-size scaling realities, and when the LP-ask deck treats the anchor commitment as a halo for follow-on LPs.',
+  marketContext: 'emerging_market',
+  expectedBiases: [
+    'anchoring_bias',
+    'overconfidence_bias',
+    'recency_bias',
+    'confirmation_bias',
+    'halo_effect',
+  ],
+  expectedDqi: 46,
+  content: `# Sub-Saharan Agriculture & Food Systems Fund I — Thesis Memo
+
+**Prepared by:** Founding GP team (3-partner emerging-manager spin-out)
+**Date:** 12 May 2026
+**Target first close:** September 2026
+**Target final close:** March 2027
+**Target AUM:** $120M
+**Recommendation:** Proceed to anchor-LP outreach. Two DFI anchor commitments verbally confirmed at $25M each subject to documentation.
+
+## Executive Summary
+
+Sub-Saharan Agriculture & Food Systems Fund I is a 10-year vehicle targeting growth-stage commitments ($3-12M tickets) into agriculture, food-processing, and cold-chain logistics businesses across Nigeria, Ghana, Kenya, and Tanzania. The fund targets a net 22% IRR — consistent with the founding partner's prior-fund realised IRR of 24% on Vintage 2018. Founding team has 47 cumulative years of Sub-Saharan agriculture experience.
+
+## Founding Team
+
+- **Managing Partner A** — 18 years agriculture finance, ex-AFC, deployed $340M across 22 deals at prior fund (Vintage 2018, $80M AUM, 24% gross IRR, fund still in harvest period).
+- **Partner B** — 12 years operations, ex-McKinsey Lagos, agriculture supply-chain specialty.
+- **Partner C** — 17 years investing, ex-IFC Nairobi, agriculture-export financing.
+
+## Market Opportunity (TAM/SAM/SOM)
+
+- **TAM:** $850B Sub-Saharan agriculture sector by 2030 (FAO 2025), growing 6.8% CAGR off the 2024 base.
+- **SAM:** $42B addressable by growth-equity capital targeting $3-12M tickets in our four target countries.
+- **SOM:** $5B serviceable over the 5-year deployment period — ~12% of SAM, achievable given our founding team's existing deal pipeline.
+
+We see no other fund in the Sub-Saharan agriculture vertical at this fund size targeting the $3-12M ticket band. The whitespace is real.
+
+## Investment Thesis
+
+Three converging trends justify the vintage:
+
+1. **AfCFTA single-market provisions** (effective Q4 2025) reduce intra-regional agriculture tariffs 12% on average, expanding addressable cross-border markets.
+2. **Climate-resilient agriculture** is moving from concessional-capital territory to growth-equity-returns territory as climate-adapted crop varieties reach commercial scale.
+3. **Cold-chain logistics** in Sub-Saharan markets is at the inflection point that East-African mobile money was in 2010 — the first movers will compound for a decade.
+
+We expect the same growth-equity returns dynamic that drove Vintage 2018's 24% gross IRR to repeat, with sectoral tailwinds amplifying the result.
+
+## Sourcing Edge
+
+Our founding team brings the proprietary deal network from 47 cumulative years on the ground. Specific sourcing channels include the Pan-African DFI relationships established at prior firms, the AfCFTA business-council network where Partner A serves on the agriculture sub-committee, and a deep operator network of ex-management-team contacts across the 22 portfolio companies from Vintage 2018.
+
+## Fund Terms
+
+- **Management fee:** 2% on committed capital during investment period, stepping to 1.5% on invested capital thereafter
+- **Carry:** 20% above an 8% hurdle, European waterfall, full GP catch-up
+- **GP commit:** 2% of target AUM ($2.4M from the founding team)
+- **Investment period:** 5 years; hold period 3-7 years; fund life 10 years + two 1-year extensions
+
+## Anchor LPs
+
+Two DFI anchors have verbally committed $25M each subject to documentation: a European DFI specialising in agriculture, and a US DFI with explicit Pan-African mandate. Their named commitment is the strongest possible signal — these are the most sophisticated agriculture LPs in the world, and they are anchoring our fund. This anchor commitment alone validates the thesis and substantially de-risks the fundraise.
+
+## Why This Vintage
+
+The Vintage 2018 fund (founding partner) returned 24% gross IRR through Year 6 with 60% of capital still deployed. The Sub-Saharan agriculture sector has continued to compound; the AfCFTA tailwind is incremental to Vintage 2018's underwriting; the dry-powder ratio in the sector is materially lower than 2018 (more deal availability per dollar). The vintage math is straightforward: better entry environment, equivalent team, validated thesis.
+
+## Risks
+
+Standard emerging-manager risks (smaller GP track record at this fund size, currency volatility, regulatory variation across the four target markets) — all manageable given the founding team's relationships and the DFI anchor commitments.
+
+## Recommendation
+
+Proceed to anchor-LP documentation and broader LP outreach. Target first close September 2026.`,
+};
+
 // ─── Public exports ─────────────────────────────────────────────────
 
 export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
@@ -1258,6 +1346,7 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   PE_LAGOS_CONSUMER_ROLLUP,
   PE_KENYA_FINTECH_GROWTH,
   PE_LAGOS_MIXED_USE_DEVELOPMENT,
+  PE_PAN_AFRICAN_AGRICULTURE_FUND_LAUNCH,
 ] as const;
 
 export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> = Object.fromEntries(

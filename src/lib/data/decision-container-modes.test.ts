@@ -1,13 +1,14 @@
 /**
  * SSOT lock for DecisionContainer modes. Mirrors the discipline of
  * NAMED_PATTERNS + INVESTMENT_DOCUMENT_TYPES + scoring/dqi.test.ts —
- * locks the 4-mode contract so adding a 5th mode (or breaking an
+ * locks the 5-mode contract so adding a 6th mode (or breaking an
  * existing one) is a deliberate, type-system-loud change.
  *
- * The 4 modes (investment / acquisition / strategic /
- * real_estate_development) are the unified replacement for the prior
- * Deal + DecisionPackage split. real_estate_development added in
- * Adaptation #2 (locked 2026-05-24, Sankore-killer follow-up). See
+ * The 5 modes (investment / acquisition / strategic /
+ * real_estate_development / fund_launch) are the unified replacement
+ * for the prior Deal + DecisionPackage split. real_estate_development
+ * added in Adaptation #2 (locked 2026-05-24). fund_launch added in
+ * Adaptation #3 (locked 2026-05-24, same-day Sankore follow-up). See
  * decision-container-modes.ts header for the architecture lock.
  */
 
@@ -26,12 +27,13 @@ import {
 } from './decision-container-modes';
 
 describe('CONTAINER_KINDS', () => {
-  it('has exactly 4 modes — investment / acquisition / strategic / real_estate_development', () => {
+  it('has exactly 5 modes — investment / acquisition / strategic / real_estate_development / fund_launch', () => {
     expect(CONTAINER_KINDS).toEqual([
       'investment',
       'acquisition',
       'strategic',
       'real_estate_development',
+      'fund_launch',
     ]);
   });
 
@@ -292,12 +294,83 @@ describe('CONTAINER_MODES — real_estate_development shape (Adaptation #2)', ()
   });
 });
 
+describe('CONTAINER_MODES — fund_launch shape (Adaptation #3)', () => {
+  it('uses fund-launch-canonical 6-stage progression', () => {
+    const mode = CONTAINER_MODES.fund_launch;
+    const ids = mode.stages.map(s => s.id);
+    expect(ids).toEqual([
+      'thesis_development',
+      'target_market_sizing',
+      'fee_structure',
+      'anchor_lp_commitments',
+      'regulatory_filing',
+      'go_to_market',
+    ]);
+  });
+
+  it('committee gate is Anchor LP Commitment', () => {
+    expect(CONTAINER_MODES.fund_launch.committeeStageId).toBe('anchor_lp_commitments');
+    expect(CONTAINER_MODES.fund_launch.committeeLabel).toBe('Anchor LP Commitment');
+  });
+
+  it('outcome shape is fund_realisation with realised_aum_pct primary', () => {
+    expect(CONTAINER_MODES.fund_launch.outcomeShape.shape).toBe('fund_realisation');
+    const primary = CONTAINER_MODES.fund_launch.outcomeShape.fields.find(f => f.primary);
+    expect(primary!.key).toBe('realised_aum_pct');
+  });
+
+  it('Anchor LP Commitments stage names canonical fund-launch toxic patterns', () => {
+    const stage = getContainerStage('fund_launch', 'anchor_lp_commitments')!;
+    expect(stage.likelyPatternLabels).toContain('The Yes Committee');
+    expect(stage.likelyPatternLabels).toContain('The Echo Chamber');
+    expect(stage.likelyPatternLabels).toContain('The Optimism Trap');
+  });
+
+  it('requiredDocsForCommittee enforces thesis_memo + fund_prospectus + lp_ask_deck', () => {
+    const required = CONTAINER_MODES.fund_launch.requiredDocsForCommittee;
+    expect(required).toContain('thesis_memo');
+    expect(required).toContain('fund_prospectus');
+    expect(required).toContain('lp_ask_deck');
+  });
+
+  it('expected docs at Anchor LP Commitments include lp_ask_deck + fund_prospectus + thesis_memo', () => {
+    const stage = getContainerStage('fund_launch', 'anchor_lp_commitments')!;
+    expect(stage.expectedDocTypes).toContain('lp_ask_deck');
+    expect(stage.expectedDocTypes).toContain('fund_prospectus');
+    expect(stage.expectedDocTypes).toContain('thesis_memo');
+  });
+
+  it('outcome shape captures DPI + TVPI + fund IRR + AUM ramp metrics', () => {
+    const fieldKeys = CONTAINER_MODES.fund_launch.outcomeShape.fields.map(f => f.key);
+    expect(fieldKeys).toContain('realised_dpi');
+    expect(fieldKeys).toContain('realised_tvpi');
+    expect(fieldKeys).toContain('realised_fund_irr');
+    expect(fieldKeys).toContain('final_close_months');
+    expect(fieldKeys).toContain('anchor_lp_count');
+    expect(fieldKeys).toContain('total_lp_count');
+  });
+
+  it('primaryDocType is thesis_memo — the load-bearing fund-launch artefact', () => {
+    expect(CONTAINER_MODES.fund_launch.primaryDocType).toBe('thesis_memo');
+  });
+
+  it('default stage is thesis_development (start of lifecycle)', () => {
+    expect(CONTAINER_MODES.fund_launch.defaultStageId).toBe('thesis_development');
+  });
+
+  it('regulatory_filing stage is post_committee (filing happens AFTER anchor LPs commit)', () => {
+    const stage = getContainerStage('fund_launch', 'regulatory_filing')!;
+    expect(stage.phase).toBe('post_committee');
+  });
+});
+
 describe('helpers', () => {
   it('getContainerMode returns mode for valid kind', () => {
     expect(getContainerMode('investment').label).toBe('Investment');
     expect(getContainerMode('acquisition').label).toBe('Acquisition');
     expect(getContainerMode('strategic').label).toBe('Strategic Decision');
     expect(getContainerMode('real_estate_development').label).toBe('Real-Estate Development');
+    expect(getContainerMode('fund_launch').label).toBe('Fund Launch');
   });
 
   it('getContainerMode throws on unknown kind', () => {
@@ -327,6 +400,11 @@ describe('helpers', () => {
     expect(isRequiredCommitteeDoc('real_estate_development', 'regulatory_checklist')).toBe(true);
     expect(isRequiredCommitteeDoc('real_estate_development', 'contractor_selection')).toBe(false);
     expect(isRequiredCommitteeDoc('real_estate_development', 'ic_memo')).toBe(false);
+    expect(isRequiredCommitteeDoc('fund_launch', 'thesis_memo')).toBe(true);
+    expect(isRequiredCommitteeDoc('fund_launch', 'fund_prospectus')).toBe(true);
+    expect(isRequiredCommitteeDoc('fund_launch', 'lp_ask_deck')).toBe(true);
+    expect(isRequiredCommitteeDoc('fund_launch', 'regulatory_filing')).toBe(false);
+    expect(isRequiredCommitteeDoc('fund_launch', 'ic_memo')).toBe(false);
   });
 
   it('isRequiredCommitteeDoc handles null/undefined gracefully', () => {
@@ -349,6 +427,11 @@ describe('helpers', () => {
     expect(isKnownContainerDocType('regulatory_checklist')).toBe(true);
     expect(isKnownContainerDocType('contractor_selection')).toBe(true);
     expect(isKnownContainerDocType('appraisal')).toBe(true);
+    // Fund-launch doc types (Adaptation #3)
+    expect(isKnownContainerDocType('thesis_memo')).toBe(true);
+    expect(isKnownContainerDocType('fund_prospectus')).toBe(true);
+    expect(isKnownContainerDocType('lp_ask_deck')).toBe(true);
+    expect(isKnownContainerDocType('regulatory_filing')).toBe(true);
   });
 });
 
@@ -377,6 +460,7 @@ describe('cross-mode invariants', () => {
       'acquisition',
       'strategic',
       'real_estate_development',
+      'fund_launch',
     ];
     expect(CONTAINER_KINDS).toEqual(allKinds);
     expect(new Set(CONTAINER_KINDS).size).toBe(CONTAINER_KINDS.length);

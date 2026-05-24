@@ -46,6 +46,16 @@ export const INVESTMENT_DOCUMENT_TYPES = [
   'regulatory_checklist', // Zoning, permits, environmental review, building-code compliance
   'contractor_selection', // GC bids, construction contracts, schedule analysis, change-order log
   'appraisal', // Third-party valuation (residual land value, as-stabilized value)
+  // Fund-launch extensions (Adaptation #3 lock 2026-05-24). Anchored on
+  // the canonical fund-launch lifecycle: thesis → market sizing → fee
+  // structure → anchor LP commitments → regulatory filing → GTM.
+  // Sankore launches funds repeatedly (Agriculture Fund, Real Wealth
+  // Fund). Distinct bias patterns: overconfidence on AUM ramp,
+  // anchoring on prior-fund returns, confirmation bias on target sectors.
+  'thesis_memo', // Fund thesis: target sector, geography, vintage, vehicle type, return target
+  'fund_prospectus', // Formal LP-facing fund document: structure, terms, GP track record, strategy
+  'lp_ask_deck', // Pitch deck for LP fundraise — narrative + commitments-to-date + ask
+  'regulatory_filing', // Fund-domicile-specific filings (Form ADV, AIFMD, fund constitution)
 ] as const;
 
 export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
@@ -355,6 +365,58 @@ This is a third-party appraisal — residual land value, as-is value, or as-stab
 NAMED TOXIC COMBINATIONS to flag:
 - "The Anchoring Trap" — Anchoring + Halo: cap rate anchored to today's market in a forward-stabilized valuation.
 - "The Optimism Trap" — Overconfidence + Confirmation: rents + occupancy parroted from developer pro forma without independent verification.`,
+
+  // ─── Fund-launch overlays (Adaptation #3, locked 2026-05-24) ───
+
+  thesis_memo: `DOCUMENT TYPE: FUND THESIS MEMO
+This is a fund-launch thesis document — typically the founding GP's first articulation of the strategy being proposed to LPs: target sector, geography, vintage, vehicle type, return target, sourcing edge, and "why us, why now." Fund-thesis documents are inherently optimistic because they are authored by the very person whose career depends on attracting LP capital. Apply the GP-Halo Filter throughout and watch for:
+- PRIOR-FUND ANCHORING: are the projected returns anchored to the GP's prior-fund performance without adjustment for vintage / market conditions / fund-size scaling? Flag if the new fund's target IRR matches or exceeds the prior fund's realised IRR without specific named drivers for the lift.
+- TAM EXTRAPOLATION: is the addressable market projected with straight-line growth from recent years? Flag if TAM/SAM/SOM is presented without acknowledging cycle position OR if the SOM (serviceable obtainable) is more than ~5% of the SAM.
+- "WHY US, WHY NOW" UNGROUNDED: does the memo answer "why is this GP team uniquely positioned to capture this opportunity" with specific founder-resume evidence — or does it wave at general experience? Flag generic "20 years of experience" framing without specific named deals / sectoral exposure.
+- SOURCING-EDGE CLAIMS: every fund thesis claims a sourcing edge ("proprietary network", "deep relationships"). Flag any sourcing claim without specific named relationships / venues / channels that produce material deal flow.
+- COMPARABLE-FUND BLINDSPOT: is the competitive fund landscape mapped honestly, including funds that ALSO target this thesis and have raised capital first? Flag if the memo presents the strategy as uncontested without naming the 3-5 obvious competing funds.
+
+NAMED TOXIC COMBINATIONS to flag when the underlying biases co-occur:
+- "The Optimism Trap" — Overconfidence + Confirmation: return targets exceeding prior-fund realisation without specific named drivers.
+- "The Recency Spiral" — Recency + Availability: TAM growth extrapolated from a hot-cycle window without down-cycle reference.
+- "The Yes Committee" — Authority + Groupthink: founding GP's conviction dominating the memo without documented dissent from advisors or co-founders.`,
+
+  fund_prospectus: `DOCUMENT TYPE: FUND PROSPECTUS / PRIVATE PLACEMENT MEMORANDUM (PPM)
+This is the formal LP-facing fund document: legal structure, fee + carry terms, investment strategy, GP track record, risk disclosures, fund-domicile-specific provisions. The PPM is procurement-grade for LPs but is authored by the GP's counsel under the GP's direction. Watch for:
+- GP TRACK-RECORD CURATION: is the GP track record presented at fund level (full IRR / DPI / TVPI across ALL prior funds) or at deal level (cherry-picked winners)? Flag any track record presented as a list of named winners without the corresponding losers OR without aggregate fund-level metrics.
+- FEE-STRUCTURE OPACITY: are the management fee, carry, hurdle rate, GP commit, and waterfall mechanics all surfaced explicitly with worked examples? Flag any PPM that buries the waterfall in legal language without a numerical worked example showing GP economics at illustrative MOIC bands (1x, 2x, 3x).
+- CONFLICTS-OF-INTEREST DISCLOSURE: are GP affiliated investments, cross-fund transactions, and side-letter arrangements disclosed? Flag any silence on these topics — they are SEC / AIFMD requirements and silence is a procurement-grade red flag.
+- KEY-PERSON RISK: is the dependency on specific named GP-team members (and what happens if they depart) explicitly addressed? Flag if the PPM lacks a key-person clause + departure mechanics.
+- TARGET-RETURN HEDGING: are the return targets expressed as "target" / "objective" / "expected" with appropriate hedging — or are they presented as if they are forecasted with confidence? Flag overconfident forward-looking language.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Yes Committee" — Authority + Groupthink + Unanimous Consensus: PPM language reads as if all GPs unanimously agree on every risk position without documented divergence.
+- "The Optimism Trap" — Overconfidence + Confirmation: target returns presented without honest probability framing OR sensitivity analysis on adverse vintage scenarios.`,
+
+  lp_ask_deck: `DOCUMENT TYPE: LP-ASK PITCH DECK
+This is the pitch deck a GP uses to ask LPs for capital commitments. LP-ask decks operate under intense narrative-coherence pressure — a 20-slide narrative arc must compress thesis + market + edge + team + track record + terms + ask into a meeting-length pitch. The narrative coherence itself can BECOME a bias: a beautifully-told story is harder for an LP to interrogate. Watch for:
+- NARRATIVE-COHERENCE OVERFITTING: does the deck present every prior deal as evidence FOR the new fund's thesis? Flag if every named portfolio company "proves" the new thesis — real careers have losers + outliers that don't fit the narrative.
+- COMMITMENT-MOMENTUM ANCHORING: is the deck's "anchor LPs committed" or "already $XM raised" used to anchor target-LP commitment size? Bandwagon-effect framing. Flag commitment-momentum language that pressures rather than informs.
+- "STRATEGIC LP" HALO: is a named-anchor LP being used as a halo (e.g. "the X University endowment is our anchor LP, so therefore...")? Flag if the anchor LP's name is doing work the strategy itself should be doing.
+- TRACK-RECORD VISUAL CURATION: are visual representations of prior performance (IRR bars, MOIC ladders, sector heatmaps) presented honestly — or are they framed to compress losses + emphasise wins? Flag any visual that omits negative-IRR funds OR uses non-standard scaling.
+- "WHY THIS VINTAGE" UNGROUNDED: every fund claims the current vintage is unusually attractive. Flag any "why now" claim without specific named cycle-position evidence (rate environment, dry-powder ratio, exit-window analysis).
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Echo Chamber" — Confirmation + Halo: every slide reinforces the thesis without internal contradiction or alternative-view presentation.
+- "The Optimism Trap" — Overconfidence + Planning Fallacy: fundraise-timeline + commitment-momentum + market-timing all assumed at best-case simultaneously.
+- "The Anchoring Trap" — Anchoring + Halo: prior-fund returns or strategic-LP commitments used to anchor target-LP expectations.`,
+
+  regulatory_filing: `DOCUMENT TYPE: FUND REGULATORY FILING
+This document covers fund-domicile-specific regulatory submissions: SEC Form ADV (US RIA), AIFMD filing (EU AIFM), fund-constitution documents (Cayman / Delaware LP), or African market-specific submissions (SEC Nigeria, FSCA South Africa, CMA Kenya). Regulatory filings are typically prepared by fund counsel + compliance team and reviewed by the regulator AFTER filing — meaning material misstatements get caught at the WORST possible time. Watch for:
+- DISCLOSURE-CONSISTENCY GAPS: do the filing's strategy description + return targets + risk disclosures match the PPM and LP-ask deck verbatim? Flag any divergence — regulators compare filings against marketing materials and inconsistencies create AIFMD / Reg D liability.
+- KEY-PERSON DISCLOSURE COMPLETENESS: is the named GP team in the filing complete + accurate? Flag any team-member or material-affiliation omission relative to the public marketing materials.
+- CONFLICTS-OF-INTEREST FILING: are all cross-fund transactions, side-letter arrangements, and affiliated investments disclosed in the filing's required schedules? Flag silence on these — they are recurring SEC enforcement triggers.
+- JURISDICTION-SPECIFIC GATES: in Pan-African or emerging-market contexts, are all required filings named (SEC Nigeria + state-level + AML/KYC + FATF Travel Rule where applicable)? Flag any filing-checklist that treats the regulatory environment as a single layer.
+- TIMING-OF-FILING vs FUNDRAISE: is the filing submitted BEFORE accepting subscriptions, or is the GP "filing in parallel" with active fundraise? Flag the latter — most jurisdictions require registration prior to subscription acceptance.
+
+NAMED TOXIC COMBINATIONS to flag:
+- "The Sunk Ship" — Sunk Cost + Anchoring: regulatory filing rushed because fundraise momentum has been built and counsel is pressured to submit despite incomplete disclosure.
+- "The Deadline Panic" — Time Pressure + Confirmation: filing deadlines (vintage close, regulatory window) compressing the disclosure review beyond prudent thoroughness.`,
 };
 
 // ─── Corporate Executive Personas for Simulation ─────────────────────────────
