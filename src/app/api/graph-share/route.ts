@@ -15,6 +15,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { generateShareToken } from '@/lib/utils/share-token';
 import { logAudit } from '@/lib/audit';
 import { generateGraphReport, type GraphNetworkReport } from '@/lib/reports/graph-report';
 import { buildOrgCalibration } from '@/lib/reports/provenance-record-data';
@@ -196,6 +197,9 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         orgId,
+        // Cryptographically-secure token — replaces former @default(cuid()).
+        // Locked 2026-05-25 (security audit); see src/lib/utils/share-token.ts.
+        token: generateShareToken(),
         snapshot: (finalSnapshot ?? {
           metrics: { nodeCount: 0, edgeCount: 0 },
         }) as Prisma.InputJsonValue,

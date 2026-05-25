@@ -99,20 +99,36 @@ echo ""
 # Step 3: Run Contextual Audit with Gemini
 # ==============================================================================
 
+# When the Gemini CLI is unavailable, the audit cannot run — but the
+# script historically returned 0 and printed "All audits passed!" which
+# created a SILENT SAFETY-GATE BYPASS. Locked 2026-05-25 (security audit):
+# any contributor or CI runner without GOOGLE_API_KEY shipped with the
+# architectural audit silently disabled. The fix below makes
+# tool-unavailable a hard failure UNLESS the operator opts in via
+# SKIP_GEMINI_AUDIT=1 (escape hatch for environments where Gemini is
+# legitimately unavailable, e.g. air-gapped CI).
 run_audit() {
     local audit_type="$1"
     local prompt="$2"
-    
+
     echo -e "${YELLOW}🔍 Running: $audit_type${NC}"
-    
+
     RESULT=$(npx gemini prompt "$prompt" 2>/dev/null || echo "AUDIT_FAILED")
-    
+
     if [[ "$RESULT" == *"PASS"* ]] || [[ "$RESULT" == *"pass"* ]] || [[ "$RESULT" == *"No issues"* ]]; then
         echo -e "   ${GREEN}✓ $audit_type: PASS${NC}"
         return 0
     elif [[ "$RESULT" == "AUDIT_FAILED" ]]; then
-        echo -e "   ${YELLOW}⚠ $audit_type: Gemini CLI unavailable${NC}"
-        return 0
+        if [[ "${SKIP_GEMINI_AUDIT:-0}" == "1" ]]; then
+            echo -e "   ${YELLOW}⚠ $audit_type: Gemini CLI unavailable (skipped via SKIP_GEMINI_AUDIT=1)${NC}"
+            return 0
+        fi
+        echo -e "   ${RED}✗ $audit_type: Gemini CLI unavailable — gate cannot run${NC}"
+        echo -e "   ${RED}   To run the gate: install gemini-cli + set GOOGLE_API_KEY${NC}"
+        echo -e "   ${RED}   To skip explicitly: SKIP_GEMINI_AUDIT=1 git commit ...${NC}"
+        AUDIT_RESULTS="${AUDIT_RESULTS}\n[${audit_type}] Gemini CLI unavailable"
+        ((ISSUES_FOUND++))
+        return 1
     else
         echo -e "   ${RED}✗ $audit_type: ISSUES FOUND${NC}"
         echo -e "   ${RED}   $RESULT${NC}"

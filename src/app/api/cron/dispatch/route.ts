@@ -16,17 +16,16 @@ import { headers } from 'next/headers';
 import { createLogger } from '@/lib/utils/logger';
 import { safeCompare } from '@/lib/utils/safe-compare';
 import { acquireCronLock, releaseCronLock } from '@/lib/utils/cron-lock';
+import { instrumentCronJob, type CronJobResult } from '@/lib/utils/cron-instrumentation';
 
 const log = createLogger('CronDispatch');
 
 export const maxDuration = 300; // 5 minutes for all sub-jobs
 
-interface JobResult {
-  job: string;
-  status: 'ok' | 'error' | 'skipped';
-  ms?: number;
-  error?: string;
-}
+// JobResult is structurally compatible with CronJobResult — the dispatcher's
+// runJob() returns this shape; instrumentCronJob() persists each call to the
+// CronRun table for /api/admin/cron-health surfacing.
+type JobResult = CronJobResult;
 
 const PER_JOB_TIMEOUT = 45_000; // 45s per job to stay within 5-minute total dispatch
 
@@ -44,9 +43,15 @@ async function runJob(baseUrl: string, path: string, cronSecret: string): Promis
     const ms = Date.now() - start;
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-      return { job: path, status: 'error', ms, error: `HTTP ${res.status}: ${body.slice(0, 200)}` };
+      return {
+        job: path,
+        status: 'error',
+        ms,
+        error: `HTTP ${res.status}: ${body.slice(0, 200)}`,
+        httpStatus: res.status,
+      };
     }
-    return { job: path, status: 'ok', ms };
+    return { job: path, status: 'ok', ms, httpStatus: res.status };
   } catch (err) {
     const ms = Date.now() - start;
     const message = err instanceof Error ? err.message : String(err);
@@ -131,15 +136,23 @@ export async function GET() {
 
   // Run jobs sequentially to avoid overwhelming the server.
   // Failed jobs get one retry after a short delay.
+  // Each job is wrapped in instrumentCronJob() so its outcome persists
+  // to the CronRun table — surfaced at /api/admin/cron-health for
+  // per-route last-run / last-success / consecutive-failures reporting.
+  // The retry pair (initial + retry) is one CronRun row capturing the
+  // FINAL outcome; intra-retry transient errors live in Vercel logs only.
   try {
     const results: JobResult[] = [];
     for (const job of jobsToRun) {
-      let result = await runJob(baseUrl, job, cronSecret);
-      if (result.status === 'error') {
-        log.warn(`Cron job ${job} failed, retrying in 2s: ${result.error}`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        result = await runJob(baseUrl, job, cronSecret);
-      }
+      const result = await instrumentCronJob(job, async () => {
+        let r = await runJob(baseUrl, job, cronSecret);
+        if (r.status === 'error') {
+          log.warn(`Cron job ${job} failed, retrying in 2s: ${r.error}`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          r = await runJob(baseUrl, job, cronSecret);
+        }
+        return r;
+      });
       results.push(result);
       if (result.status === 'error') {
         log.error(`Cron job ${job} failed after retry: ${result.error}`);
