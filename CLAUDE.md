@@ -568,6 +568,33 @@ The dark-mode sub-category dropped from 72 → 0. The MODAL category dropped fro
 
 **Forward-looking rule.** When a future external market-research / advisor pass surfaces a validated practitioner pain-phrase, the cascade is these 5 founder-facing surfaces in lockstep (event-prep BiasHook + discovery-toolkit PitchTrigger/cue + Sparring objection scenario + Education flashcard + founder-context routing) — NOT a new bias, NOT a new NAMED_PATTERN, NOT a new persona/archetype (the ranked SSOT sets stay parsimonious). Route any pipeline/taxonomy expansion through the founder; the wedge-surface cascade is the default home for validated language.
 
+## Encryption key resolution fail-closed (locked 2026-05-25 — audit-hardening)
+
+**Why this lock exists.** A 2026-05-25 security audit flagged `getCurrentKeyVersion` in [src/lib/utils/encryption.ts](src/lib/utils/encryption.ts) as a silent-downgrade window. The function had TWO failure modes that returned a version number without verifying a key for it actually existed:
+
+1. **Explicit `_VERSION` set without matching key**: operator bumped `DOCUMENT_ENCRYPTION_KEY_VERSION=2` BEFORE setting `DOCUMENT_ENCRYPTION_KEY_V2`. Function returned 2, downstream `getKeyForVersion(2)` threw with a generic error.
+2. **No keys configured at all**: function returned `LEGACY_VERSION` (1), downstream throw at `getKeyForVersion(1)`.
+
+Both paths were technically fail-closed at encrypt time (the downstream throw caught the misconfiguration), but they were silent-downgrade WINDOWS for any future caller that used the version number for purposes beyond an immediate `getKeyForVersion` lookup (e.g. stamping a row's keyVersion column BEFORE the encrypt call).
+
+**The fix.** `getCurrentKeyVersion` now throws fail-closed at the resolution site:
+
+- Explicit `_VERSION=N` without matching `_V{N}` key → throws with "Misconfigured rotation — set the V{N} key BEFORE bumping `_VERSION`" + remediation hint
+- No keys at all → throws with "No encryption key configured for domain X. Set `<PREFIX>` or `<PREFIX>_V1`."
+- Unparseable `_VERSION` value (e.g. `=abc`) → still warns + falls through to probe (robust against operator typos that don't change substance)
+
+**The standing contradiction.** [encryption.test.ts](src/lib/utils/encryption.test.ts) — 8 new regression tests (21/21 total) lock the fail-closed behavior: happy path / misconfigured rotation / no-keys-at-all / unparseable / probe-fallback / legacy-alias-resolution / end-to-end via `encryptDocumentContent`. If a future refactor returns a version number without verifying its key resolves, the suite breaks.
+
+**Production safety.** All current encrypt-path callers either (a) guard with `isDocumentEncryptionEnabled()` before calling `encryptDocumentContent` (5 routes do this verbatim) or (b) call `encryptToken` inside an OAuth callback where a hard-fail is the correct response when the env var is missing. Slack-callback failure surfaces as "Slack integration error" — the operator sees the diagnostic in logs. No legitimate scenario reaches the throw path.
+
+**Forward-looking rules.**
+
+1. **`getCurrentKeyVersion` is the single point where key-availability is verified during encrypt-time resolution.** When extending the encryption module with new domains or new resolution rules, the invariant is: every return value MUST have a verifiable key. Never return a version number that requires the caller to validate.
+
+2. **Rotation procedure is unchanged.** The 4-step rotation flow at the top of `encryption.ts` still works exactly as documented — set `_V{N}` → bump `_VERSION` → run `npm run rotate:encryption-key` → drop old key. The fail-closed change only fires when steps 1 + 2 are inverted (operator bumps `_VERSION` before setting the new key), which is a misconfiguration the function now diagnoses clearly instead of letting downstream code surface generically.
+
+3. **The unparseable-VERSION fall-through is INTENTIONAL robustness, not a gap.** When `_VERSION=2foo` is set, `parseInt` returns 2 — the misconfigured-rotation check fires correctly. When `_VERSION=abc` is set, it logs a warn and falls through to the probe (which finds the right key regardless). This is the "typo recovery" path; do not "fix" it by throwing — that would brittle the rotation workflow without security benefit.
+
 ## BiasTask PATCH authorization-matrix lock (locked 2026-05-25 — false-positive audit response)
 
 **Why this lock exists.** A 2026-05-24 security audit flagged the BiasTask PATCH outer gate at [src/app/api/bias-tasks/[id]/route.ts](<src/app/api/bias-tasks/[id]/route.ts>) as a privilege escalation — claiming `if (!isCreator && !isAssignee && !isOrgAdmin && !isOrgMember)` is "effectively `if (false)` for any org member" and that "other PATCH fields (title / description / dueAt) gate ONLY on the outer check." **The audit was wrong.** Every per-field write in the handler carries an explicit inner gate (`isCreator || isOrgAdmin` for title/description/dueAt/reassign; `isAssignee || isCreator || isOrgAdmin` for status/resolutionNote) that runs BEFORE the prisma.update call. The outer gate is **tenant-isolation**, not write-permission — it rejects strangers with no relationship to the task's org.

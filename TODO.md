@@ -63,6 +63,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-05-25)
 
+**Encryption key resolution fail-closed — audit hardening (full prose in CLAUDE.md "Encryption key resolution fail-closed 2026-05-25").**
+
+- [x] Read [src/lib/utils/encryption.ts](src/lib/utils/encryption.ts) `getCurrentKeyVersion` (lines 87-101). Verified the audit's claim: the function returned a version number without verifying a key for it actually resolved, opening two silent-downgrade windows.
+- [x] Fix A — when `*_VERSION` is explicit, verify the resolved key exists; throw with "Misconfigured rotation — set the V{N} key BEFORE bumping the version env" + remediation hint. Replaces a 2-step failure (return → generic downstream throw) with a 1-step diagnostic fail-closed throw.
+- [x] Fix B — when NO keys configured at all, throw at `getCurrentKeyVersion` instead of returning `LEGACY_VERSION`. Closes the silent-downgrade window for future callers that use the version stamp before checking the key.
+- [x] Preserved the unparseable-VERSION fall-through-to-probe path (robust against operator typos that don't change substance).
+- [x] 8 new regression tests in [encryption.test.ts](src/lib/utils/encryption.test.ts) — happy path / misconfigured rotation document + slack / no-keys-at-all / unparseable-version probe-fallback / version-unset probe / legacy-alias-as-v1 / end-to-end encryptDocumentContent.
+- [x] Gates green: tsc clean · 1328/1328 vitest (+8 new) · 4 lints clean (positioning + silent-catches 198 + counts 73 + canonical-imports) · prettier clean · slop-scan under 4.0 trip-wire.
+
 **BiasTask PATCH authorization-matrix lock — false-positive audit response (full prose in CLAUDE.md "BiasTask PATCH authorization-matrix lock 2026-05-25").**
 
 - [x] Read [src/app/api/bias-tasks/[id]/route.ts](<src/app/api/bias-tasks/[id]/route.ts>) PATCH handler end-to-end. The 2026-05-24 security audit claimed the outer gate is "effectively `if (false)` for any org member" and that title / description / dueAt gate "only on the outer check." Verified the claim is wrong — every per-field write carries an explicit `isCreator || isOrgAdmin` (or stricter) inner gate at lines 127, 136, 146 + 88 + 107 + 163.

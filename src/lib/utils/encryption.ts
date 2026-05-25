@@ -80,24 +80,72 @@ function getKeyForVersion(domain: KeyDomain, version: number): Buffer {
   return Buffer.from(hex, 'hex');
 }
 
-/** The version new writes should use. If DOCUMENT_ENCRYPTION_KEY_VERSION
- *  is set we trust it; otherwise we pick the highest resolvable version
- *  (so a deployment with only the legacy key writes v1, and a deployment
- *  that has added V2 silently starts writing v2). */
+/** The version new writes should use. Locked fail-closed 2026-05-25
+ *  (audit: silent-downgrade hardening).
+ *
+ *  Resolution order:
+ *    1. If `*_VERSION` env is set + parses to a positive integer: trust
+ *       it BUT verify a key for that version actually resolves. If not,
+ *       throw with a "misconfigured rotation" diagnostic. Previously
+ *       the function returned the version regardless and let the
+ *       downstream `getKeyForVersion` call throw a generic error;
+ *       throwing here surfaces the rotation misconfiguration with a
+ *       clear remediation pointer (set the V{N} key BEFORE bumping
+ *       the version env).
+ *    2. If `*_VERSION` env is set but unparseable: log + fall through
+ *       to probe. Robust against operator typos that don't change
+ *       substance (e.g. `=2foo`).
+ *    3. Probe descending — pick the highest resolvable version. So a
+ *       deployment with only the legacy key writes v1, and a deployment
+ *       that has added V2 silently starts writing v2.
+ *    4. If NO key resolves at all: throw. Previously returned
+ *       LEGACY_VERSION and let the downstream call fail — but that
+ *       was a silent-downgrade window for any future caller that
+ *       used the version for purposes beyond `getKeyForVersion`
+ *       (e.g. stamping a row before encrypt). Production callers
+ *       already guard with `isDocumentEncryptionEnabled()` / equivalent,
+ *       so this throw only fires on genuinely misconfigured
+ *       deployments — and surfaces the misconfiguration immediately
+ *       rather than at the next encrypt attempt.
+ */
 export function getCurrentKeyVersion(domain: KeyDomain): number {
   const prefix = ENV_PREFIX[domain];
   const explicit = process.env[`${prefix}_VERSION`];
   if (explicit) {
     const parsed = parseInt(explicit, 10);
-    if (Number.isFinite(parsed) && parsed >= 1) return parsed;
+    if (Number.isFinite(parsed) && parsed >= 1) {
+      // Fail-closed: if the operator explicitly named a version, the
+      // matching key MUST be configured. A missing key here means a
+      // misconfigured rotation (version bumped before the new key was
+      // provisioned) — fail fast with a remediation hint instead of
+      // returning a version number that will silently fail downstream.
+      if (!resolveKeyHex(domain, parsed)) {
+        throw new Error(
+          `${prefix}_VERSION=${parsed} but no key is configured at ${prefix}_V${parsed}. ` +
+            `Misconfigured rotation — set the V${parsed} key BEFORE bumping ${prefix}_VERSION. ` +
+            "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+        );
+      }
+      return parsed;
+    }
     log.warn(`${prefix}_VERSION is not a positive integer — falling back to highest resolvable`);
   }
   // Probe descending from a reasonable ceiling.
   for (let v = 16; v >= 1; v--) {
     if (resolveKeyHex(domain, v)) return v;
   }
-  // No key at all — let the downstream call fail with a clearer error.
-  return LEGACY_VERSION;
+  // Fail-closed: no key resolves at all. Previously this returned
+  // LEGACY_VERSION and let the downstream encrypt fail, but that path
+  // is a silent-downgrade window for any future caller that uses the
+  // version stamp for purposes beyond an immediate getKeyForVersion
+  // lookup. Callers that legitimately operate in environments without
+  // encryption configured must guard with `isDocumentEncryptionEnabled()`
+  // (or the slack equivalent) and NOT call getCurrentKeyVersion.
+  throw new Error(
+    `No encryption key configured for domain "${domain}". ` +
+      `Set ${prefix} (legacy v1 alias) or ${prefix}_V1. ` +
+      "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+  );
 }
 
 export interface EncryptedValue {
