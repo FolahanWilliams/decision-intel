@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
+import { generateShareToken } from '@/lib/utils/share-token';
 import { PLANS } from '@/lib/stripe';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
@@ -112,6 +113,9 @@ export async function POST(req: NextRequest) {
         email,
         role,
         invitedByUserId: user.id,
+        // Cryptographically-secure token — replaces former @default(cuid()).
+        // Locked 2026-05-25 (security audit); see src/lib/utils/share-token.ts.
+        token: generateShareToken(),
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });

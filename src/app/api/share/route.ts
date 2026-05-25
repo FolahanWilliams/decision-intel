@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { generateShareToken } from '@/lib/utils/share-token';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { safeCompare } from '@/lib/utils/safe-compare';
@@ -93,6 +94,9 @@ export async function POST(req: NextRequest) {
         analysisId,
         userId: user.id,
         orgId: analysis.document.orgId,
+        // Cryptographically-secure token — replaces former @default(cuid()).
+        // Locked 2026-05-25 (security audit); see src/lib/utils/share-token.ts.
+        token: generateShareToken(),
         expiresAt: expiryMs === null ? null : new Date(Date.now() + expiryMs),
         password: passwordHash,
         isCaseStudy,
