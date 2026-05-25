@@ -61,6 +61,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-05-25)
+
+**BiasTask PATCH authorization-matrix lock — false-positive audit response (full prose in CLAUDE.md "BiasTask PATCH authorization-matrix lock 2026-05-25").**
+
+- [x] Read [src/app/api/bias-tasks/[id]/route.ts](<src/app/api/bias-tasks/[id]/route.ts>) PATCH handler end-to-end. The 2026-05-24 security audit claimed the outer gate is "effectively `if (false)` for any org member" and that title / description / dueAt gate "only on the outer check." Verified the claim is wrong — every per-field write carries an explicit `isCreator || isOrgAdmin` (or stricter) inner gate at lines 127, 136, 146 + 88 + 107 + 163.
+- [x] Authored [bias-task-patch.test.ts](<src/app/api/bias-tasks/[id]/bias-task-patch.test.ts>) — 24-test authorization-matrix lock covering: auth floor (401/404/400-bad-body) · outer tenant-isolation gate (random user 403, null-orgId task 403) · false-positive proof block (org-member-without-creator/assignee/admin returns 403 on every per-field edit) · creator full-edit matrix · assignee narrow matrix (status + resolutionNote only) · org admin full matrix · status validation.
+- [x] Inline-commented the outer gate with the design rationale + pointer to the test suite. Future audits that re-flag the same shape have a standing contradiction.
+- [x] Gates green: tsc clean · 1320/1320 vitest · 4 lints clean (positioning + silent-catches 198 + counts 73 + canonical-imports) · prettier clean · slop-scan under 4.0.
+
 ## Recently Completed (2026-05-24)
 
 **Sankore Adaptation #3 — fund_launch container mode (founder-approved same-day follow-up to Adaptation #2; full prose in CLAUDE.md "Fund-launch container mode — Adaptation #3 lock 2026-05-24").**

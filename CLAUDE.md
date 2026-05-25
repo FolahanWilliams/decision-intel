@@ -568,6 +568,31 @@ The dark-mode sub-category dropped from 72 → 0. The MODAL category dropped fro
 
 **Forward-looking rule.** When a future external market-research / advisor pass surfaces a validated practitioner pain-phrase, the cascade is these 5 founder-facing surfaces in lockstep (event-prep BiasHook + discovery-toolkit PitchTrigger/cue + Sparring objection scenario + Education flashcard + founder-context routing) — NOT a new bias, NOT a new NAMED_PATTERN, NOT a new persona/archetype (the ranked SSOT sets stay parsimonious). Route any pipeline/taxonomy expansion through the founder; the wedge-surface cascade is the default home for validated language.
 
+## BiasTask PATCH authorization-matrix lock (locked 2026-05-25 — false-positive audit response)
+
+**Why this lock exists.** A 2026-05-24 security audit flagged the BiasTask PATCH outer gate at [src/app/api/bias-tasks/[id]/route.ts](<src/app/api/bias-tasks/[id]/route.ts>) as a privilege escalation — claiming `if (!isCreator && !isAssignee && !isOrgAdmin && !isOrgMember)` is "effectively `if (false)` for any org member" and that "other PATCH fields (title / description / dueAt) gate ONLY on the outer check." **The audit was wrong.** Every per-field write in the handler carries an explicit inner gate (`isCreator || isOrgAdmin` for title/description/dueAt/reassign; `isAssignee || isCreator || isOrgAdmin` for status/resolutionNote) that runs BEFORE the prisma.update call. The outer gate is **tenant-isolation**, not write-permission — it rejects strangers with no relationship to the task's org.
+
+**The standing contradiction.** [bias-task-patch.test.ts](<src/app/api/bias-tasks/[id]/bias-task-patch.test.ts>) — 24 tests that lock the per-field authorization matrix. The false-positive proof block ("PATCH /api/bias-tasks/:id — org member without creator/assignee/admin role") demonstrates that an org member who is NOT creator/assignee/admin returns 403 on title / description / dueAt / reassign / status edit attempts. If a future audit re-raises the same flag without updating these tests first, the tests are the standing rebuttal.
+
+**The authorization matrix (the design contract).**
+
+| Field | Required role |
+|---|---|
+| `status` | assignee \| creator \| org admin |
+| `assigneeUserId` (reassign) | creator \| org admin |
+| `title` | creator \| org admin |
+| `description` | creator \| org admin |
+| `dueAt` | creator \| org admin |
+| `resolutionNote` | assignee \| creator \| org admin |
+
+**Forward-looking rules.**
+
+1. **When extending the PATCH handler with a new field, add the inner gate FIRST.** The inline comment on the outer gate names this discipline. Every new body field needs its own `if (!<allowed-role>) return 403` BEFORE the `updates.<field> = ...` line. The outer gate does NOT enforce write-permission and must never be relied on for that.
+
+2. **When refactoring the outer gate, do not drop the test suite.** The 24 tests are intentionally redundant with the code's structure — they exist to defend against an inverse refactor (e.g. someone "simplifying" the outer gate in a way that removes the per-field inner gates). If the outer gate is restructured (the redundant `!isOrgAdmin && !isOrgMember` is logically simplifiable since `isOrgMember = isOrgAdmin || ...`), keep every per-field test passing.
+
+3. **This lock is the canonical response pattern for false-positive audits.** When an audit raises a security flag that turns out to be wrong on close reading, the response is: (a) prove the diagnostic in an authorization-matrix test class that locks the actual behavior, (b) add an inline comment to the handler explaining why the apparent vulnerability is intentional / not a vulnerability, (c) document the false-positive class in CLAUDE.md so future audits inherit the conclusion. Do NOT close as "wontfix" — that drops the protective shield. The test suite IS the shield.
+
 ## Fund-launch container mode — Adaptation #3 (locked 2026-05-24, same-day follow-up to Adaptation #2)
 
 **What it is.** The 3rd Sankore product adaptation in 24 hours (after Retroactive audit mode #1 + real_estate_development #2). Adds the **5th** `DecisionContainer` kind: **`fund_launch`** — launching a new fund vehicle with a 6-stage lifecycle (thesis_development → target_market_sizing → fee_structure → anchor_lp_commitments → regulatory_filing → go_to_market). Founder-approved 2026-05-24 as the natural completion of the CONTAINER_MODES expansion before Adaptation #5 (multi-decision-class portfolio dashboard) ships, since the dashboard surfaces all kinds and more modes shipped = more value. Sankore launches funds repeatedly (Agriculture Fund, Real Wealth Fund); the immediate utility is real.

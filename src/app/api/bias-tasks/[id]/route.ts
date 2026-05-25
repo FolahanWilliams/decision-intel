@@ -64,6 +64,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     //   - assignee can change status + add resolution note
     //   - org admin can do anything (reassign, dismiss, delete)
     //   - any other org member: read-only via GET, no PATCH
+    //
+    // The OUTER gate below is TENANT ISOLATION (not write-permission).
+    // It rejects strangers — users with no relationship to the task's
+    // org. Per-field write privileges are enforced INSIDE this handler
+    // (each body field has its own `isCreator || isOrgAdmin` or
+    // stricter check that runs BEFORE the prisma.update). An org
+    // member who is not creator/assignee/admin can ping the endpoint
+    // but cannot WRITE — every per-field branch will short-circuit to
+    // 403, and an empty body returns 400 "Nothing to update".
+    //
+    // Locked by `bias-task-patch.test.ts` (24-test matrix). A 2026-05-25
+    // security audit flagged this gate as a privilege escalation,
+    // missing the inner per-field gates; the test suite is the
+    // standing contradiction.
     const isCreator = existing.createdByUserId === user.id;
     const isAssignee = existing.assigneeUserId === user.id;
     const isOrgAdmin = await userIsOrgAdmin(user.id, existing.orgId);
