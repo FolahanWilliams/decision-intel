@@ -63,6 +63,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-05-25)
 
+**.env.example drift — audit-queue item #5 closed (21 operator-facing env vars now declared).**
+
+- [x] Audited every `process.env.<NAME>` read across `src/` + `voice-worker/` + `scripts/` (84 distinct vars). Compared against declarations in both `.env.example` + `voice-worker/.env.example`. 38 vars were missing.
+- [x] Triaged the 38: 21 are load-bearing operator-facing config (LiveKit / voice-worker / app URLs / founder-hub / Storage buckets / Slack webhook / Stripe legacy / Sentry / Puppeteer / Debug toggles / Email mirror); 17 are correctly excluded (10 runtime-provided like NODE_ENV / VERCEL_* / GITHUB_*; 2 test fixtures in encryption.test.ts; 5 maintenance-script-only).
+- [x] Added 19 entries to main `.env.example` grouped by existing sections (Auth section: NEXT_PUBLIC_APP_URL + NEXT_PUBLIC_SITE_URL + SUPABASE_*_BUCKET; new Voice Mode section: LIVEKIT_API_KEY + LIVEKIT_API_SECRET + LIVEKIT_URL + VOICE_WORKER_SECRET; Slack: SLACK_WEBHOOK_URL; Email: NEXT_PUBLIC_EMAIL_INBOUND_DOMAIN; Admin: FOUNDER_HUB_PASS + NEXT_PUBLIC_FOUNDER_HUB_PASS; Optional: SENTRY_AUTH_TOKEN + PUPPETEER_EXECUTABLE_PATH + DEBUG_FEEDBACK_ADEQUACY + DEBUG_FRACTIONATION; Stripe: STRIPE_DEAL_PRICE_ID legacy fallback).
+- [x] Added VOICE_LLM_MODEL canonical (was previously read by `voice-worker/src/config.ts` line 62 but undeclared) to `voice-worker/.env.example` + marked GROK_MODEL as DEPRECATED fallback with boot-warning context.
+- [x] Re-audited: 0 operator-facing vars missing; 16 remaining are exactly the runtime-provided / test / script entries excluded by design.
+- [x] Gates green: tsc clean · 1328/1328 vitest · 4 lints clean (positioning + silent-catches 199 + counts 73 + canonical-imports).
+
 **Silent-catch lint multi-line awareness — closes documented blind spot (full prose in CLAUDE.md silent-catch ratchet trajectory `198 → 199`).**
 
 - [x] Read `scripts/lint-silent-catches.mjs`. The regex already supported multi-line (`\s*` between tokens; `[^)]*` for arg) — only the scanner mode was line-by-line. Switched to whole-file matching with line-number derivation from the match index.
