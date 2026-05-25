@@ -200,7 +200,20 @@ const SCAN_DIR = join(ROOT, 'src');
 // the HTTP status. Each annotated inline; no delivery/audit/flywheel
 // path swallowed (the container-create write itself does NOT catch
 // silently — it fails-closed with a 500 + dev-mode diagnostic).
-const SILENT_CATCH_BASELINE = 198;
+// 198 → 199 (multi-line awareness, 2026-05-25): the scanner was
+// extended from line-by-line to whole-file scanning so multi-line
+// catches like `.catch(\n  () => {}\n)` are now counted. The single
+// previously-invisible multi-line catch found is the FK-cascade-
+// cleanup-before-retry in /api/cron/enforce-retention/route.ts
+// lines 304-306: when `prisma.document.delete` fails with P2003 (FK
+// violation), the code DELETEs the referenced HumanDecisionAudit row
+// and retries the document delete. If the cleanup DELETE fails, the
+// retry will ALSO fail with P2003 and the outer try/catch surfaces it
+// one level up — so the error isn't actually swallowed; it surfaces
+// at the retry's failure with the same P2003 diagnostic. Legitimate
+// fire-and-forget exception class, now annotated inline at the call
+// site so the lint count stays defensible.
+const SILENT_CATCH_BASELINE = 199;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
@@ -226,21 +239,47 @@ function walk(dir, out = []) {
   return out;
 }
 
+/**
+ * Multi-line awareness (locked 2026-05-25 — closes the known blind spot
+ * named in CLAUDE.md "Silent-catch ratchet" lock). The regex itself
+ * already supports multi-line catches via `\s*` between tokens, but the
+ * scanner used to read line-by-line which meant a pattern like
+ *
+ *   .catch(
+ *     () => {}
+ *   )
+ *
+ * was invisible. Switched to whole-file scanning + line-number
+ * derivation from the match index. Same risk class as the Stripe
+ * deal-audit bug that escaped the old lint and was only caught by manual
+ * audit. The fix is structural — every new silent catch, single-line
+ * OR multi-line, is now counted.
+ */
+function lineOfIndex(text, index) {
+  // 1-indexed line number of `text[index]`. Counts every `\n` strictly
+  // BEFORE `index`. Cheap enough for our file sizes; the alternative is
+  // a prefix-sum table which we don't need.
+  let line = 1;
+  for (let i = 0; i < index; i++) {
+    if (text.charCodeAt(i) === 10 /* \n */) line++;
+  }
+  return line;
+}
+
 const offenders = [];
 for (const file of walk(SCAN_DIR)) {
   const text = readFileSync(file, 'utf8');
-  const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const matches = lines[i].match(SILENT_CATCH);
-    if (matches) {
-      for (let m = 0; m < matches.length; m++) {
-        offenders.push({
-          file: relative(ROOT, file),
-          line: i + 1,
-          snippet: lines[i].trim().slice(0, 140),
-        });
-      }
-    }
+  SILENT_CATCH.lastIndex = 0;
+  let m;
+  while ((m = SILENT_CATCH.exec(text)) !== null) {
+    const line = lineOfIndex(text, m.index);
+    offenders.push({
+      file: relative(ROOT, file),
+      line,
+      // Snippet uses the matched substring (collapsed to one line for the
+      // console summary) so multi-line catches still produce a useful hint.
+      snippet: m[0].replace(/\s+/g, ' ').trim().slice(0, 140),
+    });
   }
 }
 

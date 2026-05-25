@@ -301,6 +301,12 @@ export async function GET() {
         } catch (deleteErr: unknown) {
           const code = (deleteErr as { code?: string }).code;
           if (code === 'P2003') {
+            // FK-cascade cleanup before retry. If this DELETE fails, the
+            // subsequent `prisma.document.delete` will ALSO fail with
+            // P2003 and surface via the outer try/catch — so the error
+            // isn't actually swallowed; it surfaces one level up with
+            // the same diagnostic. Legitimate fire-and-forget exception
+            // class per CLAUDE.md silent-catch ratchet lock 2026-05-25.
             await prisma.$executeRaw`DELETE FROM "HumanDecisionAudit" WHERE "documentId" = ${doc.id}`.catch(
               () => {}
             );

@@ -63,6 +63,14 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-05-25)
 
+**Silent-catch lint multi-line awareness — closes documented blind spot (full prose in CLAUDE.md silent-catch ratchet trajectory `198 → 199`).**
+
+- [x] Read `scripts/lint-silent-catches.mjs`. The regex already supported multi-line (`\s*` between tokens; `[^)]*` for arg) — only the scanner mode was line-by-line. Switched to whole-file matching with line-number derivation from the match index.
+- [x] Surveyed the codebase: only 1 multi-line catch was structurally invisible. Located it at [src/app/api/cron/enforce-retention/route.ts:304-306](src/app/api/cron/enforce-retention/route.ts) — FK-cascade-cleanup-before-retry on `prisma.$executeRaw`. Triaged as legitimate: when the cleanup DELETE fails, the subsequent `prisma.document.delete` retry will ALSO fail with P2003 and surface via the outer try/catch — the error is not actually swallowed, it surfaces one level up with the same diagnostic.
+- [x] Annotated the offender inline with the exception-class reasoning + bumped `SILENT_CATCH_BASELINE` 198 → 199 + updated CLAUDE.md prose to match (doc-sync lock).
+- [x] Flipped the previously-recorded "Residual blind spot (recorded, not yet fixed)" in CLAUDE.md (Friction audit #4 follow-through, 2026-05-17) to **RESOLVED**.
+- [x] Gates green: tsc clean · 1328/1328 vitest · 4 lints clean (positioning + silent-catches 199 + counts 73 + canonical-imports) · prettier clean · slop-scan under 4.0 trip-wire.
+
 **Encryption key resolution fail-closed — audit hardening (full prose in CLAUDE.md "Encryption key resolution fail-closed 2026-05-25").**
 
 - [x] Read [src/lib/utils/encryption.ts](src/lib/utils/encryption.ts) `getCurrentKeyVersion` (lines 87-101). Verified the audit's claim: the function returned a version number without verifying a key for it actually resolved, opening two silent-downgrade windows.
