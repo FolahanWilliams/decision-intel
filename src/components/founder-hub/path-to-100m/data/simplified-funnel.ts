@@ -1,7 +1,16 @@
 /**
  * SimplifiedThirtyDayFunnel consumer data — funnel screens + feature
  * verdicts. Split out from monolithic data.ts at F2 lock 2026-04-29.
+ *
+ * Count-derivation note: anything that names the bias count interpolates
+ * `${BIAS_COUNT}` (canonical via BIAS_EDUCATION). The legacy `30+ biases`
+ * hedge was deprecated 2026-05-13 (CR-3) — precise audit-trail discipline
+ * beats the rounded-up hedge for procurement readers.
  */
+
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 export type FunnelScreen = {
   id: string;
@@ -28,7 +37,7 @@ export const SIMPLIFIED_FUNNEL: FunnelScreen[] = [
       'Decision Knowledge Graph teasers',
       'AI boardroom simulator',
       'Multi-persona reveal copy',
-      'Hero credibility strip beyond "60-second audit · 30+ biases · DPR appendix"',
+      `Hero credibility strip beyond "60-second audit · ${BIAS_COUNT}-bias R²F · DPR appendix"`,
     ],
   },
   {
