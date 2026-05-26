@@ -52,6 +52,7 @@ import {
 } from '@/components/founder-hub/founder-os/InteractivePillars';
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
+import { KillCheckpointCountdown } from '@/components/founder-hub/founder-os/KillCheckpointCountdown';
 import { LifestyleFreezeCard } from '@/components/founder-hub/founder-os/LifestyleFreezeCard';
 import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
 import { SparringRehearsalBalance } from '@/components/founder-hub/founder-os/SparringRehearsalBalance';
@@ -148,7 +149,17 @@ interface ApiEnvelope<T> {
   data?: T;
 }
 
-export function FounderOSTab() {
+interface FounderOSTabProps {
+  /** Founder-pass forwarded through to children that hit auth-gated
+   *  /api/founder-hub/* endpoints (e.g. KillCheckpointCountdown reads
+   *  the WedgeProspect ledger). Required because this surface lives
+   *  inside the founder-hub auth gate; passing it explicitly mirrors
+   *  the established convention (SparringRoomTab / EducationRoomTab /
+   *  CsoPipelineBoard / FounderChatWidget all take it via props). */
+  founderPass: string;
+}
+
+export function FounderOSTab({ founderPass }: FounderOSTabProps) {
   const [hydrated, setHydrated] = useState(false);
   const [checkins, setCheckins] = useState<DailyCheckin[]>([]);
   const [contentLog, setContentLog] = useState<ContentLogItem[]>([]);
@@ -551,6 +562,16 @@ export function FounderOSTab() {
 
       {/* EVENT PREP — Phase 1 wedge calendar (deep nightly audit Section 9.1, locked 2026-05-05) */}
       <EventPrepCard />
+
+      {/* KILL CHECKPOINT — month-4 v3.5 kill criterion as a daily discipline
+          surface (9.2 lock 2026-05-26 — audit Section 9.2 ship). Sits
+          directly under EventPrepCard so the calendar-gated outreach
+          forcing function (BAFTA, T-N days) reads alongside the
+          revenue-gated forcing function (5 paid Individuals by month-4).
+          Self-hides once the kill-checkpoint date passes — the gate is
+          binary; after it fires the daily countdown is no longer the
+          right discipline tool. */}
+      <KillCheckpointCountdown founderPass={founderPass} />
 
       {/* TRUST EVIDENCE PACK — procurement-grade pointer card (5.4 lock
           2026-05-08). Compact variant — when a F500 GC / vendor-risk

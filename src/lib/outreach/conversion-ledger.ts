@@ -140,6 +140,25 @@ export const PHASE1_KILL_FLOOR = 5;
 /** A prospect stuck in an active stage longer than this is "stalled". */
 export const STALL_DAYS = 14;
 
+/** GTM v3.5 ratification date — the canonical start of the Phase 1 wedge motion.
+ *  When the GTM lock advances to v3.6 / a new phase, edit this in the same
+ *  commit as the CLAUDE.md lock change. Every kill-checkpoint / graduation
+ *  date downstream derives from this anchor. */
+export const PHASE_1_START_ISO = '2026-05-04';
+
+/** Month-4 kill checkpoint per GTM v3.5: 4 months from PHASE_1_START_ISO.
+ *  CLAUDE.md: "<5 paid Individuals by month 4 = halt-and-pivot, regardless
+ *  of every other metric. NEVER push harder on the same motion when the
+ *  early-warning signal is red." Used by the FounderOSTab countdown card
+ *  to make this gate visible as a daily discipline tool. */
+export const PHASE_1_KILL_CHECKPOINT_ISO = '2026-09-04';
+
+/** Month-6 graduation gate per GTM v3.5: 8-12 paid Individuals retained
+ *  90+ days. Surfaced for downstream consumers — the countdown card uses
+ *  PHASE_1_KILL_CHECKPOINT_ISO as the primary deadline; this is the next
+ *  gate after the kill checkpoint passes. */
+export const PHASE_1_GRADUATION_GATE_ISO = '2026-11-04';
+
 export interface ProspectLike {
   stage: string;
   updatedAt: Date | string;

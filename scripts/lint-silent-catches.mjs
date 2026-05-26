@@ -213,7 +213,15 @@ const SCAN_DIR = join(ROOT, 'src');
 // at the retry's failure with the same P2003 diagnostic. Legitimate
 // fire-and-forget exception class, now annotated inline at the call
 // site so the lint count stays defensible.
-const SILENT_CATCH_BASELINE = 199;
+// 199 → 200 (KillCheckpointCountdown ship 2026-05-26): canonical
+// `res.json().catch(() => null)` body-parse exception class in
+// `src/components/founder-hub/founder-os/KillCheckpointCountdown.tsx`
+// load() — same shape as every other founder-hub fetch consumer
+// (ConversionLedgerPanel, IntelBriefPanel, BulkUploadDropzone, etc).
+// The card surfaces a quiet error line on failure rather than hiding,
+// so the founder sees when the kill-checkpoint data isn't loading;
+// no delivery/audit/flywheel write swallowed.
+const SILENT_CATCH_BASELINE = 200;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

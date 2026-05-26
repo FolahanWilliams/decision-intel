@@ -1727,7 +1727,7 @@ function renderTab(
     ),
     founder_os: (
       <ErrorBoundary sectionName="Founder OS">
-        <FounderOSTab />
+        <FounderOSTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };
