@@ -457,6 +457,39 @@ function DeckPicker(props: {
     return out;
   }, [props.sm2States, mountTime]);
 
+  // 5C ship 2026-05-26: aggregate due-card stats across all decks. The
+  // founder uses this surface pre-meeting; the per-deck due badge already
+  // exists, but a single TOTAL above the grid is what the time-pressured
+  // pre-BAFTA reader actually needs. Plus a count of decks-with-due so
+  // they know how concentrated the work is.
+  const totalDue = useMemo(
+    () => Object.values(deckMastery).reduce((sum, s) => sum + s.due, 0),
+    [deckMastery]
+  );
+  const decksWithDue = useMemo(
+    () => Object.values(deckMastery).filter(s => s.due > 0).length,
+    [deckMastery]
+  );
+
+  // Sort decks: when there are due cards, push highest-due-count first so
+  // the pre-meeting reader sees the urgent decks at the top. When all
+  // decks are clean, fall back to the canonical deck.order (the curated
+  // pedagogical ordering — vocabulary → personas → frameworks etc).
+  const sortedDecks = useMemo(() => {
+    const copy = [...DECKS];
+    if (totalDue > 0) {
+      copy.sort((a, b) => {
+        const aDue = deckMastery[a.id]?.due ?? 0;
+        const bDue = deckMastery[b.id]?.due ?? 0;
+        if (aDue !== bDue) return bDue - aDue;
+        return a.order - b.order;
+      });
+    } else {
+      copy.sort((a, b) => a.order - b.order);
+    }
+    return copy;
+  }, [deckMastery, totalDue]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Mode selector */}
@@ -531,8 +564,40 @@ function DeckPicker(props: {
           borderRadius: 'var(--radius-lg)',
         }}
       >
-        <div className="section-heading" style={{ marginBottom: 10 }}>
-          2 · Pick a deck ({ALL_CARDS.length} cards across {DECKS.length} decks)
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 10,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div className="section-heading" style={{ margin: 0 }}>
+            2 · Pick a deck ({ALL_CARDS.length} cards across {DECKS.length} decks)
+          </div>
+          {totalDue > 0 && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 10px',
+                background: 'rgba(245, 158, 11, 0.10)',
+                border: '1px solid rgba(245, 158, 11, 0.32)',
+                borderRadius: 'var(--radius-full)',
+                fontSize: 11.5,
+                fontWeight: 700,
+                color: 'var(--warning)',
+                letterSpacing: '0.03em',
+              }}
+              title="Due-card totals across all decks. Decks are sorted highest-due-first to surface the most urgent work for the pre-meeting drill."
+              aria-label={`${totalDue} cards due today across ${decksWithDue} of ${DECKS.length} decks. Highest-due decks shown first.`}
+            >
+              {totalDue} due today · {decksWithDue} of {DECKS.length} decks
+            </div>
+          )}
         </div>
         <div
           style={{
@@ -541,63 +606,61 @@ function DeckPicker(props: {
             gap: 10,
           }}
         >
-          {[...DECKS]
-            .sort((a, b) => a.order - b.order)
-            .map(deck => {
-              const stats = deckMastery[deck.id];
-              const isHovered = hoveredDeck === deck.id;
-              return (
-                <button
-                  key={deck.id}
-                  onClick={() => props.onStart(deck.id, mode)}
-                  onMouseEnter={() => setHoveredDeck(deck.id)}
-                  onMouseLeave={() => setHoveredDeck(null)}
+          {sortedDecks.map(deck => {
+            const stats = deckMastery[deck.id];
+            const isHovered = hoveredDeck === deck.id;
+            return (
+              <button
+                key={deck.id}
+                onClick={() => props.onStart(deck.id, mode)}
+                onMouseEnter={() => setHoveredDeck(deck.id)}
+                onMouseLeave={() => setHoveredDeck(null)}
+                style={{
+                  padding: 12,
+                  background: isHovered ? `${deck.color}10` : 'var(--bg-elevated)',
+                  border: `1px solid ${isHovered ? deck.color : 'var(--border-color)'}`,
+                  borderRadius: 'var(--radius-md)',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                  minHeight: 130,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <DeckIcon
+                    name={deck.iconName}
+                    size={16}
+                    style={{ color: deck.color, flexShrink: 0 }}
+                  />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {deck.label}
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  {deck.description}
+                </div>
+                <div
                   style={{
-                    padding: 12,
-                    background: isHovered ? `${deck.color}10` : 'var(--bg-elevated)',
-                    border: `1px solid ${isHovered ? deck.color : 'var(--border-color)'}`,
-                    borderRadius: 'var(--radius-md)',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
+                    marginTop: 'auto',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6,
-                    minHeight: 130,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontSize: 11,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <DeckIcon
-                      name={deck.iconName}
-                      size={16}
-                      style={{ color: deck.color, flexShrink: 0 }}
-                    />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {deck.label}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                    {deck.description}
-                  </div>
-                  <div
-                    style={{
-                      marginTop: 'auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: 11,
-                    }}
-                  >
-                    <span style={{ color: 'var(--text-muted)' }}>
-                      {stats.total} cards · {stats.mastered} mastered
-                    </span>
-                    {stats.due > 0 && (
-                      <span style={{ color: deck.color, fontWeight: 700 }}>{stats.due} due</span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    {stats.total} cards · {stats.mastered} mastered
+                  </span>
+                  {stats.due > 0 && (
+                    <span style={{ color: deck.color, fontWeight: 700 }}>{stats.due} due</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
