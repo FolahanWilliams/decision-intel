@@ -46,8 +46,14 @@ vi.mock('@/lib/utils/rate-limit', () => ({
 }));
 
 const mockCheckAnalysisLimit = vi.fn();
+const mockGetUserPlan = vi.fn();
 vi.mock('@/lib/utils/plan-limits', () => ({
   checkAnalysisLimit: (...args: unknown[]) => mockCheckAnalysisLimit(...args),
+  // getUserPlan added 2026-05-26 (soft-limit pass) — the upload route
+  // now uses it to look up per-plan maxUploadMB. Default mock returns
+  // 'pro' so tests exercise the wedge-tier 100MB cap by default; the
+  // size-rejection test bumps to 100MB+ to fire the gate cleanly.
+  getUserPlan: (...args: unknown[]) => mockGetUserPlan(...args),
 }));
 
 const mockParseFile = vi.fn();
@@ -125,6 +131,10 @@ beforeEach(() => {
     used: 0,
     limit: 10,
   });
+  // Default plan = 'pro' (the wedge tier, 100MB cap). Per-test
+  // overrides cover the size-rejection edge case (Free 25MB cap)
+  // and the 'team' tier sanity check.
+  mockGetUserPlan.mockResolvedValue('pro');
   mockDocFindFirst.mockResolvedValue(null); // no cache hit
   mockSupabaseUpload.mockResolvedValue({ error: null });
   // Default: no structured-data extraction matched (covers every test
@@ -173,9 +183,11 @@ describe('POST /api/upload', () => {
     expect(body.error).toBe('No file provided');
   });
 
-  it('returns 413 for files over 25MB', async () => {
-    // Limit bumped 5MB → 25MB on 2026-05-26 (Tier-A #1 ship). 26MB → 413,
-    // not 400, because file-too-large is the canonical HTTP semantic.
+  it('returns 413 when file exceeds the Free-tier 25MB cap', async () => {
+    // Per-plan ladder locked 2026-05-26 (soft-limit pass) — Free 25MB
+    // / Pro 100MB / Team 250MB / Enterprise 500MB. Override the default
+    // 'pro' plan mock to 'free' to exercise the 25MB cap cleanly.
+    mockGetUserPlan.mockResolvedValueOnce('free');
     const bigContent = new Uint8Array(26 * 1024 * 1024); // 26MB
     const file = new File([bigContent], 'big.txt', { type: 'text/plain' });
 
@@ -185,15 +197,31 @@ describe('POST /api/upload', () => {
     expect(res.status).toBe(413);
     const body = await res.json();
     expect(body.error).toContain('File too large');
-    expect(body.error).toContain('25MB');
+    expect(body.error).toContain('Free plan cap is 25MB');
+    expect(body.error).toContain('Upgrade to Individual');
   });
 
-  it('accepts files up to 25MB', async () => {
-    // Boundary case: a 20MB file should pass the size gate. The test
-    // intentionally uses raw bytes that aren't parseable by parseFile()
-    // so it'll fail downstream — what we're verifying here is the size
-    // check no longer rejects 5-25MB files at the gate.
-    const content = new Uint8Array(20 * 1024 * 1024); // 20MB
+  it('returns 413 when file exceeds the Pro-tier 100MB cap', async () => {
+    // Pro tier accepts files up to 100MB; bumping to 101MB triggers
+    // the gate. Default mock = 'pro' so no override needed.
+    const bigContent = new Uint8Array(101 * 1024 * 1024); // 101MB
+    const file = new File([bigContent], 'big.txt', { type: 'text/plain' });
+
+    const req = createMockRequest(file);
+    const res = await POST(req);
+
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body.error).toContain('Individual plan cap is 100MB');
+    expect(body.error).toContain('Upgrade to Strategy');
+  });
+
+  it('accepts files up to the Pro-tier 100MB cap', async () => {
+    // Boundary case: a 90MB file should pass the size gate for a Pro
+    // user. The test intentionally uses raw bytes that aren't parseable
+    // by parseFile() so it'll fail downstream — what we're verifying
+    // here is the size check no longer rejects 25-100MB files for Pro.
+    const content = new Uint8Array(90 * 1024 * 1024); // 90MB
     const file = new File([content], 'big.txt', { type: 'text/plain' });
 
     const req = createMockRequest(file);

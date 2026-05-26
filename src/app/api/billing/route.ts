@@ -106,6 +106,10 @@ export async function GET() {
         analysesPerMonth: analysesLimit,
         maxPages: limits.maxPages === Infinity ? -1 : limits.maxPages,
         biasTypes: limits.biasTypes,
+        // Surfaced 2026-05-26 (soft-limit pass) so the dashboard
+        // upload-zone hints can show the user's actual plan cap
+        // ("up to 100 MB" on Individual) instead of a stale literal.
+        maxUploadMB: limits.maxUploadMB,
       },
     });
   } catch (error) {

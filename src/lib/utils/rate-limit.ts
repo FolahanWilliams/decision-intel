@@ -55,9 +55,24 @@ interface RateLimitConfig {
   failMode?: 'open' | 'closed';
 }
 
+/** Default rate-limit window + cap. Bumped 5 → 30 requests/hour
+ *  2026-05-26 (soft-limit pass after the founder's "stop being
+ *  conservative on wedge-tier paying users" call). 5/hour was
+ *  rejecting paying Pro users who could legitimately run 5 audits
+ *  in an hour — a fractional CSO drafting a memo iteratively
+ *  hits this in 15 minutes. 30/hour matches the realistic burst
+ *  pattern of a wedge persona under deadline pressure. The
+ *  rate limiter is keyed per-userId so a 30-seat Strategy team
+ *  gets 30/hour × 30 users = 900/hour aggregate capacity, plenty.
+ *
+ *  Route-specific overrides (the demo IP rate-limit at 1/24h,
+ *  the rpd-simulator at 20/hr) still apply where the caller
+ *  passes an explicit config — see /api/demo/run + /api/rpd-simulator
+ *  for those patterns.
+ */
 const DEFAULT_CONFIG: RateLimitConfig = {
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 5, // 5 requests per hour
+  maxRequests: 30,
   failMode: 'closed',
 };
 

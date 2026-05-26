@@ -126,13 +126,17 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
         const seconds = parseInt(retryAfter, 10);
         if (!isNaN(seconds) && seconds > 0) {
           const minutes = Math.ceil(seconds / 60);
-          return `Upload limit reached (5 per hour). Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`;
+          return `Upload limit reached (30 per hour). Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`;
         }
       }
       return 'Upload limit reached. Please wait before trying again.';
     }
     if (uploadRes.status === 413) {
-      return 'File is too large. Please upload a document under 25 MB. Larger CIMs / data rooms need an enterprise contract — talk to sales at /pricing/quote.';
+      // The server-side error body names the user's actual plan + cap
+      // ("File too large (45.2MB · Individual plan cap is 25MB)…") so
+      // we surface that verbatim if present. Generic fallback below
+      // when the body parse fails.
+      return 'File is too large for your plan. Upgrade for larger uploads — Individual handles 100MB, Strategy 250MB. See /pricing.';
     }
     if (uploadRes.status === 415) {
       return 'Unsupported file type. Accepted formats: PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD.';
@@ -298,7 +302,7 @@ export default function Dashboard() {
   // Plan usage for upload hint
   const { data: billingData } = useSWR<{
     usage: { analysesThisMonth: number };
-    limits: { analysesPerMonth: number };
+    limits: { analysesPerMonth: number; maxUploadMB?: number };
     plan: 'free' | 'pro' | 'team' | 'enterprise';
     planName: string;
   }>('/api/billing', url => fetch(url).then(r => (r.ok ? r.json() : null)), {
@@ -1757,7 +1761,8 @@ export default function Dashboard() {
                           CEO questions before your next meeting.
                         </p>
                         <p className="text-xs text-muted" style={{ marginTop: 10 }}>
-                          PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 25 MB
+                          PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to{' '}
+                          {billingData?.limits.maxUploadMB ?? 25} MB
                         </p>
                         {billingData && billingData.limits.analysesPerMonth > 0 && (
                           <p className="text-xs text-muted" style={{ marginTop: 6 }}>
@@ -2847,7 +2852,8 @@ export default function Dashboard() {
               <div className="text-center">
                 <p className="font-semibold text-lg">Drop your document here</p>
                 <p className="text-sm text-muted mt-1">
-                  PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 25 MB
+                  PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max{' '}
+                  {billingData?.limits.maxUploadMB ?? 25} MB
                 </p>
                 {billingData && billingData.limits.analysesPerMonth > 0 && (
                   <p className="text-xs text-muted" style={{ marginTop: '4px' }}>

@@ -255,10 +255,14 @@ export async function POST(req: NextRequest) {
           // Convert base64 to Buffer
           const buffer = Buffer.from(base64Content, 'base64');
 
-          // Enforce file size limit. Bumped 5MB → 25MB on 2026-05-26 to
-          // match the main upload route — a CSO who forwards a 15MB CIM via
-          // email expects the same audit they'd get from direct upload.
-          const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+          // Enforce file size limit. Bumped 25MB → 100MB on 2026-05-26
+          // (soft-limit pass) — email is the inbound path most likely
+          // to carry a real CIM forwarded from a deal team. We use the
+          // Pro-tier cap as the universal email ceiling rather than
+          // doing a per-recipient plan lookup (the recipient resolution
+          // happens later in the pipeline; the gate here is a coarse
+          // safety stop, not the canonical per-plan enforcement).
+          const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
           if (buffer.length > MAX_FILE_SIZE) {
             log.warn(`Attachment too large (${buffer.length} bytes), skipping: ${filename}`);
             continue;

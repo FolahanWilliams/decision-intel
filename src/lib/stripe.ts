@@ -50,9 +50,31 @@ export const PLANS = {
     // Legacy alias kept for existing callers (checkout route, billing route)
     priceId: '',
     analysesPerMonth: 4,
-    maxPages: 10,
-    biasTypes: 5,
+    /** Page cap raised to Infinity across all tiers 2026-05-26 — the
+     *  pipeline handles real documents fine via Gemini 3 Flash's 1M
+     *  token context window (~3000 pages of dense text); artificial
+     *  page caps were rejecting real CIMs / board decks for zero
+     *  benefit. Kept on the schema as Infinity rather than removed
+     *  so existing consumers (analytics, comparison tables) don't
+     *  break. */
+    maxPages: Infinity,
+    /** The audit pipeline runs the FULL 22-bias R²F taxonomy on every
+     *  call regardless of plan. The biasTypes field used to gate the
+     *  UI count ("Free sees 5 of 22") which was deceptive — the
+     *  analysis already covered all 22. Aligned to BIAS_COUNT
+     *  (22) 2026-05-26 so the field stops lying. */
+    biasTypes: 22,
     maxTeamMembers: 1,
+    /** Max upload size in MB. Pipeline + parseFile() handle real CIMs
+     *  up to several hundred MB cleanly (Gemini 3 Flash 1M context =
+     *  ~3000 pages of dense text — practical bottleneck is Vercel
+     *  Fluid Compute body size, not model capacity). The per-plan
+     *  ladder gives Free enough headroom for a real strategic memo,
+     *  Pro a typical CIM, Team a data-room bundle, Enterprise the
+     *  platform ceiling. Locked 2026-05-26 (Tier-A cluster + soft-
+     *  limit pass after the founder's "stop saving features for an
+     *  Enterprise tier we might never sell" call). */
+    maxUploadMB: 25,
     /** Days from upload before a document is soft-deleted by the
      *  enforce-retention cron. After soft-delete, a 30-day grace window
      *  applies before hard-purge (DB cascade + storage cleanup). */
@@ -85,21 +107,51 @@ export const PLANS = {
     priceIdAnnual: process.env.STRIPE_PRO_PRICE_ANNUAL_ID || '',
     // Legacy alias points to monthly for existing callers
     priceId: process.env.STRIPE_PRO_PRICE_MONTHLY_ID || '',
-    analysesPerMonth: 15,
-    maxPages: 100,
-    biasTypes: 30,
+    /** Bumped 15 → 100 audits/mo (2026-05-26 soft-limit pass). 15 was
+     *  tight for a heavy wedge user — a fractional CSO running 3-5
+     *  client engagements with weekly memo flow easily lands at 30-60
+     *  audits/month. 100/mo at ~£0.40 per audit = ~£40/month variable
+     *  cost on a £249 plan — still healthy margin (~84%). The wedge
+     *  motion can't afford to throttle paying users; if 100/mo runs
+     *  too hot, raise the price not the limit. */
+    analysesPerMonth: 100,
+    /** Page cap removed — see free.maxPages comment. */
+    maxPages: Infinity,
+    biasTypes: 22,
     maxTeamMembers: 1,
-    retentionDays: 90,
+    /** Bumped 90 → 365 days (2026-05-26) to align with the
+     *  AUDIT_LOG_RETENTION_TIERS Individual='1 year' SLA in
+     *  trust-copy.ts. 90 days was forcing a CSO to forget last
+     *  quarter's audit when prep'ing this quarter's — that's
+     *  the wedge persona's defining workflow. The compliance
+     *  artefact retention and the document retention now match. */
+    retentionDays: 365,
+    /** Bumped from universal 25MB → 100MB (2026-05-26). A real M&A
+     *  CIM is 50-150MB; a CSO uploading their actual deal memo
+     *  shouldn't hit a wall on the wedge tier. Gemini 3 Flash's 1M
+     *  token context handles 100MB documents fine. */
+    maxUploadMB: 100,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
       personalDecisionHistory: true,
       personalCalibration: true,
       teamKnowledgeGraph: false,
-      decisionRooms: false,
-      slackIntegration: false,
-      driveIntegration: false,
-      complianceMapping: false,
+      // Soft-limit pass 2026-05-26: features that REAL solo users need
+      // on the wedge tier — withholding them for an Enterprise tier we
+      // might never sell is the displacement-signal trap, not a moat.
+      // A solo CSO has their own Slack, their own Drive, their own
+      // M&A workflow that benefits from compliance mapping. Decision
+      // Rooms work for solo users inviting external advisors (counsel,
+      // PE sponsor, board member). All four flipped to true.
+      decisionRooms: true,
+      slackIntegration: true,
+      driveIntegration: true,
+      complianceMapping: true,
+      // Power-user features that genuinely need a team to justify the
+      // setup cost — kept on Strategy/Team tier. customToxicWeights
+      // requires team standardisation to be useful; teamKnowledgeGraph
+      // is by definition cross-user; teamDqiAnalytics is cross-user.
       customToxicWeights: false,
       teamDqiAnalytics: false,
       sso: false,
@@ -120,10 +172,24 @@ export const PLANS = {
     priceIdAnnual: process.env.STRIPE_TEAM_PRICE_ANNUAL_ID || '',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: Infinity,
-    maxPages: 200,
-    biasTypes: 30,
-    maxTeamMembers: 15,
-    retentionDays: 365,
+    /** Page cap removed — see free.maxPages comment. */
+    maxPages: Infinity,
+    biasTypes: 22,
+    /** Bumped 15 → 30 seats (2026-05-26). A real corporate strategy
+     *  function plus audit committee plus GC plus external counsel
+     *  routinely runs 20+. 15 was undercutting the legitimate Strategy
+     *  buyer who wants the WHOLE function on the platform. */
+    maxTeamMembers: 30,
+    /** Bumped 365 → 1095 days (3y) (2026-05-26) to align with the
+     *  AUDIT_LOG_RETENTION_TIERS Strategy='3 years' SLA in
+     *  trust-copy.ts. Team buyers running quarterly board cycles
+     *  reference 2-3 years of historical memos routinely; 1y was
+     *  forcing an artificial gap. */
+    retentionDays: 1095,
+    /** Bumped from universal 25MB → 250MB (2026-05-26). Strategy
+     *  teams routinely upload data-room-scale bundles. 250MB
+     *  handles a full diligence pack in a single upload. */
+    maxUploadMB: 250,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
@@ -138,7 +204,13 @@ export const PLANS = {
       teamDqiAnalytics: true,
       sso: false,
       multiDivision: false,
-      customTaxonomy: false,
+      /** Flipped false → true on Strategy (2026-05-26 soft-limit pass).
+       *  customTaxonomy is a power-user differentiator — a strategy
+       *  team that's standardised on its own bias vocabulary should
+       *  be able to extend the 22-bias taxonomy with house-specific
+       *  patterns. No reason to withhold for an Enterprise tier we
+       *  might never sell. */
+      customTaxonomy: true,
     } satisfies PlanFeatures,
   },
   enterprise: {
@@ -153,12 +225,20 @@ export const PLANS = {
     priceId: '',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
-    biasTypes: 30,
+    biasTypes: 22,
     maxTeamMembers: Infinity,
-    /** Default for Enterprise; configurable per Order Form. The
-     *  enforce-retention cron uses this value unless an explicit
-     *  contract-level override is set on the Org. */
-    retentionDays: 360,
+    /** Bumped 360 → 2555 days (7y) (2026-05-26) to (a) align with the
+     *  AUDIT_LOG_RETENTION_TIERS Enterprise='7 years (SOX §404)' SLA
+     *  in trust-copy.ts and (b) fix the inversion — the old 360 was
+     *  LESS than Strategy's 365, which made no sense. Document
+     *  retention now mirrors the audit-log retention SLA so the two
+     *  retention artefacts move in lockstep. Configurable per Order
+     *  Form for HIPAA / banking / government contracts. */
+    retentionDays: 2555,
+    /** Platform ceiling. Vercel Fluid Compute body-size limit is the
+     *  binding constraint above this — practical for the rare
+     *  full-data-room-as-one-upload Enterprise case. */
+    maxUploadMB: 500,
     /** Volume floor (4.5 deep). New Enterprise contracts ship with a
      *  configurable per-quarter audit floor so renewal pricing isn't
      *  open-ended. Default 100/quarter; the Order Form / quote builder

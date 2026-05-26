@@ -142,7 +142,15 @@ export async function checkAnalysisLimit(
 
 /**
  * Get the maximum number of bias types allowed for a user's plan.
- * Used to truncate bias results to plan limits (Free=5, Pro/Team/Enterprise=30).
+ *
+ * Per the 2026-05-26 soft-limit pass: every plan now sees the FULL
+ * 22-bias R²F taxonomy (the deceptive Free=5 gate was the audit
+ * pipeline running all 22 and then HIDING results in the UI — which
+ * was both confusing and a credibility hit). The function still
+ * exists because some consumers truncate the bias list for display,
+ * but the value is now BIAS_COUNT across every plan. When the
+ * taxonomy grows beyond 22, edit PLANS in stripe.ts.
+ *
  * Biases should be kept in severity order: critical > high > medium > low.
  */
 export async function getBiasTypeLimit(

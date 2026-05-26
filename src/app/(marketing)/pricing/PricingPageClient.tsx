@@ -109,12 +109,11 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       priceAnnual: 24990,
       anchor: '$24,990/year · 2 months free · ~10× cheaper than one consulting week',
       highlights: [
-        { label: 'Unlimited audits, 15 seats', strong: true },
+        { label: 'Unlimited audits, 30 seats', strong: true },
         { label: 'Shared Decision Knowledge Graph', strong: true },
-        { label: 'Decision Rooms + team consensus' },
-        { label: 'Slack, Drive, Email integrations' },
-        { label: 'Compliance mapping + audit logs' },
-        { label: 'Team DQI analytics' },
+        { label: 'Custom toxic combination weights + taxonomy' },
+        { label: 'Team DQI analytics + 3-year retention' },
+        { label: '250MB uploads · full data-room bundles' },
       ],
       cta: { label: 'Start 30-day pilot', action: 'checkout-team' },
       badge: 'Most popular',
@@ -131,11 +130,11 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       priceAnnual: 2490,
       anchor: '$2,490/year (save ~16%) on annual',
       highlights: [
-        { label: '15 audits per month', strong: true },
+        { label: '100 audits per month', strong: true },
         { label: `Full DQI + ${BIAS_COUNT}-bias R²F taxonomy` },
-        { label: 'Boardroom Simulation + Forgotten Questions' },
-        { label: 'Personal Decision History' },
-        { label: 'Calibration dashboard' },
+        { label: 'Slack + Drive + Email integrations · Decision Rooms' },
+        { label: 'Compliance mapping + Personal Decision History' },
+        { label: '100MB uploads · real CIMs welcome' },
       ],
       cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
@@ -188,17 +187,30 @@ const COMPARISON_ROWS: Array<{
   {
     label: 'Audits per month',
     free: '4',
-    pro: '15',
+    pro: '100',
     team: 'Unlimited',
     enterprise: 'Unlimited',
   },
   { label: 'Decision Quality Index (DQI)', free: true, pro: true, team: true, enterprise: true },
   {
+    // Soft-limit pass 2026-05-26: every tier sees the FULL taxonomy.
+    // The audit pipeline runs all 22 detectors regardless of plan;
+    // showing "5 of 22" on Free was deceptive UI gating without any
+    // actual analysis difference. The wedge motion is "see the value
+    // first, then pay" — that requires Free seeing the full taxonomy
+    // on the audit it just ran.
     label: 'Cognitive biases detected',
-    free: '5',
+    free: `${BIAS_COUNT} (R²F)`,
     pro: `${BIAS_COUNT} (R²F)`,
     team: `${BIAS_COUNT} (R²F)`,
     enterprise: `${BIAS_COUNT} (R²F)`,
+  },
+  {
+    label: 'Max upload size',
+    free: '25 MB',
+    pro: '100 MB',
+    team: '250 MB',
+    enterprise: '500 MB',
   },
   {
     label: 'Boardroom Simulation',
@@ -226,6 +238,8 @@ const COMPARISON_ROWS: Array<{
   },
   { section: 'Team features', label: '', free: '', pro: '', team: '', enterprise: '' },
   {
+    // Soft-limit pass 2026-05-26: cross-user shared graph genuinely
+    // needs a team to populate. Stays Team+ only.
     label: 'Decision Knowledge Graph (cross-user)',
     free: false,
     pro: false,
@@ -233,27 +247,40 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
+    // Flipped Pro → true 2026-05-26. A solo CSO inviting external
+    // advisors (counsel, board members, PE sponsors) into a single
+    // memo's room is a real wedge use-case; withholding it forced
+    // those one-off external collaborations to happen off-platform.
     label: 'Decision Rooms (team consensus)',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Flipped Pro → true 2026-05-26. Solo users have their own Slack
+    // / Drive / email; withholding integrations to "save them for
+    // Team" was the displacement-signal trap, not a moat.
     label: 'Slack, Drive, Email integrations',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Flipped Pro → true 2026-05-26. M&A operators on Individual
+    // need compliance mapping for the same regulatory reasons a
+    // Strategy team does (Basel III, EU AI Act, NDPR for African
+    // deals). Audit logs are a per-account artefact, not a team one.
     label: 'Compliance mapping + audit logs',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Power-user feature that requires team standardisation on a
+    // weight set to be useful — stays Team+ only.
     label: 'Custom toxic combination weights',
     free: false,
     pro: false,
@@ -261,6 +288,7 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
+    // Cross-USER analytics, by definition a team concept.
     label: 'Team DQI analytics',
     free: false,
     pro: false,
@@ -269,27 +297,42 @@ const COMPARISON_ROWS: Array<{
   },
   { section: 'Deal & M&A workflows', label: '', free: '', pro: '', team: '', enterprise: '' },
   {
+    // Flipped Pro → true 2026-05-26. A solo M&A operator running a
+    // multi-doc deal (CIM + QofE + IC memo) needs cross-doc conflict
+    // detection structurally — withholding it for Team made the
+    // wedge tier strictly weaker than the audit pipeline already
+    // delivers for free.
     label: 'Cross-document conflict detection',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Flipped Pro → true 2026-05-26. Composite DQI across a deal's
+    // documents is a per-DEAL artefact, not a per-team artefact.
+    // A solo PE-backed-founder or mid-market corp-dev head running
+    // a deal solo benefits identically.
     label: 'Deal-level composite DQI',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Flipped Pro → true 2026-05-26. The DPR is the procurement-grade
+    // leave-behind artefact — the wedge buyer (mid-market corp dev /
+    // smaller-fund GP / PE-backed founder) needs this most. The
+    // multi-document deal DPR ships across both tiers.
     label: 'Deal-level Decision Provenance Record',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
   {
+    // Pre-IC blind-prior voting genuinely needs ≥3 voters to produce
+    // meaningful aggregation — kept Team+ only.
     label: 'Pre-IC blind-prior voting (Decision Rooms)',
     free: false,
     pro: false,
@@ -312,7 +355,20 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
-    label: 'Multi-division + custom taxonomy',
+    // Custom taxonomy flipped to Team 2026-05-26 — see PLANS comment
+    // in stripe.ts (a strategy team that's standardised on its own
+    // bias vocabulary should extend the 22-bias taxonomy with
+    // house-specific patterns; withholding for Enterprise was
+    // displacement-signal). Multi-division stays Enterprise-only —
+    // genuine F500 scope (cross-org rollup, divisional permissions).
+    label: 'Custom taxonomy extensions',
+    free: false,
+    pro: false,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: 'Multi-division rollup + permissions',
     free: false,
     pro: false,
     team: false,
@@ -325,7 +381,24 @@ const COMPARISON_ROWS: Array<{
     team: false,
     enterprise: true,
   },
-  { label: 'Team seats', free: '1', pro: '1', team: '15', enterprise: 'Unlimited' },
+  {
+    // Strategy seats bumped 15 → 30 (2026-05-26). A real corporate
+    // strategy function plus audit committee plus GC plus external
+    // counsel routinely runs 20+; 15 was undercutting the legitimate
+    // Strategy buyer who wants the WHOLE function on the platform.
+    label: 'Team seats',
+    free: '1',
+    pro: '1',
+    team: '30',
+    enterprise: 'Unlimited',
+  },
+  {
+    label: 'Document retention',
+    free: '30 days',
+    pro: '1 year',
+    team: '3 years',
+    enterprise: '7 years (SOX §404)',
+  },
 ];
 
 const FAQ: Array<{ q: string; a: string }> = [
@@ -347,7 +420,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'What team features can I not access on Individual?',
-    a: 'Individual is intentionally solo: no Decision Rooms, no shared Knowledge Graph, no Slack/Drive/Email integrations, no compliance mapping, no custom toxic combination weights. These are team-only features that unlock on Strategy.',
+    a: 'Individual gets every feature a solo operator actually needs: Slack / Drive / Email integrations, Decision Rooms (for inviting counsel / board / external advisors into a single memo), compliance mapping, cross-document conflict detection, deal-level Decision Provenance Records, full 100MB uploads. Strategy adds the genuinely cross-USER features: the shared Decision Knowledge Graph that compounds across the team, custom toxic combination weights that require team standardisation to be useful, team DQI analytics, custom taxonomy extensions, and pre-IC blind-prior voting (which needs ≥3 voters to produce meaningful aggregation). The split is "what compounds with one user" vs "what compounds with a team" — not artificial gating.',
   },
   {
     q: 'Do you offer annual discounts?',
@@ -359,7 +432,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'How long are my documents retained, and can I delete them?',
-    a: 'Free 30 days · Individual 90 days · Strategy 12 months · Enterprise 360-day default (configurable per Order Form). Every tier has a 30-day soft-delete grace window before permanent purge: recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
+    a: 'Free 30 days · Individual 1 year · Strategy 3 years · Enterprise 7 years (SOX §404 internal-controls aligned · configurable per Order Form for HIPAA / banking / government). Document retention mirrors the audit-log retention SLA so the two compliance artefacts move in lockstep. Every tier has a 30-day soft-delete grace window before permanent purge: recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
   },
 ];
 
