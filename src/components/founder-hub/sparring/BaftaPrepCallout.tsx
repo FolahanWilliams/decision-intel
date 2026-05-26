@@ -20,11 +20,13 @@
  */
 
 import { useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import {
   BUYER_PERSONAS,
   GRADING_DIMENSIONS,
 } from '@/components/founder-hub/sparring/sparring-room-data';
 import { getHighestPriorityUpcomingEvent, daysUntil, ACTION_CADENCE } from '@/lib/data/event-prep';
+import { prefillConversionLedger } from '@/lib/outreach/ledger-prefill';
 
 /** Minimal structural contract — the full HistoryEntry lives (twice) in
  *  SparringRoomTab + SparringTrendViz; this is a read-only subset so we
@@ -371,6 +373,32 @@ export function BaftaPrepCallout({ history }: Props) {
               the verbatim phrasing has to fire under 30-second-hook pressure).
             </>
           )}
+          {/* 3C cross-link 2026-05-26: rehearsal → ledger handoff. The
+           * recommended.id is a BUYER_PERSONA.id; the IDs are aligned
+           * with WEDGE_PERSONA.id (verified) so the ledger panel
+           * pre-selects on the same string. */}
+          <div style={{ marginTop: 10 }}>
+            <button
+              type="button"
+              onClick={() => prefillConversionLedger({ persona: recommended.id })}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '6px 10px',
+                background: 'transparent',
+                border: '1px solid rgba(22, 163, 74, 0.32)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--accent-primary)',
+                cursor: 'pointer',
+              }}
+              aria-label={`Log a real ${recommended.label} prospect in the conversion ledger`}
+            >
+              <ArrowUpRight size={12} /> Log a real {recommended.label} prospect →
+            </button>
+          </div>
         </div>
       )}
     </div>
