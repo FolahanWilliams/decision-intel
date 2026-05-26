@@ -13,7 +13,11 @@
  *   (a) which Phase-1-HXC ("BAFTA") personas were drilled this week,
  *   (b) latest DQI + trend per persona,
  *   (c) the recommended next-rep persona + the weakest dimension to
- *       focus on, and the prep-arc step for the current week.
+ *       focus on, and the prep-arc step for the current week,
+ *   (d) drill-gap analysis (5B ship 2026-05-26) — event-primary HXC
+ *       personas materially under-allocated in the last 14 days of
+ *       reps, so the founder doesn't rehearse the wrong wedge before
+ *       a calendar-gated room.
  *
  * Visual pattern intentionally matches EventPrepCard (sibling surface):
  * inline borderTop accent, CSS-var palette, monospace countdown.
@@ -162,6 +166,54 @@ export function BaftaPrepCallout({ history }: Props) {
     if (aDqi !== bDqi) return aDqi - bDqi;
     return (a.lastDateMs ?? 0) - (b.lastDateMs ?? 0);
   })[0];
+
+  // 5B drill-gap analysis (locked 2026-05-26). The audit asked for
+  // "drill these 2 personas more — they're underrepresented in
+  // last-fortnight reps" — distinct from the single-persona "Focus
+  // next rep" block above. Surfaces the BROADER allocation gap:
+  // event-primary personas with materially-low share of recent reps.
+  // Self-hides when there's not enough signal or no gap exists.
+  const recentHxcReps = history.filter(
+    h => Date.parse(h.dateISO) >= twoWeeksAgoMs && hxcPersonas.some(p => p.id === h.personaId)
+  );
+  const totalRecentHxcReps = recentHxcReps.length;
+
+  interface PersonaShare {
+    id: string;
+    label: string;
+    isPrimaryAtEvent: boolean;
+    count: number;
+    sharePct: number;
+  }
+  const personaShares: PersonaShare[] = rows.map(r => {
+    const count = recentHxcReps.filter(h => h.personaId === r.id).length;
+    return {
+      id: r.id,
+      label: r.label,
+      isPrimaryAtEvent: r.isPrimaryAtEvent,
+      count,
+      sharePct: totalRecentHxcReps > 0 ? (count / totalRecentHxcReps) * 100 : 0,
+    };
+  });
+
+  // With 4 HXC personas, even-allocation share is 25%. Flag any
+  // event-primary persona running below 20% (materially under-allocated)
+  // OR with 0 reps in 14d (critical — the wedge persona the founder
+  // will MOST meet at the event has zero recent rehearsal).
+  const UNDER_DRILL_PCT = 20;
+  const underDrilled: PersonaShare[] = personaShares
+    .filter(s => s.isPrimaryAtEvent && (s.count === 0 || s.sharePct < UNDER_DRILL_PCT))
+    .sort((a, b) => {
+      // Zero-rep personas first (most critical gap), then by lowest share.
+      if ((a.count === 0) !== (b.count === 0)) return a.count === 0 ? -1 : 1;
+      return a.sharePct - b.sharePct;
+    });
+
+  // Render the balance check ONLY when (a) at least 2 recent reps to
+  // establish a baseline distribution and (b) there's an actual gap.
+  // 2 reps is a minimum signal floor — below that, share percentages
+  // are statistical noise (one rep at 100% / one rep at 0%).
+  const showDrillGap = totalRecentHxcReps >= 2 && underDrilled.length > 0;
 
   const prepStep = ACTION_CADENCE.prepArc.reduce((best, cur) =>
     Math.abs(cur.weeksBeforeEvent - weeksUntil) < Math.abs(best.weeksBeforeEvent - weeksUntil)
@@ -336,6 +388,47 @@ export function BaftaPrepCallout({ history }: Props) {
           );
         })}
       </div>
+
+      {showDrillGap && (
+        <div
+          style={{
+            marginTop: 14,
+            padding: '10px 14px',
+            background: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid rgba(245, 158, 11, 0.30)',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: 12.5,
+            color: 'var(--text-primary)',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{ marginBottom: 6 }}>
+            <strong>Rep balance · last 14 days:</strong>{' '}
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {totalRecentHxcReps} rep{totalRecentHxcReps === 1 ? '' : 's'} across the HXC wedge.
+              Event-primary persona{underDrilled.length === 1 ? '' : 's'} under {UNDER_DRILL_PCT}%
+              share —
+            </span>
+          </div>
+          <ul style={{ margin: '0 0 6px 18px', padding: 0, color: 'var(--text-primary)' }}>
+            {underDrilled.map(s => (
+              <li key={s.id} style={{ marginBottom: 3 }}>
+                <strong>{s.label}</strong>
+                {' · '}
+                <span style={{ color: 'var(--warning)' }}>
+                  {s.count === 0
+                    ? 'no reps in 14 days'
+                    : `${s.count} of ${totalRecentHxcReps} (${s.sharePct.toFixed(0)}%)`}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div style={{ color: 'var(--text-secondary)' }}>
+            BAFTA primaries should each carry roughly equal rehearsal load — these will have the
+            highest density in the room.
+          </div>
+        </div>
+      )}
 
       {recommended && (
         <div
