@@ -7,8 +7,10 @@ import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { Loader2 } from 'lucide-react';
 import { ALL_CASES, HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 const CASES_WITH_PRE_DECISION_EVIDENCE = ALL_CASES.filter(c => c.preDecisionEvidence).length;
 
@@ -740,8 +742,8 @@ const SEARCH_INDEX: SearchEntry[] = [
   {
     tabId: 'education_room',
     section: 'Education Room · DI Vocabulary deck (locked + banned + cold-context bridges)',
-    preview: `20 cards: reasoning layer, R²F, DPR, DQI, ${HISTORICAL_CASE_COUNT} historical decisions, ${FRAMEWORK_COUNT} frameworks, 30+ biases, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).`,
-    keywords: `education room di vocabulary deck reasoning layer r2f dpr dqi ${HISTORICAL_CASE_COUNT} decisions ${FRAMEWORK_COUNT} frameworks 30 biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats`,
+    preview: `20 cards: reasoning layer, R²F, DPR, DQI, ${HISTORICAL_CASE_COUNT} historical decisions, ${FRAMEWORK_COUNT} frameworks, ${BIAS_COUNT}-bias R²F taxonomy, ~90% margin, banned phrases (decision intelligence platform / decision hygiene / boardroom strategic decision).`,
+    keywords: `education room di vocabulary deck reasoning layer r2f dpr dqi ${HISTORICAL_CASE_COUNT} decisions ${FRAMEWORK_COUNT} frameworks ${BIAS_COUNT} biases blended margin banned decision intelligence platform decision hygiene boardroom strategic decision warm cold context bridge specimen library wework dangote design partner seats`,
   },
   {
     tabId: 'education_room',

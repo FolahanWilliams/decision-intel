@@ -197,9 +197,13 @@ export function TaxonomyClient() {
                   marginBottom: 20,
                 }}
               >
-                Twenty biases.
+                {/* Derived from BIAS_EDUCATION via entries.length so the H1 cannot drift
+                 when DI-B-023 ships (canonical-derivation discipline; the prior
+                 hardcoded "Twenty biases" was 2-off after the 2026-04-30 paper-
+                 application sprint added DI-B-021 + DI-B-022). */}
+                {entries.length} biases.
                 <br />
-                Twenty research anchors
+                {entries.length} research anchors
                 <span style={{ color: C.green }}>.</span>
               </h1>
               <p
