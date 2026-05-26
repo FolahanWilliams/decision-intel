@@ -255,8 +255,10 @@ export async function POST(req: NextRequest) {
           // Convert base64 to Buffer
           const buffer = Buffer.from(base64Content, 'base64');
 
-          // Enforce file size limit (5MB)
-          const MAX_FILE_SIZE = 5 * 1024 * 1024;
+          // Enforce file size limit. Bumped 5MB → 25MB on 2026-05-26 to
+          // match the main upload route — a CSO who forwards a 15MB CIM via
+          // email expects the same audit they'd get from direct upload.
+          const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
           if (buffer.length > MAX_FILE_SIZE) {
             log.warn(`Attachment too large (${buffer.length} bytes), skipping: ${filename}`);
             continue;

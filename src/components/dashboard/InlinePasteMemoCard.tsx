@@ -412,6 +412,30 @@ export function InlinePasteMemoCard({
                 ))}
               </div>
 
+              {/* Running-step description (Tier-A #2 ship 2026-05-26).
+               * Surfaces the SSE-sent per-node educational caption
+               * inline with the chips. Real users staring at /demo
+               * for 60s need to see WHAT is happening, not just chip
+               * states. Hidden when no step is running OR no
+               * description has arrived yet. */}
+              {(() => {
+                const runningStep = steps.find(s => s.status === 'running');
+                if (!runningStep?.description) return null;
+                return (
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                      margin: '0 0 8px',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {runningStep.description}
+                  </p>
+                );
+              })()}
+
               <p
                 style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55, margin: 0 }}
               >

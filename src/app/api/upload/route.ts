@@ -84,10 +84,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Enforce file size limit (5MB)
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    // Enforce file size limit. Bumped 5MB → 25MB on 2026-05-26 (Tier-A #1
+    // BAFTA-prep ship): real strategic memos / CIMs / board decks land in
+    // the 5-25MB range with embedded charts + tables. The 5MB cap was
+    // structurally rejecting the exact deal documents wedge prospects
+    // wanted to audit. Vercel Fluid Compute (the platform default) handles
+    // request bodies well above 25MB, so the only constraint is downstream
+    // processing time (parseFile() handles PDFs up to several thousand
+    // pages cleanly via pdf-parse). When a >25MB CIM lands, the user is
+    // routed to /pricing/quote — those documents typically need an
+    // enterprise contract with a custom storage pattern, not the wedge tier.
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
+      const sizeMb = (file.size / 1024 / 1024).toFixed(1);
+      return NextResponse.json(
+        {
+          error: `File too large (${sizeMb}MB · max 25MB). Larger documents — CIMs over 25MB, full data rooms — need an enterprise contract; talk to sales at /pricing/quote.`,
+        },
+        { status: 413 }
+      );
     }
 
     // Validate file type

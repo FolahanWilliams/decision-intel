@@ -173,16 +173,35 @@ describe('POST /api/upload', () => {
     expect(body.error).toBe('No file provided');
   });
 
-  it('returns 400 for files over 5MB', async () => {
-    const bigContent = new Uint8Array(6 * 1024 * 1024); // 6MB
+  it('returns 413 for files over 25MB', async () => {
+    // Limit bumped 5MB → 25MB on 2026-05-26 (Tier-A #1 ship). 26MB → 413,
+    // not 400, because file-too-large is the canonical HTTP semantic.
+    const bigContent = new Uint8Array(26 * 1024 * 1024); // 26MB
     const file = new File([bigContent], 'big.txt', { type: 'text/plain' });
 
     const req = createMockRequest(file);
     const res = await POST(req);
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(413);
     const body = await res.json();
     expect(body.error).toContain('File too large');
+    expect(body.error).toContain('25MB');
+  });
+
+  it('accepts files up to 25MB', async () => {
+    // Boundary case: a 20MB file should pass the size gate. The test
+    // intentionally uses raw bytes that aren't parseable by parseFile()
+    // so it'll fail downstream — what we're verifying here is the size
+    // check no longer rejects 5-25MB files at the gate.
+    const content = new Uint8Array(20 * 1024 * 1024); // 20MB
+    const file = new File([content], 'big.txt', { type: 'text/plain' });
+
+    const req = createMockRequest(file);
+    const res = await POST(req);
+
+    // Won't be 413 — past the size gate. Downstream may 400/500 on parse,
+    // but the size gate is the contract this test locks.
+    expect(res.status).not.toBe(413);
   });
 
   it('returns 400 for unsupported file types', async () => {

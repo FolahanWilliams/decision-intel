@@ -31,6 +31,7 @@ import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { DecisionDNAPreviewCard } from '@/components/dna/DecisionDNAPreviewCard';
 import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import { bundlesForRole, type SampleBundle } from '@/lib/data/sample-bundles';
 import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
@@ -131,7 +132,7 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
       return 'Upload limit reached. Please wait before trying again.';
     }
     if (uploadRes.status === 413) {
-      return 'File is too large. Please upload a document under 5 MB.';
+      return 'File is too large. Please upload a document under 25 MB. Larger CIMs / data rooms need an enterprise contract — talk to sales at /pricing/quote.';
     }
     if (uploadRes.status === 415) {
       return 'Unsupported file type. Accepted formats: PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD.';
@@ -424,11 +425,18 @@ export default function Dashboard() {
     }
   }, [outcomeGate]);
 
-  // Sync analysis progress to the global floating progress bar
+  // Sync analysis progress to the global floating progress bar.
+  // Pass the per-node description (Tier-A #2 ship 2026-05-26) so the
+  // collapsed view surfaces the educational caption — the SSE has been
+  // sending this all along; it just wasn't propagated past the hook.
   useEffect(() => {
     if (currentProgress > 0 && analysisSteps.length > 0) {
       const runningStep = analysisSteps.find(s => s.status === 'running');
-      updateProgress(currentProgress, runningStep?.name || 'Analyzing...');
+      updateProgress(
+        currentProgress,
+        runningStep?.name || 'Analyzing...',
+        runningStep?.description
+      );
     }
   }, [currentProgress, analysisSteps, updateProgress]);
 
@@ -1749,7 +1757,7 @@ export default function Dashboard() {
                           CEO questions before your next meeting.
                         </p>
                         <p className="text-xs text-muted" style={{ marginTop: 10 }}>
-                          PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 5 MB
+                          PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · up to 25 MB
                         </p>
                         {billingData && billingData.limits.analysesPerMonth > 0 && (
                           <p className="text-xs text-muted" style={{ marginTop: 6 }}>
@@ -1906,6 +1914,44 @@ export default function Dashboard() {
                         <Mail size={13} />
                         Email inbox
                       </Link>
+                      <span style={{ color: 'var(--border-color)' }}>·</span>
+                      {/* 4th door: sample memo (Tier-A #4 ship 2026-05-26).
+                       * Surfaces the role-matched bundle library as a peer
+                       * ingestion mode alongside Paste / Meeting / Email.
+                       * Always visible — restores the discovery path for
+                       * the returning-with-zero-docs case where the
+                       * FirstRunInlineWalkthrough has been dismissed. Loads
+                       * the bundle into the paste card with autoSubmit=false
+                       * so the user can read the memo before running.
+                       * Falls back to the 'other' mixed library when no
+                       * onboarding role is set (e.g. mid-onboarding state). */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const role = onboardingRole ?? 'other';
+                          const bundles = bundlesForRole(role);
+                          const firstBundle: SampleBundle | undefined = bundles[0];
+                          if (!firstBundle) return;
+                          setPasteSeed({ content: firstBundle.content, autoSubmit: false });
+                          setInlineMode('paste');
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          fontWeight: 600,
+                          color: 'var(--accent-primary)',
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          fontSize: 'inherit',
+                        }}
+                        aria-label="Try the platform with a role-matched sample memo"
+                      >
+                        <FileText size={13} />
+                        Try a sample
+                      </button>
                     </div>
                   )}
                 </>
@@ -2801,7 +2847,7 @@ export default function Dashboard() {
               <div className="text-center">
                 <p className="font-semibold text-lg">Drop your document here</p>
                 <p className="text-sm text-muted mt-1">
-                  PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 5 MB
+                  PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD · Max 25 MB
                 </p>
                 {billingData && billingData.limits.analysesPerMonth > 0 && (
                   <p className="text-xs text-muted" style={{ marginTop: '4px' }}>

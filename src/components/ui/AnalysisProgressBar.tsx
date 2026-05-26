@@ -26,12 +26,27 @@ interface ActiveAnalysis {
   nodeStates: Record<string, 'pending' | 'running' | 'complete'>;
   biasCount: number;
   noiseScore: number | null;
+  /** Educational description of the currently-running node (e.g.
+   *  "Analyzing for 22 cognitive biases with research verification…").
+   *  Populated from the SSE per-node `description` field — the data was
+   *  already flowing through useAnalysisStream's AnalysisStep but wasn't
+   *  surfaced in the UI (Tier-A #2 ship 2026-05-26). Real users
+   *  staring at a 60s spinner need to see WHAT is happening, not just a
+   *  percentage. */
+  currentStepDescription?: string;
+  /** ms timestamp when the current step transitioned to 'running'. Used
+   *  to surface an elapsed counter ("Bias Detection · 23s elapsed"),
+   *  which is the actual anxiety-reducer when a single node takes 15s+. */
+  currentStepStartedAt?: number;
 }
 
 interface AnalysisProgressContextType {
   activeAnalysis: ActiveAnalysis | null;
   startTracking: (documentId: string, filename: string) => void;
-  updateProgress: (progress: number, step: string) => void;
+  /** Update progress + step name + optional description. The description
+   *  rides on every step transition; when the step name changes, the
+   *  elapsed-counter timestamp also resets. */
+  updateProgress: (progress: number, step: string, description?: string) => void;
   completeTracking: (documentId: string) => void;
   errorTracking: () => void;
   dismiss: () => void;
@@ -74,10 +89,22 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
     });
   }, []);
 
-  const updateProgress = useCallback((progress: number, step: string) => {
-    setActiveAnalysis(prev =>
-      prev && prev.status === 'analyzing' ? { ...prev, progress, currentStep: step } : prev
-    );
+  const updateProgress = useCallback((progress: number, step: string, description?: string) => {
+    setActiveAnalysis(prev => {
+      if (!prev || prev.status !== 'analyzing') return prev;
+      // Reset elapsed-counter timestamp on step transition. When the
+      // SSE keeps firing the same step name with updated progress, we
+      // preserve the original timestamp so the elapsed clock keeps
+      // ticking from when the step ACTUALLY started.
+      const stepChanged = step !== prev.currentStep;
+      return {
+        ...prev,
+        progress,
+        currentStep: step,
+        currentStepDescription: description ?? prev.currentStepDescription,
+        currentStepStartedAt: stepChanged ? Date.now() : prev.currentStepStartedAt,
+      };
+    });
   }, []);
 
   const completeTracking = useCallback((documentId: string) => {
@@ -437,9 +464,34 @@ export function AnalysisProgressFloat() {
               color: 'var(--text-muted)',
             }}
           >
-            <span>{activeAnalysis.currentStep}</span>
+            <span>
+              {activeAnalysis.currentStep}
+              {isAnalyzing && activeAnalysis.currentStepStartedAt && (
+                <ElapsedCounter startedAt={activeAnalysis.currentStepStartedAt} />
+              )}
+            </span>
             <span>{Math.round(activeAnalysis.progress)}%</span>
           </div>
+
+          {/* Educational caption — Tier-A #2 ship 2026-05-26. The
+           * SSE-provided description for the current pipeline node
+           * answers the real-user question "what is this thing
+           * actually doing?" during the 60s wait. Hidden when no
+           * description has arrived yet (early seconds of stream). */}
+          {isAnalyzing && activeAnalysis.currentStepDescription && (
+            <div
+              style={{
+                fontSize: 10.5,
+                color: 'var(--text-muted)',
+                marginTop: 4,
+                fontStyle: 'italic',
+                lineHeight: 1.4,
+                opacity: 0.85,
+              }}
+            >
+              {activeAnalysis.currentStepDescription}
+            </div>
+          )}
 
           {isComplete && (
             <div
@@ -476,6 +528,39 @@ export function AnalysisProgressFloat() {
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * Live elapsed-second counter for the current pipeline node. Tier-A #2
+ * ship 2026-05-26: real users staring at a 60s spinner need confirmation
+ * something is still alive when a node sits at the same name for 15-20s
+ * (biasDetective, metaJudge). Updates once per second; no-ops once the
+ * analysis transitions out of 'analyzing' state. Pure presentational.
+ */
+function ElapsedCounter({ startedAt }: { startedAt: number }) {
+  const [tickMs, setTickMs] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setTickMs(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const seconds = Math.max(0, Math.floor((tickMs - startedAt) / 1000));
+  // Don't show 0s — the counter feels noisier than helpful when it
+  // briefly says "0s" on every step transition.
+  if (seconds < 1) return null;
+  return (
+    <span
+      style={{
+        marginLeft: 6,
+        fontSize: 10,
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+        color: 'var(--text-muted)',
+        opacity: 0.7,
+      }}
+      aria-label={`${seconds} seconds elapsed on this step`}
+    >
+      · {seconds}s
+    </span>
   );
 }
 

@@ -25,6 +25,7 @@ import {
   type ReactNode,
 } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Share2, FileText, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ShareModal } from '@/components/ui/ShareModal';
@@ -235,6 +236,28 @@ const TAB_KEYS: DocDetailTab[] = ['findings', 'actions', 'stress', 'perspectives
 export default function DocumentDetailV2Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const { showToast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // /demo → /onboarding/claim → /documents/[id]?claimed=true hand-off (#3
+  // claim-flow fix 2026-05-26). The claim flow's terminal redirect lands
+  // here with ?claimed=true; surface the success toast + strip the param
+  // so a refresh doesn't re-fire. CLAUDE.md D9 lock (locked 2026-04-27)
+  // specced this but it was never wired on the doc-detail side — the
+  // toast was effectively missing for ~30 days. The exact same toast is
+  // referenced in the audit memos and the chat-context history.
+  useEffect(() => {
+    if (searchParams.get('claimed') !== 'true') return;
+    showToast('Audit claimed from your demo run', 'success');
+    // Strip the param so a refresh / back-nav doesn't re-fire the toast.
+    const url = new URL(window.location.href);
+    url.searchParams.delete('claimed');
+    router.replace(url.pathname + url.search, { scroll: false });
+    // Intentionally NOT depending on showToast/router — both are stable
+    // refs from next/navigation hooks; including them just re-fires the
+    // effect after the replace, creating an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
