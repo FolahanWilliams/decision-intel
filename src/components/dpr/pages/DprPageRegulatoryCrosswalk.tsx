@@ -33,6 +33,20 @@ interface FrameworkSlot {
   id: string;
   shortName: string;
   region: 'g7' | 'eu' | 'uk' | 'us' | 'gcc' | 'africa' | 'global' | 'other';
+  /** Per-jurisdiction sub-classification, populated only for region='africa'.
+   *  Adaeze persona ask (A-2 ship 2026-05-26): the Pan-African map at the
+   *  region level reads as a flat list of acronyms; a Lagos-Nairobi-Cairo
+   *  deal reader needs to see "Nigeria fired NDPR + CBN + ISA · Kenya
+   *  fired none" not "12 African frameworks triggered." */
+  africanCountry?:
+    | 'nigeria'
+    | 'kenya'
+    | 'ghana'
+    | 'south_africa'
+    | 'egypt'
+    | 'tanzania'
+    | 'waemu'
+    | 'other_africa';
   triggered: boolean;
   triggerCount: number;
 }
@@ -69,6 +83,65 @@ export function DprPageRegulatoryCrosswalk(props: DprPageRegulatoryCrosswalkProp
           {(['eu', 'us', 'uk', 'g7', 'gcc', 'africa', 'global', 'other'] as const).map(region => {
             const items = groups[region];
             if (!items || items.length === 0) return null;
+
+            // A-2 ship 2026-05-26: the Africa region is rendered as
+            // per-country sub-groups (Adaeze persona ask — "Nigeria
+            // fired NDPR + CBN + ISA · Kenya fired none"). Every other
+            // region keeps the flat-list rendering — the per-country
+            // depth is the Pan-African moat layer, not a generic UI
+            // change. If GCC or US-state coverage deepens enough to
+            // warrant a sub-group, mirror this pattern.
+            if (region === 'africa') {
+              const byCountry = groupAfricaByCountry(items);
+              return (
+                <section key={region} className="dpr-crosswalk-region">
+                  <h3 className="dpr-crosswalk-region-title">{REGION_LABEL[region]}</h3>
+                  {AFRICAN_COUNTRY_ORDER.map(country => {
+                    const countryItems = byCountry[country];
+                    if (!countryItems || countryItems.length === 0) return null;
+                    const triggeredHere = countryItems.filter(s => s.triggered).length;
+                    return (
+                      <div key={country} className="dpr-crosswalk-africa-country">
+                        <div className="dpr-crosswalk-africa-country-title">
+                          {AFRICAN_COUNTRY_LABEL[country]}
+                          <span className="dpr-crosswalk-africa-country-meta">
+                            {' · '}
+                            {triggeredHere > 0
+                              ? `${triggeredHere} of ${countryItems.length} triggered`
+                              : `${countryItems.length} mapped · none triggered on this deal`}
+                          </span>
+                        </div>
+                        <div className="dpr-crosswalk-region-items">
+                          {countryItems.map(slot => (
+                            <span
+                              key={slot.id}
+                              className={
+                                slot.triggered
+                                  ? 'dpr-crosswalk-chip dpr-crosswalk-chip--triggered'
+                                  : 'dpr-crosswalk-chip'
+                              }
+                              title={
+                                slot.triggered
+                                  ? `Triggered by ${slot.triggerCount} flagged bias${slot.triggerCount === 1 ? '' : 'es'} on this audit`
+                                  : 'Mapped on the platform but not triggered by this audit'
+                              }
+                            >
+                              {slot.shortName}
+                              {slot.triggered && (
+                                <span className="dpr-crosswalk-chip-count">
+                                  {slot.triggerCount}
+                                </span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </section>
+              );
+            }
+
             return (
               <section key={region} className="dpr-crosswalk-region">
                 <h3 className="dpr-crosswalk-region-title">{REGION_LABEL[region]}</h3>
@@ -103,12 +176,65 @@ export function DprPageRegulatoryCrosswalk(props: DprPageRegulatoryCrosswalkProp
           Frameworks not triggered by this audit are still on file — the platform monitors the full{' '}
           {slots.length}-framework registry and flags new triggers as they fire. A reviewer who
           needs a specific cross-border deal-shape covered (e.g. NDPR + WAEMU + EU AI Act on a
-          Pan-African M&A) can request a per-framework deep-dive under the DPA.
+          Pan-African M&A) can request a per-framework deep-dive under the DPA. African coverage is
+          surfaced per-country so a Lagos-Nairobi-Cairo deal reads as three distinct regulatory
+          surfaces, not one Pan-African aggregate.
         </DprNotice>
       </DprSection>
     </DprPageShell>
   );
 }
+
+/** Sub-group Africa slots by country. Returns a record keyed by every
+ *  AfricanCountry, with empty arrays for countries that have no
+ *  framework on the platform — the render filters those out so a
+ *  country with zero coverage doesn't ship as an empty header. */
+function groupAfricaByCountry(
+  slots: FrameworkSlot[]
+): Record<NonNullable<FrameworkSlot['africanCountry']>, FrameworkSlot[]> {
+  const out: Record<NonNullable<FrameworkSlot['africanCountry']>, FrameworkSlot[]> = {
+    nigeria: [],
+    kenya: [],
+    ghana: [],
+    south_africa: [],
+    egypt: [],
+    tanzania: [],
+    waemu: [],
+    other_africa: [],
+  };
+  for (const s of slots) {
+    if (s.africanCountry) out[s.africanCountry].push(s);
+  }
+  return out;
+}
+
+/** Canonical render order — matches the African deal volume gradient
+ *  (Nigeria + Kenya + South Africa are the highest-volume mid-market
+ *  corp dev jurisdictions; Egypt + Ghana + Tanzania follow; WAEMU is
+ *  the regional bloc; other_africa is the catch-all). When a new
+ *  African country lands in africa-frameworks.ts, add it to the union
+ *  + the order array + the LABEL map. */
+const AFRICAN_COUNTRY_ORDER: NonNullable<FrameworkSlot['africanCountry']>[] = [
+  'nigeria',
+  'kenya',
+  'south_africa',
+  'ghana',
+  'egypt',
+  'tanzania',
+  'waemu',
+  'other_africa',
+];
+
+const AFRICAN_COUNTRY_LABEL: Record<NonNullable<FrameworkSlot['africanCountry']>, string> = {
+  nigeria: 'Nigeria',
+  kenya: 'Kenya',
+  south_africa: 'South Africa',
+  ghana: 'Ghana',
+  egypt: 'Egypt',
+  tanzania: 'Tanzania',
+  waemu: 'WAEMU · West African franc-zone',
+  other_africa: 'Other African jurisdictions',
+};
 
 const REGION_LABEL: Record<FrameworkSlot['region'], string> = {
   eu: 'European Union',
@@ -132,13 +258,17 @@ function buildFrameworkSlots(data: ProvenanceRecordData): FrameworkSlot[] {
     }
   }
 
-  return all.map(fw => ({
-    id: fw.id,
-    shortName: shortenFrameworkName(fw.name),
-    region: classifyRegion(fw.id, fw.name),
-    triggered: triggeredIds.has(fw.id),
-    triggerCount: triggerCounts.get(fw.id) ?? 0,
-  }));
+  return all.map(fw => {
+    const region = classifyRegion(fw.id, fw.name);
+    return {
+      id: fw.id,
+      shortName: shortenFrameworkName(fw.name),
+      region,
+      africanCountry: region === 'africa' ? classifyAfricanCountry(fw.id, fw.name) : undefined,
+      triggered: triggeredIds.has(fw.id),
+      triggerCount: triggerCounts.get(fw.id) ?? 0,
+    };
+  });
 }
 
 function groupByRegion(slots: FrameworkSlot[]): Record<FrameworkSlot['region'], FrameworkSlot[]> {
@@ -164,6 +294,72 @@ function shortenFrameworkName(name: string): string {
     .replace(/\s+—.*$/, '')
     .replace(/\s+·.*$/, '')
     .trim();
+}
+
+/** Per-country classifier for African frameworks (A-2 ship 2026-05-26).
+ *  Mirrors `classifyRegion`'s string-match shape so future additions to
+ *  africa-frameworks.ts inherit the bucketing automatically — when a
+ *  new country lands (Rwanda, Côte d'Ivoire-as-non-WAEMU, Morocco), add
+ *  the country to the AfricanCountry union + extend AFRICAN_COUNTRY_LABEL
+ *  + add a string-match block here. The pure-function shape is testable
+ *  and the test suite for jurisdiction-registry.ts is the canonical
+ *  pattern to mirror if Pan-African moat coverage deepens. */
+function classifyAfricanCountry(
+  id: string,
+  name: string
+): NonNullable<FrameworkSlot['africanCountry']> {
+  const lower = `${id} ${name}`.toLowerCase();
+  // WAEMU is the regional bloc — covers 8 West-African franc-zone
+  // countries. Tested first so a WAEMU-tagged framework doesn't get
+  // mis-bucketed under a country whose name appears in the description.
+  if (lower.includes('waemu') || lower.includes('west african economic')) return 'waemu';
+  if (
+    lower.includes('ndpr') ||
+    lower.includes('cbn') ||
+    lower.includes('frc_nigeria') ||
+    lower.includes('frc nigeria') ||
+    lower.includes('isa_nigeria') ||
+    lower.includes('isa nigeria') ||
+    lower.includes('nigeria')
+  )
+    return 'nigeria';
+  if (
+    lower.includes('cma_kenya') ||
+    lower.includes('cma kenya') ||
+    lower.includes('cbk') ||
+    lower.includes('kenya')
+  )
+    return 'kenya';
+  if (
+    lower.includes('bog_') ||
+    lower.includes(' bog') ||
+    lower.includes('bank of ghana') ||
+    lower.includes('ghana')
+  )
+    return 'ghana';
+  if (
+    lower.includes('popia') ||
+    lower.includes('sarb_') ||
+    lower.includes('sarb ') ||
+    lower.includes('south african reserve') ||
+    lower.includes('south africa')
+  )
+    return 'south_africa';
+  if (
+    lower.includes('cbe ') ||
+    lower.includes('cbe_') ||
+    lower.includes('bank of egypt') ||
+    lower.includes('egypt')
+  )
+    return 'egypt';
+  if (
+    lower.includes('bot fintech') ||
+    lower.includes('bot_fintech') ||
+    lower.includes('bank of tanzania') ||
+    lower.includes('tanzania')
+  )
+    return 'tanzania';
+  return 'other_africa';
 }
 
 function classifyRegion(id: string, name: string): FrameworkSlot['region'] {

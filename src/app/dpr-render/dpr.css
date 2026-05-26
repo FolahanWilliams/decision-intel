@@ -1218,6 +1218,38 @@
   font-weight: 700;
 }
 
+/* ---------------- Africa per-country sub-groups (A-2 ship 2026-05-26) -----
+ * Adaeze persona ask: render the Pan-African coverage per country so a
+ * Lagos-Nairobi-Cairo deal reads as three distinct regulatory surfaces,
+ * not one flat African-frameworks aggregate. */
+.dpr-crosswalk-africa-country {
+  margin-top: var(--dpr-space-3);
+  padding-top: var(--dpr-space-2);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.dpr-crosswalk-africa-country:first-child {
+  margin-top: 0;
+}
+
+.dpr-crosswalk-africa-country-title {
+  font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  font-size: 9.5pt;
+  font-weight: 600;
+  color: var(--dpr-grey-800);
+  margin: 0 0 var(--dpr-space-2) 0;
+  letter-spacing: -0.005em;
+}
+
+.dpr-crosswalk-africa-country-meta {
+  font-family: var(--dpr-font-body);
+  font-weight: 400;
+  font-size: 8.5pt;
+  color: var(--dpr-grey-600);
+  letter-spacing: 0;
+}
+
 /* ---------------- Findings stream container ----------------- */
 
 .dpr-findings-stream {
