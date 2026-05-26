@@ -16,7 +16,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Loader2, AlertCircle, Plus, Trash2, TrendingUp } from 'lucide-react';
+import { Loader2, AlertCircle, Plus, Trash2, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 import {
   FUNNEL_STAGES,
@@ -27,6 +27,8 @@ import {
   type FunnelStageId,
 } from '@/lib/outreach/conversion-ledger';
 import { WEDGE_PERSONAS } from '@/lib/data/event-prep';
+import { consumeLedgerPrefill } from '@/lib/outreach/ledger-prefill';
+import { FOUNDER_HUB_NAVIGATE_EVENT } from '@/lib/founder-hub/chat-nav';
 
 interface Prospect {
   id: string;
@@ -102,6 +104,28 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Cross-link prefill from BaftaPrepCallout / EventPrepCard (3C ship
+  // 2026-05-26). When the founder rehearses a persona in Sparring then
+  // clicks "Log a prospect for this persona", we land here with a
+  // prefill in sessionStorage; consume it on mount, pre-select the
+  // persona, and open the add form so it's the first thing they see.
+  useEffect(() => {
+    const prefill = consumeLedgerPrefill();
+    if (!prefill) return;
+    setForm(f => ({
+      ...f,
+      persona:
+        prefill.persona && PERSONA_OPTIONS.some(o => o.id === prefill.persona)
+          ? (prefill.persona as string)
+          : f.persona,
+      source:
+        prefill.source && PROSPECT_SOURCES.some(s => s.id === prefill.source)
+          ? (prefill.source as string)
+          : f.source,
+    }));
+    setShowAdd(true);
+  }, []);
 
   const metrics = useMemo(() => computeFunnelMetrics(prospects), [prospects]);
 
@@ -335,10 +359,39 @@ export function ConversionLedgerPanel({ founderPass }: Props) {
           <Loader2 size={16} className="animate-spin" /> Loading ledger…
         </div>
       ) : prospects.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)', fontSize: 13, padding: '8px 0' }}>
-          No prospects logged yet. The first 5-10 personalised DMs/week is the GTM v3.5 motion — log
-          them here as you send them so the month-4 checkpoint is a dashboard, not a surprise.
-        </p>
+        <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: 0 }}>
+            No prospects logged yet. The first 5-10 personalised DMs/week is the GTM v3.5 motion —
+            log them here as you send them so the month-4 checkpoint is a dashboard, not a surprise.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent(FOUNDER_HUB_NAVIGATE_EVENT, {
+                  detail: { tabId: 'sparring_room' },
+                })
+              );
+            }}
+            style={{
+              alignSelf: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '6px 10px',
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--accent-primary)',
+              cursor: 'pointer',
+            }}
+            aria-label="Rehearse the opener in Sparring Room before logging"
+          >
+            <ArrowUpRight size={12} /> Rehearse the opener in Sparring Room first
+          </button>
+        </div>
       ) : (
         <div className="cl-list">
           {prospects.map(p => {

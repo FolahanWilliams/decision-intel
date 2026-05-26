@@ -15,7 +15,7 @@
  */
 
 import { useState } from 'react';
-import { Calendar, Users, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Users, Mail, ChevronDown, ChevronUp, ArrowUpRight } from 'lucide-react';
 import {
   ACTION_CADENCE,
   WEDGE_PERSONAS,
@@ -26,6 +26,7 @@ import {
   type WedgePersona,
   type PrepEvent,
 } from '@/lib/data/event-prep';
+import { prefillConversionLedger } from '@/lib/outreach/ledger-prefill';
 
 const HIDE_AFTER_DAYS = 90;
 
@@ -304,6 +305,33 @@ function PersonaDetail({ personaId }: { personaId: WedgePersonaId }) {
         label="4-line follow-up to introducer (warm-intro discipline)"
         body={template.introducerFollowUp}
       />
+      {/* 3C cross-link 2026-05-26: DM template → ledger handoff.
+       * Source defaults to 'event' here (not 'linkedin_dm') because
+       * the EventPrepCard surfaces a CALENDAR-gated opportunity — the
+       * founder typed a name in BECAUSE of the event, even if the
+       * actual touchpoint is later a LinkedIn DM. The source can be
+       * changed in the form before save. */}
+      <button
+        type="button"
+        onClick={() => prefillConversionLedger({ persona: persona.id, source: 'event' })}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          marginTop: 4,
+          padding: '7px 12px',
+          background: 'var(--accent-primary)',
+          border: 'none',
+          borderRadius: 'var(--radius-sm)',
+          fontSize: 12.5,
+          fontWeight: 600,
+          color: '#fff',
+          cursor: 'pointer',
+        }}
+        aria-label={`Log a real ${persona.label} prospect from this event in the conversion ledger`}
+      >
+        <ArrowUpRight size={12} /> Log a real {persona.label} prospect →
+      </button>
     </div>
   );
 }
