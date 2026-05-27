@@ -39,13 +39,13 @@ describe('checkRateLimit', () => {
     const result = await checkRateLimit('127.0.0.1', '/api/upload');
 
     expect(result.success).toBe(true);
-    expect(result.remaining).toBe(4); // 5 max - 1 used
-    expect(result.limit).toBe(5);
+    expect(result.remaining).toBe(29); // 30 max - 1 used (post 2026-05-26 soft-limit bump)
+    expect(result.limit).toBe(30);
   });
 
   it('blocks requests over the limit', async () => {
     const resetAt = new Date(Date.now() + 3600_000);
-    mockQueryRaw.mockResolvedValue([{ count: 6, reset_at: resetAt }]);
+    mockQueryRaw.mockResolvedValue([{ count: 31, reset_at: resetAt }]);
 
     const result = await checkRateLimit('127.0.0.1', '/api/upload');
 
@@ -109,19 +109,19 @@ describe('getRateLimitStatus', () => {
     const result = await getRateLimitStatus('127.0.0.1', '/api/upload');
 
     expect(result.success).toBe(true);
-    expect(result.remaining).toBe(5);
+    expect(result.remaining).toBe(30); // post 2026-05-26 soft-limit bump
   });
 
   it('returns full remaining when window has expired', async () => {
     mockFindUnique.mockResolvedValue({
-      count: 5,
+      count: 30,
       resetAt: new Date(Date.now() - 1000), // expired
     });
 
     const result = await getRateLimitStatus('127.0.0.1', '/api/upload');
 
     expect(result.success).toBe(true);
-    expect(result.remaining).toBe(5);
+    expect(result.remaining).toBe(30);
   });
 
   it('returns correct remaining for active window', async () => {
@@ -133,12 +133,12 @@ describe('getRateLimitStatus', () => {
     const result = await getRateLimitStatus('127.0.0.1', '/api/upload');
 
     expect(result.success).toBe(true);
-    expect(result.remaining).toBe(2); // 5 - 3
+    expect(result.remaining).toBe(27); // 30 - 3
   });
 
   it('reports not successful when limit reached', async () => {
     mockFindUnique.mockResolvedValue({
-      count: 5,
+      count: 30,
       resetAt: new Date(Date.now() + 3600_000),
     });
 

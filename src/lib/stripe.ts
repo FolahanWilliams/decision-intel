@@ -1,4 +1,17 @@
 import Stripe from 'stripe';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+/**
+ * Canonical bias count — derived from BIAS_EDUCATION per the CLAUDE.md
+ * count-derivation discipline. When DI-B-023 ships, this value flows to
+ * every plan tier automatically instead of requiring 4 manual updates.
+ *
+ * The audit pipeline runs the FULL R²F taxonomy on every call regardless
+ * of plan; this field documents the taxonomy size, not a gating limit.
+ * Aligned to BIAS_EDUCATION 2026-05-26; derived from canonical 2026-05-27
+ * to close the drift class on the next bias addition.
+ */
+const PLAN_BIAS_TYPES = Object.keys(BIAS_EDUCATION).length;
 
 let _stripe: Stripe | null = null;
 
@@ -58,12 +71,11 @@ export const PLANS = {
      *  so existing consumers (analytics, comparison tables) don't
      *  break. */
     maxPages: Infinity,
-    /** The audit pipeline runs the FULL 22-bias R²F taxonomy on every
-     *  call regardless of plan. The biasTypes field used to gate the
-     *  UI count ("Free sees 5 of 22") which was deceptive — the
-     *  analysis already covered all 22. Aligned to BIAS_COUNT
-     *  (22) 2026-05-26 so the field stops lying. */
-    biasTypes: 22,
+    /** Derived from BIAS_EDUCATION via PLAN_BIAS_TYPES — see the
+     *  module-top comment. The audit pipeline runs the FULL taxonomy
+     *  on every call regardless of plan; this field documents the
+     *  taxonomy size, not a gating limit. */
+    biasTypes: PLAN_BIAS_TYPES,
     maxTeamMembers: 1,
     /** Max upload size in MB. Pipeline + parseFile() handle real CIMs
      *  up to several hundred MB cleanly (Gemini 3 Flash 1M context =
@@ -117,7 +129,7 @@ export const PLANS = {
     analysesPerMonth: 100,
     /** Page cap removed — see free.maxPages comment. */
     maxPages: Infinity,
-    biasTypes: 22,
+    biasTypes: PLAN_BIAS_TYPES,
     maxTeamMembers: 1,
     /** Bumped 90 → 365 days (2026-05-26) to align with the
      *  AUDIT_LOG_RETENTION_TIERS Individual='1 year' SLA in
@@ -174,7 +186,7 @@ export const PLANS = {
     analysesPerMonth: Infinity,
     /** Page cap removed — see free.maxPages comment. */
     maxPages: Infinity,
-    biasTypes: 22,
+    biasTypes: PLAN_BIAS_TYPES,
     /** Bumped 15 → 30 seats (2026-05-26). A real corporate strategy
      *  function plus audit committee plus GC plus external counsel
      *  routinely runs 20+. 15 was undercutting the legitimate Strategy
@@ -225,7 +237,7 @@ export const PLANS = {
     priceId: '',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
-    biasTypes: 22,
+    biasTypes: PLAN_BIAS_TYPES,
     maxTeamMembers: Infinity,
     /** Bumped 360 → 2555 days (7y) (2026-05-26) to (a) align with the
      *  AUDIT_LOG_RETENTION_TIERS Enterprise='7 years (SOX §404)' SLA
