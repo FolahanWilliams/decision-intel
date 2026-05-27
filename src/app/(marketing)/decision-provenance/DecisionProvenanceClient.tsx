@@ -23,6 +23,7 @@
  */
 
 import Link from 'next/link';
+import { DprSpecimenShowcase } from '@/components/marketing/dpr/DprSpecimenShowcase';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import {
   ArrowRight,
@@ -462,6 +463,17 @@ export function DecisionProvenanceClient() {
           </Link>
         </div>
       </section>
+
+      {/* DPR specimen showcase — surfaces the procurement-grade artefact
+          BEFORE the close CTA. Shipped 2026-05-27 after the platform audit
+          surfaced that the /dpr-render/specimen/* URLs were never linked
+          from any marketing surface. */}
+      <DprSpecimenShowcase
+        background={C.white}
+        eyebrow="DPR specimens · in-browser"
+        heading="See the artefact, before you commit."
+        subhead="Both specimens render the same Decision Provenance Record your team would receive. Click through to read in-browser, or download the PDF for procurement diligence."
+      />
 
       {/* Close */}
       <section style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px 88px' }}>

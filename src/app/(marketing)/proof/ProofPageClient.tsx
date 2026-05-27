@@ -7,6 +7,7 @@ import { ArrowRight, FileText, ShieldCheck, Gauge, AlertOctagon, ShieldAlert } f
 import { ALL_CASES, getDeepCases, getSlugForCase, type CaseStudy } from '@/lib/data/case-studies';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
+import { DprSpecimenShowcase } from '@/components/marketing/dpr/DprSpecimenShowcase';
 import { CaseSelector } from '@/components/marketing/proof/CaseSelector';
 import { PreDecisionDocument } from '@/components/marketing/proof/PreDecisionDocument';
 import { FlaggedAnalysisPanel } from '@/components/marketing/proof/FlaggedAnalysisPanel';
@@ -593,6 +594,17 @@ export function ProofPageClient() {
             ))}
           </div>
         </section>
+
+        {/* DPR specimen showcase — surfaces the procurement-grade artefact
+            between the proof grid and the close CTA. Shipped 2026-05-27. */}
+        <div style={{ marginBottom: 40 }}>
+          <DprSpecimenShowcase
+            background={C.white}
+            eyebrow="Procurement-grade artefact"
+            heading="The DPR your audit committee + GC actually expect."
+            subhead="Two retroactive R²F audits rendered as the same Decision Provenance Record every audit produces. Click through to read in-browser, or download for diligence review."
+          />
+        </div>
 
         {/* CTA ───────────────────────────────────────────────────── */}
         <section
