@@ -31,6 +31,7 @@ import { OutreachAndMeetingsTab } from './OutreachAndMeetingsTab';
 import { DesignPartnersTab } from './DesignPartnersTab';
 import { IntelBriefPanel } from './outreach/IntelBriefPanel';
 import { ConversionLedgerPanel } from './outreach/ConversionLedgerPanel';
+import { TargetResearchWorkbench } from './outreach/TargetResearchWorkbench';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Section = 'pipeline' | 'messages' | 'design_partners';
@@ -189,6 +190,15 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
       <div role="tabpanel">
         {section === 'pipeline' && (
           <>
+            {/* Target Research Workbench — mounted FIRST in the pipeline
+                section because pre-event prep (Strategy World London T-13d
+                as of 2026-05-27) is the highest-priority work in the
+                next 13 days per GTM v3.5 §2. The workbench drives the
+                T-2w → T-1w prep-arc actions; outputs flow into the
+                ConversionLedgerPanel below. */}
+            <ErrorBoundary sectionName="Target Research Workbench">
+              <TargetResearchWorkbench founderPass={founderPass} />
+            </ErrorBoundary>
             <ErrorBoundary sectionName="Wedge Conversion Ledger">
               <ConversionLedgerPanel founderPass={founderPass} />
             </ErrorBoundary>

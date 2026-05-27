@@ -221,7 +221,13 @@ const SCAN_DIR = join(ROOT, 'src');
 // The card surfaces a quiet error line on failure rather than hiding,
 // so the founder sees when the kill-checkpoint data isn't loading;
 // no delivery/audit/flywheel write swallowed.
-const SILENT_CATCH_BASELINE = 200;
+// 2026-05-27 Target Research Workbench ship: +1 canonical res.json()
+// body-parse exception class — TargetResearchWorkbench.handleSaveToLedger
+// parses the prospects-API error body before throwing so the inline
+// error message surfaces the real API diagnostic rather than a generic
+// "Failed". No delivery/audit/flywheel write swallowed (the create-
+// prospect POST itself fails-closed with a 5xx + dev-mode diagnostic).
+const SILENT_CATCH_BASELINE = 201;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
