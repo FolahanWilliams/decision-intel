@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllCaseSlugs } from '@/lib/data/case-studies';
 import { listComparisonSlugs } from '@/lib/data/compare-pages';
+import { listUseCaseSlugs } from '@/lib/data/use-cases';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -73,6 +74,7 @@ const STATIC_ROUTES: ReadonlyArray<{
   { path: '/faq', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/glossary', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/compare', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/use', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
 ];
@@ -107,5 +109,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticEntries, ...caseStudyEntries, ...compareEntries];
+  // /use/[slug] per-workflow pages — shadow-linked (NOT in MarketingNav)
+  // but in sitemap + llms.txt so search engines + LLM crawlers find
+  // every canonical workflow URL. Added 2026-05-27 to cover the
+  // workflow-search-intent surfaces (strategic memo / IC memo / board
+  // deck / fund thesis / M&A bias / pre-mortem) that the GSC pass
+  // surfaced as commercial-intent queries with zero clicks.
+  const useCaseEntries: MetadataRoute.Sitemap = listUseCaseSlugs().map(slug => ({
+    url: `${siteUrl}/use/${slug}`,
+    lastModified,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticEntries, ...caseStudyEntries, ...compareEntries, ...useCaseEntries];
 }

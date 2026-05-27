@@ -52,6 +52,7 @@ import {
   PROCUREMENT_CONTACT_EMAIL,
 } from '@/lib/constants/company-info';
 import { SOC2_FULL_STATEMENT, DPR_PROVENANCE_CLAIM_SHORT } from '@/lib/constants/trust-copy';
+import { USE_CASES } from '@/lib/data/use-cases';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -118,6 +119,8 @@ ${SOC2_FULL_STATEMENT}
 - [vs Palantir](${siteUrl}/compare/palantir) — Palantir owns the data integrity layer; Decision Intel owns the reasoning-audit layer above it
 - [vs ChatGPT for strategy](${siteUrl}/compare/chatgpt-for-strategy) — ChatGPT is general-purpose; Decision Intel is a purpose-built reasoning-audit engine
 - [vs McKinsey](${siteUrl}/compare/mckinsey-for-strategy) — McKinsey is a one-time deliverable; Decision Intel is always-on infrastructure
+- [Workflows](${siteUrl}/use) — hub of all per-workflow audit pages
+${USE_CASES.map(u => `- [${u.workflow}](${siteUrl}/use/${u.slug}) — ${u.oneLiner}`).join('\n')}
 - [About](${siteUrl}/about) — legal entity, founder, jurisdiction, procurement contact
 
 ## Comprehensive ingest
