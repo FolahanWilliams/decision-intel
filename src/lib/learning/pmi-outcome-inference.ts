@@ -20,7 +20,7 @@
  * elsewhere in the codebase so consumers can switch between sources.
  */
 
-import type { PmiSignal, PmiSignalsBlob } from '@/app/api/decisions/[id]/pmi-signals/route';
+import type { PmiSignal, PmiSignalsBlob } from '@/app/api/decisions/[id]/pmi-signals/helpers';
 
 // Re-export the types for downstream consumers who don't want to depend
 // on the route module directly.

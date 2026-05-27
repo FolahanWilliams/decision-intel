@@ -27,43 +27,16 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { Prisma } from '@prisma/client';
+import {
+  PMI_SIGNAL_KEYS,
+  computeSignalBrier,
+  resolveBand,
+  type PmiSignal,
+  type PmiSignalKey,
+  type PmiSignalsBlob,
+} from './helpers';
 
 const log = createLogger('PmiSignalsRoute');
-
-export type PmiSignalKey =
-  | 'synergy_realisation_pct'
-  | 'talent_retention_pct'
-  | 'integration_cost_vs_forecast'
-  | 'day_one_milestone_hit_rate'
-  | 'customer_retention_pct'
-  | 'revenue_growth_vs_forecast';
-
-export const PMI_SIGNAL_KEYS: ReadonlyArray<PmiSignalKey> = [
-  'synergy_realisation_pct',
-  'talent_retention_pct',
-  'integration_cost_vs_forecast',
-  'day_one_milestone_hit_rate',
-  'customer_retention_pct',
-  'revenue_growth_vs_forecast',
-];
-
-export interface PmiSignal {
-  key: PmiSignalKey;
-  proxy: string;
-  horizonDays: 90 | 180 | 365;
-  predictedConfidence: number;
-  observedValue?: number;
-  observedAt?: string;
-  brierScore?: number;
-  resolution?: 'hit' | 'miss' | 'partial' | 'unmeasured';
-}
-
-export interface PmiSignalsBlob {
-  signals: PmiSignal[];
-  capturedAt: string;
-  capturedByUserId: string;
-  lastUpdatedAt?: string;
-}
 
 async function resolveOrgId(userId: string): Promise<string | null> {
   try {
@@ -90,34 +63,6 @@ async function loadContainerForUser(containerId: string, userId: string, orgId: 
       outcome: { select: { id: true, pmiSignals: true } },
     },
   });
-}
-
-/**
- * Compute a Brier score for a single signal.
- *
- * Brier for a binary outcome (hit / miss) is (predicted - observed)².
- * Here we use percent-realised vs predicted-confidence as a 0-1 proxy:
- * - observedValue normalised to 0-1 (most PMI metrics are already %)
- * - predictedConfidence is 0-1
- * - Brier = (predicted - observed)² capped at [0, 1]
- *
- * Resolution band:
- *   ≥ 0.85 observed → 'hit'
- *   0.50 - 0.85    → 'partial'
- *   < 0.50         → 'miss'
- *   undefined      → 'unmeasured'
- */
-export function computeSignalBrier(predicted: number, observed: number): number {
-  const obs = Math.max(0, Math.min(1, observed));
-  const pred = Math.max(0, Math.min(1, predicted));
-  return Math.round((pred - obs) ** 2 * 1000) / 1000;
-}
-
-export function resolveBand(observed: number | undefined): PmiSignal['resolution'] {
-  if (observed === undefined) return 'unmeasured';
-  if (observed >= 0.85) return 'hit';
-  if (observed >= 0.5) return 'partial';
-  return 'miss';
 }
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
