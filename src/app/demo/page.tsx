@@ -25,14 +25,43 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { DEMO_ANALYSES } from './data';
-import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
 import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
-import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
-import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiComponentBars';
-import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { Reveal } from '@/components/ui/Reveal';
-import { DemoDeliverableHost } from '@/components/marketing/demo/DemoDeliverableHost';
+/* Below-fold heavy viz: split into async JS chunks via next/dynamic
+ * (LCP optimization 2026-05-27, Tier-A #2 ship). All keep ssr: true
+ * (default) so the SERVER-rendered HTML still carries the content
+ * for crawlers + ChatGPT ingestion — only the JS bundle is split.
+ * PipelineFlowDiagram (777 LOC) + DemoDeliverableHost are the
+ * heaviest below-fold imports on /demo; lazy-loading them keeps
+ * the idle hero (RoleSamplePicker + WeWorkProofPanel) painting
+ * fast for the cold paste prospect arriving from ChatGPT. Visual
+ * output IS BYTE-IDENTICAL once hydrated. */
+const PipelineFlowDiagram = dynamic(() =>
+  import('@/components/marketing/how-it-works/PipelineFlowDiagram').then(m => ({
+    default: m.PipelineFlowDiagram,
+  }))
+);
+const PipelineNodeDetail = dynamic(() =>
+  import('@/components/marketing/how-it-works/PipelineNodeDetail').then(m => ({
+    default: m.PipelineNodeDetail,
+  }))
+);
+const DqiComponentBars = dynamic(() =>
+  import('@/components/marketing/how-it-works/DqiComponentBars').then(m => ({
+    default: m.DqiComponentBars,
+  }))
+);
+const NoiseDistributionViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/NoiseDistributionViz').then(m => ({
+    default: m.NoiseDistributionViz,
+  }))
+);
+const DemoDeliverableHost = dynamic(() =>
+  import('@/components/marketing/demo/DemoDeliverableHost').then(m => ({
+    default: m.DemoDeliverableHost,
+  }))
+);
 import { parseTicketAmount } from '@/lib/deliverable/valueAtStake';
 import {
   DiscoveryGradeImpactCard,

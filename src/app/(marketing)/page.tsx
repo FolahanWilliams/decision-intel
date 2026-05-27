@@ -1,22 +1,74 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
 import { Reveal } from '@/components/ui/Reveal';
-import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
-import { CredibilityTrio } from '@/components/marketing/CredibilityTrio';
-import { CompetitorComparisonCard } from '@/components/marketing/CompetitorComparisonCard';
-import { LandingFaq } from '@/components/marketing/LandingFaq';
-import { ProblemScenes } from '@/components/marketing/ProblemScenes';
-import { CategoryTurn } from '@/components/marketing/CategoryTurn';
-import { KahnemanKleinSynthesis } from '@/components/marketing/KahnemanKleinSynthesis';
-import { MomentsPyramid } from '@/components/marketing/MomentsPyramid';
-import { SecurityLifecycleStrip } from '@/components/marketing/SecurityLifecycleStrip';
-import { ScrollRevealGraph } from '@/components/marketing/ScrollRevealGraph';
+
+/* Below-fold heavy components: split into async JS chunks via
+ * next/dynamic (LCP optimization 2026-05-27, Tier-A #3 ship). All
+ * keep ssr: true (default) so the SERVER-rendered HTML still carries
+ * the content for crawlers + ChatGPT ingestion — only the JS bundle
+ * is split. The hero (above-fold) stays synchronous: H1, sub-head,
+ * 3 mini-cards, HeroCredibilityStrip. Everything below the hero —
+ * ProblemScenes through CompetitorComparisonCard — moves to async
+ * chunks. ScrollRevealGraph is a desktop-only floating overlay that
+ * doesn't render until scrollProgress > 0.04, so it's safe to
+ * ssr: false (saves the HTML payload entirely on cold paint).
+ *
+ * Visual output IS BYTE-IDENTICAL once hydrated — same components,
+ * same props, same hero shape (locked 2026-05-07), same
+ * Kahneman-Klein beat, same constellation overlay. */
+const CaseStudyCarousel = dynamic(() =>
+  import('@/components/marketing/CaseStudyCarousel').then(m => ({ default: m.CaseStudyCarousel }))
+);
+const CredibilityTrio = dynamic(() =>
+  import('@/components/marketing/CredibilityTrio').then(m => ({ default: m.CredibilityTrio }))
+);
+const CompetitorComparisonCard = dynamic(() =>
+  import('@/components/marketing/CompetitorComparisonCard').then(m => ({
+    default: m.CompetitorComparisonCard,
+  }))
+);
+const LandingFaq = dynamic(() =>
+  import('@/components/marketing/LandingFaq').then(m => ({ default: m.LandingFaq }))
+);
+const ProblemScenes = dynamic(() =>
+  import('@/components/marketing/ProblemScenes').then(m => ({ default: m.ProblemScenes }))
+);
+const CategoryTurn = dynamic(() =>
+  import('@/components/marketing/CategoryTurn').then(m => ({ default: m.CategoryTurn }))
+);
+const KahnemanKleinSynthesis = dynamic(() =>
+  import('@/components/marketing/KahnemanKleinSynthesis').then(m => ({
+    default: m.KahnemanKleinSynthesis,
+  }))
+);
+const MomentsPyramid = dynamic(() =>
+  import('@/components/marketing/MomentsPyramid').then(m => ({ default: m.MomentsPyramid }))
+);
+const SecurityLifecycleStrip = dynamic(() =>
+  import('@/components/marketing/SecurityLifecycleStrip').then(m => ({
+    default: m.SecurityLifecycleStrip,
+  }))
+);
+const ScrollRevealGraph = dynamic(
+  () =>
+    import('@/components/marketing/ScrollRevealGraph').then(m => ({
+      default: m.ScrollRevealGraph,
+    })),
+  {
+    // Desktop-only floating overlay that doesn't render until
+    // scrollProgress > 0.04 + checks window.matchMedia for desktop +
+    // respects prefers-reduced-motion. Skipping SSR is safe (server
+    // would render nothing anyway given the desktop + scroll gates).
+    ssr: false,
+  }
+);
 import {
   ArrowRight,
   Check,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -13,19 +14,76 @@ import {
 } from 'lucide-react';
 
 import { MarketingNav } from '@/components/marketing/MarketingNav';
+// Above-fold viz: stays synchronous so the LCP element paints with no
+// network round-trip. PipelineMiniatureViz is in the hero (section 1);
+// AnatomyOfACallGraph is the constellation right below (section 1b,
+// barely below fold on 1080p+). Both are SVG-only, no heavy deps.
 import { PipelineMiniatureViz } from '@/components/marketing/how-it-works/PipelineMiniatureViz';
 import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
-import { PipelineFlowDiagram } from '@/components/marketing/how-it-works/PipelineFlowDiagram';
-import { PipelineNodeDetail } from '@/components/marketing/how-it-works/PipelineNodeDetail';
-import { FeaturedBiasCard } from '@/components/marketing/how-it-works/FeaturedBiasCard';
-import { DqiComponentBars } from '@/components/marketing/how-it-works/DqiComponentBars';
-import { NoiseDistributionViz } from '@/components/marketing/how-it-works/NoiseDistributionViz';
-import { BoardroomSimViz } from '@/components/marketing/how-it-works/BoardroomSimViz';
-import { OutcomeDetectionViz } from '@/components/marketing/how-it-works/OutcomeDetectionViz';
-import { DprAnatomyViz } from '@/components/marketing/how-it-works/DprAnatomyViz';
-import { CounterfactualLiftViz } from '@/components/marketing/how-it-works/CounterfactualLiftViz';
-import { ResearchCitationCard } from '@/components/marketing/how-it-works/ResearchCitationCard';
-import { ToxicNetworkGraph } from '@/components/marketing/genome/ToxicNetworkGraph';
+
+/* Below-fold viz: split into async JS chunks via next/dynamic (LCP
+ * optimization 2026-05-27, Tier-A #1 ship). All keep ssr: true
+ * (default) so the SERVER-rendered HTML still carries the content
+ * for crawlers + ChatGPT ingestion — only the JS bundle is split.
+ * 11 viz components moved here totaling ~4,400 lines of TSX; the
+ * initial JS payload shrinks correspondingly. Visual output IS
+ * BYTE-IDENTICAL once hydrated — same components, same props,
+ * same animations, same SSR'd HTML on first paint. */
+const PipelineFlowDiagram = dynamic(() =>
+  import('@/components/marketing/how-it-works/PipelineFlowDiagram').then(m => ({
+    default: m.PipelineFlowDiagram,
+  }))
+);
+const PipelineNodeDetail = dynamic(() =>
+  import('@/components/marketing/how-it-works/PipelineNodeDetail').then(m => ({
+    default: m.PipelineNodeDetail,
+  }))
+);
+const FeaturedBiasCard = dynamic(() =>
+  import('@/components/marketing/how-it-works/FeaturedBiasCard').then(m => ({
+    default: m.FeaturedBiasCard,
+  }))
+);
+const DqiComponentBars = dynamic(() =>
+  import('@/components/marketing/how-it-works/DqiComponentBars').then(m => ({
+    default: m.DqiComponentBars,
+  }))
+);
+const NoiseDistributionViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/NoiseDistributionViz').then(m => ({
+    default: m.NoiseDistributionViz,
+  }))
+);
+const BoardroomSimViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/BoardroomSimViz').then(m => ({
+    default: m.BoardroomSimViz,
+  }))
+);
+const OutcomeDetectionViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/OutcomeDetectionViz').then(m => ({
+    default: m.OutcomeDetectionViz,
+  }))
+);
+const DprAnatomyViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/DprAnatomyViz').then(m => ({
+    default: m.DprAnatomyViz,
+  }))
+);
+const CounterfactualLiftViz = dynamic(() =>
+  import('@/components/marketing/how-it-works/CounterfactualLiftViz').then(m => ({
+    default: m.CounterfactualLiftViz,
+  }))
+);
+const ResearchCitationCard = dynamic(() =>
+  import('@/components/marketing/how-it-works/ResearchCitationCard').then(m => ({
+    default: m.ResearchCitationCard,
+  }))
+);
+const ToxicNetworkGraph = dynamic(() =>
+  import('@/components/marketing/genome/ToxicNetworkGraph').then(m => ({
+    default: m.ToxicNetworkGraph,
+  }))
+);
 import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
