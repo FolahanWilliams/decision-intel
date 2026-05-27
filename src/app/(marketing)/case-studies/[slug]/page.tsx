@@ -33,6 +33,7 @@ import { StakeholderGrid } from '@/components/marketing/case-study/StakeholderGr
 import { CounterfactualCallout } from '@/components/marketing/case-study/CounterfactualCallout';
 import { PostMortemCitationsList } from '@/components/marketing/case-study/PostMortemCitationsList';
 import { RelatedCasesStrip } from '@/components/marketing/case-study/RelatedCasesStrip';
+import { CaseStudyWorkflowStrip } from '@/components/marketing/case-study/CaseStudyWorkflowStrip';
 
 export const dynamicParams = false;
 
@@ -1238,6 +1239,10 @@ export default async function CaseStudyDetailPage({
         <section style={{ marginBottom: 40 }}>
           <CaseStudyCta slug={slug} company={caseStudy.company} hasDeepAnalysis={!!deep} />
         </section>
+
+        {/* Workflow cross-link — bridges the educational case-study surface
+            to the audit-tool surface. Shipped 2026-05-27 alongside /use/[slug]. */}
+        <CaseStudyWorkflowStrip caseStudy={caseStudy} />
 
         {/* Related — prefer explicit cross-links (Tier 2), fallback to industry */}
         {caseStudy.relatedCases && caseStudy.relatedCases.length > 0 ? (

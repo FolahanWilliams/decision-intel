@@ -1266,6 +1266,99 @@ export function PricingPageClient() {
         </div>
       </section>
 
+      {/* Workflow cross-link — connects buying-stage readers to the
+          workflow tool surface. Shipped 2026-05-27 alongside /use/[slug]. */}
+      <section style={{ maxWidth: 960, margin: '0 auto', padding: '24px 24px 0' }}>
+        <div
+          style={{
+            background: C.slate50,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 12,
+            padding: '28px 28px',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: C.green,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                marginBottom: 10,
+              }}
+            >
+              What can I audit?
+            </div>
+            <h3
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                color: C.slate900,
+                margin: 0,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Six workflow-specific audit surfaces.
+            </h3>
+            <p
+              style={{
+                fontSize: 14,
+                color: C.slate600,
+                marginTop: 8,
+                marginBottom: 0,
+                lineHeight: 1.55,
+              }}
+            >
+              Each workflow runs the same Recognition-Rigor Framework pipeline with overlays
+              specific to the artefact class.
+            </p>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: 8,
+            }}
+          >
+            {[
+              { slug: 'strategic-memo-audit', label: 'Strategic memo' },
+              { slug: 'ic-memo-pre-vote-audit', label: 'IC memo' },
+              { slug: 'board-deck-pre-presentation-audit', label: 'Board deck' },
+              { slug: 'fund-investment-thesis-audit', label: 'Fund thesis' },
+              { slug: 'm-and-a-bias-audit', label: 'M&A acquisition' },
+              { slug: 'decision-pre-mortem', label: 'Pre-mortem' },
+            ].map(w => (
+              <Link
+                key={w.slug}
+                href={`/use/${w.slug}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 12px',
+                  background: C.white,
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: C.slate600,
+                  textDecoration: 'none',
+                  textAlign: 'center',
+                }}
+              >
+                {w.label}
+              </Link>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13 }}>
+            <Link href="/use" style={{ color: C.green, fontWeight: 600, textDecoration: 'none' }}>
+              See all workflows →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section style={{ maxWidth: 820, margin: '0 auto', padding: '80px 24px' }}>
         <h2

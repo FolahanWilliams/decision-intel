@@ -139,7 +139,7 @@ export const USE_CASES: UseCase[] = [
     steps: COMMON_STEPS,
     whyItMatters:
       'Most strategic memos pass cleanly. The ones that do not are the ones that destroy value. You cannot tell the catastrophic memo from the clean memo without auditing both — which is why you run the audit on every memo, not just the suspicious ones. The 60-second audit is a structural friction layer between thinking and acting.',
-    relatedCaseSlugs: ['kodak', 'blockbuster', 'nokia-microsoft'],
+    relatedCaseSlugs: ['eastman-kodak', 'blockbuster', 'nokia'],
     faq: [
       {
         q: 'How long is the audit?',
@@ -188,7 +188,7 @@ export const USE_CASES: UseCase[] = [
     ],
     whyItMatters:
       'IC memo failures are biased toward overcommitment + narrative coherence: the sponsor wrote the memo to close the deal, and the room reads it from the same frame. The audit is the antagonist that costs no political capital — fires before the IC memo can hide what the deal sponsor does not want to see.',
-    relatedCaseSlugs: ['wework-s1', 'aol-time-warner', 'hp-autonomy'],
+    relatedCaseSlugs: ['wework', 'aol-time-warner', 'quibi'],
     faq: [
       {
         q: 'Does this replace the deal team?',
@@ -242,7 +242,7 @@ export const USE_CASES: UseCase[] = [
     ],
     whyItMatters:
       'A board meeting is a high-stakes single-shot event. The presenter cannot run the audit during the meeting — only before. The boardroom simulator is the dress rehearsal: every persona-voiced question that fires in the simulator is a question that does not surprise you in the room.',
-    relatedCaseSlugs: ['kodak', 'blockbuster', 'sears-holdings'],
+    relatedCaseSlugs: ['eastman-kodak', 'blockbuster', 'sears'],
     faq: [
       {
         q: 'How realistic are the simulator personas?',
@@ -278,7 +278,7 @@ export const USE_CASES: UseCase[] = [
     steps: COMMON_STEPS,
     whyItMatters:
       'The thesis sets the frame for every IC vote in the next 5-10 years. A flawed thesis compounds across every deal in the fund. The audit catches the patterns the GP wrote in — patterns the GP cannot see because the GP is operating from the inside view by construction.',
-    relatedCaseSlugs: ['theranos', 'ftx', 'quibi'],
+    relatedCaseSlugs: ['theranos', 'ftx', 'wework'],
     faq: [
       {
         q: 'Does this work on a single-thesis or multi-thesis fund?',
@@ -327,7 +327,7 @@ export const USE_CASES: UseCase[] = [
     ],
     whyItMatters:
       'M&A failure is rarely a surprise on the day. It is a slow-motion failure visible in the original memo to anyone outside the deal team. The audit is the outside-view layer that the inside-view deal team cannot supply for itself.',
-    relatedCaseSlugs: ['aol-time-warner', 'daimler-chrysler', 'hp-autonomy'],
+    relatedCaseSlugs: ['aol-time-warner', 'wework', 'microsoft-2013'],
     faq: [
       {
         q: 'What if the acquisition is a tech tuck-in, not a platform merger?',
@@ -381,7 +381,7 @@ export const USE_CASES: UseCase[] = [
     ],
     whyItMatters:
       'A pre-mortem is the single highest-leverage discipline in strategic decision-making per the Kahneman literature. The audit operationalises it: every decision gets the pre-mortem treatment, every failure mode gets a falsifiable proxy, every outcome gets logged. The calibration loop is the moat, not the audit.',
-    relatedCaseSlugs: ['challenger-disaster', 'long-term-capital', 'bay-of-pigs'],
+    relatedCaseSlugs: ['long-term-capital-management', 'enron', 'lehman-brothers'],
     faq: [
       {
         q: "What's the difference between pre-mortem and red-teaming?",

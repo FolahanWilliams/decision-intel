@@ -1528,6 +1528,7 @@ export default function LandingPage() {
               { label: 'Proof', href: '/proof' },
               { label: 'FAQ', href: '/faq' },
               { label: 'Compare', href: '/compare' },
+              { label: 'Workflows', href: '/use' },
               { label: 'One-pager', href: '/onepager' },
               { label: 'Demo', href: '/demo' },
             ]}
