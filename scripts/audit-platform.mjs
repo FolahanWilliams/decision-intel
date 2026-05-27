@@ -186,7 +186,11 @@ function checkDeadRoutes(files) {
       rel.includes('scripts/audit-platform') ||
       rel === 'CLAUDE.md' ||
       rel === 'TODO.md' ||
-      rel.includes('docs/platform-audits/')
+      rel.includes('docs/platform-audits/') ||
+      // Test files reference retired routes intentionally — they verify
+      // the redirect, the not-in-sitemap exclusion, the 404 etc.
+      rel.endsWith('.test.ts') ||
+      rel.endsWith('.test.tsx')
     ) {
       continue;
     }
@@ -195,8 +199,13 @@ function checkDeadRoutes(files) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       // Skip line-level comments mentioning the route in a "retired" /
-      // "redirected" context — those are intentional history.
-      if (/retired|redirect|folded|deprecated|deleted|legacy|historical/i.test(line)) continue;
+      // "redirected" / "308 to X" / "→ X" context — those are intentional.
+      if (
+        /retired|redirect|folded|deprecated|deleted|legacy|historical|30\d\s+to\b|→\s*\//i.test(
+          line
+        )
+      )
+        continue;
       for (const route of RETIRED_ROUTES) {
         // Match as an href value (quote-delimited) or in a markdown link.
         const re = new RegExp(`['"\`(]${route.replace(/\//g, '\\/')}(?=['"\\s)?#])`, '');
@@ -256,19 +265,58 @@ function checkNativeDialogs(files) {
     if (rel.includes('scripts/')) continue;
     const lines = readLines(file);
     if (!lines) continue;
+    let inBlockComment = false; // tracks multi-line /* ... */ blocks
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      // Strip comment lines.
-      const code = line.replace(/\/\/.*$/, '').replace(/\/\*.*\*\//, '');
+      const rawLine = lines[i];
+
+      // Apply block-comment state BEFORE matching. A line that opens
+      // a `/*` block (without closing it on the same line) is in-comment
+      // for everything AFTER the `/*`; a line that closes a `*/` block
+      // is in-comment for everything BEFORE the `*/`.
+      let workingLine = rawLine;
+      if (inBlockComment) {
+        const closeIdx = workingLine.indexOf('*/');
+        if (closeIdx === -1) {
+          // Entire line is inside a block comment — skip.
+          continue;
+        }
+        // Strip up to and including the `*/`.
+        workingLine = workingLine.slice(closeIdx + 2);
+        inBlockComment = false;
+      }
+      // Now strip inline `/* ... */` (open + close on same line) — match
+      // non-greedy so multiple inline comments on the same line work.
+      workingLine = workingLine.replace(/\/\*[\s\S]*?\*\//g, '');
+      // Strip JSX comments `{/* ... */}` — same shape, just braces.
+      workingLine = workingLine.replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+      // Strip line comments (after the inline-block strip so `// /* */`
+      // doesn't get mis-handled).
+      workingLine = workingLine.replace(/\/\/.*$/, '');
+      // If the line opened a block comment that did NOT close on the same
+      // line, flip state ON and strip everything from `/*` onward (the
+      // line may still have code before the `/*`).
+      const openIdx = workingLine.indexOf('/*');
+      if (openIdx !== -1) {
+        workingLine = workingLine.slice(0, openIdx);
+        inBlockComment = true;
+      }
+      // Strip JSX-block-comment OPEN without close on the same line
+      // (e.g. `{/* multi-line jsx comment`).
+      const jsxOpenIdx = workingLine.indexOf('{/*');
+      if (jsxOpenIdx !== -1 && !workingLine.includes('*/}')) {
+        workingLine = workingLine.slice(0, jsxOpenIdx);
+        inBlockComment = true;
+      }
+
       for (const p of NATIVE_DIALOG_PATTERNS) {
-        if (p.test(code)) {
+        if (p.test(workingLine)) {
           findings.push({
             category: 'critical',
             severity: 'high',
             rule: 'native-browser-dialog',
             file: rel,
             line: i + 1,
-            snippet: line.trim().slice(0, 140),
+            snippet: rawLine.trim().slice(0, 140),
             suggestion:
               'Replace with shadcn <Dialog> from @/components/ui/dialog or useToast — native dialogs break the modal stack on mobile Safari and read as 2008-vintage during procurement demos.',
           });
@@ -680,7 +728,20 @@ function checkDeletedReferences(files) {
     if (!lines) continue;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (/retired|deleted|removed|legacy|deprecated/i.test(line)) continue;
+      // Skip lines marked retired / deleted / removed / etc. on the
+      // SAME line OR within a 3-line comment window (catches multi-
+      // line comments like `{/* Container roll-up widget (Phase 3
+      // P3.5 — replaces deleted UnifiedDecisionsFeed). */}` where the
+      // skip-keyword and the referenced symbol land on different lines).
+      const contextWindow = lines
+        .slice(Math.max(0, i - 2), Math.min(lines.length, i + 3))
+        .join('\n');
+      if (
+        /retired|deleted|removed|legacy|deprecated|replaces? (the )?(legacy|prior|old)|historical comment|@history\b/i.test(
+          contextWindow
+        )
+      )
+        continue;
       for (const ref of DELETED_REFERENCES) {
         if (line.includes(ref)) {
           findings.push({
