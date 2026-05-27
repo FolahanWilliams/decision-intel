@@ -201,10 +201,11 @@ describe('POST /api/upload', () => {
     expect(body.error).toContain('Upgrade to Individual');
   });
 
-  it('returns 413 when file exceeds the Pro-tier 100MB cap', async () => {
-    // Pro tier accepts files up to 100MB; bumping to 101MB triggers
-    // the gate. Default mock = 'pro' so no override needed.
-    const bigContent = new Uint8Array(101 * 1024 * 1024); // 101MB
+  it('returns 413 when file exceeds the Pro-tier 250MB cap', async () => {
+    // Pro tier accepts files up to 250MB (bumped 100→250 on 2026-05-27
+    // since upload size is NOT a meaningful Pro→Strategy differentiator).
+    // 251MB triggers the gate. Default mock = 'pro' so no override needed.
+    const bigContent = new Uint8Array(251 * 1024 * 1024); // 251MB
     const file = new File([bigContent], 'big.txt', { type: 'text/plain' });
 
     const req = createMockRequest(file);
@@ -212,16 +213,17 @@ describe('POST /api/upload', () => {
 
     expect(res.status).toBe(413);
     const body = await res.json();
-    expect(body.error).toContain('Individual plan cap is 100MB');
-    expect(body.error).toContain('Upgrade to Strategy');
+    expect(body.error).toContain('Individual plan cap is 250MB');
+    // Upgrade hint skips Pro→Strategy (same size) and points to Enterprise.
+    expect(body.error).toContain('Enterprise 500MB');
   });
 
-  it('accepts files up to the Pro-tier 100MB cap', async () => {
-    // Boundary case: a 90MB file should pass the size gate for a Pro
+  it('accepts files up to the Pro-tier 250MB cap', async () => {
+    // Boundary case: a 240MB file should pass the size gate for a Pro
     // user. The test intentionally uses raw bytes that aren't parseable
     // by parseFile() so it'll fail downstream — what we're verifying
-    // here is the size check no longer rejects 25-100MB files for Pro.
-    const content = new Uint8Array(90 * 1024 * 1024); // 90MB
+    // here is the size check no longer rejects 100-250MB files for Pro.
+    const content = new Uint8Array(240 * 1024 * 1024); // 240MB
     const file = new File([content], 'big.txt', { type: 'text/plain' });
 
     const req = createMockRequest(file);

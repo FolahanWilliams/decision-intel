@@ -87,27 +87,30 @@ export async function POST(request: NextRequest) {
     }
 
     // Enforce file size limit per the user's plan. Per-plan ladder
-    // locked 2026-05-26 (soft-limit pass) — Free 25MB / Individual
-    // 100MB / Strategy 250MB / Enterprise 500MB. Gemini 3 Flash's 1M
-    // token context (~3000 pages of dense text) means model capacity
-    // is never the binding constraint; the practical ceiling is Vercel
-    // Fluid Compute body size. The cap exists to (a) protect against
-    // accidental multi-GB uploads, (b) give a clear ladder UX of
-    // value-by-tier. parseFile() handles real CIMs cleanly.
+    // locked 2026-05-27 (soft-limit pass #2) — Free 25MB / Individual
+    // 250MB / Strategy 250MB / Enterprise 500MB. Pro and Strategy
+    // share upload size on purpose; upload size is NOT a meaningful
+    // tier differentiator (the wedge needs real CIMs). The Strategy
+    // tier earns its price on TEAM features, not upload ceiling.
+    // Gemini 3 Flash's 1M token context (~3000 pages of dense text)
+    // means model capacity is never the binding constraint; the
+    // practical ceiling is Vercel Fluid Compute body size.
     const userPlan = await getUserPlan(userId);
     const maxUploadMB = PLANS[userPlan].maxUploadMB;
     const MAX_FILE_SIZE = maxUploadMB * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       const sizeMb = (file.size / 1024 / 1024).toFixed(1);
       const planLabel = PLANS[userPlan].name;
+      // Upgrade hint skips Pro→Strategy (same size) and points
+      // straight to the next-larger tier. Free→Individual unlocks
+      // 10× more headroom (25→250); Pro/Strategy→Enterprise unlocks
+      // 2× plus the signed-URL path for full data rooms.
       const upgradeHint =
         userPlan === 'free'
-          ? 'Upgrade to Individual for 100MB uploads.'
-          : userPlan === 'pro'
-            ? 'Upgrade to Strategy for 250MB uploads.'
-            : userPlan === 'team'
-              ? 'Talk to sales at /pricing/quote for Enterprise 500MB uploads.'
-              : 'Talk to sales at /pricing/quote for a custom contract.';
+          ? 'Upgrade to Individual for 250MB uploads — 10× the Free cap.'
+          : userPlan === 'pro' || userPlan === 'team'
+            ? 'Talk to sales at /pricing/quote for Enterprise 500MB uploads + signed-URL upload path for full data rooms.'
+            : 'Talk to sales at /pricing/quote for a custom contract.';
       return NextResponse.json(
         {
           error: `File too large (${sizeMb}MB · ${planLabel} plan cap is ${maxUploadMB}MB). ${upgradeHint}`,

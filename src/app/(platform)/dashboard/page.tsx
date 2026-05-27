@@ -136,7 +136,7 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
       // ("File too large (45.2MB · Individual plan cap is 25MB)…") so
       // we surface that verbatim if present. Generic fallback below
       // when the body parse fails.
-      return 'File is too large for your plan. Upgrade for larger uploads — Individual handles 100MB, Strategy 250MB. See /pricing.';
+      return 'File is too large for your plan. Upgrade for larger uploads — Individual handles 250MB (10× the Free cap). See /pricing.';
     }
     if (uploadRes.status === 415) {
       return 'Unsupported file type. Accepted formats: PDF, DOCX, PPTX, XLSX, CSV, HTML, TXT, MD.';

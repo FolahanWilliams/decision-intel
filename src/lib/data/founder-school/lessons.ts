@@ -961,7 +961,7 @@ export const TRACKS: Track[] = [
         corpStrategyPitch:
           "Corporate strategy buyers price-anchor to consulting spend, not SaaS. You pay McKinsey or BCG £500K-£2M for a single engagement; a £30K/year subscription to DI that audits every memo across every project, every quarter, quarter after quarter, is a fraction of a percent of your total advisory budget. Frame it that way and the procurement conversation gets 10× shorter. We deliberately don't benchmark against \"decision management\" tooling because that category isn't priced to strategic impact; it's priced to analyst seats.",
         vcPitch:
-          'Enterprise strategy founders systematically undercharge — the instinct is to discount to close, and the instinct is wrong. High price signals value in this category: £500/month reads as "cheap analytics"; £30K/year reads as "strategic infrastructure." Our pricing ladder (Individual £249/mo → Strategy £2,499/mo → Enterprise custom) is deliberately flat for the first 15 seats, steep after, which lets the Strategy tier anchor the Enterprise negotiation. Pricing is information: the ones who flinch were never buyers.',
+          'Enterprise strategy founders systematically undercharge — the instinct is to discount to close, and the instinct is wrong. High price signals value in this category: £500/month reads as "cheap analytics"; £30K/year reads as "strategic infrastructure." Our pricing ladder (Individual £249/mo → Strategy £2,499/mo → Enterprise custom) is deliberately flat for the first 12 seats, steep after, which lets the Strategy tier anchor the Enterprise negotiation. Pricing is information: the ones who flinch were never buyers.',
       },
       {
         id: 'gtm_7',

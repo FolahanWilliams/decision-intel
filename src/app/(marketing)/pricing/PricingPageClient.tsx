@@ -109,11 +109,11 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       priceAnnual: 24990,
       anchor: '$24,990/year · 2 months free · ~10× cheaper than one consulting week',
       highlights: [
-        { label: 'Unlimited audits, 30 seats', strong: true },
+        { label: 'Unlimited audits, 12 seats', strong: true },
         { label: 'Shared Decision Knowledge Graph', strong: true },
-        { label: 'Custom toxic combination weights + taxonomy' },
-        { label: 'Team DQI analytics + 3-year retention' },
-        { label: '250MB uploads · full data-room bundles' },
+        { label: 'Team DQI analytics + cross-user calibration' },
+        { label: 'Pre-IC blind-prior voting (Decision Rooms)' },
+        { label: '3-year retention · audit-committee aligned' },
       ],
       cta: { label: 'Start 30-day pilot', action: 'checkout-team' },
       badge: 'Most popular',
@@ -131,10 +131,11 @@ function buildTiers(_cycle: BillingCycle): Tier[] {
       anchor: '$2,490/year (save ~16%) on annual',
       highlights: [
         { label: '100 audits per month', strong: true },
-        { label: `Full DQI + ${BIAS_COUNT}-bias R²F taxonomy` },
-        { label: 'Slack + Drive + Email integrations · Decision Rooms' },
-        { label: 'Compliance mapping + Personal Decision History' },
-        { label: '100MB uploads · real CIMs welcome' },
+        { label: `Full DQI + ${BIAS_COUNT}-bias R²F taxonomy`, strong: true },
+        { label: 'Every feature except team-only ones', strong: true },
+        { label: 'Slack + Drive + Email · Decision Rooms · Compliance mapping' },
+        { label: 'Custom toxic weights + taxonomy extensions' },
+        { label: '250MB uploads · data-room scale' },
       ],
       cta: { label: 'Start Individual', action: 'checkout-pro' },
     },
@@ -206,9 +207,13 @@ const COMPARISON_ROWS: Array<{
     enterprise: `${BIAS_COUNT} (R²F)`,
   },
   {
+    // Pro and Strategy share upload size 2026-05-27 — upload ceiling
+    // is NOT a meaningful Pro→Strategy differentiator. The wedge
+    // needs real CIMs; the Strategy tier earns its price on team
+    // features, not file size.
     label: 'Max upload size',
     free: '25 MB',
-    pro: '100 MB',
+    pro: '250 MB',
     team: '250 MB',
     enterprise: '500 MB',
   },
@@ -279,11 +284,13 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
-    // Power-user feature that requires team standardisation on a
-    // weight set to be useful — stays Team+ only.
+    // Flipped Pro → true 2026-05-27 (soft-limit pass #2). A solo
+    // CSO or M&A operator tuning weights for their domain (M&A
+    // vs market-entry vs portfolio review) doesn't need a team
+    // to do so usefully. Wedge gets the power-user feature.
     label: 'Custom toxic combination weights',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
@@ -355,15 +362,15 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
-    // Custom taxonomy flipped to Team 2026-05-26 — see PLANS comment
-    // in stripe.ts (a strategy team that's standardised on its own
-    // bias vocabulary should extend the 22-bias taxonomy with
-    // house-specific patterns; withholding for Enterprise was
-    // displacement-signal). Multi-division stays Enterprise-only —
-    // genuine F500 scope (cross-org rollup, divisional permissions).
+    // Custom taxonomy flipped to Pro 2026-05-27 — INDIVIDUAL
+    // customization at the type level. A solo CSO with a
+    // specialised domain (fintech regulatory, biotech IP,
+    // Pan-African FX) benefits without needing a team. Multi-
+    // division stays Enterprise-only — genuine F500 scope
+    // (cross-org rollup, divisional permissions).
     label: 'Custom taxonomy extensions',
     free: false,
-    pro: false,
+    pro: true,
     team: true,
     enterprise: true,
   },
@@ -382,14 +389,16 @@ const COMPARISON_ROWS: Array<{
     enterprise: true,
   },
   {
-    // Strategy seats bumped 15 → 30 (2026-05-26). A real corporate
-    // strategy function plus audit committee plus GC plus external
-    // counsel routinely runs 20+; 15 was undercutting the legitimate
-    // Strategy buyer who wants the WHOLE function on the platform.
+    // Strategy seats recalibrated to 12 (2026-05-27). The 30-seat
+    // default set 2026-05-26 was overcalibrated — a real mid-market
+    // strategy team is 5-12 people; above 12 the customer is
+    // structurally an Enterprise prospect. The seat count is what
+    // differentiates Strategy from Enterprise; upload size + most
+    // per-user features now match Individual.
     label: 'Team seats',
     free: '1',
     pro: '1',
-    team: '30',
+    team: '12',
     enterprise: 'Unlimited',
   },
   {
@@ -420,7 +429,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: 'What team features can I not access on Individual?',
-    a: 'Individual gets every feature a solo operator actually needs: Slack / Drive / Email integrations, Decision Rooms (for inviting counsel / board / external advisors into a single memo), compliance mapping, cross-document conflict detection, deal-level Decision Provenance Records, full 100MB uploads. Strategy adds the genuinely cross-USER features: the shared Decision Knowledge Graph that compounds across the team, custom toxic combination weights that require team standardisation to be useful, team DQI analytics, custom taxonomy extensions, and pre-IC blind-prior voting (which needs ≥3 voters to produce meaningful aggregation). The split is "what compounds with one user" vs "what compounds with a team" — not artificial gating.',
+    a: 'Individual gets essentially every feature except the ones that genuinely require a team. That includes the full 22-bias R²F taxonomy + custom taxonomy extensions, custom toxic combination weights, Slack / Drive / Email integrations, Decision Rooms (for inviting counsel / board / external advisors into a single memo), compliance mapping, cross-document conflict detection, deal-level Decision Provenance Records, and 250MB uploads (same as Strategy). Strategy adds the four features that ONLY work with a team: the shared Decision Knowledge Graph that compounds across users, team DQI analytics (cross-user calibration views), pre-IC blind-prior voting (which needs ≥3 voters to produce meaningful aggregation), and the team seats themselves (12 included). The split is "what compounds with one user" vs "what compounds with a team" — not artificial gating to drive upgrades.',
   },
   {
     q: 'Do you offer annual discounts?',

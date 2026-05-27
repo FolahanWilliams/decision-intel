@@ -277,7 +277,7 @@ export function TeammateWallModal({ open, onClose, source = 'unknown' }: Teammat
               lineHeight: 1.5,
             }}
           >
-            $2,499/mo · 15 seats · No card required for the pilot
+            $2,499/mo · 12 seats · No card required for the pilot
           </p>
         </div>
       </DialogContent>

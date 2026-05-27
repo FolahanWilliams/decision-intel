@@ -138,37 +138,50 @@ export const PLANS = {
      *  the wedge persona's defining workflow. The compliance
      *  artefact retention and the document retention now match. */
     retentionDays: 365,
-    /** Bumped from universal 25MB → 100MB (2026-05-26). A real M&A
-     *  CIM is 50-150MB; a CSO uploading their actual deal memo
-     *  shouldn't hit a wall on the wedge tier. Gemini 3 Flash's 1M
-     *  token context handles 100MB documents fine. */
-    maxUploadMB: 100,
+    /** Bumped 100MB → 250MB (2026-05-27 soft-limit pass #2). Per the
+     *  founder's "remember it's the wedge — should have pretty much
+     *  all features except the ones that require a team" call: upload
+     *  size is NOT a meaningful Pro→Strategy differentiator and was
+     *  rejecting real data-room exports + multi-doc deal bundles on
+     *  the wedge tier. Now matches Strategy at 250MB; the real
+     *  Strategy differentiator is team features, not upload ceiling.
+     *  Vercel Fluid Compute handles 250MB request bodies; >250MB
+     *  needs the signed-URL pattern (Enterprise 500MB path). */
+    maxUploadMB: 250,
     features: {
       boardroomSimulation: true,
       forgottenQuestions: true,
       personalDecisionHistory: true,
       personalCalibration: true,
       teamKnowledgeGraph: false,
-      // Soft-limit pass 2026-05-26: features that REAL solo users need
-      // on the wedge tier — withholding them for an Enterprise tier we
-      // might never sell is the displacement-signal trap, not a moat.
-      // A solo CSO has their own Slack, their own Drive, their own
-      // M&A workflow that benefits from compliance mapping. Decision
-      // Rooms work for solo users inviting external advisors (counsel,
-      // PE sponsor, board member). All four flipped to true.
+      // Soft-limit pass #1 (2026-05-26): features REAL solo users need
+      // on the wedge tier. Soft-limit pass #2 (2026-05-27): the wedge
+      // gets ESSENTIALLY EVERY feature except the ones that genuinely
+      // require a team to be useful. The four "team-requiring" features
+      // are listed below with reasons; everything else is on Individual.
       decisionRooms: true,
       slackIntegration: true,
       driveIntegration: true,
       complianceMapping: true,
-      // Power-user features that genuinely need a team to justify the
-      // setup cost — kept on Strategy/Team tier. customToxicWeights
-      // requires team standardisation to be useful; teamKnowledgeGraph
-      // is by definition cross-user; teamDqiAnalytics is cross-user.
-      customToxicWeights: false,
+      /** Flipped false → true 2026-05-27. A solo fractional CSO or
+       *  M&A operator tuning the toxic-combination weights for their
+       *  specific domain (M&A vs market-entry vs portfolio review)
+       *  does not need a team to do so usefully. Withholding was
+       *  pre-shrinking the wedge for an Enterprise pitch we'll
+       *  rarely use it in. */
+      customToxicWeights: true,
+      // Stays Team+. Cross-USER analytics by definition — a solo user
+      // already sees their own metrics in Personal Calibration.
       teamDqiAnalytics: false,
       sso: false,
       multiDivision: false,
-      customTaxonomy: false,
+      /** Flipped false → true 2026-05-27. Extending the 22-bias
+       *  taxonomy with house-specific patterns is INDIVIDUAL
+       *  customization at the type level — a solo CSO with a
+       *  specialised domain (fintech regulatory, biotech IP,
+       *  Pan-African FX) benefits without needing a team. Power-user
+       *  feature on the wedge tier, not Enterprise gating. */
+      customTaxonomy: true,
     } satisfies PlanFeatures,
   },
   team: {
@@ -187,11 +200,14 @@ export const PLANS = {
     /** Page cap removed — see free.maxPages comment. */
     maxPages: Infinity,
     biasTypes: PLAN_BIAS_TYPES,
-    /** Bumped 15 → 30 seats (2026-05-26). A real corporate strategy
-     *  function plus audit committee plus GC plus external counsel
-     *  routinely runs 20+. 15 was undercutting the legitimate Strategy
-     *  buyer who wants the WHOLE function on the platform. */
-    maxTeamMembers: 30,
+    /** Recalibrated to 12 seats (2026-05-27). The 30-seat default
+     *  set 2026-05-26 was overcalibrated — a real mid-market
+     *  strategy team is 5-12 people; 12 is the realistic Strategy
+     *  ceiling. Above that, the customer is structurally an
+     *  Enterprise prospect (multi-team / multi-division). The
+     *  seat count is what differentiates Strategy from Enterprise;
+     *  upload size + per-user features now mostly match Individual. */
+    maxTeamMembers: 12,
     /** Bumped 365 → 1095 days (3y) (2026-05-26) to align with the
      *  AUDIT_LOG_RETENTION_TIERS Strategy='3 years' SLA in
      *  trust-copy.ts. Team buyers running quarterly board cycles
