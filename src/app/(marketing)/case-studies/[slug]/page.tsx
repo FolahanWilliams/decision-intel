@@ -11,6 +11,12 @@ import {
   isSuccessOutcome,
   type CaseStudy,
 } from '@/lib/data/case-studies';
+import {
+  generateCaseStudySeoTitle,
+  generateCaseStudySeoDescription,
+  generateCaseStudyFaqs,
+  findRelatedCases,
+} from '@/lib/data/case-studies/seo';
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
 import { outcomeColor } from '@/lib/data/case-studies/outcome-color';
 import { gradeFromScore, type Grade } from '@/lib/utils/grade';
@@ -47,9 +53,14 @@ export async function generateMetadata({
     return { title: 'Case Study Not Found | Decision Intel' };
   }
 
-  const outcomeLabel = outcomeTitle(caseStudy.outcome);
-  const title = `${caseStudy.company} (${caseStudy.year}): ${caseStudy.title} | Decision Intel Case Study`;
-  const description = `${outcomeLabel}: ${caseStudy.summary}`.slice(0, 180);
+  // CTR-optimized title + description (locked 2026-05-27 per GSC
+  // data showing 44 case-study queries × 0 clicks — the generic
+  // "${company} (${year}): ${title} | Decision Intel Case Study"
+  // wasn't compelling enough to click). New templates promise
+  // something specific: how many bias patterns the page documents
+  // + what they did. Helpers in src/lib/data/case-studies/seo.ts.
+  const title = generateCaseStudySeoTitle(caseStudy);
+  const description = generateCaseStudySeoDescription(caseStudy);
 
   return {
     title,
@@ -231,9 +242,18 @@ export default async function CaseStudyDetailPage({
   // so for the snapshot we just pass null and get the global base rate.
   const referenceClass = computeReferenceClass({});
 
-  const related = ALL_CASES.filter(
-    c => c.industry === caseStudy.industry && c.id !== caseStudy.id
-  ).slice(0, 3);
+  // Related cases — upgraded 2026-05-27 from industry-only to a
+  // weighted score (primary-bias match +3, industry match +2,
+  // bias-overlap +1 each, outcome class +0.5). The case cluster
+  // now has stronger internal-link gravity for both human reading
+  // ("show me other cases like this one") and Google's link-graph
+  // signal. Falls back to industry-only if seo helper returns 0.
+  let related: CaseStudy[] = findRelatedCases(caseStudy, 4);
+  if (related.length === 0) {
+    related = ALL_CASES.filter(
+      c => c.industry === caseStudy.industry && c.id !== caseStudy.id
+    ).slice(0, 3);
+  }
 
   const dqiScore = computeSimulatedDQI(
     caseStudy.outcome,
@@ -252,12 +272,23 @@ export default async function CaseStudyDetailPage({
     confidence: bias === caseStudy.primaryBias ? 0.95 : 0.75,
   }));
 
-  const caseStudyJsonLd = [
+  // Article + BreadcrumbList + FAQPage + Speakable JSON-LD bundle.
+  // Schemas locked 2026-05-27 per GSC data showing 44 case-study
+  // queries × 0 clicks — richer structured data lifts both the
+  // chance of a rich-snippet in SERP AND the chance an LLM cites
+  // the page verbatim. The FAQPage data is auto-generated from
+  // the case (biases + outcome + pre-decision evidence) — purely
+  // honest, never fabricated.
+  const headline = generateCaseStudySeoTitle(caseStudy).replace(' | Decision Intel', '');
+  const description = generateCaseStudySeoDescription(caseStudy);
+  const faqs = generateCaseStudyFaqs(caseStudy);
+
+  const caseStudyJsonLd: object[] = [
     {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: `${caseStudy.company} (${caseStudy.year}): ${caseStudy.title}`,
-      description: caseStudy.summary,
+      headline,
+      description,
       author: { '@type': 'Organization', name: 'Decision Intel' },
       publisher: {
         '@type': 'Organization',
@@ -265,12 +296,34 @@ export default async function CaseStudyDetailPage({
         logo: { '@type': 'ImageObject', url: `${siteUrl}/logo.png` },
       },
       datePublished: `${caseStudy.year}-01-01`,
+      // Track the year the case research was integrated into the
+      // platform — closer to "last edited" for Google's freshness
+      // signal than the decision-event year.
+      dateModified: new Date().toISOString().slice(0, 10),
       image: `${siteUrl}/api/og-case-study/${slug}`,
-      mainEntityOfPage: `${siteUrl}/case-studies/${slug}`,
-      about: caseStudy.biasesPresent.map(b => ({
-        '@type': 'Thing',
-        name: formatBiasName(b),
-      })),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': `${siteUrl}/case-studies/${slug}`,
+      },
+      url: `${siteUrl}/case-studies/${slug}`,
+      // about → the subjects of the article (biases + the company
+      // + the industry). Google uses this for topic-targeting.
+      about: [
+        { '@type': 'Organization', name: caseStudy.company },
+        ...caseStudy.biasesPresent.map(b => ({
+          '@type': 'Thing',
+          name: formatBiasName(b),
+        })),
+      ],
+      // mentions → secondary entities (toxic combinations + the
+      // industry).
+      mentions: [
+        { '@type': 'Thing', name: formatIndustry(caseStudy.industry) },
+        ...(caseStudy.toxicCombinations || []).map(t => ({
+          '@type': 'Thing',
+          name: t,
+        })),
+      ],
       keywords: [
         caseStudy.company,
         formatIndustry(caseStudy.industry),
@@ -278,7 +331,16 @@ export default async function CaseStudyDetailPage({
         ...(caseStudy.toxicCombinations || []),
         'cognitive bias',
         'decision analysis',
+        'reasoning audit',
+        'decision quality',
       ].join(', '),
+      // Speakable — flagged for voice-assistant + AI-engine
+      // text-to-speech preference. The headline + summary read
+      // cleanly aloud.
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['h1', '.case-study-summary'],
+      },
     },
     {
       '@context': 'https://schema.org',
@@ -303,6 +365,18 @@ export default async function CaseStudyDetailPage({
           item: `${siteUrl}/case-studies/${slug}`,
         },
       ],
+    },
+    // FAQPage — auto-generated from the case data. Google may
+    // surface as rich snippets; LLMs cite Q-A pairs verbatim when
+    // answering case-specific questions ("which biases caused X?").
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(f => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
     },
   ];
 
@@ -499,6 +573,7 @@ export default async function CaseStudyDetailPage({
         {/* Summary */}
         <section style={{ marginBottom: 40 }}>
           <p
+            className="case-study-summary"
             style={{
               fontSize: 18,
               color: '#1E293B',
