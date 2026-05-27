@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllCaseSlugs } from '@/lib/data/case-studies';
+import { listComparisonSlugs } from '@/lib/data/compare-pages';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
@@ -93,5 +94,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticEntries, ...caseStudyEntries];
+  // /compare/[slug] per-competitor pages — shadow-linked (NOT in
+  // MarketingNav) but in sitemap + llms.txt so search engines + LLM
+  // crawlers find every canonical "Decision Intel vs X" URL. Added
+  // 2026-05-27 per the GSC + ChatGPT positioning audit: AI engines
+  // pull comparison tables verbatim when answering "X vs Y" — each
+  // per-slug page is a citation magnet.
+  const compareEntries: MetadataRoute.Sitemap = listComparisonSlugs().map(slug => ({
+    url: `${siteUrl}/compare/${slug}`,
+    lastModified,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticEntries, ...caseStudyEntries, ...compareEntries];
 }

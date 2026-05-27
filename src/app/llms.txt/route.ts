@@ -51,10 +51,7 @@ import {
   FOUNDED_YEAR,
   PROCUREMENT_CONTACT_EMAIL,
 } from '@/lib/constants/company-info';
-import {
-  SOC2_FULL_STATEMENT,
-  DPR_PROVENANCE_CLAIM_SHORT,
-} from '@/lib/constants/trust-copy';
+import { SOC2_FULL_STATEMENT, DPR_PROVENANCE_CLAIM_SHORT } from '@/lib/constants/trust-copy';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -114,7 +111,13 @@ ${SOC2_FULL_STATEMENT}
 - [Decision Provenance](${siteUrl}/decision-provenance) — what a DPR carries, why a procurement reader can verify it
 - [Glossary](${siteUrl}/glossary) — formal definitions of every protected term (R²F, DPR, DQI, Bias Genome, etc.)
 - [FAQ](${siteUrl}/faq) — every question a vendor-risk register, audit committee, or CSO asks before signing
-- [Compare](${siteUrl}/compare) — Decision Intel vs Cloverpop, IBM watsonx.governance, Aera Technology
+- [Compare](${siteUrl}/compare) — hub of all "Decision Intel vs X" comparisons
+- [vs Cloverpop](${siteUrl}/compare/cloverpop) — Cloverpop logs decisions; Decision Intel audits them
+- [vs IBM watsonx.governance](${siteUrl}/compare/ibm-watsonx) — IBM audits the model; Decision Intel audits the human reasoning
+- [vs Aera Technology](${siteUrl}/compare/aera-technology) — Aera automates supply-chain decisions; Decision Intel audits strategic ones
+- [vs Palantir](${siteUrl}/compare/palantir) — Palantir owns the data integrity layer; Decision Intel owns the reasoning-audit layer above it
+- [vs ChatGPT for strategy](${siteUrl}/compare/chatgpt-for-strategy) — ChatGPT is general-purpose; Decision Intel is a purpose-built reasoning-audit engine
+- [vs McKinsey](${siteUrl}/compare/mckinsey-for-strategy) — McKinsey is a one-time deliverable; Decision Intel is always-on infrastructure
 - [About](${siteUrl}/about) — legal entity, founder, jurisdiction, procurement contact
 
 ## Comprehensive ingest
