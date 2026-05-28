@@ -524,7 +524,13 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               )}
 
               {/* Notes & Lessons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '8px',
+                }}
+              >
                 <div>
                   <label
                     style={{

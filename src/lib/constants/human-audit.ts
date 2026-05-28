@@ -77,6 +77,11 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
   document_access_granted: 'Document Access Granted',
   bias_task_assigned: 'Bias Task Assigned',
   playbook_followup: 'Playbook Follow-Up',
+  // Improvement #4 (2026-05-28): outcome-due reminder nudge fires when
+  // an analysis's outcomeDueAt passes without an outcome logged. Makes
+  // outcome logging notification-driven instead of memory-driven —
+  // the moat flywheel discipline.
+  outcome_due_reminder: 'Outcome Due',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

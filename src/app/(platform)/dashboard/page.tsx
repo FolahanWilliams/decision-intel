@@ -73,6 +73,7 @@ import { SampleBadge } from '@/components/ui/SampleBadge';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
 import { ContainersWidget } from '@/components/dashboard/ContainersWidget';
+import { MoatCompoundingCard } from '@/components/outcome-flywheel/MoatCompoundingCard';
 import { AmbientSignalBanner } from '@/components/dashboard/AmbientSignalBanner';
 import { RippleAlertBanner } from '@/components/dashboard/RippleAlertBanner';
 import { useToast } from '@/components/ui/EnhancedToast';
@@ -1336,6 +1337,15 @@ export default function Dashboard() {
         <DecisionTriageWidget />
         <ErrorBoundary sectionName="Nudges">
           <NudgeWidget />
+        </ErrorBoundary>
+
+        {/* Moat compounding card — Improvement #4, shipped 2026-05-28.
+            Makes the per-user data-flywheel visible as a Strava-style
+            calibration timeline + band-tiered narrative (cold start /
+            early / calibrating / compounding). Renders nothing when
+            the user has zero audits. */}
+        <ErrorBoundary sectionName="Moat compounding">
+          <MoatCompoundingCard />
         </ErrorBoundary>
 
         {/* Container roll-up widget (Phase 3 P3.5 — replaces deleted

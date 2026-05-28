@@ -1279,6 +1279,73 @@ function checkHardcodedCountdown(files) {
   return findings;
 }
 
+// ─── Non-responsive grid layout (added 2026-05-28) ──────────────────────
+// Closes Improvement #5 (mobile experience sweep) by catching the
+// drift class that broke the founder OS surfaces in past audits: a
+// `gridTemplateColumns: '1fr 1fr 1fr'` style declaration in JSX with
+// NO `@media (max-width: 700px)` (or similar) override at any level
+// of the component. On a 6.7" phone, fixed N-column grids overflow
+// horizontally + force horizontal scroll — the BAFTA hallway demo
+// fails on a phone.
+//
+// Catches:
+//   - `gridTemplateColumns: '1fr 1fr'` (or 1fr 1fr 1fr, etc.)
+//   - `grid-template-columns: 1fr 1fr` style
+//   - Tailwind `grid-cols-N` without a `sm:` / `md:` override on the
+//     same element (separate concern — not flagged here yet)
+//
+// Allows:
+//   - `repeat(auto-fit, minmax(...))` patterns (intrinsically responsive)
+//   - Files with a sibling `<style>` block containing `@media`
+//   - Files marked with `// audit-allow-fixed-grid` header comment
+//   - Files under viz / dpr / marketing legacy palette directories
+//     where intentional fixed grids are part of the design intent
+const FIXED_GRID_PATTERN = /gridTemplateColumns:\s*['"`]\s*(?:1fr\s+){1,5}1fr\s*['"`]/;
+const RESPONSIVE_HINT = /@media[^{]*\b(?:max-width|min-width)\b|repeat\(\s*auto-fit/;
+const MOBILE_BREAKPOINT_ALLOWED_PREFIXES = [
+  'src/components/visualizations/',
+  'src/components/dpr/',
+  'src/components/marketing/',
+  'src/app/(marketing)/',
+  'src/app/dpr-render/',
+  'src/components/founder-hub/',
+];
+function checkFixedGridResponsiveness(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!rel.startsWith('src/')) continue;
+    if (MOBILE_BREAKPOINT_ALLOWED_PREFIXES.some(p => rel.startsWith(p))) continue;
+    if (rel.endsWith('.test.ts') || rel.endsWith('.test.tsx')) continue;
+    const text = readLines(file)?.join('\n');
+    if (!text) continue;
+    // Per-file allow comment.
+    if (/audit-allow-fixed-grid/.test(text)) continue;
+    // Per-file responsive-hint short-circuit: if the file has ANY
+    // @media query OR an auto-fit grid, assume the author considered
+    // mobile.
+    if (RESPONSIVE_HINT.test(text)) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (FIXED_GRID_PATTERN.test(line)) {
+        findings.push({
+          category: 'critical',
+          severity: 'medium',
+          rule: 'fixed-grid-not-responsive',
+          file: rel,
+          line: i + 1,
+          snippet: line.trim().slice(0, 140),
+          suggestion:
+            'Fixed N-column grid on a platform surface — will overflow on phone. Use `repeat(auto-fit, minmax(220px, 1fr))` OR wrap the consumer in a `<style>` block with a `@media (max-width: 700px)` collapsing rule. CSOs demo from phones at BAFTA-style events; fixed grids break the demo.',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -1306,6 +1373,7 @@ function runAllChecks() {
     ...checkSequentialIoLoopOnPipelinePath(files),
     ...checkTailwindLiteralPalette(files),
     ...checkHardcodedCountdown(files),
+    ...checkFixedGridResponsiveness(files),
   ];
 
   return allFindings;

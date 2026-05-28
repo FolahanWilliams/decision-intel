@@ -365,7 +365,13 @@ export function ShareModal({
         <div>
           {/* Export Tab */}
           {activeTab === 'export' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '8px',
+              }}
+            >
               {onExportBoardReport && (
                 <Button
                   variant="outline"

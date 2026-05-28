@@ -93,10 +93,10 @@ export function TreemapSkeleton() {
       <div
         className="card-body"
         style={{
-          height: 'clamp(240px, 30vw, 360px)',
+          minHeight: 'clamp(240px, 30vw, 360px)',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gridAutoRows: 'minmax(110px, 1fr)',
           gap: '8px',
           padding: '16px',
         }}
