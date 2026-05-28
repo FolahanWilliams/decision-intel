@@ -64,6 +64,13 @@ const NODE_HOVER_R = 26;
 // Group → accent color. Mirrors the legacy session colors so the map
 // reads consistently with any older screenshots / pitch decks.
 const GROUP_COLOR: Record<TabGroup, { primary: string; bg: string; soft: string }> = {
+  // Foundations (Faith OS) shares the Start column (x=0.07) visually; the
+  // distinct teal keeps its node + legend chip readable atop the Start band.
+  Foundations: {
+    primary: '#0D9488',
+    bg: 'rgba(13, 148, 136, 0.10)',
+    soft: 'rgba(13, 148, 136, 0.20)',
+  },
   Start: { primary: '#16A34A', bg: 'rgba(22, 163, 74, 0.10)', soft: 'rgba(22, 163, 74, 0.20)' },
   Product: { primary: '#0EA5E9', bg: 'rgba(14, 165, 233, 0.10)', soft: 'rgba(14, 165, 233, 0.20)' },
   'Go-to-Market': {

@@ -30,6 +30,10 @@ interface PostBody {
   deepReadingMinutes?: number;
   exercise?: boolean;
   meditation?: boolean;
+  /** Faith disciplines (Faith OS, 2026-05-28). Optional + default false so
+   *  legacy clients that omit them keep working unchanged. */
+  prayer?: boolean;
+  scripture?: boolean;
   notes?: string;
 }
 
@@ -89,6 +93,8 @@ export async function POST(request: Request) {
       : 0;
   const exercise = Boolean(body.exercise);
   const meditation = Boolean(body.meditation);
+  const prayer = Boolean(body.prayer);
+  const scripture = Boolean(body.scripture);
   const notes = typeof body.notes === 'string' ? body.notes.slice(0, 4000) : null;
 
   try {
@@ -102,6 +108,8 @@ export async function POST(request: Request) {
         deepReadingMinutes,
         exercise,
         meditation,
+        prayer,
+        scripture,
         notes,
       },
       update: {
@@ -110,6 +118,8 @@ export async function POST(request: Request) {
         deepReadingMinutes,
         exercise,
         meditation,
+        prayer,
+        scripture,
         notes,
       },
     });

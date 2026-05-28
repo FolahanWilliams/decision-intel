@@ -247,7 +247,17 @@ const SCAN_DIR = join(ROOT, 'src');
 //     generic "Upload failed (N)". Same shape as every other canonical
 //     fetch consumer. No delivery/audit/flywheel write swallowed; the
 //     container-create call itself fails-closed with a thrown Error.
-const SILENT_CATCH_BASELINE = 204;
+//   - 204 → 209 (Faith OS ship 2026-05-28): +5 ALL canonical
+//     res.json().catch(() => null) body-parse exception class in
+//     src/components/founder-hub/FaithOSTab.tsx — the fetchAll loader (3:
+//     checkins/reading-progress/prayer-journal), the daily-discipline
+//     toggle response parse (1), and the add-journal-entry response parse
+//     (1). Each parses the API response body; on parse failure the surface
+//     degrades to the static content / a reconcile-on-next-fetch. No
+//     delivery/audit/flywheel write swallowed — every mutation route
+//     fails-closed server-side with an apiError + the client reconciles
+//     via fetchAll() on the bare try/catch around the fetch itself.
+const SILENT_CATCH_BASELINE = 209;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

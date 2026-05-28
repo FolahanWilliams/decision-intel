@@ -46,6 +46,11 @@ import {
   CommitmentRecord,
   BuildInPublicSection,
 } from '@/components/founder-hub/founder-os/sections';
+// Faith OS (2026-05-28): the 6 cognitive pillars carry scripture anchors,
+// surfaced here collapsed-by-default. Canonical anchors live in the Faith OS
+// SSOT; this reads from it (no duplication) so the Founder OS daily surface
+// is grounded without a second copy of the content.
+import { PillarAnchorsSection } from '@/components/founder-hub/faith-os/sections';
 import {
   InteractivePillars,
   type PillarAdherenceData,
@@ -65,6 +70,11 @@ interface DailyCheckin {
   deepReadingMinutes: number;
   exercise: boolean;
   meditation: boolean;
+  // Faith disciplines (Faith OS, 2026-05-28). Co-owned with the Faith OS tab:
+  // both surfaces load the full row + send all fields, so neither clobbers
+  // the other's disciplines.
+  prayer: boolean;
+  scripture: boolean;
   notes: string | null;
 }
 
@@ -175,6 +185,8 @@ export function FounderOSTab({ founderPass }: FounderOSTabProps) {
     deepReadingMinutes: 0,
     exercise: false,
     meditation: false,
+    prayer: false,
+    scripture: false,
     notes: '',
   });
 
@@ -263,6 +275,8 @@ export function FounderOSTab({ founderPass }: FounderOSTabProps) {
         deepReadingMinutes: existing.deepReadingMinutes,
         exercise: existing.exercise,
         meditation: existing.meditation,
+        prayer: existing.prayer ?? false,
+        scripture: existing.scripture ?? false,
         notes: existing.notes ?? '',
       });
     }
@@ -877,6 +891,54 @@ export function FounderOSTab({ founderPass }: FounderOSTabProps) {
                   Meditation
                 </span>
               </label>
+
+              {/* Faith disciplines (Faith OS, 2026-05-28). Co-owned with the
+                  Faith OS tab — both surfaces load the full row + send all
+                  fields. Toggling here writes the same prayer/scripture
+                  columns the Faith OS daily checkin reads. */}
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 10px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={todayDraft.prayer}
+                  onChange={e => setTodayDraft({ ...todayDraft, prayer: e.target.checked })}
+                />
+                <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>
+                  Prayer
+                </span>
+              </label>
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 10px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={todayDraft.scripture}
+                  onChange={e => setTodayDraft({ ...todayDraft, scripture: e.target.checked })}
+                />
+                <span style={{ fontSize: 13, color: 'var(--text-primary)', fontWeight: 600 }}>
+                  Scripture
+                </span>
+              </label>
             </div>
 
             <textarea
@@ -933,6 +995,9 @@ export function FounderOSTab({ founderPass }: FounderOSTabProps) {
 
       {/* SIX PILLARS — Interactive System Map */}
       <InteractivePillars adherence={pillarAdherence} />
+
+      {/* Faith OS — scripture anchors for the 6 pillars (collapsed by default). */}
+      <PillarAnchorsSection collapsible />
 
       {/* CONTENT LOG */}
       <div

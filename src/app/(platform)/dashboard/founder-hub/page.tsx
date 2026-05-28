@@ -206,6 +206,13 @@ const FounderOSTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const FaithOSTab = dynamic(
+  () =>
+    import('@/components/founder-hub/FaithOSTab').then(m => ({
+      default: m.FaithOSTab,
+    })),
+  { loading: tabLoader }
+);
 const VoiceActivityTab = dynamic(
   () =>
     import('@/components/founder-hub/VoiceActivityTab').then(m => ({
@@ -299,9 +306,10 @@ type TabId =
   | 'voice_activity'
   | 'metrics'
   | 'founder_os'
+  | 'faith_os'
   | 'todo';
 
-type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
+type TabGroup = 'Foundations' | 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
 
 // Maps old tab slugs (from 17-tab era) to new 10-tab slugs so bookmarks and
 // deep links don't break after consolidation.
@@ -337,6 +345,10 @@ const LEGACY_TAB_REDIRECTS: Record<string, TabId> = {
 };
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabGroup }> = [
+  // Foundations — faith woven UNDER the operating platform (Faith OS, 2026-05-28).
+  // Rendered first (TAB_GROUPS lists 'Foundations' before 'Start') so the
+  // literal-first surface is the foundation everything else is built on.
+  { id: 'faith_os', label: 'Faith OS', icon: <BookOpen size={16} />, group: 'Foundations' },
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
   // GTM v3.5 §11 (RATIFIED 2026-05-05) — the cognitive-discipline surface
@@ -478,7 +490,14 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   },
 ];
 
-const TAB_GROUPS: TabGroup[] = ['Start', 'Product', 'Go-to-Market', 'Intelligence', 'Tools'];
+const TAB_GROUPS: TabGroup[] = [
+  'Foundations',
+  'Start',
+  'Product',
+  'Go-to-Market',
+  'Intelligence',
+  'Tools',
+];
 
 // ─── Search Index ─────────────────────────────────────────────────────────
 // Flat keyword index over tab sections. Previously, typing in search rendered
@@ -1728,6 +1747,11 @@ function renderTab(
     founder_os: (
       <ErrorBoundary sectionName="Founder OS">
         <FounderOSTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    faith_os: (
+      <ErrorBoundary sectionName="Faith OS">
+        <FaithOSTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

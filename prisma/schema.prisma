@@ -1331,6 +1331,14 @@ model FounderOsCheckin {
   deepReadingMinutes Int      @default(0)
   exercise           Boolean  @default(false)
   meditation         Boolean  @default(false)
+  /// Faith disciplines tracked alongside the cognitive pillars (Faith OS,
+  /// 2026-05-28). Default false so every pre-Faith-OS row reads as "not
+  /// logged" rather than silently asserting the discipline happened.
+  /// `prayer` = spent deliberate time in prayer today; `scripture` = read
+  /// scripture / engaged the reading plan today. Both feed the streak +
+  /// pillar-adherence surfaces the same way sfcZero/exercise/meditation do.
+  prayer             Boolean  @default(false)
+  scripture          Boolean  @default(false)
   notes              String?  @db.Text
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -1410,6 +1418,57 @@ model FounderOsCommitment {
 
   @@index([userId])
   @@index([userId, createdAt])
+}
+
+/// Faith OS prayer + reflection journal (2026-05-28). The spiritual sibling
+/// of FounderOsCommitment — but where the commitment record is a fixed
+/// anchor re-read when unmotivated, this is a running log. `kind` follows
+/// the ACTS prayer framework (adoration / confession / thanksgiving /
+/// supplication) plus a free `reflection` kind for journalled thoughts on a
+/// passage. `answered` + `answeredNote` turn the supplication log into an
+/// answered-prayer record over time — the faith equivalent of the
+/// outcome-calibration loop: you see, in writing, what you asked for and
+/// what came of it. Identity grounding, never a success-metric.
+model FounderOsPrayerJournal {
+  id          String    @id @default(cuid())
+  userId      String
+  /// adoration | confession | thanksgiving | supplication | reflection
+  kind        String    @default("reflection")
+  title       String?   @db.VarChar(300)
+  body        String    @db.Text
+  /// Optional scripture reference this entry is anchored to (e.g. "Proverbs 3:5-6").
+  scriptureRef String?  @db.VarChar(120)
+  /// Supplication entries can be marked answered later. Non-supplication
+  /// entries leave this false; the UI only surfaces the toggle for prayers.
+  answered    Boolean   @default(false)
+  answeredNote String?  @db.Text
+  answeredAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([userId, kind])
+  @@index([userId, createdAt])
+}
+
+/// Faith OS reading-plan progress (2026-05-28). One row per (user, plan,
+/// reference) read — idempotent via the unique index so re-marking a
+/// passage read overwrites the reflection cleanly. `planId` keys into the
+/// READING_PLANS SSOT ('proverbs' = a-chapter-a-day, 'founders-journey' =
+/// the curated season-mapped plan). `reflection` is the optional
+/// active-recall note (same encoding discipline as the content log).
+model FounderOsReadingProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  planId     String
+  /// Passage reference, e.g. "Proverbs 5" or "Joshua 1:9".
+  reference  String   @db.VarChar(120)
+  reflection String?  @db.Text
+  completedAt DateTime @default(now())
+
+  @@unique([userId, planId, reference])
+  @@index([userId])
+  @@index([userId, planId])
 }
 
 /// GTM v3.5 RATIFIED 2026-05-04 — micro-deliberation outcome event.

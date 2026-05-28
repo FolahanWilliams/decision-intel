@@ -31,6 +31,8 @@ import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 export type TabId =
+  // Foundations (1) — faith woven under the platform (Faith OS, 2026-05-28)
+  | 'faith_os'
   // Start (5)
   | 'unicorn_roadmap'
   | 'path_to_100m'
@@ -63,7 +65,13 @@ export type TabId =
   | 'cron_controls'
   | 'voice_activity';
 
-export type TabGroup = 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
+export type TabGroup =
+  | 'Foundations'
+  | 'Start'
+  | 'Product'
+  | 'Go-to-Market'
+  | 'Intelligence'
+  | 'Tools';
 
 export interface MapNode {
   id: TabId;
@@ -125,6 +133,22 @@ export interface Journey {
 //   Tools:        0.92
 
 export const NODES: MapNode[] = [
+  // ─── Foundations (1) ───────────────────────────────────────────────
+  {
+    id: 'faith_os',
+    label: 'Faith OS',
+    group: 'Foundations',
+    x: 0.07,
+    y: 0.1,
+    whatItsFor:
+      'The foundation under the platform — daily verse + agency-surrender spine, prayer + scripture tracked in your cadence, two reading plans, the ACTS prayer journal, the success-psychology↔scripture map, faith-and-work theology, Sabbath rhythm.',
+    payoff:
+      'Plan hard, hold the result with open hands. Your worth is settled before the quarter starts — the one foundation no competitor can copy.',
+    minutes: 20,
+    prerequisites: [],
+    iconName: 'BookOpen',
+  },
+
   // ─── Start (3) ─────────────────────────────────────────────────────
   {
     id: 'unicorn_roadmap',
@@ -496,6 +520,14 @@ export const NODES: MapNode[] = [
 // ordering.
 
 export const EDGES: MapEdge[] = [
+  // Foundations → Start: faith is the foundation the discipline layer runs on.
+  {
+    from: 'faith_os',
+    to: 'founder_os',
+    rationale:
+      'Faith OS is the foundation; Founder OS is the discipline that runs on it. The 6 cognitive pillars carry scripture anchors from the Faith OS.',
+    strength: 'primary',
+  },
   // Start cluster: roadmap → path
   {
     from: 'unicorn_roadmap',
