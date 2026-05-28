@@ -122,17 +122,20 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
       </div>
 
       <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8, lineHeight: 1.3 }}>
-        See what we&apos;d flag in <em>your</em> next strategic memo.
+        We caught these patterns in {company}&apos;s own record &mdash; before the outcome.
       </h3>
       <p style={{ fontSize: 14, color: C.slate400, marginBottom: 20, lineHeight: 1.6 }}>
-        Upload a strategic memo or board deck. Get the same{' '}
-        {hasDeepAnalysis ? 'hindsight-stripped analysis' : 'bias audit'} you just saw for {company},
-        on your own next decision, in under 60 seconds.
+        See the full {hasDeepAnalysis ? 'hindsight-stripped audit' : 'bias audit'} we ran &mdash; no
+        login, no card. Then run the same 60-second audit on your own next memo.
       </p>
 
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
+        {/* Primary = the cold-evidence door. A reader arriving from a ChatGPT
+            citation is cold; /demo lets them SEE a real audit with zero
+            commitment (no login wall), matching their "show me" intent. The
+            prior primary pointed at /login and bounced cold readers. */}
         <Link
-          href="/login"
+          href="/demo"
           onClick={() => trackEvent('case_study_try_demo', { slug, company })}
           style={{
             display: 'inline-flex',
@@ -149,11 +152,12 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
             cursor: 'pointer',
           }}
         >
-          <Upload size={15} />
-          Try the Demo · Free
+          See a live audit &middot; no login
         </Link>
-        <a
-          href="#pilot-form"
+        {/* Secondary = the warm door for readers ready to commit. */}
+        <Link
+          href="/login?mode=signup&redirect=/dashboard?onboarding=1"
+          onClick={() => trackEvent('case_study_signup_click', { slug, company })}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -169,9 +173,10 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
             cursor: 'pointer',
           }}
         >
-          Request a Pilot
+          <Upload size={14} />
+          Audit your own memo
           <ArrowRight size={14} />
-        </a>
+        </Link>
       </div>
 
       <div
@@ -232,17 +237,6 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
         {status === 'error' && errorMessage && (
           <p style={{ marginTop: 8, fontSize: 12, color: '#FCA5A5' }}>{errorMessage}</p>
         )}
-
-        <p style={{ marginTop: 14, fontSize: 12, color: C.slate400 }}>
-          Ready to audit your own memo right now?{' '}
-          <a
-            href="/login?redirect=/dashboard"
-            onClick={() => trackEvent('case_study_signup_click', { slug, company })}
-            style={{ color: C.white, fontWeight: 600, textDecoration: 'underline' }}
-          >
-            Create a free account &rarr;
-          </a>
-        </p>
       </div>
 
       <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
