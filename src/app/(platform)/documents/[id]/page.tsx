@@ -829,7 +829,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         primaryAction={
           analysis
             ? {
-                label: 'Share & Export DPR',
+                label: 'Forward to committee',
                 onClick: () => setShowShareModal(true),
               }
             : undefined

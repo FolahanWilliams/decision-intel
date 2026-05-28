@@ -227,7 +227,17 @@ const SCAN_DIR = join(ROOT, 'src');
 // error message surfaces the real API diagnostic rather than a generic
 // "Failed". No delivery/audit/flywheel write swallowed (the create-
 // prospect POST itself fails-closed with a 5xx + dev-mode diagnostic).
-const SILENT_CATCH_BASELINE = 201;
+// 2026-05-28 First-audit experience ship (Improvement #1): +1 canonical
+// fetch-response body-parse exception class in
+// `src/hooks/useFirstAuditExperience.ts` `fetchTotalDocs()` — parses the
+// /api/documents/stats response and falls through to `null` on parse
+// failure so consumers render the loading state rather than crashing.
+// Same shape as every other canonical fetch consumer (NotificationCenter
+// /api/notifications fetch, IntelBriefPanel /api/founder-hub/* fetches,
+// etc.). The /api/documents/stats endpoint itself fails-open with
+// totalDocs: 0 so a downstream error never surfaces to the user — the
+// silent catch here just routes the loading-state path correctly.
+const SILENT_CATCH_BASELINE = 202;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

@@ -28,7 +28,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Settings as SettingsIcon, FileText } from 'lucide-react';
+import { Settings as SettingsIcon, FileText, Send } from 'lucide-react';
 import { DqiPill } from './primitives/DqiPill';
 import styles from './DocumentDetailShell.module.css';
 
@@ -271,6 +271,7 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
               e.currentTarget.style.transform = '';
             }}
           >
+            <Send size={13} strokeWidth={2.25} aria-hidden />
             {primaryAction.label}
           </button>
         )}

@@ -31,6 +31,16 @@ import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { DecisionDNAPreviewCard } from '@/components/dna/DecisionDNAPreviewCard';
 import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
+import {
+  useFirstAuditExperience,
+  hasFirstAuditOverlayBeenShown,
+} from '@/hooks/useFirstAuditExperience';
+import { FirstAuditGuidedOverlay } from '@/components/onboarding/FirstAuditGuidedOverlay';
+import {
+  PostFirstAuditWhatsNext,
+  isPostFirstAuditDismissed,
+  markPostFirstAuditDismissed,
+} from '@/components/dashboard/PostFirstAuditWhatsNext';
 import { bundlesForRole, type SampleBundle } from '@/lib/data/sample-bundles';
 import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
@@ -396,6 +406,34 @@ export default function Dashboard() {
   const noiseScoreRef = useRef<number | undefined>(undefined);
   const [lastCompletedAnalysis, setLastCompletedAnalysis] =
     useState<CompletedAnalysisSummary | null>(null);
+
+  // First-audit experience signal (Improvement #1, shipped 2026-05-28).
+  // Drives the persona-aware first-visit empty state, the first-audit
+  // guided overlay, and the post-first-audit "what's next" tile pack.
+  // totalDocs is already SWR-fetched above; pass it as the optimistic
+  // value so the hook doesn't fan out a second request.
+  const firstAuditExperience = useFirstAuditExperience(totalDocs ?? null);
+  const [overlayActive, setOverlayActive] = useState(false);
+  const [whatsNextDismissed, setWhatsNextDismissed] = useState(false);
+
+  // Fire the first-audit overlay when (a) the user's just-completed
+  // audit IS their first (totalDocs <= 1 after the audit lands) AND
+  // (b) the overlay hasn't been shown this session yet.
+  useEffect(() => {
+    if (!lastCompletedAnalysis) return;
+    if (firstAuditExperience.totalDocs == null) return;
+    if (firstAuditExperience.totalDocs > 1) return;
+    if (hasFirstAuditOverlayBeenShown()) return;
+    // 600ms delay so the result card lands first; the overlay teaches
+    // what the user is looking at, not what they're about to see.
+    const t = setTimeout(() => setOverlayActive(true), 600);
+    return () => clearTimeout(t);
+  }, [lastCompletedAnalysis, firstAuditExperience.totalDocs]);
+
+  // Hydrate the dismissed signal once.
+  useEffect(() => {
+    if (isPostFirstAuditDismissed()) setWhatsNextDismissed(true);
+  }, []);
 
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
@@ -1651,6 +1689,25 @@ export default function Dashboard() {
                       preResolvedAnalysisId={lastCompletedAnalysis.analysisId ?? null}
                     />
                   </div>
+
+                  {/* Post-first-audit "what's next" tile pack —
+                      Improvement #1, shipped 2026-05-28. Fires once
+                      when the user's FIRST audit lands (totalDocs <= 1
+                      after audit) and they haven't dismissed it this
+                      session. Persona-aware copy via onboardingRole. */}
+                  {firstAuditExperience.totalDocs != null &&
+                    firstAuditExperience.totalDocs <= 1 &&
+                    !whatsNextDismissed && (
+                      <PostFirstAuditWhatsNext
+                        onboardingRole={onboardingRole}
+                        analysisId={lastCompletedAnalysis.analysisId ?? null}
+                        filename={lastCompletedAnalysis.filename}
+                        onDismiss={() => {
+                          markPostFirstAuditDismissed();
+                          setWhatsNextDismissed(true);
+                        }}
+                      />
+                    )}
                 </>
               ) : !uploading && !pendingFile && inlineMode === 'paste' ? (
                 <InlinePasteMemoCard
@@ -2879,6 +2936,16 @@ export default function Dashboard() {
               prev ? { ...prev, status: decision === 'merged' ? 'merged' : 'private' } : prev
             )
           }
+        />
+
+        {/* First-audit guided overlay — Improvement #1, shipped
+            2026-05-28. Fires exactly once per user when their first
+            audit completes. Teaches "what you're looking at", "read
+            like an audit committee", "the artefact you forward".
+            Dismissible; sessionStorage signal prevents re-fire. */}
+        <FirstAuditGuidedOverlay
+          active={overlayActive}
+          onComplete={() => setOverlayActive(false)}
         />
       </div>
     </ModalStackProvider>
