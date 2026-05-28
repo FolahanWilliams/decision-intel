@@ -257,7 +257,13 @@ const SCAN_DIR = join(ROOT, 'src');
 //     delivery/audit/flywheel write swallowed — every mutation route
 //     fails-closed server-side with an apiError + the client reconciles
 //     via fetchAll() on the bare try/catch around the fetch itself.
-const SILENT_CATCH_BASELINE = 209;
+//   - 209 → 210 (Faith OS companion + vizs ship 2026-05-28): +1 canonical
+//     res.json().catch(() => null) body-parse in the FaithCompanion `run`
+//     handler (FaithOSTab.tsx) — parses the /api/founder-os/faith-companion
+//     response; on parse failure surfaces an inline "unavailable" message.
+//     The route itself never throws to the client (it returns a deterministic
+//     fallback synthesis), so nothing is swallowed.
+const SILENT_CATCH_BASELINE = 210;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

@@ -28,7 +28,9 @@ import {
   ChevronDown,
   Circle,
   Heart,
+  Loader2,
   Plus,
+  Sparkles,
   Sun,
   Trash2,
 } from 'lucide-react';
@@ -48,6 +50,17 @@ import {
   SabbathCard,
   SuccessScriptureMap,
 } from '@/components/founder-hub/faith-os/sections';
+import { computeFaithProgress } from '@/components/founder-hub/faith-os/progress';
+import {
+  FaithStatStrip,
+  DisciplineHeatmap,
+  ActsBalanceBars,
+  AnsweredPrayerRing,
+  ReadingProgressBars,
+  CadenceSparkline,
+  RecurringScriptureChips,
+  FaithVizStyles,
+} from '@/components/founder-hub/faith-os/visualizations';
 
 // ─── types ──────────────────────────────────────────────────────────────
 
@@ -122,17 +135,18 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
   });
 
   const [checkin, setCheckin] = useState<Checkin | null>(null);
+  const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [progress, setProgress] = useState<ReadingProgressRow[]>([]);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [savingDiscipline, setSavingDiscipline] = useState<'prayer' | 'scripture' | null>(null);
 
   const [sabbathTaken, setSabbathTaken] = useState(false);
 
-  // ── load ──
+  // ── load ── (180-day checkin window powers the discipline heatmap + streaks)
   const fetchAll = useCallback(async () => {
     try {
       const [cRes, pRes, jRes] = await Promise.all([
-        fetch('/api/founder-os/checkins?days=2', { cache: 'no-store', headers }),
+        fetch('/api/founder-os/checkins?days=180', { cache: 'no-store', headers }),
         fetch('/api/founder-os/reading-progress', { cache: 'no-store', headers }),
         fetch('/api/founder-os/prayer-journal?limit=200', { cache: 'no-store', headers }),
       ]);
@@ -145,14 +159,41 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
       const jJson = (await jRes.json().catch(() => null)) as ApiEnvelope<{
         entries: JournalEntry[];
       }> | null;
-      const todayRow = (cJson?.data?.checkins ?? []).find(c => c.date === today) ?? null;
-      setCheckin(todayRow);
+      const allCheckins = cJson?.data?.checkins ?? [];
+      setCheckins(allCheckins);
+      setCheckin(allCheckins.find(c => c.date === today) ?? null);
       setProgress(pJson?.data?.progress ?? []);
       setJournal(jJson?.data?.entries ?? []);
     } catch {
       // @schema-drift-tolerant — render the static surfaces even if the API is cold.
     }
   }, [headers, today]);
+
+  // Pure progress computation across journal + reading reflections + checkins.
+  const faithProgress = useMemo(
+    () =>
+      computeFaithProgress(
+        journal.map(e => ({
+          kind: e.kind,
+          scriptureRef: e.scriptureRef,
+          answered: e.answered,
+          createdAt: e.createdAt,
+        })),
+        progress.map(p => ({
+          planId: p.planId,
+          reference: p.reference,
+          reflection: p.reflection,
+          completedAt: p.completedAt,
+        })),
+        checkins.map(c => ({
+          date: c.date,
+          prayer: c.prayer ?? false,
+          scripture: c.scripture ?? false,
+        })),
+        today || todayLocalISO()
+      ),
+    [journal, progress, checkins, today]
+  );
 
   useEffect(() => {
     void fetchAll();
@@ -409,6 +450,12 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
           onDelete={deleteEntry}
         />
 
+        {/* Progress & patterns — dynamic vizs over the journal + reflections */}
+        <ProgressAndPatterns progress={faithProgress} />
+
+        {/* Reflection companion — AI synthesis ACROSS journals + reflections */}
+        <FaithCompanion headers={headers} />
+
         {/* Frameworks + theology + anchors */}
         <SuccessScriptureMap />
         <PillarAnchorsSection />
@@ -424,6 +471,324 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
         }
       `}</style>
     </>
+  );
+}
+
+// ─── progress & patterns (dynamic vizs) ─────────────────────────────────
+
+function ProgressAndPatterns({ progress }: { progress: ReturnType<typeof computeFaithProgress> }) {
+  const readingDone = progress.readingCompletion.reduce((s, r) => s + r.done, 0);
+  const hasDiscipline = progress.disciplineDays.some(d => d.level > 0);
+  const empty = progress.totalEntries === 0 && readingDone === 0 && !hasDiscipline;
+
+  return (
+    <section>
+      <div style={sectionHeadingRow}>
+        <Sparkles size={18} style={{ color: 'var(--accent-primary)' }} aria-hidden />
+        <h3 style={sectionHeadingText}>Progress &amp; patterns</h3>
+      </div>
+      <FaithVizStyles />
+      {empty ? (
+        <AccentCard accent="muted" title={null}>
+          <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            Your patterns appear here as you go — the prayer + scripture heatmap, where your prayers
+            land, the prayers you&apos;ve seen answered, reading progress, and the scripture you
+            keep returning to. Log a prayer, mark a passage read, or check in above to begin.
+          </p>
+        </AccentCard>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <FaithStatStrip progress={progress} />
+          <AccentCard accent="info" title={null}>
+            <DisciplineHeatmap days={progress.disciplineDays} />
+          </AccentCard>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 16,
+            }}
+          >
+            <AccentCard accent="primary" title={null}>
+              <ActsBalanceBars distribution={progress.actsDistribution} />
+            </AccentCard>
+            <AccentCard accent="success" title={null}>
+              <AnsweredPrayerRing
+                answered={progress.answeredCount}
+                total={progress.supplicationCount}
+              />
+            </AccentCard>
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 16,
+            }}
+          >
+            <AccentCard accent="info" title={null}>
+              <ReadingProgressBars completion={progress.readingCompletion} />
+            </AccentCard>
+            <AccentCard accent="muted" title={null}>
+              <CadenceSparkline cadence={progress.cadence} />
+            </AccentCard>
+          </div>
+          {progress.recurringScripture.length > 0 && (
+            <AccentCard accent="info" title={null}>
+              <RecurringScriptureChips recurring={progress.recurringScripture} />
+            </AccentCard>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── reflection companion (AI synthesis across journals + reflections) ──
+
+interface CompanionTheme {
+  theme: string;
+  evidence: string;
+}
+interface CompanionSynthesis {
+  openingLine: string;
+  themes: CompanionTheme[];
+  recurringScripture: string[];
+  answeredReflection: string | null;
+  encouragement: string;
+  suggestedFocus: string;
+  scriptureForYou: { ref: string; text: string } | null;
+}
+
+function FaithCompanion({ headers }: { headers: Record<string, string> }) {
+  const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState<string | null>(null);
+  const [synthesis, setSynthesis] = useState<CompanionSynthesis | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/founder-os/faith-companion', { method: 'POST', headers });
+      const json = (await res.json().catch(() => null)) as ApiEnvelope<{
+        source: string;
+        synthesis: CompanionSynthesis;
+      }> | null;
+      if (json?.data?.synthesis) {
+        setSynthesis(json.data.synthesis);
+        setSource(json.data.source ?? null);
+      } else {
+        setError('The companion is unavailable right now. Try again in a moment.');
+      }
+    } catch {
+      setError('The companion is unavailable right now. Try again in a moment.');
+    } finally {
+      setLoading(false);
+    }
+  }, [headers]);
+
+  return (
+    <section>
+      <div style={sectionHeadingRow}>
+        <Sparkles size={18} style={{ color: 'var(--accent-primary)' }} aria-hidden />
+        <h3 style={sectionHeadingText}>Reflection companion</h3>
+      </div>
+      <AccentCard accent="primary" title={null}>
+        <p
+          style={{
+            margin: '0 0 12px',
+            fontSize: 13.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+          }}
+        >
+          It reads across your prayer journal and your scripture reflections and shows you the
+          threads you wouldn&apos;t see yourself — recurring themes, the scripture you keep
+          returning to, and the prayers you&apos;ve seen answered. It never promises outcomes; it
+          helps you remember who held you.
+        </p>
+        <button
+          type="button"
+          onClick={run}
+          disabled={loading}
+          style={{ ...smallBtn('primary'), opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? (
+            <>
+              <Loader2
+                size={14}
+                className="faith-spin"
+                style={{ verticalAlign: '-3px', marginRight: 6 }}
+              />
+              Reflecting…
+            </>
+          ) : (
+            <>
+              <Sparkles size={14} style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              {synthesis ? 'Reflect again' : 'Reflect across my journals'}
+            </>
+          )}
+        </button>
+
+        {error && (
+          <p style={{ margin: '12px 0 0', fontSize: 13, color: 'var(--error)' }}>{error}</p>
+        )}
+
+        {synthesis && (
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14.5,
+                color: 'var(--text-primary)',
+                lineHeight: 1.6,
+                fontWeight: 600,
+              }}
+            >
+              {synthesis.openingLine}
+            </p>
+
+            {synthesis.themes.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {synthesis.themes.map((t, i) => (
+                  <div
+                    key={i}
+                    style={{ borderLeft: '3px solid var(--accent-primary)', paddingLeft: 12 }}
+                  >
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {t.theme}
+                    </div>
+                    {t.evidence && (
+                      <div
+                        style={{
+                          fontSize: 12.5,
+                          color: 'var(--text-secondary)',
+                          lineHeight: 1.55,
+                          marginTop: 2,
+                        }}
+                      >
+                        {t.evidence}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {synthesis.recurringScripture.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {synthesis.recurringScripture.map(ref => (
+                  <span
+                    key={ref}
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: 'var(--info)',
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-full)',
+                      border: '1px solid color-mix(in srgb, var(--info) 30%, transparent)',
+                      background: 'color-mix(in srgb, var(--info) 6%, transparent)',
+                    }}
+                  >
+                    {ref}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {synthesis.answeredReflection && (
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--success) 6%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--success) 22%, transparent)',
+                }}
+              >
+                <Check
+                  size={14}
+                  style={{ verticalAlign: '-2px', marginRight: 6, color: 'var(--success)' }}
+                />
+                {synthesis.answeredReflection}
+              </div>
+            )}
+
+            {synthesis.encouragement && (
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 13.5,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {synthesis.encouragement}
+              </p>
+            )}
+
+            {synthesis.suggestedFocus && (
+              <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.55 }}>
+                <strong style={{ color: 'var(--accent-primary)' }}>Bring before God next: </strong>
+                {synthesis.suggestedFocus}
+              </div>
+            )}
+
+            {synthesis.scriptureForYou && (
+              <blockquote
+                style={{
+                  margin: 0,
+                  padding: '10px 14px',
+                  borderLeft: '3px solid color-mix(in srgb, var(--info) 45%, transparent)',
+                  background: 'color-mix(in srgb, var(--info) 4%, transparent)',
+                  borderRadius: '0 var(--radius-md) var(--radius-md) 0',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 13.5,
+                    fontStyle: 'italic',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.55,
+                  }}
+                >
+                  &ldquo;{synthesis.scriptureForYou.text}&rdquo;
+                </p>
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    color: 'var(--info)',
+                  }}
+                >
+                  {synthesis.scriptureForYou.ref}
+                </div>
+              </blockquote>
+            )}
+
+            {(source === 'fallback' || source === 'empty') && (
+              <p
+                style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}
+              >
+                Plain tally (AI companion offline). The threads sharpen once it&apos;s connected.
+              </p>
+            )}
+          </div>
+        )}
+      </AccentCard>
+      <style>{`
+        .faith-spin { animation: faith-spin 0.8s linear infinite; }
+        @keyframes faith-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .faith-spin { animation: none; } }
+      `}</style>
+    </section>
   );
 }
 
