@@ -189,12 +189,12 @@ export function SparringRehearsalBalance() {
             <>
               {eventLabel} ({upcomingEvent!.venue}) &mdash; the highest-signal CSO event of the next
               90 days. Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before
-              the Monday DM batch goes out.
+              your next live engagement.
             </>
           ) : (
             <>
-              Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before the Monday
-              DM batch goes out.
+              Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before your next
+              live engagement.
             </>
           )}
         </div>
@@ -242,7 +242,7 @@ export function SparringRehearsalBalance() {
             ) : (
               <>
                 <code>{focusPick.shortLabel}</code> is your lowest-rep persona this week (
-                {focusPick.reps7d}). Run 1-2 more reps before the Monday DM batch.
+                {focusPick.reps7d}). Run 1-2 more reps before your next live engagement.
               </>
             )}
           </div>

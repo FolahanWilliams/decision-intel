@@ -1184,6 +1184,101 @@ function checkTailwindLiteralPalette(files) {
   return findings;
 }
 
+// ─── Hardcoded countdown literals (added 2026-05-28) ────────────────────
+// Closes Critical-9.1 from the 2026-05-28 nightly audit + Tip 2 forward-
+// looking discipline. The 2026-05-08 ship of SparringRehearsalBalance.tsx
+// hardcoded "T-32 days" in JSX user-visible text. The 2026-05-12, -15,
+// -17, -20, -22, -25, -26, -27 nightly audits ALL ran AFTER this surface
+// shipped — and none caught it because the count-drift lint regex
+// `\d+\s+(biases|frameworks|cases|...)` cannot match "T-N days" patterns
+// (no canonical noun follows the number). Today (2026-05-28) the founder
+// was T-12 from Strategy World London BAFTA but the daily-use Founder OS
+// surface lied about T-32. The fix (commit 2fa5549) routed the JSX
+// through `getHighestPriorityUpcomingEvent` + `daysUntil` from event-prep
+// SSOT.
+//
+// This check catches future drift of the SAME class: any user-visible
+// JSX / .ts string that hardcodes "T-N days" (or "T-N day", "T-N hours",
+// "T-N minutes") instead of computing from a SSOT. Skips comments (//,
+// /* */, JSX {/* */}), skips JSDoc lines (lines whose stripped content
+// starts with `*`), skips .test.ts files, skips chat-context prose where
+// the literal is referencing a HISTORICAL date (the recently-shipped
+// section).
+const HARDCODED_COUNTDOWN =
+  /\bT\s*[-–—]\s*\d{1,3}\s+(?:day|days|hour|hours|minute|minutes|week|weeks)\b/i;
+// Allowed surfaces (specific historical / training cases):
+//   - founder-context.ts chat preamble (template literal narrating past ships)
+//   - founder-school lessons (curriculum references to historical T-N moments)
+//   - sales-toolkit + positioning-frameworks (rehearsal scripts that quote
+//     example phrases the founder practises saying)
+const HARDCODED_COUNTDOWN_ALLOWED_PREFIXES = [
+  'src/app/api/founder-hub/founder-context.ts',
+  'src/lib/data/founder-school/',
+  'src/lib/data/sales-toolkit.ts',
+  'src/lib/data/positioning-frameworks.ts',
+  'src/lib/data/positioning-copilot.ts',
+  'src/lib/data/competitive-positioning.ts',
+  // Test fixtures legitimately hardcode example countdowns.
+  'src/lib/outreach/target-research.test.ts',
+];
+function checkHardcodedCountdown(files) {
+  const findings = [];
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!rel.startsWith('src/')) continue;
+    if (rel.includes('scripts/')) continue;
+    if (rel.endsWith('.test.ts') || rel.endsWith('.test.tsx')) continue;
+    if (HARDCODED_COUNTDOWN_ALLOWED_PREFIXES.some(p => rel.startsWith(p))) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    let inBlockComment = false;
+    for (let i = 0; i < lines.length; i++) {
+      const rawLine = lines[i];
+
+      // Block-comment + JSX-comment state machine (same shape as
+      // checkNativeDialogs above).
+      let workingLine = rawLine;
+      if (inBlockComment) {
+        const closeIdx = workingLine.indexOf('*/');
+        if (closeIdx === -1) continue;
+        workingLine = workingLine.slice(closeIdx + 2);
+        inBlockComment = false;
+      }
+      workingLine = workingLine.replace(/\/\*[\s\S]*?\*\//g, '');
+      workingLine = workingLine.replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+      workingLine = workingLine.replace(/\/\/.*$/, '');
+      const openIdx = workingLine.indexOf('/*');
+      if (openIdx !== -1) {
+        workingLine = workingLine.slice(0, openIdx);
+        inBlockComment = true;
+      }
+      const jsxOpenIdx = workingLine.indexOf('{/*');
+      if (jsxOpenIdx !== -1 && !workingLine.includes('*/}')) {
+        workingLine = workingLine.slice(0, jsxOpenIdx);
+        inBlockComment = true;
+      }
+      // Strip JSDoc-style ` * `-prefixed lines (the line after a comment-
+      // strip starts with `*` followed by whitespace — that's a JSDoc
+      // continuation line, stripped at compile).
+      if (/^\s*\*(\s|$)/.test(workingLine)) continue;
+
+      if (HARDCODED_COUNTDOWN.test(workingLine)) {
+        findings.push({
+          category: 'critical',
+          severity: 'high',
+          rule: 'hardcoded-countdown',
+          file: rel,
+          line: i + 1,
+          snippet: rawLine.trim().slice(0, 140),
+          suggestion:
+            'Replace with a live countdown derived from a SSOT (e.g. `daysUntil(event)` from @/lib/data/event-prep). Hardcoded "T-N days" silently drifts off-truth — caught 20 days late on the BAFTA prep surface 2026-05-28.',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
 // ─── Orchestration ───────────────────────────────────────────────────────
 
 function runAllChecks() {
@@ -1210,6 +1305,7 @@ function runAllChecks() {
     ...checkBlockingAwaitOnPipelinePath(files),
     ...checkSequentialIoLoopOnPipelinePath(files),
     ...checkTailwindLiteralPalette(files),
+    ...checkHardcodedCountdown(files),
   ];
 
   return allFindings;

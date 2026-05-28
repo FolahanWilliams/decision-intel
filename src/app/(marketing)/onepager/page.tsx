@@ -27,6 +27,7 @@ import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { PROCUREMENT_CONTACT_EMAIL, FOUNDED_YEAR } from '@/lib/constants/company-info';
+import { AnatomyOfACallGraph } from '@/components/marketing/AnatomyOfACallGraph';
 
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
@@ -117,6 +118,16 @@ export default function OnepagerPage() {
           decision documentation requirement, and SEC AI-disclosure rules. Cross-border M&amp;A
           coverage no US-only incumbent carries.
         </p>
+
+        {/* Brand anchor — the same anatomy-of-a-call pentagon that
+            appears on the landing scroll-reveal overlay + /how-it-works
+            hero + favicon. Per CLAUDE.md D1 brand-mark lock 2026-04-29:
+            "the geometry IS the brand mark"; mounted here so a recipient
+            who opens the one-pager recognises the brand glyph
+            immediately, before reading the prose. */}
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '40px 0 0' }}>
+          <AnatomyOfACallGraph stage={5} captionOverride={null} />
+        </div>
 
         {/* Divider */}
         <hr style={{ border: 0, borderTop: `1px solid ${C.rule}`, margin: '48px 0' }} />
