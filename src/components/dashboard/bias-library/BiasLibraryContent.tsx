@@ -105,13 +105,12 @@ export function BiasLibraryContent() {
 
   // Lock body scroll when drawer is open
   useEffect(() => {
-    if (activeBias) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = prev;
-      };
-    }
+    if (!activeBias) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [activeBias]);
 
   const toggleCategory = (cat: string) =>

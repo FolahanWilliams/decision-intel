@@ -70,7 +70,7 @@ export function FirstAuditGuidedOverlay({ active, onComplete }: Props) {
 
   // Auto-advance / hide
   useEffect(() => {
-    if (!active || dismissing) return;
+    if (!active || dismissing) return undefined;
     const timer = setTimeout(() => {
       if (step < 2) setStep((step + 1) as Step);
       else handleDismiss();

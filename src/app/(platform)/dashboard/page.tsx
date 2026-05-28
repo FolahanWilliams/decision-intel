@@ -420,10 +420,10 @@ export default function Dashboard() {
   // audit IS their first (totalDocs <= 1 after the audit lands) AND
   // (b) the overlay hasn't been shown this session yet.
   useEffect(() => {
-    if (!lastCompletedAnalysis) return;
-    if (firstAuditExperience.totalDocs == null) return;
-    if (firstAuditExperience.totalDocs > 1) return;
-    if (hasFirstAuditOverlayBeenShown()) return;
+    if (!lastCompletedAnalysis) return undefined;
+    if (firstAuditExperience.totalDocs == null) return undefined;
+    if (firstAuditExperience.totalDocs > 1) return undefined;
+    if (hasFirstAuditOverlayBeenShown()) return undefined;
     // 600ms delay so the result card lands first; the overlay teaches
     // what the user is looking at, not what they're about to see.
     const t = setTimeout(() => setOverlayActive(true), 600);

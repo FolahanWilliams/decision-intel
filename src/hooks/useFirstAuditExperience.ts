@@ -75,7 +75,7 @@ export function useFirstAuditExperience(optimisticTotalDocs?: number | null): Fi
   // When the optimistic count is present, it's the authoritative source
   // and no state mutation is needed (we read it directly below).
   useEffect(() => {
-    if (optimisticTotalDocs != null) return;
+    if (optimisticTotalDocs != null) return undefined;
     let cancelled = false;
     void fetchTotalDocs().then(t => {
       if (cancelled) return;
