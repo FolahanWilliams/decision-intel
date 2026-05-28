@@ -23,6 +23,7 @@ import {
   FolderOpen,
   Inbox,
   Clock,
+  CheckCircle2,
 } from 'lucide-react';
 import { WebhookManager } from './WebhookManager';
 import type { SlackInstallationStatus } from '@/types/human-audit';
@@ -1533,6 +1534,199 @@ function SlackDetailSection({
   );
 }
 
+/**
+ * IntegrationSetupGuide — first-time setup helper that surfaces the
+ * recommended integration order with one-line "why this matters" framing.
+ *
+ * Renders 3 numbered steps (Email · Drive · Slack) with connection status.
+ * The hero card collapses to a slim "all connected" banner once the user
+ * finishes the recommended set, so it doesn't waste space forever.
+ *
+ * Wedge motivation: Individual + Strategy tier unlocked Slack/Drive/Email
+ * 2026-05-27. New paying customers shouldn't have to figure out which to
+ * set up first — the data flywheel order matters (Email forwarding
+ * captures memos with zero workflow change; Drive auto-detects outcomes
+ * for the moat; Slack is the wedge collaboration layer).
+ */
+function IntegrationSetupGuide({
+  slackConnected,
+  driveConnected,
+}: {
+  slackConnected: boolean;
+  driveConnected: boolean;
+}) {
+  const steps = [
+    {
+      n: 1,
+      label: 'Email Forwarding',
+      // Always considered "ready" since the per-user inbox is provisioned
+      // automatically — the only "setup" is the founder forwarding their
+      // first memo. No state to check; we surface as "ready to use".
+      status: 'ready' as const,
+      why: 'The lowest-friction path. Forward any strategic memo to your per-user inbox; an audit fires automatically + lands in your dashboard.',
+    },
+    {
+      n: 2,
+      label: 'Google Drive',
+      status: driveConnected ? 'connected' : ('disconnected' as const),
+      why: 'Auto-detect closed outcomes in shared documents — the data flywheel that compounds per-org Brier calibration over time. The moat layer.',
+    },
+    {
+      n: 3,
+      label: 'Slack',
+      status: slackConnected ? 'connected' : ('disconnected' as const),
+      why: 'Real-time decision capture + nudge delivery in the channel your team already uses. Use after the first 2-3 audits land.',
+    },
+  ];
+
+  const connectedCount = steps.filter(s => s.status === 'connected' || s.status === 'ready').length;
+  // Once Drive + Slack are both connected (Email is always ready), collapse
+  // to a slim success banner.
+  const allDone = slackConnected && driveConnected;
+
+  if (allDone) {
+    return (
+      <div
+        style={{
+          padding: '12px 16px',
+          marginBottom: 24,
+          background: 'color-mix(in srgb, var(--success) 8%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--success) 30%, transparent)',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 13,
+          color: 'var(--success)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <CheckCircle2 size={14} />
+        <span style={{ fontWeight: 600 }}>All recommended integrations connected.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        marginBottom: 28,
+        padding: '20px 22px',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderLeft: '3px solid var(--accent-primary)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          marginBottom: 14,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: 'var(--accent-primary)',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              marginBottom: 4,
+            }}
+          >
+            First-time setup · recommended order
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            Connect the data flywheel in the order that compounds fastest.
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            background: 'var(--bg-secondary)',
+            padding: '4px 10px',
+            borderRadius: 999,
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
+        >
+          {connectedCount}/3 ready
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 12,
+        }}
+      >
+        {steps.map(s => {
+          const isLive = s.status === 'connected' || s.status === 'ready';
+          return (
+            <div
+              key={s.n}
+              style={{
+                padding: '12px 14px',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                borderTop: isLive ? '3px solid var(--success)' : '3px solid var(--border-color)',
+                borderRadius: 'var(--radius-sm)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 6,
+                }}
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 22,
+                      height: 22,
+                      borderRadius: '50%',
+                      background: isLive
+                        ? 'color-mix(in srgb, var(--success) 14%, transparent)'
+                        : 'var(--bg-secondary)',
+                      color: isLive ? 'var(--success)' : 'var(--text-muted)',
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {s.n}
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {s.label}
+                  </span>
+                </div>
+                {isLive ? <CheckCircle2 size={14} style={{ color: 'var(--success)' }} /> : null}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                {s.why}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function IntegrationMarketplace() {
   const [activeTab, setActiveTab] = useState<'marketplace' | 'webhooks'>('marketplace');
   const [slackStatus, setSlackStatus] = useState<SlackInstallationStatus | null>(null);
@@ -1707,6 +1901,16 @@ export function IntegrationMarketplace() {
 
       {activeTab === 'marketplace' && (
         <>
+          {/* First-time setup guidance — locked 2026-05-28 as honorable-
+              mention #2 from the nightly audit. Surfaces the recommended
+              setup order (Email → Drive → Slack) for paying customers
+              on Individual / Strategy tier who just unlocked Slack +
+              Drive + Email features (commit 61bd44e on 2026-05-27). */}
+          <IntegrationSetupGuide
+            slackConnected={Boolean(slackStatus?.connected)}
+            driveConnected={Boolean(driveConfig?.connected)}
+          />
+
           {/* Slack detail section */}
           <SlackDetailSection
             slackStatus={slackStatus}

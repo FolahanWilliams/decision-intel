@@ -303,6 +303,18 @@ export function NotificationBell() {
                     Clear
                   </button>
                 )}
+                <Link
+                  href="/dashboard/notifications"
+                  onClick={() => setOpen(false)}
+                  style={{
+                    color: 'var(--accent-primary)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  View all →
+                </Link>
               </div>
             </div>
 

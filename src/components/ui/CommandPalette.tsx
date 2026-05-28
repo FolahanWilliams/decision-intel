@@ -304,6 +304,32 @@ export function CommandPalette() {
         action: () => navigate('/dashboard/decision-graph'),
         keywords: ['graph', 'network', 'knowledge', 'edges', 'nodes'],
       },
+      {
+        id: 'bias-library',
+        label: 'Bias Library',
+        description: 'In-platform reference for the 22-bias R²F taxonomy',
+        icon: <BookOpen size={16} />,
+        action: () => navigate('/dashboard/bias-library'),
+        keywords: [
+          'bias',
+          'biases',
+          'taxonomy',
+          'reference',
+          'library',
+          'r2f',
+          'cognitive',
+          'debiasing',
+          'kahneman',
+        ],
+      },
+      {
+        id: 'notifications',
+        label: 'Notifications',
+        description: 'Unified inbox — notifications, nudges, outcome reminders',
+        icon: <Bell size={16} />,
+        action: () => navigate('/dashboard/notifications'),
+        keywords: ['notifications', 'inbox', 'nudges', 'alerts', 'reminders', 'bell', 'updates'],
+      },
       // New decision shortcut — the unified DecisionContainer create
       // flow (Phase 2 lock 2026-05-09). Replaces the legacy "New
       // Decision Package" entry; the container kind picker on the

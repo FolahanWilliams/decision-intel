@@ -118,10 +118,11 @@ export function ContainerKanban({ containers, kind, isLoading }: ContainerKanban
         }}
       >
         <div style={{ fontSize: 'var(--fs-md)', color: 'var(--text-primary)', marginBottom: 8 }}>
-          No decisions yet
+          Track your first decision
         </div>
         <div style={{ fontSize: 'var(--fs-sm)' }}>
-          Create your first decision container to start tracking the audit moment before commit.
+          A decision container groups every document for one strategic call — memo + model +
+          diligence + IC deck — and audits them together. The first one takes about 60 seconds.
         </div>
         <Link
           href="/dashboard/decisions/new"

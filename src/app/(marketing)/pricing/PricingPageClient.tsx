@@ -443,6 +443,18 @@ const FAQ: Array<{ q: string; a: string }> = [
     q: 'How long are my documents retained, and can I delete them?',
     a: 'Free 30 days · Individual 1 year · Strategy 3 years · Enterprise 7 years (SOX §404 internal-controls aligned · configurable per Order Form for HIPAA / banking / government). Document retention mirrors the audit-log retention SLA so the two compliance artefacts move in lockstep. Every tier has a 30-day soft-delete grace window before permanent purge: recoverable via support during the grace, irrecoverable after. Self-serve Delete button on every document detail page and on the post-upload reveal card. Full retention SLA at /security#retention.',
   },
+  {
+    q: 'How fast is the first audit after I sign up?',
+    a: 'Sign-up is Google OAuth or magic-link email (under 30 seconds). Paste a strategic memo at /demo or upload from /dashboard; the 12-node R²F audit pipeline runs in 60-90 seconds end-to-end on a typical 1,500-4,000 word memo. The Decision Provenance Record PDF generates in another few seconds after that. No vendor-side onboarding call, no implementation engineer, no config wizard required — just the memo. Slack / Drive / Email integrations come later, on your own time.',
+  },
+  {
+    q: 'How does this compare to hiring another senior analyst?',
+    a: "A senior strategy analyst is $150-250K/year fully loaded — and they bring the same cognitive biases you're trying to audit out. Decision Intel is a structural antagonist: the 22-bias detector runs on EVERY memo, with verbatim academic citations and verbatim evidence quotes the analyst can't supply for themselves. The Individual tier is $2,490/year — under 2% of a single analyst hire — and a single avoided strategic mistake on one memo returns the annual subscription 50× over. The audit is not better than a senior reviewer; it is a structural addition that catches the patterns the reviewer is also vulnerable to. Hire the analyst AND run the audit on every memo they write.",
+  },
+  {
+    q: 'Can I expense this on a corporate card?',
+    a: 'Yes. Individual ($249/mo) sits comfortably within most fractional-CSO and mid-market corp-dev personal-decisive budgets. Strategy ($2,499/mo) typically requires a manager / VP signature and routes through procurement at most F500 / FTSE 250 organisations — we provide a self-serve quote builder at /pricing/quote that produces a non-binding offer letter with the line items procurement teams need. Enterprise is annual + signed Order Form by default.',
+  },
 ];
 
 export function PricingPageClient() {

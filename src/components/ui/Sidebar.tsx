@@ -20,6 +20,7 @@ import {
   ChevronRight as ChevronR,
   Briefcase,
   Share2,
+  BookOpen,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -461,6 +462,15 @@ export default function Sidebar() {
                   />
                 </>
               )}
+            <NavItem
+              href="/dashboard/bias-library"
+              icon={<BookOpen size={18} />}
+              label="Bias Library"
+              description={`In-platform reference for the 22-bias R²F taxonomy`}
+              active={pathname.startsWith('/dashboard/bias-library')}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
             {/* Phase A consolidation 2026-05-09 evening — Decision DNA folded
                into Analytics → Intelligence (it's a personal-calibration
                surface, structurally identical to Bias Genome / Explainability
