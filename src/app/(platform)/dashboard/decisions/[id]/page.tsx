@@ -12,7 +12,16 @@
 import { use, useState } from 'react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import Link from 'next/link';
-import { ChevronLeft, FileText, Download, GitCompareArrows, CheckCircle2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  FileText,
+  Download,
+  GitCompareArrows,
+  CheckCircle2,
+  Send,
+  AlertOctagon,
+  AlertTriangle,
+} from 'lucide-react';
 import { useContainer } from '@/hooks/useContainers';
 import { ContainerCompositeHero } from '@/components/containers/ContainerCompositeHero';
 import { ContainerTopFixesCard } from '@/components/containers/ContainerTopFixesCard';
@@ -113,19 +122,155 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
         All decisions
       </Link>
 
-      <div className="page-header" style={{ marginBottom: 16 }}>
-        <h1>{container.name}</h1>
-        {container.decisionFrame && (
-          <p
+      <div
+        className="page-header"
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ flex: '1 1 320px', minWidth: 0 }}>
+          <div
             style={{
-              color: 'var(--text-secondary)',
-              fontSize: 'var(--fs-sm)',
-              marginTop: 4,
-              fontStyle: 'italic',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+              marginBottom: 4,
             }}
           >
-            {container.decisionFrame}
-          </p>
+            <h1 style={{ margin: 0 }}>{container.name}</h1>
+            {/* Cross-doc conflict chip — Improvement #3 lock 2026-05-28.
+                Renders prominently when the latest cross-ref run has
+                conflicts. Mirrors VerdictBand chip styling from the
+                doc-detail page. */}
+            {container.latestCrossReference && container.latestCrossReference.conflictCount > 0 && (
+              <a
+                href="#cross-reference"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  textDecoration: 'none',
+                  color:
+                    container.latestCrossReference.highSeverityCount > 0
+                      ? 'var(--error)'
+                      : container.latestCrossReference.conflictCount >= 3
+                        ? 'var(--warning)'
+                        : 'var(--info)',
+                  background: `color-mix(in srgb, ${
+                    container.latestCrossReference.highSeverityCount > 0
+                      ? 'var(--error)'
+                      : container.latestCrossReference.conflictCount >= 3
+                        ? 'var(--warning)'
+                        : 'var(--info)'
+                  } 12%, transparent)`,
+                  border: `1px solid ${
+                    container.latestCrossReference.highSeverityCount > 0
+                      ? 'var(--error)'
+                      : container.latestCrossReference.conflictCount >= 3
+                        ? 'var(--warning)'
+                        : 'var(--info)'
+                  }`,
+                }}
+              >
+                {container.latestCrossReference.highSeverityCount > 0 ? (
+                  <AlertOctagon size={12} />
+                ) : (
+                  <AlertTriangle size={12} />
+                )}
+                {container.latestCrossReference.conflictCount} cross-doc conflict
+                {container.latestCrossReference.conflictCount === 1 ? '' : 's'}
+                {container.latestCrossReference.highSeverityCount > 0 && (
+                  <> · {container.latestCrossReference.highSeverityCount} high</>
+                )}
+              </a>
+            )}
+          </div>
+          {container.decisionFrame && (
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: 'var(--fs-sm)',
+                marginTop: 4,
+                fontStyle: 'italic',
+              }}
+            >
+              {container.decisionFrame}
+            </p>
+          )}
+        </div>
+
+        {/* Header action row — Improvement #3 lock 2026-05-28. Promotes
+            Export DPR to the procurement-grade "Forward to committee"
+            action (mirrors the doc-detail page's primary action shipped
+            today). Cross-reference button is a secondary action when
+            ≥2 docs are analyzed. */}
+        {container.analyzedDocCount > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              flexShrink: 0,
+              alignItems: 'center',
+            }}
+          >
+            {container.analyzedDocCount >= 2 && (
+              <button
+                type="button"
+                onClick={triggerCrossRef}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 14px',
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+                title="Re-run cross-document conflict detection across all analyzed members"
+              >
+                <GitCompareArrows size={13} strokeWidth={2.25} />
+                Re-scan conflicts
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={exportPdf}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 16px',
+                background: 'var(--accent-primary)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
+              }}
+              title="Export composite Decision Provenance Record for this decision"
+            >
+              <Send size={13} strokeWidth={2.25} />
+              Forward to committee
+            </button>
+          </div>
         )}
       </div>
 
@@ -415,7 +560,9 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
             )}
           </div>
 
-          <ContainerCrossReferenceCard run={container.latestCrossReference} />
+          <div id="cross-reference" style={{ scrollMarginTop: 72 }}>
+            <ContainerCrossReferenceCard run={container.latestCrossReference} />
+          </div>
 
           <ContainerLinksPanel containerId={container.id} />
 

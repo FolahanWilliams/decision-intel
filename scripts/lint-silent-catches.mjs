@@ -237,7 +237,17 @@ const SCAN_DIR = join(ROOT, 'src');
 // etc.). The /api/documents/stats endpoint itself fails-open with
 // totalDocs: 0 so a downstream error never surfaces to the user — the
 // silent catch here just routes the loading-state path correctly.
-const SILENT_CATCH_BASELINE = 202;
+// 2026-05-28 Bulk decisions ship (Improvement #3): +2 canonical fetch-
+// response body-parse exception classes in BulkDocumentsPath.tsx —
+// (1) container-create response: parses /api/containers POST response,
+//     falls through to null so the error message surfaces "Failed to
+//     create decision" rather than crashing; (2) per-file upload-error:
+//     parses /api/upload POST error response to surface the real
+//     diagnostic in the per-file FileRow error chip rather than a
+//     generic "Upload failed (N)". Same shape as every other canonical
+//     fetch consumer. No delivery/audit/flywheel write swallowed; the
+//     container-create call itself fails-closed with a thrown Error.
+const SILENT_CATCH_BASELINE = 204;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

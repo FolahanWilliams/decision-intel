@@ -49,8 +49,10 @@ import { AccentCard } from '@/components/ui/AccentCard';
 import { ContainerFormModal } from '@/components/containers/ContainerFormModal';
 import { PriorsCaptureCard } from '@/components/containers/PriorsCaptureCard';
 import { flushDraftPriorsToContainer } from '@/lib/priors/draft-handoff';
+import { BulkDocumentsPath } from '@/components/decisions/BulkDocumentsPath';
+import { Layers3 } from 'lucide-react';
 
-type Path = 'pick' | 'document' | 'manual';
+type Path = 'pick' | 'document' | 'bulk' | 'manual';
 
 // Map common upload extensions / filename hints → suggested document
 // type. The bias-detective + structurer nodes use documentType to pick
@@ -129,6 +131,7 @@ export default function NewDecisionPage() {
 
           <PathPicker
             onPickDocument={() => setPath('document')}
+            onPickBulk={() => setPath('bulk')}
             onPickManual={() => setPath('manual')}
           />
         </>
@@ -137,6 +140,14 @@ export default function NewDecisionPage() {
       {path === 'document' && (
         <DocumentPath
           defaultKind={defaultKind}
+          onBack={() => setPath('pick')}
+          onCreated={id => router.push(`/dashboard/decisions/${id}`)}
+        />
+      )}
+
+      {path === 'bulk' && (
+        <BulkDocumentsPath
+          defaultKind={defaultKind ?? 'strategic'}
           onBack={() => setPath('pick')}
           onCreated={id => router.push(`/dashboard/decisions/${id}`)}
         />
@@ -191,16 +202,18 @@ export default function NewDecisionPage() {
 
 function PathPicker({
   onPickDocument,
+  onPickBulk,
   onPickManual,
 }: {
   onPickDocument: () => void;
+  onPickBulk: () => void;
   onPickManual: () => void;
 }) {
   return (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: 16,
         marginBottom: 32,
       }}
@@ -208,16 +221,31 @@ function PathPicker({
       <PathCard
         accent="primary"
         icon={<FileText size={18} style={{ color: 'var(--accent-primary)' }} />}
-        eyebrow="Recommended"
-        title="Start from a document"
-        description="Upload a memo, IC deck, synergy model, or CIM. The full audit pipeline kicks off automatically — biases, named patterns, DQI score, DPR — and the decision is auto-created from the analysis."
+        eyebrow="Single document"
+        title="Start from one document"
+        description="Upload one memo, IC deck, synergy model, or CIM. The full audit pipeline runs — biases, named patterns, DQI score, DPR — and the decision is auto-created."
         bullets={[
           'Auto-detects document type (synergy model, QofE, IC memo, etc.)',
           'Audit pipeline streams in real time on the detail page',
-          'Cross-doc conflict detection fires once a second doc is added',
+          'Best when you have one anchor artefact to audit',
         ]}
         cta="Upload + audit"
         onClick={onPickDocument}
+      />
+
+      <PathCard
+        accent="primary"
+        icon={<Layers3 size={18} style={{ color: 'var(--accent-primary)' }} />}
+        eyebrow="M&A workflow"
+        title="Bulk upload (2-6 docs)"
+        description="Drop CIM + synergy model + IC memo + counsel review at once. All audited in parallel; cross-doc conflict scan fires automatically. The wedge feature for M&A heads + IC reviewers."
+        bullets={[
+          'Up to 6 files audited in parallel',
+          'Per-file document-type auto-detection',
+          'Cross-doc conflict detection fires automatically on ≥2 docs',
+        ]}
+        cta="Bulk upload + audit"
+        onClick={onPickBulk}
       />
 
       <PathCard
