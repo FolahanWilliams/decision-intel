@@ -9,7 +9,13 @@
  * The Sparring Room's HXC default + 4 wedge personas shipped 2026-05-07
  * wedge-batch-3, but the founder doesn't see "you've rehearsed
  * fractional_cso 3× this week and skipped midmarket_corpdev_head" —
- * which is exactly the rebalancing signal the T-32 prep window needs.
+ * which is exactly the rebalancing signal the pre-event prep window needs.
+ *
+ * The countdown text renders LIVE from getHighestPriorityUpcomingEvent +
+ * daysUntil (SSOT in src/lib/data/event-prep.ts). Do NOT reintroduce
+ * hardcoded "T-N days" strings — the prior version had "T-32" literals
+ * that silently drifted 20 days off-truth between the 2026-05-08 lock
+ * and the 2026-05-28 nightly audit catch.
  *
  * This widget reads localStorage['di-sparring-room-history-v1'], filters
  * to the last 7 days, buckets reps per HXC persona, surfaces the
@@ -22,6 +28,7 @@
 
 import { useEffect, useState } from 'react';
 import { Swords, ArrowRight } from 'lucide-react';
+import { getHighestPriorityUpcomingEvent, daysUntil } from '@/lib/data/event-prep';
 
 const HISTORY_KEY = 'di-sparring-room-history-v1';
 
@@ -135,6 +142,20 @@ export function SparringRehearsalBalance() {
 
   if (!stats) return null;
 
+  // Live countdown to the highest-priority upcoming event (canonical
+  // SSOT in src/lib/data/event-prep.ts EVENTS). Prior versions of this
+  // surface hardcoded "T-32 days" in the empty-state + focus-block JSX
+  // which silently drifted 20 days off-truth between the 2026-05-08 lock
+  // date and the actual event countdown. Render dynamically so the
+  // surface stays accurate every day without code edits.
+  const upcomingEvent = getHighestPriorityUpcomingEvent(new Date(mountTime));
+  const daysToEvent = upcomingEvent ? daysUntil(upcomingEvent, new Date(mountTime)) : null;
+  const eventLabel = upcomingEvent
+    ? daysToEvent === 0
+      ? `${upcomingEvent.name} is TODAY`
+      : `${upcomingEvent.name} is T-${daysToEvent} days`
+    : null;
+
   const totalReps = stats.reduce((acc, s) => acc + s.reps7d, 0);
   const isEmpty = totalReps === 0 && stats.every(s => s.latestGrade === null);
 
@@ -163,10 +184,19 @@ export function SparringRehearsalBalance() {
 
       {isEmpty ? (
         <div style={emptyStateBody}>
-          <strong style={{ color: 'var(--text-primary)' }}>No HXC reps logged yet.</strong> Strategy
-          World London is T-32 days (June 9-10 BAFTA) &mdash; the highest-signal CSO event of the
-          next 90 days. Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before
-          the Monday DM batch goes out.
+          <strong style={{ color: 'var(--text-primary)' }}>No HXC reps logged yet.</strong>{' '}
+          {eventLabel ? (
+            <>
+              {eventLabel} ({upcomingEvent!.venue}) &mdash; the highest-signal CSO event of the next
+              90 days. Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before
+              the Monday DM batch goes out.
+            </>
+          ) : (
+            <>
+              Run your first rep against <code>{HXC_PERSONAS[0].shortLabel}</code> before the Monday
+              DM batch goes out.
+            </>
+          )}
         </div>
       ) : (
         <>
@@ -205,9 +235,9 @@ export function SparringRehearsalBalance() {
                 {focusPick.latestGrade
                   ? ` (latest grade ${focusPick.latestGrade})`
                   : ' and no prior rehearsal'}
-                . Strategy World London is T-32 days &mdash; balanced rep across all 4 HXC personas
-                before the BAFTA hallway, not 4× <code>{stats[0].shortLabel}</code> and 0× everyone
-                else.
+                .{eventLabel ? ` ${eventLabel} ` : ' '}&mdash; balanced rep across all 4 HXC
+                personas before the BAFTA hallway, not 4× <code>{stats[0].shortLabel}</code> and 0×
+                everyone else.
               </>
             ) : (
               <>
