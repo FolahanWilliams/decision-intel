@@ -32,6 +32,7 @@ import { DesignPartnersTab } from './DesignPartnersTab';
 import { IntelBriefPanel } from './outreach/IntelBriefPanel';
 import { ConversionLedgerPanel } from './outreach/ConversionLedgerPanel';
 import { TargetResearchWorkbench } from './outreach/TargetResearchWorkbench';
+import { SpecimenLibrary } from './outreach/SpecimenLibrary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Section = 'pipeline' | 'messages' | 'design_partners';
@@ -198,6 +199,12 @@ export function OutreachHubTab({ founderPass, initialSection }: Props) {
                 ConversionLedgerPanel below. */}
             <ErrorBoundary sectionName="Target Research Workbench">
               <TargetResearchWorkbench founderPass={founderPass} />
+            </ErrorBoundary>
+            {/* Specimen library — the send-ready BAFTA artefacts, grabbed +
+                sent right where the outbound motion runs (the /specimen pages
+                are noindex/unlisted, so this is how the founder finds them). */}
+            <ErrorBoundary sectionName="Specimen Library">
+              <SpecimenLibrary />
             </ErrorBoundary>
             <ErrorBoundary sectionName="Wedge Conversion Ledger">
               <ConversionLedgerPanel founderPass={founderPass} />
