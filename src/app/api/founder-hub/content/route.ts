@@ -18,6 +18,7 @@ import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth'
 import { prisma } from '@/lib/prisma';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import {
   buildPersonalSocialSystemPrompt,
   type PostArchetypeId,
@@ -99,7 +100,7 @@ Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's 
 Suggested angles: Why your IC produces different answers on different days, the rubber-stamp problem, simulating the boardroom.`,
 
   toxic_combos: `CONTENT PILLAR: "Toxic Combinations" and Compound Risk
-Focus on: Individual biases are manageable but combinations are catastrophic. Reference Echo Chamber pattern, Boeing 737 MAX, Lehman Brothers. Use named patterns (Optimism Trap, Sunk Ship). Highlight 20x20 compound scoring matrix.
+Focus on: Individual biases are manageable but combinations are catastrophic. Reference Echo Chamber pattern, Boeing 737 MAX, Lehman Brothers. Use named patterns (Optimism Trap, Sunk Ship). Highlight ${MATRIX_DIMENSION}x${MATRIX_DIMENSION} compound scoring matrix.
 Suggested angles: Why single-bias detection is a feature but compound risk scoring is a product, echo chamber deals, historical catastrophes that were predictable.`,
 
   decision_alpha: `CONTENT PILLAR: "Decision Alpha" — Bias Signals from Public Markets

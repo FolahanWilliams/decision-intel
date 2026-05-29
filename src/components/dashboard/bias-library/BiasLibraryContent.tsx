@@ -21,6 +21,15 @@
  *     biases (clickable in-drawer navigation)
  *
  * Reuses canonical formatBiasName + DIFFICULTY_COLORS from the SSOT.
+ *
+ * intentional-modal-pattern — DO NOT migrate to <Dialog> without
+ * review. The bias detail surface is a right-side slide-in drawer
+ * (600px wide, full-height, sticky header), not a centered modal.
+ * Mirrors the QuickScanModal pattern. The drawer's own focus
+ * management + ESC handler + click-outside dismiss is implemented at
+ * the file's bottom (DetailDrawer component). Same marker shape as
+ * QuickScanModal — audit-platform.mjs recognises it via this header
+ * comment.
  */
 
 import { useMemo, useState, useEffect } from 'react';
