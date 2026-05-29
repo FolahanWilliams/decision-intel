@@ -1197,6 +1197,18 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     generatorHint:
       "Damien just said: \"You're claiming a 22-bias matrix can audit my analyst's reasoning better than I can? That feels reductive — strategic memos aren't a quant problem.\" The false-precision objection, locked 2026-05-13 (anchored on Dawes 1979 'Robust Beauty of Improper Linear Models' + Meehl 1954 clinical-vs-statistical-prediction). You have 30 seconds. The right counter has three beats: (1) agree with the felt sense (\"you're right that strategic memos aren't a quant problem — and the matrix isn't trying to score them quant-style\"), (2) name the actual claim (\"what we audit is whether the reasoning has structural rigor — explicit criteria vs narrative-only, reference-class anchoring vs inside view, confidence calibrated to evidence vs rhetorical. Dawes 1979 showed that even simple structured rubrics outperform pure narrative judgment on prediction tasks — that's the literature your analyst was implicitly arguing against\"), (3) flip the frame (\"the matrix is your second pair of eyes on whether your analyst is doing the structured work, not the structured work itself. You still make the call\"). Don't quote Meehl by name on a 30-second window — let the procurement reader find Dawes / Meehl in the DPR. Don't say \"great question.\"",
   },
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'objection_handler',
+    generatorHint:
+      'Damien just said: "By the time I\'ve written the IC memo, the decision is basically made. Auditing it then is a rubber stamp." The ex-ante-timing objection, locked 2026-05-29 (the AI-native reframe). You have 30 seconds. Three beats: (1) AGREE — "you\'re right, and that\'s exactly the point: conviction forms before the memo, so auditing only the finished memo audits the exhaust, not the engine"; (2) reframe UPSTREAM — "so we fire before conviction locks: capture your priors, pull the reference class, run the pre-mortem, and surface the dissent that costs no political capital — we help you build the reasoning, not grade it after the fact"; (3) keep the BACKSTOP — "and the finished-memo audit still produces the tamper-evident record your audit committee needs for the EU AI Act Art-14 file. Upstream is the value; the record is what falls out." NARROWNESS GUARD: never say you "write the memo" or "co-author the deliverable" — you structure the REASONING, never the document. Don\'t say "great question."',
+  },
+  {
+    personaId: 'f500_cso',
+    mode: 'objection_handler',
+    generatorHint:
+      'Margaret just said: "A 0-100 score on a strategic call is a black-box grade. I am not putting an arbitrary number in front of my board." The DQI-is-arbitrary objection, locked 2026-05-29 — DISTINCT from the algorithm-aversion one (that attacks AI-questioning-judgment) and the false-precision one (that attacks reducing judgment to a quant). This one attacks the SCORE as a bare grade. You have 30 seconds. Three beats: (1) agree it would be arbitrary AS a bare grade — "if it were just a number, you\'d be right not to show it"; (2) OPEN THE BOX — "it\'s a reproducible weighted methodology, v2.4.0: seven components, each with a per-component breakdown showing exactly what drove the score, and the weights are user-adjustable — your team tunes them to your domain (that\'s the Dietvorst 2016 algorithm-aversion fix)"; (3) prove INTEGRITY — "and every score carries a tamper-evident hash on the Decision Provenance Record, so two people get the same number from the same memo, verifiably." It is a defensible baseline she shapes and can defend, not a verdict imposed. Don\'t quote the DOI to her face. Don\'t say "great question."',
+  },
 
   // Live demo walkthrough per persona
   {

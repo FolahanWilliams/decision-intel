@@ -343,8 +343,7 @@ const DI_VOCABULARY_CARDS: EducationCard[] = [
     id: 'voc_dpr',
     deckId: 'di_vocabulary',
     prompt: 'What is the Decision Provenance Record (DPR) and what does it currently provide?',
-    canonicalAnswer:
-      `The procurement-grade artefact every audit produces. It is hashed and tamper-evident (SHA-256 input hash + record fingerprint). Private-key signing is on the roadmap, NOT shipped today. The artefact carries integrity fingerprints, model lineage, judge variance, academic citations, ${FRAMEWORK_COUNT}-framework regulatory mapping, pipeline lineage, blind-prior aggregations, and (when applicable) reviewer-decisions HITL log + data-lifecycle footer. Use the EXACT phrase "hashed and tamper-evident" — never overclaim "signed" until that ships.`,
+    canonicalAnswer: `The procurement-grade artefact every audit produces. It is hashed and tamper-evident (SHA-256 input hash + record fingerprint). Private-key signing is on the roadmap, NOT shipped today. The artefact carries integrity fingerprints, model lineage, judge variance, academic citations, ${FRAMEWORK_COUNT}-framework regulatory mapping, pipeline lineage, blind-prior aggregations, and (when applicable) reviewer-decisions HITL log + data-lifecycle footer. Use the EXACT phrase "hashed and tamper-evident" — never overclaim "signed" until that ships.`,
     difficulty: 'core',
     applicationContext:
       'A GC asks: "what does your audit actually produce that I can show to a regulator?"',
@@ -656,8 +655,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt:
       "Titi says 'I worry you'll close 5 wedge cases and pivot to F500 next year. Where does that leave my fund?' Verbatim 30-second response?",
-    canonicalAnswer:
-      `"You should worry about that with US-only vendors. The ${FRAMEWORK_COUNT}-framework regulatory map covers NDPR, CBN, WAEMU, PoPIA, CMA Kenya — that's not a feature I added because you asked. That's the structural moat. The Dangote DPR carries Pan-African regulatory mapping by default. Pivoting to F500 means killing the moat, which means killing the company. The wedge IS the company. The F500 ceiling is the natural expansion vector — not the replacement." Lead with structural commitment (the regulatory map IS the moat), not promise-based reassurance.`,
+    canonicalAnswer: `"You should worry about that with US-only vendors. The ${FRAMEWORK_COUNT}-framework regulatory map covers NDPR, CBN, WAEMU, PoPIA, CMA Kenya — that's not a feature I added because you asked. That's the structural moat. The Dangote DPR carries Pan-African regulatory mapping by default. Pivoting to F500 means killing the moat, which means killing the company. The wedge IS the company. The F500 ceiling is the natural expansion vector — not the replacement." Lead with structural commitment (the regulatory map IS the moat), not promise-based reassurance.`,
     difficulty: 'advanced',
     applicationContext: 'Live objection handling with a Pan-African fund partner.',
     source: 'closing-lab-data.ts',
@@ -702,8 +700,7 @@ const BUYER_PERSONAS_CARDS: EducationCard[] = [
     deckId: 'buyer_personas',
     prompt:
       'Riya asks "is this a wrapper that GPT-5 with vision eats in 6 months?" Verbatim 30-second response?',
-    canonicalAnswer:
-      `"What GPT-5 doesn't eat: the 143-decision case library, the ${FRAMEWORK_COUNT}-framework regulatory mapping across G7 / EU / GCC / African markets, the Brier-scored per-org outcome flywheel that recalibrates the DQI for THIS organisation specifically. Wrapper-class products are the prompt; we're the prompt PLUS the procurement-grade artefact PLUS the data flywheel. The architectural moat is the regulatory + outcome data, not the model call." Name three specific structural moats. Don't deny the wrapper concern abstractly.`,
+    canonicalAnswer: `"What GPT-5 doesn't eat: the 143-decision case library, the ${FRAMEWORK_COUNT}-framework regulatory mapping across G7 / EU / GCC / African markets, the Brier-scored per-org outcome flywheel that recalibrates the DQI for THIS organisation specifically. Wrapper-class products are the prompt; we're the prompt PLUS the procurement-grade artefact PLUS the data flywheel. The architectural moat is the regulatory + outcome data, not the model call." Name three specific structural moats. Don't deny the wrapper concern abstractly.`,
     difficulty: 'advanced',
     applicationContext: 'Pre-seed investor call. The wrapper question always comes up.',
     source: 'CLAUDE.md External Attack Vectors',
@@ -884,8 +881,7 @@ const SILENT_OBJECTIONS_CARDS: EducationCard[] = [
     id: 'silent_chatgpt_wrapper',
     deckId: 'silent_objections',
     prompt: 'What is the ChatGPT-wrapper objection, and what 3 specific moats answer it?',
-    canonicalAnswer:
-      `Silent objection: 'This looks like a system prompt around GPT-4 with a UI. Why pay you?' Three structural moats answer: (1) The 143-decision case library (cross-referenced patterns, not just prompt context). (2) The ${FRAMEWORK_COUNT}-framework regulatory mapping across G7 / EU / GCC / African markets (NDPR, CBN, WAEMU, PoPIA — Cloverpop / IBM watsonx don't cover). (3) The per-org Brier-scored outcome flywheel that recalibrates DQI weights for THIS organisation specifically (data moat that compounds with every audit — Cloverpop's data advantage but in YOUR direction). Plus: ensemble sampling across 3 model judges, NOT a single GPT call.`,
+    canonicalAnswer: `Silent objection: 'This looks like a system prompt around GPT-4 with a UI. Why pay you?' Three structural moats answer: (1) The 143-decision case library (cross-referenced patterns, not just prompt context). (2) The ${FRAMEWORK_COUNT}-framework regulatory mapping across G7 / EU / GCC / African markets (NDPR, CBN, WAEMU, PoPIA — Cloverpop / IBM watsonx don't cover). (3) The per-org Brier-scored outcome flywheel that recalibrates DQI weights for THIS organisation specifically (data moat that compounds with every audit — Cloverpop's data advantage but in YOUR direction). Plus: ensemble sampling across 3 model judges, NOT a single GPT call.`,
     difficulty: 'advanced',
     applicationContext: 'Pre-seed investor or Adaeze-class associate asks the wrapper question.',
     source: 'closing-lab-data.ts + CLAUDE.md External Attack Vectors',
@@ -1516,8 +1512,7 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
     id: 'reg_ndpr',
     deckId: 'regulatory_frameworks',
     prompt: 'NDPR (Nigeria): what is the framework, and why does it matter for the wedge?',
-    canonicalAnswer:
-      `NDPR (Nigeria Data Protection Regulation) — the Nigerian data-protection framework, similar in shape to GDPR but with NITDA as the supervisory authority. Critical for the Pan-African / EM-fund wedge: Pan-African PE funds based in Lagos handle data subjects (portfolio companies' employees + customers) under NDPR. The DPR carries NDPR provisions for Nigerian-jurisdiction memos. Without NDPR coverage, Titi-class fund partners cannot procure DI under their data-residency posture. This is part of the ${FRAMEWORK_COUNT}-framework structural moat against US-only competitors.`,
+    canonicalAnswer: `NDPR (Nigeria Data Protection Regulation) — the Nigerian data-protection framework, similar in shape to GDPR but with NITDA as the supervisory authority. Critical for the Pan-African / EM-fund wedge: Pan-African PE funds based in Lagos handle data subjects (portfolio companies' employees + customers) under NDPR. The DPR carries NDPR provisions for Nigerian-jurisdiction memos. Without NDPR coverage, Titi-class fund partners cannot procure DI under their data-residency posture. This is part of the ${FRAMEWORK_COUNT}-framework structural moat against US-only competitors.`,
     difficulty: 'core',
     applicationContext: 'Pan-African fund partner asks about Nigerian data protection.',
     source: 'src/lib/compliance/frameworks/africa-frameworks.ts',
@@ -1573,6 +1568,19 @@ const REGULATORY_FRAMEWORKS_CARDS: EducationCard[] = [
 // ─── Cards: R²F Framework (5) ───────────────────────────────────
 
 const R2F_FRAMEWORK_CARDS: EducationCard[] = [
+  {
+    id: 'r2f_mediating_assessments_protocol',
+    deckId: 'r2f_framework',
+    prompt:
+      'What is the Mediating Assessments Protocol (MAP), and why is it the queued next R²F detector?',
+    canonicalAnswer:
+      "MAP (Kahneman, Lovallo & Sibony, HBR 2019 / 'Noise' 2021) is the noise-side complement to the bias-heavy R²F stack: decompose a decision into independent attributes, blind-score each on objective criteria BEFORE any holistic discussion, and DELAY the global judgment until all sub-scores are in. It defeats the halo / coherence cascade (DI-B-021 illusion_of_validity) and cuts inter-rater noise — grounded in the mechanical-aggregation literature (Meehl 1954 / Dawes 1979 'improper linear models' / Grove et al. 2000 meta-analysis). Status: ROADMAP, NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it at events as the next R²F detector; never claim it is live. The current noise jury is decorrelated FRAMES (analyst-skeptical / regulator-hostile / contrarian-strategist) = framing-variance, NOT MAP's attribute-decomposition-with-blind-scoring.",
+    difficulty: 'advanced',
+    applicationContext:
+      'A CSO/GP asks how you reduce NOISE (not just bias), or what is next on the R²F roadmap.',
+    source: 'CLAUDE.md AI-native reframe lock 2026-05-29; Kahneman/Lovallo/Sibony Noise (2021)',
+    tag: 'roadmap',
+  },
   {
     id: 'r2f_kahneman_side',
     deckId: 'r2f_framework',
@@ -1634,6 +1642,20 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
 // ─── Cards: Founder One-Liners (8) ──────────────────────────────
 
 const FOUNDER_ONELINERS_CARDS: EducationCard[] = [
+  {
+    id: 'oneliner_ex_ante_additive_narration',
+    deckId: 'founder_oneliners',
+    prompt:
+      'How do you NARRATE Decision Intel so it lands as additive (time-saving) and upstream, not corrective?',
+    canonicalAnswer:
+      "Lead with the upstream, additive value: 'We help you build defensible reasoning BEFORE conviction locks in — the reference class, the pre-mortem, the dissent that costs no political capital — and the audit-committee record falls out of it.' The memo audit + DPR + DQI are the procurement / defensibility BACKSTOP, NOT the headline. Why: commitment forms before the memo lands, so an ex-post-only pitch audits the exhaust, not the engine (Mitchell/Russo/Pennington 1989; Kahneman & Lovallo RCF). Frame the value as time-saved-additive ('it does the reasoning-hygiene work you skip under deadline'), never corrective ('we grade your memo' = ego threat). NARROWNESS GUARD: it co-creates the REASONING (reference class, pre-mortem, priors, antagonist), NEVER authors the deliverable (memo / IC packet / LP letter) — that is the Quantellia / Aera / Wealor horizontal trap. DO-NOT-QUOTE the '~30h saved/deal' figure (confabulated Deep Research stat).",
+    difficulty: 'core',
+    applicationContext:
+      'Ordering the demo or writing a cold DM — lead ex-ante-additive, keep DPR/DQI as the backstop.',
+    source:
+      'icp.ts POSITIONING_EX_ANTE_FRAME + POSITIONING_TIME_SAVING_FRAME; CLAUDE.md reframe lock 2026-05-29',
+    tag: 'narration',
+  },
   {
     id: 'oneliner_external_attack_vectors',
     deckId: 'founder_oneliners',
@@ -1841,8 +1863,7 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
     deckId: 'advanced_sales_moves',
     prompt:
       'How do you operationalise "natural scarcity" without sounding like a desperate startup?',
-    canonicalAnswer:
-      `Frame the constraint as STRUCTURALLY TRUE (founder bandwidth + outcome calibration), not marketing scarcity. Verbatim: 'We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.' Mechanism: triggers loss-aversion (buyer who hesitates loses the seat) AND establishes the contractual ask early so it's not a surprise at procurement. Anti-pattern: fake scarcity ('limited-time offer', 'only this month') — sophisticated buyers detect this in 5 seconds.`,
+    canonicalAnswer: `Frame the constraint as STRUCTURALLY TRUE (founder bandwidth + outcome calibration), not marketing scarcity. Verbatim: 'We're onboarding 4 more design partners this quarter. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. If we partner, the ask is that your team commits to 90-day outcome logging so the model recalibrates against your firm's specific failure patterns.' Mechanism: triggers loss-aversion (buyer who hesitates loses the seat) AND establishes the contractual ask early so it's not a surprise at procurement. Anti-pattern: fake scarcity ('limited-time offer', 'only this month') — sophisticated buyers detect this in 5 seconds.`,
     difficulty: 'advanced',
     applicationContext: "Buyer says 'we'd want to look at this next quarter.'",
     source: 'sales-toolkit.ts SALES_FRAMEWORK_GAPS · cialdini_natural_scarcity',
@@ -1900,8 +1921,7 @@ const ADVANCED_SALES_MOVES_CARDS: EducationCard[] = [
     deckId: 'advanced_sales_moves',
     prompt:
       'How does "competence-signalling via extreme specificity" beat the ChatGPT-wrapper question?',
-    canonicalAnswer:
-      `Verbatim: 'I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.' Mechanism: true experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't. Anti-pattern: vague generic claims ('AI-powered', 'next-generation governance') — specificity is the only credibility-builder against age skepticism.`,
+    canonicalAnswer: `Verbatim: 'I didn't build a ChatGPT wrapper. ChatGPT gives you one generative guess. I operationalised the 2009 Kahneman-Klein synthesis into a deterministic 12-node pipeline. The engine runs your memo through a ${MATRIX_DIMENSION}×${MATRIX_DIMENSION} toxic-combination matrix and maps every flag to EU AI Act Article 14 record-keeping requirements. I built this because I published a paper on the neuro-cognitive roots of the 2008 financial crisis, and I realised the Fortune 500 still has no software to stop those exact same bias cascades from happening today.' Mechanism: true experts don't use buzzwords; they signal elite status by describing the architecture of a problem with such terrifying granular precision that the older buyer instantly realises the teenager has done the deep academic work they haven't. Anti-pattern: vague generic claims ('AI-powered', 'next-generation governance') — specificity is the only credibility-builder against age skepticism.`,
     difficulty: 'advanced',
     applicationContext:
       "Buyer asks 'why did you build this?' or hints at ChatGPT-wrapper suspicion.",
@@ -2020,8 +2040,7 @@ const BRINKMANSHIP_CARDS: EducationCard[] = [
     id: 'brink_natural_scarcity_seats',
     deckId: 'advanced_sales_moves',
     prompt: 'How does brinkmanship apply to your 4 design-partner seats?',
-    canonicalAnswer:
-      `Source: Cialdini scarcity × Schelling commitment. Verbatim: 'We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.' Mechanism: scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. Anti-pattern: discounting the operational requirements when the buyer pushes back — destroys the scarcity.`,
+    canonicalAnswer: `Source: Cialdini scarcity × Schelling commitment. Verbatim: 'We have 4 design-partner seats open. Because the outcome flywheel needs me to map your firm's specific decision pipeline to the ${FRAMEWORK_COUNT}-framework regulatory engine, I physically don't have capacity for a fifth. The seats come with strict operational requirements — 90-day outcome logging, audit-before-meeting on every IC, and the engagement is a contractual data flywheel commitment. If those terms don't fit, we hold the seat for someone else.' Mechanism: scarcity is structurally true (founder bandwidth + outcome calibration), not marketing. By tying the seat to non-negotiable operational commitments, you create a deliberate risk: the buyer either accepts your terms or loses access entirely. Anti-pattern: discounting the operational requirements when the buyer pushes back — destroys the scarcity.`,
     difficulty: 'advanced',
     applicationContext: "Buyer says 'we'd want to do this next quarter, can you hold a seat?'",
     source: 'sales-toolkit.ts BRINKMANSHIP_MOVES · brinkmanship_natural_scarcity_seats',

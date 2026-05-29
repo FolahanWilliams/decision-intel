@@ -115,6 +115,50 @@ export const POSITIONING_POLITICAL_CAPITAL_LINE =
 export const POSITIONING_HERO_SECONDARY =
   'The reasoning audit platform the Fortune 500 needs before EU AI Act enforcement begins August 2026.';
 
+/**
+ * Ex-ante-additive narration frame (locked 2026-05-29 — the adversarial-verified
+ * reframe after the AI-native Deep Research pass + the 8-agent integration
+ * workflow).
+ *
+ * The shift: when NARRATING the product (demo ordering, cold DM, wedge pitch),
+ * lead with the UPSTREAM, ADDITIVE value — we help you build defensible
+ * reasoning BEFORE conviction locks (the reference class, the pre-mortem, the
+ * antagonist that costs no political capital) — and the ex-post memo audit +
+ * DPR + DQI are the procurement/defensibility BACKSTOP, not the headline.
+ *
+ * Why: the empirically-robust finding (commitment forms before the memo, so
+ * an ex-post-only audit audits the exhaust, not the engine; Mitchell/Russo/
+ * Pennington 1989, Kahneman & Lovallo RCF) means the ex-ante surfaces are the
+ * higher-leverage first impression. Crucially this is a NARRATION change, not
+ * a build — the surfaces already ship (PriorsCaptureCard, Intelligent
+ * Antagonist, reference-class forecast, Deal Fever pre-mortem). The DPR/audit
+ * is NOT abandoned (it's the EU AI Act Art 14 contractual artefact + the
+ * cold-evidence /demo door); it moves from headline to backstop.
+ *
+ * NARROWNESS GUARD (load-bearing): DI structures + pressure-tests the
+ * REASONING. It NEVER authors the deliverable (the memo / IC packet / board
+ * deck / LP letter). "Co-create the reasoning" is the line; "auto-draft the
+ * memo" is the Quantellia/Aera/Wealor horizontal trap — banned (see
+ * BANNED_VOCABULARY). Reasoning, never the document.
+ */
+export const POSITIONING_EX_ANTE_FRAME =
+  'We help you build defensible reasoning before conviction locks in — the reference class, the pre-mortem, the dissent that costs no political capital — and the audit-committee record falls out of it.';
+
+/**
+ * Time-saving / additive framing (locked 2026-05-29). Reframes the value from
+ * corrective ("we grade your memo" — ego-threatening, the empathic-mode-first
+ * violation) to additive ("the model does the reasoning-hygiene work you'd
+ * otherwise skip under deadline"). Anchor ONLY to surfaces that genuinely DO
+ * the work — auto reference-class lookup over the 143-case library, the
+ * prospective-hindsight pre-mortem, the priority-divergence antagonist.
+ *
+ * DO-NOT-QUOTE: the Deep Research report's "~30h saved/deal" is a stacked sum
+ * of four fabricated component estimates — illustrative direction only, NEVER
+ * a quoted figure (same do-not-quote discipline as Brier 0.258 / ~90% margin).
+ */
+export const POSITIONING_TIME_SAVING_FRAME =
+  'It does the reasoning-hygiene work you skip under deadline — pulls the reference class, runs the pre-mortem, surfaces where your read diverges from the evidence — so the rigor is additive, not another step.';
+
 export const IP_MOAT_NAME = 'Recognition-Rigor Framework (R²F)';
 
 export const IP_MOAT_DESCRIPTION =
@@ -459,6 +503,16 @@ export const BANNED_VOCABULARY: ReadonlyArray<{ phrase: string; reason: string }
     reason:
       'Banned 2026-05-11 alongside "always-on red team" — same deprecation reasoning. The "digital" prefix doesn\'t fix the structural antagonism problem.',
   },
+  {
+    phrase: 'auto-draft the memo',
+    reason:
+      'Banned 2026-05-29 (AI-native reframe narrowness guard, adversarial-verified). DI structures + audits the REASONING; it NEVER authors the deliverable (memo / IC packet / board deck / LP letter). Auto-drafting the deliverable is the Quantellia/Aera/Wealor horizontal-do-everything trap — narrowness is the moat. Same applies to "write your IC memo / board deck / LP letter for you" and "co-author your deal docs". The ex-ante value is co-creating the REASONING (RCF, pre-mortem, priors, the antagonist), not the document.',
+  },
+  {
+    phrase: 'decision co-creation platform',
+    reason:
+      'Banned 2026-05-29 as a CATEGORY claim. "Co-create the reasoning" is a valid description of the shipped ex-ante surfaces (priors capture + Intelligent Antagonist + RCF + pre-mortem); but "decision co-creation platform" as the category noun drifts toward horizontal workflow and away from the protected category claim "the reasoning audit platform". The Deep Research report pushed this verb — it smuggles the horizontal trap. Reasoning, never the deliverable.',
+  },
 ] as const;
 
 /**
@@ -495,6 +549,7 @@ export const COLD_CONTEXT_ONRAMPS: ReadonlyArray<string> = [
   'reasoning audit',
   'an antagonist that costs no political capital', // Tier 3.1, corp-dev-head cold DM hook
   'audit that fires before the IC memo can hide it', // Tier 3.1, sponsor-driven-deal cold DM hook
+  'the reference class + pre-mortem, run for you before the memo', // ex-ante-additive hook (2026-05-29)
 ] as const;
 
 /**
@@ -529,6 +584,16 @@ export function buildPositioningPromptBlock(): string {
     `Layering rule: when both sub-heads fit a surface (e.g. landing page sales section), use them in sequence — contrast first (resolves category question), political-capital second (resolves buyer-psychology question). DO NOT pick "always-on red team" or "digital red team" framings; both banned 2026-05-11 because red teams fail structurally (sponsor-driven deal environments make dissent ego-costly). The political-capital line is the literature-grounded fix.`,
     `Asymmetric-tail body (use as JUSTIFICATION for running the audit on every memo): "${POSITIONING_ASYMMETRIC_TAIL_BODY}"`,
     `Secondary H1 (cold investor / regulatory-tailwind contexts only): "${POSITIONING_HERO_SECONDARY}"`,
+    ``,
+    `EX-ANTE-ADDITIVE NARRATION (locked 2026-05-29 — adversarial-verified reframe after the AI-native Deep Research pass; the H1 + pain framing above are UNCHANGED, this is how to ORDER the story):`,
+    `When narrating the product (demo, cold DM, wedge pitch) LEAD with the upstream, additive value: "${POSITIONING_EX_ANTE_FRAME}"`,
+    `Time-saving / additive frame (reframes value from corrective/ego-threatening to additive): "${POSITIONING_TIME_SAVING_FRAME}"`,
+    `Demo ORDERING: lead with the ex-ante surfaces that ALREADY SHIP (PriorsCaptureCard = conviction + kill criteria before the memo; the Intelligent Antagonist = priority captured before the algorithm reveals; reference-class forecast + Deal Fever pre-mortem the model runs FOR them). The ex-post memo audit + DPR + DQI are the procurement/defensibility BACKSTOP and second beat — NOT the headline. This is a narration + sequencing change, NOT a build; do not imply anything new was built.`,
+    `NARROWNESS GUARD (load-bearing): DI co-creates the REASONING (RCF, pre-mortem, priors, dissent) — it NEVER authors the deliverable (the memo / IC packet / board deck / LP letter). "Auto-draft the memo / co-author your deal docs / decision co-creation platform" are banned (horizontal Quantellia/Aera/Wealor trap). Reasoning, never the document.`,
+    `KEEP, do NOT abandon (the Deep Research report wrongly recommended killing these — they are moat layers): the DQI, the ex-post memo audit, and the DPR. The DPR is the EU AI Act Art 14 contractual artefact + the cold-evidence /demo door; the DQI is a reproducible weighted methodology, not a grade (see DQI rebuttal below).`,
+    `DQI "black-box / arbitrary grade" REBUTTAL (use verbatim when a buyer/investor says the score feels arbitrary): "It's not a black-box grade — here's the slider (the weights are user-adjustable, the Dietvorst 2016 algorithm-aversion fix), here's the per-component breakdown, and here's the tamper-evident hash on the DPR." The DQI is a reproducible, weighted, methodology-versioned (v2.4.0) score — the academically-grounded answer to the false-precision objection, not the objection's target.`,
+    `MAP roadmap (Mediating Assessments Protocol — Kahneman/Lovallo/Sibony, "Noise" 2021): the one genuinely net-new idea from the research. Name it at events as the QUEUED next R²F detector — the noise-side complement (decompose a decision into independent attributes, blind-score each before holistic discussion, delay the verdict; attacks the halo/coherence cascade). It is NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it as roadmap, never as a current capability.`,
+    `DO-NOT-QUOTE (confabulated Deep Research figures): "~30h saved per deal", "+30% failure-cause ID", "55% noise variance". Reason from the mechanisms; never quote the numbers (same discipline as Brier 0.258 / ~90% margin).`,
     ``,
     `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,
     `Canonical pain phrase: "${POSITIONING_PAIN_FRAMING}"`,
