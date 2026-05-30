@@ -126,6 +126,28 @@ const BANNED = [
       '"the red team you can buy / as-a-service / platform" (banned 2026-05-11 — same Tier 3.1 reasoning)',
   },
 
+  // AI-native ex-ante-additive reframe 2026-05-29 — NARROWNESS GUARD bans.
+  // DI co-creates the REASONING (RCF, pre-mortem, priors, antagonist), it
+  // NEVER authors the deliverable (memo / IC packet / board deck / LP
+  // letter). Auto-drafting the deliverable is the Quantellia / Aera /
+  // Wealor horizontal-do-everything trap — narrowness is the moat. Source:
+  // icp.ts BANNED_VOCABULARY (lines 506-515). The banned phrases below
+  // are scoped to MARKETING surfaces only; icp.ts + founder-context.ts +
+  // CLAUDE.md are out-of-scope via SKIP_SUFFIXES + the SCAN_ROOTS
+  // restriction. Pattern shapes match the canonical phrases plus the
+  // common drift variants the icp.ts reason text names ("write your IC
+  // memo / board deck / LP letter for you", "co-author your deal docs").
+  {
+    pattern: /\bauto-?draft(?:s|ing|ed)? (?:the |your |a |an )?(?:memo|IC memo|board deck|LP letter|deliverable|document)\b/i,
+    label:
+      '"auto-draft the memo" (DEPRECATED 2026-05-29 — narrowness guard; DI co-creates REASONING, never authors the deliverable. Horizontal Quantellia/Aera/Wealor trap)',
+  },
+  {
+    pattern: /\bdecision co-?creation (platform|tool|product|system|app)\b/i,
+    label:
+      '"decision co-creation platform" (DEPRECATED 2026-05-29 as a CATEGORY claim — drifts toward horizontal workflow; the protected category claim is "the reasoning audit platform")',
+  },
+
   // Stage-of-company language banned on marketing surfaces.
   { pattern: /\bpre-seed\b/i, label: 'pre-seed (stage-of-company banned)' },
   {
