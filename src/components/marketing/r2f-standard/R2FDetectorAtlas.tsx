@@ -38,6 +38,7 @@ import {
   Lightbulb,
   Eye,
   Calendar,
+  Grid2x2,
   type LucideIcon,
 } from 'lucide-react';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
@@ -77,11 +78,21 @@ interface DetectorEntry {
   mechanism: string;
   citation: string;
   citationDoi?: string;
-  /** ISO date the detector reached production. */
-  shippedDate: string;
-  /** Path(s) to the canonical implementation. */
+  /**
+   * 'shipped' (default) = live in the pipeline / product surfaces.
+   * 'queued' = on the roadmap, NOT a current capability. Renders a ROADMAP
+   * pill instead of a shipped-date badge + an amber roadmap-note callout.
+   * Discipline (CLAUDE.md AI-native reframe lock): speak MAP as roadmap,
+   * never as a current capability.
+   */
+  status?: 'shipped' | 'queued';
+  /** ISO date the detector reached production. Omit for queued entries. */
+  shippedDate?: string;
+  /** What gating a queued detector requires before it can ship. */
+  roadmapNote?: string;
+  /** Path(s) to the canonical implementation (or planned path for queued). */
   implementationFiles: string[];
-  /** Where the detector surfaces in the product. */
+  /** Where the detector surfaces in the product (empty for queued). */
   liveSurfaces: string[];
   /** Renderer for the per-detector mini-viz. */
   renderMiniViz: () => ReactElement;
@@ -523,6 +534,61 @@ function InsideOutsideViz() {
 
 // ─── Detector data ──────────────────────────────────────────────────
 
+/** MAP signal shape — independent attributes blind-scored on the left of a
+ *  blind wall, the holistic verdict delayed (dashed) on the right. The whole
+ *  point: attributes are scored without seeing each other OR the verdict, so
+ *  the halo / coherence cascade can't leak across them. */
+function MapDecompositionViz() {
+  const attrs = [
+    { y: 18, fill: 38, color: C.red },
+    { y: 42, fill: 70, color: C.green },
+    { y: 66, fill: 52, color: C.amber },
+    { y: 90, fill: 64, color: C.blue },
+  ];
+  const barX = 12;
+  const barW = 46;
+  const wallX = 70;
+  return (
+    <svg width="120" height="120" viewBox="0 0 120 120" aria-label="Mediating assessments protocol">
+      {/* Independent attribute bars, blind-scored */}
+      {attrs.map((a, i) => (
+        <g key={i}>
+          <rect x={barX} y={a.y} width={barW} height={10} rx={3} fill={C.slate200} />
+          <rect x={barX} y={a.y} width={(barW * a.fill) / 100} height={10} rx={3} fill={a.color} />
+        </g>
+      ))}
+      {/* Blind wall — attributes can't see each other or the verdict */}
+      <line
+        x1={wallX}
+        y1={10}
+        x2={wallX}
+        y2={110}
+        stroke={C.slate400}
+        strokeWidth={1.5}
+        strokeDasharray="4 4"
+      />
+      {/* Delayed holistic verdict (dashed = not yet formed) */}
+      <rect
+        x={wallX + 12}
+        y={42}
+        width={26}
+        height={34}
+        rx={5}
+        fill="none"
+        stroke={C.slate400}
+        strokeWidth={1.5}
+        strokeDasharray="3 3"
+      />
+      <text x={wallX + 25} y={62} textAnchor="middle" fontSize={9} fill={C.slate500}>
+        ?
+      </text>
+      <text x={31} y={114} textAnchor="middle" fontSize={9} fill={C.slate500}>
+        blind-scored
+      </text>
+    </svg>
+  );
+}
+
 const DETECTORS: DetectorEntry[] = [
   // #1
   {
@@ -722,7 +788,34 @@ const DETECTORS: DetectorEntry[] = [
     liveSurfaces: ['DPR §4.4 strip', 'PaperApplicationsCard SignalBlock', 'Insights API'],
     renderMiniViz: () => <CalibrationGapViz />,
   },
+  // #11 — ROADMAP (queued, not shipped)
+  {
+    id: 'pa_11',
+    paperAppNumber: 11,
+    name: 'Mediating Assessments Protocol',
+    shortLabel: 'Blind Attribute Decomposition',
+    side: 'rigor',
+    icon: Grid2x2,
+    status: 'queued',
+    summary:
+      'The noise-side complement to the bias-heavy detector stack: decompose a decision into independent attributes, blind-score each on objective criteria before any holistic discussion, and delay the global verdict. Structurally defeats the halo / coherence cascade — the exact failure DI-B-021 (Illusion of Validity) names.',
+    mechanism:
+      "Where the current 3-frame noise jury measures variance across professional LENSES scoring the whole memo, MAP measures variance across DECOMPOSED ATTRIBUTES scored in isolation. A queued pipeline node derives the attribute set per document type, fires blind per-attribute scoring calls walled off from each other's outputs, then aggregates mechanically — so coherence can't leak from a strong narrative section into the financial assessment. Per Noise (2021), this attacks noise (the random scatter that debiasing checklists leave untouched), completing the Kahneman × Klein × Noise spine of R²F.",
+    citation:
+      'Kahneman, Sibony & Lovallo — "Noise: A Flaw in Human Judgment" (2021), Ch. on the Mediating Assessments Protocol',
+    shippedDate: undefined,
+    roadmapNote:
+      'Queued, not shipped. The engine is a founder-gated pipeline change — it requires a methodology version bump (2.4.0 → 2.5.0) plus a held-out before/after parity run to prove DQI distributions do not drift invisibly. Deferred until after the first paying customer per the execution-discipline lock; surfaced here as a published roadmap exhibit, never as a current capability.',
+    implementationFiles: [
+      'Planned: src/lib/agents/ (new mapAssessmentNode) + a 6-surface detector cascade',
+    ],
+    liveSurfaces: [],
+    renderMiniViz: () => <MapDecompositionViz />,
+  },
 ];
+
+const SHIPPED_COUNT = DETECTORS.filter(d => d.status !== 'queued').length;
+const QUEUED_COUNT = DETECTORS.filter(d => d.status === 'queued').length;
 
 // ─── Atlas component ────────────────────────────────────────────────
 
@@ -760,7 +853,7 @@ export function R2FDetectorAtlas() {
               marginBottom: 12,
             }}
           >
-            R²F DETECTOR ATLAS · 10 OF 10 SHIPPED
+            R²F DETECTOR ATLAS · {SHIPPED_COUNT} SHIPPED · {QUEUED_COUNT} ON THE ROADMAP
           </div>
           <h2
             style={{
@@ -783,8 +876,10 @@ export function R2FDetectorAtlas() {
             }}
           >
             Each entry below is a procurement-grade signal anchored in a specific academic paper.
-            The 10-paper sprint completed 2026-05-07 with the Calibrated Rejection lock; click any
-            detector to inspect its mechanism, implementation file, and live product surfaces.
+            The shipped detectors are live in the pipeline today; the roadmap entry (the Mediating
+            Assessments Protocol, from Kahneman, Sibony &amp; Lovallo&apos;s <em>Noise</em>) is the
+            queued noise-side complement, marked clearly as not-yet-shipped. Click any detector to
+            inspect its mechanism, citation, implementation file, and live product surfaces.
           </p>
         </div>
 
@@ -897,18 +992,44 @@ export function R2FDetectorAtlas() {
                   {d.name}
                 </div>
 
-                {/* Side label */}
+                {/* Side label + (for queued) a roadmap chip */}
                 <div
                   style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: sideStyle.fg,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    flexWrap: 'wrap',
                     marginTop: 2,
                   }}
                 >
-                  {sideStyle.label}
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: sideStyle.fg,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    {sideStyle.label}
+                  </span>
+                  {d.status === 'queued' && (
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        color: C.amber,
+                        background: C.amberSoft,
+                        border: `1px solid rgba(217, 119, 6, 0.30)`,
+                        padding: '2px 7px',
+                        borderRadius: 999,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                      }}
+                    >
+                      Roadmap
+                    </span>
+                  )}
                 </div>
               </button>
             );
@@ -953,7 +1074,8 @@ function DetectorDetailPanel({
 }) {
   const sideStyle = SIDE_COLORS[detector.side];
   const Icon = detector.icon;
-  const shippedDateLabel = formatShippedDate(detector.shippedDate);
+  const isQueued = detector.status === 'queued';
+  const shippedDateLabel = detector.shippedDate ? formatShippedDate(detector.shippedDate) : null;
   return (
     <div
       style={{
@@ -1012,16 +1134,16 @@ function DetectorDetailPanel({
                 style={{
                   fontSize: 10,
                   fontWeight: 700,
-                  color: C.green,
-                  background: C.greenSoft,
-                  border: `1px solid ${C.greenBorder}`,
+                  color: isQueued ? C.amber : C.green,
+                  background: isQueued ? C.amberSoft : C.greenSoft,
+                  border: `1px solid ${isQueued ? 'rgba(217, 119, 6, 0.30)' : C.greenBorder}`,
                   padding: '4px 10px',
                   borderRadius: 999,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                 }}
               >
-                Shipped · {shippedDateLabel}
+                {isQueued ? 'Roadmap · queued' : `Shipped · ${shippedDateLabel}`}
               </span>
               <button
                 type="button"
@@ -1045,6 +1167,24 @@ function DetectorDetailPanel({
           <p style={{ fontSize: 16, color: C.slate700, lineHeight: 1.55, marginBottom: 16 }}>
             {detector.summary}
           </p>
+
+          {isQueued && detector.roadmapNote && (
+            <div
+              style={{
+                marginBottom: 16,
+                padding: '12px 14px',
+                background: C.amberSoft,
+                border: `1px solid rgba(217, 119, 6, 0.30)`,
+                borderRadius: 10,
+                fontSize: 13,
+                color: C.slate700,
+                lineHeight: 1.5,
+              }}
+            >
+              <strong style={{ color: C.amber }}>On the roadmap — not shipped. </strong>
+              {detector.roadmapNote}
+            </div>
+          )}
 
           <div style={{ marginBottom: 16 }}>
             <div
@@ -1111,12 +1251,18 @@ function DetectorDetailPanel({
               ))}
             </DetailField>
 
-            <DetailField label="Live surfaces">
-              {detector.liveSurfaces.map(s => (
-                <div key={s} style={{ fontSize: 13, color: C.slate700, marginBottom: 2 }}>
-                  · {s}
+            <DetailField label={isQueued ? 'Status' : 'Live surfaces'}>
+              {detector.liveSurfaces.length > 0 ? (
+                detector.liveSurfaces.map(s => (
+                  <div key={s} style={{ fontSize: 13, color: C.slate700, marginBottom: 2 }}>
+                    · {s}
+                  </div>
+                ))
+              ) : (
+                <div style={{ fontSize: 13, color: C.slate500, fontStyle: 'italic' }}>
+                  Not yet shipped — roadmap entry
                 </div>
-              ))}
+              )}
             </DetailField>
           </div>
         </div>
