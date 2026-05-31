@@ -258,6 +258,31 @@ export const COMPETITIVE_DEFENSIVE_LINES: ReadonlyArray<{
 ] as const;
 
 /**
+ * Epistemic-honesty discipline (locked 2026-05-31 — GPT-pushback-validated;
+ * the causality-overclaim guardrail + procurement weapon).
+ *
+ * The single sharpest challenge a sophisticated CSO / GC raises: "your
+ * software flags confirmation bias, the deal later fails — but you can't
+ * prove the bias CAUSED the failure versus the market, rates, or
+ * integration." They are right, and conceding it is the move. Decision Intel
+ * identifies reasoning-RISK INDICATORS correlated with poor outcomes; it does
+ * NOT claim to establish causation. A score that names risk indicators is
+ * defensible in front of an audit committee; one that pretends to prove cause
+ * collapses under the first hard question. This is the operational
+ * follow-through to the pain framing ("unaudited reasoning", never "the
+ * reasoning that CAUSED the loss") + the Kahneman x Klein synthesis ("audit
+ * it", not "here is the verdict").
+ *
+ * Use verbatim when a buyer / investor challenges causality. NEVER let
+ * marketing or structured-data (JSON-LD FAQ) copy assert that a detected bias
+ * CAUSED a historical outcome — the lint guard in
+ * scripts/lint-positioning.mjs enforces the interrogative-overclaim shape;
+ * this constant is the affirmative line that replaces it.
+ */
+export const POSITIONING_EPISTEMIC_HONESTY =
+  'Decision Intel identifies reasoning-risk indicators correlated with poor outcomes — it does not claim to establish causation. That honesty is the procurement weapon: a CSO can defend a score that names the risk indicators a committee should pressure-test, not one that pretends to prove the cause.';
+
+/**
  * Decision system of record · positioning extension (locked v3.2).
  *
  * Decision Intel is the system of record for DECISIONS specifically — not
@@ -626,6 +651,8 @@ export function buildPositioningPromptBlock(): string {
     ``,
     `COMPETITIVE DEFENSIVE LINES — use verbatim when buyer / investor names a competitor:`,
     competitiveLines,
+    ``,
+    `EPISTEMIC-HONESTY / CAUSALITY REBUTTAL (locked 2026-05-31 — GPT-pushback-validated; the sharpest sophisticated-buyer challenge): when a CSO / GC says "you flagged a bias and the deal failed, but you can't prove the bias CAUSED it vs the market / rates / integration" — AGREE, then turn it into the moat: "${POSITIONING_EPISTEMIC_HONESTY}" Three beats: (1) concede correlation is not causation; (2) reframe what DI claims — risk INDICATORS the committee should pressure-test, not a proven cause; (3) close on why that is MORE defensible for an audit committee, not less. NEVER let marketing or JSON-LD copy assert a detected bias CAUSED a historical outcome (historical-analysis prose in the 143-case library is fine; product claims are not).`,
     ``,
     `Protected category noun: "${CATEGORY_CLAIM}". Treat like R²F / DPR / DQI — never substitute synonyms in shipped surfaces. Only allowed deviation: "the reasoning audit" (drop "platform") for cold LinkedIn DMs / conference introductions where SaaS-platform vocabulary sounds heavy.`,
     ``,

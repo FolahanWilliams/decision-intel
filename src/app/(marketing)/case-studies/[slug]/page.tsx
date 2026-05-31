@@ -369,7 +369,7 @@ export default async function CaseStudyDetailPage({
     },
     // FAQPage — auto-generated from the case data. Google may
     // surface as rich snippets; LLMs cite Q-A pairs verbatim when
-    // answering case-specific questions ("which biases caused X?").
+    // answering case-specific questions ("which biases were evident in X?").
     {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',

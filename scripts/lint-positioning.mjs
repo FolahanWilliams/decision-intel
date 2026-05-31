@@ -148,6 +148,22 @@ const BANNED = [
       '"decision co-creation platform" (DEPRECATED 2026-05-29 as a CATEGORY claim — drifts toward horizontal workflow; the protected category claim is "the reasoning audit platform")',
   },
 
+  // Causality-overclaim guard 2026-05-31 — GPT-pushback-validated. DI
+  // identifies reasoning-risk INDICATORS correlated with poor outcomes; it
+  // does NOT claim a detected bias CAUSED a historical outcome (the affirmative
+  // line is POSITIONING_EPISTEMIC_HONESTY in icp.ts). This pattern is
+  // DELIBERATELY NARROW — only the interrogative PRODUCT-claim shape ("which
+  // biases caused [X]?", the old seo.ts FAQ template). It does NOT match
+  // historical-analysis prose in the 143-case library ("authority bias caused
+  // leaders to override warnings" — no "which … biases caused"), which is
+  // legitimate documented analysis, not a DI product claim. Verified: fires on
+  // the pre-2026-05-31 seo.ts FAQ; silent on the current tree + narrative prose.
+  {
+    pattern: /\bwhich\s+(cognitive\s+)?biases?\s+caused\b/i,
+    label:
+      '"which biases caused [outcome]" (causality overclaim, banned 2026-05-31 — DI claims correlation, not causation; use "which biases were evident in" + the explicit epistemic-honesty FAQ. See POSITIONING_EPISTEMIC_HONESTY)',
+  },
+
   // Stage-of-company language banned on marketing surfaces.
   { pattern: /\bpre-seed\b/i, label: 'pre-seed (stage-of-company banned)' },
   {

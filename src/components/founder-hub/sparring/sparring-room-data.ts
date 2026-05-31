@@ -1209,6 +1209,12 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     generatorHint:
       'Margaret just said: "A 0-100 score on a strategic call is a black-box grade. I am not putting an arbitrary number in front of my board." The DQI-is-arbitrary objection, locked 2026-05-29 — DISTINCT from the algorithm-aversion one (that attacks AI-questioning-judgment) and the false-precision one (that attacks reducing judgment to a quant). This one attacks the SCORE as a bare grade. You have 30 seconds. Three beats: (1) agree it would be arbitrary AS a bare grade — "if it were just a number, you\'d be right not to show it"; (2) OPEN THE BOX — "it\'s a reproducible weighted methodology, v2.4.0: seven components, each with a per-component breakdown showing exactly what drove the score, and the weights are user-adjustable — your team tunes them to your domain (that\'s the Dietvorst 2016 algorithm-aversion fix)"; (3) prove INTEGRITY — "and every score carries a tamper-evident hash on the Decision Provenance Record, so two people get the same number from the same memo, verifiably." It is a defensible baseline she shapes and can defend, not a verdict imposed. Don\'t quote the DOI to her face. Don\'t say "great question."',
   },
+  {
+    personaId: 'midmarket_corp_dev',
+    mode: 'objection_handler',
+    generatorHint:
+      'Damien just said: "You flagged confirmation bias on a deal that later went sideways. But you can\'t prove the bias caused it — the market turned, integration slipped. That\'s correlation dressed as insight." The causality objection, locked 2026-05-31 (GPT-pushback-validated; distinct from the false-precision and algorithm-aversion objections — this attacks the CAUSAL claim). You have 30 seconds. Three beats: (1) AGREE, fully — "you\'re right, and I\'d be suspicious of anyone who claimed otherwise: no audit can isolate one cause after the fact"; (2) REFRAME what DI claims — "we don\'t claim the bias caused it. We identify reasoning-risk indicators that were detectable in the memo BEFORE the outcome was known — the patterns a committee should pressure-test, not a verdict"; (3) CLOSE on why that\'s MORE defensible — "a score that names what to pressure-test survives the first hard question in the room; a score that claims to have found the cause collapses under it. The restraint is the rigor." Do NOT overclaim to win the point — conceding correlation≠causation IS the win. Don\'t say "great question."',
+  },
 
   // Live demo walkthrough per persona
   {

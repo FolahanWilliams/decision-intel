@@ -844,6 +844,19 @@ const SATYAM_PILLARS_CARDS: EducationCard[] = [
 
 const SILENT_OBJECTIONS_CARDS: EducationCard[] = [
   {
+    id: 'silent_causality_correlation',
+    deckId: 'silent_objections',
+    prompt:
+      'A buyer says "you flagged a bias and the deal failed — but that\'s correlation, not causation." What is the rebuttal that turns it into the moat?',
+    canonicalAnswer:
+      "AGREE first — correlation is not causation, and no audit can isolate one cause after the fact (market, rates, integration all move); being suspicious of anyone who claims otherwise is correct. Then REFRAME what DI claims: reasoning-RISK INDICATORS detectable in the memo BEFORE the outcome was known — the patterns a committee should pressure-test, NOT a proven cause or a verdict. Then CLOSE on why that is MORE defensible: a score that names what to pressure-test survives the first hard question in the room; a score that claims to have found the cause collapses under it. 'The restraint is the rigor.' Canonical line: POSITIONING_EPISTEMIC_HONESTY (icp.ts). Surfaced publicly on /r2f-standard ('What the audit establishes · and what it deliberately doesn't') + the case-study 'Did these biases cause X?' JSON-LD FAQ (the honest answer is now what AI engines cite). NEVER let marketing / JSON-LD copy assert a detected bias CAUSED a historical outcome — lint-guarded.",
+    difficulty: 'advanced',
+    applicationContext:
+      'A CSO / GC / corp-dev head challenges causality at a procurement-stage call or at a BAFTA-style event.',
+    source: 'CLAUDE.md epistemic-honesty lock 2026-05-31; GPT-pushback-validated',
+    tag: 'objection_causality',
+  },
+  {
     id: 'silent_dqi_trust_me_math',
     deckId: 'silent_objections',
     prompt: 'What is the "DQI trust-me math" silent objection, and what is the real answer?',

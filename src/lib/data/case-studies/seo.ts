@@ -29,6 +29,7 @@ import type { CaseStudy } from './types';
 import { ALL_CASES } from './index';
 import { formatBiasName } from '@/lib/utils/labels';
 import { truncate } from '@/lib/utils/string';
+import { POSITIONING_EPISTEMIC_HONESTY } from '@/lib/constants/icp';
 
 /** Outcome → verb map for headline templates. */
 const OUTCOME_VERB: Record<CaseStudy['outcome'], string> = {
@@ -124,10 +125,13 @@ export function generateCaseStudySeoDescription(caseStudy: CaseStudy): string {
  * FAQPage schema. LLMs cite FAQ Q-A pairs verbatim; Google may
  * surface them as rich snippets in search results.
  *
- * Three deterministic FAQs per case:
- *   1. Which biases caused [Company]'s outcome?
- *   2. What was the actual outcome?
- *   3. How would Decision Intel have flagged this at the time?
+ * Deterministic FAQs per case:
+ *   1. Which biases were evident in [Company]'s outcome?
+ *   2. Did those biases CAUSE the outcome? (epistemic-honesty answer —
+ *      correlation, not causation; the procurement-grade differentiator
+ *      baked into the JSON-LD layer AI engines cite)
+ *   3. What was the actual outcome?
+ *   4. How would Decision Intel have flagged this at the time?
  *
  * Returns null when the case lacks enough data to answer the third
  * FAQ honestly (no preDecisionEvidence) — we'd rather skip the
@@ -136,12 +140,24 @@ export function generateCaseStudySeoDescription(caseStudy: CaseStudy): string {
 export function generateCaseStudyFaqs(caseStudy: CaseStudy): Array<{ q: string; a: string }> {
   const faqs: Array<{ q: string; a: string }> = [];
 
-  // FAQ 1: Which biases caused this?
+  // FAQ 1: Which biases were evident in this case? (correlational framing —
+  // the page documents the patterns present in the reasoning, it does not
+  // assert they caused the outcome; FAQ 2 below makes that explicit.)
   const namedBiases = caseStudy.biasesPresent.slice(0, 5).map(formatBiasName).join(', ');
   const primary = formatBiasName(caseStudy.primaryBias);
   faqs.push({
-    q: `Which cognitive biases caused ${caseStudy.company}'s ${OUTCOME_NOUN[caseStudy.outcome]}?`,
+    q: `Which cognitive biases were evident in ${caseStudy.company}'s ${OUTCOME_NOUN[caseStudy.outcome]}?`,
     a: `${caseStudy.biasesPresent.length} bias patterns are documented in this case, led by ${primary}. The full set: ${namedBiases}. Each is mapped to Decision Intel's 22-bias R²F taxonomy with stable IDs and academic citations.`,
+  });
+
+  // FAQ 2: Did those biases CAUSE the outcome? — the epistemic-honesty
+  // answer. This is deliberately in the JSON-LD layer: AI engines cite FAQ
+  // pairs verbatim, so DI's correlation-not-causation discipline is what an
+  // engine surfaces when a searcher asks "did bias cause X". The honest
+  // answer IS the procurement differentiator (POSITIONING_EPISTEMIC_HONESTY).
+  faqs.push({
+    q: `Did these cognitive biases cause ${caseStudy.company}'s ${OUTCOME_NOUN[caseStudy.outcome]}?`,
+    a: `${POSITIONING_EPISTEMIC_HONESTY} ${primary} and the other documented patterns were detectable in the reasoning before the outcome was known; whether they caused it is a question no audit can settle — too many other factors (market, timing, execution) are in play. A reasoning audit names the risk indicators a committee should pressure-test, not a verdict it should accept.`,
   });
 
   // FAQ 2: What was the actual outcome?

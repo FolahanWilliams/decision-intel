@@ -34,7 +34,7 @@ import {
   PLATFORM_BASELINE_FOOTNOTE,
 } from '@/lib/learning/platform-baseline-snapshot';
 import { R2FDetectorAtlas } from '@/components/marketing/r2f-standard/R2FDetectorAtlas';
-import { POSITIONING_SYNTHESIS_LINE } from '@/lib/constants/icp';
+import { POSITIONING_SYNTHESIS_LINE, POSITIONING_EPISTEMIC_HONESTY } from '@/lib/constants/icp';
 
 // Tetlock-anchored Brier scale — ordered low→high (low = better calibration).
 // "self" marks where DI's seed baseline lands so the scale reads as procurement
@@ -1198,6 +1198,130 @@ const baseline = computePlatformCalibrationBaseline();
             `computeBrierFairPredictedDqi` (the no-evidence-peeking variant of the DQI formula) over
             each case, and bootstraps the mean with a seeded mulberry32 PRNG. Same seed → same
             number across machines and dates.
+          </div>
+        </div>
+      </section>
+
+      {/* Epistemic honesty — correlation, not causation. Locked 2026-05-31
+          (GPT-pushback-validated). Turns the sharpest sophisticated-buyer
+          challenge ("you can't prove the bias CAUSED the loss") into the
+          differentiator: a reasoning audit names risk indicators a committee
+          pressure-tests, it does not pretend to prove cause. Reads the
+          POSITIONING_EPISTEMIC_HONESTY SSOT so the public line can't drift
+          from the chat-coaching + Sparring rebuttal. */}
+      <section
+        id="epistemic-honesty"
+        style={{
+          maxWidth: 1100,
+          margin: '0 auto',
+          padding: '40px 24px 24px',
+          scrollMarginTop: 80,
+        }}
+      >
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            color: C.green,
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            marginBottom: 8,
+          }}
+        >
+          <Scale size={12} strokeWidth={2.5} aria-hidden />
+          What the audit establishes · and what it deliberately doesn&rsquo;t
+        </div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: 'clamp(24px, 3vw, 34px)',
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: C.slate900,
+            lineHeight: 1.15,
+            marginBottom: 12,
+          }}
+        >
+          We name the risk indicators &mdash; not the cause.
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 15.5,
+            lineHeight: 1.6,
+            color: C.slate600,
+            maxWidth: 760,
+            marginBottom: 24,
+          }}
+        >
+          {POSITIONING_EPISTEMIC_HONESTY} A score that names what a committee should pressure-test
+          survives the first hard question in the room; a score that claims to have found the cause
+          does not. The restraint is the rigor.
+        </p>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 16,
+            maxWidth: 860,
+          }}
+        >
+          <div
+            style={{
+              border: `1px solid ${C.slate200}`,
+              borderTop: `3px solid ${C.green}`,
+              borderRadius: 12,
+              padding: '18px 20px',
+              background: C.white,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: C.green,
+                marginBottom: 8,
+              }}
+            >
+              What the DQI establishes
+            </div>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: C.slate600 }}>
+              Which reasoning-risk patterns were present in the memo before the outcome was known,
+              scored against a 22-bias taxonomy and a 143-case reference class &mdash; reproducible,
+              weighted, and versioned. Indicators a committee can act on.
+            </p>
+          </div>
+          <div
+            style={{
+              border: `1px solid ${C.slate200}`,
+              borderTop: `3px solid ${C.slate600}`,
+              borderRadius: 12,
+              padding: '18px 20px',
+              background: C.slate50,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: C.slate600,
+                marginBottom: 8,
+              }}
+            >
+              What it deliberately doesn&rsquo;t claim
+            </div>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: C.slate600 }}>
+              That a detected bias <em>caused</em> the outcome. Markets move, rates shift, execution
+              slips &mdash; no audit can isolate one cause after the fact. Anything that claims
+              otherwise is correlation dressed as proof, and a sophisticated buyer knows it.
+            </p>
           </div>
         </div>
       </section>
