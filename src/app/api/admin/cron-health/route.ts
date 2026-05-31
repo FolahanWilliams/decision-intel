@@ -130,9 +130,7 @@ export async function GET() {
         routesWithFailures: health.filter(r => r.consecutiveFailures > 0).length,
         routesWithCriticalFailures: health.filter(r => r.consecutiveFailures >= 3).length,
         routesStaleOver48h: health.filter(
-          r =>
-            !r.lastRunAt ||
-            Date.now() - new Date(r.lastRunAt).getTime() > 48 * 60 * 60 * 1000
+          r => !r.lastRunAt || Date.now() - new Date(r.lastRunAt).getTime() > 48 * 60 * 60 * 1000
         ).length,
       },
     });
