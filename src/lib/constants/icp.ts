@@ -164,6 +164,26 @@ export const IP_MOAT_NAME = 'Recognition-Rigor Framework (R²F)';
 export const IP_MOAT_DESCRIPTION =
   "Kahneman's debiasing + Klein's Recognition-Primed Decisions, arbitrated in one pipeline.";
 
+/**
+ * R²F synthesis line (locked 2026-05-30, founder-endorsed). The human-facing,
+ * rehearsable crystallization of IP_MOAT_DESCRIPTION — the Kahneman × Klein
+ * synthesis in four words. Most decision-AI products pick a side: either
+ * "the model decides" (replaces intuition) or "the model is just a copilot"
+ * (defers to intuition). DI's position is the nuanced third option the 2009
+ * Kahneman & Klein paper actually argues for — expert intuition is
+ * load-bearing AND systematically biased, so you neither overrule it nor
+ * trust it blind. You audit it.
+ *
+ * Pairs with POSITIONING_HERO_CONTRAST (which differentiates DI from BI /
+ * model-risk-management) on the buyer-psychology axis: "audit it, not
+ * replace it" is ego-safe (same discipline as POSITIONING_PAIN_FRAMING —
+ * names a missing process, never broken thinking). Use as the R²F-page
+ * lead line, pitch-deck synthesis slide, and the one-line answer to "so are
+ * you trying to replace the CSO's judgment?". NOT the landing H1 — that's
+ * POSITIONING_HERO_PRIMARY ("the reasoning audit platform").
+ */
+export const POSITIONING_SYNTHESIS_LINE = "Don't replace intuition. Audit it.";
+
 export const SPECIMEN_LIBRARY_DESCRIPTION =
   'WeWork S-1 (US/global) + Dangote 2014 Pan-African expansion (Africa / EM). Two production DPRs in public/.';
 
@@ -592,7 +612,8 @@ export function buildPositioningPromptBlock(): string {
     `NARROWNESS GUARD (load-bearing): DI co-creates the REASONING (RCF, pre-mortem, priors, dissent) — it NEVER authors the deliverable (the memo / IC packet / board deck / LP letter). "Auto-draft the memo / co-author your deal docs / decision co-creation platform" are banned (horizontal Quantellia/Aera/Wealor trap). Reasoning, never the document.`,
     `KEEP, do NOT abandon (the Deep Research report wrongly recommended killing these — they are moat layers): the DQI, the ex-post memo audit, and the DPR. The DPR is the EU AI Act Art 14 contractual artefact + the cold-evidence /demo door; the DQI is a reproducible weighted methodology, not a grade (see DQI rebuttal below).`,
     `DQI "black-box / arbitrary grade" REBUTTAL (use verbatim when a buyer/investor says the score feels arbitrary): "It's not a black-box grade — here's the slider (the weights are user-adjustable, the Dietvorst 2016 algorithm-aversion fix), here's the per-component breakdown, and here's the tamper-evident hash on the DPR." The DQI is a reproducible, weighted, methodology-versioned (v2.4.0) score — the academically-grounded answer to the false-precision objection, not the objection's target.`,
-    `MAP roadmap (Mediating Assessments Protocol — Kahneman/Lovallo/Sibony, "Noise" 2021): the one genuinely net-new idea from the research. Name it at events as the QUEUED next R²F detector — the noise-side complement (decompose a decision into independent attributes, blind-score each before holistic discussion, delay the verdict; attacks the halo/coherence cascade). It is NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it as roadmap, never as a current capability.`,
+    `MAP roadmap (Mediating Assessments Protocol — Kahneman/Lovallo/Sibony, "Noise" 2021): the one genuinely net-new idea from the research. Name it at events as the QUEUED next R²F detector — the noise-side complement (decompose a decision into independent attributes, blind-score each before holistic discussion, delay the verdict; attacks the halo/coherence cascade). It is NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it as roadmap, never as a current capability. Surfaced as a roadmap exhibit on /r2f-standard (the Detector Atlas).`,
+    `R²F SYNTHESIS LINE (locked 2026-05-30, founder-endorsed — the four-word crystallization of the Kahneman × Klein moat): "${POSITIONING_SYNTHESIS_LINE}" Use as the one-line answer to "are you replacing the CSO's judgment?" and as the R²F-page lead. Ego-safe (audit a process, never call the thinking broken) + IP-true (audit = the reasoning-audit category). NOT the landing H1.`,
     `DO-NOT-QUOTE (confabulated Deep Research figures): "~30h saved per deal", "+30% failure-cause ID", "55% noise variance". Reason from the mechanisms; never quote the numbers (same discipline as Brier 0.258 / ~90% margin).`,
     ``,
     `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,

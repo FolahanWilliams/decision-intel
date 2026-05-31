@@ -101,7 +101,7 @@ Detection difficulty: ${b.difficulty}
 - Provisions: ${f.provisions.length}
 - Bias mappings: ${f.biasMappings.length}
 - Last updated: ${f.lastUpdated}
-`,
+`
     )
     .join('\n');
 
@@ -120,19 +120,19 @@ Primary bias: ${c.primaryBias}. Biases present: ${c.biasesPresent.join(', ') || 
 Lessons: ${c.lessonsLearned.join(' ') || 'see case detail'}
 
 Source: ${c.source} (${c.sourceType}).
-`,
+`
     )
     .join('\n');
 
   // ─── Sub-processor block ────────────────────────────────────────────
   const subProcessors = SUB_PROCESSORS.map(
     sp =>
-      `- **${sp.name}** (${sp.region}): ${sp.categoryLabel} — handles ${sp.dataTouched}. Compliance: ${sp.compliancePosture ?? 'see vendor DPA'}. Verify: ${sp.verification}`,
+      `- **${sp.name}** (${sp.region}): ${sp.categoryLabel} — handles ${sp.dataTouched}. Compliance: ${sp.compliancePosture ?? 'see vendor DPA'}. Verify: ${sp.verification}`
   ).join('\n');
 
   // ─── Retention block ────────────────────────────────────────────────
   const retentionTiers = AUDIT_LOG_RETENTION_TIERS.map(
-    t => `- **${t.tier}**: ${t.window}${t.note ? ` — ${t.note}` : ''}`,
+    t => `- **${t.tier}**: ${t.window}${t.note ? ` — ${t.note}` : ''}`
   ).join('\n');
 
   const body = `# ${LEGAL_ENTITY_NAME} · Comprehensive Reference
@@ -227,7 +227,7 @@ ${COMPETITIVE_DEFENSIVE_LINES.map(
 > ${l.line}
 
 Why: ${l.why}
-`,
+`
 ).join('\n')}
 
 ## Security posture

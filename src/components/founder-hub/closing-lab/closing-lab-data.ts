@@ -286,15 +286,13 @@ export const TRAP_PERSONAS: TrapPersona[] = [
       'Your tri-cultural moat (Lagos / UK / US) + capital-allocation pressure across volatile FX regimes makes them the ultimate enterprise beachhead. Sankore is your first design partner. The fit is real.',
     whyTheyAreATrap:
       'Enterprise PE/VC sales cycles take 9-18 months. Selling to the partner requires proving ROI across multiple deals + satisfying strict regional regulatory frameworks (Nigerian SEC ISA 2007, NDPR, FRC Nigeria current code). Waiting for them to sign a $30K/year contract drains your immediate 30-day momentum. The partnership is real but it is not a 30-day close.',
-    whenToRevisit:
-      `After the Sankore design partnership produces a published reference case AND the ${FRAMEWORK_COUNT}-framework regulatory map is procurement-validated. Then bundle with adjacent Pan-African funds for a multi-deal close motion.`,
+    whenToRevisit: `After the Sankore design partnership produces a published reference case AND the ${FRAMEWORK_COUNT}-framework regulatory map is procurement-validated. Then bundle with adjacent Pan-African funds for a multi-deal close motion.`,
     color: '#475569',
   },
   {
     id: 'gc_audit_committee',
     label: 'General Counsels / Audit Committees',
-    whyTheyLookAttractive:
-      `Your ${FRAMEWORK_COUNT}-framework compliance map makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.`,
+    whyTheyLookAttractive: `Your ${FRAMEWORK_COUNT}-framework compliance map makes them look like a great target. Regulatory tailwinds (EU AI Act Article 14 enforceable Aug 2026) make their pain real and dated.`,
     whyTheyAreATrap:
       'GCs are gatekeepers, not early adopters. Their literal job on any enterprise contract is to find reasons NOT to sign. They will relentlessly scrutinize your data retention windows, NDA compliance, lack of statistical confidence intervals on DQI, and your continuity-of-vendor risk as a 16-year-old solo founder. Pitching them directly at pre-seed is corporate suicide.',
     whenToRevisit:

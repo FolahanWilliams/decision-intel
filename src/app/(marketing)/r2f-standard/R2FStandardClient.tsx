@@ -34,6 +34,7 @@ import {
   PLATFORM_BASELINE_FOOTNOTE,
 } from '@/lib/learning/platform-baseline-snapshot';
 import { R2FDetectorAtlas } from '@/components/marketing/r2f-standard/R2FDetectorAtlas';
+import { POSITIONING_SYNTHESIS_LINE } from '@/lib/constants/icp';
 
 // Tetlock-anchored Brier scale — ordered low→high (low = better calibration).
 // "self" marks where DI's seed baseline lands so the scale reads as procurement
@@ -235,12 +236,25 @@ export function R2FStandardClient() {
           The Recognition-Rigor Framework
         </h1>
         <p
+          className="marketing-display"
+          style={{
+            fontSize: 'clamp(22px, 3vw, 30px)',
+            lineHeight: 1.2,
+            fontWeight: 400,
+            fontStyle: 'italic',
+            color: C.green,
+            margin: '16px 0 0',
+          }}
+        >
+          {POSITIONING_SYNTHESIS_LINE}
+        </p>
+        <p
           style={{
             fontSize: 20,
             lineHeight: 1.5,
             color: C.slate600,
             maxWidth: 780,
-            margin: '18px 0 0',
+            margin: '14px 0 0',
           }}
         >
           A first-party, voluntary standard for human-AI strategic reasoning. Kahneman’s debiasing

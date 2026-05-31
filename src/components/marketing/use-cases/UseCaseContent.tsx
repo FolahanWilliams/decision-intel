@@ -241,7 +241,7 @@ export function UseCaseContent({ useCase: u, sectionId, background }: Props) {
                 margin: '0 0 16px',
               }}
             >
-              Related from the { }
+              Related from the {}
               <span style={{ color: C.slate700 }}>case library</span>
             </h3>
             <div
