@@ -209,6 +209,252 @@ export const EXTRACTION_TARGETS: ExtractionTarget[] = [
   },
 ];
 
+// =============================================================================
+// THE QUESTION BANK — 8 focused, branched questions for the 2-3 hour session.
+// The EXTRACTION_TARGETS above are the ranked FRAME (what to mine + why him).
+// This is the actual CONVERSATION ENGINE: each question is built to branch —
+// depending on his answer, you have the next move already loaded, so the talk
+// can run deep for hours without stalling. Lead with Q1 + Q3 (his crown jewel +
+// your ego wall = targets A + B); save Q7 + Q8 for the close, once he's been
+// mining-rich. Let each branch breathe — you have the time; don't rush to Q8.
+// =============================================================================
+
+export const QUESTION_BANK_INTRO =
+  'You have 2-3 hours — these 8 are the spine of the conversation, not a checklist to race through. Each one is built to BRANCH: ask it, listen, then follow the matching branch wherever his answer goes. Lead with Q1 + Q3 (the institutional-trust playbook + the ego wall — targets A + B). Q4 is the highest-ROI 20 minutes (his day job = your blocker). Q7 + Q8 are the close: only once he has been mining-rich do you turn the lens onto your own next 7 days and lock the accountability metric.';
+
+export interface QuestionBranch {
+  cue: string;
+  follow: string;
+}
+
+export interface SprintQuestion {
+  n: number;
+  theme: string;
+  links: string;
+  priority: ExtractionPriority;
+  question: string;
+  why: string;
+  branches: QuestionBranch[];
+  capture: string;
+}
+
+export const QUESTION_BANK: SprintQuestion[] = [
+  {
+    n: 1,
+    theme: 'The trust-flip moment',
+    links: 'Deepens A · institutional trust',
+    priority: 'lead',
+    question:
+      'Take me to the single hardest "no" you turned into a "yes" at InsurX — one specific institution. What was the actual sequence that flipped them?',
+    why: 'The institutional-trust playbook is the one thing only he can give you, and a specific story carries more than any framework. The flip mechanism is what you copy.',
+    branches: [
+      {
+        cue: 'If he points to ONE person / an internal champion',
+        follow:
+          '"How did you spot that person before you knew they would champion you — what was the tell that they were the believer in a skeptical room?" → this is your "who do I find first inside a target firm" answer.',
+      },
+      {
+        cue: 'If it was a single proof point / a data moment',
+        follow:
+          '"What was the proof, and how did you manufacture credibility BEFORE you had your own track record?" → maps straight onto your 143-case corpus and the cold-start problem.',
+      },
+      {
+        cue: 'If it was inside the product (an "aha" in a demo)',
+        follow:
+          '"What exactly did they see in the first session that made it click — and how long did that take?" → that is the shape of your 60-second live audit. Show it if it pulls.',
+      },
+    ],
+    capture:
+      'The literal mechanism that flipped trust — person, proof, or product moment. Copy it.',
+  },
+  {
+    n: 2,
+    theme: 'Push vs pull · #1 vs #40',
+    links: 'Deepens A · institutional trust',
+    priority: 'lead',
+    question:
+      'How different did it feel getting institutions #1 to #3 onto InsurX versus #10 to #40 — and what specifically turned pushing-a-boulder into momentum?',
+    why: 'Tells you what to optimise for NOW (the painful first references) versus what compounds later. You are at #0; he is at #40.',
+    branches: [
+      {
+        cue: 'If references / word-of-mouth flipped it',
+        follow:
+          '"How did you engineer the first reference — did you deliberately over-serve customer #1, or did you get lucky?" → this is your free-pilot-for-a-testimonial play.',
+      },
+      {
+        cue: 'If a category or regulatory tailwind pulled them in',
+        follow:
+          '"How did you ride it without sounding like you were just surfing a trend?" → your EU-AI-Act tailwind, kept ego-safe.',
+      },
+      {
+        cue: 'If it is STILL all push at 40',
+        follow:
+          '"Then what would you do differently if you restarted at zero?" → the honest contrarian answer is often the most valuable one in the room.',
+      },
+    ],
+    capture:
+      'The inflection — what turned push into pull, and roughly when (which customer number).',
+  },
+  {
+    n: 3,
+    theme: 'The ego wall, in his exact words',
+    links: 'Deepens B · empower, don’t threaten',
+    priority: 'lead',
+    question:
+      'When a veteran underwriter pushes back with some version of "an algorithm can’t price MY book" — what is the literal sentence you say back?',
+    why: 'This is your exact wall: a strategy director hears "bias audit" and feels accused before they have seen anything. Steal his de-escalation phrasing word for word.',
+    branches: [
+      {
+        cue: 'If he reframes as augmentation ("it sharpens you, it doesn’t replace you")',
+        follow:
+          '"Give me the exact words — I want to A/B them against my line, which is ‘we audit the reasoning, never the person.’"',
+      },
+      {
+        cue: 'If he lets them win a demo (proves it on THEIR book)',
+        follow:
+          '"How do you set that up so the win feels like their win, not your tool’s?" → the demo psychology that disarms ego.',
+      },
+      {
+        cue: 'If he finds the believers and ignores the blockers',
+        follow:
+          '"How do you spot the early-adopter underwriter versus the one who will never move — what’s the tell?" → that tell is your wedge-persona targeting filter.',
+      },
+    ],
+    capture: 'The verbatim de-escalation line. Write it down exactly — do not paraphrase it.',
+  },
+  {
+    n: 4,
+    theme: 'What he cut from the pitch',
+    links: 'Deepens C · your stated blocker, his day job',
+    priority: 'lead',
+    question:
+      'The engine is built; my real blocker is translation. When you carried InsurX’s genuinely complex tech to a broker who does not care how it works — what did you cut from the pitch, and what was the ONE thing you led with?',
+    why: 'He is a product manager — translation and packaging is literally his day job, and it is your stated #1 hurdle. This is the highest-ROI 20 minutes of the night.',
+    branches: [
+      {
+        cue: 'If he led with the outcome, not the mechanism',
+        follow:
+          '"How did you find the outcome that actually landed — did you guess it, or did you hear it from customers first?" → your discovery script is exactly this machine.',
+      },
+      {
+        cue: 'If it was a single hero number',
+        follow: '"Which number — and why that one over all the others you could have used?"',
+      },
+      {
+        cue: 'If it was a live demo',
+        follow:
+          '"Walk me through the 60-second version — what do you show first?" → open the live app here and run a real audit if the conversation pulls there.',
+      },
+    ],
+    capture: 'The one thing he led with + the first thing he cut. Both matter equally.',
+  },
+  {
+    n: 5,
+    theme: 'The first yes without a procurement fight',
+    links: 'Deepens D · pricing + packaging',
+    priority: 'secondary',
+    question:
+      'How did you get a conservative institution to say yes without a six-month procurement fight — did you start them small and frictionless, or full-platform, and what was the price-point psychology at the front door?',
+    why: 'You are pricing £249 individual versus a team pilot into the same buyer-psychology he has already navigated. Get the entry-point shape.',
+    branches: [
+      {
+        cue: 'If a free / cheap pilot converted into paid',
+        follow:
+          '"What was the conversion mechanic — what had to be TRUE inside the pilot for them to pay?"',
+      },
+      {
+        cue: 'If land-small-and-expand',
+        follow:
+          '"What triggered the expansion — usage, a single result, or a new stakeholder showing up?"',
+      },
+      {
+        cue: 'If a champion spent discretionary budget',
+        follow:
+          '"Whose budget was it, and how small did the number have to be to skip procurement entirely?" → that is your "personal budget, pre-team" wedge, validated.',
+      },
+    ],
+    capture: 'The entry-point shape + the price threshold that lets a buyer skip procurement.',
+  },
+  {
+    n: 6,
+    theme: 'The distribution-pivot trigger',
+    links: 'Deepens E · the personal reason you are here',
+    priority: 'secondary',
+    question:
+      'You left engineering to chase users for FLTR while running a whole real-estate operation. What was the specific moment you realised that building MORE was not the bottleneck — and how did you physically force yourself out of the code?',
+    why: 'He already told you you are "a builder by nature." He was too. You keep retreating into the code because it is where you feel competent — get his escape hatch.',
+    branches: [
+      {
+        cue: 'If an external forcing function (a deadline, a person, money running out)',
+        follow: '"How would I manufacture that same forcing function for myself this summer?"',
+      },
+      {
+        cue: 'If a single realisation / metric',
+        follow: '"What was the number or the moment that finally made it undeniable?"',
+      },
+      {
+        cue: 'If it was slow and painful',
+        follow:
+          '"What habit actually stuck — what did your week look like once you had switched?" → that becomes your sprint time-protection blocks.',
+      },
+    ],
+    capture: 'His escape-from-build-mode trigger — and the move to manufacture your own.',
+  },
+  {
+    n: 7,
+    theme: 'His read on your next 7 days',
+    links: 'Synthesis · turn the lens onto you',
+    priority: 'secondary',
+    question:
+      'Put yourself in my exact shoes: 16, this engine already built, a free summer, and a room full of M&A heads and CSOs at BAFTA in 8 days. What do your literal next 7 days look like?',
+    why: 'Forces him from advisor-in-general to operator-on-YOUR-problem. His answer is your week-1 plan, pressure-tested by someone who has run this gauntlet.',
+    branches: [
+      {
+        cue: 'If discovery-first',
+        follow:
+          '"Then tear apart the discovery script I brought — would it actually land on that floor?" → pull out Deliverable 1 and hand it over.',
+      },
+      {
+        cue: 'If "build one undeniable reference"',
+        follow:
+          '"Which single prospect would you chase, and how would you over-serve them to get the testimonial?"',
+      },
+      {
+        cue: 'If content / brand-first',
+        follow:
+          '"Which channel, and what would the first post be?" → your 2008-crisis bias research is the expert-not-engineer angle.',
+      },
+    ],
+    capture: 'His version of your next 7 days — then note the deltas against your own plan.',
+  },
+  {
+    n: 8,
+    theme: 'The accountability metric',
+    links: 'Close · sets up the four weeks',
+    priority: 'secondary',
+    question:
+      'Over these four weeks, what is the ONE thing you would want me to report each week so you can tell I am actually executing versus just being busy?',
+    why: 'This is how you convert a one-night host into a recurring advisor who has watched you ship. Letting HIM pick the metric makes him invested in the outcome.',
+    branches: [
+      {
+        cue: 'If conversations / discovery count',
+        follow:
+          '"Done — I will send you a weekly debrief with the verbatim pain-language. First one lands right after BAFTA."',
+      },
+      {
+        cue: 'If pilots / revenue',
+        follow:
+          '"Honest recalibration: enterprise pilots will not close in four weeks; the realistic week-4 metric is 1-2 individual operators committing. Does that hold up to you?" → this shows strategic discipline (your goal-correction #1), not lack of ambition.',
+      },
+      {
+        cue: 'If learning velocity / something softer',
+        follow: '"How would you want me to make that measurable, so it is not just a vibe?"',
+      },
+    ],
+    capture: 'The metric HE chose — that is your weekly WhatsApp post for the next four weeks.',
+  },
+];
+
 export interface GoalCorrection {
   title: string;
   detail: string;
