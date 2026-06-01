@@ -113,7 +113,11 @@
   },
   "overrides": {
     "@prisma/get-platform": "7.4.0",
-    "glob": "11.1.0"
+    "glob": "11.1.0",
+    "postcss": "8.5.15",
+    "@opentelemetry/otlp-transformer": {
+      "protobufjs": "^8.2.0"
+    }
   },
   "devDependencies": {
     "@google/gemini-cli": "^0.35.3",
