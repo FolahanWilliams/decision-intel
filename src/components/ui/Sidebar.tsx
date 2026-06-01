@@ -49,7 +49,6 @@ export default function Sidebar() {
   // collaborating). Existing users who explicitly collapsed Reflect will keep
   // their preference via the localStorage hydration below.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
-    Decisions: false,
     Reflect: false,
     Together: true,
   });
@@ -362,48 +361,37 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-          {/* Decisions cluster — locked 2026-05-06 (Option B cap-stone).
-             The three list surfaces — standalone documents, M&A deals,
-             and decision packages — converge under one parent so the
-             cognitive-load problem on first-login is solved without
-             breaking URLs. Each list keeps its workflow-specific shape
-             (deal kanban, package grid, document table); the home
-             dashboard's ContainersWidget is the cross-list entry
-             point (UnifiedDecisionsFeed was retired in the Phase 3
-             P3.5 unification). Sub-items always render when expanded so the user
-             learns the grouping once. */}
-          <CollapsibleSection
-            label="Decisions"
-            icon={<Briefcase size={16} />}
+          {/* Flattened 2026-06-01 — the nested "Decisions" collapsible cluster
+             was removed: a section named "Decisions" containing an item also
+             named "Decisions" read as a duplicate, and a collapsible cluster
+             nested inside the flat ACT section was a second grouping level the
+             eye had to learn. Documents + Decisions + AI Copilot now sit flat
+             directly under ACT (one grouping level). Every route is unchanged;
+             each list keeps its workflow-specific shape (doc table, deal kanban,
+             package grid). Supersedes the 2026-05-06 Option-B cluster lock. */}
+          <NavItem
+            href="/dashboard/documents"
+            icon={<FileText size={18} />}
+            label="Documents"
+            description="Standalone strategic memos + audits"
+            active={
+              pathname.startsWith('/dashboard/documents') ||
+              pathname.startsWith('/documents') ||
+              (pathname === '/dashboard' && viewParam === 'browse')
+            }
             collapsed={collapsed}
-            isOpen={!collapsedSections.Decisions}
-            onToggle={() => toggleSection('Decisions')}
-          >
-            <NavItem
-              href="/dashboard/documents"
-              icon={<FileText size={18} />}
-              label="Documents"
-              description="Standalone strategic memos + audits"
-              active={
-                pathname.startsWith('/dashboard/documents') ||
-                pathname.startsWith('/documents') ||
-                (pathname === '/dashboard' && viewParam === 'browse')
-              }
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
-              id="onborda-nav-decisions"
-              href="/dashboard/decisions"
-              icon={<Briefcase size={18} />}
-              label="Decisions"
-              description="Investments, acquisitions, strategic decisions — committee gate audits"
-              active={pathname.startsWith('/dashboard/decisions')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-          </CollapsibleSection>
-
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            id="onborda-nav-decisions"
+            href="/dashboard/decisions"
+            icon={<Briefcase size={18} />}
+            label="Decisions"
+            description="Investments, acquisitions, strategic decisions — committee gate audits"
+            active={pathname.startsWith('/dashboard/decisions')}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
           <NavItem
             href="/dashboard/ask"
             icon={<Bot size={18} />}
@@ -629,6 +617,15 @@ export default function Sidebar() {
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 260px !important;
             min-width: 260px !important;
+            /* On mobile the drawer floats over the dark page-dim overlay, so the
+               desktop "liquid glass" (translucent tint + saturate backdrop) goes
+               muddy and casts the slate text periwinkle. Force a solid opaque
+               surface + drop the backdrop saturate so the nav renders on a clean
+               panel. Desktop keeps its glass — this only fires under 768px. */
+            background: var(--bg-primary) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.18) !important;
           }
           aside[role='navigation'].sidebar-mobile-open {
             transform: translateX(0);
