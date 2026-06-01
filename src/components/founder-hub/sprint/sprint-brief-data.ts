@@ -63,6 +63,49 @@ export const SPRINT_META: SprintMeta = {
 export const READ_THE_ROOM =
   'A seasoned B2B product manager is getting on a train during a tube strike to run a "group" event for one person. He is not doing it for the £20 ticket — he saw the profile, clocked the hustle, and decided you are worth his evening. So this is not a workshop and not a generic accountability spreadsheet: it is an exclusive 1-on-1 with someone who works out of the Lloyd’s building, scales financial technology, and has run the exact founder gauntlet you are entering. Your job is to mine his playbook and make him want to keep investing across the four weeks — not to "set a goal" anyone could set.';
 
+export interface RunSheetItem {
+  moment: string;
+  move: string;
+  line: string;
+}
+
+/**
+ * First-viewport run sheet for tomorrow. The long brief below is the strategy;
+ * this is the "20 minutes before the meeting" operating card.
+ */
+export const TOMORROW_RUN_SHEET: RunSheetItem[] = [
+  {
+    moment: 'Open',
+    move: 'Thank him, then earn the room with the InsurX ↔ DI parallel.',
+    line: 'You have already cracked my hardest problem — getting skeptical institutions to trust an algorithm — and that is what I want to learn from you tonight.',
+  },
+  {
+    moment: 'Mine first',
+    move: 'Lead with institutional trust, then empower-don’t-threaten positioning.',
+    line: 'Where did trust actually flip at InsurX — proof point, product moment, person, or packaging?',
+  },
+  {
+    moment: 'Use artifacts',
+    move: 'CV / thesis / live app are support, not the opener.',
+    line: 'If it helps, I brought the one-page version of my background and can show the product in sixty seconds — but I would rather get your teardown first.',
+  },
+  {
+    moment: 'Week 1',
+    move: 'Show the deliverables are already drafted, then ask him to tear them apart.',
+    line: 'I drafted the discovery script and leave-behind already — can you pressure-test whether this would land with a skeptical institutional buyer?',
+  },
+  {
+    moment: 'Late',
+    move: 'Float the InsurX stint as a learning shape, never as a job ask.',
+    line: 'Is there a light, two-day-a-week shape where I could get close enough to your institutional-trust playbook to apply it back to Decision Intel?',
+  },
+  {
+    moment: 'Close',
+    move: 'Leave with one weekly commitment + one way he can hold you accountable.',
+    line: 'By next week I will have run the BAFTA discovery script and logged the exact language buyers use — I will send you the debrief before the next session.',
+  },
+];
+
 /** The opener that earns instant respect — the InsurX <-> DI parallel. */
 export const RESONANCE = {
   opener:

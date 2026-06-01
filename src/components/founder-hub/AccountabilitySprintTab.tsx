@@ -22,6 +22,7 @@ import {
   ClipboardCheck,
   ShieldAlert,
   Users,
+  Clock,
   MessagesSquare,
   Send,
   FileText,
@@ -31,6 +32,7 @@ import { AccentCard } from '@/components/ui/AccentCard';
 import {
   SPRINT_META,
   READ_THE_ROOM,
+  TOMORROW_RUN_SHEET,
   RESONANCE,
   EXTRACTION_TARGETS,
   GOAL,
@@ -173,6 +175,68 @@ export function AccountabilitySprintTab() {
           <SayThis>{SPRINT_META.oneLiner}</SayThis>
         </div>
       </div>
+
+      {/* Tomorrow run sheet */}
+      <Section
+        icon={<Clock size={16} />}
+        title="Tomorrow run sheet"
+        subtitle="First-viewport operating card — what to do in the room, in order"
+        accent={ACCENT.warning}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {TOMORROW_RUN_SHEET.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '72px 1fr',
+                gap: 10,
+                padding: '10px 12px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+              }}
+              className="sprint-run-sheet-row"
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: ACCENT.warning,
+                  paddingTop: 2,
+                }}
+              >
+                {item.moment}
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {item.move}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                    marginTop: 4,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  “{item.line}”
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
 
       {/* Read the room */}
       <Section
@@ -721,6 +785,7 @@ export function AccountabilitySprintTab() {
         @media (max-width: 640px) {
           .sprint-resonance-grid { grid-template-columns: 1fr !important; }
           .sprint-week1-grid { grid-template-columns: 1fr !important; }
+          .sprint-run-sheet-row { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
