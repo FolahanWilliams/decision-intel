@@ -629,6 +629,15 @@ export default function Sidebar() {
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 260px !important;
             min-width: 260px !important;
+            /* On mobile the drawer floats over the dark page-dim overlay, so the
+               desktop "liquid glass" (translucent tint + saturate backdrop) goes
+               muddy and casts the slate text periwinkle. Force a solid opaque
+               surface + drop the backdrop saturate so the nav renders on a clean
+               panel. Desktop keeps its glass — this only fires under 768px. */
+            background: var(--bg-primary) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.18) !important;
           }
           aside[role='navigation'].sidebar-mobile-open {
             transform: translateX(0);
