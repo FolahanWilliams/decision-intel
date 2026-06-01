@@ -37,6 +37,7 @@ import {
   GUARDRAILS,
   RELATIONSHIP_PLAY,
 } from './sprint/sprint-brief-data';
+import { ConvergenceViz, SprintArcViz, ExtractionLadderViz } from './sprint/SprintVizzes';
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -188,6 +189,9 @@ export function AccountabilitySprintTab() {
         <div style={{ marginBottom: 14 }}>
           <SayThis>{RESONANCE.opener}</SayThis>
         </div>
+        <div style={{ marginBottom: 14 }}>
+          <ConvergenceViz />
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {RESONANCE.map.map((row, i) => (
             <AccentCard key={i} accent="info" title={null}>
@@ -248,6 +252,9 @@ export function AccountabilitySprintTab() {
         subtitle="The heart of it — ranked by his unique edge. Lead with A + B; let the rest pull through."
         accent={ACCENT.green}
       >
+        <div style={{ marginBottom: 16 }}>
+          <ExtractionLadderViz />
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {EXTRACTION_TARGETS.map(t => (
             <AccentCard
@@ -321,6 +328,9 @@ export function AccountabilitySprintTab() {
         subtitle="DI-aligned: HXC-persona wedge, discovery-led, BAFTA as the week-1 engine"
         accent={ACCENT.info}
       >
+        <div style={{ marginBottom: 16 }}>
+          <SprintArcViz />
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {FOUR_WEEK_PLAN.map((w, i) => (
             <div
