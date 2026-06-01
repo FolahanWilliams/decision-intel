@@ -281,9 +281,9 @@ export const LOGISTICS: LogisticsItem[] = [
       'Have a sample memo ready to run a real 60-second audit live if he is curious — the working product beats any screenshot. Do not pitch it; show it only if the conversation pulls there.',
   },
   {
-    item: 'One credible physical artifact',
+    item: 'Bring the CV — but as support, not the headline',
     detail:
-      'A one-pager and/or the financial-crisis research. Gives him something to hold while he advises.',
+      'Your CV is founder-framed (Decision Intel as lead Founder/CEO) and genuinely strong — and the i-Fitness finance internship (rated Excellent by a finance line manager, "the mindset for a future career in finance and the business world") is a real credibility bridge into Kristian’s fintech world. So bring it. But do NOT open by sliding a resume across the table (that flips you from founder-peer to job applicant). Lead with the conversation + the InsurX parallel, let the 2008-crisis thesis carry the intellectual proof, show the live app if it pulls there — and have the CV as the one-page "full picture" he can hold and scan while advising.',
   },
   { item: 'A dedicated notebook', detail: 'Write his feedback by hand (see GIVE).' },
   { item: 'Arrive 6:25', detail: 'Be the one already there when he walks in off the train.' },
@@ -412,6 +412,32 @@ export const ONE_PAGER = {
   cta: 'Send me your next strategic memo — I will run the 60-second audit and walk you through it. No slides.',
   egoSafeFooter:
     'It audits the reasoning, never the person. Most memos pass clean — the value is catching the rare one that would have cost you, before it does.',
+};
+
+// =============================================================================
+// INTERNSHIP CONSIDERATION — a live ~2-day/week stint inside InsurX.
+// Context: school ended ~2026-06-01; the founder is free for the summer (~2
+// months), so the opportunity-cost objection that made this a "no" is gone.
+// Updated position: a LIGHT, deliberately-scoped, DI-subordinate stint is a
+// good move — IF it stays a DI multiplier, not a comfortable place to hide
+// from the scary distribution work. Do NOT lead the meeting with the ask.
+// =============================================================================
+
+export const INTERNSHIP_CONSIDERATION = {
+  verdict:
+    'Lean yes — a light ~2-day/week stint inside InsurX is a good move now that the summer is free. The deciding fact changed: the only thing that made it a bad idea was hours you could not spare; a free summer + 2 days a week makes it additive to Decision Intel, not competitive with it.',
+  realPrize:
+    'Be precise about WHY. The strong reason is the institutional-trust playbook: InsurX is the one company that has already solved DI’s #1 go-to-market blocker — getting skeptical institutions to trust an algorithm. Watching that daily, and A/B-ing it against your own DI sales motion in real time, is a multiplier almost nothing else gives you. "See how a company makes decisions generally" is a bonus, not the headline — InsurX’s decision workflows (underwriting) are not your buyers’ (strategy memos / IC decks). Go in optimising for the trust playbook.',
+  operatingRules: [
+    '2 days, hard cap. DI gets the other five — and the deep blocks. Your first-customer push off BAFTA is the priority; the internship fills around it, never the reverse.',
+    'Go in with a weekly learning objective, like you did at i-Fitness — one question tied to a real DI problem (how does InsurX win this trust / package this / handle this objection).',
+    'Keep an "InsurX → DI application log": every week, one thing you learned + how you applied it to DI’s go-to-market that same week. That log is the whole game — it makes the learning compound into DI instead of staying a hobby, and it is your early-warning system if it stops.',
+    'Use it to deepen the Kristian relationship (still the bigger long-game asset). Being inside makes you more useful to him and him more invested in you.',
+  ],
+  caution:
+    'The one caution that survives the free summer: this is still your highest-leverage customer-acquisition window of the year — no school, a room full of buyers at BAFTA in 8 days. The failure mode is no longer "no time" — it is COMFORT. An interesting insurtech is an easier place to feel productive than chasing your own first paying customer. If DI’s distribution work ever slips BECAUSE the internship is the more comfortable thing, that is the signal to dial it back immediately.',
+  howToFloat:
+    'For tomorrow: do NOT lead with the internship ask — establish the founder-peer dynamic and run the extraction first. Then, late and lightly, float it as a learning question, not a job request: "Honestly, the thing I’d value most is getting close enough to how you win institutional trust to apply it to my own market — is there a light, 2-day-a-week shape to that this summer that wouldn’t get in the way of me running Decision Intel?" Get the real parameters (hours, what you’d actually see, how close to the trust problem you’d sit) before committing. Decide after you have the real shape, not before.',
 };
 
 /** Update after each weekly session. Starts empty. */

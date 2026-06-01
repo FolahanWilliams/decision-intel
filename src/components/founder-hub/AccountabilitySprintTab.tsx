@@ -25,6 +25,7 @@ import {
   MessagesSquare,
   Send,
   FileText,
+  Briefcase,
 } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 import {
@@ -42,6 +43,7 @@ import {
   DISCOVERY_SCRIPT,
   LEAVE_BEHIND,
   ONE_PAGER,
+  INTERNSHIP_CONSIDERATION,
 } from './sprint/sprint-brief-data';
 import { ConvergenceViz, SprintArcViz, ExtractionLadderViz } from './sprint/SprintVizzes';
 
@@ -640,6 +642,69 @@ export function AccountabilitySprintTab() {
             ))}
           </ul>
         </AccentCard>
+      </Section>
+
+      {/* Internship consideration */}
+      <Section
+        icon={<Briefcase size={16} />}
+        title="Internship consideration · the ~2-day/week stint"
+        subtitle="School's out for the summer — the time objection is gone. Updated position: lean yes, IF it stays a DI multiplier."
+        accent={ACCENT.info}
+      >
+        <div style={{ marginBottom: 12 }}>
+          <SayThis>{INTERNSHIP_CONSIDERATION.verdict}</SayThis>
+        </div>
+        <AccentCard accent="primary" title="The real prize (optimise for this)">
+          <p style={{ ...bodyText, margin: 0 }}>{INTERNSHIP_CONSIDERATION.realPrize}</p>
+        </AccentCard>
+        <div style={{ marginTop: 12 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: ACCENT.green,
+              marginBottom: 8,
+            }}
+          >
+            Operating rules — these are the deal, not caveats
+          </div>
+          <ul
+            style={{
+              ...bodyText,
+              margin: 0,
+              paddingLeft: 18,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+            }}
+          >
+            {INTERNSHIP_CONSIDERATION.operatingRules.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <AccentCard accent="danger" title="The one caution — the comfort trap">
+            <p style={{ ...bodyText, margin: 0 }}>{INTERNSHIP_CONSIDERATION.caution}</p>
+          </AccentCard>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: ACCENT.info,
+              marginBottom: 8,
+            }}
+          >
+            How to float it tomorrow
+          </div>
+          <p style={{ ...bodyText, margin: 0 }}>{INTERNSHIP_CONSIDERATION.howToFloat}</p>
+        </div>
       </Section>
 
       {/* The relationship play */}
