@@ -22,6 +22,9 @@ import {
   ClipboardCheck,
   ShieldAlert,
   Users,
+  MessagesSquare,
+  Send,
+  FileText,
 } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 import {
@@ -36,6 +39,9 @@ import {
   LOGISTICS,
   GUARDRAILS,
   RELATIONSHIP_PLAY,
+  DISCOVERY_SCRIPT,
+  LEAVE_BEHIND,
+  ONE_PAGER,
 } from './sprint/sprint-brief-data';
 import { ConvergenceViz, SprintArcViz, ExtractionLadderViz } from './sprint/SprintVizzes';
 
@@ -411,6 +417,172 @@ export function AccountabilitySprintTab() {
             </ul>
           </AccentCard>
         </div>
+      </Section>
+
+      {/* Week-1 deliverable 1 — Discovery script */}
+      <Section
+        icon={<MessagesSquare size={16} />}
+        title="Deliverable 1 · Discovery script"
+        subtitle="Bring this tomorrow. Run it live at BAFTA + every call. Mom-Test: past-tense, behaviour-not-opinion, no pitch until the pivot."
+        accent={ACCENT.green}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+          <div style={bodyText}>
+            <strong style={{ color: 'var(--text-primary)' }}>Opener — </strong>
+            {DISCOVERY_SCRIPT.opener}
+          </div>
+          <div style={bodyText}>
+            <strong style={{ color: 'var(--text-primary)' }}>Deflection — </strong>
+            {DISCOVERY_SCRIPT.deflection}
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {DISCOVERY_SCRIPT.questions.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderLeft: `3px solid ${ACCENT.green}`,
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 12px',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <span
+                  style={{
+                    width: 18,
+                    height: 18,
+                    flexShrink: 0,
+                    borderRadius: 5,
+                    background: ACCENT.green,
+                    color: '#fff',
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 1,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span
+                  style={{
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    color: 'var(--text-primary)',
+                    fontWeight: 600,
+                  }}
+                >
+                  {item.q}
+                </span>
+              </div>
+              <div
+                style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6, paddingLeft: 26 }}
+              >
+                <strong style={{ color: 'var(--text-secondary)' }}>Listen for: </strong>
+                {item.listenFor}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <SayThis>
+            <strong>Pivot (only if signal): </strong>
+            {DISCOVERY_SCRIPT.pivot}
+          </SayThis>
+        </div>
+        <div style={{ ...bodyText, marginTop: 10 }}>
+          <strong style={{ color: 'var(--text-primary)' }}>Capture rule — </strong>
+          {DISCOVERY_SCRIPT.captureRule}
+        </div>
+      </Section>
+
+      {/* Week-1 deliverable 2 — Leave-behind line */}
+      <Section
+        icon={<Send size={16} />}
+        title="Deliverable 2 · Jargon-free leave-behind"
+        subtitle="The one line a prospect forwards to a colleague. Zero engineering vocabulary — no DPR / DQI / R²F / pipeline."
+        accent={ACCENT.info}
+      >
+        <div style={{ marginBottom: 12 }}>
+          <SayThis>{LEAVE_BEHIND.coreLine}</SayThis>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {LEAVE_BEHIND.variants.map((v, i) => (
+            <div key={i} style={bodyText}>
+              <strong style={{ color: 'var(--text-primary)' }}>{v.persona}: </strong>
+              {v.line}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Week-1 deliverable 3 — One-pager */}
+      <Section
+        icon={<FileText size={16} />}
+        title="Deliverable 3 · One-pager"
+        subtitle="The leave-behind artefact + the script for what you actually say. Hand it over, or DM it after."
+        accent={ACCENT.warning}
+      >
+        <AccentCard accent="primary" title={null}>
+          <div
+            style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}
+          >
+            {ONE_PAGER.headline}
+          </div>
+          <div style={{ ...bodyText, marginTop: 6, color: 'var(--text-primary)' }}>
+            {ONE_PAGER.subhead}
+          </div>
+          <div style={{ ...bodyText, marginTop: 12 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>The problem — </strong>
+            {ONE_PAGER.problem}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: ACCENT.green,
+                marginBottom: 6,
+              }}
+            >
+              What you get in 60 seconds
+            </div>
+            <ul
+              style={{
+                ...bodyText,
+                margin: 0,
+                paddingLeft: 18,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
+              {ONE_PAGER.whatYouGet.map((w, i) => (
+                <li key={i}>{w}</li>
+              ))}
+            </ul>
+          </div>
+          <div style={{ ...bodyText, marginTop: 12 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Proof — </strong>
+            {ONE_PAGER.proof}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <SayThis>
+              <strong>Call to action: </strong>
+              {ONE_PAGER.cta}
+            </SayThis>
+          </div>
+          <div
+            style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}
+          >
+            {ONE_PAGER.egoSafeFooter}
+          </div>
+        </AccentCard>
       </Section>
 
       {/* What to give */}

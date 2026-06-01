@@ -305,6 +305,115 @@ export const GUARDRAILS = [
 export const RELATIONSHIP_PLAY =
   'The sprint runs a WhatsApp accountability chat for the full four weeks — that is the asset. Most people post a checkbox update. You post a crisp weekly progress note + ONE sharp question that uses his expertise, and over four weeks you convert a one-night host into a recurring B2B advisor who has watched you execute. That is when the network ask becomes earned — not tomorrow (too soon), but week 3-4, after he has seen you deliver: "As I make progress, I would value your read on who in your world is worth me talking to." Insurance buyers are not your ICP, but he sits inside the Atomico-backed, Founders-of-the-Future London ecosystem; the doors he can open are operators + fundability insight, unlocked by execution, not by asking on day one.';
 
+// =============================================================================
+// WEEK-1 DELIVERABLES — bring these to the meeting tomorrow.
+// Kristian asked for the Week-1 commitments; showing up with them ALREADY
+// DRAFTED (not promised) proves execution AND turns the session into a working
+// PM teardown of the real artifacts (his day job = translation/packaging, which
+// is the founder's stated blocker). All copy is jargon-free for the cold-context
+// BAFTA floor + ego-safe (audit unaudited reasoning, never "your thinking is
+// flawed") + tuned to the 4 HXC personas.
+// =============================================================================
+
+export interface DiscoveryQuestion {
+  q: string;
+  listenFor: string;
+}
+
+/**
+ * Mom-Test discovery script — past-tense, behaviour-not-opinion, no pitch until
+ * the pivot. Run it live at BAFTA (T-8d) + on every discovery call.
+ */
+export const DISCOVERY_SCRIPT = {
+  opener:
+    'At the event, connect-not-pitch: "What are you working on?" → listen → "I am working on something in strategic decision-making — mind if I ask how your team handles one thing?"',
+  deflection:
+    'Keep it research, not a pitch: "I am trying to figure out whether a problem I keep seeing is actually real — can I get your take for two minutes?" (You are asking for advice, not selling. The artefact sells later.)',
+  questions: [
+    {
+      q: 'Walk me through the last big strategic memo or deal paper your team put in front of a committee — how did it actually get pressure-tested before the decision?',
+      listenFor:
+        'The real process (or the lack of one). Is it structured, or gut-feel + whoever-is-loudest? This is the gap DI fills.',
+    },
+    {
+      q: 'When a deal or initiative went sideways, where did the original reasoning turn out to be off — and looking back, was that visible in the memo at the time?',
+      listenFor:
+        'The pain, in their words. Capture the exact phrase they use ("deal-killer", "we talked ourselves into it") — that becomes your copy.',
+    },
+    {
+      q: 'Who in the room is actually responsible for catching a blind spot before capital is committed — and how do they do it today?',
+      listenFor:
+        'Who owns it = who the buyer is. "Nobody, really" is the strongest possible answer for you.',
+    },
+    {
+      q: 'When a strategic call goes wrong, what does it actually cost — in money, or in credibility with the board or your LPs?',
+      listenFor:
+        'The stakes + the loss-framing. A named, specific loss is what makes the audit worth paying for.',
+    },
+    {
+      q: 'If you could see the questions your committee or CEO will ask before the meeting, what would that change for you?',
+      listenFor:
+        'Tests the value without pitching. A leaning-in answer is your green light to the pivot.',
+    },
+  ] as DiscoveryQuestion[],
+  pivot:
+    'Only after the last question, and only if there is real signal: "Based on what you said about [their pain, in their words], I think I have built something you should see — can I send you a 60-second audit on your next memo?"',
+  captureRule:
+    'Log every conversation the same night: name, the verbatim pain-language, who owns blind-spot-catching, the cost of a bad call, and one follow-up. The vocabulary you collect rewrites your positioning in week 3.',
+};
+
+export interface LeaveBehindVariant {
+  persona: string;
+  line: string;
+}
+
+/**
+ * The one-line, jargon-free hook a prospect can forward to a colleague. Core
+ * line + a per-persona variant. NO "DPR / DQI / R²F / multi-node pipeline".
+ */
+export const LEAVE_BEHIND = {
+  coreLine:
+    'Decision Intel runs a 60-second audit on a strategic memo or deal paper and flags the reasoning blind spots — the bias patterns behind most failed deals — before the committee commits. Most memos pass clean; the ones that do not are the ones that destroy value.',
+  variants: [
+    {
+      persona: 'Mid-market corp dev / M&A head',
+      line: 'It flags the bias patterns behind the 70-90% of deals that miss their synergies — before the IC meeting, not in the post-mortem.',
+    },
+    {
+      persona: 'Fractional CSO',
+      line: 'So you walk into every client board meeting having already caught what the room will challenge — across all your engagements.',
+    },
+    {
+      persona: 'Smaller-fund GP',
+      line: 'It catches the thesis blind spots before the capital call, and leaves a record your LPs can actually see.',
+    },
+    {
+      persona: 'PE-backed founder / CEO',
+      line: 'It pressure-tests the strategic call before you take it to your sponsor — so you walk in already knowing where they will push.',
+    },
+  ] as LeaveBehindVariant[],
+};
+
+/** The one-pager copy — the leave-behind artefact / the script for what you say. */
+export const ONE_PAGER = {
+  headline: 'Decision Intel — the reasoning audit platform.',
+  subhead:
+    'Most tools audit your data. We audit your reasoning — and catch the fatal blind spots in a strategic memo before the committee does.',
+  problem:
+    '70-90% of M&A deals miss their projected synergies. Most failures trace back to bias patterns that were visible in the original memo — but that nobody named at the time.',
+  whatYouGet: [
+    'A scan for the reasoning blind spots + decision noise in the memo (not just the data).',
+    'The questions your CEO, board, or committee is most likely to ask — before the meeting.',
+    'A single decision-quality score, with the breakdown behind it.',
+    'A shareable, audit-committee-ready record of how the call was reasoned.',
+  ],
+  proof:
+    '143 audited real-world corporate decisions behind the engine — the same lens that catches the WeWork-class blind spots, run on your memo in 60 seconds.',
+  cta: 'Send me your next strategic memo — I will run the 60-second audit and walk you through it. No slides.',
+  egoSafeFooter:
+    'It audits the reasoning, never the person. Most memos pass clean — the value is catching the rare one that would have cost you, before it does.',
+};
+
 /** Update after each weekly session. Starts empty. */
 export interface SessionNote {
   date: string;
