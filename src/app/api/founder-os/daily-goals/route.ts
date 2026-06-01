@@ -48,6 +48,8 @@ interface PostBody {
   text?: string;
   intention?: string;
   isHighlight?: boolean;
+  scheduledFor?: string;
+  linkedPeriodGoalId?: string;
 }
 
 interface PatchBody {
@@ -57,6 +59,12 @@ interface PatchBody {
   intention?: string | null;
   isHighlight?: boolean;
   committed?: boolean;
+  scheduledFor?: string | null;
+  linkedPeriodGoalId?: string | null;
+}
+
+function cleanShort(v: unknown, max: number): string | null {
+  return typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null;
 }
 
 export async function GET(request: Request) {
@@ -101,11 +109,10 @@ export async function POST(request: Request) {
   if (!text) {
     return apiError({ error: 'text required', status: 400 });
   }
-  const intention =
-    typeof body.intention === 'string' && body.intention.trim()
-      ? body.intention.trim().slice(0, 400)
-      : null;
+  const intention = cleanShort(body.intention, 400);
   const isHighlight = Boolean(body.isHighlight);
+  const scheduledFor = cleanShort(body.scheduledFor, 120);
+  const linkedPeriodGoalId = cleanShort(body.linkedPeriodGoalId, 60);
 
   try {
     // The cap IS the feature. Count live commitments for the day and refuse
@@ -136,6 +143,8 @@ export async function POST(request: Request) {
         rank: activeCount + 1,
         isHighlight,
         intention,
+        scheduledFor,
+        linkedPeriodGoalId,
         status: 'open',
         committed: false,
       },
@@ -203,6 +212,9 @@ export async function PATCH(request: Request) {
     }
     if (body.isHighlight !== undefined) data.isHighlight = Boolean(body.isHighlight);
     if (body.committed !== undefined) data.committed = Boolean(body.committed);
+    if (body.scheduledFor !== undefined) data.scheduledFor = cleanShort(body.scheduledFor, 120);
+    if (body.linkedPeriodGoalId !== undefined)
+      data.linkedPeriodGoalId = cleanShort(body.linkedPeriodGoalId, 60);
 
     const goal = await prisma.founderOsDailyGoal.update({
       where: { id: existing.id },

@@ -145,3 +145,151 @@ export function summarizeDailyThree(
     perDay,
   };
 }
+
+// ─── weekly execution (for the Sunday review auto-pull) ──────────────────
+
+export interface WeekExecution {
+  /** Sunday-start ISO of the summarised week. */
+  weekStart: string;
+  set: number;
+  done: number;
+  completionRate: number;
+  daysActive: number;
+  highlightDays: number;
+  highlightHits: number;
+  highlightHitRate: number;
+  /** The 7 days Sun → Sat. */
+  perDay: DailyThreeDay[];
+}
+
+/** Summarise one week's Today's-Three execution, Sun → Sat from `weekStartIso`.
+ *  Pure — the Founder OS weekly-review panel feeds it the goal rows. */
+export function summarizeWeek(
+  goals: ReadonlyArray<DailyGoalLite>,
+  weekStartIso: string
+): WeekExecution {
+  const byDate = new Map<string, DailyGoalLite[]>();
+  for (const g of goals) {
+    const list = byDate.get(g.date);
+    if (list) list.push(g);
+    else byDate.set(g.date, [g]);
+  }
+
+  const perDay: DailyThreeDay[] = [];
+  let set = 0;
+  let done = 0;
+  let daysActive = 0;
+  let highlightDays = 0;
+  let highlightHits = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const iso = shiftIsoDate(weekStartIso, i);
+    const dayGoals = (byDate.get(iso) ?? []).filter(g => isActive(g.status));
+    const daySet = dayGoals.length;
+    const dayDone = dayGoals.filter(g => g.status === 'done').length;
+    const hasHighlight = dayGoals.some(g => g.isHighlight);
+    const highlightDone = dayGoals.some(g => g.isHighlight && g.status === 'done');
+
+    perDay.push({ date: iso, set: daySet, done: dayDone, hasHighlight, highlightDone });
+    set += daySet;
+    done += dayDone;
+    if (daySet > 0) daysActive += 1;
+    if (hasHighlight) {
+      highlightDays += 1;
+      if (highlightDone) highlightHits += 1;
+    }
+  }
+
+  return {
+    weekStart: weekStartIso,
+    set,
+    done,
+    completionRate: set > 0 ? done / set : 0,
+    daysActive,
+    highlightDays,
+    highlightHits,
+    highlightHitRate: highlightDays > 0 ? highlightHits / highlightDays : 0,
+    perDay,
+  };
+}
+
+// ─── discipline → execution correlation ──────────────────────────────────
+
+/** Minimal checkin shape the correlation needs. */
+export interface CheckinLite {
+  date: string;
+  sfcZero: boolean;
+}
+
+export interface ExecutionCorrelation {
+  /** Days in window with ≥1 goal set AND a checkin marked SFC-zero. */
+  sfcZeroDays: number;
+  /** done / set across those days, 0-1. */
+  sfcZeroCompletion: number;
+  /** Days in window with ≥1 goal set AND a checkin marked NOT SFC-zero. */
+  otherDays: number;
+  otherCompletion: number;
+  /** sfcZeroCompletion − otherCompletion (positive = discipline tracks with execution). */
+  delta: number;
+  /** True only when BOTH buckets have ≥ MIN_CORRELATION_DAYS days — below that
+   *  the comparison is noise and the UI should not render a claim. */
+  hasSignal: boolean;
+}
+
+/** Minimum days per bucket before the correlation is worth surfacing. */
+export const MIN_CORRELATION_DAYS = 3;
+
+/** Does an SFC-zero (no short-form content) day track with completing more of
+ *  the three? Pure — surfaces the founder's own base rates, never fabricates a
+ *  claim below the signal floor. */
+export function computeDisciplineExecutionCorrelation(
+  goals: ReadonlyArray<DailyGoalLite>,
+  checkins: ReadonlyArray<CheckinLite>,
+  today: string,
+  windowDays = 30
+): ExecutionCorrelation {
+  const goalsByDate = new Map<string, DailyGoalLite[]>();
+  for (const g of goals) {
+    const list = goalsByDate.get(g.date);
+    if (list) list.push(g);
+    else goalsByDate.set(g.date, [g]);
+  }
+  const sfcByDate = new Map<string, boolean>();
+  for (const c of checkins) sfcByDate.set(c.date, c.sfcZero);
+
+  let zSet = 0;
+  let zDone = 0;
+  let zDays = 0;
+  let oSet = 0;
+  let oDone = 0;
+  let oDays = 0;
+
+  for (let i = 0; i < windowDays; i++) {
+    const iso = shiftIsoDate(today, -i);
+    const dayGoals = (goalsByDate.get(iso) ?? []).filter(g => isActive(g.status));
+    if (dayGoals.length === 0) continue; // no goals → no execution signal
+    if (!sfcByDate.has(iso)) continue; // no checkin → can't classify
+    const set = dayGoals.length;
+    const done = dayGoals.filter(g => g.status === 'done').length;
+    if (sfcByDate.get(iso)) {
+      zSet += set;
+      zDone += done;
+      zDays += 1;
+    } else {
+      oSet += set;
+      oDone += done;
+      oDays += 1;
+    }
+  }
+
+  const sfcZeroCompletion = zSet > 0 ? zDone / zSet : 0;
+  const otherCompletion = oSet > 0 ? oDone / oSet : 0;
+  return {
+    sfcZeroDays: zDays,
+    sfcZeroCompletion,
+    otherDays: oDays,
+    otherCompletion,
+    delta: sfcZeroCompletion - otherCompletion,
+    hasSignal: zDays >= MIN_CORRELATION_DAYS && oDays >= MIN_CORRELATION_DAYS,
+  };
+}

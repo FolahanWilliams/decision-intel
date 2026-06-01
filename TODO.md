@@ -72,6 +72,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [x] UI: `DailyThreeSection` mounted in FaithOSTab after the spiritual checkin — the three slots (specific + finishable), if-then intention per goal, Highlight star, done/carry/release/edit, "Commit to the Lord" (Prov 16:3), a stat strip (show-up streak + 30-day completion + Highlight-hit) + 30-day heatmap + a "Why three?" research-and-scripture panel.
 - [x] Gates green: tsc clean · 20/20 faith-os vitest (13 new + 7 existing) · positioning clean · counts 73 · canonical-imports clean · silent-catches 212 (+2 canonical body-parse class, bumped + documented) · prettier clean · slop-scan 3.23 (< 4.0).
 
+**Faith OS "Today's Three" — DEEPEN + tracking/weekly-review (founder-approved boil-the-ocean follow-up; full prose in CLAUDE.md "Deepen + tracking layer" sub-lock 2026-06-01). Modified existing surfaces only — NO new tab (founder-directed: improve Start Here, never spawn a parallel one).**
+
+- [x] Cascade: new `FounderOsPeriodGoal` model (week + quarter, ≤3 cap server-enforced) → `CascadeSection` above Today's Three; each daily goal can be linked to "serve" a weekly intention (`linkedPeriodGoalId`, soft ref). Pure keys/labels in [faith-os/period-goals.ts](src/components/founder-hub/faith-os/period-goals.ts) (8 vitest).
+- [x] Evening reflection: new `FounderOsDailyReflection` model (moved/blocked, upsert) + `EveningReflectionCard` (Knapp reflect step + Lam 3:40). Time-block the Highlight (`scheduledFor`) + one-tap "Carry to tomorrow".
+- [x] Tracking: `WeeklyThreeExecutionPanel` auto-pulled into the existing Founder OS Sunday review (completion + Highlight-hit + 7-day strip + Δ vs last week + the week's intentions). Discipline→execution correlation tile (SFC-zero days vs other; honest signal floor of 3 days). Pure `summarizeWeek` + `computeDisciplineExecutionCorrelation` (daily-three.ts, +7 vitest).
+- [x] **FOUNDER ACTION: run `npx prisma migrate deploy`** — TWO additive migrations this session (`20260601120000_founder_os_daily_goals` + `20260601130000_founder_os_period_goals_reflections`), new tables + nullable columns only, zero-risk.
+- [x] Saved durable rule to CLAUDE.md Session Workflow (0a): read the relevant md / access-model BEFORE proposing — `/dashboard` = customer surface, `/dashboard/founder-hub` = founder-private; never propose founder-only surfaces on the customer dashboard.
+- [x] Gates green: tsc clean · 35/35 faith-os vitest · 4 lints clean (positioning · counts 73 · canonical-imports · silent-catches 217, +5 documented) · prettier · slop-scan 3.23.
+
 ## Recently Completed (2026-05-25)
 
 **.env.example drift — audit-queue item #5 closed (21 operator-facing env vars now declared).**

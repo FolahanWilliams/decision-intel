@@ -1509,12 +1509,70 @@ model FounderOsDailyGoal {
   rank        Int       @default(1)
   isHighlight Boolean   @default(false)
   intention   String?   @db.VarChar(400)
+  /// Optional time-block for the goal (mainly the Highlight) — free text like
+  /// "9:00-10:30" or "after standup" (Make Time pairs the Highlight with a
+  /// when). Additive 2026-06-01.
+  scheduledFor String?  @db.VarChar(120)
+  /// Optional cascade link to the FounderOsPeriodGoal (weekly/quarterly) this
+  /// daily goal serves — the Rule-of-3 hierarchy made real, so the day's work
+  /// ladders up to the bigger rock instead of floating free. Soft ref (no FK)
+  /// — same decoupled / schema-drift-tolerant discipline as the other soft
+  /// links; a dangling id is treated as "no link". Additive 2026-06-01.
+  linkedPeriodGoalId String?
   status      String    @default("open")
   committed   Boolean   @default(false)
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// Faith OS period goals — the weekly + quarterly cascade above Today's Three
+/// (2026-06-01). The Rule of 3 is a hierarchy: a few quarter "rocks" → a few
+/// weekly intentions → the day's three. Seeing the week's three above today's
+/// three keeps the daily work laddering up to the bigger thing instead of
+/// floating free (Locke clarity + Buffett focus; "where there is no vision the
+/// people perish," Prov 29:18). The API enforces ≤3 active goals per
+/// (userId, period, periodKey).
+///   period     'week' | 'quarter'.
+///   periodKey  ISO-week key 'YYYY-Www' (week) or 'YYYY-Qn' (quarter).
+///   status     open | done | carried | released — same semantics as the daily
+///              goal; carried + released free the slot against the cap.
+model FounderOsPeriodGoal {
+  id          String    @id @default(cuid())
+  userId      String
+  period      String
+  periodKey   String
+  text        String    @db.VarChar(280)
+  rank        Int       @default(1)
+  status      String    @default("open")
+  committed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([userId, period, periodKey])
+}
+
+/// Faith OS evening reflection — the 60-second close on the day's three
+/// (2026-06-01). Two honest lines: what MOVED (what actually advanced) and what
+/// BLOCKED (the obstacle) — the Knapp "reflect" step + the scriptural discipline
+/// of examining the day ("Let us test and examine our ways," Lam 3:40; Ps
+/// 139:23-24). Feeds the weekly review + the pattern view; it is a record, never
+/// a verdict on the day. One row per (userId, date), upserted.
+model FounderOsDailyReflection {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String
+  moved     String?  @db.Text
+  blocked   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
   @@index([userId])
   @@index([userId, date])
 }

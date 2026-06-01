@@ -828,6 +828,41 @@ export const WHY_THREE = {
   body: 'Because it is the number where ambition and attention meet. Below it you under-use the day; above it the science says output does not rise — focus fragments, decision fatigue compounds, and the list becomes a place good intentions go to hide. Working memory holds about four things (Cowan, 2001). Specific, hard goals beat vague ones in ~90% of studies (Locke & Latham). Nearly every serious framework converges on the same small number: the Rule of 3, the daily Highlight, the ONE Thing, Buffett’s vital few. Three is enough to move the company and few enough to actually finish — and it leaves room to commit the day, and your worth, to something steadier than the result.',
 } as const;
 
+/** The cap for weekly + quarterly goals — locked to the daily cap so the whole
+ *  cascade obeys the same Rule of 3 (quarter rocks → weekly intentions →
+ *  the day's three). Imported by the period-goals route + helpers. */
+export const PERIOD_GOAL_MAX = DAILY_THREE_MAX;
+
+/** The cascade — why the day's three ladder up to a weekly intention and a
+ *  quarter rock. The Rule of 3 is explicitly a hierarchy (year → quarter →
+ *  week → day); the clarity comes from the day's work visibly serving the
+ *  bigger thing instead of floating free. */
+export const CASCADE_FRAME = {
+  headline: 'A few rocks for the quarter, three for the week, three for today.',
+  body: 'Daily focus only compounds when it points somewhere. Set at most three rocks for the quarter (the few things that, done, make the quarter a win), three intentions for the week that serve them, and then choose today’s three to move the week. When you can see the week’s three above today’s three, every day’s work is visibly laddering up to the bigger thing — and a "busy" day that moved none of them stops being able to hide.',
+  scriptureRef: 'Habakkuk 2:2',
+  scriptureText:
+    'And the LORD answered me: "Write the vision; make it plain on tablets, so he may run who reads it."',
+  faithFrame:
+    'Write the vision and make it plain — then run by it. "Where there is no vision the people perish" (Prov 29:18); a quarter with no named rocks is a quarter you drift through. The cascade is that vision made plain enough to run by, one day at a time.',
+} as const;
+
+/** The 60-second evening close on the day's three — two honest lines. The
+ *  Knapp "reflect" step + the scriptural discipline of examining the day. A
+ *  record that feeds the weekly review + the pattern view, never a verdict. */
+export const EVENING_REFLECTION = {
+  title: 'Close the day',
+  subtitle: '60 seconds — a record, not a verdict',
+  movedLabel: 'What moved?',
+  movedPlaceholder: 'What actually advanced today — however small.',
+  blockedLabel: 'What blocked it?',
+  blockedPlaceholder:
+    'The obstacle, named honestly — the raw material for tomorrow’s if-then plan.',
+  scriptureRef: 'Lamentations 3:40',
+  scriptureText: 'Let us test and examine our ways, and return to the LORD!',
+  note: 'Naming the obstacle is not self-judgment — it is how you write tomorrow’s if-then plan, and where you bring the day to God: "Search me, O God, and know my heart" (Ps 139:23-24).',
+} as const;
+
 // ─────────────────────────────────────────────────────────────────────
 // THE GUARDRAIL — load-bearing theological discipline
 // ─────────────────────────────────────────────────────────────────────

@@ -270,7 +270,14 @@ const SCAN_DIR = join(ROOT, 'src');
 //     create-response parse in addGoal (on null the client reconciles via
 //     fetchAll()). The route fails-closed server-side with apiError; no
 //     delivery/audit/flywheel write is swallowed.
-const SILENT_CATCH_BASELINE = 212;
+//   - 212 → 217 (Faith OS Today's-Three DEEPEN ship 2026-06-01): +5 canonical
+//     res.json().catch(() => null) body-parse class. FaithOSTab.tsx: the
+//     period-goals GET + daily-reflections GET inside fetchAll (+2) + the
+//     create-response parse in addPeriodGoal (+1). WeeklyThreeExecutionPanel.tsx:
+//     the daily-goals + period-goals GET parses (+2). Each degrades to empty /
+//     reconciles via fetchAll(); every route fails-closed server-side with
+//     apiError. No delivery/audit/flywheel write swallowed.
+const SILENT_CATCH_BASELINE = 217;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
