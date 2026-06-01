@@ -3111,13 +3111,20 @@ function EveningReflectionCard({
   const [blocked, setBlocked] = useState(reflection?.blocked ?? '');
   const [saved, setSaved] = useState(false);
 
-  // Hydrate once the row arrives from the server, without clobbering typing.
-  useEffect(() => {
+  // Seed the editable fields when the server row arrives, without clobbering
+  // in-progress typing (the `|| prev` guard). React's "adjust state during
+  // render when a prop changes" pattern — the sanctioned alternative to a
+  // setState-in-effect (react.dev/learn/you-might-not-need-an-effect). Fires
+  // only when the reflection identity changes (load, or save → new object),
+  // so there is no render loop.
+  const [seededFrom, setSeededFrom] = useState(reflection);
+  if (reflection !== seededFrom) {
+    setSeededFrom(reflection);
     if (reflection) {
       setMoved(m => m || reflection.moved || '');
       setBlocked(b => b || reflection.blocked || '');
     }
-  }, [reflection]);
+  }
 
   return (
     <AccentCard accent="muted" title={null}>
