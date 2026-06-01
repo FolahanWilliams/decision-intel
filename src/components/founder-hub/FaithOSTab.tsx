@@ -22,25 +22,41 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  ArrowRight,
   BookOpen,
   Check,
   CheckCircle2,
   ChevronDown,
   Circle,
+  Flame,
+  Hand,
   Heart,
   Loader2,
+  Pencil,
   Plus,
   Sparkles,
+  Star,
   Sun,
+  Target,
   Trash2,
+  X,
 } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 import { BibleVersePill } from '@/components/founder-hub/founder-os/sections';
 import {
   READING_PLANS,
   PRAYER_FRAMEWORK,
+  DAILY_THREE_PRINCIPLES,
+  DAILY_THREE_COMMIT,
+  DAILY_THREE_RITUAL,
+  WHY_THREE,
   type PrayerMovement,
 } from '@/components/founder-hub/faith-os/content';
+import {
+  summarizeDailyThree,
+  type DailyGoalLite,
+  type DailyThreeSummary,
+} from '@/components/founder-hub/faith-os/daily-three';
 import {
   AgencySurrenderSpine,
   AntiProsperityGuardrail,
@@ -95,6 +111,21 @@ interface JournalEntry {
   createdAt: string;
 }
 
+type DailyGoalStatus = 'open' | 'done' | 'carried' | 'released';
+
+interface DailyGoal {
+  id: string;
+  date: string;
+  text: string;
+  rank: number;
+  isHighlight: boolean;
+  intention: string | null;
+  status: DailyGoalStatus;
+  committed: boolean;
+  completedAt: string | null;
+  createdAt: string;
+}
+
 interface ApiEnvelope<T> {
   success?: boolean;
   data?: T;
@@ -138,6 +169,7 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [progress, setProgress] = useState<ReadingProgressRow[]>([]);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
+  const [goals, setGoals] = useState<DailyGoal[]>([]);
   const [savingDiscipline, setSavingDiscipline] = useState<'prayer' | 'scripture' | null>(null);
 
   const [sabbathTaken, setSabbathTaken] = useState(false);
@@ -145,10 +177,11 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
   // ── load ── (180-day checkin window powers the discipline heatmap + streaks)
   const fetchAll = useCallback(async () => {
     try {
-      const [cRes, pRes, jRes] = await Promise.all([
+      const [cRes, pRes, jRes, gRes] = await Promise.all([
         fetch('/api/founder-os/checkins?days=180', { cache: 'no-store', headers }),
         fetch('/api/founder-os/reading-progress', { cache: 'no-store', headers }),
         fetch('/api/founder-os/prayer-journal?limit=200', { cache: 'no-store', headers }),
+        fetch('/api/founder-os/daily-goals?days=60', { cache: 'no-store', headers }),
       ]);
       const cJson = (await cRes.json().catch(() => null)) as ApiEnvelope<{
         checkins: Checkin[];
@@ -159,11 +192,15 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
       const jJson = (await jRes.json().catch(() => null)) as ApiEnvelope<{
         entries: JournalEntry[];
       }> | null;
+      const gJson = (await gRes.json().catch(() => null)) as ApiEnvelope<{
+        goals: DailyGoal[];
+      }> | null;
       const allCheckins = cJson?.data?.checkins ?? [];
       setCheckins(allCheckins);
       setCheckin(allCheckins.find(c => c.date === today) ?? null);
       setProgress(pJson?.data?.progress ?? []);
       setJournal(jJson?.data?.entries ?? []);
+      setGoals(gJson?.data?.goals ?? []);
     } catch {
       // @schema-drift-tolerant — render the static surfaces even if the API is cold.
     }
@@ -351,6 +388,141 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
     [headers, fetchAll]
   );
 
+  // ── today's three (daily-priority goals) ──
+  const addGoal = useCallback(
+    async (text: string, intention: string, isHighlight: boolean) => {
+      if (!today || !text.trim()) return;
+      try {
+        const res = await fetch('/api/founder-os/daily-goals', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            date: today,
+            text: text.trim(),
+            intention: intention.trim() || undefined,
+            isHighlight,
+          }),
+        });
+        const json = (await res.json().catch(() => null)) as ApiEnvelope<{
+          goal: DailyGoal;
+        }> | null;
+        if (json?.data?.goal) {
+          const created = json.data.goal;
+          setGoals(prev => {
+            // One Highlight per day — demote the others locally to match the server.
+            const base = isHighlight
+              ? prev.map(g => (g.date === today ? { ...g, isHighlight: false } : g))
+              : prev;
+            return [...base, created];
+          });
+        } else {
+          void fetchAll(); // cap hit or transient — reconcile
+        }
+      } catch {
+        void fetchAll();
+      }
+    },
+    [headers, today, fetchAll]
+  );
+
+  const updateGoal = useCallback(
+    async (
+      id: string,
+      patch: Partial<Pick<DailyGoal, 'status' | 'text' | 'intention' | 'isHighlight' | 'committed'>>
+    ) => {
+      setGoals(prev => {
+        const target = prev.find(g => g.id === id);
+        if (!target) return prev;
+        return prev.map(g => {
+          if (g.id === id) {
+            const next: DailyGoal = { ...g, ...patch };
+            if (patch.status === 'done') next.completedAt = new Date().toISOString();
+            else if (patch.status) next.completedAt = null;
+            return next;
+          }
+          // One Highlight per day — demote the day's other highlight locally.
+          if (patch.isHighlight === true && g.date === target.date) {
+            return { ...g, isHighlight: false };
+          }
+          return g;
+        });
+      });
+      try {
+        await fetch('/api/founder-os/daily-goals', {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ id, ...patch }),
+        });
+      } catch {
+        void fetchAll();
+      }
+    },
+    [headers, fetchAll]
+  );
+
+  const deleteGoal = useCallback(
+    async (id: string) => {
+      setGoals(prev => prev.filter(g => g.id !== id));
+      try {
+        await fetch(`/api/founder-os/daily-goals?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers,
+        });
+      } catch {
+        void fetchAll();
+      }
+    },
+    [headers, fetchAll]
+  );
+
+  const commitTodayGoals = useCallback(async () => {
+    const todays = goals.filter(
+      g => g.date === today && (g.status === 'open' || g.status === 'done') && !g.committed
+    );
+    if (todays.length === 0) return;
+    setGoals(prev =>
+      prev.map(g =>
+        g.date === today && (g.status === 'open' || g.status === 'done')
+          ? { ...g, committed: true }
+          : g
+      )
+    );
+    try {
+      await Promise.all(
+        todays.map(g =>
+          fetch('/api/founder-os/daily-goals', {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify({ id: g.id, committed: true }),
+          })
+        )
+      );
+    } catch {
+      void fetchAll();
+    }
+  }, [goals, today, headers, fetchAll]);
+
+  const todayGoals = useMemo(
+    () => goals.filter(g => g.date === today).sort((a, b) => a.rank - b.rank),
+    [goals, today]
+  );
+
+  const dailyThree = useMemo<DailyThreeSummary>(
+    () =>
+      summarizeDailyThree(
+        goals.map(
+          (g): DailyGoalLite => ({
+            date: g.date,
+            status: g.status,
+            isHighlight: g.isHighlight,
+            committed: g.committed,
+          })
+        ),
+        today || todayLocalISO()
+      ),
+    [goals, today]
+  );
+
   const toggleSabbath = useCallback(() => {
     const next = !sabbathTaken;
     setSabbathTaken(next);
@@ -415,6 +587,16 @@ export function FaithOSTab({ founderPass }: FaithOSTabProps) {
           scripture={checkin?.scripture ?? false}
           saving={savingDiscipline}
           onToggle={toggleDiscipline}
+        />
+
+        {/* Today's Three — daily-priority goal setting */}
+        <DailyThreeSection
+          todayGoals={todayGoals}
+          summary={dailyThree}
+          onAdd={addGoal}
+          onUpdate={updateGoal}
+          onDelete={deleteGoal}
+          onCommitAll={commitTodayGoals}
         />
 
         {/* Reading plans */}
@@ -1409,6 +1591,851 @@ function PrayerJournalSection({
   );
 }
 
+// ─── today's three (daily-priority goals) ───────────────────────────────
+
+const GOAL_STATUS_META: Record<DailyGoalStatus, { label: string; color: string }> = {
+  open: { label: 'Open', color: 'var(--text-muted)' },
+  done: { label: 'Done', color: 'var(--success)' },
+  carried: { label: 'Carried', color: 'var(--warning)' },
+  released: { label: 'Released', color: 'var(--info)' },
+};
+
+function DailyThreeSection({
+  todayGoals,
+  summary,
+  onAdd,
+  onUpdate,
+  onDelete,
+  onCommitAll,
+}: {
+  todayGoals: DailyGoal[];
+  summary: DailyThreeSummary;
+  onAdd: (text: string, intention: string, isHighlight: boolean) => void;
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<DailyGoal, 'status' | 'text' | 'intention' | 'isHighlight' | 'committed'>>
+  ) => void;
+  onDelete: (id: string) => void;
+  onCommitAll: () => void;
+}) {
+  const [showWhy, setShowWhy] = useState(false);
+  const activeGoals = todayGoals.filter(g => g.status === 'open' || g.status === 'done');
+  const closedGoals = todayGoals.filter(g => g.status === 'carried' || g.status === 'released');
+  const hasActive = activeGoals.length > 0;
+  const highlightTaken = activeGoals.some(g => g.isHighlight);
+
+  return (
+    <section>
+      <div style={sectionHeadingRow}>
+        <Target size={18} style={{ color: 'var(--accent-primary)' }} aria-hidden />
+        <h3 style={sectionHeadingText}>Today&apos;s three</h3>
+      </div>
+
+      <AccentCard accent="primary" title={null}>
+        <p
+          style={{
+            margin: '0 0 4px',
+            fontSize: 13.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+          }}
+        >
+          The (at most) three priorities that would make today a win. Three is the cap, not a
+          shortfall — the science and the scripture point the same way: plan with clarity, hold the
+          result with open hands.
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowWhy(s => !s)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            color: 'var(--accent-primary)',
+            fontSize: 12.5,
+            fontWeight: 700,
+            marginBottom: 14,
+          }}
+          aria-expanded={showWhy}
+        >
+          <Sparkles size={13} />
+          {showWhy ? 'Why three? — hide' : 'Why three? — the research + the frame'}
+          <ChevronDown
+            size={14}
+            style={{
+              transform: showWhy ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.18s ease',
+            }}
+          />
+        </button>
+        {showWhy && <WhyThreePanel />}
+
+        {/* the three slots */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {activeGoals.map((g, i) => (
+            <GoalRow key={g.id} goal={g} slot={i + 1} onUpdate={onUpdate} onDelete={onDelete} />
+          ))}
+
+          {summary.slotsLeft > 0 ? (
+            <AddGoalForm
+              slot={activeGoals.length + 1}
+              allowHighlight={!highlightTaken}
+              onAdd={onAdd}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--text-muted)',
+                fontStyle: 'italic',
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px dashed var(--border-color)',
+                lineHeight: 1.5,
+              }}
+            >
+              Three set. A fourth waits for tomorrow — that is the point. Finish, carry, or release
+              one to open a slot.
+            </div>
+          )}
+        </div>
+
+        {/* commit to the Lord (Prov 16:3) */}
+        {hasActive &&
+          (summary.todayCommitted ? (
+            <div
+              style={{
+                marginTop: 14,
+                fontSize: 12.5,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                padding: '10px 14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--accent-primary) 22%, transparent)',
+              }}
+            >
+              <Hand
+                size={14}
+                style={{ verticalAlign: '-2px', marginRight: 6, color: 'var(--accent-primary)' }}
+              />
+              Committed today. &ldquo;Commit your work to the LORD, and your plans will be
+              established.&rdquo;{' '}
+              <span style={{ color: 'var(--info)', fontWeight: 600 }}>Proverbs 16:3</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onCommitAll}
+              style={{ ...smallBtn('primary'), marginTop: 14 }}
+            >
+              <Hand size={14} style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              Commit today&apos;s three to the Lord
+            </button>
+          ))}
+
+        {/* carried / released, kept honest in a quiet list */}
+        {closedGoals.length > 0 && (
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                color: 'var(--text-muted)',
+              }}
+            >
+              Carried &amp; released
+            </div>
+            {closedGoals.map(g => (
+              <ClosedGoalRow key={g.id} goal={g} onUpdate={onUpdate} onDelete={onDelete} />
+            ))}
+          </div>
+        )}
+      </AccentCard>
+
+      {/* stats + 30-day heatmap */}
+      <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <DailyThreeStatStrip summary={summary} />
+        <AccentCard accent="info" title={null}>
+          <DailyThreeHeatmap perDay={summary.perDay} />
+        </AccentCard>
+      </div>
+
+      <style>{`
+        @media (max-width: 800px) {
+          .daily-three-stats { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+function GoalRow({
+  goal,
+  slot,
+  onUpdate,
+  onDelete,
+}: {
+  goal: DailyGoal;
+  slot: number;
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<DailyGoal, 'status' | 'text' | 'intention' | 'isHighlight' | 'committed'>>
+  ) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(goal.text);
+  const [intention, setIntention] = useState(goal.intention ?? '');
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const done = goal.status === 'done';
+
+  return (
+    <div
+      style={{
+        border: `1px solid ${goal.isHighlight ? 'color-mix(in srgb, var(--accent-primary) 40%, transparent)' : 'var(--border-color)'}`,
+        borderLeft: `3px solid ${goal.isHighlight ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+        borderRadius: 'var(--radius-md)',
+        background: goal.isHighlight
+          ? 'color-mix(in srgb, var(--accent-primary) 5%, var(--bg-card))'
+          : 'var(--bg-card)',
+        padding: '10px 12px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <button
+          type="button"
+          onClick={() => onUpdate(goal.id, { status: done ? 'open' : 'done' })}
+          aria-label={done ? 'Mark not done' : 'Mark done'}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            marginTop: 1,
+            display: 'flex',
+            color: done ? 'var(--success)' : 'var(--text-muted)',
+          }}
+        >
+          {done ? <CheckCircle2 size={19} /> : <Circle size={19} />}
+        </button>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {editing ? (
+            <>
+              <input
+                type="text"
+                value={text}
+                maxLength={280}
+                onChange={e => setText(e.target.value)}
+                style={{ ...textareaStyle, height: 34, minHeight: 'auto', marginBottom: 6 }}
+              />
+              <input
+                type="text"
+                value={intention}
+                maxLength={400}
+                onChange={e => setIntention(e.target.value)}
+                placeholder="If-then plan (optional) — e.g. If it's 9am, then I draft the synergy section first."
+                style={{ ...textareaStyle, height: 34, minHeight: 'auto' }}
+              />
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (text.trim()) onUpdate(goal.id, { text: text.trim(), intention });
+                    setEditing(false);
+                  }}
+                  style={smallBtn('primary')}
+                >
+                  <Check size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setText(goal.text);
+                    setIntention(goal.intention ?? '');
+                    setEditing(false);
+                  }}
+                  style={smallBtn('muted')}
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  #{slot}
+                </span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: done ? 'var(--text-muted)' : 'var(--text-primary)',
+                    textDecoration: done ? 'line-through' : 'none',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {goal.text}
+                </span>
+                {goal.isHighlight && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      color: 'var(--accent-primary)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 3,
+                    }}
+                  >
+                    <Star size={11} style={{ fill: 'var(--accent-primary)' }} /> Highlight
+                  </span>
+                )}
+                {goal.committed && (
+                  <Hand
+                    size={12}
+                    style={{ color: 'var(--accent-primary)' }}
+                    aria-label="Committed"
+                  />
+                )}
+              </div>
+              {goal.intention && (
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.5,
+                    marginTop: 3,
+                  }}
+                >
+                  <span style={{ fontWeight: 700, color: 'var(--info)' }}>If-then · </span>
+                  {goal.intention}
+                </div>
+              )}
+              {/* actions */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                <GoalAction
+                  icon={<Star size={12} />}
+                  label={goal.isHighlight ? 'Unstar' : 'Highlight'}
+                  active={goal.isHighlight}
+                  onClick={() => onUpdate(goal.id, { isHighlight: !goal.isHighlight })}
+                />
+                <GoalAction
+                  icon={<Pencil size={12} />}
+                  label="Edit"
+                  onClick={() => setEditing(true)}
+                />
+                <GoalAction
+                  icon={<ArrowRight size={12} />}
+                  label="Carry"
+                  onClick={() => onUpdate(goal.id, { status: 'carried' })}
+                />
+                <GoalAction
+                  icon={<Hand size={12} />}
+                  label="Release"
+                  onClick={() => onUpdate(goal.id, { status: 'released' })}
+                />
+                {confirmingDelete ? (
+                  <span style={{ display: 'inline-flex', gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(goal.id)}
+                      style={tinyBtn('danger')}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingDelete(false)}
+                      style={tinyBtn('muted')}
+                    >
+                      Cancel
+                    </button>
+                  </span>
+                ) : (
+                  <GoalAction
+                    icon={<Trash2 size={12} />}
+                    label="Delete"
+                    onClick={() => setConfirmingDelete(true)}
+                  />
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GoalAction({
+  icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 11.5,
+        fontWeight: 600,
+        padding: '3px 8px',
+        borderRadius: 'var(--radius-full)',
+        cursor: 'pointer',
+        border: `1px solid ${active ? 'color-mix(in srgb, var(--accent-primary) 40%, transparent)' : 'var(--border-color)'}`,
+        background: active
+          ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)'
+          : 'transparent',
+        color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+      }}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+function ClosedGoalRow({
+  goal,
+  onUpdate,
+  onDelete,
+}: {
+  goal: DailyGoal;
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<DailyGoal, 'status' | 'text' | 'intention' | 'isHighlight' | 'committed'>>
+  ) => void;
+  onDelete: (id: string) => void;
+}) {
+  const meta = GOAL_STATUS_META[goal.status];
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        fontSize: 12.5,
+        color: 'var(--text-muted)',
+        padding: '6px 10px',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-color)',
+        background: 'var(--bg-secondary)',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 9.5,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          color: meta.color,
+          flexShrink: 0,
+        }}
+      >
+        {meta.label}
+      </span>
+      <span style={{ flex: 1, minWidth: 0, lineHeight: 1.4 }}>{goal.text}</span>
+      <button
+        type="button"
+        onClick={() => onUpdate(goal.id, { status: 'open' })}
+        style={tinyBtn('muted')}
+        title="Reopen"
+      >
+        Reopen
+      </button>
+      <button
+        type="button"
+        onClick={() => onDelete(goal.id)}
+        aria-label="Delete"
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: 'var(--text-muted)',
+          display: 'flex',
+          padding: 2,
+        }}
+      >
+        <X size={13} />
+      </button>
+    </div>
+  );
+}
+
+function AddGoalForm({
+  slot,
+  allowHighlight,
+  onAdd,
+}: {
+  slot: number;
+  allowHighlight: boolean;
+  onAdd: (text: string, intention: string, isHighlight: boolean) => void;
+}) {
+  const [text, setText] = useState('');
+  const [intention, setIntention] = useState('');
+  const [showIntention, setShowIntention] = useState(false);
+  const [highlight, setHighlight] = useState(false);
+
+  const submit = () => {
+    if (!text.trim()) return;
+    onAdd(text.trim(), intention, highlight && allowHighlight);
+    setText('');
+    setIntention('');
+    setShowIntention(false);
+    setHighlight(false);
+  };
+
+  return (
+    <div
+      style={{
+        border: '1px dashed var(--border-color)',
+        borderRadius: 'var(--radius-md)',
+        padding: '10px 12px',
+        background: 'var(--bg-card)',
+      }}
+    >
+      <input
+        type="text"
+        value={text}
+        maxLength={280}
+        onChange={e => setText(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submit();
+          }
+        }}
+        placeholder={`Priority #${slot} — make it specific and finishable`}
+        style={{ ...textareaStyle, height: 36, minHeight: 'auto' }}
+      />
+      {showIntention && (
+        <input
+          type="text"
+          value={intention}
+          maxLength={400}
+          onChange={e => setIntention(e.target.value)}
+          placeholder="If {when/where}, then I will {action} — e.g. If it's 9am, then I draft the deck first"
+          style={{ ...textareaStyle, height: 36, minHeight: 'auto', marginTop: 6 }}
+        />
+      )}
+      <div
+        style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}
+      >
+        <button
+          type="button"
+          disabled={!text.trim()}
+          onClick={submit}
+          style={{ ...smallBtn('primary'), marginTop: 0, opacity: text.trim() ? 1 : 0.5 }}
+        >
+          <Plus size={14} style={{ verticalAlign: '-3px', marginRight: 4 }} />
+          Add priority
+        </button>
+        {!showIntention && (
+          <button type="button" onClick={() => setShowIntention(true)} style={tinyBtn('muted')}>
+            + If-then plan
+          </button>
+        )}
+        {allowHighlight && (
+          <button
+            type="button"
+            onClick={() => setHighlight(h => !h)}
+            style={tinyBtn(highlight ? 'primary' : 'muted')}
+          >
+            <Star
+              size={12}
+              style={{
+                verticalAlign: '-2px',
+                marginRight: 3,
+                fill: highlight ? 'var(--accent-primary)' : 'none',
+              }}
+            />
+            {highlight ? 'Highlight' : 'Make Highlight'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DailyThreeStatStrip({ summary }: { summary: DailyThreeSummary }) {
+  const tiles = [
+    {
+      icon: <Flame size={16} />,
+      value: `${summary.currentStreak}`,
+      label: summary.currentStreak === 1 ? 'day streak' : 'day streak',
+      sub: 'days you showed up',
+      accent: 'var(--accent-primary)',
+    },
+    {
+      icon: <CheckCircle2 size={16} />,
+      value: `${Math.round(summary.completionRate * 100)}%`,
+      label: 'completed',
+      sub: 'last 30 days',
+      accent: 'var(--success)',
+    },
+    {
+      icon: <Star size={16} />,
+      value: summary.highlightDays > 0 ? `${Math.round(summary.highlightHitRate * 100)}%` : '—',
+      label: 'Highlight hit',
+      sub: `${summary.highlightDays} day${summary.highlightDays === 1 ? '' : 's'} set one`,
+      accent: 'var(--info)',
+    },
+  ];
+  return (
+    <div
+      className="daily-three-stats"
+      style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}
+    >
+      {tiles.map((t, i) => (
+        <div
+          key={i}
+          style={{
+            border: '1px solid var(--border-color)',
+            borderTop: `3px solid ${t.accent}`,
+            borderRadius: 'var(--radius-lg)',
+            background: 'var(--bg-card)',
+            padding: '12px 14px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: t.accent }}>
+            {t.icon}
+            <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>
+              {t.value}
+            </span>
+          </div>
+          <div
+            style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}
+          >
+            {t.label}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.sub}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DailyThreeHeatmap({ perDay }: { perDay: DailyThreeSummary['perDay'] }) {
+  const anyData = perDay.some(d => d.set > 0);
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          color: 'var(--text-muted)',
+          marginBottom: 8,
+        }}
+      >
+        Last 30 days
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+        {perDay.map(d => {
+          const ratio = d.set > 0 ? d.done / d.set : 0;
+          const pct = d.set === 0 ? 0 : 16 + Math.round(ratio * 64);
+          return (
+            <div
+              key={d.date}
+              title={`${d.date} — ${d.done}/${d.set} done${d.hasHighlight ? (d.highlightDone ? ' · Highlight hit' : ' · Highlight set') : ''}`}
+              style={{
+                width: 15,
+                height: 15,
+                borderRadius: 4,
+                background:
+                  d.set === 0
+                    ? 'var(--bg-secondary)'
+                    : `color-mix(in srgb, var(--accent-primary) ${pct}%, transparent)`,
+                border:
+                  d.set === 0
+                    ? '1px solid var(--border-color)'
+                    : d.highlightDone
+                      ? '1px solid var(--accent-primary)'
+                      : '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
+                boxShadow: d.highlightDone
+                  ? '0 0 0 1px color-mix(in srgb, var(--accent-primary) 35%, transparent)'
+                  : 'none',
+              }}
+            />
+          );
+        })}
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, lineHeight: 1.5 }}>
+        {anyData
+          ? 'Each square is a day; fuller green = more of the three completed. A ring marks a day the Highlight landed.'
+          : 'Set today’s three to start the record. The streak rewards showing up, not perfection.'}
+      </div>
+    </div>
+  );
+}
+
+function WhyThreePanel() {
+  return (
+    <div
+      style={{
+        marginBottom: 14,
+        padding: '12px 14px',
+        borderRadius: 'var(--radius-md)',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-color)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <div>
+        <div
+          style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}
+        >
+          {WHY_THREE.headline}
+        </div>
+        <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          {WHY_THREE.body}
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {DAILY_THREE_PRINCIPLES.map(p => (
+          <div
+            key={p.id}
+            style={{
+              borderLeft: '3px solid color-mix(in srgb, var(--accent-primary) 45%, transparent)',
+              paddingLeft: 12,
+            }}
+          >
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {p.principle}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{p.source}</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                marginTop: 4,
+              }}
+            >
+              {p.coreIdea}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                marginTop: 4,
+              }}
+            >
+              <span style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>
+                In practice ·{' '}
+              </span>
+              {p.inPractice}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                marginTop: 4,
+                paddingTop: 4,
+              }}
+            >
+              <span style={{ fontWeight: 700, color: 'var(--info)' }}>{p.scriptureRef} · </span>
+              <span style={{ fontStyle: 'italic' }}>{p.faithFrame}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* the commit/release spine */}
+      <div
+        style={{
+          padding: '10px 12px',
+          borderRadius: 'var(--radius-md)',
+          background: 'color-mix(in srgb, var(--accent-primary) 6%, transparent)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 20%, transparent)',
+        }}
+      >
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)' }}>
+          {DAILY_THREE_COMMIT.title}
+        </div>
+        <p
+          style={{
+            margin: '4px 0 0',
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+          }}
+        >
+          {DAILY_THREE_COMMIT.body}
+        </p>
+        <p
+          style={{
+            margin: '6px 0 0',
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.55,
+            fontStyle: 'italic',
+          }}
+        >
+          {DAILY_THREE_COMMIT.releaseNote}
+        </p>
+      </div>
+
+      {/* the ritual */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {DAILY_THREE_RITUAL.map(r => (
+          <div key={r.when} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'var(--accent-primary)',
+                flexShrink: 0,
+                width: 130,
+              }}
+            >
+              {r.when}
+            </span>
+            <span style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {r.step}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── shared styles ──────────────────────────────────────────────────────
 
 const sectionHeadingRow: React.CSSProperties = {
@@ -1455,6 +2482,28 @@ function smallBtn(tone: 'primary' | 'success' | 'danger' | 'muted'): React.CSSPr
     fontWeight: 700,
     padding: '7px 14px',
     borderRadius: 'var(--radius-md)',
+    cursor: 'pointer',
+    border: `1px solid color-mix(in srgb, ${color} 40%, transparent)`,
+    background: `color-mix(in srgb, ${color} 10%, transparent)`,
+    color,
+  };
+}
+
+/** Compact inline button (no top margin) for goal-row + add-form actions. */
+function tinyBtn(tone: 'primary' | 'success' | 'danger' | 'muted'): React.CSSProperties {
+  const color =
+    tone === 'primary'
+      ? 'var(--accent-primary)'
+      : tone === 'success'
+        ? 'var(--success)'
+        : tone === 'danger'
+          ? 'var(--error)'
+          : 'var(--text-muted)';
+  return {
+    fontSize: 11.5,
+    fontWeight: 700,
+    padding: '4px 10px',
+    borderRadius: 'var(--radius-full)',
     cursor: 'pointer',
     border: `1px solid color-mix(in srgb, ${color} 40%, transparent)`,
     background: `color-mix(in srgb, ${color} 10%, transparent)`,

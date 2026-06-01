@@ -61,6 +61,17 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-01)
+
+**Faith OS "Today's Three" — daily-priority goal setting (founder-approved "boil the ocean"; full prose in CLAUDE.md "Faith OS Today's Three lock 2026-06-01").**
+
+- [x] Researched the science of daily goal-setting (Locke & Latham goal-setting theory; working-memory limits Cowan 2001; the Rule of 3; Gollwitzer implementation intentions + Oettingen WOOP/MCII; Buffett 5/25; Keller's The ONE Thing; Knapp's daily Highlight) — synthesis: the optimal number of daily priorities is THREE.
+- [x] Schema: additive `FounderOsDailyGoal` model + migration `20260601120000_founder_os_daily_goals` (new table only, zero-risk). **FOUNDER ACTION: run `npx prisma migrate deploy` lock-step with the deploy** — same pattern as every FounderOs* model.
+- [x] API: [/api/founder-os/daily-goals](src/app/api/founder-os/daily-goals/route.ts) GET/POST/PATCH/DELETE — `authenticateFounderOs` dual-gate; the cap of three enforced server-side (rejects the 4th active goal); one Highlight/day enforced; status done stamps completedAt.
+- [x] Teaching SSOT in [faith-os/content.ts](src/components/founder-hub/faith-os/content.ts) (DAILY_THREE_PRINCIPLES / _COMMIT / _RITUAL / WHY_THREE) — each principle paired with its scriptural frame; pure math [faith-os/daily-three.ts](src/components/founder-hub/faith-os/daily-three.ts) (streak/completion/highlight-hit/heatmap) + 13 vitest.
+- [x] UI: `DailyThreeSection` mounted in FaithOSTab after the spiritual checkin — the three slots (specific + finishable), if-then intention per goal, Highlight star, done/carry/release/edit, "Commit to the Lord" (Prov 16:3), a stat strip (show-up streak + 30-day completion + Highlight-hit) + 30-day heatmap + a "Why three?" research-and-scripture panel.
+- [x] Gates green: tsc clean · 20/20 faith-os vitest (13 new + 7 existing) · positioning clean · counts 73 · canonical-imports clean · silent-catches 212 (+2 canonical body-parse class, bumped + documented) · prettier clean · slop-scan 3.23 (< 4.0).
+
 ## Recently Completed (2026-05-25)
 
 **.env.example drift — audit-queue item #5 closed (21 operator-facing env vars now declared).**

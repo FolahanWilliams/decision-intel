@@ -263,7 +263,14 @@ const SCAN_DIR = join(ROOT, 'src');
 //     response; on parse failure surfaces an inline "unavailable" message.
 //     The route itself never throws to the client (it returns a deterministic
 //     fallback synthesis), so nothing is swallowed.
-const SILENT_CATCH_BASELINE = 210;
+//   - 210 → 212 (Faith OS "Today's Three" daily-goals ship 2026-06-01): +2
+//     canonical res.json().catch(() => null) body-parse class in FaithOSTab.tsx
+//     — the daily-goals GET inside fetchAll (parses /api/founder-os/daily-goals;
+//     empty list on parse failure, the static surfaces still render) + the
+//     create-response parse in addGoal (on null the client reconciles via
+//     fetchAll()). The route fails-closed server-side with apiError; no
+//     delivery/audit/flywheel write is swallowed.
+const SILENT_CATCH_BASELINE = 212;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
