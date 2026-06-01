@@ -42,7 +42,7 @@ export type TabId =
   // Product (2)
   | 'product_deep'
   | 'research'
-  // Go-to-Market (8) — positioning_copilot + category_position + positioning
+  // Go-to-Market (9) — positioning_copilot + category_position + positioning
   // consolidated into positioning_hub on 2026-05-10
   | 'positioning_hub'
   | 'sales'
@@ -51,6 +51,7 @@ export type TabId =
   | 'education_room'
   | 'outreach_hub'
   | 'lrqa'
+  | 'accountability_sprint'
   | 'content'
   // Intelligence (4)
   | 'data_ecosystem'
@@ -330,6 +331,22 @@ export const NODES: MapNode[] = [
     minutes: 30,
     prerequisites: ['outreach_hub'],
     iconName: 'Handshake',
+  },
+  {
+    // Role-neutral label per CLAUDE.md no-named-prospects rule (brief content
+    // names the mentor internally, like the other warm-intro briefs).
+    id: 'accountability_sprint',
+    label: 'Accountability Sprint',
+    group: 'Go-to-Market',
+    x: 0.5,
+    y: 0.97,
+    whatItsFor:
+      '1-on-1 mentor brief + 4-week plan: the InsurX↔DI parallel opener, what to extract from the host, the goal + week-1 commitments, logistics, and the relationship play.',
+    payoff:
+      'Walk into the session with the extraction plan ready — mine his institutional-trust playbook instead of setting a generic goal.',
+    minutes: 15,
+    prerequisites: ['outreach_hub'],
+    iconName: 'Target',
   },
 
   // ─── Intelligence (2) ──────────────────────────────────────────────

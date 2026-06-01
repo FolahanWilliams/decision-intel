@@ -100,6 +100,18 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
     label: 'Pre-Seed VC · Warm Intro',
     aliases: ['pre-seed vc warm intro', 'cornerstone brief', 'vc warm intro brief'],
   },
+  {
+    id: 'accountability_sprint',
+    label: 'Accountability Sprint',
+    aliases: [
+      'accountability sprint',
+      'kristian',
+      'kristian marcus',
+      'sprint brief',
+      'mentor session',
+      'mentor brief',
+    ],
+  },
   { id: 'content', label: 'Content Studio' },
   // Intelligence
   { id: 'data_ecosystem', label: 'Data Ecosystem' },

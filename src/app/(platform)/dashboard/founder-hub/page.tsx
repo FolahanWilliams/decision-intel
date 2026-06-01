@@ -243,6 +243,13 @@ const CornerstoneBriefTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const AccountabilitySprintTab = dynamic(
+  () =>
+    import('@/components/founder-hub/AccountabilitySprintTab').then(m => ({
+      default: m.AccountabilitySprintTab,
+    })),
+  { loading: tabLoader }
+);
 const PathToHundredMillionTab = dynamic(
   () =>
     import('@/components/founder-hub/PathToHundredMillionTab').then(m => ({
@@ -302,6 +309,7 @@ type TabId =
   | 'meetings_log'
   | 'lrqa'
   | 'cornerstone'
+  | 'accountability_sprint'
   | 'path_to_100m'
   | 'voice_activity'
   | 'metrics'
@@ -427,6 +435,14 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'cornerstone',
     label: 'Pre-Seed VC · Warm Intro',
     icon: <Handshake size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    // Role-neutral label per CLAUDE.md no-named-prospects rule (the brief
+    // content names the mentor + InsurX internally, like the LRQA brief).
+    id: 'accountability_sprint',
+    label: 'Accountability Sprint',
+    icon: <Target size={16} />,
     group: 'Go-to-Market',
   },
   { id: 'content', label: 'Content Studio', icon: <Zap size={16} />, group: 'Go-to-Market' },
@@ -779,6 +795,14 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: `Kahneman & Tversky 1979 prospect theory applied to your sales pitch · the ${FRAMEWORK_COUNT} regulatory frameworks card-by-card · how 3 nodes implement Kahneman + 3 implement Klein + metaJudge arbitrates · External Attack Vectors + ICP wedge vs ceiling.`,
     keywords:
       'education room loss aversion framing kahneman tversky prospect theory regulatory frameworks eu ai act basel iii ndpr cbn waemu popia isa 2007 r2f kahneman klein recognition primed decision pre mortem external attack vectors icp wedge ceiling design partner contract',
+  },
+  {
+    tabId: 'accountability_sprint',
+    section: 'Accountability Sprint · 1-on-1 mentor brief + 4-week plan',
+    preview:
+      'Extraction plan for the Kristian Marcus 1-on-1 (InsurX PM): the InsurX↔DI parallel opener, what to pull from him, the 4-week goal + week-1 commitments, logistics, and the relationship play.',
+    keywords:
+      'accountability sprint kristian marcus insurx mentor advisor 1 on 1 one on one hoxton shoreditch four week 4 week plan goal commitments discovery script bafta strategy world london institutional trust playbook empower not threaten pm friction teardown engineer to distribution pivot relationship play whatsapp',
   },
   // Outreach Hub — three internal sections, surfaced separately in
   // search so the founder lands on the right section directly.
@@ -1640,6 +1664,11 @@ function renderTab(
       // named prospect per CLAUDE.md no-named-prospects rule.
       <ErrorBoundary sectionName="Pre-seed VC warm-intro brief">
         <CornerstoneBriefTab />
+      </ErrorBoundary>
+    ),
+    accountability_sprint: (
+      <ErrorBoundary sectionName="Accountability Sprint brief">
+        <AccountabilitySprintTab />
       </ErrorBoundary>
     ),
     content: (
