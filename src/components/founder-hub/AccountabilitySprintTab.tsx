@@ -27,6 +27,9 @@ import {
   Send,
   FileText,
   Briefcase,
+  GitBranch,
+  CornerDownRight,
+  Bookmark,
 } from 'lucide-react';
 import { AccentCard } from '@/components/ui/AccentCard';
 import {
@@ -35,6 +38,8 @@ import {
   TOMORROW_RUN_SHEET,
   RESONANCE,
   EXTRACTION_TARGETS,
+  QUESTION_BANK,
+  QUESTION_BANK_INTRO,
   GOAL,
   FOUR_WEEK_PLAN,
   WEEK_ONE,
@@ -371,6 +376,174 @@ export function AccountabilitySprintTab() {
               ))}
             </AccentCard>
           ))}
+        </div>
+      </Section>
+
+      {/* The question bank — 8 branched questions for the 2-3 hour session */}
+      <Section
+        icon={<GitBranch size={16} />}
+        title="The question bank · 8 questions, each built to branch"
+        subtitle="The conversation engine for a 2-3 hour session. Ask, listen, then follow the matching branch — each one can open into its own full conversation."
+        accent={ACCENT.info}
+      >
+        <p style={{ ...bodyText, margin: '0 0 16px' }}>{QUESTION_BANK_INTRO}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {QUESTION_BANK.map(q => {
+            const lead = q.priority === 'lead';
+            const accent = lead ? ACCENT.green : ACCENT.info;
+            return (
+              <div
+                key={q.n}
+                style={{
+                  border: '1px solid var(--border-color)',
+                  borderLeft: `3px solid ${accent}`,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-card)',
+                  padding: '14px 16px',
+                }}
+              >
+                {/* head row: number + theme + links chip + lead badge */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    flexWrap: 'wrap',
+                    marginBottom: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 24,
+                      height: 24,
+                      flexShrink: 0,
+                      borderRadius: 7,
+                      background: accent,
+                      color: '#fff',
+                      fontSize: 12,
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {q.n}
+                  </span>
+                  <span style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {q.theme}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                      color: 'var(--text-muted)',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 999,
+                      padding: '2px 8px',
+                    }}
+                  >
+                    {q.links}
+                  </span>
+                  {lead && (
+                    <span
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        letterSpacing: '0.06em',
+                        color: ACCENT.green,
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      LEAD
+                    </span>
+                  )}
+                </div>
+
+                {/* the question — quotable */}
+                <SayThis>{q.question}</SayThis>
+
+                {/* why */}
+                <p style={{ ...bodyText, margin: '10px 0 0' }}>
+                  <strong style={{ color: 'var(--text-primary)' }}>Why ask it: </strong>
+                  {q.why}
+                </p>
+
+                {/* branches */}
+                <div
+                  style={{
+                    marginTop: 12,
+                    paddingTop: 12,
+                    borderTop: '1px dashed var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 9,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 800,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    Branch from his answer
+                  </div>
+                  {q.branches.map((b, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                      <CornerDownRight
+                        size={14}
+                        style={{ color: accent, flexShrink: 0, marginTop: 3 }}
+                        aria-hidden
+                      />
+                      <div style={{ minWidth: 0 }}>
+                        <span
+                          style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)' }}
+                        >
+                          {b.cue}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 12.5,
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          {' — '}
+                          {b.follow}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* capture */}
+                <div
+                  style={{
+                    marginTop: 12,
+                    display: 'flex',
+                    gap: 7,
+                    alignItems: 'flex-start',
+                    fontSize: 12,
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  <Bookmark
+                    size={12}
+                    style={{ color: accent, flexShrink: 0, marginTop: 2 }}
+                    aria-hidden
+                  />
+                  <span>
+                    <strong style={{ color: 'var(--text-secondary)' }}>Capture: </strong>
+                    {q.capture}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Section>
 
