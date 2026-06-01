@@ -682,6 +682,188 @@ export const SABBATH = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
+// TODAY'S THREE — daily-priority goal setting (research + scripture)
+// ─────────────────────────────────────────────────────────────────────
+//
+// The operating-system layer of Faith OS. The whole feature rests on one
+// convergent finding: the right number of daily priorities is small, and
+// for most people that number is THREE. The science and the scripture point
+// the same way — plan with clarity, hold the result with open hands.
+
+/** The hard cap. Three is the feature, not a limitation. Surfaced wherever
+ *  the UI or API needs the number, so it can never drift between them. */
+export const DAILY_THREE_MAX = 3;
+
+export interface DailyThreePrinciple {
+  id: string;
+  /** The productivity principle. */
+  principle: string;
+  /** Named primary source — author, work, year. Verifiable. */
+  source: string;
+  /** The core idea in one sentence. */
+  coreIdea: string;
+  /** How it shapes the daily-three ritual concretely. */
+  inPractice: string;
+  /** The scriptural parallel that makes the discipline sturdier — grounded in
+   *  identity + stewardship, not contingent on the outcome landing. */
+  scriptureRef: string;
+  scriptureText: string;
+  faithFrame: string;
+}
+
+/** The science of setting clear daily goals — five findings, each paired with
+ *  the scriptural frame that makes it hold under pressure. Same discipline as
+ *  SUCCESS_SCRIPTURE_MAP: the faith frame is sturdier because it does not
+ *  depend on the day going to plan. */
+export const DAILY_THREE_PRINCIPLES: ReadonlyArray<DailyThreePrinciple> = [
+  {
+    id: 'rule-of-three',
+    principle: 'The Rule of 3 — three priorities, not a to-do list',
+    source:
+      'J.D. Meier, Getting Results the Agile Way (2010); Chris Bailey, The Productivity Project (2016)',
+    coreIdea:
+      'Each morning, name the three outcomes that would make today a win. Three is enough to be meaningful and few enough to actually finish.',
+    inPractice:
+      'You set at most three. A fourth does not get added — it waits for tomorrow or it never mattered. The cap forces the choice the long list lets you avoid.',
+    scriptureRef: 'Psalm 90:12',
+    scriptureText: 'So teach us to number our days that we may get a heart of wisdom.',
+    faithFrame:
+      'A day is a finite, given thing — not an infinite to-do list to grind against. Numbering your days is choosing what the few hours you were entrusted with are actually for. Three named priorities is what numbering a day looks like in practice.',
+  },
+  {
+    id: 'working-memory',
+    principle: 'Your working memory holds about four things',
+    source: 'Cowan (2001), ~4±1 chunks; Miller (1956), 7±2; Baumeister on decision fatigue',
+    coreIdea:
+      'Attention is a hard-capped resource. A 12-item list does not make you do more — it splits your focus and burns executive function on deciding what to do next.',
+    inPractice:
+      'Holding the day in three items keeps the whole plan in view at once. You spend your willpower executing, not re-triaging a list every hour.',
+    scriptureRef: 'Luke 10:41-42',
+    scriptureText:
+      'Martha, Martha, you are anxious and troubled about many things, but one thing is necessary.',
+    faithFrame:
+      'The "many things" are the anxiety; the "one thing" is the peace. Cutting the list is not lowering ambition — it is refusing to be "anxious and troubled about many things" when a few rightly-chosen things are what the day is for.',
+  },
+  {
+    id: 'specific-and-hard',
+    principle: 'Specific + challenging beats "do your best"',
+    source:
+      'Locke & Latham, Goal-Setting Theory (1990; 2002) — clarity, challenge, commitment, feedback, complexity',
+    coreIdea:
+      'In roughly 90% of studies, specific and difficult goals produced higher performance than vague or easy ones. "Ship the synergy section" beats "work on the deck."',
+    inPractice:
+      'Write each of the three as a concrete, finishable outcome you can tell you hit — not a vague area. Clarity and a real edge of difficulty are doing the motivational work.',
+    scriptureRef: 'Luke 14:28',
+    scriptureText:
+      'For which of you, desiring to build a tower, does not first sit down and count the cost, whether he has enough to complete it?',
+    faithFrame:
+      'Counting the cost is specificity as faithfulness — Jesus commends the builder who names the real, finishable thing before starting. Wisdom is concrete. Vague goals are how good intentions quietly die.',
+  },
+  {
+    id: 'implementation-intentions',
+    principle: 'If-then plans roughly double follow-through',
+    source:
+      'Gollwitzer (1999); Gollwitzer & Sheeran meta-analysis (2006); Oettingen, WOOP / mental contrasting',
+    coreIdea:
+      'Pair each goal with a trigger: "if {when/where/after X}, then I will {action}." Deciding in advance when and where you will act removes the in-the-moment decision that is where intentions usually leak away.',
+    inPractice:
+      'Each of the three can carry one if-then intention. Naming the obstacle and the move in advance (WOOP: Wish, Outcome, Obstacle, Plan) is the single highest-leverage add-on to a goal.',
+    scriptureRef: 'Daniel 1:8',
+    scriptureText: 'But Daniel resolved that he would not defile himself with the king’s food.',
+    faithFrame:
+      'Daniel decided his line BEFORE the pressure arrived — the original implementation intention. Resolve set in advance is what holds when the moment comes and the will is weak. Decide the move while it is still cheap to decide.',
+  },
+  {
+    id: 'focus-on-the-vital-few',
+    principle: 'Say no to the other twenty — and pick the ONE',
+    source:
+      'Buffett 5/25 (attributed); Keller & Papasan, The ONE Thing (2013); Knapp & Zeratsky, Make Time (2018)',
+    coreIdea:
+      'Brain-dump everything, then circle only the vital few — everything not circled is the "avoid-at-all-costs" list. Of the three, one is the Highlight: "the ONE thing such that by doing it everything else becomes easier or unnecessary."',
+    inPractice:
+      'Star one of the three as the Highlight and protect it first. The discipline is not doing more things — it is the courage to let the good ones go so the essential one gets done.',
+    scriptureRef: 'Matthew 6:33',
+    scriptureText:
+      'But seek first the kingdom of God and his righteousness, and all these things will be added to you.',
+    faithFrame:
+      '"Seek first" is priority-ordering as a spiritual discipline — one thing genuinely first, the rest in their place behind it. The ordered life is not the one that does everything; it is the one that has the first thing first.',
+  },
+];
+
+/** The commit/release spine — why the day's three are rolled onto the Lord and
+ *  then held with open hands. This is the daily-goals expression of the
+ *  AGENCY_SURRENDER spine: plan hard (set the specific three), release the
+ *  outcome (commit them, and let go what the day does not allow). */
+export const DAILY_THREE_COMMIT = {
+  title: 'Commit the three. Then hold them with open hands.',
+  scriptureRef: 'Proverbs 16:3',
+  scriptureText: 'Commit your work to the LORD, and your plans will be established.',
+  body: 'The Hebrew for "commit" means to ROLL — to roll your work onto the Lord the way you shift a heavy load off your shoulders onto someone stronger. You do the full rigor of choosing three specific, hard, well-ordered priorities. Then you roll them onto Him and start. This is the same posture the whole product is built to enforce: plan like it all depends on the work, rest like it all depends on God. A goal you cannot finish today is not a verdict on you — you can RELEASE it, held with open hands (Prov 16:9; James 4:13-15, "if the Lord wills"), and that is wisdom, not failure.',
+  releaseNote:
+    'Marking a goal "released" is the agency-surrender beat made concrete — an intentional letting-go, recorded honestly, not a missed box. Carrying it forward is fine too; pretending the day had room it did not is the only real failure.',
+} as const;
+
+/** The 60-second ritual: a morning set + an evening close. Deliberately tiny —
+ *  the discipline only compounds if it actually happens every day. */
+export const DAILY_THREE_RITUAL: ReadonlyArray<{ when: string; step: string }> = [
+  {
+    when: 'Morning (before the inbox)',
+    step: 'Name the three. Make each one specific and finishable. Star the one Highlight. Add an if-then for the hard one. Commit them.',
+  },
+  {
+    when: 'During the day',
+    step: 'Protect the Highlight first. When something new shouts for a slot, it waits — the three are set.',
+  },
+  {
+    when: 'Evening (60-second close)',
+    step: 'Mark each done, carried, or released. Notice the pattern over the week, not the verdict on the day. The streak is showing up, not perfection.',
+  },
+];
+
+/** The named-evidence panel — the procurement-grade answer to "why exactly
+ *  three, and says who?" Kept honest: the 5/25 rule is attributed, not proven,
+ *  the way the rest of the codebase flags un-sourced numbers. */
+export const WHY_THREE = {
+  headline: 'Why three?',
+  body: 'Because it is the number where ambition and attention meet. Below it you under-use the day; above it the science says output does not rise — focus fragments, decision fatigue compounds, and the list becomes a place good intentions go to hide. Working memory holds about four things (Cowan, 2001). Specific, hard goals beat vague ones in ~90% of studies (Locke & Latham). Nearly every serious framework converges on the same small number: the Rule of 3, the daily Highlight, the ONE Thing, Buffett’s vital few. Three is enough to move the company and few enough to actually finish — and it leaves room to commit the day, and your worth, to something steadier than the result.',
+} as const;
+
+/** The cap for weekly + quarterly goals — locked to the daily cap so the whole
+ *  cascade obeys the same Rule of 3 (quarter rocks → weekly intentions →
+ *  the day's three). Imported by the period-goals route + helpers. */
+export const PERIOD_GOAL_MAX = DAILY_THREE_MAX;
+
+/** The cascade — why the day's three ladder up to a weekly intention and a
+ *  quarter rock. The Rule of 3 is explicitly a hierarchy (year → quarter →
+ *  week → day); the clarity comes from the day's work visibly serving the
+ *  bigger thing instead of floating free. */
+export const CASCADE_FRAME = {
+  headline: 'A few rocks for the quarter, three for the week, three for today.',
+  body: 'Daily focus only compounds when it points somewhere. Set at most three rocks for the quarter (the few things that, done, make the quarter a win), three intentions for the week that serve them, and then choose today’s three to move the week. When you can see the week’s three above today’s three, every day’s work is visibly laddering up to the bigger thing — and a "busy" day that moved none of them stops being able to hide.',
+  scriptureRef: 'Habakkuk 2:2',
+  scriptureText:
+    'And the LORD answered me: "Write the vision; make it plain on tablets, so he may run who reads it."',
+  faithFrame:
+    'Write the vision and make it plain — then run by it. "Where there is no vision the people perish" (Prov 29:18); a quarter with no named rocks is a quarter you drift through. The cascade is that vision made plain enough to run by, one day at a time.',
+} as const;
+
+/** The 60-second evening close on the day's three — two honest lines. The
+ *  Knapp "reflect" step + the scriptural discipline of examining the day. A
+ *  record that feeds the weekly review + the pattern view, never a verdict. */
+export const EVENING_REFLECTION = {
+  title: 'Close the day',
+  subtitle: '60 seconds — a record, not a verdict',
+  movedLabel: 'What moved?',
+  movedPlaceholder: 'What actually advanced today — however small.',
+  blockedLabel: 'What blocked it?',
+  blockedPlaceholder:
+    'The obstacle, named honestly — the raw material for tomorrow’s if-then plan.',
+  scriptureRef: 'Lamentations 3:40',
+  scriptureText: 'Let us test and examine our ways, and return to the LORD!',
+  note: 'Naming the obstacle is not self-judgment — it is how you write tomorrow’s if-then plan, and where you bring the day to God: "Search me, O God, and know my heart" (Ps 139:23-24).',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
 // THE GUARDRAIL — load-bearing theological discipline
 // ─────────────────────────────────────────────────────────────────────
 

@@ -58,6 +58,7 @@ import {
 import { InteractiveSfcMatrix } from '@/components/founder-hub/founder-os/InteractiveSfcMatrix';
 import { EventPrepCard } from '@/components/founder-hub/founder-os/EventPrepCard';
 import { KillCheckpointCountdown } from '@/components/founder-hub/founder-os/KillCheckpointCountdown';
+import { WeeklyThreeExecutionPanel } from '@/components/founder-hub/founder-os/WeeklyThreeExecutionPanel';
 import { LifestyleFreezeCard } from '@/components/founder-hub/founder-os/LifestyleFreezeCard';
 import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
 import { SparringRehearsalBalance } from '@/components/founder-hub/founder-os/SparringRehearsalBalance';
@@ -1425,6 +1426,10 @@ export function FounderOSTab({ founderPass }: FounderOSTabProps) {
           >
             {showReviewForm ? 'Cancel' : "Write this week's review"}
           </button>
+        </div>
+
+        <div style={{ marginTop: 14 }}>
+          <WeeklyThreeExecutionPanel founderPass={founderPass} />
         </div>
 
         {showReviewForm && (

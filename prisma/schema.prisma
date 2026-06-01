@@ -1471,6 +1471,112 @@ model FounderOsReadingProgress {
   @@index([userId, planId])
 }
 
+/// Faith OS "Today's Three" — daily-priority goal setting (2026-06-01).
+/// The operating-system layer of Faith OS: the research-backed practice of
+/// committing to AT MOST THREE clear priorities a day. The cap of three IS
+/// the feature, not a limitation — it is the convergent finding across the
+/// goal-setting science (working-memory limits ~4±1 + decision fatigue; the
+/// Rule of 3; Buffett's 5/25 focus discipline; Keller's "The ONE Thing";
+/// Make Time's single daily Highlight) AND the scriptural frame the rest of
+/// Faith OS is built on (Prov 16:3 "commit your work to the LORD and your
+/// plans will be established"; Matt 6:33 "seek first" → priority ordering;
+/// Ps 90:12 "teach us to number our days"). One row per goal; the API
+/// enforces ≤3 active goals per (userId, date) — the cap is server-enforced.
+///   rank        1 = the day's highlight / ONE Thing, then 2, 3.
+///   isHighlight the single most important of the three (Keller / Knapp).
+///   intention   optional if-then implementation intention (Gollwitzer 1999)
+///               — "if {trigger/when/where}, then I will {action}". The single
+///               highest-leverage add-on; roughly doubles goal attainment.
+///   status      open | done | carried | released. `released` is the
+///               agency-surrender beat made concrete — a goal intentionally
+///               let go, held with open hands (Prov 16:9 / James 4:13-15) —
+///               NOT a failure. `carried` closes it honestly as "still
+///               matters, not done today" — you re-set it tomorrow if it is
+///               still one of the three. Both `carried` and `released` free
+///               their slot against the day's cap of three.
+///   committed   was the day's three rolled onto the Lord (Prov 16:3)? The
+///               daily surrender act, recorded the way the prayer journal
+///               records supplication — identity grounding, never a metric.
+/// Deletes cascade via userId (string ref to Supabase auth, no FK), same as
+/// every other FounderOs* model.
+model FounderOsDailyGoal {
+  id          String    @id @default(cuid())
+  userId      String
+  /// Local date string YYYY-MM-DD — the founder's day is HIS day, not UTC
+  /// (matches FounderOsCheckin.date so the surfaces line up day-for-day).
+  date        String
+  text        String    @db.VarChar(280)
+  rank        Int       @default(1)
+  isHighlight Boolean   @default(false)
+  intention   String?   @db.VarChar(400)
+  /// Optional time-block for the goal (mainly the Highlight) — free text like
+  /// "9:00-10:30" or "after standup" (Make Time pairs the Highlight with a
+  /// when). Additive 2026-06-01.
+  scheduledFor String?  @db.VarChar(120)
+  /// Optional cascade link to the FounderOsPeriodGoal (weekly/quarterly) this
+  /// daily goal serves — the Rule-of-3 hierarchy made real, so the day's work
+  /// ladders up to the bigger rock instead of floating free. Soft ref (no FK)
+  /// — same decoupled / schema-drift-tolerant discipline as the other soft
+  /// links; a dangling id is treated as "no link". Additive 2026-06-01.
+  linkedPeriodGoalId String?
+  status      String    @default("open")
+  committed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// Faith OS period goals — the weekly + quarterly cascade above Today's Three
+/// (2026-06-01). The Rule of 3 is a hierarchy: a few quarter "rocks" → a few
+/// weekly intentions → the day's three. Seeing the week's three above today's
+/// three keeps the daily work laddering up to the bigger thing instead of
+/// floating free (Locke clarity + Buffett focus; "where there is no vision the
+/// people perish," Prov 29:18). The API enforces ≤3 active goals per
+/// (userId, period, periodKey).
+///   period     'week' | 'quarter'.
+///   periodKey  ISO-week key 'YYYY-Www' (week) or 'YYYY-Qn' (quarter).
+///   status     open | done | carried | released — same semantics as the daily
+///              goal; carried + released free the slot against the cap.
+model FounderOsPeriodGoal {
+  id          String    @id @default(cuid())
+  userId      String
+  period      String
+  periodKey   String
+  text        String    @db.VarChar(280)
+  rank        Int       @default(1)
+  status      String    @default("open")
+  committed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([userId, period, periodKey])
+}
+
+/// Faith OS evening reflection — the 60-second close on the day's three
+/// (2026-06-01). Two honest lines: what MOVED (what actually advanced) and what
+/// BLOCKED (the obstacle) — the Knapp "reflect" step + the scriptural discipline
+/// of examining the day ("Let us test and examine our ways," Lam 3:40; Ps
+/// 139:23-24). Feeds the weekly review + the pattern view; it is a record, never
+/// a verdict on the day. One row per (userId, date), upserted.
+model FounderOsDailyReflection {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String
+  moved     String?  @db.Text
+  blocked   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+}
+
 /// GTM v3.5 RATIFIED 2026-05-04 — micro-deliberation outcome event.
 /// Fast-feedback signal that closes Cloverpop's data-advantage attack vector
 /// without requiring 5-7-year macro-outcome wait times. Each Analysis can
