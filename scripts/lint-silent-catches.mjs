@@ -277,7 +277,12 @@ const SCAN_DIR = join(ROOT, 'src');
 //     the daily-goals + period-goals GET parses (+2). Each degrades to empty /
 //     reconciles via fetchAll(); every route fails-closed server-side with
 //     apiError. No delivery/audit/flywheel write swallowed.
-const SILENT_CATCH_BASELINE = 217;
+//   - 217 → 218 (The Build gamification cockpit 2026-06-01): +1 canonical
+//     res.json().catch(() => null) body-parse class in CampaignCockpit.tsx —
+//     parses /api/founder-os/campaign; on parse failure the cockpit degrades to
+//     not-rendered and the rest of Start Here still renders. The route itself
+//     fails-open to a level-1 campaign. No delivery/audit/flywheel write swallowed.
+const SILENT_CATCH_BASELINE = 218;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

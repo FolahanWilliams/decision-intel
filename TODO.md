@@ -81,6 +81,13 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [x] Saved durable rule to CLAUDE.md Session Workflow (0a): read the relevant md / access-model BEFORE proposing — `/dashboard` = customer surface, `/dashboard/founder-hub` = founder-private; never propose founder-only surfaces on the customer dashboard.
 - [x] Gates green: tsc clean · 35/35 faith-os vitest · 4 lints clean (positioning · counts 73 · canonical-imports · silent-catches 217, +5 documented) · prettier · slop-scan 3.23.
 
+**The Build — Faith OS gamification layer (founder-approved after a gamification-psychology research pass; full prose in CLAUDE.md "The Build" lock 2026-06-01). Founder-private only; the customer product is never gamified.**
+
+- [x] Recommendation taken: Faith-arc spine (7 Scripture builder arcs Joshua→Paul) + mission-control mechanics + the Bible as a business manual. Serves consistency / output / mind / faith in one layer.
+- [x] Load-bearing rule: **XP rewards inputs only (the controllable work), never outcomes** — satisfies the anti-prosperity guardrail AND the research's intrinsic-motivation finding. Outcomes → milestones/badges. No leaderboards (solo). Engine test asserts outcomes never change XP.
+- [x] NO new tables — XP/level/quests/milestones/badges all DERIVE from already-logged FounderOs* + WedgeProspect data. Pure SSOT [campaign-content.ts](src/components/founder-hub/campaign/campaign-content.ts) + pure engine [campaign-engine.ts](src/components/founder-hub/campaign/campaign-engine.ts) (13 vitest) + aggregation API [/api/founder-os/campaign](src/app/api/founder-os/campaign/route.ts) (fails-open) + [CampaignCockpit](src/components/founder-hub/campaign/CampaignCockpit.tsx) mounted at the top of the EXISTING Start Here (no new tab).
+- [x] Gates green: tsc clean · 13/13 campaign vitest · 4 lints clean (positioning · counts 73 · canonical-imports · silent-catches 218, +1 documented) · prettier · slop-scan 3.24. No migration this ship.
+
 ## Recently Completed (2026-05-25)
 
 **.env.example drift — audit-queue item #5 closed (21 operator-facing env vars now declared).**
