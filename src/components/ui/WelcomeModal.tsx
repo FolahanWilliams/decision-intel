@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { FileText, Upload, Compass, Briefcase, Landmark, Building2, Users } from 'lucide-react';
 import { PHASE_1_PERSONAS, type Phase1PersonaId } from '@/lib/constants/icp';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 
 /**
  * First-login gate (v3.5 HXC-first, merged 2026-05-11).
@@ -32,13 +34,20 @@ import { PHASE_1_PERSONAS, type Phase1PersonaId } from '@/lib/constants/icp';
  * only when onboardingCompleted=true AND phase1Persona=null (users who
  * completed the old WelcomeModal flow before 2026-05-11).
  *
- * "Other" path captures free-text role detail and routes to a friendly
- * waitlist confirmation — DI is currently optimised for the four HXC
- * personas only, and the explicit waitlist captures non-buyer-class
- * sign-ups without distorting the Vohra HXC PMF metric.
+ * "Other" / non-wedge sign-ups get FULL platform access + the generic
+ * reasoning-audit overview (access-policy amendment 2026-05-19) — they are
+ * NOT waitlisted. They capture optional free-text role detail and are
+ * cohort-tagged phase1HxcEligible=false server-side so they stay out of the
+ * Vohra HXC PMF graduation cohort. Access ≠ cohort.
  */
 const STORAGE_KEY = 'decision-intel-onboarding-completed';
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
+
+// Canonical counts derive from the source arrays so the welcome copy can
+// never drift from the live taxonomy / case library (mirrors OnboardingTour
+// + role-empty-states). NB: "22-bias" / "143-case" are hyphenated singulars
+// that evade the lint:counts regex — derivation is the only guard here.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -79,7 +88,7 @@ const VALUE_PROPS_BY_PERSONA: Record<
     eyebrow: 'For fractional CSOs',
     headline: 'Audits the strategic memos behind every client engagement, in 60 seconds each.',
     bullets: [
-      '22-bias R²F detection on board recommendations + market-entry memos',
+      `${BIAS_COUNT}-bias R²F detection on board recommendations + market-entry memos`,
       "Decision Provenance Record per engagement — defensible artefact your client's audit committee can pull up",
       'Portfolio Bias Heatmap across all 3-5 client engagements compounds quarter over quarter',
     ],
@@ -95,7 +104,7 @@ const VALUE_PROPS_BY_PERSONA: Record<
   },
   smaller_fund_gp: {
     eyebrow: 'For smaller-fund GPs',
-    headline: 'Pre-IC audit on every memo, against a 143-case M&A and venture failure library.',
+    headline: `Pre-IC audit on every memo, against a ${HISTORICAL_CASE_COUNT}-case M&A and venture failure library.`,
     bullets: [
       'Reference-class forecast — outside view to counter inside-view optimism',
       'Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting',
@@ -106,7 +115,7 @@ const VALUE_PROPS_BY_PERSONA: Record<
     eyebrow: 'For PE-backed founders',
     headline: 'Audits the strategic memo before the operating partner reads it.',
     bullets: [
-      '22-bias detection on board recommendations + acquisition memos',
+      `${BIAS_COUNT}-bias detection on board recommendations + acquisition memos`,
       'Predicted operating-partner questions before the meeting (pre-board pre-mortem)',
       'Decision Knowledge Graph survives team transitions, sponsor turnover, and LP audits',
     ],
@@ -115,7 +124,7 @@ const VALUE_PROPS_BY_PERSONA: Record<
     eyebrow: 'The reasoning audit platform',
     headline: 'Audit any strategic decision in 60 seconds. Full access, every feature.',
     bullets: [
-      '22-bias R²F detection on any memo, board deck, or strategy doc, with the exact passages flagged',
+      `${BIAS_COUNT}-bias R²F detection on any memo, board deck, or strategy doc, with the exact passages flagged`,
       'A hashed, tamper-evident Decision Provenance Record on every audit',
       'Your Decision Knowledge Graph compounds across every decision your team makes',
     ],

@@ -326,7 +326,14 @@ export default function Dashboard() {
       showToast('Welcome to your upgraded plan! Your new limits are now active.', 'success');
       window.history.replaceState({}, '', '/dashboard');
     }
-    if (params.get('welcome') === 'true') {
+    // Fresh-signup arrivals from the marketing funnel carry ?welcome=true
+    // (legacy) or ?onboarding=1 (sign-in-first hero CTA, 2026-05-07 lock —
+    // also emitted by the specimen + case-study CTAs). The WelcomeModal and
+    // the product tour both self-gate on /api/onboarding state, so the param
+    // is purely a fresh-arrival signal — acknowledge it by stripping it so a
+    // refresh or shared URL doesn't carry onboarding cruft (the upgraded /
+    // frameId branches strip theirs the same way).
+    if (params.get('welcome') === 'true' || params.get('onboarding') === '1') {
       window.history.replaceState({}, '', '/dashboard');
     }
     const fId = params.get('frameId');
