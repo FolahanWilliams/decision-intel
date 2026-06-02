@@ -4,11 +4,11 @@ import { NextRequest } from 'next/server';
 // ─── Mocks (hoisted) ──────────────────────────────────────────────────────
 //
 // Phase 2 migration (2026-05-02) swapped the route from direct Gemini SDK
-// to Vercel AI Gateway via streamChat. The auth-gate tests still pass with
-// minimal changes since they short-circuit before any LLM call. The
-// history-shape assertions further down were keyed to the old Gemini
-// startChat({ history: [...] }) shape and are .skipped pending a Phase 3
-// test-rewrite session that mirrors the new GatewayMessage[] contract.
+// to Vercel AI Gateway via streamChat. The auth-gate tests short-circuit
+// before any LLM call; the history-shape assertions below were rewritten
+// (2026-06-02) to mirror the new GatewayMessage[] contract — they assert
+// against the `messages` array passed to streamChat instead of the old
+// Gemini startChat({ history: [...] }) shape.
 
 const { mockStreamChat } = vi.hoisted(() => {
   const mockStreamChat = vi.fn();
@@ -18,11 +18,6 @@ const { mockStreamChat } = vi.hoisted(() => {
 vi.mock('@/lib/ai/providers/gateway', () => ({
   streamChat: mockStreamChat,
 }));
-
-// Backwards-compat export for any tests that referenced these mocks before;
-// retained to avoid breaking imports while the test-rewrite is queued.
-const mockSendMessageStream = vi.fn();
-const mockStartChat = vi.fn();
 
 vi.mock('@/lib/env', () => ({
   getRequiredEnvVar: vi.fn(() => 'fake-api-key'),
@@ -154,23 +149,39 @@ describe('POST /api/founder-hub/chat', () => {
     expect(text).toContain('done');
   });
 
-  it.skip('passes history to Gemini chat (Phase 2 TODO: rewrite for GatewayMessage[] shape)', async () => {
+  // The route maps prior turns into a single GatewayMessage[] passed to
+  // streamChat({ model, messages, ... }). The recent-meetings block is
+  // mocked empty in beforeEach, so the deterministic message prefix is
+  // exactly two `system` grounding messages (FOUNDER_CONTEXT + persona),
+  // then the (filtered, truncated) prior turns, then the new user message.
+  function streamChatMessages(): Array<{ role: string; content: string }> {
+    const callArgs = mockStreamChat.mock.calls[0]?.[0] as
+      | { messages: Array<{ role: string; content: string }> }
+      | undefined;
+    expect(callArgs).toBeDefined();
+    return callArgs!.messages;
+  }
+
+  it('passes prior turns into the gateway messages array', async () => {
     const history = [
       { role: 'user', content: 'Hello' },
       { role: 'assistant', content: 'Hi there' },
     ];
     await POST(makeRequest({ message: 'Follow up', history }, PASS));
-    expect(mockStartChat).toHaveBeenCalledWith(
-      expect.objectContaining({
-        history: expect.arrayContaining([
-          expect.objectContaining({ role: 'user', parts: [{ text: 'Hello' }] }),
-          expect.objectContaining({ role: 'model', parts: [{ text: 'Hi there' }] }),
-        ]),
-      })
+    expect(mockStreamChat).toHaveBeenCalledTimes(1);
+    const messages = streamChatMessages();
+    // Prior turns preserve their role + content verbatim.
+    expect(messages).toEqual(
+      expect.arrayContaining([
+        { role: 'user', content: 'Hello' },
+        { role: 'assistant', content: 'Hi there' },
+      ])
     );
+    // The new user turn is appended last.
+    expect(messages[messages.length - 1]).toEqual({ role: 'user', content: 'Follow up' });
   });
 
-  it.skip('filters invalid history entries (Phase 2 TODO: rewrite for GatewayMessage[] shape)', async () => {
+  it('filters invalid history entries before building the messages array', async () => {
     const history = [
       { role: 'user', content: 'Valid' },
       { bad: 'entry' },
@@ -179,35 +190,40 @@ describe('POST /api/founder-hub/chat', () => {
       { role: 'user', content: 'Also valid' },
     ];
     await POST(makeRequest({ message: 'Test', history }, PASS));
-    expect(mockStartChat).toHaveBeenCalled();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as
-      | { history: Array<{ role: string; parts?: Array<{ text: string }> }> }
-      | undefined;
-    expect(chatArgs).toBeDefined();
-    // At minimum, the 2 valid history entries should be present
-    expect(chatArgs!.history.length).toBeGreaterThanOrEqual(4); // system pair + 2 valid
+    const messages = streamChatMessages();
+    // 2 system grounding messages + 2 valid prior turns + 1 new user message.
+    expect(messages.length).toBe(5);
+    const contents = messages.map(m => m.content);
+    expect(contents).toContain('Valid');
+    expect(contents).toContain('Also valid');
+    expect(contents).toContain('Test');
+    // The malformed entries never reach the messages array.
+    expect(contents).not.toContain('entry');
   });
 
-  it.skip('truncates history to last 20 entries (Phase 2 TODO: rewrite for GatewayMessage[] shape)', async () => {
+  it('truncates history to the last 20 entries', async () => {
     const history = Array.from({ length: 30 }, (_, i) => ({
       role: i % 2 === 0 ? 'user' : 'assistant',
       content: `Message ${i}`,
     }));
     await POST(makeRequest({ message: 'Test', history }, PASS));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as
-      | { history: Array<unknown> }
-      | undefined;
-    expect(chatArgs).toBeDefined();
-    // System pair (2) + last 20 history entries
-    expect(chatArgs!.history.length).toBe(22);
+    const messages = streamChatMessages();
+    // 2 system grounding messages + last 20 prior turns + 1 new user message.
+    expect(messages.length).toBe(23);
+    const contents = messages.map(m => m.content);
+    // The oldest 10 turns are dropped; Message 10 is the first one kept.
+    expect(contents).not.toContain('Message 9');
+    expect(contents).toContain('Message 10');
+    expect(contents).toContain('Message 29');
   });
 
-  it.skip('truncates message to 5000 chars (Phase 2 TODO: rewrite for streamChat)', async () => {
+  it('truncates the message to 5000 chars', async () => {
     const longMessage = 'x'.repeat(10000);
     await POST(makeRequest({ message: longMessage }, PASS));
-    expect(mockSendMessageStream).toHaveBeenCalledWith('x'.repeat(5000));
+    const messages = streamChatMessages();
+    const finalMessage = messages[messages.length - 1];
+    expect(finalMessage.role).toBe('user');
+    expect(finalMessage.content).toBe('x'.repeat(5000));
   });
 
   describe('response-style sanitizer', () => {
