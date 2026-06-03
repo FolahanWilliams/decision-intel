@@ -266,6 +266,7 @@ import {
   MessageSquare,
   Zap,
   Lock,
+  Delete,
   Search,
   X,
   Library,
@@ -1098,6 +1099,12 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
 const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || '';
+// Persist a successful unlock on this device so the founder isn't re-prompted
+// on every page reload / tab navigation. The REAL access control is the
+// server-side isAdminUserId gate in layout.tsx — this client keypad is only
+// defense-in-depth (a shared/borrowed logged-in session), so remembering the
+// unlock on the device is an acceptable trade for the speed.
+const UNLOCK_STORAGE_KEY = 'di-founder-hub-unlocked-v1';
 
 export default function FounderHubPage() {
   // Default to Product Overview — Meeting Prep is time-sensitive and goes
@@ -1113,6 +1120,7 @@ export default function FounderHubPage() {
     return LEGACY_TAB_REDIRECTS[raw] ?? 'start';
   });
   const [unlocked, setUnlocked] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1122,18 +1130,73 @@ export default function FounderHubPage() {
   // for returning users — acceptable, no migration needed.
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const handleUnlock = useCallback(() => {
-    if (!FOUNDER_PASS) {
-      setPassError(true);
-      return;
+  // Restore a prior unlock on this device (set `mounted` afterwards so we
+  // never flash the lock screen for an already-unlocked returning user).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(UNLOCK_STORAGE_KEY) === '1') setUnlocked(true);
+    } catch {
+      // localStorage unavailable (e.g. private mode) — fall through to keypad.
     }
+    setMounted(true);
+  }, []);
+
+  // Auto-unlock the instant the entered code matches — no Enter or button
+  // press needed. Drives both the on-screen keypad and physical typing.
+  useEffect(() => {
+    if (unlocked || !FOUNDER_PASS) return;
     if (passInput === FOUNDER_PASS) {
       setUnlocked(true);
       setPassError(false);
-    } else {
-      setPassError(true);
+      try {
+        localStorage.setItem(UNLOCK_STORAGE_KEY, '1');
+      } catch {
+        // ignore — unlock still holds for this session.
+      }
     }
+  }, [passInput, unlocked]);
+
+  const handleKeypadPress = useCallback((digit: string) => {
+    setPassError(false);
+    setPassInput(prev => (prev + digit).slice(0, 64));
+  }, []);
+
+  const handleKeypadBackspace = useCallback(() => {
+    setPassError(false);
+    setPassInput(prev => prev.slice(0, -1));
+  }, []);
+
+  const handleKeypadClear = useCallback(() => {
+    setPassError(false);
+    setPassInput('');
+  }, []);
+
+  // Wrong-code error only surfaces on an explicit Enter — the auto-unlock
+  // effect owns the success path, so the founder normally never sees it.
+  const handleSubmit = useCallback(() => {
+    if (FOUNDER_PASS && passInput === FOUNDER_PASS) return;
+    setPassError(true);
   }, [passInput]);
+
+  // Physical-keyboard fallback while locked (e.g. if the code isn't purely
+  // numeric) — without rendering a text field, so the keypad stays primary.
+  useEffect(() => {
+    if (unlocked || !mounted) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        handleKeypadBackspace();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key.length === 1) {
+        handleKeypadPress(e.key);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [unlocked, mounted, handleKeypadBackspace, handleKeypadPress, handleSubmit]);
 
   // Keyboard shortcut: Cmd/Ctrl+K to focus search, Escape to clear
   useEffect(() => {
@@ -1173,10 +1236,32 @@ export default function FounderHubPage() {
     return () => window.removeEventListener('founder-hub-navigate', handler);
   }, [unlocked]);
 
+  if (!mounted) {
+    // Avoid flashing the lock screen before the localStorage restore runs
+    // for an already-unlocked returning user.
+    return <div style={{ minHeight: '60vh' }} />;
+  }
+
   if (!unlocked) {
+    const keypadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const btnStyle: React.CSSProperties = {
+      height: 56,
+      borderRadius: 12,
+      border: '1px solid var(--border-primary, #333)',
+      background: 'var(--bg-secondary, #111)',
+      color: 'var(--text-primary, #fff)',
+      fontSize: 20,
+      fontWeight: 600,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      userSelect: 'none',
+      transition: 'background 0.12s ease',
+    };
     return (
       <div
-        className="max-w-md mx-auto px-4"
+        className="max-w-xs mx-auto px-4"
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -1185,13 +1270,13 @@ export default function FounderHubPage() {
           minHeight: '60vh',
         }}
       >
-        <Lock size={40} style={{ color: 'var(--text-muted, #71717a)', marginBottom: 16 }} />
+        <Lock size={36} style={{ color: 'var(--text-muted, #71717a)', marginBottom: 14 }} />
         <h2
           style={{
             fontSize: 18,
             fontWeight: 700,
             color: 'var(--text-primary, #fff)',
-            marginBottom: 8,
+            marginBottom: 6,
           }}
         >
           Founder Access Only
@@ -1200,55 +1285,95 @@ export default function FounderHubPage() {
           style={{
             fontSize: 13,
             color: 'var(--text-muted, #71717a)',
-            marginBottom: 20,
+            marginBottom: 18,
             textAlign: 'center',
           }}
         >
-          This page is private. Enter the access code to continue.
+          Tap your access code.
         </p>
-        <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-          <input
-            type="password"
-            value={passInput}
-            onChange={e => {
-              setPassInput(e.target.value);
-              setPassError(false);
-            }}
-            onKeyDown={e => e.key === 'Enter' && handleUnlock()}
-            placeholder="Access code"
-            style={{
-              flex: 1,
-              padding: '10px 14px',
-              fontSize: 14,
-              borderRadius: 8,
-              border: `1px solid ${passError ? '#ef4444' : 'var(--border-primary, #333)'}`,
-              background: 'var(--bg-secondary, #111)',
-              color: 'var(--text-primary, #fff)',
-              outline: 'none',
-            }}
-            autoFocus
-          />
+
+        {/* Entered-code dots */}
+        <div
+          aria-hidden
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 6,
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: 16,
+            maxWidth: 220,
+            marginBottom: 18,
+          }}
+        >
+          {passInput.length === 0 ? (
+            <span style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', letterSpacing: 4 }}>
+              ••••
+            </span>
+          ) : (
+            passInput.split('').map((_, i) => (
+              <span
+                key={i}
+                style={{
+                  width: 9,
+                  height: 9,
+                  borderRadius: '50%',
+                  background: passError ? '#ef4444' : '#16A34A',
+                  display: 'inline-block',
+                }}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Click keypad */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 10,
+            width: '100%',
+            maxWidth: 260,
+          }}
+        >
+          {keypadKeys.map(k => (
+            <button key={k} type="button" onClick={() => handleKeypadPress(k)} style={btnStyle}>
+              {k}
+            </button>
+          ))}
           <button
-            onClick={handleUnlock}
-            style={{
-              padding: '10px 20px',
-              fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 8,
-              border: 'none',
-              background: '#16A34A',
-              color: '#fff',
-              cursor: 'pointer',
-            }}
+            type="button"
+            onClick={handleKeypadClear}
+            style={{ ...btnStyle, fontSize: 13, color: 'var(--text-muted, #71717a)' }}
           >
-            Unlock
+            Clear
+          </button>
+          <button type="button" onClick={() => handleKeypadPress('0')} style={btnStyle}>
+            0
+          </button>
+          <button
+            type="button"
+            onClick={handleKeypadBackspace}
+            aria-label="Delete last digit"
+            style={{ ...btnStyle, color: 'var(--text-muted, #71717a)' }}
+          >
+            <Delete size={20} />
           </button>
         </div>
+
         {passError && (
-          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 8 }}>
-            Incorrect access code.
-          </p>
+          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 14 }}>Incorrect access code.</p>
         )}
+        <p
+          style={{
+            fontSize: 11,
+            color: 'var(--text-muted, #71717a)',
+            marginTop: 14,
+            textAlign: 'center',
+          }}
+        >
+          Unlocks automatically when the code matches, then stays unlocked on this device.
+        </p>
       </div>
     );
   }
