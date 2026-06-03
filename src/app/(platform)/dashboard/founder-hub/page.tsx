@@ -1362,7 +1362,9 @@ export default function FounderHubPage() {
         </div>
 
         {passError && (
-          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 14 }}>Incorrect access code.</p>
+          <p style={{ fontSize: 12, color: 'var(--error)', marginTop: 14 }}>
+            Incorrect access code.
+          </p>
         )}
         <p
           style={{
