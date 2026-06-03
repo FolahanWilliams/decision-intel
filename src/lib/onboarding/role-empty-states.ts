@@ -2,8 +2,11 @@
  * Role-aware empty-state copy (4.2 deep).
  *
  * Centralised per-role copy for the empty states on /dashboard,
- * /dashboard/deals, /dashboard/decision-log, /dashboard/analytics so
- * each surface lands with vocabulary the buyer recognizes.
+ * /dashboard/deals, /dashboard/decisions?view=log (Phase G fold 2026-05-10
+ * — surface ID 'decision-log' is the stable SSOT key; the URL moved when
+ * the standalone /dashboard/decision-log page folded into the parent),
+ * and /dashboard/analytics so each surface lands with vocabulary the
+ * buyer recognizes.
  *
  * Server-side helper for RSC usage; the client equivalent reads the
  * onboarding role via /api/onboarding and indexes into the same map.
