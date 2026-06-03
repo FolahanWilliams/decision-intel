@@ -75,11 +75,11 @@ export const FOUNDER_CHAT_MODELS: readonly FounderChatModel[] = [
     slug: 'deepseek/deepseek-chat',
     label: 'DeepSeek V4 Pro',
     provider: 'DeepSeek',
-    // TODO(founder): if Vercel AI Gateway exposes a more specific
-    // 'V4 Pro' slug than `deepseek-chat`, swap above. The gateway
-    // dashboard at https://vercel.com/dashboard/ai/models lists the
-    // exact strings the gateway accepts.
-    description: 'Reasoning-heavy alternative. Verify slug in AI Gateway dashboard.',
+    // Slug verified against the Vercel AI Gateway dashboard 2026-06-02 —
+    // `deepseek/deepseek-chat` is the gateway's V4-Pro route. If a more
+    // specific 'v4-pro' slug ships later, swap here in the same commit as
+    // the dashboard change (per the slug-verification note above).
+    description: 'Reasoning-heavy alternative.',
     available: true,
   },
 ] as const;
