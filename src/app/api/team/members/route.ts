@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { logAudit } from '@/lib/audit';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -61,6 +62,14 @@ export async function PUT(req: NextRequest) {
       data: { role },
     });
 
+    await logAudit({
+      action: 'TEAM_MEMBER_ROLE_CHANGED',
+      resource: 'team_member',
+      resourceId: target.userId,
+      orgId: target.orgId,
+      details: { email: target.email, from: target.role, to: role },
+    });
+
     log.info(`Member ${memberId} role updated to ${role} by ${user.id}`);
     return NextResponse.json(updated);
   } catch (error) {
@@ -108,6 +117,15 @@ export async function DELETE(req: NextRequest) {
       }
 
       await prisma.teamMember.delete({ where: { id: requester.id } });
+
+      await logAudit({
+        action: 'TEAM_MEMBER_REMOVED',
+        resource: 'team_member',
+        resourceId: requester.userId,
+        orgId: requester.orgId,
+        details: { email: requester.email, role: requester.role, selfRemoved: true },
+      });
+
       return NextResponse.json({ success: true });
     }
 
@@ -134,6 +152,14 @@ export async function DELETE(req: NextRequest) {
     }
 
     await prisma.teamMember.delete({ where: { id: target.id } });
+
+    await logAudit({
+      action: 'TEAM_MEMBER_REMOVED',
+      resource: 'team_member',
+      resourceId: target.userId,
+      orgId: requester.orgId,
+      details: { email: target.email, role: target.role, selfRemoved: false },
+    });
 
     log.info(`Member ${targetUserId} removed from org ${requester.orgId} by ${user.id}`);
     return NextResponse.json({ success: true });

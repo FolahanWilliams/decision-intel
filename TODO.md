@@ -61,6 +61,17 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-05)
+
+**Strategy 12-seat tier — Tier A (integrity) + Tier B (admin polish). Refinement-grade hardening of the shipped tier; no schema migration, no speculative team features (the deeper team-only differentiators stay deferred per the GTM "build FROM Sankore feedback" lock). Full prose in CLAUDE.md "Team seat administration + audit trail (locked 2026-06-05)".**
+
+- [x] **Accept-time seat enforcement (Tier A).** [/api/team/invite/accept](src/app/api/team/invite/accept/route.ts) now does an atomic member-count + insert inside one `$transaction` against the org's CURRENT plan cap → closes the count→insert double-accept race AND the downgrade hole (a stale Strategy-era invite can't push a since-downgraded org past its new cap). Members are never auto-removed on downgrade — growth is blocked, the over-limit state is surfaced.
+- [x] **Seat-usage meter (Tier A).** `/api/team` GET returns `seats {plan,used,limit}`; TeamPage renders a color-coded `SeatMeter` at the top of the Members tab + disables the Invite button when full. Reads the cap from `PLANS.team.maxTeamMembers` — no hardcoded "12".
+- [x] **Team-admin audit trail (Tier B).** 5 new `AuditAction` values wired into invite/accept/role-change/remove/revoke; `logAudit` gained an optional `orgId` so org-level rows survive in the Team Activity feed + AdminAuditLog even after the actor leaves. Team Activity `ACTION_LABELS` render all 5.
+- [x] **Bulk invite (Tier B).** New [/api/team/invite/bulk](src/app/api/team/invite/bulk/route.ts) (owner/admin, 5/hr, dedupe + seat-headroom stop, per-email `{created,skipped}` w/ reasons) + a single ↔ multiple toggle in the invite modal.
+- [x] Fixed a stale comment in the invite route (seat-tier comment said "Starter 3 / Professional 10 / Team 50" → corrected to Free/Individual 1 / Strategy 12 / Enterprise ∞).
+- [x] Gates green: tsc clean (src/) · 4 lints clean (positioning · silent-catches 218 no-new · counts 73 · canonical-imports) · prettier · slop-scan under 4.0.
+
 ## Recently Completed (2026-06-01)
 
 **Faith OS "Today's Three" — daily-priority goal setting (founder-approved "boil the ocean"; full prose in CLAUDE.md "Faith OS Today's Three lock 2026-06-01").**

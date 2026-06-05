@@ -12,6 +12,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
 
 const log = createLogger('Team');
 
@@ -45,12 +46,23 @@ export async function GET() {
     });
 
     if (!membership) {
-      return NextResponse.json({ organization: null, role: null });
+      return NextResponse.json({ organization: null, role: null, seats: null });
     }
+
+    // Authoritative seat usage (active members + pending invites vs. the plan
+    // cap) so the UI meter can't drift from the server-side enforcement in
+    // checkTeamSizeLimit. `limit` is Number.MAX_SAFE_INTEGER for unlimited
+    // (Enterprise) — the client treats a non-finite-scale limit as "unlimited".
+    const seatCheck = await checkTeamSizeLimit(membership.orgId);
 
     return NextResponse.json({
       organization: membership.organization,
       role: membership.role,
+      seats: {
+        plan: seatCheck.plan,
+        used: seatCheck.used,
+        limit: seatCheck.limit,
+      },
     });
   } catch (error) {
     log.error('Failed to fetch team:', error);
