@@ -10,6 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
@@ -91,7 +92,11 @@ export async function POST(req: NextRequest) {
     const memberEmails = new Set(members.map(m => m.email.toLowerCase()));
     const pendingEmails = new Set(pendingInvites.map(i => i.email.toLowerCase()));
 
-    // Seat headroom — pending invites already count toward `used`.
+    // Seat headroom — pending invites already count toward `used`. This is a
+    // best-effort gate to avoid obviously over-inviting; the AUTHORITATIVE seat
+    // boundary is the atomic, org-row-locked check at invite/accept (a pending
+    // invite is not a consumed seat until accepted, and any excess pending
+    // invites are blocked there).
     const seatCheck = await checkTeamSizeLimit(orgId);
     let remaining = Math.max(0, seatCheck.limit - seatCheck.used);
 
@@ -120,16 +125,31 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const invite = await prisma.teamInvite.create({
-        data: {
-          orgId,
-          email,
-          role,
-          invitedByUserId: user.id,
-          token: generateShareToken(),
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      });
+      let invite;
+      try {
+        invite = await prisma.teamInvite.create({
+          data: {
+            orgId,
+            email,
+            role,
+            invitedByUserId: user.id,
+            token: generateShareToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+        });
+      } catch (createErr) {
+        // A concurrent invite can win the (orgId, email) unique race between
+        // our pre-check and this insert. Treat the collision as an
+        // already-invited skip rather than 500-ing the whole batch.
+        if (
+          createErr instanceof Prisma.PrismaClientKnownRequestError &&
+          createErr.code === 'P2002'
+        ) {
+          skipped.push({ email, reason: 'already_invited' });
+          continue;
+        }
+        throw createErr;
+      }
       remaining -= 1;
       pendingEmails.add(email); // guard against duplicate rows within this batch
       created.push({ email, id: invite.id });

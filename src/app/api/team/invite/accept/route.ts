@@ -88,6 +88,12 @@ export async function POST(req: NextRequest) {
     // accepts can't both slip past a cap-1 check (the count→insert race).
     try {
       await prisma.$transaction(async tx => {
+        // Serialize seat mutations for this org. Under Postgres READ COMMITTED
+        // a bare count-then-insert is NOT atomic — two concurrent accepts both
+        // read the same member count and both insert, exceeding the cap.
+        // Locking the org row makes concurrent seat-mutating transactions queue.
+        await tx.$queryRaw`SELECT id FROM "Organization" WHERE id = ${invite.orgId} FOR UPDATE`;
+
         // Re-read inside the tx to defend against a double-accept race.
         const fresh = await tx.teamInvite.findUnique({
           where: { id: invite.id },
