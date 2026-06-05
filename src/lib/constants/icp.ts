@@ -530,6 +530,48 @@ export const SHARRAN_111 = {
 } as const;
 
 /**
+ * Retroactive post-mortem cold-open + logo-minting motion (locked 2026-06-05,
+ * SF-advisor-validated). An outside advisor independently reconstructed the
+ * v3.5 wedge + the Retroactive Audit Mode, and sharpened the GTM ASK three ways
+ * the toolkit (discovery-pitch-toolkit.ts `post_close_surprise`) did not yet
+ * LEAD with:
+ *
+ * 1. LEAD with the retro, not the forward audit. For the M&A-primary wedge
+ *    personas (mid-market corp dev / smaller-fund GP / PE-backed founder) the
+ *    cold-open is NOT "audit your next memo" — it is "let me run it over a deal
+ *    you've ALREADY closed." Forensic, not predictive: you are not asking them
+ *    to bet on you, only to let you read the past. This sidesteps the two
+ *    things killing a pre-revenue solo founder — no track record (analyse the
+ *    past, don't bet on the future) and no data (the retro IS the data).
+ *    (Fractional CSOs keep the forward "next client memo" lead — that genuinely
+ *    is their workflow; the retro-lead is for the deal-team personas.)
+ * 2. PAIR it: "one you feel good about AND one that went sideways." The good
+ *    deal is ego-safe (you are not implying their judgment was bad); the bad
+ *    deal is where the value detonates. The pairing is the psychological unlock.
+ * 3. The retro is the LOGO-MINTING engine, not just a conversion move. They
+ *    keep the output, they get a no-risk look, and you walk away with a case
+ *    study + a real logo + the proprietary closed-outcome data that seeds the
+ *    Bias Genome moat. Five of these = a deck that sells itself. This is the
+ *    wedge→bridge reference-generation engine.
+ *
+ * BOUTIQUES RECONCILIATION: the advisor named "boutique M&A advisory firms" as
+ * a beachhead; ICP_AVOID excludes boutique SELL-SIDE advisors (no software
+ * budget, relationship-driven). Both hold — the avoid is about PAID budget, but
+ * the retro ask is FREE. So boutiques are a poor paid wedge yet a strong FREE
+ * reference / logo channel (feel the pain, one decision-maker, fast yes to a
+ * no-risk look). Mint logos there, not revenue. Do not let the advisor's line
+ * silently override the locked paid-wedge avoid.
+ */
+export const RETRO_POSTMORTEM_COLD_OPEN = {
+  motion:
+    "Lead the cold ask with a retroactive post-mortem on TWO already-closed deals — one the prospect feels good about, one that went sideways. Forensic, not predictive; free; they keep the output. It sidesteps no-track-record (analyse the past, don't bet on the future) and no-data (the retro IS the data). For the deal-team wedge personas (corp dev / GP / PE-backed founder); fractional CSOs keep the forward 'next memo' lead.",
+  logoMechanic:
+    'Every retro post-mortem mints a LOGO: they keep the output, you keep a case study with a real logo + the proprietary closed-outcome data that seeds the Bias Genome. Five of these = a deck that sells itself. This is the wedge→bridge reference-generation engine, NOT just a per-prospect conversion move.',
+  boutiquesNote:
+    'Boutique sell-side M&A advisors stay in ICP_AVOID as a PAID wedge (no software budget, relationship-driven) — but they are a strong FREE reference / logo channel for the retro post-mortem (one decision-maker, fast yes to a no-risk look). Mint logos there, not revenue.',
+} as const;
+
+/**
  * Connection-leverage referral asks — the literal scripts to send Mr. Gabe
  * and Mr. Reiner for warm intros. Captured from GTM Plan v3.2 §8.
  */
@@ -668,7 +710,8 @@ export function buildIcpPromptBlock(): string {
   const ceiling = `${ICP_CEILING.label}: ${ICP_CEILING.audience} — ${ICP_CEILING.whyItUnlocks}`;
   const avoid = `${ICP_AVOID.label}: ${ICP_AVOID.audience} ${ICP_AVOID.why}`;
   const sequence = ICP_SEQUENCING.join(' ');
-  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE}`;
+  const retro = `RETRO POST-MORTEM COLD-OPEN (lead the deal-team wedge personas with this, not "audit your next memo"): ${RETRO_POSTMORTEM_COLD_OPEN.motion} ${RETRO_POSTMORTEM_COLD_OPEN.logoMechanic} ${RETRO_POSTMORTEM_COLD_OPEN.boutiquesNote}`;
+  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE} ${retro}`;
 }
 
 /**

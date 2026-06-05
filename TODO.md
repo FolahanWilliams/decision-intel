@@ -5,6 +5,7 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 ## Active Priorities
 
 - [ ] Land first paying design partner (outreach via advisor network)
+- [ ] **Founder-side: run 5 retroactive post-mortems to MINT LOGOS (SF-advisor motion, locked 2026-06-05).** Lead the cold DM with the retro ask, not "audit your next memo": _"Not pitching software — let me run my audit over two deals you've already closed, one you feel good about and one that went sideways. Free, you keep the output."_ Forensic-not-predictive removes their risk; the paired good/bad is the unlock; **each retro = a case study + a real logo + closed-outcome data that seeds the Bias Genome.** Five of these = a deck that sells itself + clears the wedge→bridge reference gate. Target the deal-team wedge personas (corp dev / GP / PE-backed founder); boutique sell-side advisors are a strong FREE logo channel even though they're an ICP_AVOID paid wedge. Scripts: `DM_TEMPLATES` openers in `event-prep.ts` (already updated to lead with the retro) + the `post_close_surprise` trigger in `discovery-pitch-toolkit.ts`.
 - [ ] Post 1 case study per day on LinkedIn (use Content Studio → Generate LinkedIn Post, or wait for daily email from `/api/cron/daily-linkedin`)
 - [ ] Pre-seed/seed fundraise: target first paying design partner + 2-3 reference logos before kickoff
 - [ ] Find GTM / enterprise-sales co-founder or advisor
