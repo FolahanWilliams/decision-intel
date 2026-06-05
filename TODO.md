@@ -72,6 +72,21 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [x] Fixed a stale comment in the invite route (seat-tier comment said "Starter 3 / Professional 10 / Team 50" → corrected to Free/Individual 1 / Strategy 12 / Enterprise ∞).
 - [x] Gates green: tsc clean (src/) · 4 lints clean (positioning · silent-catches 218 no-new · counts 73 · canonical-imports) · prettier · slop-scan under 4.0.
 
+**Enforcement-gate atomicity sweep + nightly-audit prompt v1.3 (the "why did the audit miss this?" follow-up).**
+
+- [x] **Webhook cap race** ([/api/webhooks](src/app/api/webhooks/route.ts)) — count-then-create wrapped in a transaction + per-user `pg_advisory_xact_lock`; `MAX_WEBHOOKS_PER_USER` const.
+- [x] **Seat accept-gate properly race-safe** — the prior count+insert-in-a-transaction was NOT atomic under READ COMMITTED; added `SELECT … FOR UPDATE` on the Organization row so concurrent accepts serialize. Bulk-invite handles the `(orgId,email)` P2002 collision as a skip, not a 500.
+- [x] **Nightly-audit prompt → v1.3** ([docs/nightly-audit-prompt.md](docs/nightly-audit-prompt.md)) — folded the split v1.1-full + v1.2-delta into one self-contained doc; made grep-before-assert BIDIRECTIONAL ("X is enforced/atomic" needs a write-path trace); added Discipline 11 (enforcement-gate / invariant trace) + two Section-1 bug categories (enforcement-gate integrity; load-bearing route with zero tests); baselines now "read the const."
+
+**Superforecasting / Tetlock calibration leg + AOM — founder-approved "boil the oceans" narration cascade + one cited engine backfill. Full prose in CLAUDE.md "Superforecasting / Tetlock calibration leg lock 2026-06-05".**
+
+- [x] Mapped the Superforecasting essay against SHIPPED code (grep-before-assert; the prior session had the wrong engine path). ~90% already ships — leverage is NARRATION, not a build.
+- [x] **icp.ts SSOT**: `POSITIONING_CALIBRATION_LEG` (Tetlock as the measurement THIRD leg on R²F, not a rename) + `POSITIONING_ACTIVE_OPEN_MINDEDNESS` (the shipped Intelligent Antagonist) + `SUPERFORECASTING_DO_NOT_QUOTE`, wired into `buildPositioningPromptBlock()`.
+- [x] **Cascade**: founder-context.ts chat block (zero backticks, balance verified) + 3 Education `r2f_framework` flashcards + 1 Sparring calibration-claim-probe scenario + a public /r2f-standard "What Brier scores, and what it doesn't" callout.
+- [x] **Engine backfill** ([bayesian-priors.ts](src/lib/scoring/bayesian-priors.ts)): the 6 taxonomy biases that silently fell to 0.5 (incl. illusion_of_validity + inside_view_dominance) got real cited base rates + a 11-test coverage-invariant suite. Scope-safe: prior-gated path only, no-prior DQI byte-identical (held-out check confirms), no methodology bump.
+- [x] **Refused under "boil the oceans"**: the extremizing-the-aggregate aggregator. It assumes independent private info; on a decorrelated-not-independent jury it could DEGRADE calibration — I'd argued it could backfire, so shipping it would contradict my own analysis. Recorded as a founder-gated deferred boundary, not roadmap-confident.
+- [x] Gates green: tsc clean (src/) · 5 lints clean (positioning · counts 73 · silent-catches 218 · canonical-imports · doc-sync) · prettier.
+
 ## Recently Completed (2026-06-01)
 
 **Faith OS "Today's Three" — daily-priority goal setting (founder-approved "boil the ocean"; full prose in CLAUDE.md "Faith OS Today's Three lock 2026-06-01").**
