@@ -761,6 +761,58 @@ export function R2FStandardClient() {
           below.
         </p>
 
+        {/* Brier-vs-DQI honest distinction + Active Open-Mindedness (locked
+            2026-06-05). The Brier baseline is shown prominently above; a
+            sophisticated reader could mistake it for the DQI's accuracy. Naming
+            the distinction is the same procurement-grade honesty as the "what it
+            deliberately doesn't" epistemic-honesty section, and frames the
+            calibration loop as Tetlock's measurement leg on top of the Kahneman
+            x Klein synthesis. Minimal em-dashes per the marketing voice cap. */}
+        <div
+          style={{
+            background: C.white,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 14,
+            padding: '18px 22px',
+            marginBottom: 18,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: C.slate500,
+              marginBottom: 12,
+            }}
+          >
+            What Brier scores, and what it doesn&rsquo;t
+          </div>
+          <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: C.slate700 }}>
+            Brier scores our <strong>calibration on these forecasts</strong>, not the DQI. The DQI
+            grades the <em>reasoning quality</em> of a memo; Brier grades whether our probability
+            estimates were right. Two instruments, kept separate on purpose: a calibration number is
+            only meaningful against settled outcomes, which is why every live audit also logs a
+            falsifiable 90-day proxy that scores at the horizon.
+          </p>
+          <p
+            style={{
+              margin: '12px 0 0',
+              fontSize: 14.5,
+              lineHeight: 1.6,
+              color: C.slate700,
+            }}
+          >
+            That calibration loop, measured rather than asserted, is the third tradition in the
+            framework: Kahneman debiases, Klein recognises the pattern, and the calibration layer
+            (anchored in Tetlock&rsquo;s Good Judgment Project) tracks whether the call was right
+            and sharpens the next one. It is also why the audit captures your prior <em>before</em>{' '}
+            it reveals its own read, the discipline Tetlock calls Active Open-Mindedness: the gap
+            between the two is the signal.
+          </p>
+        </div>
+
         {/* Methodology version progression — Item 2 lock 2026-05-07,
             extended 2026-05-13 (M-4 sharpening) to surface the full
             engine-epoch chain through 2.4.0. Procurement readers ask
