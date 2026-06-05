@@ -5,6 +5,7 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 ## Active Priorities
 
 - [ ] Land first paying design partner (outreach via advisor network)
+- [ ] **Founder-side: run 5 retroactive post-mortems to MINT LOGOS (SF-advisor motion, locked 2026-06-05).** Lead the cold DM with the retro ask, not "audit your next memo": _"Not pitching software — let me run my audit over two deals you've already closed, one you feel good about and one that went sideways. Free, you keep the output."_ Forensic-not-predictive removes their risk; the paired good/bad is the unlock; **each retro = a case study + a real logo + closed-outcome data that seeds the Bias Genome.** Five of these = a deck that sells itself + clears the wedge→bridge reference gate. Target the deal-team wedge personas (corp dev / GP / PE-backed founder); boutique sell-side advisors are a strong FREE logo channel even though they're an ICP_AVOID paid wedge. Scripts: `DM_TEMPLATES` openers in `event-prep.ts` (already updated to lead with the retro) + the `post_close_surprise` trigger in `discovery-pitch-toolkit.ts`.
 - [ ] Post 1 case study per day on LinkedIn (use Content Studio → Generate LinkedIn Post, or wait for daily email from `/api/cron/daily-linkedin`)
 - [ ] Pre-seed/seed fundraise: target first paying design partner + 2-3 reference logos before kickoff
 - [ ] Find GTM / enterprise-sales co-founder or advisor
@@ -60,6 +61,32 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] "Decision Score" — external-facing credit score for organizational decision quality
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
+
+## Recently Completed (2026-06-05)
+
+**Strategy 12-seat tier — Tier A (integrity) + Tier B (admin polish). Refinement-grade hardening of the shipped tier; no schema migration, no speculative team features (the deeper team-only differentiators stay deferred per the GTM "build FROM Sankore feedback" lock). Full prose in CLAUDE.md "Team seat administration + audit trail (locked 2026-06-05)".**
+
+- [x] **Accept-time seat enforcement (Tier A).** [/api/team/invite/accept](src/app/api/team/invite/accept/route.ts) now does an atomic member-count + insert inside one `$transaction` against the org's CURRENT plan cap → closes the count→insert double-accept race AND the downgrade hole (a stale Strategy-era invite can't push a since-downgraded org past its new cap). Members are never auto-removed on downgrade — growth is blocked, the over-limit state is surfaced.
+- [x] **Seat-usage meter (Tier A).** `/api/team` GET returns `seats {plan,used,limit}`; TeamPage renders a color-coded `SeatMeter` at the top of the Members tab + disables the Invite button when full. Reads the cap from `PLANS.team.maxTeamMembers` — no hardcoded "12".
+- [x] **Team-admin audit trail (Tier B).** 5 new `AuditAction` values wired into invite/accept/role-change/remove/revoke; `logAudit` gained an optional `orgId` so org-level rows survive in the Team Activity feed + AdminAuditLog even after the actor leaves. Team Activity `ACTION_LABELS` render all 5.
+- [x] **Bulk invite (Tier B).** New [/api/team/invite/bulk](src/app/api/team/invite/bulk/route.ts) (owner/admin, 5/hr, dedupe + seat-headroom stop, per-email `{created,skipped}` w/ reasons) + a single ↔ multiple toggle in the invite modal.
+- [x] Fixed a stale comment in the invite route (seat-tier comment said "Starter 3 / Professional 10 / Team 50" → corrected to Free/Individual 1 / Strategy 12 / Enterprise ∞).
+- [x] Gates green: tsc clean (src/) · 4 lints clean (positioning · silent-catches 218 no-new · counts 73 · canonical-imports) · prettier · slop-scan under 4.0.
+
+**Enforcement-gate atomicity sweep + nightly-audit prompt v1.3 (the "why did the audit miss this?" follow-up).**
+
+- [x] **Webhook cap race** ([/api/webhooks](src/app/api/webhooks/route.ts)) — count-then-create wrapped in a transaction + per-user `pg_advisory_xact_lock`; `MAX_WEBHOOKS_PER_USER` const.
+- [x] **Seat accept-gate properly race-safe** — the prior count+insert-in-a-transaction was NOT atomic under READ COMMITTED; added `SELECT … FOR UPDATE` on the Organization row so concurrent accepts serialize. Bulk-invite handles the `(orgId,email)` P2002 collision as a skip, not a 500.
+- [x] **Nightly-audit prompt → v1.3** ([docs/nightly-audit-prompt.md](docs/nightly-audit-prompt.md)) — folded the split v1.1-full + v1.2-delta into one self-contained doc; made grep-before-assert BIDIRECTIONAL ("X is enforced/atomic" needs a write-path trace); added Discipline 11 (enforcement-gate / invariant trace) + two Section-1 bug categories (enforcement-gate integrity; load-bearing route with zero tests); baselines now "read the const."
+
+**Superforecasting / Tetlock calibration leg + AOM — founder-approved "boil the oceans" narration cascade + one cited engine backfill. Full prose in CLAUDE.md "Superforecasting / Tetlock calibration leg lock 2026-06-05".**
+
+- [x] Mapped the Superforecasting essay against SHIPPED code (grep-before-assert; the prior session had the wrong engine path). ~90% already ships — leverage is NARRATION, not a build.
+- [x] **icp.ts SSOT**: `POSITIONING_CALIBRATION_LEG` (Tetlock as the measurement THIRD leg on R²F, not a rename) + `POSITIONING_ACTIVE_OPEN_MINDEDNESS` (the shipped Intelligent Antagonist) + `SUPERFORECASTING_DO_NOT_QUOTE`, wired into `buildPositioningPromptBlock()`.
+- [x] **Cascade**: founder-context.ts chat block (zero backticks, balance verified) + 3 Education `r2f_framework` flashcards + 1 Sparring calibration-claim-probe scenario + a public /r2f-standard "What Brier scores, and what it doesn't" callout.
+- [x] **Engine backfill** ([bayesian-priors.ts](src/lib/scoring/bayesian-priors.ts)): the 6 taxonomy biases that silently fell to 0.5 (incl. illusion_of_validity + inside_view_dominance) got real cited base rates + a 11-test coverage-invariant suite. Scope-safe: prior-gated path only, no-prior DQI byte-identical (held-out check confirms), no methodology bump.
+- [x] **Refused under "boil the oceans"**: the extremizing-the-aggregate aggregator. It assumes independent private info; on a decorrelated-not-independent jury it could DEGRADE calibration — I'd argued it could backfire, so shipping it would contradict my own analysis. Recorded as a founder-gated deferred boundary, not roadmap-confident.
+- [x] Gates green: tsc clean (src/) · 5 lints clean (positioning · counts 73 · silent-catches 218 · canonical-imports · doc-sync) · prettier.
 
 ## Recently Completed (2026-06-01)
 

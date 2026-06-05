@@ -12,6 +12,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
 import { generateShareToken } from '@/lib/utils/share-token';
 import { PLANS } from '@/lib/stripe';
+import { logAudit } from '@/lib/audit';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Enforce plan-based team size tier. Limits come from PLANS in
-    // src/lib/stripe.ts (Starter 3 / Professional 10 / Team 50 / Enterprise ∞).
+    // src/lib/stripe.ts (Free/Individual 1 / Strategy 12 / Enterprise ∞).
     // Pending invites count against the limit so the cap can't be bypassed.
     const seatCheck = await checkTeamSizeLimit(membership.orgId);
     if (!seatCheck.allowed) {
@@ -133,6 +134,14 @@ export async function POST(req: NextRequest) {
         )
       )
       .catch(err => log.error('Invite email failed:', err));
+
+    await logAudit({
+      action: 'TEAM_MEMBER_INVITED',
+      resource: 'team_invite',
+      resourceId: invite.id,
+      orgId: membership.orgId,
+      details: { email, role },
+    });
 
     log.info(`Invite sent to ${email} for org ${membership.orgId}`);
     return NextResponse.json(invite, { status: 201 });
@@ -250,6 +259,14 @@ export async function DELETE(req: NextRequest) {
     await prisma.teamInvite.update({
       where: { id: inviteId },
       data: { status: 'revoked' },
+    });
+
+    await logAudit({
+      action: 'TEAM_MEMBER_INVITE_REVOKED',
+      resource: 'team_invite',
+      resourceId: inviteId,
+      orgId: invite.orgId,
+      details: { email: invite.email },
     });
 
     return NextResponse.json({ success: true });

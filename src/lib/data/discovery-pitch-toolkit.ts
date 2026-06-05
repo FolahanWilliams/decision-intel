@@ -405,16 +405,16 @@ export const PAIN_PATTERNS: PainPattern[] = [
       "Looking back, the bias was obvious — we just couldn't see it at the time.",
     ],
     featureWedge:
-      "Retrospective audit on a CLOSED deal. Run the audit on a memo from 12-24 months ago where the outcome is known. The DPR surfaces the structural assumptions that didn't hold + the biases that drove them. This is forensic, not predictive — and that's why it's safe.",
+      "Retrospective audit on a CLOSED deal — lead with TWO: one the prospect feels good about (ego-safe, proves it isn't a hit-piece) and one that went sideways (where the value detonates). Run the audit on memos from 12-24 months ago where the outcome is known. The DPR surfaces the structural assumptions that didn't hold + the biases that drove them. Forensic, not predictive — and that's why it's safe.",
     demoMove:
-      "Goldner's 'safest starter' move. Ask: 'Do you have an old memo handy — even one from 2 years ago? Send it over right now, I'll run it in the next 60 seconds and show you what we surface.' The retrospective frame removes political risk (no live deal in scope) and the reaction is immediate — they SEE the bias they missed.",
+      "Goldner's 'safest starter' move, sharpened (SF advisor 2026-06-05): 'Not pitching software — let me run it over two deals you've already closed, one you feel good about and one that went sideways. Free, you keep the output.' The PAIRED ask + the retrospective frame remove all political risk (no live deal in scope); the reaction is immediate — they SEE the bias they missed.",
     biasHookAnchors: [
       'Quibi launch (planning fallacy)',
       'Boeing 737 MAX (optimism bias)',
       'Theranos investor decisions (halo effect + authority bias)',
     ],
     starterRationale:
-      "Goldner's locked move from the 4-Week Traction Plan: 'safest starter' because the deal is already closed — there's no live political stake. Use this when the prospect is curious but hesitant to commit a live deal to the audit. Retrospective audits convert at higher rates than live audits when the prospect is in evaluation mode.",
+      "Goldner's locked move from the 4-Week Traction Plan: 'safest starter' because the deal is already closed — no live political stake; retro audits convert higher than live audits when the prospect is in evaluation mode. STRATEGIC REFRAME (the logo-minting engine, SF advisor 2026-06-05): this is not just the safest CONVERSION move — every retro post-mortem MINTS A LOGO. They keep the output, they get a no-risk look, you walk away with a case study + a real logo + the proprietary closed-outcome data that seeds the Bias Genome moat (the single highest-leverage moat move per the Sankore retroactive-seed lock). Five of these = a deck that sells itself. It is the wedge→bridge reference-generation engine, not a per-prospect tactic. Boutique sell-side advisors are a strong FREE channel here even though they stay in ICP_AVOID as a paid wedge — mint logos there, not revenue. Canonical: RETRO_POSTMORTEM_COLD_OPEN in icp.ts.",
   },
   {
     id: 'ic_friction',

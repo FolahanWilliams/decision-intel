@@ -1,5 +1,10 @@
 # Nightly Audit Prompt v1.2 (locked 2026-05-13 — CR-2 ship)
 
+> **HISTORICAL — folded into the canonical v1.3 (2026-06-05).** The
+> current, self-contained copy-paste prompt is
+> [docs/nightly-audit-prompt.md](../nightly-audit-prompt.md). This delta
+> file is kept for changelog history only; do not run from it.
+
 **Supersedes v1.1.** Updates to v1.1 captured here:
 
 1. **Silent-catch baseline corrected**: prompt v1.1 hardcoded `152` as the

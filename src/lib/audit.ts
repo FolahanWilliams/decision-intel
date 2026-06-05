@@ -112,12 +112,25 @@ export type AuditAction =
   | 'PROSPECT_STAGE_ADVANCED'
   | 'PROSPECT_CONVERTED'
   | 'PROSPECT_LOST'
-  | 'PROSPECT_DELETED';
+  | 'PROSPECT_DELETED'
+  // Team / seat administration (locked 2026-06-05 — Strategy 12-seat tier)
+  | 'TEAM_MEMBER_INVITED'
+  | 'TEAM_MEMBER_INVITE_REVOKED'
+  | 'TEAM_MEMBER_JOINED'
+  | 'TEAM_MEMBER_ROLE_CHANGED'
+  | 'TEAM_MEMBER_REMOVED';
 
 export interface AuditLogParams {
   action: AuditAction;
   resource: string;
   resourceId?: string;
+  /**
+   * Org scope for the entry. Set this on org-level actions (team / seat
+   * administration, package + container lifecycle) so the row surfaces in
+   * the Team Activity feed and AdminAuditLog org filter even after the
+   * actor later leaves the org. Omit for purely personal actions.
+   */
+  orgId?: string;
   details?: Record<string, unknown>;
 }
 
@@ -137,6 +150,7 @@ export async function logAudit(params: AuditLogParams) {
     await prisma.auditLog.create({
       data: {
         userId,
+        orgId: params.orgId,
         action: params.action,
         resource: params.resource,
         resourceId: params.resourceId,

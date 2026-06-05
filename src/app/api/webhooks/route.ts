@@ -13,6 +13,9 @@ import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { encryptWebhookSecret } from '@/lib/utils/encryption';
 
+/** Per-user anti-abuse cap on webhook subscriptions (enforced atomically). */
+const MAX_WEBHOOKS_PER_USER = 10;
+
 /**
  * Block webhook URLs pointing to private/internal networks (SSRF prevention).
  */
@@ -112,31 +115,45 @@ export async function POST(request: Request) {
     );
   }
 
-  // Limit subscriptions per user
-  const existingCount = await prisma.webhookSubscription.count({
-    where: { userId: auth.userId },
-  });
-
-  if (existingCount >= 10) {
-    return NextResponse.json(
-      { error: 'Maximum 10 webhook subscriptions per user' },
-      { status: 400 }
-    );
-  }
-
   // Generate signing secret and encrypt for storage
   const secret = `whsec_${randomBytes(32).toString('hex')}`;
   const encryptedSecret = encryptWebhookSecret(secret);
 
-  const subscription = await prisma.webhookSubscription.create({
-    data: {
-      orgId: auth.userId!, // Use userId as orgId fallback
-      userId: auth.userId!,
-      url,
-      events,
-      secret: encryptedSecret,
-    },
-  });
+  // Atomic cap enforcement. A plain count-then-create races under Postgres
+  // READ COMMITTED (two concurrent POSTs both read N-1 and both insert,
+  // exceeding the cap). A per-user advisory xact-lock serializes creates for
+  // this user so the count is authoritative inside the transaction.
+  let subscription;
+  try {
+    subscription = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('webhook_subscription'), hashtext(${auth.userId!}))`;
+
+      const existingCount = await tx.webhookSubscription.count({
+        where: { userId: auth.userId },
+      });
+      if (existingCount >= MAX_WEBHOOKS_PER_USER) {
+        throw new Error('WEBHOOK_LIMIT');
+      }
+
+      return tx.webhookSubscription.create({
+        data: {
+          orgId: auth.userId!, // Use userId as orgId fallback
+          userId: auth.userId!,
+          url,
+          events,
+          secret: encryptedSecret,
+        },
+      });
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === 'WEBHOOK_LIMIT') {
+      return NextResponse.json(
+        { error: `Maximum ${MAX_WEBHOOKS_PER_USER} webhook subscriptions per user` },
+        { status: 400 }
+      );
+    }
+    throw err;
+  }
 
   // Return secret only on creation — cannot be retrieved later
   return NextResponse.json(

@@ -62,6 +62,16 @@ export interface BayesianResult {
  * Base rates for each bias type in organizational decisions.
  * Derived from meta-analyses of cognitive bias research.
  * These serve as the "population prior" when no user prior exists.
+ *
+ * COVERAGE INVARIANT: this map MUST carry an entry for every key in the
+ * canonical 22-bias taxonomy (BIAS_EDUCATION, DI-B-001 → DI-B-022). A
+ * missing key silently falls through to DEFAULT_BASE_RATE (0.5), which
+ * quietly de-tunes the Bayesian prior path for that bias. The test at
+ * bayesian-priors.test.ts asserts full taxonomy coverage + citation
+ * coverage; keep `citations` in getAllBaseRates() in LOCKSTEP with this map.
+ * Each rate is a reasoned prevalence anchored to a real, citable source —
+ * never fabricate a number; where the evidence is meta-analytically
+ * contested (paradox_of_choice), pick a conservative moderate value.
  */
 export const BIAS_BASE_RATES: Record<string, number> = {
   confirmation_bias: 0.72, // Nickerson (1998): "ubiquitous"
@@ -80,6 +90,14 @@ export const BIAS_BASE_RATES: Record<string, number> = {
   selective_perception: 0.48, // Hastorf & Cantril (1954)
   recency_bias: 0.53, // evidence from serial position research
   cognitive_misering: 0.57, // Fiske & Taylor (1991)
+  // Taxonomy backfill 2026-06-05 (DI-B-008/009/.../021/022 + halo/gamblers):
+  // these 6 keys exist in BIAS_EDUCATION but previously fell through to 0.5.
+  halo_effect: 0.62, // Nisbett & Wilson (1977): pervasive in evaluative judgment
+  gamblers_fallacy: 0.42, // Tversky & Kahneman (1971); Croson & Sundali (2005): context-specific
+  zeigarnik_effect: 0.38, // Zeigarnik (1927): memory/attention effect, narrow in strategy decisions
+  paradox_of_choice: 0.4, // Iyengar & Lepper (2000); meta-analytically contested (Scheibehenne 2010) → conservative
+  illusion_of_validity: 0.66, // Einhorn & Hogarth (1978): coherence-driven confidence, common in low-validity strategy
+  inside_view_dominance: 0.69, // Kahneman & Lovallo (1993): inside-view default; planning-fallacy sibling
 };
 
 const DEFAULT_BASE_RATE = 0.5;
@@ -240,6 +258,9 @@ export function getBiasBaseRate(biasType: string): number {
  * Get all bias base rates, sorted by prevalence.
  */
 export function getAllBaseRates(): Array<{ biasType: string; baseRate: number; citation: string }> {
+  // LOCKSTEP with BIAS_BASE_RATES — every key there needs a citation here, or
+  // it renders "General research" instead of its real anchor. The test enforces
+  // citation coverage across the full 22-bias taxonomy.
   const citations: Record<string, string> = {
     confirmation_bias: 'Nickerson (1998)',
     anchoring_bias: 'Furnham & Boo (2011)',
@@ -257,6 +278,12 @@ export function getAllBaseRates(): Array<{ biasType: string; baseRate: number; c
     selective_perception: 'Hastorf & Cantril (1954)',
     recency_bias: 'Serial position research',
     cognitive_misering: 'Fiske & Taylor (1991)',
+    halo_effect: 'Nisbett & Wilson (1977)',
+    gamblers_fallacy: 'Tversky & Kahneman (1971)',
+    zeigarnik_effect: 'Zeigarnik (1927)',
+    paradox_of_choice: 'Iyengar & Lepper (2000)',
+    illusion_of_validity: 'Einhorn & Hogarth (1978)',
+    inside_view_dominance: 'Kahneman & Lovallo (1993)',
   };
 
   return Object.entries(BIAS_BASE_RATES)

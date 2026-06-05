@@ -85,8 +85,18 @@ const ROLE_LABELS: Record<string, string> = {
   viewer: 'Viewer',
 };
 
+interface SeatUsage {
+  plan: string;
+  used: number;
+  limit: number;
+}
+
+/** Above this, a plan's seat cap is treated as effectively unlimited (Enterprise). */
+const SEAT_UNLIMITED_THRESHOLD = 100000;
+
 export default function TeamPage() {
   const [org, setOrg] = useState<Organization | null>(null);
+  const [seats, setSeats] = useState<SeatUsage | null>(null);
   const [myRole, setMyRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -115,6 +125,7 @@ export default function TeamPage() {
         const data = await res.json();
         setOrg(data.organization);
         setMyRole(data.role);
+        setSeats(data.seats ?? null);
       } else if (res.status >= 500) {
         setFetchError('Failed to load team data. Please try again.');
       }
@@ -252,6 +263,9 @@ export default function TeamPage() {
   }
 
   const isAdmin = myRole === 'owner' || myRole === 'admin';
+  const isUnlimitedSeats = seats ? seats.limit > SEAT_UNLIMITED_THRESHOLD : false;
+  const seatsRemaining = seats && !isUnlimitedSeats ? Math.max(0, seats.limit - seats.used) : null;
+  const seatsFull = seats ? !isUnlimitedSeats && seats.used >= seats.limit : false;
 
   return (
     <div
@@ -296,12 +310,18 @@ export default function TeamPage() {
         {isAdmin && (
           <button
             className="btn btn-primary"
-            style={{ gap: 8 }}
+            style={{ gap: 8, opacity: isTeamPlan && seatsFull ? 0.55 : 1 }}
+            disabled={isTeamPlan && seatsFull}
+            title={
+              isTeamPlan && seatsFull
+                ? 'All seats are in use. Remove a member or upgrade your plan to invite more.'
+                : undefined
+            }
             onClick={() => {
-              if (isTeamPlan) {
-                setShowInviteModal(true);
-              } else {
+              if (!isTeamPlan) {
                 setShowTeammateWall(true);
+              } else if (!seatsFull) {
+                setShowInviteModal(true);
               }
             }}
           >
@@ -354,6 +374,11 @@ export default function TeamPage() {
 
       {activeTab === 'members' && (
         <>
+          {/* Seat usage meter */}
+          {seats && (
+            <SeatMeter seats={seats} isUnlimited={isUnlimitedSeats} isTeamPlan={isTeamPlan} />
+          )}
+
           {/* Members List */}
           <div className="card mb-lg animate-fade-in">
             <div className="card-header">
@@ -438,10 +463,8 @@ export default function TeamPage() {
       {showInviteModal && (
         <InviteModal
           onClose={() => setShowInviteModal(false)}
-          onInvited={() => {
-            setShowInviteModal(false);
-            fetchTeam();
-          }}
+          onChanged={fetchTeam}
+          seatsRemaining={seatsRemaining}
         />
       )}
 
@@ -450,6 +473,89 @@ export default function TeamPage() {
         onClose={() => setShowTeammateWall(false)}
         source="team-page-invite"
       />
+    </div>
+  );
+}
+
+function SeatMeter({
+  seats,
+  isUnlimited,
+  isTeamPlan,
+}: {
+  seats: SeatUsage;
+  isUnlimited: boolean;
+  isTeamPlan: boolean;
+}) {
+  const { used, limit } = seats;
+  const over = !isUnlimited && used > limit;
+  const full = !isUnlimited && used >= limit;
+  const ratio = isUnlimited || limit <= 0 ? 0 : used / limit;
+  const pct = isUnlimited ? 100 : Math.min(100, Math.round(ratio * 100));
+  const remaining = isUnlimited ? null : Math.max(0, limit - used);
+
+  const accent = over
+    ? 'var(--error)'
+    : full || ratio >= 0.75
+      ? 'var(--warning)'
+      : 'var(--success)';
+
+  const headline = isUnlimited
+    ? `${used} seat${used === 1 ? '' : 's'} in use · Unlimited`
+    : `${used} of ${limit} seat${limit === 1 ? '' : 's'} used`;
+
+  let note: string | null = null;
+  if (over) {
+    note = `${used - limit} over this plan's limit. New invites are blocked until you upgrade or remove members — no one is removed automatically.`;
+  } else if (full && isTeamPlan) {
+    note = 'All seats are in use. Remove a member or upgrade to add more.';
+  } else if (!isTeamPlan) {
+    note = 'Upgrade to Strategy for a shared team workspace and more seats.';
+  } else if (remaining !== null) {
+    note = `${remaining} seat${remaining === 1 ? '' : 's'} remaining.`;
+  }
+
+  return (
+    <div className="card mb-lg animate-fade-in">
+      <div className="card-body">
+        <div
+          className="flex items-center justify-between"
+          style={{ marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}
+        >
+          <div className="flex items-center gap-sm">
+            <Users size={16} style={{ color: 'var(--text-muted)' }} />
+            <span style={{ fontSize: '14px', fontWeight: 600 }}>{headline}</span>
+          </div>
+          {note && (
+            <span style={{ fontSize: '12px', color: over ? 'var(--error)' : 'var(--text-muted)' }}>
+              {note}
+            </span>
+          )}
+        </div>
+        <div
+          style={{
+            height: 8,
+            width: '100%',
+            background: 'var(--bg-tertiary)',
+            borderRadius: 'var(--radius-full)',
+            overflow: 'hidden',
+          }}
+          role="progressbar"
+          aria-valuenow={used}
+          aria-valuemin={0}
+          aria-valuemax={isUnlimited ? used : limit}
+          aria-label="Team seats used"
+        >
+          <div
+            style={{
+              height: '100%',
+              width: `${pct}%`,
+              background: accent,
+              borderRadius: 'var(--radius-full)',
+              transition: 'width 0.3s ease',
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -918,8 +1024,32 @@ function CreateOrgModal({ onClose, onCreated }: { onClose: () => void; onCreated
   );
 }
 
-function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: () => void }) {
+interface BulkInviteResult {
+  created: { email: string; id: string }[];
+  skipped: { email: string; reason: string }[];
+}
+
+const SKIP_REASON_LABELS: Record<string, string> = {
+  invalid_email: 'invalid email',
+  self: "that's you",
+  already_member: 'already a member',
+  already_invited: 'already invited',
+  seat_limit: 'no seats left',
+};
+
+function InviteModal({
+  onClose,
+  onChanged,
+  seatsRemaining,
+}: {
+  onClose: () => void;
+  onChanged: () => void;
+  seatsRemaining: number | null;
+}) {
+  const [mode, setMode] = useState<'single' | 'bulk'>('single');
   const [email, setEmail] = useState('');
+  const [bulkText, setBulkText] = useState('');
+  const [bulkResult, setBulkResult] = useState<BulkInviteResult | null>(null);
   const [role, setRole] = useState('member');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -938,10 +1068,54 @@ function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: (
       });
       if (res.ok) {
         showToast(`Invite sent to ${email}`, 'success');
-        onInvited();
+        onChanged();
+        onClose();
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to send invite');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Split on commas, semicolons, whitespace, or newlines.
+  const parseEmails = (text: string): string[] =>
+    Array.from(
+      new Set(
+        text
+          .split(/[\s,;]+/)
+          .map(e => e.trim().toLowerCase())
+          .filter(Boolean)
+      )
+    );
+
+  const handleBulkInvite = async () => {
+    const emails = parseEmails(bulkText);
+    if (emails.length === 0) return;
+    setSending(true);
+    setError(null);
+    setBulkResult(null);
+    try {
+      const res = await fetch('/api/team/invite/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails, role }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBulkResult({ created: data.created || [], skipped: data.skipped || [] });
+        if ((data.created || []).length > 0) {
+          showToast(
+            `${data.created.length} invite${data.created.length === 1 ? '' : 's'} sent`,
+            'success'
+          );
+        }
+        onChanged(); // refresh the team list + seat meter, keep the modal open to show results
+      } else {
+        setError(data.error || 'Failed to send invites');
       }
     } catch {
       setError('Network error. Please try again.');
@@ -955,6 +1129,8 @@ function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: (
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const parsedCount = mode === 'bulk' ? parseEmails(bulkText).length : 0;
 
   return (
     <div
@@ -974,52 +1150,133 @@ function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: (
     >
       <div
         className="card"
-        style={{ maxWidth: 460, width: '90%' }}
+        style={{ maxWidth: 480, width: '90%' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="card-header">
           <h3 className="flex items-center gap-sm">
             <UserPlus size={18} />
-            Invite Team Member
+            Invite Team Members
           </h3>
         </div>
         <div className="card-body">
-          <div className="flex flex-col gap-lg">
-            <div>
-              <label
-                htmlFor="invite-email"
-                className="text-xs font-medium text-muted block"
-                style={{ marginBottom: '6px' }}
-              >
-                Email Address
-              </label>
-              <input
-                id="invite-email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="colleague@company.com"
+          {/* Single / multiple toggle */}
+          <div
+            className="flex"
+            style={{
+              gap: 4,
+              padding: 3,
+              marginBottom: 'var(--spacing-lg)',
+              background: 'var(--bg-secondary)',
+              borderRadius: '8px',
+            }}
+          >
+            {(['single', 'bulk'] as const).map(m => (
+              <button
+                key={m}
+                onClick={() => {
+                  setMode(m);
+                  setError(null);
+                  setBulkResult(null);
+                }}
                 style={{
-                  width: '100%',
-                  padding: 'var(--spacing-md)',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--liquid-border)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)',
-                  fontSize: '14px',
+                  flex: 1,
+                  padding: '6px 10px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  background: mode === m ? 'var(--bg-card)' : 'transparent',
+                  color: mode === m ? 'var(--text-primary)' : 'var(--text-muted)',
+                  boxShadow: mode === m ? 'var(--shadow-sm)' : 'none',
                 }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && email.trim()) handleInvite();
-                }}
-              />
-            </div>
+              >
+                {m === 'single' ? 'One person' : 'Multiple'}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-lg">
+            {mode === 'single' ? (
+              <div>
+                <label
+                  htmlFor="invite-email"
+                  className="text-xs font-medium text-muted block"
+                  style={{ marginBottom: '6px' }}
+                >
+                  Email Address
+                </label>
+                <input
+                  id="invite-email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="colleague@company.com"
+                  style={{
+                    width: '100%',
+                    padding: 'var(--spacing-md)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--liquid-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)',
+                    fontSize: '14px',
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && email.trim()) handleInvite();
+                  }}
+                />
+              </div>
+            ) : (
+              <div>
+                <label
+                  htmlFor="invite-emails-bulk"
+                  className="text-xs font-medium text-muted block"
+                  style={{ marginBottom: '6px' }}
+                >
+                  Email addresses
+                  {seatsRemaining !== null && (
+                    <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                      {' '}
+                      · {seatsRemaining} seat{seatsRemaining === 1 ? '' : 's'} remaining
+                    </span>
+                  )}
+                </label>
+                <textarea
+                  id="invite-emails-bulk"
+                  value={bulkText}
+                  onChange={e => setBulkText(e.target.value)}
+                  placeholder={
+                    'Paste emails separated by commas, spaces, or new lines\n\nana@company.com\nben@company.com'
+                  }
+                  rows={5}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--spacing-md)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--liquid-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)',
+                    fontSize: '14px',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                  }}
+                />
+                {parsedCount > 0 && (
+                  <div className="text-xs text-muted" style={{ marginTop: '6px' }}>
+                    {parsedCount} unique email{parsedCount === 1 ? '' : 's'} detected
+                  </div>
+                )}
+              </div>
+            )}
+
             <div>
               <label
                 htmlFor="invite-role"
                 className="text-xs font-medium text-muted block"
                 style={{ marginBottom: '6px' }}
               >
-                Role
+                Role {mode === 'bulk' && '(applied to everyone in this batch)'}
               </label>
               <select
                 id="invite-role"
@@ -1040,13 +1297,50 @@ function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: (
                 <option value="viewer">Viewer — read-only access to shared analyses</option>
               </select>
             </div>
+
             {error && (
               <div className="flex items-center gap-sm text-sm" style={{ color: 'var(--error)' }}>
                 <AlertTriangle size={14} />
                 {error}
               </div>
             )}
+
+            {bulkResult && (
+              <div
+                style={{
+                  padding: 'var(--spacing-md)',
+                  background: 'var(--bg-secondary)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                }}
+              >
+                {bulkResult.created.length > 0 && (
+                  <div
+                    className="flex items-center gap-sm text-sm"
+                    style={{
+                      color: 'var(--success)',
+                      marginBottom: bulkResult.skipped.length ? 8 : 0,
+                    }}
+                  >
+                    <CheckCircle size={14} />
+                    Invited {bulkResult.created.length}:{' '}
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      {bulkResult.created.map(c => c.email).join(', ')}
+                    </span>
+                  </div>
+                )}
+                {bulkResult.skipped.length > 0 && (
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    Skipped {bulkResult.skipped.length}:{' '}
+                    {bulkResult.skipped
+                      .map(s => `${s.email} (${SKIP_REASON_LABELS[s.reason] || s.reason})`)
+                      .join(', ')}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
           <div
             className="flex items-center justify-between"
             style={{ marginTop: 'var(--spacing-xl)' }}
@@ -1061,16 +1355,29 @@ function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: (
             </button>
             <div className="flex items-center gap-sm">
               <button className="btn btn-ghost" onClick={onClose} disabled={sending}>
-                Cancel
+                {bulkResult ? 'Done' : 'Cancel'}
               </button>
-              <button
-                className="btn btn-primary flex items-center gap-sm"
-                onClick={handleInvite}
-                disabled={sending || !email.trim()}
-              >
-                {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
-                {sending ? 'Sending...' : 'Send Invite'}
-              </button>
+              {mode === 'single' ? (
+                <button
+                  className="btn btn-primary flex items-center gap-sm"
+                  onClick={handleInvite}
+                  disabled={sending || !email.trim()}
+                >
+                  {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                  {sending ? 'Sending...' : 'Send Invite'}
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary flex items-center gap-sm"
+                  onClick={handleBulkInvite}
+                  disabled={sending || parsedCount === 0}
+                >
+                  {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
+                  {sending
+                    ? 'Sending...'
+                    : `Send ${parsedCount || ''} Invite${parsedCount === 1 ? '' : 's'}`.trim()}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1107,6 +1414,11 @@ const ACTION_LABELS: Record<string, string> = {
   DELETE_DOCUMENT: 'deleted a document',
   UPDATE_SETTINGS: 'updated settings',
   CREATE_PERSONA: 'created a persona',
+  TEAM_MEMBER_INVITED: 'invited a teammate',
+  TEAM_MEMBER_INVITE_REVOKED: 'revoked an invite',
+  TEAM_MEMBER_JOINED: 'joined the team',
+  TEAM_MEMBER_ROLE_CHANGED: 'changed a member role',
+  TEAM_MEMBER_REMOVED: 'removed a member',
 };
 
 function TeamActivityTab() {

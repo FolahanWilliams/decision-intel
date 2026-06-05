@@ -184,6 +184,67 @@ export const IP_MOAT_DESCRIPTION =
  */
 export const POSITIONING_SYNTHESIS_LINE = "Don't replace intuition. Audit it.";
 
+/**
+ * Calibration leg — Tetlock as the third tradition (locked 2026-06-05).
+ *
+ * R²F is framed as Kahneman (debiasing) × Klein (recognition). Tetlock's
+ * Good Judgment Project supplies the missing MEASUREMENT leg: it turns a
+ * one-shot audit OPINION into a system that tracks its own accuracy and
+ * sharpens. This is the substantive, code-grounded answer to "isn't this
+ * just a prompt wrapper?" — the wrapper produces a verdict; the calibration
+ * layer (forced ≤90-day falsifiable proxies logged at the vote, Brier-scored
+ * at the horizon, per-org recalibration) is the part a fast-follower can't
+ * copy by stealing prompts.
+ *
+ * DISCIPLINE: reference Brier-SCORING (the method) — never quote the 0.258
+ * platform-baseline number in a cold moat sentence (same do-not-quote lock).
+ * Do NOT rename R²F (the protected category) — Tetlock is an ADDED leg, a
+ * measurement layer ON TOP of R²F, not a replacement for the K×K synthesis.
+ */
+export const POSITIONING_CALIBRATION_LEG =
+  "R²F arbitrates two traditions in one pipeline — Kahneman's debiasing and Klein's pattern-recognition. Tetlock's Good Judgment Project method is the third leg: forced ≤90-day falsifiable proxies logged at the decision and Brier-scored at the horizon, with per-org recalibration. It turns the audit from a one-shot opinion into a system that tracks its own accuracy and gets sharper — the substantive answer to 'isn't this just a prompt wrapper?'.";
+
+/**
+ * Active Open-Mindedness (AOM) — Tetlock's strongest INDIVIDUAL-level
+ * predictor of forecasting accuracy (locked 2026-06-05). DI already
+ * operationalises it (the Intelligent Antagonist captures the user's prior
+ * BEFORE revealing the algorithm's read — the automation-bias defense), it
+ * just wasn't named. Naming it gives a second citeable Tetlock anchor
+ * alongside base-rate / reference-class forecasting, and is the cleanest
+ * bridge to the POSITIONING_SYNTHESIS_LINE ("audit it, don't replace it").
+ *
+ * Ego-safe by construction — it names a DISCIPLINE (treat your read as a
+ * hypothesis), never "your reasoning is broken" (same discipline as
+ * POSITIONING_PAIN_FRAMING).
+ */
+export const POSITIONING_ACTIVE_OPEN_MINDEDNESS =
+  "Active Open-Mindedness — Tetlock's strongest individual predictor of forecasting accuracy — is treating your own read as a hypothesis to test, not a position to defend. Decision Intel operationalises it as the Intelligent Antagonist: it captures your prior before it reveals the algorithm's read, so the gap between the two is the signal.";
+
+/**
+ * Superforecasting do-not-quote / honesty guardrails (locked 2026-06-05).
+ *
+ * Tetlock is a powerful narration anchor BUT three claims drift into
+ * overclaim in a diligence room — these are the rehearsable corrections.
+ * Same class as the Brier 0.258 / ~90% margin / Deep-Research-figure
+ * do-not-quote discipline. Use the mechanism; never quote the borrowed
+ * number, and never inherit a human-team result as ours.
+ */
+export const SUPERFORECASTING_DO_NOT_QUOTE: ReadonlyArray<{ claim: string; why: string }> = [
+  {
+    claim: 'Brier ≠ DQI — keep them in separate sentences.',
+    why: 'DQI grades the REASONING quality of a memo; Brier grades our CALIBRATION on probabilistic forecasts (the ≤90-day proxies + the 143-case predictions). "Brier-scored DQI" is a category error a sophisticated buyer catches — DQI is a quality score, not a probability. Say: "DQI grades the reasoning; Brier grades our calibration on the forecasts."',
+  },
+  {
+    claim:
+      'The "23% more accurate / constructive confrontation" stat is the GJP human-team result, NOT ours.',
+    why: 'Tetlock\'s team-accuracy finding is about real human forecasters SHARING private information. The noise jury is decorrelated LLM frames that never see each other\'s output — it measures framing-variance, it is NOT a "superteam" doing constructive confrontation. Never claim the 23%, never call the jury a superteam (it is "decorrelated samples, not formally independent judges" per the v3.3 honesty repair).',
+  },
+  {
+    claim: 'Do NOT pitch "extremizing the aggregate" as a quick win.',
+    why: "GJP's extremizing algorithm assumes diverse INDEPENDENT private information. The jury is decorrelated-not-independent, so extremizing the spread could amplify shared base-model priors and DEGRADE calibration, not recover signal. It is a founder-gated pipeline change requiring a held-out parity run, and may fail it — deferred, not roadmap-confident.",
+  },
+] as const;
+
 export const SPECIMEN_LIBRARY_DESCRIPTION =
   'WeWork S-1 (US/global) + Dangote 2014 Pan-African expansion (Africa / EM). Two production DPRs in public/.';
 
@@ -469,6 +530,48 @@ export const SHARRAN_111 = {
 } as const;
 
 /**
+ * Retroactive post-mortem cold-open + logo-minting motion (locked 2026-06-05,
+ * SF-advisor-validated). An outside advisor independently reconstructed the
+ * v3.5 wedge + the Retroactive Audit Mode, and sharpened the GTM ASK three ways
+ * the toolkit (discovery-pitch-toolkit.ts `post_close_surprise`) did not yet
+ * LEAD with:
+ *
+ * 1. LEAD with the retro, not the forward audit. For the M&A-primary wedge
+ *    personas (mid-market corp dev / smaller-fund GP / PE-backed founder) the
+ *    cold-open is NOT "audit your next memo" — it is "let me run it over a deal
+ *    you've ALREADY closed." Forensic, not predictive: you are not asking them
+ *    to bet on you, only to let you read the past. This sidesteps the two
+ *    things killing a pre-revenue solo founder — no track record (analyse the
+ *    past, don't bet on the future) and no data (the retro IS the data).
+ *    (Fractional CSOs keep the forward "next client memo" lead — that genuinely
+ *    is their workflow; the retro-lead is for the deal-team personas.)
+ * 2. PAIR it: "one you feel good about AND one that went sideways." The good
+ *    deal is ego-safe (you are not implying their judgment was bad); the bad
+ *    deal is where the value detonates. The pairing is the psychological unlock.
+ * 3. The retro is the LOGO-MINTING engine, not just a conversion move. They
+ *    keep the output, they get a no-risk look, and you walk away with a case
+ *    study + a real logo + the proprietary closed-outcome data that seeds the
+ *    Bias Genome moat. Five of these = a deck that sells itself. This is the
+ *    wedge→bridge reference-generation engine.
+ *
+ * BOUTIQUES RECONCILIATION: the advisor named "boutique M&A advisory firms" as
+ * a beachhead; ICP_AVOID excludes boutique SELL-SIDE advisors (no software
+ * budget, relationship-driven). Both hold — the avoid is about PAID budget, but
+ * the retro ask is FREE. So boutiques are a poor paid wedge yet a strong FREE
+ * reference / logo channel (feel the pain, one decision-maker, fast yes to a
+ * no-risk look). Mint logos there, not revenue. Do not let the advisor's line
+ * silently override the locked paid-wedge avoid.
+ */
+export const RETRO_POSTMORTEM_COLD_OPEN = {
+  motion:
+    "Lead the cold ask with a retroactive post-mortem on TWO already-closed deals — one the prospect feels good about, one that went sideways. Forensic, not predictive; free; they keep the output. It sidesteps no-track-record (analyse the past, don't bet on the future) and no-data (the retro IS the data). For the deal-team wedge personas (corp dev / GP / PE-backed founder); fractional CSOs keep the forward 'next memo' lead.",
+  logoMechanic:
+    'Every retro post-mortem mints a LOGO: they keep the output, you keep a case study with a real logo + the proprietary closed-outcome data that seeds the Bias Genome. Five of these = a deck that sells itself. This is the wedge→bridge reference-generation engine, NOT just a per-prospect conversion move.',
+  boutiquesNote:
+    'Boutique sell-side M&A advisors stay in ICP_AVOID as a PAID wedge (no software budget, relationship-driven) — but they are a strong FREE reference / logo channel for the retro post-mortem (one decision-maker, fast yes to a no-risk look). Mint logos there, not revenue.',
+} as const;
+
+/**
  * Connection-leverage referral asks — the literal scripts to send Mr. Gabe
  * and Mr. Reiner for warm intros. Captured from GTM Plan v3.2 §8.
  */
@@ -607,7 +710,8 @@ export function buildIcpPromptBlock(): string {
   const ceiling = `${ICP_CEILING.label}: ${ICP_CEILING.audience} — ${ICP_CEILING.whyItUnlocks}`;
   const avoid = `${ICP_AVOID.label}: ${ICP_AVOID.audience} ${ICP_AVOID.why}`;
   const sequence = ICP_SEQUENCING.join(' ');
-  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE}`;
+  const retro = `RETRO POST-MORTEM COLD-OPEN (lead the deal-team wedge personas with this, not "audit your next memo"): ${RETRO_POSTMORTEM_COLD_OPEN.motion} ${RETRO_POSTMORTEM_COLD_OPEN.logoMechanic} ${RETRO_POSTMORTEM_COLD_OPEN.boutiquesNote}`;
+  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE} ${retro}`;
 }
 
 /**
@@ -620,6 +724,9 @@ export function buildIcpPromptBlock(): string {
 export function buildPositioningPromptBlock(): string {
   const competitiveLines = COMPETITIVE_DEFENSIVE_LINES.map(
     c => `  - ${c.competitor}: "${c.line}" (why: ${c.why})`
+  ).join('\n');
+  const superforecastingGuardrails = SUPERFORECASTING_DO_NOT_QUOTE.map(
+    g => `  - ${g.claim} (${g.why})`
   ).join('\n');
   return [
     `CATEGORY CLAIM (locked 2026-05-04 — replaces the prior "native reasoning layer" lock):`,
@@ -639,6 +746,14 @@ export function buildPositioningPromptBlock(): string {
     `DQI "black-box / arbitrary grade" REBUTTAL (use verbatim when a buyer/investor says the score feels arbitrary): "It's not a black-box grade — here's the slider (the weights are user-adjustable, the Dietvorst 2016 algorithm-aversion fix), here's the per-component breakdown, and here's the tamper-evident hash on the DPR." The DQI is a reproducible, weighted, methodology-versioned (v2.4.0) score — the academically-grounded answer to the false-precision objection, not the objection's target.`,
     `MAP roadmap (Mediating Assessments Protocol — Kahneman/Lovallo/Sibony, "Noise" 2021): the one genuinely net-new idea from the research. Name it at events as the QUEUED next R²F detector — the noise-side complement (decompose a decision into independent attributes, blind-score each before holistic discussion, delay the verdict; attacks the halo/coherence cascade). It is NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it as roadmap, never as a current capability. Surfaced as a roadmap exhibit on /r2f-standard (the Detector Atlas).`,
     `R²F SYNTHESIS LINE (locked 2026-05-30, founder-endorsed — the four-word crystallization of the Kahneman × Klein moat): "${POSITIONING_SYNTHESIS_LINE}" Use as the one-line answer to "are you replacing the CSO's judgment?" and as the R²F-page lead. Ego-safe (audit a process, never call the thinking broken) + IP-true (audit = the reasoning-audit category). NOT the landing H1.`,
+    ``,
+    `TETLOCK / CALIBRATION FRAME (locked 2026-06-05 — the MEASUREMENT third leg + Active Open-Mindedness; deploy when an investor / sophisticated buyer probes "isn't this just a prompt wrapper?" or "are you replacing my judgment?"):`,
+    `Calibration leg: "${POSITIONING_CALIBRATION_LEG}"`,
+    `Active Open-Mindedness: "${POSITIONING_ACTIVE_OPEN_MINDEDNESS}"`,
+    `Framing rule: R²F is the protected IP category noun — do NOT rename it. Tetlock is an ADDED measurement leg ON TOP of the K×K synthesis: Kahneman catches the bias, Klein amplifies the expert read, Tetlock scores whether the call was right and sharpens the next one. AOM + base-rate/reference-class forecasting are the two citeable Tetlock anchors. This is a NARRATION reframe — every surface it describes already ships (PriorsCaptureCard conviction snapshot, the Intelligent Antagonist, reference-class forecast, the forced ≤90-day operational-proxy Brier loop). Do not imply anything new was built.`,
+    `SUPERFORECASTING DO-NOT-QUOTE (same discipline as Brier 0.258 / ~90% margin — overclaiming these loses a diligence room):`,
+    superforecastingGuardrails,
+    ``,
     `DO-NOT-QUOTE (confabulated Deep Research figures): "~30h saved per deal", "+30% failure-cause ID", "55% noise variance". Reason from the mechanisms; never quote the numbers (same discipline as Brier 0.258 / ~90% margin).`,
     ``,
     `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,
