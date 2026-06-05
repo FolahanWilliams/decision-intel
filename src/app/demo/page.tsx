@@ -656,7 +656,7 @@ export default function DemoPage() {
                   letterSpacing: '-0.025em',
                 }}
               >
-                Paste your strategic memo.
+                Paste a strategic memo, closed or upcoming.
                 <br />
                 <span style={{ color: C.green }}>Get a full audit in 60 seconds.</span>
               </h1>
@@ -669,9 +669,11 @@ export default function DemoPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Decision Quality Index. Top cognitive biases with evidence excerpts. AI boardroom
-                objections. What-if interventions. Your decision mapped into the Knowledge Graph.
-                Everything on your actual text &mdash; no signup, no card.
+                Run it on a deal you&rsquo;ve already closed and see what the committee missed; the
+                WeWork S-1 below is the same engine, in hindsight. Or run it on your next memo
+                before the board votes. You get a Decision Quality Index, the top biases with
+                evidence excerpts, and the boardroom objections, all on your actual text. No signup,
+                no card.
               </p>
             </div>
 
@@ -700,7 +702,7 @@ export default function DemoPage() {
                   margin: 0,
                 }}
               >
-                Or see one we already ran
+                Or see a closed deal we already audited
               </p>
               <WeWorkProofPanel eventName="demo_wework_proof_panel_clicked" />
             </div>
@@ -734,7 +736,7 @@ export default function DemoPage() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
                 style={{ minHeight: 200, fontSize: 14, lineHeight: 1.6 }}
                 placeholder={
-                  'Paste a strategic memo, board deck excerpt, or market-entry recommendation.\n\nExamples: "We should acquire [target] because…", a pre-mortem, a growth-plan one-pager, the recommendation section of a board deck…'
+                  'Paste a memo from a deal you have already closed (so you can see what the audit catches against the known outcome), or your next one.\n\nExamples: "We should acquire [target] because…", a pre-mortem, the recommendation section of a board deck, a market-entry one-pager…'
                 }
                 aria-label="Paste your strategic memo for auditing"
               />
