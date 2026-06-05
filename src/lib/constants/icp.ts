@@ -184,6 +184,67 @@ export const IP_MOAT_DESCRIPTION =
  */
 export const POSITIONING_SYNTHESIS_LINE = "Don't replace intuition. Audit it.";
 
+/**
+ * Calibration leg — Tetlock as the third tradition (locked 2026-06-05).
+ *
+ * R²F is framed as Kahneman (debiasing) × Klein (recognition). Tetlock's
+ * Good Judgment Project supplies the missing MEASUREMENT leg: it turns a
+ * one-shot audit OPINION into a system that tracks its own accuracy and
+ * sharpens. This is the substantive, code-grounded answer to "isn't this
+ * just a prompt wrapper?" — the wrapper produces a verdict; the calibration
+ * layer (forced ≤90-day falsifiable proxies logged at the vote, Brier-scored
+ * at the horizon, per-org recalibration) is the part a fast-follower can't
+ * copy by stealing prompts.
+ *
+ * DISCIPLINE: reference Brier-SCORING (the method) — never quote the 0.258
+ * platform-baseline number in a cold moat sentence (same do-not-quote lock).
+ * Do NOT rename R²F (the protected category) — Tetlock is an ADDED leg, a
+ * measurement layer ON TOP of R²F, not a replacement for the K×K synthesis.
+ */
+export const POSITIONING_CALIBRATION_LEG =
+  "R²F arbitrates two traditions in one pipeline — Kahneman's debiasing and Klein's pattern-recognition. Tetlock's Good Judgment Project method is the third leg: forced ≤90-day falsifiable proxies logged at the decision and Brier-scored at the horizon, with per-org recalibration. It turns the audit from a one-shot opinion into a system that tracks its own accuracy and gets sharper — the substantive answer to 'isn't this just a prompt wrapper?'.";
+
+/**
+ * Active Open-Mindedness (AOM) — Tetlock's strongest INDIVIDUAL-level
+ * predictor of forecasting accuracy (locked 2026-06-05). DI already
+ * operationalises it (the Intelligent Antagonist captures the user's prior
+ * BEFORE revealing the algorithm's read — the automation-bias defense), it
+ * just wasn't named. Naming it gives a second citeable Tetlock anchor
+ * alongside base-rate / reference-class forecasting, and is the cleanest
+ * bridge to the POSITIONING_SYNTHESIS_LINE ("audit it, don't replace it").
+ *
+ * Ego-safe by construction — it names a DISCIPLINE (treat your read as a
+ * hypothesis), never "your reasoning is broken" (same discipline as
+ * POSITIONING_PAIN_FRAMING).
+ */
+export const POSITIONING_ACTIVE_OPEN_MINDEDNESS =
+  "Active Open-Mindedness — Tetlock's strongest individual predictor of forecasting accuracy — is treating your own read as a hypothesis to test, not a position to defend. Decision Intel operationalises it as the Intelligent Antagonist: it captures your prior before it reveals the algorithm's read, so the gap between the two is the signal.";
+
+/**
+ * Superforecasting do-not-quote / honesty guardrails (locked 2026-06-05).
+ *
+ * Tetlock is a powerful narration anchor BUT three claims drift into
+ * overclaim in a diligence room — these are the rehearsable corrections.
+ * Same class as the Brier 0.258 / ~90% margin / Deep-Research-figure
+ * do-not-quote discipline. Use the mechanism; never quote the borrowed
+ * number, and never inherit a human-team result as ours.
+ */
+export const SUPERFORECASTING_DO_NOT_QUOTE: ReadonlyArray<{ claim: string; why: string }> = [
+  {
+    claim: 'Brier ≠ DQI — keep them in separate sentences.',
+    why: 'DQI grades the REASONING quality of a memo; Brier grades our CALIBRATION on probabilistic forecasts (the ≤90-day proxies + the 143-case predictions). "Brier-scored DQI" is a category error a sophisticated buyer catches — DQI is a quality score, not a probability. Say: "DQI grades the reasoning; Brier grades our calibration on the forecasts."',
+  },
+  {
+    claim:
+      'The "23% more accurate / constructive confrontation" stat is the GJP human-team result, NOT ours.',
+    why: 'Tetlock\'s team-accuracy finding is about real human forecasters SHARING private information. The noise jury is decorrelated LLM frames that never see each other\'s output — it measures framing-variance, it is NOT a "superteam" doing constructive confrontation. Never claim the 23%, never call the jury a superteam (it is "decorrelated samples, not formally independent judges" per the v3.3 honesty repair).',
+  },
+  {
+    claim: 'Do NOT pitch "extremizing the aggregate" as a quick win.',
+    why: "GJP's extremizing algorithm assumes diverse INDEPENDENT private information. The jury is decorrelated-not-independent, so extremizing the spread could amplify shared base-model priors and DEGRADE calibration, not recover signal. It is a founder-gated pipeline change requiring a held-out parity run, and may fail it — deferred, not roadmap-confident.",
+  },
+] as const;
+
 export const SPECIMEN_LIBRARY_DESCRIPTION =
   'WeWork S-1 (US/global) + Dangote 2014 Pan-African expansion (Africa / EM). Two production DPRs in public/.';
 
@@ -621,6 +682,9 @@ export function buildPositioningPromptBlock(): string {
   const competitiveLines = COMPETITIVE_DEFENSIVE_LINES.map(
     c => `  - ${c.competitor}: "${c.line}" (why: ${c.why})`
   ).join('\n');
+  const superforecastingGuardrails = SUPERFORECASTING_DO_NOT_QUOTE.map(
+    g => `  - ${g.claim} (${g.why})`
+  ).join('\n');
   return [
     `CATEGORY CLAIM (locked 2026-05-04 — replaces the prior "native reasoning layer" lock):`,
     `Primary H1: "${POSITIONING_HERO_PRIMARY}"`,
@@ -639,6 +703,14 @@ export function buildPositioningPromptBlock(): string {
     `DQI "black-box / arbitrary grade" REBUTTAL (use verbatim when a buyer/investor says the score feels arbitrary): "It's not a black-box grade — here's the slider (the weights are user-adjustable, the Dietvorst 2016 algorithm-aversion fix), here's the per-component breakdown, and here's the tamper-evident hash on the DPR." The DQI is a reproducible, weighted, methodology-versioned (v2.4.0) score — the academically-grounded answer to the false-precision objection, not the objection's target.`,
     `MAP roadmap (Mediating Assessments Protocol — Kahneman/Lovallo/Sibony, "Noise" 2021): the one genuinely net-new idea from the research. Name it at events as the QUEUED next R²F detector — the noise-side complement (decompose a decision into independent attributes, blind-score each before holistic discussion, delay the verdict; attacks the halo/coherence cascade). It is NOT shipped — the engine is a founder-gated pipeline change (methodology bump + held-out parity run), deferred post-first-customer. Speak it as roadmap, never as a current capability. Surfaced as a roadmap exhibit on /r2f-standard (the Detector Atlas).`,
     `R²F SYNTHESIS LINE (locked 2026-05-30, founder-endorsed — the four-word crystallization of the Kahneman × Klein moat): "${POSITIONING_SYNTHESIS_LINE}" Use as the one-line answer to "are you replacing the CSO's judgment?" and as the R²F-page lead. Ego-safe (audit a process, never call the thinking broken) + IP-true (audit = the reasoning-audit category). NOT the landing H1.`,
+    ``,
+    `TETLOCK / CALIBRATION FRAME (locked 2026-06-05 — the MEASUREMENT third leg + Active Open-Mindedness; deploy when an investor / sophisticated buyer probes "isn't this just a prompt wrapper?" or "are you replacing my judgment?"):`,
+    `Calibration leg: "${POSITIONING_CALIBRATION_LEG}"`,
+    `Active Open-Mindedness: "${POSITIONING_ACTIVE_OPEN_MINDEDNESS}"`,
+    `Framing rule: R²F is the protected IP category noun — do NOT rename it. Tetlock is an ADDED measurement leg ON TOP of the K×K synthesis: Kahneman catches the bias, Klein amplifies the expert read, Tetlock scores whether the call was right and sharpens the next one. AOM + base-rate/reference-class forecasting are the two citeable Tetlock anchors. This is a NARRATION reframe — every surface it describes already ships (PriorsCaptureCard conviction snapshot, the Intelligent Antagonist, reference-class forecast, the forced ≤90-day operational-proxy Brier loop). Do not imply anything new was built.`,
+    `SUPERFORECASTING DO-NOT-QUOTE (same discipline as Brier 0.258 / ~90% margin — overclaiming these loses a diligence room):`,
+    superforecastingGuardrails,
+    ``,
     `DO-NOT-QUOTE (confabulated Deep Research figures): "~30h saved per deal", "+30% failure-cause ID", "55% noise variance". Reason from the mechanisms; never quote the numbers (same discipline as Brier 0.258 / ~90% margin).`,
     ``,
     `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,

@@ -1650,6 +1650,45 @@ const R2F_FRAMEWORK_CARDS: EducationCard[] = [
     source: 'CLAUDE.md Kahneman×Klein synthesis + External Attack Vectors',
     tag: 'moat',
   },
+  {
+    id: 'r2f_tetlock_calibration_leg',
+    deckId: 'r2f_framework',
+    prompt:
+      'What is the THIRD leg of R²F beyond Kahneman and Klein, and how does it answer "isn\'t this just a prompt wrapper?"',
+    canonicalAnswer:
+      "Tetlock's calibration / MEASUREMENT leg (the Good Judgment Project method). R²F arbitrates Kahneman (debiasing) and Klein (recognition); Tetlock adds the layer that scores whether the call was RIGHT and sharpens the next one — forced 90-day falsifiable proxies logged at the decision, Brier-scored at the horizon, with per-org recalibration. It turns the audit from a one-shot opinion into a system that tracks its own accuracy. THAT is the substantive answer to the wrapper objection: the wrapper produces a verdict; the calibration loop is the part a fast-follower cannot copy by stealing prompts — it requires accumulated, embedded outcome data. Do NOT rename R²F — Tetlock is an ADDED leg, not a replacement. Every surface already ships (operational-proxy-gate.ts forced proxies + per-org Brier).",
+    difficulty: 'advanced',
+    applicationContext:
+      "Investor / sophisticated buyer says 'isn't this just a GPT prompt wrapper?'",
+    source: 'icp.ts POSITIONING_CALIBRATION_LEG; CLAUDE.md Defensibility Vector 1 + 4',
+    tag: 'moat',
+  },
+  {
+    id: 'r2f_active_open_mindedness',
+    deckId: 'r2f_framework',
+    prompt:
+      'What is Active Open-Mindedness (AOM), and which shipped DI surface already operationalises it?',
+    canonicalAnswer:
+      "AOM is Tetlock's strongest INDIVIDUAL-level predictor of forecasting accuracy: treat your own read as a hypothesis to TEST, not a position to defend. DI already operationalises it as the Intelligent Antagonist — it captures the user's PRIOR before it reveals the algorithm's read, so the GAP between the two is the signal (the automation-bias defense). Name it as a second citeable Tetlock anchor alongside reference-class / base-rate forecasting. Ego-safe: it names a discipline, never 'your reasoning is broken'. It is the cleanest bridge to the synthesis line 'Don't replace intuition. Audit it.' and to the founder-mindset half of Superforecasting (treat your own thesis as a hypothesis, run pre-mortems on your own plans).",
+    difficulty: 'advanced',
+    applicationContext:
+      "Buyer asks 'are you replacing my judgment?', or you want a second Tetlock anchor in the R²F story.",
+    source:
+      'icp.ts POSITIONING_ACTIVE_OPEN_MINDEDNESS; CLAUDE.md Constellation IntelligentAntagonistPrompt',
+    tag: 'integration',
+  },
+  {
+    id: 'r2f_brier_vs_dqi_honesty',
+    deckId: 'r2f_framework',
+    prompt: 'What are the three Superforecasting overclaims to NEVER make in a diligence room?',
+    canonicalAnswer:
+      "(1) Brier is NOT DQI — DQI grades the REASONING quality of a memo; Brier grades our CALIBRATION on probabilistic forecasts (the 90-day proxies + the 143-case predictions). 'Brier-scored DQI' is a category error a sophisticated buyer catches. Say: 'DQI grades the reasoning; Brier grades our calibration on the forecasts.' (2) Tetlock's '23% more accurate / constructive confrontation' is the Good Judgment Project HUMAN-team result — our noise jury is decorrelated LLM frames that never see each other's output; never claim the 23% and never call the jury a 'superteam' (it is 'decorrelated samples, not formally independent judges'). (3) 'Extremizing the aggregate' is NOT a quick win — it assumes diverse INDEPENDENT private information, so on a decorrelated-not-independent jury it could amplify shared model priors and HURT calibration; it is founder-gated and may fail a held-out parity run. Same do-not-quote discipline as Brier 0.258 / ~90% margin.",
+    difficulty: 'advanced',
+    applicationContext:
+      'Before any investor / diligence conversation where you might reach for a Superforecasting stat.',
+    source: 'icp.ts SUPERFORECASTING_DO_NOT_QUOTE; CLAUDE.md do-not-quote discipline',
+    tag: 'honesty',
+  },
 ];
 
 // ─── Cards: Founder One-Liners (8) ──────────────────────────────
