@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Audit a Strategic Memo in 60 Seconds | Decision Intel Demo',
+  title: 'Audit a Strategic Memo, Closed or Upcoming | Decision Intel Demo',
   description:
-    'Try the interactive demo. Pick a famous corporate decision (Kodak, Blockbuster, Nokia) and watch Decision Intel score cognitive biases, predict steering-committee objections, and map the decision into the Knowledge Graph.',
+    "Run Decision Intel over a deal you've already closed (or your next memo) and see what the committee missed: cognitive biases scored with evidence, steering-committee objections predicted, the decision mapped into the Knowledge Graph. No signup.",
   openGraph: {
-    title: 'Decision Intel | Interactive Demo',
+    title: "Decision Intel | Run it on a deal you've already closed",
     description:
-      'Audit a strategic memo in 60 seconds. Score cognitive biases, predict board objections, and see the Knowledge Graph come to life.',
+      "Run it on a deal you've already closed and see what the audit catches against the known outcome. Biases scored, board objections predicted, in 60 seconds.",
     url: '/demo',
   },
 };
