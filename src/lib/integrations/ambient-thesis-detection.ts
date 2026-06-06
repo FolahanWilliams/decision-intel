@@ -310,15 +310,25 @@ export async function pollSlackInstallationForSignals(install: {
 
   for (const channelId of install.ambientCaptureChannels) {
     const messages = await fetchSlackChannelHistory(install.teamId, channelId, oldestTs);
+    // Batch the idempotency lookup: one query per channel instead of one
+    // findUnique per message (N+1). Skips already-seen messages BEFORE the
+    // per-message LLM classification, saving DB round-trips + LLM calls.
+    const channelRefs = messages.filter(m => m.text && m.user).map(m => `${channelId}:${m.ts}`);
+    const seenRefs =
+      channelRefs.length > 0
+        ? new Set(
+            (
+              await prisma.ambientThesisSignal.findMany({
+                where: { source: 'slack', sourceRef: { in: channelRefs } },
+                select: { sourceRef: true },
+              })
+            ).map(r => r.sourceRef)
+          )
+        : new Set<string>();
     for (const m of messages) {
       if (!m.text || !m.user) continue;
       const sourceRef = `${channelId}:${m.ts}`;
-      // Skip ones we've seen.
-      const existing = await prisma.ambientThesisSignal.findUnique({
-        where: { source_sourceRef: { source: 'slack', sourceRef } },
-        select: { id: true },
-      });
-      if (existing) continue;
+      if (seenRefs.has(sourceRef)) continue;
 
       const classification = await classifyTextForThesisFormation(m.text);
       if (
@@ -484,14 +494,25 @@ export async function pollDriveInstallationForSignals(install: {
   const candidates = selectParsableDriveFiles(listed, DRIVE_MAX_FILES_PER_PASS);
   let persistedCount = 0;
 
+  // Batch the idempotency lookup: one query for the whole pass instead of one
+  // findUnique per file (N+1). Skips already-seen files BEFORE the expensive
+  // download + classify.
+  const candidateIds = candidates.map(f => f.id);
+  const seenFileIds =
+    candidateIds.length > 0
+      ? new Set(
+          (
+            await prisma.ambientThesisSignal.findMany({
+              where: { source: 'drive', sourceRef: { in: candidateIds } },
+              select: { sourceRef: true },
+            })
+          ).map(r => r.sourceRef)
+        )
+      : new Set<string>();
+
   for (const file of candidates) {
     try {
-      // Cheap idempotency gate before the expensive download + classify.
-      const existing = await prisma.ambientThesisSignal.findUnique({
-        where: { source_sourceRef: { source: 'drive', sourceRef: file.id } },
-        select: { id: true },
-      });
-      if (existing) continue;
+      if (seenFileIds.has(file.id)) continue;
 
       const buffer = await downloadFileContent(drive, file.id, file.mimeType);
       const parsed = (await parseFile(buffer, file.parseMimeType, file.name)).trim();

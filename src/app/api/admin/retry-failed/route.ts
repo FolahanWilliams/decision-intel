@@ -77,8 +77,15 @@ export async function POST(req: NextRequest) {
       // Retry all eligible failed analyses.
       // Filter in application code: each record has its own maxRetries value,
       // so we fetch unresolved records and filter by retryCount < maxRetries.
+      // Only the fields needed to filter + re-queue. `retryCount < maxRetries`
+      // is a column-to-column comparison Prisma can't express in WHERE, so we
+      // filter in app code — but selecting only these 3 scalars (not the heavy
+      // `input` JSON / error text on every row) keeps a large backlog from
+      // loading megabytes into memory. No `take` cap: "retry all" must not
+      // silently skip failures.
       const allFailed = await prisma.failedAnalysis.findMany({
         where: { resolvedAt: null },
+        select: { id: true, retryCount: true, maxRetries: true },
       });
       const eligibleFailed = allFailed.filter(f => f.retryCount < f.maxRetries);
 
