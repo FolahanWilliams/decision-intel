@@ -34,7 +34,7 @@ import { Reveal } from '@/components/ui/Reveal';
  * for crawlers + ChatGPT ingestion — only the JS bundle is split.
  * PipelineFlowDiagram (777 LOC) + DemoDeliverableHost are the
  * heaviest below-fold imports on /demo; lazy-loading them keeps
- * the idle hero (RoleSamplePicker + WeWorkProofPanel) painting
+ * the idle hero (RoleSamplePicker + RetroProofPair) painting
  * fast for the cold paste prospect arriving from ChatGPT. Visual
  * output IS BYTE-IDENTICAL once hydrated. */
 const PipelineFlowDiagram = dynamic(() =>
@@ -73,7 +73,7 @@ import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-tr
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
-import { WeWorkProofPanel } from '@/components/marketing/proof/WeWorkProofPanel';
+import { RetroProofPair } from '@/components/marketing/proof/RetroProofPair';
 
 /* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
 const C = {
@@ -656,7 +656,7 @@ export default function DemoPage() {
                   letterSpacing: '-0.025em',
                 }}
               >
-                Paste your strategic memo.
+                Paste a strategic memo, closed or upcoming.
                 <br />
                 <span style={{ color: C.green }}>Get a full audit in 60 seconds.</span>
               </h1>
@@ -669,40 +669,24 @@ export default function DemoPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Decision Quality Index. Top cognitive biases with evidence excerpts. AI boardroom
-                objections. What-if interventions. Your decision mapped into the Knowledge Graph.
-                Everything on your actual text &mdash; no signup, no card.
+                Run it on a deal you&rsquo;ve already closed and see what the committee missed; the
+                WeWork S-1 below is the same engine, in hindsight. Or run it on your next memo
+                before the board votes. You get a Decision Quality Index, the top biases with
+                evidence excerpts, and the boardroom objections, all on your actual text. No signup,
+                no card.
               </p>
             </div>
 
-            {/* WeWork S-1 specimen — moved here from the landing hero
-                2026-05-07 founder refactor. Cold readers who landed on
-                /demo but don't yet have a memo to paste can click the
-                WeWork specimen and see what a real audit looks like
-                first. The panel is a clickable card to the public DPR
-                sample PDF. */}
-            <div
-              style={{
-                marginBottom: 32,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 14,
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: C.slate500,
-                  margin: 0,
-                }}
-              >
-                Or see one we already ran
-              </p>
-              <WeWorkProofPanel eventName="demo_wework_proof_panel_clicked" />
+            {/* Paired retro proof — the SF-advisor cold-open made visual
+                (locked 2026-06-05, RetroProofPair). Two famous PUBLIC closed
+                decisions audited in hindsight: Apple's iPhone bet (held up) +
+                WeWork's S-1 (went sideways), same engine. The held-up half is
+                the ego-safe move — the audit isn't a hit-piece; sound reasoning
+                gets a clean bill. Cold readers who don't yet have a memo to
+                paste see both halves of the pitch before they paste their own
+                closed deal. */}
+            <div style={{ marginBottom: 32, width: '100%' }}>
+              <RetroProofPair />
             </div>
 
             <div
@@ -734,7 +718,7 @@ export default function DemoPage() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900 resize-none focus:outline-none focus:border-green-300 placeholder:text-slate-400"
                 style={{ minHeight: 200, fontSize: 14, lineHeight: 1.6 }}
                 placeholder={
-                  'Paste a strategic memo, board deck excerpt, or market-entry recommendation.\n\nExamples: "We should acquire [target] because…", a pre-mortem, a growth-plan one-pager, the recommendation section of a board deck…'
+                  'Paste a memo from a deal you have already closed (so you can see what the audit catches against the known outcome), or your next one.\n\nExamples: "We should acquire [target] because…", a pre-mortem, the recommendation section of a board deck, a market-entry one-pager…'
                 }
                 aria-label="Paste your strategic memo for auditing"
               />
