@@ -6,10 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
+import { getOrgPlan } from '@/lib/utils/plan-limits';
 import { generateShareToken } from '@/lib/utils/share-token';
 import { PLANS } from '@/lib/stripe';
 import { logAudit } from '@/lib/audit';
@@ -17,6 +18,13 @@ import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
 const log = createLogger('TeamInvite');
+
+/** Thrown inside the seat-enforcement transaction to carry the live `used` count. */
+class SeatLimitError extends Error {
+  constructor(public readonly used: number) {
+    super('SEAT_LIMIT');
+  }
+}
 
 const InviteSchema = z.object({
   email: z.string().email(),
@@ -89,37 +97,68 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Enforce plan-based team size tier. Limits come from PLANS in
-    // src/lib/stripe.ts (Free/Individual 1 / Strategy 12 / Enterprise ∞).
-    // Pending invites count against the limit so the cap can't be bypassed.
-    const seatCheck = await checkTeamSizeLimit(membership.orgId);
-    if (!seatCheck.allowed) {
-      const planName = PLANS[seatCheck.plan].name;
-      const limitLabel = Number.isFinite(seatCheck.limit) ? String(seatCheck.limit) : 'unlimited';
-      return NextResponse.json(
-        {
-          error: `Team size limit reached for the ${planName} plan (${seatCheck.used}/${limitLabel} seats, including pending invites). Upgrade your plan to add more teammates.`,
-          code: 'TEAM_SIZE_LIMIT',
-          plan: seatCheck.plan,
-          used: seatCheck.used,
-          limit: seatCheck.limit,
-        },
-        { status: 403 }
-      );
-    }
+    // Enforce the plan-based seat tier ATOMICALLY with the invite insert.
+    // Limits come from PLANS in src/lib/stripe.ts (Free/Individual 1 /
+    // Strategy 12 / Enterprise ∞); pending invites count toward the cap.
+    //
+    // A bare checkTeamSizeLimit()-then-create is racy under Postgres READ
+    // COMMITTED: two concurrent invites both read used = limit-1 and both
+    // insert, pushing the org one seat past the cap. We lock the org row
+    // FOR UPDATE and re-count members + pending invites inside the same
+    // transaction so concurrent seat-mutating invites queue (mirrors the
+    // authoritative gate in invite/accept).
+    const plan = await getOrgPlan(membership.orgId);
+    const seatLimit = PLANS[plan].maxTeamMembers;
 
-    const invite = await prisma.teamInvite.create({
-      data: {
-        orgId: membership.orgId,
-        email,
-        role,
-        invitedByUserId: user.id,
-        // Cryptographically-secure token — replaces former @default(cuid()).
-        // Locked 2026-05-25 (security audit); see src/lib/utils/share-token.ts.
-        token: generateShareToken(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      },
-    });
+    let invite;
+    try {
+      invite = await prisma.$transaction(async tx => {
+        await tx.$queryRaw`SELECT id FROM "Organization" WHERE id = ${membership.orgId} FOR UPDATE`;
+        const [memberCount, pendingCount] = await Promise.all([
+          tx.teamMember.count({ where: { orgId: membership.orgId } }),
+          tx.teamInvite.count({ where: { orgId: membership.orgId, status: 'pending' } }),
+        ]);
+        const used = memberCount + pendingCount;
+        if (used >= seatLimit) {
+          throw new SeatLimitError(used);
+        }
+        return tx.teamInvite.create({
+          data: {
+            orgId: membership.orgId,
+            email,
+            role,
+            invitedByUserId: user.id,
+            // Cryptographically-secure token — replaces former @default(cuid()).
+            // Locked 2026-05-25 (security audit); see src/lib/utils/share-token.ts.
+            token: generateShareToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+          },
+        });
+      });
+    } catch (txError) {
+      if (txError instanceof SeatLimitError) {
+        const limitLabel = Number.isFinite(seatLimit) ? String(seatLimit) : 'unlimited';
+        return NextResponse.json(
+          {
+            error: `Team size limit reached for the ${PLANS[plan].name} plan (${txError.used}/${limitLabel} seats, including pending invites). Upgrade your plan to add more teammates.`,
+            code: 'TEAM_SIZE_LIMIT',
+            plan,
+            used: txError.used,
+            limit: Number.isFinite(seatLimit) ? seatLimit : Number.MAX_SAFE_INTEGER,
+          },
+          { status: 403 }
+        );
+      }
+      // A concurrent invite can win the (orgId, email) unique race between the
+      // pre-check above and this insert — surface it as the same 409.
+      if (txError instanceof Prisma.PrismaClientKnownRequestError && txError.code === 'P2002') {
+        return NextResponse.json(
+          { error: 'An invite is already pending for this email' },
+          { status: 409 }
+        );
+      }
+      throw txError;
+    }
 
     // Send invite email (fire and forget) — org already loaded with membership query
     import('@/lib/notifications/email')

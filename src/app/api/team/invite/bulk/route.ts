@@ -14,7 +14,7 @@ import { Prisma } from '@prisma/client';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
+import { getOrgPlan } from '@/lib/utils/plan-limits';
 import { generateShareToken } from '@/lib/utils/share-token';
 import { PLANS } from '@/lib/stripe';
 import { logAudit } from '@/lib/audit';
@@ -92,88 +92,100 @@ export async function POST(req: NextRequest) {
     const memberEmails = new Set(members.map(m => m.email.toLowerCase()));
     const pendingEmails = new Set(pendingInvites.map(i => i.email.toLowerCase()));
 
-    // Seat headroom — pending invites already count toward `used`. This is a
-    // best-effort gate to avoid obviously over-inviting; the AUTHORITATIVE seat
-    // boundary is the atomic, org-row-locked check at invite/accept (a pending
-    // invite is not a consumed seat until accepted, and any excess pending
-    // invites are blocked there).
-    const seatCheck = await checkTeamSizeLimit(orgId);
-    let remaining = Math.max(0, seatCheck.limit - seatCheck.used);
-
-    const created: { email: string; id: string }[] = [];
+    const created: { email: string; id: string; token: string }[] = [];
     const skipped: { email: string; reason: SkipReason }[] = [];
 
+    // Classify every email against the non-seat checks OUTSIDE the transaction
+    // (these don't mutate seats). What's left is the seat-consuming candidate set.
+    const candidates: string[] = [];
     for (const email of normalized) {
       if (!emailShape.safeParse(email).success) {
         skipped.push({ email, reason: 'invalid_email' });
-        continue;
-      }
-      if (email === user.email?.toLowerCase()) {
+      } else if (email === user.email?.toLowerCase()) {
         skipped.push({ email, reason: 'self' });
-        continue;
-      }
-      if (memberEmails.has(email)) {
+      } else if (memberEmails.has(email)) {
         skipped.push({ email, reason: 'already_member' });
-        continue;
-      }
-      if (pendingEmails.has(email)) {
+      } else if (pendingEmails.has(email)) {
         skipped.push({ email, reason: 'already_invited' });
-        continue;
+      } else {
+        candidates.push(email);
       }
-      if (remaining <= 0) {
-        skipped.push({ email, reason: 'seat_limit' });
-        continue;
-      }
+    }
 
-      let invite;
-      try {
-        invite = await prisma.teamInvite.create({
-          data: {
-            orgId,
-            email,
-            role,
-            invitedByUserId: user.id,
-            token: generateShareToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          },
-        });
-      } catch (createErr) {
-        // A concurrent invite can win the (orgId, email) unique race between
-        // our pre-check and this insert. Treat the collision as an
-        // already-invited skip rather than 500-ing the whole batch.
-        if (
-          createErr instanceof Prisma.PrismaClientKnownRequestError &&
-          createErr.code === 'P2002'
-        ) {
-          skipped.push({ email, reason: 'already_invited' });
+    // Consume seats ATOMICALLY: lock the org row, re-count used (members +
+    // pending invites) inside the transaction, and create invites only up to
+    // the LIVE headroom. The prior best-effort gate let two concurrent bulks
+    // both read the same headroom and both over-invite; locking the org row
+    // serializes them (mirrors the authoritative gate in invite/accept).
+    // Interactive transactions don't auto-retry, so mutating the outer
+    // skipped/created arrays inside the callback is safe (runs exactly once).
+    const plan = await getOrgPlan(orgId);
+    const seatLimit = PLANS[plan].maxTeamMembers;
+    let usedBefore = 0;
+
+    await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "Organization" WHERE id = ${orgId} FOR UPDATE`;
+      const [memberCount, pendingCount] = await Promise.all([
+        tx.teamMember.count({ where: { orgId } }),
+        tx.teamInvite.count({ where: { orgId, status: 'pending' } }),
+      ]);
+      usedBefore = memberCount + pendingCount;
+      let headroom = Number.isFinite(seatLimit)
+        ? Math.max(0, seatLimit - usedBefore)
+        : candidates.length;
+
+      for (const email of candidates) {
+        if (headroom <= 0) {
+          skipped.push({ email, reason: 'seat_limit' });
           continue;
         }
-        throw createErr;
+        try {
+          const invite = await tx.teamInvite.create({
+            data: {
+              orgId,
+              email,
+              role,
+              invitedByUserId: user.id,
+              token: generateShareToken(),
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            },
+          });
+          created.push({ email, id: invite.id, token: invite.token });
+          headroom -= 1;
+        } catch (createErr) {
+          // A concurrent invite can win the (orgId, email) unique race between
+          // our pre-check and this insert. Treat the collision as an
+          // already-invited skip rather than failing the whole batch.
+          if (
+            createErr instanceof Prisma.PrismaClientKnownRequestError &&
+            createErr.code === 'P2002'
+          ) {
+            skipped.push({ email, reason: 'already_invited' });
+            continue;
+          }
+          throw createErr;
+        }
       }
-      remaining -= 1;
-      pendingEmails.add(email); // guard against duplicate rows within this batch
-      created.push({ email, id: invite.id });
+    });
 
-      // Fire-and-forget invite email (per-invite, mirrors the single-invite route).
+    // Post-commit, fire-and-forget: emails + audit logs for the created set.
+    // Kept OUTSIDE the transaction so network/email latency never holds the
+    // org-row lock open.
+    const inviterName =
+      (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+      user.email ||
+      'A teammate';
+    const orgName = membership.organization?.name || 'a team';
+    for (const c of created) {
       import('@/lib/notifications/email')
-        .then(({ notifyTeamInvite }) =>
-          notifyTeamInvite(
-            email,
-            (user.user_metadata as Record<string, string> | undefined)?.full_name ||
-              user.email ||
-              'A teammate',
-            membership.organization?.name || 'a team',
-            invite.token
-          )
-        )
+        .then(({ notifyTeamInvite }) => notifyTeamInvite(c.email, inviterName, orgName, c.token))
         .catch(err => log.error('Bulk invite email failed:', err));
-
       await logAudit({
         action: 'TEAM_MEMBER_INVITED',
         resource: 'team_invite',
-        resourceId: invite.id,
+        resourceId: c.id,
         orgId,
-        details: { email, role, bulk: true },
+        details: { email: c.email, role, bulk: true },
       });
     }
 
@@ -181,13 +193,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        created,
+        created: created.map(({ email, id }) => ({ email, id })),
         skipped,
         seats: {
-          plan: seatCheck.plan,
-          planName: PLANS[seatCheck.plan].name,
-          used: seatCheck.used + created.length,
-          limit: seatCheck.limit,
+          plan,
+          planName: PLANS[plan].name,
+          used: usedBefore + created.length,
+          limit: Number.isFinite(seatLimit) ? seatLimit : Number.MAX_SAFE_INTEGER,
         },
       },
       { status: created.length > 0 ? 201 : 200 }
