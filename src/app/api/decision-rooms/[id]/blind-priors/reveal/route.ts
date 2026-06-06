@@ -118,10 +118,20 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const revealedAt = new Date();
-    await prisma.decisionRoom.update({
-      where: { id: roomId },
+    // Atomic compare-and-set: only ONE concurrent reveal flips the flag and
+    // proceeds to fire emails + write the audit log. The read-check at line 91
+    // is a fast pre-check; this is the real guard — without it two simultaneous
+    // reveals both pass the read-check and both email every participant.
+    const claim = await prisma.decisionRoom.updateMany({
+      where: { id: roomId, blindPriorRevealedAt: null },
       data: { blindPriorRevealedAt: revealedAt },
     });
+    if (claim.count === 0) {
+      return NextResponse.json(
+        { error: 'The aggregate has already been revealed.' },
+        { status: 409 }
+      );
+    }
 
     // Audit log first — even if email delivery fails, the event must be
     // recorded.

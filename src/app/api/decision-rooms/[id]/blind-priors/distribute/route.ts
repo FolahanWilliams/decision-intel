@@ -243,14 +243,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    // Update the room's deadline + outcome frame.
-    await prisma.decisionRoom.update({
-      where: { id: roomId },
+    // Update the room's deadline + outcome frame — guarded so a concurrent
+    // reveal/close can't be silently overwritten (the status/revealed reads
+    // above are a fast pre-check; this re-asserts the precondition atomically).
+    const applied = await prisma.decisionRoom.updateMany({
+      where: { id: roomId, status: 'open', blindPriorRevealedAt: null },
       data: {
         blindPriorDeadline: deadlineDate,
         blindPriorOutcomeFrame: trimmedFrame ?? null,
       },
     });
+    if (applied.count === 0) {
+      return NextResponse.json(
+        { error: 'Room state changed (revealed or no longer open). Refresh and try again.' },
+        { status: 409 }
+      );
+    }
 
     // Token expiry — capped to deadline + 24h so a token never lives
     // beyond the natural close window. The 24h grace covers late

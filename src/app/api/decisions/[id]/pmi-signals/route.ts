@@ -135,45 +135,55 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'horizonDays must be 90, 180, or 365' }, { status: 400 });
     }
 
-    const existing = (container.outcome?.pmiSignals as unknown as PmiSignalsBlob | null) ?? {
-      signals: [],
-      capturedAt: new Date().toISOString(),
-      capturedByUserId: user.id,
-    };
-    // Replace existing signal of same key (idempotent), else append.
-    const otherSignals = existing.signals.filter(s => s.key !== body.signal!.key);
-    const updated: PmiSignalsBlob = {
-      ...existing,
-      signals: [
-        ...otherSignals,
-        {
-          key: body.signal.key,
-          proxy: body.signal.proxy,
-          horizonDays: body.signal.horizonDays,
-          predictedConfidence: Math.max(0, Math.min(1, body.signal.predictedConfidence)),
-          resolution: 'unmeasured',
-        },
-      ],
-      lastUpdatedAt: new Date().toISOString(),
-    };
-
-    // Ensure an outcome row exists — required for the FK on pmiSignals.
-    if (!container.outcome) {
-      await prisma.decisionContainerOutcome.create({
-        data: {
-          containerId: container.id,
-          summary: 'PMI signal capture initiated',
-          metrics: {} as Prisma.InputJsonValue,
-          reportedByUserId: user.id,
-          pmiSignals: updated as unknown as Prisma.InputJsonValue,
-        },
+    // Append/replace-by-key ATOMICALLY. A bare read-then-write loses a
+    // concurrent capture (both read [A], one appends B, the other appends C,
+    // one write wins → a signal vanishes). Lock the container row and re-read
+    // the outcome's pmiSignals inside the transaction before merging.
+    const signalDef = body.signal;
+    const updated = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "DecisionContainer" WHERE id = ${container.id} FOR UPDATE`;
+      const outcome = await tx.decisionContainerOutcome.findFirst({
+        where: { containerId: container.id },
+        select: { id: true, pmiSignals: true },
       });
-    } else {
-      await prisma.decisionContainerOutcome.update({
-        where: { id: container.outcome.id },
-        data: { pmiSignals: updated as unknown as Prisma.InputJsonValue },
-      });
-    }
+      const existing = (outcome?.pmiSignals as unknown as PmiSignalsBlob | null) ?? {
+        signals: [],
+        capturedAt: new Date().toISOString(),
+        capturedByUserId: user.id,
+      };
+      const next: PmiSignalsBlob = {
+        ...existing,
+        signals: [
+          ...existing.signals.filter(s => s.key !== signalDef.key),
+          {
+            key: signalDef.key,
+            proxy: signalDef.proxy,
+            horizonDays: signalDef.horizonDays,
+            predictedConfidence: Math.max(0, Math.min(1, signalDef.predictedConfidence)),
+            resolution: 'unmeasured',
+          },
+        ],
+        lastUpdatedAt: new Date().toISOString(),
+      };
+      // Ensure an outcome row exists — required for the FK on pmiSignals.
+      if (!outcome) {
+        await tx.decisionContainerOutcome.create({
+          data: {
+            containerId: container.id,
+            summary: 'PMI signal capture initiated',
+            metrics: {} as Prisma.InputJsonValue,
+            reportedByUserId: user.id,
+            pmiSignals: next as unknown as Prisma.InputJsonValue,
+          },
+        });
+      } else {
+        await tx.decisionContainerOutcome.update({
+          where: { id: outcome.id },
+          data: { pmiSignals: next as unknown as Prisma.InputJsonValue },
+        });
+      }
+      return next;
+    });
 
     await logAudit({
       action: 'PMI_SIGNAL_RECORDED',
@@ -233,25 +243,43 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: `No signal with key ${body.key}` }, { status: 404 });
     }
 
-    // Update in place.
+    // Update in place. predictedConfidence is immutable after POST, so the
+    // Brier/resolution computed from the initial read are stable.
     const observed = body.observedValue;
     const observedAt = new Date().toISOString();
     const brierScore = computeSignalBrier(target.predictedConfidence, observed);
     const resolution = resolveBand(observed);
+    const patchKey = body.key;
 
-    const updatedSignals = existing.signals.map(s =>
-      s.key === body.key ? { ...s, observedValue: observed, observedAt, brierScore, resolution } : s
-    );
-    const updated: PmiSignalsBlob = {
-      ...existing,
-      signals: updatedSignals,
-      lastUpdatedAt: observedAt,
-    };
-
-    await prisma.decisionContainerOutcome.update({
-      where: { id: container.outcome!.id },
-      data: { pmiSignals: updated as unknown as Prisma.InputJsonValue },
+    // Observe ATOMICALLY: lock the container row, re-read the outcome's signals
+    // inside the transaction, re-map by key, write. A bare read-then-write would
+    // clobber a concurrent POST that added another signal between read and write.
+    const updated = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "DecisionContainer" WHERE id = ${container.id} FOR UPDATE`;
+      const outcome = await tx.decisionContainerOutcome.findFirst({
+        where: { containerId: container.id },
+        select: { id: true, pmiSignals: true },
+      });
+      const fresh = (outcome?.pmiSignals as unknown as PmiSignalsBlob | null) ?? null;
+      if (!outcome || !fresh) return null; // concurrently removed (unlikely)
+      const next: PmiSignalsBlob = {
+        ...fresh,
+        signals: fresh.signals.map(s =>
+          s.key === patchKey
+            ? { ...s, observedValue: observed, observedAt, brierScore, resolution }
+            : s
+        ),
+        lastUpdatedAt: observedAt,
+      };
+      await tx.decisionContainerOutcome.update({
+        where: { id: outcome.id },
+        data: { pmiSignals: next as unknown as Prisma.InputJsonValue },
+      });
+      return next;
     });
+    if (!updated) {
+      return NextResponse.json({ error: 'PMI signal no longer exists' }, { status: 404 });
+    }
 
     await logAudit({
       action: 'PMI_SIGNAL_OBSERVED',

@@ -67,34 +67,43 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       );
     }
 
-    const parsed = parsePriorsForProxies(container.priors);
-    if (!parsed) {
+    // Fast validation on the initial read — cheap 400 before taking a lock.
+    if (!parsePriorsForProxies(container.priors)) {
       return NextResponse.json(
         { error: 'No operational proxies on record for this decision' },
         { status: 400 }
       );
     }
 
-    const nextProxies = applyProxyResolution(
-      parsed,
-      index,
-      resolution as ProxyResolution,
-      Date.now()
-    );
+    // Apply the resolution ATOMICALLY: lock the container row, then re-read +
+    // re-apply inside the transaction. The resolution rewrites the WHOLE
+    // microPredictions array, so a bare read-then-write would lose a concurrent
+    // resolution of a different proxy index. The lock serializes them.
+    const nextProxies = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "DecisionContainer" WHERE id = ${id} FOR UPDATE`;
+      const fresh = await tx.decisionContainer.findUnique({
+        where: { id },
+        select: { priors: true },
+      });
+      const freshParsed = parsePriorsForProxies(fresh?.priors ?? null);
+      const applied = freshParsed
+        ? applyProxyResolution(freshParsed, index, resolution as ProxyResolution, Date.now())
+        : null;
+      if (!applied) return null; // not found / already resolved under the lock
+      // Merge back into the FULL priors blob — preserve the conviction snapshot
+      // + kill criteria + capture provenance; only microPredictions changes.
+      const existing = (fresh?.priors as Record<string, unknown> | null) ?? {};
+      await tx.decisionContainer.update({
+        where: { id },
+        data: {
+          priors: { ...existing, microPredictions: applied } as unknown as Prisma.InputJsonValue,
+        },
+      });
+      return applied;
+    });
     if (!nextProxies) {
       return NextResponse.json({ error: 'Proxy not found, or already resolved' }, { status: 400 });
     }
-
-    // Merge back into the FULL priors blob — preserve the conviction
-    // snapshot + kill criteria + capture provenance; only the
-    // microPredictions array changes.
-    const existing = (container.priors as Record<string, unknown> | null) ?? {};
-    const merged = { ...existing, microPredictions: nextProxies };
-
-    await prisma.decisionContainer.update({
-      where: { id },
-      data: { priors: merged as unknown as Prisma.InputJsonValue },
-    });
 
     await logAudit({
       action: 'OPERATIONAL_PROXY_RESOLVED',

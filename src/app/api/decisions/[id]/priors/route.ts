@@ -137,38 +137,46 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     : [];
 
   // Auth + ownership.
-  const { authorized, existingPriors } = await resolveContainerOwnership(containerId, user.id);
+  const { authorized } = await resolveContainerOwnership(containerId, user.id);
   if (!authorized) {
     return NextResponse.json({ error: 'Container not found' }, { status: 404 });
   }
 
-  // Conviction snapshot: keep the first-captured value if priors already
-  // exist (pre-artefact reasoning is by definition the EARLIEST capture).
-  // Micro-predictions: append to the existing list.
-  const merged: PriorsPayload = existingPriors
-    ? {
-        convictionLevel: existingPriors.convictionLevel,
-        convictionRationale: existingPriors.convictionRationale,
-        killCriteria: Array.from(
-          new Set([...(existingPriors.killCriteria ?? []), ...killCriteria])
-        ),
-        microPredictions: [...(existingPriors.microPredictions ?? []), ...microPredictions],
-        capturedAt: existingPriors.capturedAt,
-        capturedByUserId: existingPriors.capturedByUserId,
-      }
-    : {
-        convictionLevel: body.convictionLevel as PriorsPayload['convictionLevel'],
-        convictionRationale,
-        killCriteria,
-        microPredictions,
-        capturedAt: new Date().toISOString(),
-        capturedByUserId: user.id,
-      };
-
+  // Conviction snapshot: keep the first-captured value if priors already exist.
+  // Micro-predictions: append. Done ATOMICALLY — a bare read-existing-then-
+  // write-merged is racy: two concurrent captures both read the same priors,
+  // both append in JS, and one write is lost. Lock the container row and
+  // re-read inside the transaction so the append can't drop a concurrent one.
   try {
-    await prisma.decisionContainer.update({
-      where: { id: containerId },
-      data: { priors: merged as unknown as Prisma.InputJsonValue },
+    const merged = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "DecisionContainer" WHERE id = ${containerId} FOR UPDATE`;
+      const fresh = await tx.decisionContainer.findUnique({
+        where: { id: containerId },
+        select: { priors: true },
+      });
+      const prev = (fresh?.priors as unknown as PriorsPayload | null) ?? null;
+      const next: PriorsPayload = prev
+        ? {
+            convictionLevel: prev.convictionLevel,
+            convictionRationale: prev.convictionRationale,
+            killCriteria: Array.from(new Set([...(prev.killCriteria ?? []), ...killCriteria])),
+            microPredictions: [...(prev.microPredictions ?? []), ...microPredictions],
+            capturedAt: prev.capturedAt,
+            capturedByUserId: prev.capturedByUserId,
+          }
+        : {
+            convictionLevel: body.convictionLevel as PriorsPayload['convictionLevel'],
+            convictionRationale,
+            killCriteria,
+            microPredictions,
+            capturedAt: new Date().toISOString(),
+            capturedByUserId: user.id,
+          };
+      await tx.decisionContainer.update({
+        where: { id: containerId },
+        data: { priors: next as unknown as Prisma.InputJsonValue },
+      });
+      return next;
     });
     return NextResponse.json({ priors: merged });
   } catch (err) {

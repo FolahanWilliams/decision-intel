@@ -73,6 +73,13 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [x] **Analysis-quota cost race (full reservation fix, founder-approved)** — `reserveAnalysisSlot`/`releaseAnalysisSlot` + `AnalysisReservation` reserve the slot under a per-user advisory lock BEFORE the ~£0.40 pipeline (the Analysis row only existed after, so a lock there couldn't un-spend the money). Streaming route (5 release points) + shared `analyzeDocument` (`finally`). Unlimited bypass; schema-drift fails open; TTL sweeps crash-orphans.
 - [x] Score-neutral verified: held-out `dqi-distribution-check` byte-identical (hashes unchanged), no methodology bump. Gates green: tsc · full vitest 1472 pass (8 new reservation tests) · 4 lints (positioning · silent-catches 218 · counts 73 · canonical-imports) · prettier.
 
+**Second concurrency sweep — JSON read-modify-write + check-then-act races (3 parallel bidirectional agents). Full prose in CLAUDE.md "Sibling race classes hardened (2026-06-06, second sweep)".**
+
+- [x] Verified-and-DROPPED false positives: ripple-alerts "over-fetch" (the detector USES `decisionFrame` + `outcome.summary`), bias-comments fire-and-forget (documented-intentional codebase-wide pattern), edge-inference/blind-prior-brier loops (idiomatic + bounded). Grep-before-assert caught the ripple one.
+- [x] Fixed 3 JSON read-modify-write data-loss races (priors microPredictions append, pmi-signals POST+PATCH, proxy-resolution) — each now locks the `DecisionContainer` row `FOR UPDATE` + re-reads inside a `$transaction` before re-applying the existing pure helper.
+- [x] Fixed 2 blind-prior check-then-act races (reveal, distribute) — atomic guarded `updateMany` (precondition in WHERE, `count===0 → 409`); reveal no longer double-sends emails/audit under a concurrent reveal.
+- [x] UTC quota-boundary hardening (`startOfCurrentMonthUtc()` in plan-limits.ts) — local-time month boundary drifted on non-UTC hosts (prod is UTC, so quota-neutral today). Gates green: tsc · 1472 vitest · 4 lints · prettier.
+
 ## Recently Completed (2026-06-05)
 
 **Strategy 12-seat tier — Tier A (integrity) + Tier B (admin polish). Refinement-grade hardening of the shipped tier; no schema migration, no speculative team features (the deeper team-only differentiators stay deferred per the GTM "build FROM Sankore feedback" lock). Full prose in CLAUDE.md "Team seat administration + audit trail (locked 2026-06-05)".**

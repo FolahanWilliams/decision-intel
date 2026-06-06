@@ -14,6 +14,17 @@ const log = createLogger('PlanLimits');
  */
 export const ANALYSIS_RESERVATION_TTL_MS = 15 * 60 * 1000;
 
+/**
+ * First instant of the current month in UTC. Quota windows MUST be UTC so the
+ * month boundary doesn't drift on a non-UTC runtime (Vercel is UTC, but a
+ * local-time `new Date()` + setDate/setHours would mis-count audits in the
+ * timezone-offset window around month rollover on any other host).
+ */
+function startOfCurrentMonthUtc(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+}
+
 export async function getUserPlan(userId: string): Promise<PlanType> {
   // Founder / admin bypass — users listed in ADMIN_USER_IDS always resolve
   // to the enterprise plan so they can exercise gated features end-to-end
@@ -124,9 +135,7 @@ export async function checkAnalysisLimit(
   const plan = await getUserPlan(userId);
   const limits = PLANS[plan];
 
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const startOfMonth = startOfCurrentMonthUtc();
 
   try {
     const used = await prisma.analysis.count({
@@ -193,9 +202,7 @@ export async function reserveAnalysisSlot(
     };
   }
 
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const startOfMonth = startOfCurrentMonthUtc();
   const staleCutoff = new Date(Date.now() - ANALYSIS_RESERVATION_TTL_MS);
 
   try {
