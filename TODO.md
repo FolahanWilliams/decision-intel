@@ -62,6 +62,17 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-06)
+
+**Enforcement-gate / concurrency-race sweep + the full analysis-quota reservation fix. Full prose in CLAUDE.md "Count-then-create race discipline + analysis-quota reservation (locked 2026-06-06)".**
+
+- [x] **FOUNDER ACTION:** run `npx prisma migrate deploy` lock-step with the deploy — one additive migration (`20260606120000_analysis_quota_reservation`, new `AnalysisReservation` table only, zero-risk; pre-migration code fails-open to the legacy check).
+- [x] Sentry production-noise filter (commit `fda9fa8`) — the `Object Not Found Matching Id … MethodName:update, ParamCount` UnhandledRejection on /how-it-works is browser-extension noise (grep-confirmed no first-party source); added `ignoreErrors` + `denyUrls` to `instrumentation-client.ts`.
+- [x] 3 parallel bidirectional grep-before-assert audits: **authz inner-gates (50+ routes) CLEAN · fail-open commerce CLEAN · tenant isolation CLEAN.** Only real findings were count-then-create races.
+- [x] Seat-cap races (commit `64f639b`) — `team/invite` + `team/invite/bulk` now lock the Organization row `FOR UPDATE` and re-count inside one interactive transaction; seat cap is atomic at BOTH invite + accept layers.
+- [x] **Analysis-quota cost race (full reservation fix, founder-approved)** — `reserveAnalysisSlot`/`releaseAnalysisSlot` + `AnalysisReservation` reserve the slot under a per-user advisory lock BEFORE the ~£0.40 pipeline (the Analysis row only existed after, so a lock there couldn't un-spend the money). Streaming route (5 release points) + shared `analyzeDocument` (`finally`). Unlimited bypass; schema-drift fails open; TTL sweeps crash-orphans.
+- [x] Score-neutral verified: held-out `dqi-distribution-check` byte-identical (hashes unchanged), no methodology bump. Gates green: tsc · full vitest 1472 pass (8 new reservation tests) · 4 lints (positioning · silent-catches 218 · counts 73 · canonical-imports) · prettier.
+
 ## Recently Completed (2026-06-05)
 
 **Strategy 12-seat tier — Tier A (integrity) + Tier B (admin polish). Refinement-grade hardening of the shipped tier; no schema migration, no speculative team features (the deeper team-only differentiators stay deferred per the GTM "build FROM Sankore feedback" lock). Full prose in CLAUDE.md "Team seat administration + audit trail (locked 2026-06-05)".**

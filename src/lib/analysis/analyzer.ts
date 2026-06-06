@@ -8,7 +8,11 @@ import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/li
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 import { getDocumentContent } from '@/lib/utils/encryption';
-import { checkAnalysisLimit, getBiasTypeLimit } from '@/lib/utils/plan-limits';
+import {
+  reserveAnalysisSlot,
+  releaseAnalysisSlot,
+  getBiasTypeLimit,
+} from '@/lib/utils/plan-limits';
 
 import {
   NoiseStatsSchema,
@@ -91,6 +95,9 @@ export async function analyzeDocument(
   // Look up the FIRST DecisionContainer this doc belongs to (if any) so
   // per-container audit purchases bypass subscription limits.
   let containerIdForLimit: string | null = null;
+  // Quota reservation slot — set when an audit is admitted, released in the
+  // finally below whether it succeeds or fails. Declared here in function scope.
+  let reservationId: string | null = null;
   try {
     const containerJoin = await prisma.decisionContainerDocument.findFirst({
       where: { documentId },
@@ -101,7 +108,11 @@ export async function analyzeDocument(
     // @schema-drift-tolerant — DecisionContainerDocument may not be
     // migrated in older deployments.
   }
-  const planCheck = await checkAnalysisLimit(document.userId, containerIdForLimit);
+  // Atomically reserve the monthly-analysis slot BEFORE the expensive pipeline.
+  // A bare checkAnalysisLimit()-then-create is racy: two concurrent audits both
+  // pass the count and both spend ~£0.40 (the Analysis row only exists after the
+  // pipeline). reserveAnalysisSlot serializes per-user under an advisory lock.
+  const planCheck = await reserveAnalysisSlot(document.userId, containerIdForLimit);
   if (!planCheck.allowed) {
     const err = new Error(
       `Analysis limit reached (${planCheck.used}/${planCheck.limit} this month on the ${planCheck.plan} plan)`
@@ -109,6 +120,7 @@ export async function analyzeDocument(
     (err as NodeJS.ErrnoException).code = 'PLAN_LIMIT_EXCEEDED';
     throw err;
   }
+  reservationId = planCheck.reservationId;
 
   // Run analysis within a transaction for atomicity
   try {
@@ -618,6 +630,11 @@ export async function analyzeDocument(
       );
     }
     throw error;
+  } finally {
+    // Free the reserved quota slot whether the audit succeeded, failed, or the
+    // cache short-circuited (no-op if no slot was reserved). TTL backs up any
+    // path that never reaches here (e.g. a process crash).
+    await releaseAnalysisSlot(reservationId);
   }
 }
 

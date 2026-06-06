@@ -1,9 +1,18 @@
 import { prisma } from '@/lib/prisma';
 import { PLANS, PlanType } from '@/lib/stripe';
 import { isAdminUserId } from './admin';
+import { isSchemaDrift } from './error';
 import { createLogger } from './logger';
 
 const log = createLogger('PlanLimits');
+
+/**
+ * How long a quota reservation holds an analysis slot before it's swept as
+ * orphaned. Comfortably longer than the ~60s pipeline so a slow audit is never
+ * swept mid-flight, short enough that a crashed reservation frees the slot
+ * quickly. Sweep happens lazily on the next reserveAnalysisSlot for the user.
+ */
+export const ANALYSIS_RESERVATION_TTL_MS = 15 * 60 * 1000;
 
 export async function getUserPlan(userId: string): Promise<PlanType> {
   // Founder / admin bypass — users listed in ADMIN_USER_IDS always resolve
@@ -137,6 +146,117 @@ export async function checkAnalysisLimit(
     // On error, deny (fail closed to prevent limit bypass)
     log.error('Analysis count check failed, denying by default:', _countErr);
     return { allowed: false, plan, used: 0, limit: limits.analysesPerMonth };
+  }
+}
+
+export interface ReservationResult {
+  allowed: boolean;
+  plan: PlanType;
+  used: number;
+  limit: number;
+  /** Non-null when a slot was reserved; the caller MUST releaseAnalysisSlot(it)
+   *  in a finally. Null when the plan is unlimited (nothing to release) or when
+   *  the reservation table isn't migrated (legacy fallback). */
+  reservationId: string | null;
+}
+
+/**
+ * Atomically reserve a monthly-analysis slot BEFORE the expensive pipeline runs.
+ *
+ * A bare checkAnalysisLimit()-then-create is racy: two concurrent requests both
+ * read used = limit-1, both pass, and both run the ~£0.40 / ~17-LLM-call
+ * pipeline (the row is only created AFTER the pipeline, so a lock there can't
+ * un-spend the money). Here, under a per-user advisory lock, we sweep stale
+ * reservations, count this-month analyses PLUS live reservations, then either
+ * insert a reservation (consuming the slot for the duration of the audit) or
+ * deny. The caller MUST releaseAnalysisSlot(reservationId) in a finally.
+ *
+ * Unlimited plans (Team/Enterprise/admin/container-purchase) bypass entirely —
+ * no slot, reservationId null. On schema drift (table not migrated) we fall
+ * back to the legacy non-atomic check so the analysis path keeps working.
+ */
+export async function reserveAnalysisSlot(
+  userId: string,
+  containerId?: string | null
+): Promise<ReservationResult> {
+  // Reuse checkAnalysisLimit for plan/limit resolution + the container-purchase
+  // and admin/unlimited bypasses (its monthly count is advisory here; the
+  // authoritative count happens inside the lock below).
+  const base = await checkAnalysisLimit(userId, containerId);
+  if (!Number.isFinite(base.limit) || base.limit < 0) {
+    return {
+      allowed: true,
+      plan: base.plan,
+      used: base.used,
+      limit: base.limit,
+      reservationId: null,
+    };
+  }
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  const staleCutoff = new Date(Date.now() - ANALYSIS_RESERVATION_TTL_MS);
+
+  try {
+    return await prisma.$transaction(async tx => {
+      // Serialize quota mutations for this user (mirrors the webhook-cap lock).
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('analysis_quota'), hashtext(${userId}))`;
+
+      // Sweep orphaned reservations (crash between reserve and release) so a
+      // stale row can't permanently consume a slot.
+      await tx.analysisReservation.deleteMany({
+        where: { userId, createdAt: { lt: staleCutoff } },
+      });
+
+      const [monthlyUsed, liveReservations] = await Promise.all([
+        tx.analysis.count({ where: { document: { userId }, createdAt: { gte: startOfMonth } } }),
+        tx.analysisReservation.count({ where: { userId } }), // all non-stale post-sweep
+      ]);
+      const used = monthlyUsed + liveReservations;
+
+      if (used >= base.limit) {
+        return { allowed: false, plan: base.plan, used, limit: base.limit, reservationId: null };
+      }
+
+      const reservation = await tx.analysisReservation.create({ data: { userId } });
+      return {
+        allowed: true,
+        plan: base.plan,
+        used: used + 1,
+        limit: base.limit,
+        reservationId: reservation.id,
+      };
+    });
+  } catch (err) {
+    // Additive table not yet migrated → behave exactly as before this fix
+    // (legacy non-atomic check). Fail OPEN is correct: the worst case is the
+    // pre-existing race, never a blocked legitimate audit.
+    if (isSchemaDrift(err)) {
+      log.warn('AnalysisReservation not migrated — falling back to non-atomic limit check');
+      return {
+        allowed: base.allowed,
+        plan: base.plan,
+        used: base.used,
+        limit: base.limit,
+        reservationId: null,
+      };
+    }
+    throw err;
+  }
+}
+
+/**
+ * Release a reserved analysis slot. Idempotent + non-fatal: a missing row
+ * (already swept by TTL, or never created on an unlimited plan) is fine — the
+ * TTL sweep is the backstop for any release that doesn't run (crash/cancel).
+ */
+export async function releaseAnalysisSlot(reservationId: string | null): Promise<void> {
+  if (!reservationId) return;
+  try {
+    await prisma.analysisReservation.delete({ where: { id: reservationId } });
+  } catch (err) {
+    log.warn('releaseAnalysisSlot: reservation already gone (non-fatal)', err);
   }
 }
 

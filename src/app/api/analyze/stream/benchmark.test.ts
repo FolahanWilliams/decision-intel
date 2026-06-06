@@ -175,6 +175,14 @@ vi.mock('@/lib/utils/plan-limits', () => ({
     limit: 100,
     plan: 'pro',
   }),
+  reserveAnalysisSlot: vi.fn().mockResolvedValue({
+    allowed: true,
+    used: 1,
+    limit: 100,
+    plan: 'pro',
+    reservationId: 'res-test',
+  }),
+  releaseAnalysisSlot: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/lib/utils/logger', () => ({

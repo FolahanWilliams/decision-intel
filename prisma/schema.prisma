@@ -687,6 +687,23 @@ model Analysis {
   @@index([outcomeStatus, outcomeDueAt]) // Outcome gate reminders query
 }
 
+/// Short-lived monthly-analysis quota reservation. A row is inserted (under a
+/// per-user advisory lock) the instant a plan-limited audit is admitted, and
+/// deleted when the pipeline finishes. This closes the cost race where two
+/// concurrent requests both pass a bare count-then-create limit check and both
+/// run the ~£0.40 pipeline: the second request's atomic count now sees the
+/// first's reservation. Orphans from a crash mid-pipeline are swept by TTL on
+/// the next reserve. See reserveAnalysisSlot / releaseAnalysisSlot in
+/// src/lib/utils/plan-limits.ts. Additive table — pre-migration deployments
+/// fall back to the legacy non-atomic check (fail-open on schema drift).
+model AnalysisReservation {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
 model BiasInstance {
   id          String        @id @default(cuid())
   analysisId  String

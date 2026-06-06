@@ -10,7 +10,11 @@ import { safeJsonClone } from '@/lib/utils/json';
 import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
+import {
+  checkAnalysisLimit,
+  reserveAnalysisSlot,
+  releaseAnalysisSlot,
+} from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
@@ -88,6 +92,11 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
 };
 
 export async function POST(request: NextRequest) {
+  // Quota reservation slot held for the duration of a plan-limited audit, set
+  // by the gate below and released on every exit path. Declared in function
+  // scope so the outer setup-catch can free it if a throw happens before the
+  // SSE stream takes over the release responsibility.
+  let reservationId: string | null = null;
   try {
     const supabase = await createClient();
     const {
@@ -244,6 +253,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Atomically reserve the monthly-analysis slot BEFORE the expensive
+    // pipeline runs. The fast checkAnalysisLimit above rejects the common
+    // over-limit case early; this closes the concurrency COST race — two
+    // requests both passing the bare count check and both spending ~£0.40,
+    // because the Analysis row (and thus a lock around it) only exists AFTER
+    // the pipeline. Released on every exit path below (doc-lock 409, the outer
+    // setup-catch, and the stream's completion/error/cancel handlers); a crash
+    // mid-pipeline is swept by the reservation TTL. Reserve BEFORE the doc lock
+    // so a denied reservation never leaves the document stuck in 'analyzing'.
+    const reservation = await reserveAnalysisSlot(userId);
+    if (!reservation.allowed) {
+      return NextResponse.json(
+        {
+          error: `Monthly analysis limit reached (${reservation.used}/${reservation.limit}). Upgrade your plan for more.`,
+          code: 'PLAN_LIMIT',
+          plan: reservation.plan,
+          used: reservation.used,
+          limit: reservation.limit,
+        },
+        { status: 429 }
+      );
+    }
+    reservationId = reservation.reservationId;
+
     // Atomic lock: only one request can transition a document to 'analyzing'
     const lockResult = await prisma.document.updateMany({
       where: {
@@ -256,6 +289,8 @@ export async function POST(request: NextRequest) {
       data: { status: 'analyzing' },
     });
     if (lockResult.count === 0) {
+      // Another request already holds the doc lock — free the slot we reserved.
+      await releaseAnalysisSlot(reservationId);
       return NextResponse.json(
         { error: 'Analysis already in progress', status: 'analyzing' },
         { status: 409 }
@@ -1334,6 +1369,9 @@ export async function POST(request: NextRequest) {
           const cacheKey = `stream:${documentId}:${userId}`;
           await prisma.cacheEntry.delete({ where: { key: cacheKey } }).catch(() => {});
 
+          // Pipeline complete — the persisted Analysis row now represents this
+          // slot, so the reservation can be freed.
+          await releaseAnalysisSlot(reservationId);
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
             clearTimeout(streamAbsoluteTimeout);
@@ -1407,6 +1445,8 @@ export async function POST(request: NextRequest) {
           const errorMessage = getSafeErrorMessage(error);
           sendUpdate({ type: 'error', message: errorMessage, progress: 0 });
 
+          // Pipeline failed — no Analysis row was persisted, so free the slot.
+          await releaseAnalysisSlot(reservationId);
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
             clearTimeout(streamAbsoluteTimeout);
@@ -1419,6 +1459,9 @@ export async function POST(request: NextRequest) {
         if (heartbeatInterval) {
           clearInterval(heartbeatInterval);
         }
+        // Client disconnected mid-audit — free the reserved slot (the TTL sweep
+        // would also catch it, but releasing promptly is cleaner).
+        void releaseAnalysisSlot(reservationId);
       },
     });
 
@@ -1430,6 +1473,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    // A throw before the SSE stream took over release responsibility — free any
+    // slot we reserved (no-op when none was reserved).
+    await releaseAnalysisSlot(reservationId);
     // Outer setup-error handler. Anything that throws BEFORE the SSE stream
     // starts (auth, document lookup, outcome gate check, etc.) lands here.
     // Pre-2026-05-01 this returned the literal string "Internal Server Error"

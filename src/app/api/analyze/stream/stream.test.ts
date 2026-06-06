@@ -51,8 +51,12 @@ vi.mock('@/lib/utils/rate-limit', () => ({
 }));
 
 const mockCheckAnalysisLimit = vi.fn();
+const mockReserveAnalysisSlot = vi.fn();
+const mockReleaseAnalysisSlot = vi.fn();
 vi.mock('@/lib/utils/plan-limits', () => ({
   checkAnalysisLimit: (...args: unknown[]) => mockCheckAnalysisLimit(...args),
+  reserveAnalysisSlot: (...args: unknown[]) => mockReserveAnalysisSlot(...args),
+  releaseAnalysisSlot: (...args: unknown[]) => mockReleaseAnalysisSlot(...args),
 }));
 
 const mockCheckOutcomeGate = vi.fn();
@@ -212,6 +216,16 @@ beforeEach(() => {
     used: 2,
     limit: 50,
   });
+
+  // Default: quota reservation succeeds (atomic gate before the pipeline)
+  mockReserveAnalysisSlot.mockResolvedValue({
+    allowed: true,
+    plan: 'pro',
+    used: 3,
+    limit: 50,
+    reservationId: 'res-test',
+  });
+  mockReleaseAnalysisSlot.mockResolvedValue(undefined);
 
   // Default: outcome gate passes
   mockCheckOutcomeGate.mockResolvedValue({
