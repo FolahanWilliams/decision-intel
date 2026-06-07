@@ -27,6 +27,7 @@ import { CheckCircle2, Sparkles, Compass, ArrowRight, Activity } from 'lucide-re
 import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
 import { CampaignCockpit } from '@/components/founder-hub/campaign/CampaignCockpit';
 import { SatReminderCard } from '@/components/founder-hub/sat/SatReminderCard';
+import { DailyDumpPanel } from '@/components/founder-hub/intake/DailyDumpPanel';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_CONTRAST,
@@ -196,6 +197,13 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           operating principle of the day. Founder-private. */}
       <div style={{ marginBottom: 20 }}>
         <CampaignCockpit />
+      </div>
+      {/* Brain-dump intake (2026-06-07) — the friction-killer for the whole hub.
+          Dump the day in one voice transcription → AI proposes a batch of writes
+          → confirm/edit/drop → logged across the founder-os surfaces.
+          Confirm-before-write; founder-private. */}
+      <div style={{ marginBottom: 20 }}>
+        <DailyDumpPanel />
       </div>
       {/* SAT daily consistency nudge — founder-private; the reminder where the
           founder lands every day. Self-hides if SAT Prep has no data yet. */}

@@ -293,7 +293,12 @@ const SCAN_DIR = join(ROOT, 'src');
 // 228 → 231 (SAT Start-Here reminder · 2026-06-07): +3 canonical res.json()
 //     body-parse in SatReminderCard's self-fetch (sessions/error-log/settings).
 //     Self-hides on failure; no critical write swallowed.
-const SILENT_CATCH_BASELINE = 231;
+// 231 → 235 (Brain-dump intake · 2026-06-07): +4 canonical res.json()/fetch
+//     body-parse in DailyDumpPanel — fetchContext (goals + prospects ×2, degrades
+//     to empty context), parse (surfaces the API error), execAction (surfaces the
+//     per-action error before marking it failed). No write swallowed — the
+//     confirm-before-write executor reports each result to the founder.
+const SILENT_CATCH_BASELINE = 235;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
