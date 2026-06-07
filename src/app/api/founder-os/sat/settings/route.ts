@@ -45,7 +45,8 @@ export async function POST(request: Request) {
   } catch {
     return apiError({ error: 'Invalid JSON body', status: 400 });
   }
-  const benchmarkTestDate = body.benchmarkTestDate === null ? null : cleanDate(body.benchmarkTestDate);
+  const benchmarkTestDate =
+    body.benchmarkTestDate === null ? null : cleanDate(body.benchmarkTestDate);
   const targetTestDate = body.targetTestDate === null ? null : cleanDate(body.targetTestDate);
 
   try {

@@ -21,7 +21,10 @@ import { authenticateFounderOs } from '@/lib/founder-os/auth';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { SAT_ROOT_CAUSE_IDS } from '@/components/founder-hub/sat/sat-content';
-import { applySm2, type SM2CardState } from '@/components/founder-hub/education/education-room-data';
+import {
+  applySm2,
+  type SM2CardState,
+} from '@/components/founder-hub/education/education-room-data';
 
 const log = createLogger('SatErrorLog');
 

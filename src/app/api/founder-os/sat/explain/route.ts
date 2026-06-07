@@ -84,7 +84,7 @@ Be concrete and Socratic, not generic. Do NOT invent the question if none was gi
     if (entryId && explanation) {
       await prisma.satErrorLogEntry
         .update({ where: { id: entryId }, data: { explanation } })
-        .catch((e) => log.warn('cache explanation failed:', e));
+        .catch(e => log.warn('cache explanation failed:', e));
     }
     return apiSuccess({ data: { explanation, cached: false } });
   } catch (err) {
