@@ -1157,6 +1157,15 @@ function checkTailwindLiteralPalette(files) {
     if (rel.includes('.test.') || rel.includes('.spec.')) continue;
     if (rel.includes('scripts/audit-platform')) continue;
     if (DARK_TOKEN_ALLOWED_PREFIXES.some(p => rel.startsWith(p))) continue;
+    // Marketing has design license for rich / literal palettes (CLAUDE.md:
+    // "marketing pages use hardcoded color constants ... intentional, NOT a
+    // bug"). Mirror checkHardcodedHex, which skips the marketing tree wholesale
+    // — the check's own header already names marketing as allowlisted, but the
+    // DARK_TOKEN_ALLOWED_PREFIXES list only covers specific marketing files, so
+    // CaseStudyCard / CaseStudyGallery leaked through. This is a platform
+    // washout check; marketing is out of scope by design.
+    if (rel.includes('src/components/marketing/')) continue;
+    if (rel.includes('src/app/(marketing)/')) continue;
     const lines = readLines(file);
     if (!lines) continue;
     const fileHeader = lines.slice(0, 30).join('\n');

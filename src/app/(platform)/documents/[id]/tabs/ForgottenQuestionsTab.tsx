@@ -97,10 +97,14 @@ export function ForgottenQuestionsTab({
   return (
     <ErrorBoundary sectionName="Forgotten Questions">
       <div className="flex flex-col gap-lg">
-        <div className="card border-l-4 border-l-blue-500">
+        <div className="card border-l-4" style={{ borderLeftColor: 'var(--info)' }}>
           <div className="card-body">
             <div className="flex items-start gap-3">
-              <HelpCircle size={22} className="text-blue-400 mt-0.5 flex-shrink-0" />
+              <HelpCircle
+                size={22}
+                className="mt-0.5 flex-shrink-0"
+                style={{ color: 'var(--info)' }}
+              />
               <div className="flex-1">
                 <h4 className="text-sm font-semibold text-foreground mb-1">
                   Questions this memo never asks
@@ -133,7 +137,12 @@ export function ForgottenQuestionsTab({
                 {forgottenQuestions.analogsUsed.map((analog, i) => (
                   <span
                     key={i}
-                    className="text-[11px] px-2 py-1 bg-blue-500/5 text-blue-400 border border-blue-500/20"
+                    className="text-[11px] px-2 py-1 border"
+                    style={{
+                      background: 'color-mix(in srgb, var(--info) 5%, transparent)',
+                      color: 'var(--info)',
+                      borderColor: 'color-mix(in srgb, var(--info) 20%, transparent)',
+                    }}
                   >
                     {analog}
                   </span>
