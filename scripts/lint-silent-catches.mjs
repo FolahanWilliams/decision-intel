@@ -282,7 +282,18 @@ const SCAN_DIR = join(ROOT, 'src');
 //     parses /api/founder-os/campaign; on parse failure the cockpit degrades to
 //     not-rendered and the rest of Start Here still renders. The route itself
 //     fails-open to a level-1 campaign. No delivery/audit/flywheel write swallowed.
-const SILENT_CATCH_BASELINE = 218;
+// 218 → 226 (SAT Prep founder-private surface · 2026-06-07): +8, ALL canonical
+//     res.json() body-parse + best-effort fire-and-forget UI mutations
+//     (SatPrepTab fetchAll ×4 · SatDailyTraining/SatTestLog/SatVocabBank fetch +
+//     body-parse). Founder-private study-stat writes, reconciled on the next
+//     fetchAll(); no delivery/audit/commerce/product-flywheel write swallowed.
+// 226 → 228 (SAT Prep v2 active-error-loop · 2026-06-07): +2 canonical
+//     res.json() body-parse (SatPrepTab settings fetch + SatReview explain
+//     response). Same founder-private class; no critical write swallowed.
+// 228 → 231 (SAT Start-Here reminder · 2026-06-07): +3 canonical res.json()
+//     body-parse in SatReminderCard's self-fetch (sessions/error-log/settings).
+//     Self-hides on failure; no critical write swallowed.
+const SILENT_CATCH_BASELINE = 231;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

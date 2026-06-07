@@ -25,6 +25,8 @@ function zeroCounts(): CampaignCounts {
     skillsComplete: 0,
     dmsLogged: 0,
     auditsRun: 0,
+    satSessions: 0,
+    satReps: 0,
   };
 }
 
@@ -66,6 +68,10 @@ describe('computeXp — inputs only', () => {
     expect(computeXp({ ...zeroCounts(), dmsLogged: 3 })).toBe(3 * XP.dmLogged);
     expect(computeXp({ ...zeroCounts(), checkins: 2, sfcZeroDays: 2 })).toBe(
       2 * XP.checkin + 2 * XP.sfcZeroDay
+    );
+    // SAT consistency is a controllable input — sessions + reps accrue XP.
+    expect(computeXp({ ...zeroCounts(), satSessions: 2, satReps: 10 })).toBe(
+      2 * XP.satSession + 10 * XP.satRep
     );
   });
 

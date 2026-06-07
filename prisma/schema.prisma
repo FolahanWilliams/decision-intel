@@ -1594,6 +1594,149 @@ model FounderOsDailyReflection {
   @@index([userId, date])
 }
 
+/// SAT Prep — founder-private study surface (founder-hub `sat_prep` tab).
+/// Single-user, partitioned by Supabase user.id like every other FounderOs*
+/// model. The error log is the heart: one row per attempted/missed question
+/// worth analysing. Confidence (0-3, tagged BEFORE answering) × wasCorrect
+/// drives the Brier calibration loop; skill/section drive weak-area weighting;
+/// rootCause drives the targeted-drill recommendation. Source distinguishes
+/// in-app AI drills from official Bluebook/Khan/released-test misses — both
+/// feed the same analysis, but only official test scores feed the projected
+/// score (AI-generated questions are off-distribution; never the score truth).
+model SatErrorLogEntry {
+  id         String   @id @default(cuid())
+  userId     String
+  /// Local date string YYYY-MM-DD (the founder's day, matches the FounderOs* convention).
+  date       String
+  /// 'daily_drill' | 'official_test' | 'review'
+  source     String   @default("daily_drill")
+  /// 'rw' (Reading & Writing) | 'math'
+  section    String
+  /// Canonical skill tag from sat-content.ts SKILL_TAGS (e.g. 'algebra', 'words_in_context').
+  skill      String
+  /// 'content_gap' | 'careless' | 'misread' | 'timing' | 'trap' | null (unset).
+  rootCause  String?
+  /// Pre-answer confidence 0-3 (0=guess, 3=certain) for the calibration/Brier loop. Null if untagged.
+  confidence Int?
+  wasCorrect Boolean
+  /// The question stem / what was missed / the rule — free text for review + SM-2.
+  note       String?  @db.Text
+  /// Cached LLM Socratic explanation of the miss (the in-tab tutor layer).
+  explanation String? @db.Text
+  // ── Spaced-retrieval (SM-2) over the MISS itself — the active error loop.
+  // Misses (wasCorrect=false) are scheduled for review (nextDue set at create);
+  // correct attempts stay calibration substrate only (nextDue null). Reuses the
+  // Education Room applySm2 engine. reviewArchived retires a mastered miss.
+  easeFactor        Float     @default(2.5)
+  repetitions       Int       @default(0)
+  intervalDays      Int       @default(0)
+  lastReviewed      DateTime?
+  nextDue           DateTime?
+  totalReviews      Int       @default(0)
+  successfulReviews Int       @default(0)
+  reviewArchived    Boolean   @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, date])
+  @@index([userId, section, skill])
+  @@index([userId, reviewArchived, nextDue])
+}
+
+/// SAT Prep founder-private settings (test dates for the countdown). One row
+/// per user; additive, optional everything.
+model SatSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  /// YYYY-MM-DD of the benchmark (September) + target (November) sittings.
+  benchmarkTestDate String?
+  targetTestDate    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+/// One per-day SAT daily-training session. Tracks the input-streak + the
+/// weak-area-weighted focus. XP rewards the INPUT (showing up + reps), never
+/// the projected score — same anti-prosperity discipline as the campaign layer.
+model SatDailySession {
+  id           String   @id @default(cuid())
+  userId       String
+  date         String
+  /// The skills this session targeted (chosen from the error-log weak areas). JSON string[].
+  focusSkills  Json?
+  attempted    Int      @default(0)
+  correct      Int      @default(0)
+  /// Minutes spent (self-reported / timer). Optional.
+  minutes      Int?
+  completed    Boolean  @default(false)
+  xpAwarded    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// Official full-length / sectional test result. The ONLY source of the
+/// projected score — real Bluebook/Khan/released/real-SAT scores, never the
+/// in-app AI questions (which are off-distribution). Section scores are the
+/// real 200-800 scale; total is their sum (or null for a sectional sitting).
+model SatTestResult {
+  id          String   @id @default(cuid())
+  userId      String
+  date        String
+  /// 'bluebook' | 'khan' | 'released' | 'real_sat'
+  source      String   @default("bluebook")
+  /// 'full' | 'rw' | 'math' — which section(s) this sitting covered.
+  section     String   @default("full")
+  rwScore     Int?
+  mathScore   Int?
+  totalScore  Int?
+  rwCorrect   Int?
+  rwTotal     Int?
+  mathCorrect Int?
+  mathTotal   Int?
+  durationMin Int?
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, date])
+}
+
+/// SAT vocab card with persisted SM-2 spaced-repetition state (reuses the
+/// Education Room applySm2 engine). Words-in-context framing — fed from drill
+/// + reading misses, not obscure-word memorisation (the digital SAT de-
+/// emphasises rare vocab).
+model SatVocabCard {
+  id                String    @id @default(cuid())
+  userId            String
+  word              String
+  definition        String    @db.Text
+  partOfSpeech      String?
+  mnemonic          String?   @db.Text
+  etymology         String?   @db.Text
+  exampleSentence   String?   @db.Text
+  /// 'new' | 'learning' | 'reviewing' | 'mastered' (derived from SM-2 state).
+  status            String    @default("new")
+  easeFactor        Float     @default(2.5)
+  repetitions       Int       @default(0)
+  intervalDays      Int       @default(0)
+  lastReviewed      DateTime?
+  nextDue           DateTime?
+  totalReviews      Int       @default(0)
+  successfulReviews Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([userId, word])
+  @@index([userId])
+  @@index([userId, nextDue])
+}
+
 /// GTM v3.5 RATIFIED 2026-05-04 — micro-deliberation outcome event.
 /// Fast-feedback signal that closes Cloverpop's data-advantage attack vector
 /// without requiring 5-7-year macro-outcome wait times. Each Analysis can
