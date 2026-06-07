@@ -177,4 +177,46 @@ describe('isActionReady', () => {
     const [r] = normalizeIntakeActions([{ type: 'daily_reflection', fields: {} }], ctx);
     expect(isActionReady(r)).toBe(true);
   });
+  it('a multi-required action (weekly_review) needs ALL non-optional fields', () => {
+    const [partial] = normalizeIntakeActions(
+      [{ type: 'weekly_review', fields: { topLongForm: 'shipped the intake' } }],
+      ctx
+    );
+    expect(isActionReady(partial)).toBe(false); // internalLocusReflection still missing
+    const [full] = normalizeIntakeActions(
+      [
+        {
+          type: 'weekly_review',
+          fields: {
+            topLongForm: 'shipped the intake',
+            internalLocusReflection: 'velocity is real',
+          },
+        },
+      ],
+      ctx
+    );
+    expect(isActionReady(full)).toBe(true);
+  });
+  it('content_log needs both title and the active-recall takeaway', () => {
+    const [noSummary] = normalizeIntakeActions(
+      [{ type: 'content_log', fields: { title: 'HBR piece' } }],
+      ctx
+    );
+    expect(isActionReady(noSummary)).toBe(false);
+  });
+  it('commitment + skill_dev gate on their primary field', () => {
+    expect(
+      isActionReady(normalizeIntakeActions([{ type: 'commitment', fields: {} }], ctx)[0])
+    ).toBe(false);
+    expect(
+      isActionReady(
+        normalizeIntakeActions([{ type: 'commitment', fields: { text: 'ship daily' } }], ctx)[0]
+      )
+    ).toBe(true);
+    expect(
+      isActionReady(
+        normalizeIntakeActions([{ type: 'skill_dev', fields: { skill: 'cold outreach' } }], ctx)[0]
+      )
+    ).toBe(true);
+  });
 });

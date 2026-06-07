@@ -22,6 +22,9 @@ import {
   BookOpen,
   ClipboardCheck,
   NotebookPen,
+  Flag,
+  CalendarCheck,
+  Dumbbell,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -58,6 +61,9 @@ const ICONS: Record<string, LucideIcon> = {
   BookOpen,
   ClipboardCheck,
   NotebookPen,
+  Flag,
+  CalendarCheck,
+  Dumbbell,
 };
 const ACCENT: Record<string, string> = {
   primary: 'var(--accent-primary)',

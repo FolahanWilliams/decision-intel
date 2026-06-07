@@ -45,13 +45,18 @@ export type IntakeActionType =
   | 'reading_progress'
   | 'sat_session'
   | 'sat_test'
-  | 'content_log';
+  | 'content_log'
+  | 'commitment'
+  | 'skill_dev'
+  | 'weekly_review';
 
 export const INTAKE_ACTION_TYPES: IntakeActionType[] = [
   'daily_goal',
   'complete_goal',
   'period_goal',
+  'commitment',
   'daily_reflection',
+  'weekly_review',
   'meeting_log',
   'todo_add',
   'todo_complete',
@@ -63,6 +68,7 @@ export const INTAKE_ACTION_TYPES: IntakeActionType[] = [
   'sat_session',
   'sat_test',
   'content_log',
+  'skill_dev',
 ];
 
 export type IntakeCluster = 'goals' | 'work' | 'outreach' | 'faith' | 'learning';
@@ -238,7 +244,7 @@ export const INTAKE_ACTION_META: Record<IntakeActionType, IntakeActionMeta> = {
     accent: 'primary',
     cluster: 'goals',
     fields: [
-      { key: 'period', label: 'Period', kind: 'select', options: PERIOD_OPTIONS },
+      { key: 'period', label: 'Period', kind: 'select', options: PERIOD_OPTIONS, optional: true },
       { key: 'text', label: 'Rock', kind: 'text', placeholder: 'the few that matter' },
     ],
     summarize: a => `Add ${str(a, 'period') || 'week'} rock: ${str(a, 'text') || '(empty)'}`,
@@ -569,6 +575,94 @@ export const INTAKE_ACTION_META: Record<IntakeActionType, IntakeActionMeta> = {
         activeRecallSummary: str(a, 'activeRecallSummary'),
         source: str(a, 'source') || 'Other',
         durationMin: num(a, 'durationMin'),
+      },
+    }),
+  },
+  commitment: {
+    type: 'commitment',
+    label: 'Log a commitment',
+    icon: 'Flag',
+    accent: 'primary',
+    cluster: 'goals',
+    fields: [
+      {
+        key: 'text',
+        label: 'Commitment',
+        kind: 'textarea',
+        placeholder: 'what you are committing to',
+      },
+      { key: 'title', label: 'Title', kind: 'text', optional: true },
+    ],
+    summarize: a => `Commit: ${str(a, 'title') || str(a, 'text').slice(0, 48) || '(empty)'}`,
+    toRequest: a => ({
+      method: 'POST',
+      path: '/api/founder-os/commitments',
+      body: { text: str(a, 'text'), title: strOrNull(a, 'title') ?? undefined },
+    }),
+  },
+  weekly_review: {
+    type: 'weekly_review',
+    label: 'Log weekly review',
+    icon: 'CalendarCheck',
+    accent: 'info',
+    cluster: 'goals',
+    fields: [
+      {
+        key: 'topLongForm',
+        label: 'The week',
+        kind: 'textarea',
+        placeholder: 'what mattered this week',
+      },
+      {
+        key: 'internalLocusReflection',
+        label: 'What I control (internal locus)',
+        kind: 'textarea',
+        placeholder: 'what was in my control, what I learned',
+      },
+      { key: 'oneSkillNote', label: 'One skill note', kind: 'textarea', optional: true },
+    ],
+    summarize: () => 'Log weekly review',
+    toRequest: (a, ctx) => ({
+      method: 'POST',
+      path: '/api/founder-os/weekly-reviews',
+      body: {
+        weekStartDate: weekKeyFor(ctx.today),
+        topLongForm: str(a, 'topLongForm'),
+        internalLocusReflection: str(a, 'internalLocusReflection'),
+        oneSkillNote: strOrNull(a, 'oneSkillNote') ?? undefined,
+      },
+    }),
+  },
+  skill_dev: {
+    type: 'skill_dev',
+    label: 'Add a skill goal',
+    icon: 'Dumbbell',
+    accent: 'info',
+    cluster: 'learning',
+    fields: [
+      {
+        key: 'skill',
+        label: 'Skill',
+        kind: 'text',
+        placeholder: 'a skill to develop this quarter',
+      },
+      { key: 'whyItMatters', label: 'Why it matters', kind: 'textarea', optional: true },
+      {
+        key: 'quarter',
+        label: 'Quarter',
+        kind: 'text',
+        optional: true,
+        placeholder: 'e.g. 2026-Q3',
+      },
+    ],
+    summarize: a => `Add skill goal: ${str(a, 'skill') || '(empty)'}`,
+    toRequest: (a, ctx) => ({
+      method: 'POST',
+      path: '/api/founder-os/skills',
+      body: {
+        quarter: str(a, 'quarter') || quarterKeyFor(ctx.today),
+        skill: str(a, 'skill'),
+        whyItMatters: strOrNull(a, 'whyItMatters') ?? undefined,
       },
     }),
   },

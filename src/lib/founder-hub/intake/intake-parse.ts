@@ -211,13 +211,18 @@ export function resolvePick(action: ProposedAction, targetId: string): ProposedA
   };
 }
 
-/** An action is executable iff every target-bound type has a resolved targetId. */
+/**
+ * An action is executable iff: target-bound types have a resolved targetId, and
+ * create/log types have EVERY non-optional field non-empty (so multi-required
+ * actions like weekly_review / content_log gate correctly, not just on the first).
+ */
 export function isActionReady(action: ProposedAction): boolean {
   const meta = INTAKE_ACTION_META[action.type];
   if (meta.needsTarget) return Boolean(action.targetId) && !action.needsPick;
-  // create/log types need at least the primary text field non-empty.
-  const primary = meta.fields[0];
-  if (!primary || primary.optional) return true;
-  const v = action.fields[primary.key];
-  return typeof v === 'string' ? v.trim().length > 0 : v != null;
+  return meta.fields
+    .filter(f => !f.optional)
+    .every(f => {
+      const v = action.fields[f.key];
+      return typeof v === 'string' ? v.trim().length > 0 : v != null;
+    });
 }

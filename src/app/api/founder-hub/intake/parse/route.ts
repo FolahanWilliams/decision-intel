@@ -134,7 +134,8 @@ Rules:
 - Map persona/stage/source values to the allowed one-of[...] options; if unsure, omit that field.
 - For meetings he had, use meeting_log (person = who). For someone he reached out to for the first time, prospect_create (default stage dm_sent). For an update on an existing prospect, prospect_advance.
 - Faith: if he only says he prayed / read scripture WITHOUT specifics, use ONE faith_checkin (booleans). Only use prayer_journal (a specific prayer or answered prayer with content) or reading_progress (a specific passage + reflection) when there is real content — never double-log the same fact as both a checkin boolean AND a journal/reading entry.
-- Learning: a study SESSION (time/reps) is sat_session; a SCORED full-length is sat_test (needs a section score); a book/article/paper takeaway is content_log (needs a real takeaway).
+- Learning: a study SESSION (time/reps) is sat_session; a SCORED full-length is sat_test (needs a section score); a book/article/paper takeaway is content_log (needs a real takeaway); a skill he wants to DEVELOP is skill_dev.
+- Occasional: commitment = a stated personal/public commitment he is making. weekly_review = ONLY when he is explicitly reviewing his week (needs both a week summary AND an internal-locus reflection); never emit it for an ordinary day.
 - Put short clarifying context in a per-action "note" only when genuinely ambiguous.
 - Today's date is provided by the system; do not output dates.
 
