@@ -26,6 +26,7 @@ import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { CheckCircle2, Sparkles, Compass, ArrowRight, Activity } from 'lucide-react';
 import { TrustEvidencePackPointer } from '@/components/founder-hub/founder-os/TrustEvidencePackPointer';
 import { CampaignCockpit } from '@/components/founder-hub/campaign/CampaignCockpit';
+import { SatReminderCard } from '@/components/founder-hub/sat/SatReminderCard';
 import {
   POSITIONING_HERO_PRIMARY,
   POSITIONING_HERO_CONTRAST,
@@ -195,6 +196,11 @@ export function StartHereTab({ onNavigateToTab }: Props) {
           operating principle of the day. Founder-private. */}
       <div style={{ marginBottom: 20 }}>
         <CampaignCockpit />
+      </div>
+      {/* SAT daily consistency nudge — founder-private; the reminder where the
+          founder lands every day. Self-hides if SAT Prep has no data yet. */}
+      <div style={{ marginBottom: 20 }}>
+        <SatReminderCard onOpen={() => onNavigateToTab('sat_prep')} />
       </div>
       {renderHero()}
       {/* Phase 1 graduation gate meter — Item 2 lock 2026-05-07. The

@@ -290,7 +290,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // 226 → 228 (SAT Prep v2 active-error-loop · 2026-06-07): +2 canonical
 //     res.json() body-parse (SatPrepTab settings fetch + SatReview explain
 //     response). Same founder-private class; no critical write swallowed.
-const SILENT_CATCH_BASELINE = 228;
+// 228 → 231 (SAT Start-Here reminder · 2026-06-07): +3 canonical res.json()
+//     body-parse in SatReminderCard's self-fetch (sessions/error-log/settings).
+//     Self-hides on failure; no critical write swallowed.
+const SILENT_CATCH_BASELINE = 231;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

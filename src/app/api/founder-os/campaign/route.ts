@@ -51,6 +51,8 @@ function zeroCounts(): CampaignCounts {
     skillsComplete: 0,
     dmsLogged: 0,
     auditsRun: 0,
+    satSessions: 0,
+    satReps: 0,
   };
 }
 
@@ -206,6 +208,22 @@ export async function GET(request: Request) {
     counts.skillsComplete = skillsCompleteCount;
     // auditsRun stays 0 — running the founder's own analyses isn't cleanly
     // attributable from these tables; XP from it is 0 until a clean hook exists.
+
+    // SAT consistency (founder-private) — completed daily sessions + logged
+    // reps both count as controllable INPUTS (showing up + doing the work).
+    // Separate Promise.all to avoid touching the aligned destructure above;
+    // schema-drift tolerant (fails to 0 pre-migration). Inputs-only per the
+    // anti-prosperity rule — the projected score never touches XP.
+    try {
+      const [satSessionsDone, satReps] = await Promise.all([
+        prisma.satDailySession.count({ where: { userId: uid, completed: true } }),
+        prisma.satErrorLogEntry.count({ where: { userId: uid } }),
+      ]);
+      counts.satSessions = satSessionsDone;
+      counts.satReps = satReps;
+    } catch (e) {
+      log.warn('sat campaign counts failed (pre-migration?):', e);
+    }
 
     input.highlightsHit = highlightsHitCount;
 

@@ -41,6 +41,8 @@ export const XP = {
   skillComplete: 100, // an irreplaceable skill acquired
   dmLogged: 20, // a wedge DM SENT + logged (the core motion; richly rewarded)
   auditRun: 15, // ran an audit on a memo
+  satSession: 12, // completed a daily SAT training session (an input — showing up)
+  satRep: 1, // logged a SAT question attempt (the rep + the analysis IS the work)
 } as const;
 
 // ─── Level arcs — the Scripture builders, each an operating principle ────

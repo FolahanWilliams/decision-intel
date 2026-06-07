@@ -39,6 +39,8 @@ export interface CampaignCounts {
   skillsComplete: number;
   dmsLogged: number;
   auditsRun: number;
+  satSessions: number;
+  satReps: number;
 }
 
 export interface CampaignInput {
@@ -128,7 +130,9 @@ export function computeXp(c: CampaignCounts): number {
       c.contentLogs * XP.contentLog +
       c.skillsComplete * XP.skillComplete +
       c.dmsLogged * XP.dmLogged +
-      c.auditsRun * XP.auditRun
+      c.auditsRun * XP.auditRun +
+      c.satSessions * XP.satSession +
+      c.satReps * XP.satRep
   );
 }
 
