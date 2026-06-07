@@ -17,6 +17,10 @@ const ctx: IntakeContext = {
     { id: 'p1', name: 'Jane Doe', company: 'AcmeCo', stage: 'dm_sent' },
     { id: 'p2', name: 'Bob Smith', company: 'Initech', stage: 'replied' },
   ],
+  openTodos: [
+    { id: 't1', title: 'Send Kristian the deck' },
+    { id: 't2', title: 'Book the Strategy World ticket' },
+  ],
 };
 
 describe('matchByName', () => {
@@ -37,6 +41,14 @@ describe('matchByName', () => {
   });
   it('ignores sub-3-char noise tokens', () => {
     expect(matchByName('to', cands)).toEqual([]);
+  });
+  it('does not match on a shared stopword alone', () => {
+    const todos = [
+      { id: 't1', name: 'Send Kristian the deck' },
+      { id: 't2', name: 'Book the Strategy World ticket' },
+    ];
+    // "the" is shared but a stopword — only the real-token overlap (deck/kristian) wins.
+    expect(matchByName('send the deck to Kristian', todos)).toEqual(['t1']);
   });
 });
 
@@ -96,6 +108,25 @@ describe('normalizeIntakeActions', () => {
     expect(out[0].targetId).toBeUndefined();
     expect(out[0].candidates).toHaveLength(2);
     expect(out[0].note).toContain("Couldn't match");
+  });
+
+  it('todo_complete resolves via the generic target resolver', () => {
+    const raw: RawIntakeAction[] = [
+      { type: 'todo_complete', targetName: 'send the deck to Kristian' },
+    ];
+    const out = normalizeIntakeActions(raw, ctx);
+    expect(out[0].targetId).toBe('t1');
+    expect(out[0].fields.matchedLabel).toBe('Send Kristian the deck');
+  });
+
+  it('period_goal coerces the period field and is not target-bound', () => {
+    const raw: RawIntakeAction[] = [
+      { type: 'period_goal', fields: { period: 'quarter', text: 'Land Sankore' } },
+    ];
+    const out = normalizeIntakeActions(raw, ctx);
+    expect(out[0].fields.period).toBe('quarter');
+    expect(out[0].needsPick).toBeFalsy();
+    expect(out[0].targetId).toBeUndefined();
   });
 
   it('prospect_advance matches and carries the stage field', () => {

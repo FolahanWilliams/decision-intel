@@ -27,10 +27,31 @@ export interface IntakeContextProspect {
   company: string | null;
   stage: string;
 }
+export interface IntakeContextTodo {
+  id: string;
+  title: string;
+}
 export interface IntakeContext {
   openGoals: IntakeContextGoal[];
   prospects: IntakeContextProspect[];
+  openTodos: IntakeContextTodo[];
 }
+
+/**
+ * Where each target-bound action looks for its existing-row candidates. Adding a
+ * new target-bound action = add one entry here (the resolver below is generic).
+ */
+const TARGET_SOURCES: Partial<
+  Record<IntakeActionType, (ctx: IntakeContext) => { id: string; name: string }[]>
+> = {
+  complete_goal: ctx => ctx.openGoals.map(g => ({ id: g.id, name: g.text })),
+  prospect_advance: ctx =>
+    ctx.prospects.map(p => ({
+      id: p.id,
+      name: `${p.name}${p.company ? ` @ ${p.company}` : ''}`,
+    })),
+  todo_complete: ctx => ctx.openTodos.map(t => ({ id: t.id, name: t.title })),
+};
 
 /** Loose shape the LLM returns (everything optional — we validate hard here). */
 export interface RawIntakeAction {
@@ -49,13 +70,44 @@ function norm(s: string): string {
     .trim();
 }
 
+/** Common words that are ≥3 chars but carry no matching signal — excluded from
+ *  the distinctive-token set so e.g. "the" in two unrelated names is not a match. */
+const STOPWORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'that',
+  'this',
+  'from',
+  'into',
+  'your',
+  'our',
+  'you',
+  'was',
+  'are',
+  'has',
+  'had',
+  'have',
+  'but',
+  'not',
+  'all',
+  'any',
+  'his',
+  'her',
+  'their',
+  'about',
+  'today',
+  'tomorrow',
+]);
+
 /** Fuzzy name match: a query matches a candidate if either contains the other's
- *  normalized form, or they share a distinctive (≥3-char) token. Returns the ids
- *  of all matches (caller decides single vs ambiguous). */
+ *  normalized form, or they share a distinctive (≥3-char, non-stopword) token.
+ *  Returns the ids of all matches (caller decides single vs ambiguous). */
 export function matchByName(query: string, candidates: { id: string; name: string }[]): string[] {
   const q = norm(query);
   if (!q) return [];
-  const qTokens = new Set(q.split(' ').filter(t => t.length >= 3));
+  const qTokens = new Set(q.split(' ').filter(t => t.length >= 3 && !STOPWORDS.has(t)));
   const hits: string[] = [];
   for (const c of candidates) {
     const n = norm(c.name);
@@ -120,40 +172,20 @@ export function normalizeIntakeActions(
             : typeof fields.name === 'string'
               ? fields.name
               : '';
-
-      if (type === 'complete_goal') {
-        const cands = context.openGoals.map(g => ({ id: g.id, name: g.text }));
-        const hits = matchByName(mention, cands);
-        if (hits.length === 1) {
-          action.targetId = hits[0];
-          action.fields.matchedLabel = labelFor(hits[0], cands);
-        } else {
-          action.needsPick = true;
-          action.candidates = cands.map(c => ({ id: c.id, label: c.name }));
-          action.note = hits.length
-            ? 'Multiple goals match — pick one.'
-            : mention
-              ? `Couldn't match "${mention}" — pick the goal.`
-              : 'Pick which goal to complete.';
-        }
-      } else if (type === 'prospect_advance') {
-        const cands = context.prospects.map(p => ({
-          id: p.id,
-          name: `${p.name}${p.company ? ` @ ${p.company}` : ''}`,
-        }));
-        const hits = matchByName(mention, cands);
-        if (hits.length === 1) {
-          action.targetId = hits[0];
-          action.fields.matchedLabel = labelFor(hits[0], cands);
-        } else {
-          action.needsPick = true;
-          action.candidates = cands.map(c => ({ id: c.id, label: c.name }));
-          action.note = hits.length
-            ? 'Multiple prospects match — pick one.'
-            : mention
-              ? `Couldn't match "${mention}" — pick the prospect.`
-              : 'Pick which prospect to advance.';
-        }
+      const noun = meta.targetNoun ?? 'item';
+      const cands = (TARGET_SOURCES[type]?.(context) ?? []).map(c => ({ id: c.id, name: c.name }));
+      const hits = matchByName(mention, cands);
+      if (hits.length === 1) {
+        action.targetId = hits[0];
+        action.fields.matchedLabel = labelFor(hits[0], cands);
+      } else {
+        action.needsPick = true;
+        action.candidates = cands.map(c => ({ id: c.id, label: c.name }));
+        action.note = hits.length
+          ? `Multiple ${noun}s match — pick one.`
+          : mention
+            ? `Couldn't match "${mention}" — pick the ${noun}.`
+            : `Pick which ${noun}.`;
       }
     }
 

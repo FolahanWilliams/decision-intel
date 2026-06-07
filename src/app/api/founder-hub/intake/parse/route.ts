@@ -78,7 +78,13 @@ function clampContext(raw: unknown): IntakeContext {
           stage: typeof p.stage === 'string' ? p.stage : 'dm_sent',
         }))
     : [];
-  return { openGoals, prospects };
+  const openTodos = Array.isArray(c.openTodos)
+    ? c.openTodos
+        .filter(t => t && typeof t.id === 'string' && typeof t.title === 'string')
+        .slice(0, 50)
+        .map(t => ({ id: t.id, title: String(t.title).slice(0, 280) }))
+    : [];
+  return { openGoals, prospects, openTodos };
 }
 
 export async function POST(request: Request) {
@@ -107,6 +113,7 @@ export async function POST(request: Request) {
     context.prospects
       .map(p => `  ${p.id}="${p.name}${p.company ? ` @ ${p.company}` : ''}" (stage:${p.stage})`)
       .join('\n') || '  (none)';
+  const todoList = context.openTodos.map(t => `  ${t.id}="${t.title}"`).join('\n') || '  (none)';
 
   const prompt = `You are the founder's intake assistant. Convert his free-form day-dump into a JSON batch of actions to log in his Founder Hub. Extract ONLY what he clearly stated — never invent meetings, prospects, goals, or numbers. If something is vague, omit it rather than guess.
 
@@ -119,10 +126,15 @@ ${goalList}
 His EXISTING PROSPECTS (if he mentions progress with one of these, use prospect_advance with targetName = the name; if it is a NEW person, use prospect_create):
 ${prospectList}
 
+His OPEN TO-DOS (if he says he finished one, use todo_complete with targetName = what he referenced; a NEW next-step is todo_add):
+${todoList}
+
 Rules:
 - Output one action per distinct thing he did/said. Multiple goals → multiple daily_goal actions.
 - Map persona/stage/source values to the allowed one-of[...] options; if unsure, omit that field.
 - For meetings he had, use meeting_log (person = who). For someone he reached out to for the first time, prospect_create (default stage dm_sent). For an update on an existing prospect, prospect_advance.
+- Faith: if he only says he prayed / read scripture WITHOUT specifics, use ONE faith_checkin (booleans). Only use prayer_journal (a specific prayer or answered prayer with content) or reading_progress (a specific passage + reflection) when there is real content — never double-log the same fact as both a checkin boolean AND a journal/reading entry.
+- Learning: a study SESSION (time/reps) is sat_session; a SCORED full-length is sat_test (needs a section score); a book/article/paper takeaway is content_log (needs a real takeaway).
 - Put short clarifying context in a per-action "note" only when genuinely ambiguous.
 - Today's date is provided by the system; do not output dates.
 

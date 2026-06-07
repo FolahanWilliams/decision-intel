@@ -16,10 +16,17 @@ import {
   Users,
   UserPlus,
   ArrowRightCircle,
+  CalendarRange,
+  ListPlus,
+  BookHeart,
+  BookOpen,
+  ClipboardCheck,
+  NotebookPen,
   type LucideIcon,
 } from 'lucide-react';
 import {
   INTAKE_ACTION_META,
+  INTAKE_CLUSTERS,
   type ProposedAction,
   type FieldSpec,
   type FieldValue,
@@ -45,6 +52,12 @@ const ICONS: Record<string, LucideIcon> = {
   Users,
   UserPlus,
   ArrowRightCircle,
+  CalendarRange,
+  ListPlus,
+  BookHeart,
+  BookOpen,
+  ClipboardCheck,
+  NotebookPen,
 };
 const ACCENT: Record<string, string> = {
   primary: 'var(--accent-primary)',
@@ -83,12 +96,14 @@ export function DailyDumpPanel({ founderPass, onLogged }: Props) {
 
   async function fetchContext(): Promise<IntakeContext> {
     try {
-      const [gRes, pRes] = await Promise.all([
+      const [gRes, pRes, tRes] = await Promise.all([
         fetch('/api/founder-os/daily-goals?days=2', { cache: 'no-store', headers }),
         fetch('/api/founder-hub/outreach/prospects', { cache: 'no-store', headers }),
+        fetch('/api/founder-hub/todos', { cache: 'no-store', headers }),
       ]);
       const gBody = await gRes.json().catch(() => null);
       const pBody = await pRes.json().catch(() => null);
+      const tBody = await tRes.json().catch(() => null);
       const openGoals = (
         (gBody?.data?.goals as { id: string; text: string; status: string; date: string }[]) ?? []
       )
@@ -104,10 +119,15 @@ export function DailyDumpPanel({ founderPass, onLogged }: Props) {
       )
         .filter(p => p.stage !== 'converted' && p.stage !== 'lost')
         .map(p => ({ id: p.id, name: p.name, company: p.company ?? null, stage: p.stage }));
-      return { openGoals, prospects };
+      const openTodos = (
+        (tBody?.data?.todos as { id: string; title: string; done: boolean }[] | undefined) ?? []
+      )
+        .filter(t => !t.done)
+        .map(t => ({ id: t.id, title: t.title }));
+      return { openGoals, prospects, openTodos };
     } catch {
       // canonical fire-and-forget — degrade to empty context (matching still works on names)
-      return { openGoals: [], prospects: [] };
+      return { openGoals: [], prospects: [], openTodos: [] };
     }
   }
 
@@ -147,9 +167,6 @@ export function DailyDumpPanel({ founderPass, onLogged }: Props) {
     }
   }
 
-  function patchAction(id: string, patch: Partial<ProposedAction>) {
-    setActions(prev => prev.map(a => (a.id === id ? { ...a, ...patch } : a)));
-  }
   function setField(id: string, key: string, value: FieldValue) {
     setActions(prev =>
       prev.map(a => (a.id === id ? { ...a, fields: { ...a.fields, [key]: value } } : a))
@@ -246,18 +263,36 @@ export function DailyDumpPanel({ founderPass, onLogged }: Props) {
               : `${readyCount} ready to log${live.length - readyCount > 0 ? ` · ${live.length - readyCount} need a pick` : ''}. Review, edit, or drop — then confirm.`}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {live.map(a => (
-              <ActionRow
-                key={a.id}
-                action={a}
-                result={results[a.id]}
-                onDrop={() => setDropped(prev => new Set(prev).add(a.id))}
-                onField={(k, v) => setField(a.id, k, v)}
-                onPick={tid => pick(a.id, tid)}
-                onNote={n => patchAction(a.id, { note: n })}
-              />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {INTAKE_CLUSTERS.map(cluster => {
+              const inCluster = live.filter(a => INTAKE_ACTION_META[a.type].cluster === cluster.id);
+              if (inCluster.length === 0) return null;
+              return (
+                <div key={cluster.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div
+                    style={{
+                      fontSize: 'var(--fs-3xs)',
+                      fontWeight: 600,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    {cluster.label}
+                  </div>
+                  {inCluster.map(a => (
+                    <ActionRow
+                      key={a.id}
+                      action={a}
+                      result={results[a.id]}
+                      onDrop={() => setDropped(prev => new Set(prev).add(a.id))}
+                      onField={(k, v) => setField(a.id, k, v)}
+                      onPick={tid => pick(a.id, tid)}
+                    />
+                  ))}
+                </div>
+              );
+            })}
           </div>
 
           <div
@@ -306,14 +341,12 @@ function ActionRow({
   onDrop,
   onField,
   onPick,
-  onNote,
 }: {
   action: ProposedAction;
   result?: { ok: boolean; error?: string };
   onDrop: () => void;
   onField: (key: string, value: FieldValue) => void;
   onPick: (targetId: string) => void;
-  onNote: (note: string) => void;
 }) {
   const meta = INTAKE_ACTION_META[action.type];
   const Icon = ICONS[meta.icon] ?? Target;

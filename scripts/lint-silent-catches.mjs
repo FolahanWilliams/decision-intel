@@ -298,7 +298,10 @@ const SCAN_DIR = join(ROOT, 'src');
 //     to empty context), parse (surfaces the API error), execAction (surfaces the
 //     per-action error before marking it failed). No write swallowed — the
 //     confirm-before-write executor reports each result to the founder.
-const SILENT_CATCH_BASELINE = 235;
+// 235 → 236 (Intake daily-fill expansion · 2026-06-07): +1 canonical res.json()
+//     body-parse on the new todos context fetch in DailyDumpPanel.fetchContext
+//     (degrades to empty todos — todo_complete matching still works on names).
+const SILENT_CATCH_BASELINE = 236;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
