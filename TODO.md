@@ -62,6 +62,19 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-07)
+
+**SAT Prep — founder-private study surface (founder-directed "afternoon" build; full prose in CLAUDE.md "SAT Prep" lock 2026-06-07).**
+
+- [x] **FOUNDER ACTION: run `npx prisma migrate deploy`** lock-step with the deploy — migration `20260607120000_sat_prep` (4 new additive tables only, zero-risk; pre-migration the routes fail-soft to empty).
+- [x] **FOUNDER ACTION: register for the SAT** — September (live-conditions benchmark) + November (the score that counts); Stanford superscores. Note: UC Berkeley is test-blind, so this is for Stanford + test-requiring privates only.
+- [x] 4 Prisma models (`SatErrorLogEntry` + `SatDailySession` + `SatTestResult` + `SatVocabCard`) + pure SSOT (`sat-content.ts`: digital-SAT skill taxonomy, root causes, score targets, XP, study-plan phases) + pure tested math (`sat-calibration.ts`: Brier calibration / weak-area ranking / projected score / streak, 20 vitest).
+- [x] 5 routes under `/api/founder-os/sat/` (error-log · sessions · tests · vocab w/ SM-2 reuse · AI-generate w/ mock fallback) + shell `SatPrepTab.tsx` + 4 surfaces (Daily Training · Official Test Log · Progress & Calibration · Vocab Bank). Tab registered in the founder-hub Foundations cluster (`sat_prep`).
+- [x] Load-bearing architecture: official tests = sole projected-score source; AI drills = targeted-reps-only (never the score); confidence-tagged Brier calibration loop; XP rewards inputs only. Companion plan at `docs/sat-study-plan.md`.
+- [x] Gates green: tsc clean (0 non-e2e errors) · 20/20 vitest · 4 lints (positioning · counts 73 · canonical-imports · silent-catches 226, +8 documented) · prettier · slop-scan 3.26.
+
+**Tailwind-literal-palette backlog cleared to 0 (full prose in CLAUDE.md "Tailwind-literal-palette washout" lock · Progress 2026-06-07).** Migrated ForgottenQuestionsTab's 3 blue usages → `var(--info)` (last platform doc-detail washout) + aligned `checkTailwindLiteralPalette` with its documented marketing-skip intent (the 12 CaseStudyCard/Gallery findings were marketing-by-rule). 14 → 0. Corrected the stale "14 = all false positives" note.
+
 ## Recently Completed (2026-06-06)
 
 **Enforcement-gate / concurrency-race sweep + the full analysis-quota reservation fix. Full prose in CLAUDE.md "Count-then-create race discipline + analysis-quota reservation (locked 2026-06-06)".**

@@ -213,6 +213,13 @@ const FaithOSTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const SatPrepTab = dynamic(
+  () =>
+    import('@/components/founder-hub/SatPrepTab').then(m => ({
+      default: m.SatPrepTab,
+    })),
+  { loading: tabLoader }
+);
 const VoiceActivityTab = dynamic(
   () =>
     import('@/components/founder-hub/VoiceActivityTab').then(m => ({
@@ -316,6 +323,7 @@ type TabId =
   | 'metrics'
   | 'founder_os'
   | 'faith_os'
+  | 'sat_prep'
   | 'todo';
 
 type TabGroup = 'Foundations' | 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -358,6 +366,8 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   // Rendered first (TAB_GROUPS lists 'Foundations' before 'Start') so the
   // literal-first surface is the foundation everything else is built on.
   { id: 'faith_os', label: 'Faith OS', icon: <BookOpen size={16} />, group: 'Foundations' },
+  // Personal study OS — SAT prep (founder-private; never on the customer dashboard).
+  { id: 'sat_prep', label: 'SAT Prep', icon: <GraduationCap size={16} />, group: 'Foundations' },
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
   // GTM v3.5 §11 (RATIFIED 2026-05-05) — the cognitive-discipline surface
@@ -537,6 +547,13 @@ type SearchEntry = {
 };
 
 const SEARCH_INDEX: SearchEntry[] = [
+  {
+    tabId: 'sat_prep',
+    section: 'SAT Prep',
+    preview: 'Daily drills, official test log, calibration loop, and SM-2 vocab. 1280 → 1550.',
+    keywords:
+      'sat prep study test score psat 1550 1280 stanford bluebook khan academy math reading writing rw vocab spaced repetition calibration brier error log weak areas drills daily training official test september november digital sat college board',
+  },
   {
     tabId: 'start',
     section: 'Start Here — 2-day study plan',
@@ -1908,6 +1925,11 @@ function renderTab(
     faith_os: (
       <ErrorBoundary sectionName="Faith OS">
         <FaithOSTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    sat_prep: (
+      <ErrorBoundary sectionName="SAT Prep">
+        <SatPrepTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };
