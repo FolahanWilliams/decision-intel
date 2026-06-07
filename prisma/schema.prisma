@@ -1621,12 +1621,39 @@ model SatErrorLogEntry {
   wasCorrect Boolean
   /// The question stem / what was missed / the rule — free text for review + SM-2.
   note       String?  @db.Text
+  /// Cached LLM Socratic explanation of the miss (the in-tab tutor layer).
+  explanation String? @db.Text
+  // ── Spaced-retrieval (SM-2) over the MISS itself — the active error loop.
+  // Misses (wasCorrect=false) are scheduled for review (nextDue set at create);
+  // correct attempts stay calibration substrate only (nextDue null). Reuses the
+  // Education Room applySm2 engine. reviewArchived retires a mastered miss.
+  easeFactor        Float     @default(2.5)
+  repetitions       Int       @default(0)
+  intervalDays      Int       @default(0)
+  lastReviewed      DateTime?
+  nextDue           DateTime?
+  totalReviews      Int       @default(0)
+  successfulReviews Int       @default(0)
+  reviewArchived    Boolean   @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@index([userId])
   @@index([userId, date])
   @@index([userId, section, skill])
+  @@index([userId, reviewArchived, nextDue])
+}
+
+/// SAT Prep founder-private settings (test dates for the countdown). One row
+/// per user; additive, optional everything.
+model SatSettings {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  /// YYYY-MM-DD of the benchmark (September) + target (November) sittings.
+  benchmarkTestDate String?
+  targetTestDate    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 /// One per-day SAT daily-training session. Tracks the input-streak + the

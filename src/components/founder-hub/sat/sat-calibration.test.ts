@@ -7,6 +7,10 @@ import {
   overconfidentMisses,
   computeProjectedScore,
   computeStreak,
+  computeCalibrationBySkill,
+  computeCalibrationTrend,
+  daysUntil,
+  isDueForReview,
   CALIBRATION_MIN_N,
   type ErrorEntryLite,
   type SessionLite,
@@ -205,5 +209,79 @@ describe('computeStreak', () => {
   it('dedupes multiple sessions on the same day', () => {
     const r = computeStreak([s('2026-06-07'), s('2026-06-07')], '2026-06-07');
     expect(r.current).toBe(1);
+  });
+});
+
+describe('computeCalibrationBySkill', () => {
+  it('buckets by skill and sorts most-overconfident first', () => {
+    const entries: ErrorEntryLite[] = [
+      // algebra: 5 confident-and-correct → well calibrated
+      ...Array.from({ length: 5 }, () => entry({ skill: 'algebra', confidence: 3, wasCorrect: true })),
+      // inferences: 5 confident-and-wrong → overconfident (big positive gap)
+      ...Array.from({ length: 5 }, () =>
+        entry({ skill: 'inferences', section: 'rw', confidence: 3, wasCorrect: false })
+      ),
+    ];
+    const out = computeCalibrationBySkill(entries);
+    expect(out[0].skill).toBe('inferences');
+    expect(out[0].band).toBe('overconfident');
+    expect(out.find((s) => s.skill === 'algebra')?.band).toBe('well_calibrated');
+  });
+
+  it('ignores untagged entries', () => {
+    const out = computeCalibrationBySkill([entry({ skill: 'algebra', confidence: null })]);
+    expect(out).toHaveLength(0);
+  });
+});
+
+describe('computeCalibrationTrend', () => {
+  it('buckets confidence-tagged entries into Sunday-start weeks', () => {
+    // 2026-06-07 is a Sunday; 2026-06-10 is the same week; 2026-06-15 next week.
+    const entries: ErrorEntryLite[] = [
+      entry({ date: '2026-06-07', confidence: 3, wasCorrect: true }),
+      entry({ date: '2026-06-10', confidence: 3, wasCorrect: true }),
+      entry({ date: '2026-06-15', confidence: 3, wasCorrect: false }),
+    ];
+    const trend = computeCalibrationTrend(entries);
+    expect(trend).toHaveLength(2);
+    expect(trend[0].weekStart).toBe('2026-06-07');
+    expect(trend[0].n).toBe(2);
+    expect(trend[1].n).toBe(1);
+    expect(trend[1].brier).toBe(0.903); // (0.95-0)^2 → round3
+  });
+
+  it('windows to the most recent N weeks', () => {
+    const entries: ErrorEntryLite[] = [];
+    // 10 distinct weeks
+    for (let w = 0; w < 10; w++) {
+      const d = new Date('2026-01-04T00:00:00Z'); // a Sunday
+      d.setUTCDate(d.getUTCDate() + w * 7);
+      entries.push(entry({ date: d.toISOString().slice(0, 10), confidence: 2, wasCorrect: true }));
+    }
+    expect(computeCalibrationTrend(entries, 4)).toHaveLength(4);
+  });
+});
+
+describe('daysUntil', () => {
+  it('counts forward days', () => {
+    expect(daysUntil('2026-11-08', '2026-11-01')).toBe(7);
+  });
+  it('is negative for past dates', () => {
+    expect(daysUntil('2026-06-01', '2026-06-07')).toBe(-6);
+  });
+});
+
+describe('isDueForReview', () => {
+  const now = new Date('2026-06-07T12:00:00Z').getTime();
+  it('schedules a miss with no due date as due now', () => {
+    expect(isDueForReview({ wasCorrect: false, nextDue: null }, now)).toBe(true);
+  });
+  it('excludes correct answers + archived', () => {
+    expect(isDueForReview({ wasCorrect: true, nextDue: null }, now)).toBe(false);
+    expect(isDueForReview({ wasCorrect: false, reviewArchived: true, nextDue: null }, now)).toBe(false);
+  });
+  it('respects a future due date', () => {
+    expect(isDueForReview({ wasCorrect: false, nextDue: '2026-06-10T00:00:00Z' }, now)).toBe(false);
+    expect(isDueForReview({ wasCorrect: false, nextDue: '2026-06-05T00:00:00Z' }, now)).toBe(true);
   });
 });

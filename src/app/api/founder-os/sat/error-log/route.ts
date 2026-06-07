@@ -21,6 +21,7 @@ import { authenticateFounderOs } from '@/lib/founder-os/auth';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { SAT_ROOT_CAUSE_IDS } from '@/components/founder-hub/sat/sat-content';
+import { applySm2, type SM2CardState } from '@/components/founder-hub/education/education-room-data';
 
 const log = createLogger('SatErrorLog');
 
@@ -47,6 +48,10 @@ interface PatchBody {
   confidence?: number | null;
   note?: string | null;
   wasCorrect?: boolean;
+  /** SM-2 self-grade 0-5 on a spaced review of this miss. */
+  reviewQuality?: number;
+  /** Retire a mastered miss from the review queue. */
+  reviewArchived?: boolean;
 }
 
 function cleanConfidence(v: unknown): number | null {
@@ -120,6 +125,9 @@ export async function POST(request: Request) {
         confidence: cleanConfidence(body.confidence),
         note,
         source,
+        // Schedule misses for spaced review immediately; correct attempts stay
+        // calibration substrate only (nextDue null = never in the review queue).
+        nextDue: body.wasCorrect ? null : new Date(),
       },
     });
     return apiSuccess({ data: { entry: created } });
@@ -156,6 +164,33 @@ export async function PATCH(request: Request) {
         typeof body.note === 'string' && body.note.trim() ? body.note.trim().slice(0, 2000) : null;
     }
     if (typeof body.wasCorrect === 'boolean') data.wasCorrect = body.wasCorrect;
+    if (typeof body.reviewArchived === 'boolean') data.reviewArchived = body.reviewArchived;
+
+    // Spaced-review self-grade → advance the SM-2 schedule on this miss.
+    if (body.reviewQuality !== undefined) {
+      const quality = Math.min(5, Math.max(0, Math.round(Number(body.reviewQuality) || 0)));
+      const prev: SM2CardState = {
+        cardId: existing.id,
+        easeFactor: existing.easeFactor,
+        repetitions: existing.repetitions,
+        intervalDays: existing.intervalDays,
+        lastReviewed: (existing.lastReviewed ?? new Date()).toISOString(),
+        nextDue: (existing.nextDue ?? new Date()).toISOString(),
+        totalReviews: existing.totalReviews,
+        successfulReviews: existing.successfulReviews,
+      };
+      const next = applySm2(prev, quality, existing.id);
+      data.easeFactor = next.easeFactor;
+      data.repetitions = next.repetitions;
+      data.intervalDays = next.intervalDays;
+      data.lastReviewed = new Date(next.lastReviewed);
+      data.nextDue = new Date(next.nextDue);
+      data.totalReviews = next.totalReviews;
+      data.successfulReviews = next.successfulReviews;
+      // Auto-retire a well-mastered miss (interval past ~3 weeks) from the queue.
+      if (next.intervalDays >= 21) data.reviewArchived = true;
+    }
+
     const entry = await prisma.satErrorLogEntry.update({ where: { id: existing.id }, data });
     return apiSuccess({ data: { entry } });
   } catch (err) {

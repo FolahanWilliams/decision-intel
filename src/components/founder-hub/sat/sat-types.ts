@@ -11,7 +11,20 @@ export interface SatErrorEntry {
   confidence: number | null;
   wasCorrect: boolean;
   note: string | null;
+  explanation: string | null;
+  // SM-2 spaced-review state over the miss itself (the active error loop).
+  nextDue: string | null;
+  reviewArchived: boolean;
+  repetitions: number;
+  intervalDays: number;
+  totalReviews: number;
+  successfulReviews: number;
   createdAt?: string;
+}
+
+export interface SatSettings {
+  benchmarkTestDate: string | null;
+  targetTestDate: string | null;
 }
 
 export interface SatSession {

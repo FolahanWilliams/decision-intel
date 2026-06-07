@@ -242,7 +242,90 @@ export function computeStreak(sessions: SessionLite[], todayIso?: string): Strea
   return { current, longest };
 }
 
+export interface SkillCalibration extends CalibrationResult {
+  skill: string;
+}
+
+/**
+ * Per-skill calibration — far more actionable than one global Brier ("you're
+ * overconfident on Inferences, fine on Algebra"). Returns skills with at least
+ * one confidence-tagged entry, sorted most-overconfident-first (then by sample).
+ */
+export function computeCalibrationBySkill(entries: ErrorEntryLite[]): SkillCalibration[] {
+  const bySkill = new Map<string, ErrorEntryLite[]>();
+  for (const e of entries) {
+    if (e.confidence === null || e.confidence === undefined) continue;
+    const arr = bySkill.get(e.skill) ?? [];
+    arr.push(e);
+    bySkill.set(e.skill, arr);
+  }
+  const out: SkillCalibration[] = [];
+  for (const [skill, arr] of bySkill) {
+    out.push({ skill, ...computeCalibration(arr) });
+  }
+  out.sort((a, b) => (b.gap ?? -Infinity) - (a.gap ?? -Infinity) || b.sampleSize - a.sampleSize);
+  return out;
+}
+
+export interface BrierTrendPoint {
+  weekStart: string; // YYYY-MM-DD (Sunday)
+  brier: number | null;
+  n: number;
+}
+
+/**
+ * Weekly Brier trend (is your calibration improving?). Buckets confidence-tagged
+ * entries into Sunday-start weeks (matches the app's Sunday-week convention),
+ * returns the most recent `weeks` buckets chronologically. Brier is null for a
+ * week with no tagged entries.
+ */
+export function computeCalibrationTrend(entries: ErrorEntryLite[], weeks = 8): BrierTrendPoint[] {
+  const tagged = entries.filter((e) => e.confidence !== null && e.confidence !== undefined);
+  const byWeek = new Map<string, ErrorEntryLite[]>();
+  for (const e of tagged) {
+    const wk = weekStartOf(e.date);
+    const arr = byWeek.get(wk) ?? [];
+    arr.push(e);
+    byWeek.set(wk, arr);
+  }
+  const sortedWeeks = Array.from(byWeek.keys()).sort();
+  const recent = sortedWeeks.slice(-weeks);
+  return recent.map((wk) => {
+    const arr = byWeek.get(wk)!;
+    let brierSum = 0;
+    for (const e of arr) {
+      const p = confidenceToProbability(e.confidence as number);
+      brierSum += (p - (e.wasCorrect ? 1 : 0)) ** 2;
+    }
+    return { weekStart: wk, brier: round3(brierSum / arr.length), n: arr.length };
+  });
+}
+
+/** Whole non-negative days from today to a target date (negative ⇒ past). */
+export function daysUntil(targetIso: string, todayIso?: string): number {
+  const today = todayIso ?? new Date().toISOString().slice(0, 10);
+  const a = new Date(today + 'T00:00:00Z').getTime();
+  const b = new Date(targetIso + 'T00:00:00Z').getTime();
+  return Math.round((b - a) / 86400000);
+}
+
+/** Is a logged miss due for spaced review? (pure; nextDue is an ISO string or null) */
+export function isDueForReview(
+  e: { wasCorrect: boolean; reviewArchived?: boolean; nextDue?: string | null },
+  nowMs: number = Date.now()
+): boolean {
+  if (e.wasCorrect || e.reviewArchived) return false;
+  if (!e.nextDue) return true; // scheduled-but-undated ⇒ due now
+  return new Date(e.nextDue).getTime() <= nowMs;
+}
+
 // ── helpers ──────────────────────────────────────────────────────────
+/** Sunday-start week key for an ISO date (matches the app's Sunday-week convention). */
+function weekStartOf(iso: string): string {
+  const d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - d.getUTCDay()); // back to Sunday
+  return d.toISOString().slice(0, 10);
+}
 function avg(xs: number[]): number {
   return xs.reduce((a, b) => a + b, 0) / xs.length;
 }

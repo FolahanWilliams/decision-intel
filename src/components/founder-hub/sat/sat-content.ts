@@ -293,3 +293,55 @@ export const SAT_STRATEGIC_NOTES = [
   'The digital SAT is adaptive (Bluebook) — question difficulty matters, not just count correct. Only official scoring is the truth.',
   'Vocab is de-emphasised on the digital SAT — it is words-in-context reasoning, not obscure-word recall. Keep the vocab block thin.',
 ] as const;
+
+/**
+ * Default test-date anchors for the countdown. The founder sets the real dates
+ * in the tab (persisted to SatSettings) — these are editable defaults, NOT a
+ * hardcoded claim about a specific College Board sitting (international digital
+ * SAT dates shift). Format YYYY-MM-DD.
+ */
+export const SAT_TEST_DATE_DEFAULTS = {
+  benchmark: '2026-09-13',
+  target: '2026-11-08',
+} as const;
+
+/** Daily review cadence — how many due error-cards to clear per session. */
+export const SAT_REVIEW_DAILY_TARGET = 8;
+
+/**
+ * The learning-science the system operationalises (founder is AP-Psych + bias-
+ * thesis literate, so named at the mechanism level). Surfaced lightly so the
+ * method is legible, not just asserted.
+ */
+export const SAT_LEARNING_SCIENCE = [
+  {
+    principle: 'Retrieval practice',
+    source: 'Roediger & Karpicke 2006',
+    application: 'Re-encountering a missed concept and recalling it beats re-reading. Every miss becomes a spaced review card.',
+  },
+  {
+    principle: 'Spacing effect',
+    source: 'Cepeda et al. 2006',
+    application: 'Review intervals expand as you get a card right (SM-2). Cards you miss come back sooner.',
+  },
+  {
+    principle: 'Interleaving',
+    source: 'Rohrer & Taylor 2007',
+    application: 'Mixing skills within a session beats blocking one skill — the daily drill rotates your weak skills.',
+  },
+  {
+    principle: 'Calibration / metacognition',
+    source: 'Kahneman; your own bias thesis',
+    application: 'Tag confidence before answering; the overconfident-and-wrong set is where a baited System-1 pattern lives.',
+  },
+  {
+    principle: 'Implementation intentions',
+    source: 'Gollwitzer 1999',
+    application: 'An if-then ("if it is 7pm, then I do my 30-min block") roughly doubles follow-through — pair it with the streak.',
+  },
+  {
+    principle: 'Desirable difficulties',
+    source: 'Bjork',
+    application: 'Effortful recall (not recognition) is what sticks — the review surface hides the answer until you have tried.',
+  },
+] as const;
