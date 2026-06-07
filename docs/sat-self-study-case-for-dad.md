@@ -29,7 +29,7 @@ That's personalised to _my_ error patterns in a way an hour-a-week tutor never c
 ## The plan — 30 focused minutes a day
 
 - **Now:** one official Bluebook full-length, timed, to get my real Reading↔Math split and weakest skills.
-- **Summer:** daily targeted drilling on my weakest skills + spaced review of past misses. Lock **Math toward 790–800 first** (it's finite, pattern-based, and my strongest area), then grind Reading & Writing.
+- **Summer:** daily targeted drilling on my weakest skills + spaced review of past misses. Push **Math first** — it's the more trainable half (finite and pattern-based) and the one with the most room to gain. My PSAT split was Reading & Writing 660 / Math 620, and one Math topic in particular (Advanced Math) is pulling the score down, so that's the first target. Then push Reading & Writing.
 - **September:** sit the real SAT as a live-conditions benchmark. (Stanford superscores — takes your best section across dates — so this one counts toward the final.)
 - **November:** the real push. **This is the score that matters.**
 

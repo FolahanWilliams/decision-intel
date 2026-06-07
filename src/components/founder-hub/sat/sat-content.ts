@@ -198,14 +198,59 @@ export const SAT_TEST_SOURCES = [
 /** Score goal config — the founder's target + the section strategy. */
 export const SAT_GOAL = {
   baselinePsat: 1280,
+  /** Real PSAT section split (Oct 2025): R&W is the STRONGER half, Math the weaker. */
+  baselineRW: 660,
+  baselineMath: 620,
   targetTotal: 1550,
-  /** Math is the trainable-to-ceiling section + the founder's edge — push it first. */
+  /**
+   * Math is the more-trainable section AND the weaker half (620 vs R&W 660), so it is
+   * the biggest point reservoir — push it first. Within Math, Advanced Math (PSAT band
+   * 470–540) is the standout weakness; Algebra (610–670, 35% of the section) is second.
+   */
   mathCeilingTarget: 790,
   rwTarget: 760,
   /** Test cadence: Sept benchmark (live conditions) → Nov score that counts. Stanford superscores. */
   benchmarkMonth: 'September',
   targetMonth: 'November',
   dailyMinutes: 30,
+} as const;
+
+/**
+ * The real PSAT/NMSQT baseline (grade 10, Oct 8 2025) — the honest starting
+ * point the whole plan targets, and the single source of truth for the section
+ * split + per-domain bands. The `band` values are the "Knowledge and Skills"
+ * performance bands from the score report; lower band = higher ROI. This is
+ * REFERENCE: the live weak-area map is still built from logged misses. It tells
+ * day-one drilling where to weight before the Bluebook diagnostic refines it.
+ *
+ * The standout finding: Advanced Math (470–540) sits ~140 pts below every other
+ * domain AND is 32.5% of the Math section — the single biggest score lever.
+ */
+export const SAT_PSAT_BASELINE = {
+  date: '2025-10-08',
+  total: 1280,
+  rw: 660,
+  math: 620,
+  selectionIndex: 194,
+  domains: {
+    rw: [
+      { domain: 'Craft and Structure', weightPct: 28, band: '680-760', tier: 'strong' },
+      { domain: 'Information and Ideas', weightPct: 26, band: '610-670', tier: 'mid' },
+      { domain: 'Standard English Conventions', weightPct: 26, band: '610-670', tier: 'mid' },
+      { domain: 'Expression of Ideas', weightPct: 20, band: '610-670', tier: 'mid' },
+    ],
+    math: [
+      { domain: 'Advanced Math', weightPct: 32.5, band: '470-540', tier: 'weak' },
+      { domain: 'Algebra', weightPct: 35, band: '610-670', tier: 'mid' },
+      {
+        domain: 'Problem-Solving and Data Analysis',
+        weightPct: 20,
+        band: '680-760',
+        tier: 'strong',
+      },
+      { domain: 'Geometry and Trigonometry', weightPct: 12.5, band: '680-760', tier: 'strong' },
+    ],
+  },
 } as const;
 
 /**
@@ -265,7 +310,7 @@ export const SAT_PLAN: SatPlanPhase[] = [
     title: 'Lock Math toward the ceiling',
     window: 'Weeks 2–6',
     focus:
-      'Math is finite, pattern-based, and your edge — drive it to 780–800 first. Daily 30-min drills on your weakest Math skills (from the log), interleaved. Every miss → root cause → flashcard. Re-test a Bluebook Math section every ~2 weeks to confirm the climb.',
+      'Math is finite, pattern-based, and your biggest point reservoir — it is your WEAKER half (620 vs 660 R&W), and one domain, Advanced Math (PSAT band 470–540), is dragging it down. Lead with Advanced Math, then Algebra (your biggest-weight Math domain, 35%). Drive Math toward the high-700s. Daily 30-min drills on your weakest Math skills (from the log), interleaved. Every miss → root cause → flashcard. Re-test a Bluebook Math section every ~2 weeks to confirm the climb.',
     exit: 'Math practice sections landing 770+ consistently.',
   },
   {
@@ -292,6 +337,7 @@ export const SAT_STRATEGIC_NOTES = [
   'Stanford superscores: take it in Sept (benchmark) AND Nov (the real push); the best section scores across dates composite.',
   'The digital SAT is adaptive (Bluebook) — question difficulty matters, not just count correct. Only official scoring is the truth.',
   'Vocab is de-emphasised on the digital SAT — it is words-in-context reasoning, not obscure-word recall. Keep the vocab block thin.',
+  'National Merit bonus: your JUNIOR-year PSAT (fall 2026) is the qualifying one — the 2025 sophomore Selection Index (194) does not count. The Selection Index double-weights R&W ((2×R&W + Math) / 10), so R&W gains carry extra leverage there (not on the SAT total, where R&W and Math are equal). Same study, two payoffs.',
 ] as const;
 
 /**
