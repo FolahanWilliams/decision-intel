@@ -64,7 +64,17 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-06-07)
 
-**SAT Prep — founder-private study surface (founder-directed "afternoon" build; full prose in CLAUDE.md "SAT Prep" lock 2026-06-07).**
+**SAT Prep v2 — all-improvements boil-the-ocean (founder "boil the ocean, goal is consistency + 1550"; full prose in CLAUDE.md "SAT Prep v2" sub-lock).** All 4 improvement bundles, autonomous, 3 commits, gates green.
+
+- [x] **FOUNDER ACTION: `npx prisma migrate deploy`** now picks up TWO migrations (`20260607120000_sat_prep` + `20260607130000_sat_prep_v2`) — additive, zero-risk.
+- [x] **Active error loop** — misses become SM-2 spaced-review cards (new Review tab: recall→self-grade→reschedule) + "Explain this miss" Grok tutor (caches on the row, never fabricates the question).
+- [x] **Real-test miss capture** — Test Log per-skill tap grid (`official_test`) so weak-areas + Brier are built on REAL Bluebook questions, not just AI drills.
+- [x] **Per-skill calibration + Brier-trend sparkline** in Progress (+9 vitest, 29 total).
+- [x] **Consistency engine** — editable test-date countdown (SatSettings), SAT wired into The Build campaign as inputs-only XP (guardrail extended), Start Here daily reminder card (Gollwitzer if-then framing). `SAT_LEARNING_SCIENCE` SSOT (6 anchors).
+- [x] Deferred (founder-gated, recorded): per-question drill timing · cron email nudge · voice SAT-tutor persona. Each with rationale in the lock.
+- [x] Gates: tsc 0 non-e2e · 42/42 vitest (campaign 13 + calibration 29) · positioning · counts 73 · canonical-imports · silent-catches 218→231 (documented) · prettier · slop-scan 3.25.
+
+**SAT Prep v1 — founder-private study surface (founder-directed "afternoon" build; full prose in CLAUDE.md "SAT Prep" lock 2026-06-07).**
 
 - [x] **FOUNDER ACTION: run `npx prisma migrate deploy`** lock-step with the deploy — migration `20260607120000_sat_prep` (4 new additive tables only, zero-risk; pre-migration the routes fail-soft to empty).
 - [x] **FOUNDER ACTION: register for the SAT** — September (live-conditions benchmark) + November (the score that counts); Stanford superscores. Note: UC Berkeley is test-blind, so this is for Stanford + test-requiring privates only.
