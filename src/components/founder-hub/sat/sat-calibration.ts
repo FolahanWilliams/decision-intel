@@ -319,6 +319,81 @@ export function isDueForReview(
   return new Date(e.nextDue).getTime() <= nowMs;
 }
 
+// ── vocab SR: honest-quality from confidence + response time ──────────
+/** ≤ this (ms) on a correct answer = fast/solid recall → bump quality. */
+export const VOCAB_FAST_MS = 4000;
+/** ≥ this (ms) on a correct answer = shaky recall → nudge quality down (but never below passing). */
+export const VOCAB_SLOW_MS = 12000;
+/** EMA smoothing for the per-card response-time signal. */
+export const VOCAB_EMA_ALPHA = 0.3;
+
+/**
+ * Map a vocab attempt to an SM-2 quality (0-5) that is HONEST about confidence
+ * and speed — then fed into the UNCHANGED shared `applySm2` (never fork it).
+ * This is the calibration loop applied to scheduling:
+ *   - wrong + confident (≥2) → 0  (the baited System-1 miss — the worst case)
+ *   - wrong + unsure         → 1  (a lapse, but you knew you didn't know)
+ *   - correct + certain (3)  → 5
+ *   - correct + unsure (≤1)  → 3  (you guessed right — don't over-extend the interval)
+ *   - correct + fairly sure  → 4
+ *   - then a response-time nudge on CORRECT answers only (fast → +1 cap 5;
+ *     slow → −1, floored at 3 so a correct answer never resets the SM-2 streak).
+ */
+export function effectiveQuality(input: {
+  correct: boolean;
+  confidence: number | null;
+  responseMs?: number | null;
+}): number {
+  const c = input.confidence ?? 1;
+  if (!input.correct) {
+    return c >= OVERCONFIDENT_THRESHOLD ? 0 : 1;
+  }
+  let q = 4;
+  if (c >= 3) q = 5;
+  else if (c <= 1) q = 3;
+  const ms = input.responseMs;
+  if (ms != null && ms > 0) {
+    if (ms <= VOCAB_FAST_MS) q = Math.min(5, q + 1);
+    else if (ms >= VOCAB_SLOW_MS) q = Math.max(3, q - 1);
+  }
+  return q;
+}
+
+/** Rolling EMA of response time (ms). First sample seeds the average. */
+export function updateResponseMsEma(prev: number | null | undefined, responseMs: number): number {
+  if (responseMs <= 0) return prev ?? 0;
+  if (prev == null || prev <= 0) return Math.round(responseMs);
+  return Math.round(prev + VOCAB_EMA_ALPHA * (responseMs - prev));
+}
+
+/**
+ * Per-quiz-type failure memory: a miss adds the type, a pass removes it. Adaptive
+ * mode then drills the angle you actually fail, not just whether you know the word.
+ */
+export function nextFailedTypes(prev: string[], quizType: string, correct: boolean): string[] {
+  const set = new Set(prev);
+  if (correct) set.delete(quizType);
+  else set.add(quizType);
+  return Array.from(set);
+}
+
+/**
+ * Adaptive type selection: prefer a type this card has FAILED (the weak angle);
+ * otherwise rotate deterministically (rotation = totalReviews) so the angle
+ * varies across sessions. Pure — no Math.random, so it's testable + resume-safe.
+ */
+export function pickAdaptiveQuizType<T extends string>(
+  available: T[],
+  failedTypes: string[],
+  rotation: number
+): T | null {
+  if (available.length === 0) return null;
+  const weak = available.find(t => failedTypes.includes(t));
+  if (weak) return weak;
+  const idx = ((Math.round(rotation) % available.length) + available.length) % available.length;
+  return available[idx];
+}
+
 // ── helpers ──────────────────────────────────────────────────────────
 /** Sunday-start week key for an ISO date (matches the app's Sunday-week convention). */
 function weekStartOf(iso: string): string {

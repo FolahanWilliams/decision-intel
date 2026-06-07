@@ -397,3 +397,63 @@ export const SAT_LEARNING_SCIENCE = [
       'Effortful recall (not recognition) is what sticks — the review surface hides the answer until you have tried.',
   },
 ] as const;
+
+/**
+ * Vocab REVIEW types — the SAT-relevant subset (NOT a 12-type kitchen sink). The
+ * digital SAT tests words IN CONTEXT, so `cloze` is the most test-aligned drill.
+ * Adaptive mode targets a word's weak angle via its `failedTypes` memory.
+ */
+export const SAT_VOCAB_QUIZ_TYPES = [
+  {
+    id: 'cloze',
+    label: 'Context cloze',
+    blurb:
+      'Drop the word into a sentence — the most test-aligned drill (the SAT tests words in context).',
+  },
+  { id: 'definition', label: 'Word → meaning', blurb: 'Pick the definition that fits the word.' },
+  { id: 'reverse', label: 'Meaning → word', blurb: 'Pick the word that fits the definition.' },
+  { id: 'synonym', label: 'Synonym', blurb: 'Pick the closest in meaning.' },
+  { id: 'antonym', label: 'Antonym', blurb: 'Pick the opposite.' },
+] as const;
+export type SatVocabQuizType = (typeof SAT_VOCAB_QUIZ_TYPES)[number]['id'];
+export const SAT_VOCAB_QUIZ_TYPE_IDS = SAT_VOCAB_QUIZ_TYPES.map(t => t.id) as SatVocabQuizType[];
+
+/**
+ * Word-quality discipline for the generator (the "no more 'underscore'" fix).
+ * The SSOT for difficulty: a 1550-ceiling card must be a nuanced, mid-to-advanced
+ * word that appears on HARD adaptive R&W "words in context" items — never a common
+ * word a strong reader already owns. The generator reads BOTH lists.
+ */
+export const SAT_VOCAB_GEN = {
+  /** Too common to be worth a card at the 1550 ceiling — avoid these AND their tier. */
+  tooEasyExamples: [
+    'underscore',
+    'mitigate',
+    'pragmatic',
+    'ambivalent',
+    'benefit',
+    'analyze',
+    'significant',
+    'establish',
+    'highlight',
+    'crucial',
+  ],
+  /** The target tier — nuanced academic words a strong reader still has to reason about. */
+  targetExamples: [
+    'ostensible',
+    'tractable',
+    'tenuous',
+    'salient',
+    'equivocal',
+    'sanguine',
+    'prosaic',
+    'capricious',
+    'laconic',
+    'sardonic',
+    'cogent',
+    'tenable',
+    'circumspect',
+    'pellucid',
+    'inveterate',
+  ],
+} as const;

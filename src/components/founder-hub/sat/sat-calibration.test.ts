@@ -11,6 +11,12 @@ import {
   computeCalibrationTrend,
   daysUntil,
   isDueForReview,
+  effectiveQuality,
+  updateResponseMsEma,
+  nextFailedTypes,
+  pickAdaptiveQuizType,
+  VOCAB_FAST_MS,
+  VOCAB_SLOW_MS,
   CALIBRATION_MIN_N,
   type ErrorEntryLite,
   type SessionLite,
@@ -287,5 +293,86 @@ describe('isDueForReview', () => {
   it('respects a future due date', () => {
     expect(isDueForReview({ wasCorrect: false, nextDue: '2026-06-10T00:00:00Z' }, now)).toBe(false);
     expect(isDueForReview({ wasCorrect: false, nextDue: '2026-06-05T00:00:00Z' }, now)).toBe(true);
+  });
+});
+
+describe('effectiveQuality (honest vocab SR)', () => {
+  it('wrong + confident is the worst case (0) — the baited System-1 miss', () => {
+    expect(effectiveQuality({ correct: false, confidence: 2 })).toBe(0);
+    expect(effectiveQuality({ correct: false, confidence: 3 })).toBe(0);
+  });
+  it('wrong + unsure is a lesser lapse (1)', () => {
+    expect(effectiveQuality({ correct: false, confidence: 0 })).toBe(1);
+    expect(effectiveQuality({ correct: false, confidence: 1 })).toBe(1);
+    expect(effectiveQuality({ correct: false, confidence: null })).toBe(1);
+  });
+  it('correct + certain is 5; correct + fairly-sure is 4', () => {
+    expect(effectiveQuality({ correct: true, confidence: 3 })).toBe(5);
+    expect(effectiveQuality({ correct: true, confidence: 2 })).toBe(4);
+  });
+  it('correct but unsure is downgraded to 3 (you guessed right — do not over-extend)', () => {
+    expect(effectiveQuality({ correct: true, confidence: 1 })).toBe(3);
+    expect(effectiveQuality({ correct: true, confidence: 0 })).toBe(3);
+  });
+  it('fast + correct bumps quality (capped at 5)', () => {
+    expect(effectiveQuality({ correct: true, confidence: 2, responseMs: VOCAB_FAST_MS - 1 })).toBe(
+      5
+    );
+    // already-5 stays 5
+    expect(effectiveQuality({ correct: true, confidence: 3, responseMs: VOCAB_FAST_MS - 1 })).toBe(
+      5
+    );
+  });
+  it('slow + correct nudges down but never resets the streak (floored at 3)', () => {
+    expect(effectiveQuality({ correct: true, confidence: 2, responseMs: VOCAB_SLOW_MS + 1 })).toBe(
+      3
+    );
+    // unsure-correct (3) slow stays at the 3 floor, never drops to a failing <3
+    expect(effectiveQuality({ correct: true, confidence: 1, responseMs: VOCAB_SLOW_MS + 1 })).toBe(
+      3
+    );
+  });
+  it('a wrong answer ignores response time entirely', () => {
+    expect(effectiveQuality({ correct: false, confidence: 0, responseMs: 100 })).toBe(1);
+  });
+});
+
+describe('updateResponseMsEma', () => {
+  it('seeds with the first sample', () => {
+    expect(updateResponseMsEma(null, 5000)).toBe(5000);
+    expect(updateResponseMsEma(0, 5000)).toBe(5000);
+  });
+  it('moves toward the new sample by alpha', () => {
+    expect(updateResponseMsEma(5000, 10000)).toBe(6500); // 5000 + 0.3*5000
+  });
+  it('ignores non-positive samples', () => {
+    expect(updateResponseMsEma(5000, 0)).toBe(5000);
+  });
+});
+
+describe('nextFailedTypes (per-type failure memory)', () => {
+  it('adds a type on a miss, removes it on a pass, dedupes', () => {
+    expect(nextFailedTypes([], 'cloze', false)).toEqual(['cloze']);
+    expect(nextFailedTypes(['cloze'], 'cloze', false)).toEqual(['cloze']);
+    expect(nextFailedTypes(['cloze', 'definition'], 'cloze', true)).toEqual(['definition']);
+    expect(nextFailedTypes(['definition'], 'cloze', true)).toEqual(['definition']);
+  });
+});
+
+describe('pickAdaptiveQuizType', () => {
+  const all = ['cloze', 'definition', 'reverse'] as const;
+  it('returns null when no types are available', () => {
+    expect(pickAdaptiveQuizType([], [], 0)).toBeNull();
+  });
+  it('prefers a failed (weak-angle) type that is available', () => {
+    expect(pickAdaptiveQuizType([...all], ['reverse'], 0)).toBe('reverse');
+  });
+  it('rotates deterministically when there is no weak angle', () => {
+    expect(pickAdaptiveQuizType([...all], [], 0)).toBe('cloze');
+    expect(pickAdaptiveQuizType([...all], [], 1)).toBe('definition');
+    expect(pickAdaptiveQuizType([...all], [], 3)).toBe('cloze');
+  });
+  it('ignores a failed type that is not currently available', () => {
+    expect(pickAdaptiveQuizType([...all], ['synonym'], 1)).toBe('definition');
   });
 });

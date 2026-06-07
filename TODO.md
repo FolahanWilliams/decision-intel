@@ -64,6 +64,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-06-07)
 
+**SAT Prep v3 — vocab engine (founder "fix low-level words + sloppy SR + tie in my old Forge/WordForge"; full prose in CLAUDE.md "SAT Prep v3 — vocab engine" sub-lock).** Scoped via AskUserQuestion: full adaptive engine, MindForge deliberately skipped.
+
+- [x] **FOUNDER ACTION: a 3rd SAT migration — `npx prisma migrate deploy` now picks up all three** (`20260607120000_sat_prep` + `_v2` + new `20260607140000_sat_vocab_engine`; additive substrate + SR-richness columns on `SatVocabCard`, zero-risk).
+- [x] Word quality: hard difficulty floor + easy-word exclusion + dedup against existing words (`SAT_VOCAB_GEN` SSOT) + full substrate (IPA/synonyms/antonyms/related/cloze) + upgraded 4-word hard mock. No more "underscore".
+- [x] Honest SR WITHOUT forking `applySm2`: pure `effectiveQuality(correct, confidence, responseMs)` → smarter SM-2 quality input (wrong+confident→0, correct+unsure→3, certain→5, fast→+1, slow→floor 3) + response-time EMA + per-quiz-type failure memory. 15 new vitest (44 total).
+- [x] Multi-type adaptive review (context cloze + definition both ways + synonym/antonym; weak-angle targeting via `failedTypes`; confidence + response-time capture; graceful recall fallback). Richer cards (IPA, relation chips, your-own-mnemonic, reveal-on-demand AI hint).
+- [x] Deliberately skipped (recorded, founder-confirmed): MindForge (off-target for SAT R&W; comms training lives in Sparring/Education), the RPG combat economy (inputs-only XP lock), the knowledge graph.
+- [x] Gates: tsc clean · 44/44 sat vitest · 5 lints (silent-catches 231 unchanged) · prettier · slop-scan.
+
 **SAT Prep v2 — all-improvements boil-the-ocean (founder "boil the ocean, goal is consistency + 1550"; full prose in CLAUDE.md "SAT Prep v2" sub-lock).** All 4 improvement bundles, autonomous, 3 commits, gates green.
 
 - [x] **FOUNDER ACTION: `npx prisma migrate deploy`** now picks up TWO migrations (`20260607120000_sat_prep` + `20260607130000_sat_prep_v2`) — additive, zero-risk.

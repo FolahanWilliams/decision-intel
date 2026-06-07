@@ -1718,8 +1718,16 @@ model SatVocabCard {
   definition        String    @db.Text
   partOfSpeech      String?
   mnemonic          String?   @db.Text
+  /// The founder's OWN mnemonic (the generation effect — self-made aids stick harder).
+  userMnemonic      String?   @db.Text
   etymology         String?   @db.Text
   exampleSentence   String?   @db.Text
+  /// Quiz substrate (generated): IPA + relations + a cloze sentence with the word blanked.
+  ipa               String?
+  synonyms          String[]  @default([])
+  antonyms          String[]  @default([])
+  relatedWords      String[]  @default([])
+  clozeSentence     String?   @db.Text
   /// 'new' | 'learning' | 'reviewing' | 'mastered' (derived from SM-2 state).
   status            String    @default("new")
   easeFactor        Float     @default(2.5)
@@ -1729,6 +1737,10 @@ model SatVocabCard {
   nextDue           DateTime?
   totalReviews      Int       @default(0)
   successfulReviews Int       @default(0)
+  /// Honest-SR signal: rolling response-time EMA (ms) + per-quiz-type failure memory.
+  responseMsEma       Float?
+  failedTypes         String[] @default([])
+  consecutiveFailures Int      @default(0)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

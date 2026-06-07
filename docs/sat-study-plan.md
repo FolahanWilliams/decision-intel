@@ -32,7 +32,7 @@ from your data, not a fixed syllabus.
 
 1. **~5 min — Review tab.** Clear your due cards: each is a past miss — recall the concept + the trap _before_ you reveal it (retrieval beats re-reading), then self-grade. Hit "Explain this miss" on anything fuzzy. The tab badge shows how many are due.
 2. **~20 min — targeted drilling.** Daily Training → pick your weakest skill (it pre-selects from the error log) → `Generate 3 drills`. **Tag your confidence _before_ you answer** (the calibration loop). On a miss, tag the root cause — it becomes a Review card automatically.
-3. **~5 min — vocab.** Vocab Bank → clear your due cards (SM-2).
+3. **~5 min — vocab.** Vocab Bank → clear your due cards. It's now an adaptive drill (context cloze + definition both ways + synonym/antonym), not a flip-card: tag confidence before you answer, and a confident-but-wrong miss is scheduled hardest (the calibration loop applied to vocab). Keep this block thin — the digital SAT is words-in-context, not rare-word recall.
 4. **Mark the session complete.** The streak rewards _showing up_, never the score — and it feeds your campaign XP on Start Here.
 
 After a Bluebook full-length: **Test Log → "Log this test's misses"** — tap each skill you missed so your weak-area map + calibration are built on real questions (and each becomes a Review card).

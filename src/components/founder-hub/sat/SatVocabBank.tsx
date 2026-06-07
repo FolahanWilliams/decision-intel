@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Sparkles, Plus, BookOpen, Trash2 } from 'lucide-react';
+import { Sparkles, Plus, BookOpen, Trash2, Lightbulb, Check } from 'lucide-react';
 import type { SatVocab, GenVocabWord } from './sat-types';
+import { SatVocabReview } from './SatVocabReview';
 
 interface Props {
   headers: Record<string, string>;
@@ -31,27 +32,14 @@ const STATUS_TONE: Record<string, string> = {
   reviewing: 'var(--info)',
   mastered: 'var(--success)',
 };
-const QUALITY = [
-  { q: 1, label: 'Again' },
-  { q: 3, label: 'Hard' },
-  { q: 4, label: 'Good' },
-  { q: 5, label: 'Easy' },
-];
 
 export function SatVocabBank({ headers, vocab, onChanged }: Props) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [revealed, setRevealed] = useState(false);
   const [gen, setGen] = useState<GenVocabWord[] | null>(null);
   const [loadingGen, setLoadingGen] = useState(false);
   const [word, setWord] = useState('');
   const [definition, setDefinition] = useState('');
-
-  const dueCards = useMemo(
-    () => vocab.filter(c => !c.nextDue || new Date(c.nextDue) <= new Date()),
-    [vocab]
-  );
-  const reviewCard = dueCards[0] ?? null;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -62,18 +50,6 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
     });
   }, [vocab, search, statusFilter]);
 
-  async function review(id: string, q: number) {
-    setRevealed(false);
-    await fetch('/api/founder-os/sat/vocab', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ id, quality: q }),
-    }).catch(() => {
-      /* best-effort */
-    });
-    onChanged();
-  }
-
   async function generate() {
     setLoadingGen(true);
     setGen(null);
@@ -81,7 +57,7 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
       const res = await fetch('/api/founder-os/sat/generate', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ kind: 'vocab', count: 4 }),
+        body: JSON.stringify({ kind: 'vocab', count: 4, exclude: vocab.map(v => v.word) }),
       });
       const body = await res.json().catch(() => null);
       setGen((body?.data?.words as GenVocabWord[]) ?? []);
@@ -110,6 +86,17 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
     setDefinition('');
   }
 
+  async function saveMnemonic(id: string, userMnemonic: string) {
+    await fetch('/api/founder-os/sat/vocab', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ id, userMnemonic }),
+    }).catch(() => {
+      /* best-effort */
+    });
+    onChanged();
+  }
+
   async function remove(id: string) {
     await fetch(`/api/founder-os/sat/vocab?id=${encodeURIComponent(id)}`, {
       method: 'DELETE',
@@ -122,46 +109,8 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Review due */}
-      {reviewCard && (
-        <div style={{ ...cardStyle, borderTop: '3px solid var(--success)' }}>
-          <div style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)', marginBottom: 6 }}>
-            {dueCards.length} due · spaced repetition
-          </div>
-          <div style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, color: 'var(--text-primary)' }}>
-            {reviewCard.word}
-          </div>
-          {!revealed ? (
-            <button onClick={() => setRevealed(true)} style={{ ...secondaryBtn, marginTop: 10 }}>
-              Reveal
-            </button>
-          ) : (
-            <>
-              <p
-                style={{
-                  fontSize: 'var(--fs-sm)',
-                  color: 'var(--text-secondary)',
-                  margin: '8px 0',
-                }}
-              >
-                {reviewCard.definition}
-                {reviewCard.exampleSentence ? (
-                  <em style={{ display: 'block', color: 'var(--text-muted)', marginTop: 4 }}>
-                    &ldquo;{reviewCard.exampleSentence}&rdquo;
-                  </em>
-                ) : null}
-              </p>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {QUALITY.map(x => (
-                  <button key={x.q} onClick={() => review(reviewCard.id, x.q)} style={secondaryBtn}>
-                    {x.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      {/* Adaptive review */}
+      <SatVocabReview headers={headers} vocab={vocab} onChanged={onChanged} />
 
       {/* Add / generate */}
       <div style={cardStyle}>
@@ -175,6 +124,9 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
           >
             <Sparkles size={13} /> {loadingGen ? 'Generating…' : 'Generate 4'}
           </button>
+        </div>
+        <div style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)', marginBottom: 8 }}>
+          Hard, 1550-ceiling words only — excludes ones you already have.
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <input
@@ -209,6 +161,11 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
             ))}
           </div>
         )}
+        {gen && gen.length === 0 && (
+          <p style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)', marginTop: 8 }}>
+            Nothing new to add right now — you may already have these.
+          </p>
+        )}
       </div>
 
       {/* Library */}
@@ -239,91 +196,184 @@ export function SatVocabBank({ headers, vocab, onChanged }: Props) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {filtered.map(c => (
-              <details
-                key={c.id}
-                style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 6 }}
-              >
-                <summary
-                  style={{
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: 'var(--fs-sm)',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      background: STATUS_TONE[c.status] ?? 'var(--text-muted)',
-                    }}
-                  />
-                  <strong>{c.word}</strong>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
-                    {c.status}
-                  </span>
-                </summary>
-                <div style={{ paddingLeft: 16, paddingTop: 4 }}>
-                  <p
-                    style={{
-                      fontSize: 'var(--fs-2xs)',
-                      color: 'var(--text-secondary)',
-                      margin: '4px 0',
-                    }}
-                  >
-                    {c.definition}
-                  </p>
-                  {c.mnemonic && (
-                    <p
-                      style={{
-                        fontSize: 'var(--fs-3xs)',
-                        color: 'var(--text-muted)',
-                        margin: '2px 0',
-                      }}
-                    >
-                      💡 {c.mnemonic}
-                    </p>
-                  )}
-                  {c.exampleSentence && (
-                    <p
-                      style={{
-                        fontSize: 'var(--fs-3xs)',
-                        color: 'var(--text-muted)',
-                        margin: '2px 0',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      &ldquo;{c.exampleSentence}&rdquo;
-                    </p>
-                  )}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                    <span style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)' }}>
-                      {c.successfulReviews}/{c.totalReviews} reviews
-                    </span>
-                    <button
-                      onClick={() => remove(c.id)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: 'var(--text-muted)',
-                      }}
-                      aria-label="Delete word"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
-              </details>
+              <VocabRow key={c.id} card={c} onSaveMnemonic={saveMnemonic} onRemove={remove} />
             ))}
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function VocabRow({
+  card,
+  onSaveMnemonic,
+  onRemove,
+}: {
+  card: SatVocab;
+  onSaveMnemonic: (id: string, text: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  const [aidDraft, setAidDraft] = useState(card.userMnemonic ?? '');
+  const [hintShown, setHintShown] = useState(false);
+  const dirty = aidDraft.trim() !== (card.userMnemonic ?? '').trim();
+
+  return (
+    <details style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 6 }}>
+      <summary
+        style={{
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text-primary)',
+        }}
+      >
+        <span
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: STATUS_TONE[card.status] ?? 'var(--text-muted)',
+          }}
+        />
+        <strong>{card.word}</strong>
+        {card.ipa && (
+          <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>{card.ipa}</span>
+        )}
+        <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)', marginLeft: 'auto' }}>
+          {card.status}
+        </span>
+      </summary>
+      <div style={{ paddingLeft: 16, paddingTop: 4 }}>
+        <p style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-secondary)', margin: '4px 0' }}>
+          {card.partOfSpeech ? (
+            <em style={{ color: 'var(--text-muted)' }}>{card.partOfSpeech} · </em>
+          ) : null}
+          {card.definition}
+        </p>
+        {card.exampleSentence && (
+          <p
+            style={{
+              fontSize: 'var(--fs-3xs)',
+              color: 'var(--text-muted)',
+              margin: '2px 0',
+              fontStyle: 'italic',
+            }}
+          >
+            &ldquo;{card.exampleSentence}&rdquo;
+          </p>
+        )}
+        {card.etymology && (
+          <p style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)', margin: '2px 0' }}>
+            ⚯ {card.etymology}
+          </p>
+        )}
+
+        {/* relation chips */}
+        {(card.synonyms.length > 0 || card.antonyms.length > 0 || card.relatedWords.length > 0) && (
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', margin: '6px 0' }}>
+            {card.synonyms.map(s => (
+              <span key={`s-${s}`} style={relChip('var(--success)')}>
+                = {s}
+              </span>
+            ))}
+            {card.antonyms.map(a => (
+              <span key={`a-${a}`} style={relChip('var(--error)')}>
+                ≠ {a}
+              </span>
+            ))}
+            {card.relatedWords.map(r => (
+              <span key={`r-${r}`} style={relChip('var(--info)')}>
+                ~ {r}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Your own memory aid (the generation effect) */}
+        <div style={{ margin: '8px 0' }}>
+          <div style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)', marginBottom: 3 }}>
+            Your memory aid (self-made aids stick harder)
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input
+              value={aidDraft}
+              onChange={e => setAidDraft(e.target.value)}
+              placeholder="write your own hook…"
+              style={{ ...inputStyle, flex: 1, fontSize: 'var(--fs-3xs)', padding: '4px 8px' }}
+            />
+            {dirty && (
+              <button
+                onClick={() => onSaveMnemonic(card.id, aidDraft.trim())}
+                style={{ ...chipBtn, borderColor: 'var(--success)', color: 'var(--success)' }}
+                aria-label="Save memory aid"
+              >
+                <Check size={12} /> Save
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* AI hint — hidden until you've tried yourself */}
+        {card.mnemonic &&
+          (hintShown ? (
+            <p style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)', margin: '4px 0' }}>
+              💡 {card.mnemonic}
+            </p>
+          ) : (
+            <button
+              onClick={() => setHintShown(true)}
+              style={{
+                ...chipBtn,
+                marginTop: 2,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <Lightbulb size={12} /> Reveal AI hint
+            </button>
+          ))}
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+          <span style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)' }}>
+            {card.successfulReviews}/{card.totalReviews} reviews
+          </span>
+          {card.responseMsEma != null && card.responseMsEma > 0 && (
+            <span style={{ fontSize: 'var(--fs-3xs)', color: 'var(--text-muted)' }}>
+              ~{(card.responseMsEma / 1000).toFixed(1)}s recall
+            </span>
+          )}
+          <button
+            onClick={() => onRemove(card.id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              marginLeft: 'auto',
+            }}
+            aria-label="Delete word"
+          >
+            <Trash2 size={13} />
+          </button>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function relChip(color: string): React.CSSProperties {
+  return {
+    padding: '1px 7px',
+    borderRadius: 'var(--radius-full)',
+    border: `1px solid color-mix(in srgb, ${color} 35%, transparent)`,
+    background: `color-mix(in srgb, ${color} 8%, transparent)`,
+    color,
+    fontSize: 'var(--fs-3xs)',
+  };
 }
 
 const primaryBtn: React.CSSProperties = {

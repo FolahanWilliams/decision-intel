@@ -60,8 +60,14 @@ export interface SatVocab {
   definition: string;
   partOfSpeech: string | null;
   mnemonic: string | null;
+  userMnemonic: string | null;
   etymology: string | null;
   exampleSentence: string | null;
+  ipa: string | null;
+  synonyms: string[];
+  antonyms: string[];
+  relatedWords: string[];
+  clozeSentence: string | null;
   status: string;
   easeFactor: number;
   repetitions: number;
@@ -70,6 +76,9 @@ export interface SatVocab {
   nextDue: string | null;
   totalReviews: number;
   successfulReviews: number;
+  responseMsEma: number | null;
+  failedTypes: string[];
+  consecutiveFailures: number;
 }
 
 export interface DrillQuestion {
@@ -86,6 +95,11 @@ export interface GenVocabWord {
   mnemonic?: string;
   etymology?: string;
   exampleSentence?: string;
+  ipa?: string;
+  synonyms?: string[];
+  antonyms?: string[];
+  relatedWords?: string[];
+  clozeSentence?: string;
 }
 
 /** The founder's local calendar day (their day, not UTC) — matches FounderOs convention. */
