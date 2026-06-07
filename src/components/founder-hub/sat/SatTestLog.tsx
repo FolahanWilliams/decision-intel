@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, FileText } from 'lucide-react';
-import { SAT_TEST_SOURCES } from './sat-content';
+import { Trash2, FileText, Crosshair } from 'lucide-react';
+import { SAT_TEST_SOURCES, SAT_SECTIONS, skillsForSection, type SatSection } from './sat-content';
 import type { SatTest } from './sat-types';
 
 interface Props {
@@ -38,6 +38,29 @@ export function SatTestLog({ headers, today, tests, onChanged }: Props) {
   const [durationMin, setDuration] = useState('');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // Real-test miss capture — tap a skill per missed question so weak-area
+  // ranking + the Brier loop are built on REAL questions, not AI drills.
+  const [missSection, setMissSection] = useState<SatSection>('math');
+  const [missTally, setMissTally] = useState<Record<string, number>>({});
+
+  async function addMiss(skill: string) {
+    setMissTally(t => ({ ...t, [skill]: (t[skill] ?? 0) + 1 }));
+    await fetch('/api/founder-os/sat/error-log', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        date,
+        section: missSection,
+        skill,
+        wasCorrect: false,
+        source: 'official_test',
+      }),
+    }).catch(() => {
+      /* best-effort; reconciled on the next fetch */
+    });
+    onChanged();
+  }
 
   async function submit() {
     setErr(null);
@@ -177,6 +200,48 @@ export function SatTestLog({ headers, today, tests, onChanged }: Props) {
         </button>
       </div>
 
+      {/* Real-test miss capture */}
+      <div style={{ ...cardStyle, borderTop: '3px solid var(--warning)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <Crosshair size={16} style={{ color: 'var(--warning)' }} />
+          <strong style={{ color: 'var(--text-primary)' }}>Log this test&rsquo;s misses</strong>
+        </div>
+        <p style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)', margin: '0 0 10px' }}>
+          Tap a skill once per missed question (for the {date} sitting). This is the gold — your
+          weak-area map + calibration get built on REAL questions, and each becomes a spaced-review
+          card. Add a confidence/root-cause later in the error log if you want.
+        </p>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+          {Object.values(SAT_SECTIONS).map(s => (
+            <button
+              key={s.id}
+              onClick={() => setMissSection(s.id)}
+              style={{
+                ...chipBtn,
+                ...(missSection === s.id
+                  ? { background: 'var(--warning)', color: '#fff', borderColor: 'var(--warning)' }
+                  : {}),
+              }}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {skillsForSection(missSection).map(sk => (
+            <button key={sk.id} onClick={() => addMiss(sk.id)} style={chipBtn} title="Add a miss">
+              {sk.label}
+              {missTally[sk.id] ? (
+                <span style={{ color: 'var(--warning)', fontWeight: 700 }}>
+                  {' '}
+                  +{missTally[sk.id]}
+                </span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div style={cardStyle}>
         <strong style={{ color: 'var(--text-primary)', fontSize: 'var(--fs-sm)' }}>
           Logged tests ({tests.length})
@@ -248,5 +313,14 @@ const primaryBtn: React.CSSProperties = {
   color: '#fff',
   fontSize: 'var(--fs-sm)',
   fontWeight: 600,
+  cursor: 'pointer',
+};
+const chipBtn: React.CSSProperties = {
+  padding: '5px 10px',
+  borderRadius: 'var(--radius-full)',
+  border: '1px solid var(--border-color)',
+  background: 'var(--bg-secondary)',
+  color: 'var(--text-secondary)',
+  fontSize: 'var(--fs-2xs)',
   cursor: 'pointer',
 };

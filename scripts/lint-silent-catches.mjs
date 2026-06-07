@@ -287,7 +287,10 @@ const SCAN_DIR = join(ROOT, 'src');
 //     (SatPrepTab fetchAll ×4 · SatDailyTraining/SatTestLog/SatVocabBank fetch +
 //     body-parse). Founder-private study-stat writes, reconciled on the next
 //     fetchAll(); no delivery/audit/commerce/product-flywheel write swallowed.
-const SILENT_CATCH_BASELINE = 226;
+// 226 → 228 (SAT Prep v2 active-error-loop · 2026-06-07): +2 canonical
+//     res.json() body-parse (SatPrepTab settings fetch + SatReview explain
+//     response). Same founder-private class; no critical write swallowed.
+const SILENT_CATCH_BASELINE = 228;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

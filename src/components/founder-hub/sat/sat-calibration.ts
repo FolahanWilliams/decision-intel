@@ -280,7 +280,7 @@ export interface BrierTrendPoint {
  * week with no tagged entries.
  */
 export function computeCalibrationTrend(entries: ErrorEntryLite[], weeks = 8): BrierTrendPoint[] {
-  const tagged = entries.filter((e) => e.confidence !== null && e.confidence !== undefined);
+  const tagged = entries.filter(e => e.confidence !== null && e.confidence !== undefined);
   const byWeek = new Map<string, ErrorEntryLite[]>();
   for (const e of tagged) {
     const wk = weekStartOf(e.date);
@@ -290,7 +290,7 @@ export function computeCalibrationTrend(entries: ErrorEntryLite[], weeks = 8): B
   }
   const sortedWeeks = Array.from(byWeek.keys()).sort();
   const recent = sortedWeeks.slice(-weeks);
-  return recent.map((wk) => {
+  return recent.map(wk => {
     const arr = byWeek.get(wk)!;
     let brierSum = 0;
     for (const e of arr) {

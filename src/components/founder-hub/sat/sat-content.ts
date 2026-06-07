@@ -317,31 +317,37 @@ export const SAT_LEARNING_SCIENCE = [
   {
     principle: 'Retrieval practice',
     source: 'Roediger & Karpicke 2006',
-    application: 'Re-encountering a missed concept and recalling it beats re-reading. Every miss becomes a spaced review card.',
+    application:
+      'Re-encountering a missed concept and recalling it beats re-reading. Every miss becomes a spaced review card.',
   },
   {
     principle: 'Spacing effect',
     source: 'Cepeda et al. 2006',
-    application: 'Review intervals expand as you get a card right (SM-2). Cards you miss come back sooner.',
+    application:
+      'Review intervals expand as you get a card right (SM-2). Cards you miss come back sooner.',
   },
   {
     principle: 'Interleaving',
     source: 'Rohrer & Taylor 2007',
-    application: 'Mixing skills within a session beats blocking one skill — the daily drill rotates your weak skills.',
+    application:
+      'Mixing skills within a session beats blocking one skill — the daily drill rotates your weak skills.',
   },
   {
     principle: 'Calibration / metacognition',
     source: 'Kahneman; your own bias thesis',
-    application: 'Tag confidence before answering; the overconfident-and-wrong set is where a baited System-1 pattern lives.',
+    application:
+      'Tag confidence before answering; the overconfident-and-wrong set is where a baited System-1 pattern lives.',
   },
   {
     principle: 'Implementation intentions',
     source: 'Gollwitzer 1999',
-    application: 'An if-then ("if it is 7pm, then I do my 30-min block") roughly doubles follow-through — pair it with the streak.',
+    application:
+      'An if-then ("if it is 7pm, then I do my 30-min block") roughly doubles follow-through — pair it with the streak.',
   },
   {
     principle: 'Desirable difficulties',
     source: 'Bjork',
-    application: 'Effortful recall (not recognition) is what sticks — the review surface hides the answer until you have tried.',
+    application:
+      'Effortful recall (not recognition) is what sticks — the review surface hides the answer until you have tried.',
   },
 ] as const;

@@ -14,6 +14,8 @@ import {
 import {
   computeProjectedScore,
   computeCalibration,
+  computeCalibrationBySkill,
+  computeCalibrationTrend,
   computeWeakAreas,
   rootCauseBreakdown,
   overconfidentMisses,
@@ -53,6 +55,14 @@ export function SatProgressCalibration({ errors, sessions, tests, today }: Props
   const weak = useMemo(() => computeWeakAreas(errors, 6), [errors]);
   const rootCauses = useMemo(() => rootCauseBreakdown(errors), [errors]);
   const ocMisses = useMemo(() => overconfidentMisses(errors).slice(0, 5), [errors]);
+  const bySkill = useMemo(
+    () =>
+      computeCalibrationBySkill(errors)
+        .filter(s => s.band !== 'too_few')
+        .slice(0, 5),
+    [errors]
+  );
+  const trend = useMemo(() => computeCalibrationTrend(errors), [errors]);
   const streak = useMemo(() => computeStreak(sessions, today), [sessions, today]);
   const totalXp = useMemo(() => sessions.reduce((a, s) => a + (s.xpAwarded || 0), 0), [sessions]);
 
@@ -166,6 +176,43 @@ export function SatProgressCalibration({ errors, sessions, tests, today }: Props
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {bySkill.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+              Calibration by skill (most overconfident first):
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
+              {bySkill.map(s => (
+                <div
+                  key={s.skill}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: 'var(--fs-2xs)',
+                  }}
+                >
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    {SAT_SKILL_BY_ID[s.skill]?.label ?? s.skill}
+                  </span>
+                  <span style={{ color: toneColor[CALIBRATION_BAND_COPY[s.band].tone] }}>
+                    {s.gap != null ? `${s.gap > 0 ? '+' : ''}${Math.round(s.gap * 100)}pp` : '—'} ·{' '}
+                    {CALIBRATION_BAND_COPY[s.band].label.split(' —')[0]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {trend.length >= 2 && (
+          <div style={{ marginTop: 12 }}>
+            <span style={{ fontSize: 'var(--fs-2xs)', color: 'var(--text-muted)' }}>
+              Brier trend (lower = better calibrated; {trend.length} weeks):
+            </span>
+            <Sparkline points={trend.map(t => t.brier ?? 0)} />
           </div>
         )}
       </div>
@@ -398,5 +445,46 @@ function SectionBar({
         />
       </div>
     </div>
+  );
+}
+
+function Sparkline({ points }: { points: number[] }) {
+  if (points.length < 2) return null;
+  const w = 200;
+  const h = 36;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+  const coords = points.map((p, i) => {
+    const x = (i / (points.length - 1)) * (w - 4) + 2;
+    const y = h - 2 - ((p - min) / range) * (h - 6); // lower Brier → higher on chart
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const last = points[points.length - 1];
+  const first = points[0];
+  const improving = last <= first; // lower Brier is better
+  return (
+    <svg width={w} height={h} style={{ marginTop: 6, display: 'block' }} aria-label="Brier trend">
+      <polyline
+        points={coords.join(' ')}
+        fill="none"
+        stroke={improving ? 'var(--success)' : 'var(--warning)'}
+        strokeWidth={2}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      {coords.map((c, i) => {
+        const [x, y] = c.split(',');
+        return (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r={2}
+            fill={improving ? 'var(--success)' : 'var(--warning)'}
+          />
+        );
+      })}
+    </svg>
   );
 }

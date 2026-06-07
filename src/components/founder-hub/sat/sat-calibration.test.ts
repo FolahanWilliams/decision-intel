@@ -216,7 +216,9 @@ describe('computeCalibrationBySkill', () => {
   it('buckets by skill and sorts most-overconfident first', () => {
     const entries: ErrorEntryLite[] = [
       // algebra: 5 confident-and-correct → well calibrated
-      ...Array.from({ length: 5 }, () => entry({ skill: 'algebra', confidence: 3, wasCorrect: true })),
+      ...Array.from({ length: 5 }, () =>
+        entry({ skill: 'algebra', confidence: 3, wasCorrect: true })
+      ),
       // inferences: 5 confident-and-wrong → overconfident (big positive gap)
       ...Array.from({ length: 5 }, () =>
         entry({ skill: 'inferences', section: 'rw', confidence: 3, wasCorrect: false })
@@ -225,7 +227,7 @@ describe('computeCalibrationBySkill', () => {
     const out = computeCalibrationBySkill(entries);
     expect(out[0].skill).toBe('inferences');
     expect(out[0].band).toBe('overconfident');
-    expect(out.find((s) => s.skill === 'algebra')?.band).toBe('well_calibrated');
+    expect(out.find(s => s.skill === 'algebra')?.band).toBe('well_calibrated');
   });
 
   it('ignores untagged entries', () => {
@@ -278,7 +280,9 @@ describe('isDueForReview', () => {
   });
   it('excludes correct answers + archived', () => {
     expect(isDueForReview({ wasCorrect: true, nextDue: null }, now)).toBe(false);
-    expect(isDueForReview({ wasCorrect: false, reviewArchived: true, nextDue: null }, now)).toBe(false);
+    expect(isDueForReview({ wasCorrect: false, reviewArchived: true, nextDue: null }, now)).toBe(
+      false
+    );
   });
   it('respects a future due date', () => {
     expect(isDueForReview({ wasCorrect: false, nextDue: '2026-06-10T00:00:00Z' }, now)).toBe(false);
