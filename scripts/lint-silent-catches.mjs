@@ -301,7 +301,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // 235 → 236 (Intake daily-fill expansion · 2026-06-07): +1 canonical res.json()
 //     body-parse on the new todos context fetch in DailyDumpPanel.fetchContext
 //     (degrades to empty todos — todo_complete matching still works on names).
-const SILENT_CATCH_BASELINE = 236;
+// 236 → 238 (Argument Builder · 2026-06-07): +2 canonical res.json() body-parse
+//     in ArgumentBuilder.tsx (generateClaim + grade) — each surfaces the API
+//     error to the founder; no write/grade swallowed.
+const SILENT_CATCH_BASELINE = 238;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

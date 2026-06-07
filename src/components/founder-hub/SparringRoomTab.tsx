@@ -53,6 +53,7 @@ import {
 import { Target } from 'lucide-react';
 import { SparringTrendViz } from './sparring/SparringTrendViz';
 import { BaftaPrepCallout } from './sparring/BaftaPrepCallout';
+import { ArgumentBuilder } from './sparring/ArgumentBuilder';
 
 interface Props {
   founderPass: string;
@@ -104,6 +105,9 @@ export function SparringRoomTab({ founderPass }: Props) {
   const [busy, setBusy] = useState<boolean>(false);
   const [prepCountdown, setPrepCountdown] = useState<number>(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  // Two surfaces share the Sparring Room: live buyer-rep practice + the
+  // Claim→Evidence→Counter→Rebuttal Argument Builder (the ported MindForge drill).
+  const [surface, setSurface] = useState<'live' | 'argument'>('live');
 
   // Load history on mount.
   useEffect(() => {
@@ -266,9 +270,54 @@ export function SparringRoomTab({ founderPass }: Props) {
   const persona = findPersonaById(personaId);
   const scenario = findScenarioById(mode);
 
+  const surfaceToggle = (
+    <div
+      style={{
+        display: 'inline-flex',
+        gap: 4,
+        padding: 4,
+        background: 'var(--bg-secondary)',
+        borderRadius: 'var(--radius-md)',
+        border: '1px solid var(--border-color)',
+        alignSelf: 'flex-start',
+      }}
+    >
+      {(['live', 'argument'] as const).map(s => (
+        <button
+          key={s}
+          onClick={() => setSurface(s)}
+          style={{
+            padding: '5px 14px',
+            borderRadius: 'var(--radius-sm)',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 'var(--fs-2xs)',
+            fontWeight: 600,
+            background: surface === s ? 'var(--accent-primary)' : 'transparent',
+            color: surface === s ? '#fff' : 'var(--text-secondary)',
+          }}
+        >
+          {s === 'live' ? 'Live reps' : 'Argument Builder'}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (surface === 'argument') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <Hero />
+        {surfaceToggle}
+        <ArgumentBuilder founderPass={founderPass} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <Hero />
+
+      {surfaceToggle}
 
       <BaftaPrepCallout history={history} />
 

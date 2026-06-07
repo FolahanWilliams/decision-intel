@@ -64,6 +64,13 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-06-07)
 
+**Argument Builder — the one MindForge principle, ported into the Sparring Room (full prose in CLAUDE.md "Argument Builder" lock).** Claim → Evidence → Counterargument → Rebuttal reasoning drill.
+
+- [x] A second Sparring Room surface (toggle: Live reps | Argument Builder) — no new tab. Trains investor-Q&A / pitch defence; the grader is hardest on a weak (non-steelman) counterargument.
+- [x] Pure SSOT [argument-builder.ts](src/components/founder-hub/sparring/argument-builder.ts) (5 categories + 4-part scaffold + 4-dim rubric + readiness + normalize + mock, 7 vitest) · endpoint [/api/founder-hub/argument-builder](src/app/api/founder-hub/argument-builder/route.ts) (generate + grade, Grok, mock fallback) · [ArgumentBuilder.tsx](src/components/founder-hub/sparring/ArgumentBuilder.tsx) (0-100 + sub-score bars + steelman verdict + model answer + score trend) mounted in SparringRoomTab.
+- [x] Honest scoping: most of MindForge already lives in DI (Sparring grader / generation effect / campaign XP / FOUNDER_CONTEXT); only the Claim→Evidence→Counter→Rebuttal scaffold was additive. Analogy Engine + Summary Challenge evaluated lower-leverage and NOT built (recorded).
+- [x] Gates: tsc + eslint clean · 7/7 argument vitest · 5 lints (silent-catches 236→238 documented) · prettier · slop 3.30.
+
 **Founder Hub brain-dump intake (founder "boil the ocean" — friction-killer for tab/field sprawl; full prose in CLAUDE.md "Founder Hub brain-dump intake" lock).** One day-dump → AI proposes a batch → confirm/edit/drop → logged across founder-os surfaces.
 
 - [x] **Confirm-before-write (load-bearing):** the parse endpoint writes nothing; nothing saves until the founder confirms. Ambiguous entity refs (which goal/prospect?) → `needsPick` with candidates, never guessed. Protects the conversion-ledger / Vohra / campaign signals from a silent misparse.
