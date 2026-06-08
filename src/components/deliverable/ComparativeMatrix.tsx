@@ -154,6 +154,22 @@ export function ComparativeMatrix({
               e.currentTarget.style.background = 'transparent';
             }
           }}
+          onFocus={e => {
+            // Keyboard focus indicator — inline styles can't do :focus-visible,
+            // and the row is role=button/tabIndex=0, so without this a keyboard
+            // user tabbing the matrix sees no focus state at all.
+            if (row.onOpenDrawer) {
+              e.currentTarget.style.background = 'var(--bg-secondary, #F8FAFC)';
+              e.currentTarget.style.outline = '2px solid var(--accent-primary, #16A34A)';
+              e.currentTarget.style.outlineOffset = '-2px';
+            }
+          }}
+          onBlur={e => {
+            if (row.onOpenDrawer) {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.outline = 'none';
+            }
+          }}
         >
           {columns.map(col => (
             <div

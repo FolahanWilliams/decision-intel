@@ -50,7 +50,9 @@ function arcPath(cx: number, cy: number, r: number, startAngle: number, endAngle
 }
 
 export function DqiRadialGauge({ score, size = 180, showGrade = true }: DqiRadialGaugeProps) {
-  const clamped = Math.max(0, Math.min(100, score));
+  // Coerce non-finite scores to 0 — Math.max/min propagate NaN, which renders a
+  // malformed arc + a literal "NaN" in the gauge text on a bad analysis row.
+  const clamped = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
   const cx = size / 2;
   const cy = size / 2;
   const r = size / 2 - 14;

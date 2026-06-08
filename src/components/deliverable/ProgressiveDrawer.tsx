@@ -9,16 +9,18 @@
  * content hash + regulatory mapping + source link. The executive view
  * stays clean (Impute); the drawer carries the rigor (defensibility).
  *
- * Single-click open, ESC + click-outside close. Built on the shared
- * shadcn Dialog primitive (per the 2026-05-11 modal-Dialog discipline
- * lock) — never a hand-rolled position:fixed shape.
+ * Single-click open; ESC + click-outside close. This is a hand-rolled
+ * right-edge slide-in (the shadcn Dialog is a centered modal — the wrong
+ * shape here) that carries its own modal a11y: focus moves into the drawer
+ * on open, returns to the trigger on close, Tab is trapped inside, and body
+ * scroll is locked. intentional-modal-pattern
  */
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 
 interface ProgressiveDrawerProps {
   open: boolean;
@@ -60,6 +62,40 @@ export function ProgressiveDrawer({
     };
   }, [open]);
 
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Modal focus management: move focus into the drawer on open + restore it to
+  // the trigger on close — keyboard/screen-reader users otherwise stay stranded
+  // behind the backdrop. Deferred a tick so the panel is mounted before focus.
+  useEffect(() => {
+    if (!open) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const t = setTimeout(() => closeRef.current?.focus(), 0);
+    return () => {
+      clearTimeout(t);
+      previouslyFocused?.focus?.();
+    };
+  }, [open]);
+
+  // Trap Tab within the drawer while open.
+  const onTrapKeyDown = (e: ReactKeyboardEvent<HTMLElement>) => {
+    if (e.key !== 'Tab' || !panelRef.current) return;
+    const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -80,9 +116,12 @@ export function ProgressiveDrawer({
 
       {/* Slide-in panel */}
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
+        onKeyDown={onTrapKeyDown}
         style={{
           position: 'fixed',
           top: 0,
@@ -138,6 +177,7 @@ export function ProgressiveDrawer({
             </h3>
           </div>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close drawer"

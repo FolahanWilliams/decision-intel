@@ -101,9 +101,18 @@ export interface ValueAtStakeInput {
  * ticket is absent or non-positive, so consumers can simply check
  * for null and render the DQI-lift fallback.
  */
+/**
+ * Floor below which an exposure figure reads as unserious on a procurement-grade
+ * surface — a $100 ticket × an 8% base rate renders "$8 exposure" in red bold,
+ * which undercuts the whole deliverable. Below this we suppress the exposure and
+ * let the DQI-lift fallback render instead. A real strategic decision's
+ * value-at-stake is far above this, so no legitimate deal is hidden.
+ */
+export const MIN_TICKET_AMOUNT = 1000;
+
 export function computeFindingValueAtStake(input: ValueAtStakeInput): ValueAtStake | null {
   const { ticketAmount, ticketCurrency, severity, namedPatternLabel } = input;
-  if (!Number.isFinite(ticketAmount) || ticketAmount <= 0) return null;
+  if (!Number.isFinite(ticketAmount) || ticketAmount < MIN_TICKET_AMOUNT) return null;
 
   let rate: number;
   let source: string;
