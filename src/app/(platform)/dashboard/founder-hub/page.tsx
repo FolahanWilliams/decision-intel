@@ -555,11 +555,20 @@ const SEARCH_INDEX: SearchEntry[] = [
       'sat prep study test score psat 1550 1280 stanford bluebook khan academy math reading writing rw vocab spaced repetition calibration brier error log weak areas drills daily training official test september november digital sat college board',
   },
   {
-    tabId: 'start',
-    section: 'Start Here — 2-day study plan',
-    preview: 'Interactive flow + 4 sessions guiding you through all 15 tabs in ~6 hours.',
+    tabId: 'faith_os',
+    section: 'Faith OS',
+    preview:
+      "Daily spiritual checkin + Today's Three (the day's three priorities), evening reflection, prayer journal, reading progress.",
     keywords:
-      'start here study plan guided tour walkthrough 2 day two day sessions progress compass onboarding first where begin path flow',
+      "faith os todays three today's three daily three priorities goals rule of three highlight commit evening reflection prayer journal scripture devotional spiritual checkin streak the build campaign quarter rocks weekly intentions",
+  },
+  {
+    tabId: 'start',
+    section: 'Start Here — interactive map',
+    preview:
+      'The daily landing: The Build campaign, the brain-dump intake, and an interactive map of every Founder Hub tab with journey overlays.',
+    keywords:
+      'start here map journey overlay guided tour walkthrough compass onboarding first where begin path flow brain dump intake daily dump campaign the build pitch research outreach reflect product',
   },
   {
     tabId: 'overview',
