@@ -23,8 +23,8 @@ export interface TabNavTarget {
   aliases?: string[];
 }
 
-// Reconciled against the canonical 26-id TabId union in the hub page
-// (2026-05-15). The 2026-05-10 positioning consolidation +
+// Reconciled against the canonical 29-id TabId union in the hub page
+// (2026-06-08; was 26 at the 2026-05-15 reconciliation). The 2026-05-10 positioning consolidation +
 // 2026-04-28 OutreachHub consolidation half-shipped — this table still
 // carried 6 retired tab-ids (positioning_copilot / positioning /
 // category_position / outreach_cmd / outreach / design_partners) that
@@ -113,6 +113,26 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
     ],
   },
   { id: 'content', label: 'Content Studio' },
+  // Foundations
+  {
+    id: 'faith_os',
+    label: 'Faith OS',
+    aliases: [
+      'faith os',
+      'faith os tab',
+      'todays three',
+      "today's three",
+      'daily three',
+      'devotional',
+      'spiritual checkin',
+      'prayer journal',
+    ],
+  },
+  {
+    id: 'sat_prep',
+    label: 'SAT Prep',
+    aliases: ['sat prep', 'sat prep tab', 'sat study', 'sat tab', 'study for the sat'],
+  },
   // Intelligence
   { id: 'data_ecosystem', label: 'Data Ecosystem' },
   { id: 'case_library', label: 'Case Library' },
