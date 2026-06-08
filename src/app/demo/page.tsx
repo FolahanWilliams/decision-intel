@@ -285,11 +285,25 @@ export default function DemoPage() {
     setPasteAudit(null);
     setPasteProgress(0);
 
+    // Watchdog: abort if the stream goes silent for STALL_MS. The server
+    // heartbeats every ~15s during the ~60-90s audit, so 75s of silence means a
+    // genuinely dead connection (mobile network handoff, laptop sleep) — without
+    // this, reader.read() can hang forever and the prospect sits on the spinner
+    // with no error and no escape (a silent abandon). Re-armed on every chunk.
+    const controller = new AbortController();
+    const STALL_MS = 75_000;
+    let watchdog: ReturnType<typeof setTimeout> | undefined;
+    const armWatchdog = () => {
+      if (watchdog) clearTimeout(watchdog);
+      watchdog = setTimeout(() => controller.abort(), STALL_MS);
+    };
+
     try {
       const res = await fetch('/api/demo/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: textToAudit }),
+        signal: controller.signal,
       });
 
       // Pre-stream guards (env 503 / IP-or-global rate-limit 429 / word
@@ -358,11 +372,15 @@ export default function DemoPage() {
         }
       };
 
+      armWatchdog();
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        armWatchdog();
         sse.processChunk(decoder.decode(value, { stream: true }), handle);
+        if (settled) break; // got the terminal event — stop reading + disarm
       }
+      if (watchdog) clearTimeout(watchdog);
 
       // Stream closed without a terminal complete/error event.
       if (!settled) {
@@ -371,11 +389,14 @@ export default function DemoPage() {
         setPasteAuditing(false);
       }
     } catch (err) {
-      const msg =
-        err instanceof Error && err.message
+      if (watchdog) clearTimeout(watchdog);
+      const aborted = controller.signal.aborted;
+      const msg = aborted
+        ? 'The audit stalled — your connection may have dropped. Please try again.'
+        : err instanceof Error && err.message
           ? 'Network error. Please check your connection and try again.'
           : 'Something went wrong. Please try again.';
-      trackEvent('demo_paste_error', { network: true });
+      trackEvent('demo_paste_error', aborted ? { stalled: true } : { network: true });
       setPasteError(msg);
       setPasteAuditing(false);
     }
@@ -1091,7 +1112,7 @@ export default function DemoPage() {
       {/* Paste audit: in-flight progress (real /api/demo/run running) */}
       {pasteAuditing && (
         <SectionBand bg={C.slate50} borderTop paddingY={56} maxWidth={720}>
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div role="status" aria-live="polite" style={{ textAlign: 'center', marginBottom: 32 }}>
             <div
               style={{
                 width: 56,
@@ -1163,6 +1184,7 @@ export default function DemoPage() {
       {pasteError && !pasteAuditing && !pasteAudit && (
         <SectionBand bg={C.slate50} borderTop paddingY={48} maxWidth={640}>
           <div
+            role="alert"
             style={{
               background: '#FEF2F2',
               border: '1px solid #FECACA',

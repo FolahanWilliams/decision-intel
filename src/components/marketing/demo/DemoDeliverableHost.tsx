@@ -18,7 +18,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Clock, BookmarkPlus, ArrowRight } from 'lucide-react';
 import type { AnalysisResult } from '@/types';
@@ -64,13 +64,29 @@ export function DemoDeliverableHost({
 }: DemoDeliverableHostProps) {
   const [llmTitles, setLlmTitles] = useState<Partial<ActionTitleResponse> | null>(null);
 
+  // Stabilise the ticket so the LLM-title effect below keys on its VALUE, not
+  // its identity. The parent passes a fresh `{ amount, currency }` literal every
+  // render; without this, supplying a ticket re-fires the effect → setLlmTitles →
+  // re-render → new ticket object → infinite refetch of /api/audit/action-titles
+  // (until it 429s) + action-title flicker. Reconstructed from primitives so the
+  // memo + the effect deps stay exhaustive-deps-clean.
+  const ticketAmount = ticket?.amount ?? null;
+  const ticketCurrency = ticket?.currency ?? null;
+  const stableTicket = useMemo(
+    () =>
+      ticketAmount !== null && ticketCurrency
+        ? { amount: ticketAmount, currency: ticketCurrency }
+        : undefined,
+    [ticketAmount, ticketCurrency]
+  );
+
   // Compose deliverable WITH the LLM titles when available; otherwise
   // the deterministic templates render. The composer falls back per-key
   // when an action-title is missing — guaranteed always valid.
   const deliverable = buildAuditDeliverable(result, {
     documentId,
     analysisId,
-    ticket,
+    ticket: stableTicket,
     actionTitles: llmTitles ?? undefined,
   });
 
@@ -82,7 +98,7 @@ export function DemoDeliverableHost({
         const res = await fetch('/api/audit/action-titles', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ result, documentId, analysisId, ticket }),
+          body: JSON.stringify({ result, documentId, analysisId, ticket: stableTicket }),
         });
         if (!res.ok) return;
         // canonical res.json() body-parse exception class — falls back to templates
@@ -96,7 +112,7 @@ export function DemoDeliverableHost({
     return () => {
       cancelled = true;
     };
-  }, [result, documentId, analysisId, ticket]);
+  }, [result, documentId, analysisId, stableTicket]);
 
   const saveAuditHref = buildSaveAuditHref({ analysisId, documentId });
 
@@ -114,7 +130,14 @@ export function DemoDeliverableHost({
               placement: 'deliverable_cover',
               cta: 'book_call',
             });
-            window.open('/contact', '_blank');
+            // Canonical booking destination (mirrors BookDemoCTA): Calendly when
+            // configured, else the design-partner pricing anchor. The prior
+            // '/contact' target was a 404 — a dead primary CTA at peak intent.
+            window.open(
+              process.env.NEXT_PUBLIC_DEMO_BOOKING_URL ?? '/pricing#design-partner',
+              '_blank',
+              'noopener,noreferrer'
+            );
           },
         }}
       />

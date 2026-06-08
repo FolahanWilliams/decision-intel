@@ -85,6 +85,11 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
   // Hit-level toggle; user can deselect false positives (especially names).
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [expandedCat, setExpandedCat] = useState<RedactionCategory | null>(null);
+  // Guards a double-click double-submit: the handlers await SHA-256 hashing,
+  // leaving a window where a second click fires a second audit — the 2nd then
+  // trips the 1-audit-per-IP-per-day limit and shows a confusing 429 AFTER the
+  // 1st already succeeded.
+  const [submitting, setSubmitting] = useState(false);
 
   // Reset selection state every time the modal re-opens. Deferred via a
   // microtask-scheduled timeout so react-hooks/set-state-in-effect doesn't
@@ -96,6 +101,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
     const t = setTimeout(() => {
       setExcluded(new Set());
       setExpandedCat(null);
+      setSubmitting(false);
     }, 0);
     return () => clearTimeout(t);
   }, [isOpen]);
@@ -147,6 +153,8 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
   };
 
   const handleRedact = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     const { redactedText, placeholderMap } = applyRedactions(text, selected);
     const placeholderEntries: PlaceholderMapEntry[] = Object.entries(placeholderMap).map(
       ([placeholder, original]) => {
@@ -185,6 +193,8 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
   };
 
   const handleSkip = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     const hash = await sha256Hex(text);
     const trail: RedactionTrailContext = {
       originalHash: hash,
@@ -582,6 +592,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
           {totalHits === 0 ? (
             <Button
               onClick={handleSkip}
+              disabled={submitting}
               style={{
                 width: '100%',
                 background: 'var(--accent-primary)',
@@ -602,7 +613,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
           ) : (
             <Button
               onClick={handleRedact}
-              disabled={selected.length === 0}
+              disabled={selected.length === 0 || submitting}
               style={{
                 width: '100%',
                 background: 'var(--accent-primary)',
@@ -615,7 +626,7 @@ export function RedactionPreModal({ isOpen, text, scan, onRedact, onSkip, onCanc
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-                opacity: selected.length === 0 ? 0.55 : 1,
+                opacity: selected.length === 0 || submitting ? 0.55 : 1,
               }}
             >
               <ShieldCheck size={15} strokeWidth={2.4} />
