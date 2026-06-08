@@ -35,6 +35,29 @@ vi.mock('@google/generative-ai', () => {
   };
 });
 
+// Hermeticity: keep the nodes off real DB/embedding I/O. Without these, in any
+// env with DATABASE_URL set (CI) the risk-compiler loaders + searchSimilar*
+// queries hang past the test timeout. Rejecting Prisma + empty embeddings
+// reproduces the passing local (no-DB) path: loaders fall back to defaults
+// instantly, so riskScorerNode's scores (87 / 85) are unchanged.
+vi.mock('../prisma', () => {
+  const fail = () => Promise.reject(new Error('prisma disabled in unit test'));
+  const model = new Proxy({}, { get: (_t, p) => (p === 'then' ? undefined : fail) });
+  const client = new Proxy(
+    {},
+    {
+      get: (_t, p) =>
+        p === 'then' ? undefined : typeof p === 'string' && p.startsWith('$') ? fail : model,
+    }
+  );
+  return { prisma: client };
+});
+
+vi.mock('../rag/embeddings', () => ({
+  searchSimilarDocuments: vi.fn(async () => []),
+  searchSimilarWithOutcomes: vi.fn(async () => []),
+}));
+
 describe('riskScorerNode', () => {
   it('should correctly aggregate scores and include new fields', async () => {
     const state: AuditState = {

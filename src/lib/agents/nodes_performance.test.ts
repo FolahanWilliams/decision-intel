@@ -51,6 +51,28 @@ vi.mock('../tools/financial', () => ({
   }),
 }));
 
+// Hermeticity: verificationNode's searchSimilarDocuments (pgvector + embedding
+// API) otherwise hangs in any env with DATABASE_URL set (CI), timing the test
+// out. Empty embeddings + rejecting Prisma reproduce the passing local (no-DB)
+// path so the dedup assertion runs deterministically.
+vi.mock('../rag/embeddings', () => ({
+  searchSimilarDocuments: vi.fn(async () => []),
+  searchSimilarWithOutcomes: vi.fn(async () => []),
+}));
+
+vi.mock('../prisma', () => {
+  const fail = () => Promise.reject(new Error('prisma disabled in unit test'));
+  const model = new Proxy({}, { get: (_t, p) => (p === 'then' ? undefined : fail) });
+  const client = new Proxy(
+    {},
+    {
+      get: (_t, p) =>
+        p === 'then' ? undefined : typeof p === 'string' && p.startsWith('$') ? fail : model,
+    }
+  );
+  return { prisma: client };
+});
+
 describe('factCheckerNode Performance', () => {
   beforeEach(() => {
     vi.clearAllMocks();

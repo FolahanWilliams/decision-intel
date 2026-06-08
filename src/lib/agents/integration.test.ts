@@ -52,6 +52,30 @@ vi.mock('@google/generative-ai', () => {
   };
 });
 
+// Hermeticity: keep the nodes off real DB/embedding I/O. verificationNode's
+// searchSimilarDocuments (pgvector + embedding API) otherwise hangs in any env
+// with DATABASE_URL set (CI) past the test timeout — and that timeout leaves
+// this file's mockResolvedValueOnce queue half-consumed, which then poisons the
+// later structurerNode test (it reads a leftover value → falls back to raw
+// content). Empty embeddings + rejecting Prisma reproduce the passing local path.
+vi.mock('../rag/embeddings', () => ({
+  searchSimilarDocuments: vi.fn(async () => []),
+  searchSimilarWithOutcomes: vi.fn(async () => []),
+}));
+
+vi.mock('../prisma', () => {
+  const fail = () => Promise.reject(new Error('prisma disabled in unit test'));
+  const model = new Proxy({}, { get: (_t, p) => (p === 'then' ? undefined : fail) });
+  const client = new Proxy(
+    {},
+    {
+      get: (_t, p) =>
+        p === 'then' ? undefined : typeof p === 'string' && p.startsWith('$') ? fail : model,
+    }
+  );
+  return { prisma: client };
+});
+
 describe('Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
