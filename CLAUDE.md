@@ -940,6 +940,20 @@ The internal-execution pre-mortems (cathedral-of-code, outcome-gate avoidance, i
 - **Deployment:** Vercel (serverless)
 - **Monitoring:** Sentry + custom AuditLog + structured logging
 
+## Gemini context caching on the bias detective — EVALUATED, DELIBERATELY NOT SHIPPED (locked 2026-06-09)
+
+A 2026-06-09 cost sweep flagged the ~80KB `BIAS_DETECTIVE_PROMPT` ([prompts.ts](src/lib/agents/prompts.ts)) being re-sent uncached on every audit and recommended Gemini explicit context caching (`CachedContent`). It was investigated thoroughly and **declined** — this is a recorded boundary, not a silent omission, in the same spirit as the Superforecasting extremizing-aggregator refusal (ship depth on the RIGHT work, never a change you've refuted).
+
+Three independent disqualifiers, each code-verified:
+
+1. **Grounding is ON and incompatible with explicit caching.** `biasDetectiveNode` ([nodes.ts](src/lib/agents/nodes.ts)) calls `getGroundedModel().generateContent([...])` — `getGroundedModel` = `gemini-3-flash-preview` with `tools: [{ googleSearch: {} }]`. The third prompt part explicitly instructs the model to "verify their accuracy using Google Search BEFORE flagging." Gemini's `CachedContent` does not support requests that carry tools/grounding; you would have to choose caching OR grounding, and grounding is load-bearing for the bias detective's fact-checking. Non-starter.
+2. **There is no stable cacheable prefix.** The first prompt element is `buildEnrichedBiasPrompt(detectedIndustry)` + a conditional `buildInvestmentBiasOverlay(documentType, dealStage)` append + a conditional `buildMarketContextBlock(...)` append — all of which vary per audit by detected industry / doc type / deal stage / market context. Caching only helps when the cached span is a byte-stable prefix; here even the "static" head changes audit-to-audit.
+3. **At pre-revenue volume it would cost MORE.** Explicit caches carry a per-storage cost and a TTL; at a handful of audits/day the cache expires between audits, so you pay the write without amortizing it. Context caching pays off only at sustained QPS reusing an identical prefix inside the TTL window.
+
+**Plus the validation gate can't be cleared here:** the held-out `dqi-distribution-check` runs `computeDQI` over synthetic memos — it does NOT exercise the bias-detective LLM call, so it cannot validate a change to that call. With no LLM API key in the dev/audit sandbox, the held-out parity run the pipeline-change rule mandates is unrunnable. Any bias-detective behavioral change is therefore unvalidatable in-repo by design.
+
+**Revisit triggers (when caching becomes worth re-evaluating):** (a) sustained audit volume post-PMF where the same prompt prefix recurs inside a TTL window; (b) grounding is ever moved off the main bias-detective call (e.g. a separate grounded fact-check pass) so the main call becomes cache-eligible; (c) the enriched-prompt head is refactored into a genuinely static prefix + a separate dynamic tail. Until then, implicit caching (automatic + free on supported Gemini models, nothing to implement) is the only caching in play. **Forward-looking rule:** do NOT implement explicit `CachedContent` on any grounded pipeline node — grounding + explicit caching don't compose; the win, if any, is implicit caching via a stable prefix, which is a prompt-refactor decision gated on a real held-out parity run.
+
 ## Commands
 
 ```bash
