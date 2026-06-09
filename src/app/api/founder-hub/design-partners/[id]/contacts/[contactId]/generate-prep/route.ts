@@ -25,7 +25,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { FOUNDER_CONTEXT } from '@/app/api/founder-hub/founder-context';
 import type { PartnerRichProfile } from '@/types/partner-profile';
 
@@ -168,6 +168,15 @@ export async function POST(
 ) {
   if (!verify(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('generate-prep'))) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — try again in a minute.' },
+      { status: 429 }
+    );
   }
   const { id, contactId } = await params;
 

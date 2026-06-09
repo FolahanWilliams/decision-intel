@@ -14,7 +14,10 @@ import { streamChat } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
+import {
+  verifyFounderPass as checkFounderPass,
+  checkFounderHubLlmRateLimit,
+} from '@/lib/utils/founder-auth';
 import { prisma } from '@/lib/prisma';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
@@ -133,6 +136,15 @@ TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their 
 export async function POST(request: NextRequest) {
   if (!verifyFounderPass(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('content-generate'))) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — try again in a minute.' },
+      { status: 429 }
+    );
   }
 
   let body;

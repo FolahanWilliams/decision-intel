@@ -18,7 +18,7 @@ import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { FOUNDER_CONTEXT } from '../../founder-context';
 
 const log = createLogger('FounderSchoolSources');
@@ -37,6 +37,12 @@ export interface Source {
 
 export async function GET(req: NextRequest) {
   if (!verify(req)) return apiError({ error: 'Unauthorized', status: 401 });
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('founder-school-sources'))) {
+    return apiError({ error: 'Rate limit exceeded — try again in a minute.', status: 429 });
+  }
 
   const { searchParams } = new URL(req.url);
   const trackId = searchParams.get('trackId') || '';

@@ -17,6 +17,7 @@ import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { prisma } from '@/lib/prisma';
 import { authenticateFounderOs } from '@/lib/founder-os/auth';
+import { checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
 import { SAT_SKILL_BY_ID } from '@/components/founder-hub/sat/sat-content';
@@ -37,6 +38,12 @@ export async function POST(request: Request) {
   const auth = await authenticateFounderOs(request);
   if (!auth.ok || !auth.userId) {
     return apiError({ error: auth.error ?? 'Unauthorized', status: auth.status ?? 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('sat-explain'))) {
+    return apiError({ error: 'Rate limit exceeded — try again in a minute.', status: 429 });
   }
   let body: { id?: string; skill?: string; section?: string; note?: string };
   try {

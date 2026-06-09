@@ -25,7 +25,10 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass as checkFounderPass } from '@/lib/utils/founder-auth';
+import {
+  verifyFounderPass as checkFounderPass,
+  checkFounderHubLlmRateLimit,
+} from '@/lib/utils/founder-auth';
 import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { ALL_CASES, getSlugForCase } from '@/lib/data/case-studies';
@@ -49,6 +52,12 @@ function verifyFounderPass(req: NextRequest): boolean {
 export async function POST(req: NextRequest) {
   if (!verifyFounderPass(req)) {
     return apiError({ error: 'Unauthorized', status: 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('onepager'))) {
+    return apiError({ error: 'Rate limit exceeded — try again in a minute.', status: 429 });
   }
 
   const apiKey = process.env.AI_GATEWAY_API_KEY;

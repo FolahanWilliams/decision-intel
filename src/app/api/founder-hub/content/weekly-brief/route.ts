@@ -13,7 +13,7 @@ import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_CHEAP } from '@/lib/ai/gateway-models';
 import { apiError, apiSuccess } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { FOUNDER_CONTEXT } from '../../founder-context';
 
@@ -94,6 +94,12 @@ No markdown, no explanation — raw JSON array only.`;
 
 export async function GET(req: NextRequest) {
   if (!verify(req)) return apiError({ error: 'Unauthorized', status: 401 });
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('weekly-brief'))) {
+    return apiError({ error: 'Rate limit exceeded — try again in a minute.', status: 429 });
+  }
 
   const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) return apiError({ error: 'AI not configured', status: 503 });

@@ -24,7 +24,7 @@ import { streamChat } from '@/lib/ai/providers/gateway';
 import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
@@ -136,6 +136,15 @@ export async function POST(req: NextRequest) {
   const passCheck = verifyFounderPass(req.headers.get('x-founder-pass'));
   if (!passCheck.ok) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('meeting-prep'))) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — try again in a minute.' },
+      { status: 429 }
+    );
   }
 
   let body: PrepBody;
