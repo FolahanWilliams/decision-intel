@@ -814,6 +814,54 @@ const ONBOARDING_GATE_FILES = [
   'src/app/api/onboarding/route.ts',
 ];
 
+// ─── SEMANTIC: dead founder-pass guard ─────────────────────────────────
+// verifyFounderPass() (the canonical in src/lib/utils/founder-auth.ts)
+// returns a FounderAuthResult OBJECT — always truthy. A guard shaped
+// `if (!verifyFounderPass(...))` therefore NEVER fires, silently leaving
+// the route unauthenticated. The 2026-06-09 security sweep found FOUR
+// LLM routes (argument-builder, grade-recall, sparring generate/grade)
+// with exactly this dead guard — every one effectively open to the
+// internet. The legitimate patterns this check must NOT flag:
+//   - `!verifyFounderPass(...).ok`            (correct object guard)
+//   - files defining a LOCAL boolean wrapper `function verifyFounderPass`
+//     (content / outreach routes alias the canonical as checkFounderPass)
+//   - aliased imports (`verifyFounderPass as checkFounderPass`)
+function checkDeadFounderPassGuard(files) {
+  const findings = [];
+  const importRe =
+    /import\s*\{[^}]*\bverifyFounderPass\b(?!\s+as\s)[^}]*\}\s*from\s*['"]@\/lib\/utils\/founder-auth['"]/;
+  for (const file of files) {
+    const rel = relative(ROOT, file);
+    if (!rel.startsWith('src/')) continue;
+    if (rel.endsWith('founder-auth.ts')) continue;
+    const lines = readLines(file);
+    if (!lines) continue;
+    const content = lines.join('\n');
+    if (!importRe.test(content)) continue; // not importing the canonical unaliased
+    if (/function\s+verifyFounderPass\s*\(/.test(content)) continue; // local wrapper shadows it
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!/!\s*verifyFounderPass\s*\(/.test(line)) continue;
+      // Allow the correct `.ok` guard. NOTE: a paren-balanced regex breaks on
+      // nested call args (`verifyFounderPass(req.headers.get('x'))`), so the
+      // allow-test is the simple presence of `).ok` on the guard line — the
+      // observed bug class is single-line guards.
+      if (line.includes(').ok')) continue;
+      findings.push({
+        category: 'critical',
+        severity: 'critical',
+        rule: 'dead-founder-pass-guard',
+        file: rel,
+        line: i + 1,
+        snippet: line.trim().slice(0, 140),
+        suggestion:
+          'verifyFounderPass returns an OBJECT (always truthy) — `!verifyFounderPass(...)` never fires and the route is unauthenticated. Guard on `.ok`: `if (!verifyFounderPass(x).ok)`.',
+      });
+    }
+  }
+  return findings;
+}
+
 function checkOnboardingPersonaCoherence(files) {
   const findings = [];
   for (const file of files) {
@@ -1387,6 +1435,7 @@ function runAllChecks() {
     ...checkStaleStageLanguage(files),
     ...checkStaleAsOfDates(files),
     ...checkDeletedReferences(files),
+    ...checkDeadFounderPassGuard(files),
     ...checkOnboardingPersonaCoherence(files),
     ...checkLockedCountDrift(files),
     ...checkStaticAssetLink(files),
