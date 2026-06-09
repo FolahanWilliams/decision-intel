@@ -26,8 +26,14 @@ import {
   type BuyerPersonaId,
   type ScenarioMode,
 } from '@/components/founder-hub/sparring/sparring-room-data';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const log = createLogger('SparringGenerateQuestions');
+
+// Derived — canonical bias count for the LLM system prompt (LLM prompt strings
+// are user-visible prose per the 2026-05-29 lock; the legacy "30+ bias
+// taxonomy" phrasing was deprecated 2026-05-13, CR-3).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 interface RequestBody {
   personaId: BuyerPersonaId;
@@ -102,7 +108,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const prompt = `You are simulating a real buyer for a B2B SaaS sales-practice exercise. Your job is to generate the OPENING LINE the buyer says + 3 questions they ask the salesperson, in the buyer's authentic voice.
 
-CONTEXT — the salesperson is selling Decision Intel, "the reasoning audit platform" (their 2026-05-04 locked category claim). It runs a 60-second audit on strategic memos / IC memos / CIMs, scoring cognitive biases against a 30+ bias taxonomy and producing a Decision Provenance Record (procurement-grade artefact, hashed + tamper-evident). The contrast: most tools audit data; they audit human reasoning — catching the fatal blind spots in strategic memos before the committee does.
+CONTEXT — the salesperson is selling Decision Intel, "the reasoning audit platform" (their 2026-05-04 locked category claim). It runs a 60-second audit on strategic memos / IC memos / CIMs, scoring cognitive biases against a ${BIAS_COUNT}-bias taxonomy and producing a Decision Provenance Record (procurement-grade artefact, hashed + tamper-evident). The contrast: most tools audit data; they audit human reasoning — catching the fatal blind spots in strategic memos before the committee does.
 
 THE BUYER YOU ARE SIMULATING:
 - Role + company shape: ${persona.rolePlayIntro}

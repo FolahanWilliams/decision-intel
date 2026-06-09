@@ -890,6 +890,18 @@ const LOCKED_COUNT_DRIFT_FILES = [
   'src/components/founder-hub/path-to-100m/data/failure-modes.ts',
   'src/components/founder-hub/path-to-100m/data/ninety-day-actions.ts',
   'src/components/founder-hub/education/education-room-data.ts',
+  // Added 2026-06-09 (nightly audit Section 1) — four files carried the
+  // deprecated '30+ bias(es)/taxonomy' phrasing in LIVE user-visible
+  // strings (a marketing showcase detail, a verbatim founder rehearsal
+  // script, two Slack response texts, an LLM system prompt — LLM prompt
+  // strings are user-visible prose per the 2026-05-29 lock). All four
+  // were OUTSIDE this allowlist, so checkLockedCountDrift was a false
+  // negative for them — the exact class the 2026-05-21 entry documents.
+  // Literals migrated to ${BIAS_COUNT} interpolation in the same commit.
+  'src/components/marketing/CategoryGapShowcase.tsx',
+  'src/components/founder-hub/path-to-100m/data/killer-responses.ts',
+  'src/app/api/integrations/slack/commands/route.ts',
+  'src/app/api/founder-hub/sparring/generate-questions/route.ts',
   // NOTE: education-room-data.ts IS deliberately INCLUDED here for the
   // hyphenated-framework class — those are ASSERT-the-count flashcard
   // canonicalAnswers (the founder rehearses "17-framework regulatory
