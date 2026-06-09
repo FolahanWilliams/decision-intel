@@ -8,6 +8,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { isAdminUserId } from '@/lib/utils/admin';
 
 const log = createLogger('ExperimentsAPI');
 
@@ -36,6 +37,11 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  // Admin-only: nudge experiments are GLOBAL platform-operator config (no
+  // per-tenant owner), so customer-tier users must not read or mutate them.
+  if (!isAdminUserId(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   try {
     const experiments = await prisma.nudgeExperiment.findMany({
@@ -61,6 +67,11 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  // Admin-only: nudge experiments are GLOBAL platform-operator config (no
+  // per-tenant owner), so customer-tier users must not read or mutate them.
+  if (!isAdminUserId(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const rateLimitResult = await checkRateLimit(user.id, '/api/experiments', {

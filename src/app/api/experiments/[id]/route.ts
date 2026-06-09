@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { createClient } from '@/utils/supabase/server';
 import { getExperimentResults, autoOptimizeExperiment } from '@/lib/nudges/ab-testing';
+import { isAdminUserId } from '@/lib/utils/admin';
 import { z } from 'zod';
 
 const log = createLogger('ExperimentDetailAPI');
@@ -23,6 +24,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  // Admin-only: nudge experiments are GLOBAL platform-operator config (no
+  // per-tenant owner), so customer-tier users must not read or mutate them.
+  if (!isAdminUserId(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -53,6 +59,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  // Admin-only: nudge experiments are GLOBAL platform-operator config (no
+  // per-tenant owner), so customer-tier users must not read or mutate them.
+  if (!isAdminUserId(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -96,6 +107,11 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  // Admin-only: nudge experiments are GLOBAL platform-operator config (no
+  // per-tenant owner), so customer-tier users must not read or mutate them.
+  if (!isAdminUserId(user.id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
