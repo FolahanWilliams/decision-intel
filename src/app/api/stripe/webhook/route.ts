@@ -147,7 +147,29 @@ export async function POST(request: NextRequest) {
                 `Container audit purchased: ${tier} for container ${resolvedContainerId} by user ${auditUserId}`
               );
             } catch (err) {
-              log.error('Failed to create DecisionContainerAuditPurchase:', err);
+              // P2002 on the @unique stripePaymentId = the purchase row already
+              // exists (a prior partial run got this far) — safe to ack so
+              // Stripe stops retrying. EVERY other failure must rethrow:
+              // swallowing here let control reach the idempotency stamp below,
+              // so Stripe's retry saw `duplicate: true` and the PAID purchase
+              // was never recorded (commerce fail-closed lock — the user paid,
+              // the system kept no record). Rethrowing returns 500 with no
+              // idempotency stamp, so Stripe retries until the write lands.
+              const isDuplicate =
+                typeof err === 'object' &&
+                err !== null &&
+                (err as { code?: string }).code === 'P2002';
+              if (isDuplicate) {
+                log.warn(
+                  `DecisionContainerAuditPurchase already recorded for ${session.id} — acking duplicate`
+                );
+              } else {
+                log.error(
+                  'Failed to create DecisionContainerAuditPurchase — rethrowing for Stripe retry:',
+                  err
+                );
+                throw err;
+              }
             }
           }
           break;
