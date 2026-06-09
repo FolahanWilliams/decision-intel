@@ -392,7 +392,7 @@ export default function DemoPage() {
       if (watchdog) clearTimeout(watchdog);
       const aborted = controller.signal.aborted;
       const msg = aborted
-        ? 'The audit stalled — your connection may have dropped. Please try again.'
+        ? 'The audit stalled. Your connection may have dropped. Please try again.'
         : err instanceof Error && err.message
           ? 'Network error. Please check your connection and try again.'
           : 'Something went wrong. Please try again.';
@@ -723,7 +723,7 @@ export default function DemoPage() {
                 <RoleSamplePicker
                   fetchRole={false}
                   title="Paste a sample memo"
-                  subtitle="Pick the one closest to a decision your team makes — the picker is role-routed so the first paste maps to your stack."
+                  subtitle="Pick the one closest to a decision your team makes. The picker is role-routed so the first paste maps to your stack."
                   onSelect={bundle => {
                     setPasteText(bundle.content);
                     trackEvent('demo_sample_bundle_loaded', {
@@ -794,7 +794,7 @@ export default function DemoPage() {
                       : pasteUnderMin
                         ? `${pasteWordCount}/${PASTE_MIN_WORDS} words minimum`
                         : pasteOverMax
-                          ? `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} — trim ${(pasteWordCount - PASTE_MAX_WORDS).toLocaleString()}`
+                          ? `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} · trim ${(pasteWordCount - PASTE_MAX_WORDS).toLocaleString()}`
                           : `${pasteWordCount.toLocaleString()} / ${PASTE_MAX_WORDS.toLocaleString()} words`}
                   </span>
                   {/* Optional ticket-size input. Closed by default; opens
@@ -1621,7 +1621,7 @@ export default function DemoPage() {
                 <Section
                   icon={<BarChart3 size={16} />}
                   title="Executive Summary"
-                  subtitle="What the audit caught, in two minutes — written for the strategist about to walk into the room."
+                  subtitle="What the audit caught, in two minutes, written for the strategist about to walk into the room."
                 >
                   <p style={{ color: C.slate600, lineHeight: 1.65, margin: 0, fontSize: 14 }}>
                     {analysis.summary}
@@ -1631,7 +1631,7 @@ export default function DemoPage() {
                 <Section
                   icon={<BarChart3 size={16} />}
                   title="How the DQI is built"
-                  subtitle="Six weighted components feed the composite score. A-F grade scale is fixed and published — re-runnable against the methodology, not a proprietary black box."
+                  subtitle="Six weighted components feed the composite score. A-F grade scale is fixed and published: re-runnable against the methodology, not a proprietary black box."
                 >
                   <DqiComponentBars />
                 </Section>
@@ -1965,7 +1965,7 @@ export default function DemoPage() {
                 <Section
                   icon={<Target size={16} />}
                   title="Why noise matters"
-                  subtitle="Two memos with the same logic should get the same DQI. Low noise means your reasoning travels — different reviewers converge on the same verdict. High noise means half your committee was reading a different paper."
+                  subtitle="Two memos with the same logic should get the same DQI. Low noise means your reasoning travels: different reviewers converge on the same verdict. High noise means half your committee was reading a different paper."
                 >
                   <NoiseDistributionViz />
                 </Section>
@@ -1976,7 +1976,7 @@ export default function DemoPage() {
                 <Section
                   icon={<Users size={16} />}
                   title="Boardroom Simulation"
-                  subtitle="See which board member would push back, on what, and why — before the meeting happens."
+                  subtitle="See which board member would push back, on what, and why, before the meeting happens."
                 >
                   <div
                     style={{
@@ -2163,7 +2163,7 @@ export default function DemoPage() {
                 <Section
                   icon={<Skull size={16} />}
                   title="Pre-Mortem"
-                  subtitle="Two years from now, this decision has failed and you're in front of the CEO. The audit names the failure modes — so you can pre-empt them."
+                  subtitle="Two years from now, this decision has failed and you're in front of the CEO. The audit names the failure modes, so you can pre-empt them."
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {analysis.preMortem.scenarios.map((s, idx) => {
@@ -2476,7 +2476,7 @@ function DemoVideoSection() {
           onMouseEnter={e => (e.currentTarget.style.background = C.greenDark)}
           onMouseLeave={e => (e.currentTarget.style.background = C.green)}
         >
-          Start free — 4 audits on us <ArrowRight size={14} />
+          Start free · 4 audits on us <ArrowRight size={14} />
         </Link>
         {DEMO_BOOKING_URL && (
           <a
