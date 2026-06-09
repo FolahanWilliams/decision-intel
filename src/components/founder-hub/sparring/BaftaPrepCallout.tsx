@@ -29,7 +29,13 @@ import {
   BUYER_PERSONAS,
   GRADING_DIMENSIONS,
 } from '@/components/founder-hub/sparring/sparring-room-data';
-import { getHighestPriorityUpcomingEvent, daysUntil, ACTION_CADENCE } from '@/lib/data/event-prep';
+import {
+  getHighestPriorityUpcomingEvent,
+  daysUntil,
+  hasEventEnded,
+  formatEventCountdown,
+  ACTION_CADENCE,
+} from '@/lib/data/event-prep';
 import { prefillConversionLedger } from '@/lib/outreach/ledger-prefill';
 
 /** Minimal structural contract — the full HistoryEntry lives (twice) in
@@ -93,7 +99,10 @@ export function BaftaPrepCallout({ history }: Props) {
   const event = getHighestPriorityUpcomingEvent(today);
   if (!event) return null;
   const days = daysUntil(event, today);
-  if (days > HIDE_AFTER_DAYS || days < 0) return null;
+  // Use hasEventEnded (keyed on endDate), NOT days < 0 (keyed on startDate) —
+  // otherwise this whole callout vanishes on day 2 of a multi-day event while
+  // the conference is still running (e.g. Strategy World London, Jun 9-10).
+  if (days > HIDE_AFTER_DAYS || hasEventEnded(event, today)) return null;
 
   const weeksUntil = Math.max(0, Math.min(6, Math.ceil(days / 7)));
   const weekAgoMs = nowMs - WEEK_MS;
@@ -273,7 +282,7 @@ export function BaftaPrepCallout({ history }: Props) {
               lineHeight: 1,
             }}
           >
-            {days === 0 ? 'Today' : `T-${days}d`}
+            {formatEventCountdown(event, today)}
           </div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
             week {weeksUntil} of the prep arc

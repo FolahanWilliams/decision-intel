@@ -35,7 +35,12 @@ import {
   type ResearchedProspect,
   type PersonaIdOrOther,
 } from '@/lib/outreach/target-research';
-import { getHighestPriorityUpcomingEvent, daysUntil, WEDGE_PERSONAS } from '@/lib/data/event-prep';
+import {
+  getHighestPriorityUpcomingEvent,
+  daysUntil,
+  hasEventEnded,
+  WEDGE_PERSONAS,
+} from '@/lib/data/event-prep';
 
 interface Props {
   founderPass: string;
@@ -180,7 +185,7 @@ export function TargetResearchWorkbench({ founderPass }: Props) {
             <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
               Target Research Workbench
             </span>
-            {event && eventCountdown != null && eventCountdown >= 0 && (
+            {event && !hasEventEnded(event) && (
               <span
                 style={{
                   fontSize: 11,
@@ -193,7 +198,10 @@ export function TargetResearchWorkbench({ founderPass }: Props) {
                   letterSpacing: '0.06em',
                 }}
               >
-                {event.name} · T-{eventCountdown}d
+                {event.name} ·{' '}
+                {eventCountdown != null && eventCountdown > 0
+                  ? `T-${eventCountdown}d`
+                  : 'happening now'}
               </span>
             )}
           </div>

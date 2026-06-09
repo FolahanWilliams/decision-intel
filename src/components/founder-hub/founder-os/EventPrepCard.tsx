@@ -176,7 +176,7 @@ function EventHeader({
             fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
           }}
         >
-          {days}d
+          {days > 0 ? `${days}d` : 'Now'}
         </div>
         <div
           style={{
@@ -188,7 +188,7 @@ function EventHeader({
             marginTop: 4,
           }}
         >
-          {days === 0 ? 'Today' : days < 0 ? 'Past' : 'Until'}
+          {days > 0 ? 'Until' : 'Happening'}
         </div>
       </div>
     </div>

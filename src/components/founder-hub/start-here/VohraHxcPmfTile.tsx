@@ -26,7 +26,7 @@
 
 import { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
-import { getHighestPriorityUpcomingEvent, daysUntil } from '@/lib/data/event-prep';
+import { getHighestPriorityUpcomingEvent, daysUntil, hasEventEnded } from '@/lib/data/event-prep';
 
 interface PmfPayload {
   veryDisappointedPct: number;
@@ -197,8 +197,12 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
     const today = new Date(nowMs);
     const event = getHighestPriorityUpcomingEvent(today);
     const daysToEvent = event ? daysUntil(event, today) : null;
+    // Stay anchored to the event THROUGH its run (endDate), not just until its
+    // start — otherwise the reminder de-anchors on day 2 of a live multi-day
+    // event, dropping the "investors there will ask" urgency on the day it
+    // matters most.
     const eventAnchored =
-      event != null && daysToEvent != null && daysToEvent >= 0 && daysToEvent <= 45;
+      event != null && daysToEvent != null && !hasEventEnded(event, today) && daysToEvent <= 45;
     const accent = eventAnchored
       ? daysToEvent != null && daysToEvent <= 14
         ? 'var(--error)'
@@ -211,7 +215,7 @@ export function VohraHxcPmfTile({ onNavigateToMetrics }: Props) {
         : '';
     const body =
       eventAnchored && event && daysToEvent != null
-        ? `Graduation gate is dark — n = ${pmf.sampleSize} / ${pmf.killMinN}. ${event.name} is T-${daysToEvent}d; investors and warm intros there will ask whether you have PMF signal. ${needed} more HXC "very disappointed" response${s} unlocks the gate.${pendingClause} Send the Vohra survey to every HXC customer 30+ days in before the event.`
+        ? `Graduation gate is dark — n = ${pmf.sampleSize} / ${pmf.killMinN}. ${event.name} is ${daysToEvent > 0 ? `T-${daysToEvent}d` : 'happening now'}; investors and warm intros there will ask whether you have PMF signal. ${needed} more HXC "very disappointed" response${s} unlocks the gate.${pendingClause} Send the Vohra survey to every HXC customer 30+ days in before the event.`
         : `Graduation gate needs n ≥ ${pmf.killMinN} HXC responses (currently ${pmf.sampleSize}). ${needed} more unlock${needed === 1 ? 's' : ''} the gate.${pendingClause}${
             pmf.daysSinceLastSurveyResponse != null && pmf.daysSinceLastSurveyResponse > 14
               ? ` Last response was ${pmf.daysSinceLastSurveyResponse}d ago — cadence is slipping.`

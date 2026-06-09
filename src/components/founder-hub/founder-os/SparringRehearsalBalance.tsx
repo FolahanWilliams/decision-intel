@@ -151,9 +151,12 @@ export function SparringRehearsalBalance() {
   const upcomingEvent = getHighestPriorityUpcomingEvent(new Date(mountTime));
   const daysToEvent = upcomingEvent ? daysUntil(upcomingEvent, new Date(mountTime)) : null;
   const eventLabel = upcomingEvent
-    ? daysToEvent === 0
-      ? `${upcomingEvent.name} is TODAY`
-      : `${upcomingEvent.name} is T-${daysToEvent} days`
+    ? daysToEvent !== null && daysToEvent < 0
+      ? // multi-day event currently running (daysUntil keys off startDate → negative)
+        `${upcomingEvent.name} is happening now`
+      : daysToEvent === 0
+        ? `${upcomingEvent.name} is TODAY`
+        : `${upcomingEvent.name} is T-${daysToEvent} days`
     : null;
 
   const totalReps = stats.reduce((acc, s) => acc + s.reps7d, 0);

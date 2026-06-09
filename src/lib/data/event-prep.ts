@@ -429,22 +429,52 @@ export function daysUntil(event: PrepEvent, today: Date = new Date()): number {
 }
 
 /**
- * Returns the next upcoming event (start date >= today). Returns null when
- * the calendar is empty or all events have passed.
+ * Whether the event's LAST day is in the past — keyed on endDate, not
+ * startDate. This is the correct "is this event still relevant?" test for a
+ * MULTI-DAY event: daysUntil() keys off startDate, so on day 2 of a 2-day
+ * conference daysUntil is already negative even though the event is still
+ * running. The selectors below filter on this so a live multi-day event
+ * (e.g. Strategy World London, Jun 9-10) doesn't vanish on its second day.
+ * Mirrors daysUntil's ceil semantics: 0 on the final day, negative once past.
+ */
+export function hasEventEnded(event: PrepEvent, today: Date = new Date()): boolean {
+  const end = new Date(event.endDate);
+  return Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) < 0;
+}
+
+/**
+ * Human countdown label that handles the in-progress case. Because daysUntil()
+ * keys off startDate, a running multi-day event has daysUntil <= 0 — so a naive
+ * `days < 0 ? 'Past'` mislabels a live event. Use this everywhere a countdown
+ * chip is rendered so the label reads "Happening now" during the event.
+ */
+export function formatEventCountdown(event: PrepEvent, today: Date = new Date()): string {
+  if (hasEventEnded(event, today)) return 'Past';
+  const days = daysUntil(event, today);
+  if (days <= 0) return 'Happening now';
+  if (days === 1) return 'Tomorrow';
+  return `${days} days away`;
+}
+
+/**
+ * Returns the next event that has not yet ended (running OR upcoming). Returns
+ * null when the calendar is empty or all events have passed. A currently-running
+ * event sorts first (its startDate-based daysUntil is <= 0, i.e. most proximate).
  */
 export function getNextEvent(today: Date = new Date()): PrepEvent | null {
-  const upcoming = EVENTS.filter(e => daysUntil(e, today) >= 0).sort(
+  const upcoming = EVENTS.filter(e => !hasEventEnded(e, today)).sort(
     (a, b) => daysUntil(a, today) - daysUntil(b, today)
   );
   return upcoming[0] ?? null;
 }
 
 /**
- * Returns the highest-priority upcoming event ('highest' before 'high'
- * before 'medium', tie-broken by date proximity).
+ * Returns the highest-priority not-yet-ended event ('highest' before 'high'
+ * before 'medium', tie-broken by date proximity). Includes events that are
+ * currently running (not just future-dated ones).
  */
 export function getHighestPriorityUpcomingEvent(today: Date = new Date()): PrepEvent | null {
-  const upcoming = EVENTS.filter(e => daysUntil(e, today) >= 0);
+  const upcoming = EVENTS.filter(e => !hasEventEnded(e, today));
   if (upcoming.length === 0) return null;
   const priorityWeight: Record<PrepEvent['priority'], number> = {
     highest: 3,
