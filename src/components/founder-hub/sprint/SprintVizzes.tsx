@@ -14,10 +14,24 @@
  */
 
 import { EXTRACTION_TARGETS, FOUR_WEEK_PLAN } from './sprint-brief-data';
+import { EVENTS, formatEventCountdown } from '@/lib/data/event-prep';
 
 const GREEN = 'var(--accent-primary)';
 const INFO = 'var(--accent-secondary, #6366f1)';
 const MUTED = 'var(--text-muted)';
+
+/**
+ * Live BAFTA badge label for the week-1 sprint-arc marker. The prior
+ * hardcoded 'T-8d' was the canonical "your daily UI silently rots" class
+ * (per the 2026-05-28 SparringRehearsalBalance lock: NEVER hardcode T-N in
+ * JSX body text — derive from the event-prep SSOT). Falls back to the bare
+ * label if the event is ever pruned from EVENTS.
+ */
+function baftaBadgeLabel(): string {
+  const bafta = EVENTS.find(e => e.id === 'strategy_world_london_2026');
+  if (!bafta) return '★ BAFTA';
+  return `★ BAFTA · ${formatEventCountdown(bafta)}`;
+}
 
 /* ─── 1. Convergence: InsurX <-> DI ─────────────────────────────────── */
 
@@ -202,7 +216,7 @@ export function SprintArcViz() {
                   padding: '2px 8px',
                 }}
               >
-                ★ BAFTA · T-8d
+                {baftaBadgeLabel()}
               </div>
             )}
           </div>
