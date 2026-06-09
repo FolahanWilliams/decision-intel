@@ -138,7 +138,8 @@ const BANNED = [
   // common drift variants the icp.ts reason text names ("write your IC
   // memo / board deck / LP letter for you", "co-author your deal docs").
   {
-    pattern: /\bauto-?draft(?:s|ing|ed)? (?:the |your |a |an )?(?:memo|IC memo|board deck|LP letter|deliverable|document)\b/i,
+    pattern:
+      /\bauto-?draft(?:s|ing|ed)? (?:the |your |a |an )?(?:memo|IC memo|board deck|LP letter|deliverable|document)\b/i,
     label:
       '"auto-draft the memo" (DEPRECATED 2026-05-29 — narrowness guard; DI co-creates REASONING, never authors the deliverable. Horizontal Quantellia/Aera/Wealor trap)',
   },

@@ -8,3 +8,10 @@ dist
 prisma/migrations
 .github
 .husky
+# Generated point-in-time reports (audit-platform:write / dqi-distribution-check
+# / nightly-audit output) — same class as prisma/migrations: written once by a
+# script, never hand-edited; formatting them rewrites historical artefacts and
+# every future generated report would re-break `prettier --check .`.
+docs/platform-audits
+docs/nightly-audits
+docs/dqi-distribution-checks
