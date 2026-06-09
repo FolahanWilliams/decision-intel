@@ -22,8 +22,13 @@ import {
 import { prisma } from '@/lib/prisma';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { checkRateLimit as checkRateLimitDb } from '@/lib/utils/rate-limit';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const log = createLogger('SlackCommands');
+
+// Derived — canonical bias count for user-visible Slack response text (the
+// legacy "30+ bias" phrasing was deprecated 2026-05-13, CR-3).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 // ─── Per-User Rate Limiting (Postgres-backed, consistent across instances) ──
 
@@ -257,7 +262,7 @@ function handleScoreCommand(params: { text: string; channelId: string }) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: ':large_green_circle: *No cognitive biases detected*\n\nThe text appears clear of common bias patterns. For a deeper analysis with 30+ bias checks, upload the full document to the dashboard.',
+            text: `:large_green_circle: *No cognitive biases detected*\n\nThe text appears clear of common bias patterns. For a deeper analysis with the full ${BIAS_COUNT}-bias taxonomy, upload the full document to the dashboard.`,
           },
         },
         {
@@ -308,7 +313,7 @@ function handleScoreCommand(params: { text: string; channelId: string }) {
         elements: [
           {
             type: 'mrkdwn',
-            text: '_Quick check covers 14 common biases. Upload to the dashboard for a full 30+ bias analysis with severity scoring._',
+            text: `_Quick check covers 14 common biases. Upload to the dashboard for a full ${BIAS_COUNT}-bias analysis with severity scoring._`,
           },
         ],
       },

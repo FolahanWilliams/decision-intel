@@ -68,3 +68,34 @@ export function verifyFounderPass(headerValue: string | null | undefined): Found
 
   return { ok: false, reason: 'unauthorized' };
 }
+
+/**
+ * Cost-burn cap for founder-hub/founder-os LLM endpoints (locked 2026-06-09
+ * security sweep). These routes are pass-gated but the UI credential
+ * (NEXT_PUBLIC_FOUNDER_HUB_PASS) is bundle-extractable by any signed-in user,
+ * and every call costs real LLM spend — without a throttle, a leaked pass is
+ * an unbounded credit-burn vector. 30/min/route is far above any human
+ * founder's drill cadence, so the cap never bites legitimate use.
+ *
+ * failMode 'open' is deliberate: this is a COST cap, not a security boundary
+ * (the pass check is) — a transient DB blip must never lock the founder out
+ * of his own cockpit mid-BAFTA-prep.
+ *
+ * Returns true when the request is allowed. Call AFTER the pass check so
+ * unauthenticated probes don't consume the window.
+ */
+export async function checkFounderHubLlmRateLimit(routeName: string): Promise<boolean> {
+  try {
+    const { checkRateLimit } = await import('./rate-limit');
+    const result = await checkRateLimit('founder-hub', `/api/founder-hub-llm/${routeName}`, {
+      maxRequests: 30,
+      windowMs: 60_000,
+      failMode: 'open',
+    });
+    return result.success;
+  } catch (err) {
+    // Fail open — see above; the limiter degrading must not break the hub.
+    log.warn('Founder-hub LLM rate-limit check failed, allowing request:', err);
+    return true;
+  }
+}

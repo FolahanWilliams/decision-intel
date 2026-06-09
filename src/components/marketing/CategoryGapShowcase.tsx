@@ -10,6 +10,11 @@ import {
   type DiGap,
   type GapId,
 } from '@/lib/data/competitive-positioning';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — canonical bias count per the count-discipline lock (the legacy
+// "30+ cognitive biases" phrasing was deprecated 2026-05-13, CR-3).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 /**
  * Landing-page "category-creator" showcase.
@@ -1212,8 +1217,7 @@ const FLYWHEEL_STAGES: FlywheelStage[] = [
     icon: 'clipboard',
     label: 'Audit',
     sub: 'Full memo audit',
-    detail:
-      '60-second audit across 30+ cognitive biases, triangulated noise measurement, logical-coherence check, pre-mortem, red team, fact-check, compliance mapping, and compound-risk scoring. Output: a DQI score and an evidence pack.',
+    detail: `60-second audit across the ${BIAS_COUNT}-bias taxonomy, triangulated noise measurement, logical-coherence check, pre-mortem, fact-check, compliance mapping, and compound-risk scoring. Output: a DQI score and an evidence pack.`,
     cap: 'DQI assigned',
   },
   {

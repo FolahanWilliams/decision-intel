@@ -10,6 +10,7 @@ import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { createHmac } from 'crypto';
 import { decryptWebhookSecret } from '@/lib/utils/encryption';
+import { assertPublicWebhookUrl, SsrfBlockedError } from '@/lib/utils/ssrf';
 import type { WebhookEvent } from './events';
 
 const log = createLogger('WebhookEngine');
@@ -92,6 +93,35 @@ async function deliverWithRetry(
     }
   } catch {
     // Non-critical — deliver anyway if count check fails
+  }
+
+  // SSRF guard at DELIVERY time (resolves DNS) — the registration-time check
+  // can be defeated by DNS rebinding (public at register, internal at deliver).
+  // Reject once here rather than per-retry; a rebound target won't recover.
+  try {
+    await assertPublicWebhookUrl(url);
+  } catch (err) {
+    if (err instanceof SsrfBlockedError) {
+      log.warn(`Webhook ${subscriptionId} blocked by SSRF guard at delivery: ${err.message}`);
+      try {
+        await prisma.webhookDelivery.create({
+          data: {
+            subscriptionId,
+            event,
+            payload: JSON.parse(JSON.stringify(data)) as Prisma.InputJsonValue,
+            statusCode: null,
+            success: false,
+            responseBody: `Blocked by SSRF guard: ${err.message}`.slice(0, 2000),
+            durationMs: 0,
+            attempt: 0,
+          },
+        });
+      } catch {
+        // delivery-log write is best-effort
+      }
+      return;
+    }
+    throw err;
   }
 
   const plaintextSecret = decryptWebhookSecret(secret);

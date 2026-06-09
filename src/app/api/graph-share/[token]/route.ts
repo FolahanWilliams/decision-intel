@@ -12,6 +12,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { extractIp } from '@/lib/utils/request';
 import bcrypt from 'bcryptjs';
 import type { GraphNetworkReport } from '@/lib/reports/graph-report';
 
@@ -124,6 +126,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   const { token } = await params;
   if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+  }
+
+  // Brute-force guard: bcrypt.compare below is an unauthenticated password
+  // check on a public token. Without a limit an attacker enumerates the share
+  // password at full speed. 10 attempts / 5 min / IP+token is generous for a
+  // human typo, hostile to a guesser. Fail-open (a DB blip never bricks a
+  // legitimate unlock).
+  const ip = extractIp(req);
+  const rl = await checkRateLimit(`graph-share-unlock:${ip}:${token}`, '/api/graph-share:POST', {
+    maxRequests: 10,
+    windowMs: 5 * 60_000,
+    failMode: 'open',
+  }).catch(() => ({ success: true }));
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: 'Too many attempts — please wait a few minutes.' },
+      { status: 429 }
+    );
   }
 
   const body = (await req.json().catch(() => ({}))) as { password?: string };

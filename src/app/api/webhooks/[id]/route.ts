@@ -10,23 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
-
-/**
- * Block webhook URLs pointing to private/internal networks (SSRF prevention).
- */
-function isPrivateHostname(hostname: string): boolean {
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') return true;
-  if (hostname === '169.254.169.254') return true;
-  const ipv4Match = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-  if (ipv4Match) {
-    const [, a, b] = ipv4Match.map(Number);
-    if (a === 10) return true;
-    if (a === 172 && b >= 16 && b <= 31) return true;
-    if (a === 192 && b === 168) return true;
-    if (a === 0) return true;
-  }
-  return false;
-}
+import { assertPublicWebhookUrl, SsrfBlockedError } from '@/lib/utils/ssrf';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
@@ -68,20 +52,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const updates: Record<string, unknown> = {};
 
   if (body.url !== undefined) {
-    let parsed: URL;
     try {
-      parsed = new URL(body.url);
-    } catch {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
-    }
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return NextResponse.json({ error: 'URL must use http or https' }, { status: 400 });
-    }
-    if (isPrivateHostname(parsed.hostname)) {
-      return NextResponse.json(
-        { error: 'URL must not point to a private or internal network address' },
-        { status: 400 }
-      );
+      await assertPublicWebhookUrl(body.url);
+    } catch (err) {
+      if (err instanceof SsrfBlockedError) {
+        return NextResponse.json({ error: err.message }, { status: 400 });
+      }
+      throw err;
     }
     updates.url = body.url;
   }

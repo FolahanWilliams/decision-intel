@@ -433,6 +433,30 @@ export async function POST(request: NextRequest) {
               progress: 0,
             });
             controller.close();
+            // Cleanup must happen HERE, not via the catch block: if the event
+            // stream is hung on a stalled LLM call, the for-await never wakes
+            // to throw on the closed controller, and Vercel kills the function
+            // at maxDuration — leaving the document stuck in 'analyzing' (up
+            // to the 10-min stale threshold) and the monthly quota reservation
+            // leaked until the TTL sweep. Fire-and-forget with best-effort
+            // ordering; the function may die mid-flight, in which case the
+            // stale-threshold + reservation TTL remain the backstop.
+            if (heartbeatInterval) clearInterval(heartbeatInterval);
+            void (async () => {
+              try {
+                await prisma.document.update({
+                  where: { id: documentId },
+                  data: { status: 'error' },
+                });
+              } catch (err) {
+                log.warn('Timeout cleanup: failed to reset document status:', err);
+              }
+              try {
+                await releaseAnalysisSlot(reservationId);
+              } catch (err) {
+                log.warn('Timeout cleanup: failed to release reservation:', err);
+              }
+            })();
           }, 235_000);
 
           for await (const event of eventStream) {

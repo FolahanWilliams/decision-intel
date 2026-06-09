@@ -856,7 +856,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
                 Claim verification
               </h3>
               <p style={{ fontSize: 12.5, color: C.slate500, margin: '2px 0 0' }}>
-                {verifications.length} claim{verifications.length === 1 ? '' : 's'} cross-checked —
+                {verifications.length} claim{verifications.length === 1 ? '' : 's'} cross-checked:
                 verified, contradicted, or unverifiable.
               </p>
             </div>
@@ -1088,7 +1088,7 @@ export function PasteAuditResults({ documentId, analysisId, result }: PasteAudit
                 The AI boardroom
               </h3>
               <p style={{ fontSize: 12.5, color: C.slate500, margin: '2px 0 0' }}>
-                All {twins.length} role-primed personas the simulation node ran — CEO, CFO, board
+                All {twins.length} role-primed personas the simulation node ran: CEO, CFO, board
                 chair, GC, audit committee.{' '}
                 {result.simulation?.overallVerdict
                   ? `Overall verdict: ${result.simulation.overallVerdict}.`

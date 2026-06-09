@@ -48,12 +48,14 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { BookDemoCTA } from '@/components/marketing/BookDemoCTA';
-import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
-import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { HISTORICAL_CASE_COUNT_SNAPSHOT as HISTORICAL_CASE_COUNT } from '@/lib/data/case-count';
+import { BIAS_COUNT } from '@/lib/constants/bias-count';
 
-// Canonical bias count — derived per the count-drift discipline (CLAUDE.md
-// "Bias Taxonomy" cascade rule: never literal "20" or "22"; always derive).
-const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+// Counts come from the bundle-safe SNAPSHOT mirrors (bias-count.ts /
+// case-count.ts), NOT the canonical heavy modules: this nav mounts on every
+// marketing page, and importing bias-education.ts (~41.5KB) + the case-studies
+// index (~170KB) for two integers shipped both payloads to every visitor.
+// Drift from canonical is caught in CI by the snapshots' lockstep tests.
 
 const C = {
   navy: '#0F172A',

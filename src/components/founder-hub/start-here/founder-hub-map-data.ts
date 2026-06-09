@@ -31,8 +31,10 @@ import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
 export type TabId =
-  // Foundations (1) — faith woven under the platform (Faith OS, 2026-05-28)
+  // Foundations (2) — faith woven under the platform (Faith OS, 2026-05-28)
+  // + the founder-private SAT study system (SAT Prep, 2026-06-07)
   | 'faith_os'
+  | 'sat_prep'
   // Start (5)
   | 'unicorn_roadmap'
   | 'path_to_100m'
@@ -134,7 +136,7 @@ export interface Journey {
 //   Tools:        0.92
 
 export const NODES: MapNode[] = [
-  // ─── Foundations (1) ───────────────────────────────────────────────
+  // ─── Foundations (2) ───────────────────────────────────────────────
   {
     id: 'faith_os',
     label: 'Faith OS',
@@ -148,6 +150,20 @@ export const NODES: MapNode[] = [
     minutes: 20,
     prerequisites: [],
     iconName: 'BookOpen',
+  },
+  {
+    id: 'sat_prep',
+    label: 'SAT Prep',
+    group: 'Foundations',
+    x: 0.16,
+    y: 0.1,
+    whatItsFor:
+      'The founder-private SAT study system — daily training with confidence-tagged Brier calibration, the SM-2 active error loop over real misses, the official Bluebook test log (the SOLE source of the projected score), and the adaptive vocab engine.',
+    payoff:
+      '1280 PSAT → 1550 target by November. Inputs-only XP rewards the reps, never the score — the same calibration discipline the platform sells, applied to the test-taker.',
+    minutes: 15,
+    prerequisites: [],
+    iconName: 'GraduationCap',
   },
 
   // ─── Start (3) ─────────────────────────────────────────────────────

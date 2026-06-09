@@ -18,7 +18,7 @@ import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { getFounderChatModel, isFounderChatModelId } from '@/lib/ai/founder-chat-models';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
 import { buildRecentMeetingsBlock } from '@/lib/founder-hub/recent-meetings-context';
@@ -130,6 +130,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: auth.reason === 'not_configured' ? 'Not configured' : 'Unauthorized' },
       { status: auth.reason === 'not_configured' ? 503 : 401 }
+    );
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('chat'))) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — try again in a minute.' },
+      { status: 429 }
     );
   }
 

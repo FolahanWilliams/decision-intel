@@ -14,6 +14,7 @@ import {
   Pin,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 import { AgentBadge } from './AgentBadge';
 import { SourceAttribution } from '@/components/chat/SourceAttribution';
 import { SuggestedQuestions } from '@/components/chat/SuggestedQuestions';
@@ -180,7 +181,11 @@ export function CopilotChat({
                 )}
                 <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
                   {msg.role === 'agent' ? (
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    // rehype-sanitize: msg.content is LLM output (prompt-injectable).
+                    // react-markdown v10 strips raw HTML by default; pinning the
+                    // sanitize plugin locks the surface against a future rehype-raw
+                    // addition re-opening a stored-XSS vector.
+                    <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{msg.content}</ReactMarkdown>
                   ) : (
                     <span className="whitespace-pre-wrap">{msg.content}</span>
                   )}

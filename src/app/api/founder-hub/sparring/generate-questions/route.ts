@@ -17,7 +17,7 @@ import { generateText } from '@/lib/ai/providers/gateway';
 import { MODEL_FOUNDER_HUB } from '@/lib/ai/gateway-models';
 import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
-import { verifyFounderPass } from '@/lib/utils/founder-auth';
+import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import {
   findPersonaById,
   findScenarioById,
@@ -26,8 +26,14 @@ import {
   type BuyerPersonaId,
   type ScenarioMode,
 } from '@/components/founder-hub/sparring/sparring-room-data';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const log = createLogger('SparringGenerateQuestions');
+
+// Derived — canonical bias count for the LLM system prompt (LLM prompt strings
+// are user-visible prose per the 2026-05-29 lock; the legacy "30+ bias
+// taxonomy" phrasing was deprecated 2026-05-13, CR-3).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 interface RequestBody {
   personaId: BuyerPersonaId;
@@ -53,8 +59,21 @@ function extractJSON(text: string): unknown {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   // Auth
   const founderPass = req.headers.get('x-founder-pass') || '';
-  if (!verifyFounderPass(founderPass)) {
+  // SECURITY (2026-06-09): verifyFounderPass returns an OBJECT — `!obj` is always
+  // false, so the prior guard NEVER fired and this LLM endpoint was effectively
+  // unauthenticated. Guard on `.ok`. Structural check: dead-founder-pass-guard
+  // in scripts/audit-platform.mjs.
+  if (!verifyFounderPass(founderPass).ok) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Cost-burn cap (2026-06-09 security sweep): pass-gated is not enough — the
+  // UI credential is bundle-extractable and every call costs real LLM spend.
+  if (!(await checkFounderHubLlmRateLimit('sparring-generate'))) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded — try again in a minute.' },
+      { status: 429 }
+    );
   }
 
   let body: RequestBody;
@@ -102,7 +121,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const prompt = `You are simulating a real buyer for a B2B SaaS sales-practice exercise. Your job is to generate the OPENING LINE the buyer says + 3 questions they ask the salesperson, in the buyer's authentic voice.
 
-CONTEXT — the salesperson is selling Decision Intel, "the reasoning audit platform" (their 2026-05-04 locked category claim). It runs a 60-second audit on strategic memos / IC memos / CIMs, scoring cognitive biases against a 30+ bias taxonomy and producing a Decision Provenance Record (procurement-grade artefact, hashed + tamper-evident). The contrast: most tools audit data; they audit human reasoning — catching the fatal blind spots in strategic memos before the committee does.
+CONTEXT — the salesperson is selling Decision Intel, "the reasoning audit platform" (their 2026-05-04 locked category claim). It runs a 60-second audit on strategic memos / IC memos / CIMs, scoring cognitive biases against a ${BIAS_COUNT}-bias taxonomy and producing a Decision Provenance Record (procurement-grade artefact, hashed + tamper-evident). The contrast: most tools audit data; they audit human reasoning — catching the fatal blind spots in strategic memos before the committee does.
 
 THE BUYER YOU ARE SIMULATING:
 - Role + company shape: ${persona.rolePlayIntro}
