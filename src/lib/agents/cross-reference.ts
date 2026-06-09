@@ -296,6 +296,13 @@ export async function runCrossReferenceAgent(docs: CrossRefInputDoc[]): Promise<
     model: 'gemini-3-flash-preview',
     temperature: 0.15,
     maxTokens: 2400,
+    // The cross-reference auto-trigger is AWAITED inside the analyze-stream
+    // post-completion handler (route.ts ~1078); without a timeout a hung
+    // grounded call would block that handler indefinitely (and keep billing).
+    // 90s is generous for a 2-doc compare; the caller wraps this in try/catch
+    // and fails soft, so a timeout degrades to "no cross-ref this run", never
+    // a broken audit.
+    timeoutMs: 90_000,
   });
 
   const parsed = parseJSON(result.text) as {

@@ -34,6 +34,17 @@ export interface GenerateTextOptions {
   model?: string;
   maxTokens?: number;
   temperature?: number;
+  /**
+   * Optional wall-clock timeout (ms) for the underlying generateContent call.
+   * When set, the call is raced against a timer that rejects with a clear
+   * 'Gemini generateText timed out' error. Default: undefined (no timeout —
+   * preserves prior behaviour for every existing caller). NOTE: this is a
+   * Promise.race — it unblocks the caller, it does NOT abort the in-flight
+   * HTTP request (the legacy @google/generative-ai SDK does not surface an
+   * AbortSignal on generateContent). The win is that a hung background call
+   * can no longer block its awaiter indefinitely.
+   */
+  timeoutMs?: number;
 }
 
 /**
@@ -89,7 +100,18 @@ export async function generateText(
   });
 
   const start = Date.now();
-  const result = await model.generateContent([prompt]);
+  const generate = model.generateContent([prompt]);
+  const result = options?.timeoutMs
+    ? await Promise.race([
+        generate,
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`Gemini generateText timed out after ${options.timeoutMs}ms`)),
+            options.timeoutMs
+          )
+        ),
+      ])
+    : await generate;
   const latencyMs = Date.now() - start;
 
   const response = result.response;
