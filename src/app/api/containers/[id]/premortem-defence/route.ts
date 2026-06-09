@@ -104,10 +104,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       answeredAt: new Date().toISOString(),
     };
 
-    await prisma.decisionContainer.update({
-      where: { id },
+    // Atomic guarded write — ownership predicate folded into the WHERE
+    // (2026-06-06 check-then-act lock) so the write is tenant-scoped, not just
+    // the preceding findFirst read.
+    const result = await prisma.decisionContainer.updateMany({
+      where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
       data: { premortemDefence: defence as unknown as Prisma.InputJsonValue },
     });
+    if (result.count === 0) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
 
     await logAudit({
       action: 'PREMORTEM_DEFENCE_RECORDED',

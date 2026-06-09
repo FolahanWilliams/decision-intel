@@ -360,10 +360,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updates.decidedAt = body.decidedAt ? new Date(body.decidedAt) : null;
     }
 
-    const updated = await prisma.decisionContainer.update({
-      where: { id },
+    // Atomic guarded write — fold the ownership predicate into the WHERE so
+    // the write itself is tenant-scoped, not just the preceding findFirst read
+    // (the 2026-06-06 check-then-act lock: precondition in the WHERE,
+    // count===0 ⇒ reject). `update({ where: { id } })` would be a bare-id write.
+    const result = await prisma.decisionContainer.updateMany({
+      where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
       data: updates,
     });
+    if (result.count === 0) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
 
     await logAudit({
       action: 'CONTAINER_UPDATED',
@@ -372,7 +379,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       details: { fields: Object.keys(updates) },
     }).catch(err => log.warn('Audit log for container update failed:', err));
 
-    return NextResponse.json({ ok: true, id: updated.id });
+    return NextResponse.json({ ok: true, id });
   } catch (error) {
     log.error('PATCH /api/containers/[id] failed:', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
@@ -394,16 +401,14 @@ export async function DELETE(
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const orgId = await resolveOrgId(user.id);
-    const existing = await prisma.decisionContainer.findFirst({
+    // Atomic guarded soft-delete — ownership predicate folded into the WHERE
+    // (2026-06-06 check-then-act lock); replaces the findFirst-then-bare-update
+    // pattern so the archive write is itself tenant-scoped.
+    const result = await prisma.decisionContainer.updateMany({
       where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
-      select: { id: true },
-    });
-    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-    await prisma.decisionContainer.update({
-      where: { id },
       data: { status: 'archived' },
     });
+    if (result.count === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     await logAudit({
       action: 'CONTAINER_ARCHIVED',

@@ -118,10 +118,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
-    // Stamp decidedAt on first outcome land if not already set.
+    // Stamp decidedAt on first outcome land. Ownership predicate folded into
+    // the WHERE (2026-06-06 check-then-act lock) so the stamp is tenant-scoped.
     await prisma.decisionContainer
-      .update({
-        where: { id },
+      .updateMany({
+        where: { id, OR: [{ orgId: orgId ?? undefined }, { ownerUserId: user.id }] },
         data: { decidedAt: new Date() },
       })
       .catch(err => log.warn(`decidedAt stamp failed: ${String(err)}`));
