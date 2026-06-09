@@ -15,7 +15,15 @@ const log = createLogger('CronInferGraphEdges');
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && (!authHeader || !safeCompare(authHeader, `Bearer ${cronSecret}`))) {
+  // Fail CLOSED when the secret is unconfigured — the prior `if (cronSecret &&
+  // ...)` shape silently skipped auth entirely when CRON_SECRET was unset
+  // (fresh deploy / env-var deletion), letting any anonymous request trigger a
+  // full cross-org edge-inference scan. Every other cron route already uses
+  // this fail-closed pattern; this was the lone fail-open straggler.
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  }
+  if (!authHeader || !safeCompare(authHeader, `Bearer ${cronSecret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
