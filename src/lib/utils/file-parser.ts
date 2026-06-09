@@ -26,6 +26,73 @@ import {
 const log = createLogger('FileParser');
 
 /**
+ * Decompression-bomb guard (locked 2026-06-09 security sweep).
+ *
+ * The upload route caps the RAW upload bytes (plan-based, 25-500MB), but
+ * ZIP-based office formats (PPTX / DOCX / XLSX) can decompress to many GB of
+ * text from a small archive — a classic zip-bomb that exhausts the serverless
+ * function's heap and crashes/times-out the process. These caps bound the
+ * EXTRACTED text so a malicious-but-small archive can't OOM us.
+ *
+ * - MAX_EXTRACTED_TEXT_CHARS: hard ceiling on total text pulled from one
+ *   archive. 12M chars (~12MB / ~3M tokens) is far above any legitimate board
+ *   deck or model, and the downstream audit truncates to a fraction of this
+ *   anyway, so a real document is never harmed.
+ * - MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES: per-entry guard. JSZip exposes each
+ *   entry's declared uncompressed size; an entry claiming >50MB is skipped
+ *   before we ever call .async('text') on it (the call is what allocates).
+ */
+const MAX_EXTRACTED_TEXT_CHARS = 12_000_000;
+const MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES = 50 * 1024 * 1024;
+
+/**
+ * Best-effort read of a JSZip entry's declared uncompressed size. JSZip keeps
+ * it on the internal `_data` descriptor; the property is not in the public
+ * types, so we read it defensively and return null when unavailable (in which
+ * case the running-total cap below is the backstop).
+ */
+function zipEntryUncompressedSize(file: unknown): number | null {
+  const data = (file as { _data?: { uncompressedSize?: number } })?._data;
+  return typeof data?.uncompressedSize === 'number' ? data.uncompressedSize : null;
+}
+
+/**
+ * Metadata-only decompression-bomb pre-flight for archive formats handed to a
+ * THIRD-PARTY parser (DOCX → mammoth, XLSX → exceljs) that controls its own
+ * decompression and can't be guarded entry-by-entry the way the PPTX path is.
+ *
+ * JSZip.loadAsync parses the central directory + per-entry metadata WITHOUT
+ * decompressing the content (decompression is lazy, on .async()), so summing
+ * the declared uncompressed sizes is cheap. If the archive claims to expand to
+ * more than the cap, we throw BEFORE mammoth/exceljs ever decompress it. A
+ * legitimate office document is orders of magnitude under the cap.
+ *
+ * Fails OPEN on a parse error (returns without throwing) so a merely-unusual
+ * but legitimate archive isn't rejected — the parser's own error handling +
+ * the raw-upload byte cap remain the backstop.
+ */
+async function assertArchiveNotBomb(buffer: Buffer, label: string): Promise<void> {
+  try {
+    const zip = await JSZip.loadAsync(buffer);
+    let declaredTotal = 0;
+    for (const file of Object.values(zip.files)) {
+      const size = zipEntryUncompressedSize(file);
+      if (size !== null) declaredTotal += size;
+    }
+    if (declaredTotal > MAX_EXTRACTED_TEXT_CHARS) {
+      throw new Error(
+        `${label} declares ${declaredTotal} uncompressed bytes (> ${MAX_EXTRACTED_TEXT_CHARS} cap) — refusing to parse (decompression-bomb guard).`
+      );
+    }
+  } catch (err) {
+    // Re-throw OUR guard error; swallow JSZip structural-parse errors (fail
+    // open — let the real parser surface its own error).
+    if (err instanceof Error && err.message.includes('decompression-bomb guard')) throw err;
+    log.warn(`${label} bomb pre-flight could not read archive metadata (allowing):`, err);
+  }
+}
+
+/**
  * Parses the content of a file buffer based on its MIME type or filename extension.
  * Supports PDF, DOCX, XLSX, CSV, HTML, PPTX, and Plain Text.
  * Throws an error for legacy DOC files.
@@ -100,6 +167,7 @@ export async function parseFile(
 
   if (isDocx) {
     try {
+      await assertArchiveNotBomb(buffer, 'DOCX');
       const result = await mammoth.extractRawText({ buffer });
       if (!result.value.trim()) {
         log.warn(
@@ -184,26 +252,44 @@ export async function parseFile(
 
       type Slide = { index: number; text: string; notes: string };
       const slidesByIndex = new Map<number, Slide>();
+      // Zip-bomb guard: running total of XML bytes read across all entries.
+      let extractedChars = 0;
 
       for (const [path, file] of Object.entries(zip.files)) {
-        const slideMatch = path.match(/^ppt\/slides\/slide(\d+)\.xml$/);
-        if (slideMatch && file) {
-          const xml = await file.async('text');
-          const idx = parseInt(slideMatch[1], 10);
+        const isSlide = /^ppt\/slides\/slide(\d+)\.xml$/.test(path);
+        const isNotes = /^ppt\/notesSlides\/notesSlide(\d+)\.xml$/.test(path);
+        if (!file || (!isSlide && !isNotes)) continue;
+
+        // Per-entry guard: skip an entry whose DECLARED uncompressed size is
+        // absurd BEFORE calling .async('text') (which is what allocates).
+        const declared = zipEntryUncompressedSize(file);
+        if (declared !== null && declared > MAX_ZIP_ENTRY_UNCOMPRESSED_BYTES) {
+          log.warn(
+            `PPTX entry ${path} declares ${declared} uncompressed bytes (> cap) — skipping (zip-bomb guard)`
+          );
+          continue;
+        }
+        // Running-total guard: once we've pulled the cap's worth of text,
+        // stop — a real deck never approaches this.
+        if (extractedChars >= MAX_EXTRACTED_TEXT_CHARS) {
+          log.warn(`PPTX extraction hit the ${MAX_EXTRACTED_TEXT_CHARS}-char cap — truncating`);
+          break;
+        }
+
+        const xml = await file.async('text');
+        extractedChars += xml.length;
+
+        if (isSlide) {
+          const idx = parseInt(path.match(/slide(\d+)\.xml$/)![1], 10);
           const existing = slidesByIndex.get(idx) ?? { index: idx, text: '', notes: '' };
           existing.text = extractTextNodes(xml).join(' ');
           slidesByIndex.set(idx, existing);
-          continue;
-        }
-
-        // Speaker notes often carry the actual argument behind a deck —
-        // the narrative the presenter will say out loud. For board decks
-        // this is frequently where the decision logic lives, so include
-        // them in the extracted content rather than dropping them.
-        const notesMatch = path.match(/^ppt\/notesSlides\/notesSlide(\d+)\.xml$/);
-        if (notesMatch && file) {
-          const xml = await file.async('text');
-          const idx = parseInt(notesMatch[1], 10);
+        } else {
+          // Speaker notes often carry the actual argument behind a deck —
+          // the narrative the presenter will say out loud. For board decks
+          // this is frequently where the decision logic lives, so include
+          // them in the extracted content rather than dropping them.
+          const idx = parseInt(path.match(/notesSlide(\d+)\.xml$/)![1], 10);
           const existing = slidesByIndex.get(idx) ?? { index: idx, text: '', notes: '' };
           existing.notes = extractTextNodes(xml).join(' ');
           slidesByIndex.set(idx, existing);
@@ -232,6 +318,7 @@ export async function parseFile(
 
   if (isXlsx) {
     try {
+      await assertArchiveNotBomb(buffer, 'XLSX');
       const workbook = new ExcelJS.Workbook();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await workbook.xlsx.load(buffer as any);
@@ -409,6 +496,7 @@ export async function extractTypeAwareStructuredData(
     try {
       let text: string;
       if (isDocx) {
+        await assertArchiveNotBomb(buffer, 'DOCX');
         const result = await mammoth.extractRawText({ buffer });
         text = result.value;
       } else {
