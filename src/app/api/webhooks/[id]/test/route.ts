@@ -7,6 +7,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { createHmac } from 'crypto';
 import { decryptWebhookSecret } from '@/lib/utils/encryption';
+import { assertPublicWebhookUrl, SsrfBlockedError } from '@/lib/utils/ssrf';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
@@ -31,6 +32,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       subscriptionId: subscription.id,
     },
   });
+
+  // SSRF guard at FETCH time (not just registration) — resolves DNS so a
+  // hostname that was public at registration but now points at an internal
+  // address (rebinding) is rejected before we ever fetch it.
+  try {
+    await assertPublicWebhookUrl(subscription.url);
+  } catch (err) {
+    if (err instanceof SsrfBlockedError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    throw err;
+  }
 
   const plaintextSecret = decryptWebhookSecret(subscription.secret);
   const signature = createHmac('sha256', plaintextSecret).update(testPayload).digest('hex');
