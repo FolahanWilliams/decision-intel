@@ -456,11 +456,25 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Native form controls (checkbox / radio / range / progress) pick up the
+     brand green instead of the browser's default blue. */
+  accent-color: var(--accent-primary);
+}
+
+/* Text selection — soft brand tint instead of the browser default blue.
+   One of those details a procurement reader never names but always feels. */
+::selection {
+  background: rgba(22, 163, 74, 0.16);
+  color: var(--text-primary);
 }
 
 /* Ambient gradient mesh — monochrome white/gray for clean glass refraction.
-   No colored gradients: glass refracts neutral light only. */
-body::before {
+   No colored gradients: glass refracts neutral light only.
+   DARK-ONLY: white radials at 2-4% opacity are literally invisible on the
+   light theme (white-on-white) but still cost paint on every frame — and
+   body::after ran a 30s infinite transform animation for zero visible
+   pixels. Scoped to .dark so the light theme skips the work entirely. */
+.dark body::before {
   content: '';
   position: fixed;
   inset: 0;
@@ -489,7 +503,7 @@ body::before {
   }
 }
 
-body::after {
+.dark body::after {
   content: '';
   position: fixed;
   inset: -20%;
@@ -512,9 +526,22 @@ h4,
 h5,
 h6 {
   font-weight: 700;
-  color: var(--text-highlight);
+  /* Ink, not brand-green. The green default was a dark-era remnant: flagship
+     pages (analytics / compare / team / submit) deliberately wrap their H1 in
+     .text-gradient (dark ink) while every page without it silently fell
+     through to green — half the platform's titles in one color, half in the
+     other. Headings are hierarchy, green is accent (per DESIGN.md color
+     usage). Metric values (.score-value / .stat-card-value) keep the brand
+     green deliberately. */
+  color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.3;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 h1 {
@@ -803,18 +830,18 @@ pre {
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
-/* Secondary accent button */
+/* Secondary accent button — theme-aware (was a white-opacity wash). */
 .btn-lime {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-color);
   box-shadow: none;
   font-weight: 700;
 }
 
 .btn-lime:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
@@ -848,15 +875,26 @@ textarea {
   -webkit-backdrop-filter: blur(12px);
 }
 
+input,
+textarea {
+  caret-color: var(--accent-primary);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Focus state — brand-green ring. The previous rule used a white border +
+   white box-shadow (dark-era remnant) which was invisible on the light
+   theme: focused inputs looked identical to unfocused ones. */
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  background: var(--liquid-bg-hover);
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.08),
-    0 1px 0 var(--liquid-specular) inset;
+  border-color: rgba(22, 163, 74, 0.5);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 
 /* ═══════════════════════════════════════════
@@ -874,39 +912,39 @@ select:focus {
   border-radius: var(--radius-full);
 }
 
+/* Severity badges — tokenized to the theme's severity scale. The previous
+   values were hardcoded DARK-theme pastels (#34d399 mint / #fbbf24 amber /
+   #f87171 rose) with glow text-shadows: washed-out, low-contrast chips on
+   the light theme. Tokens flip automatically per theme; color-mix derives
+   the tint + border from the same hue so the three layers can never drift. */
 .badge-low {
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.18);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  text-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+  color: var(--severity-low);
+  background: color-mix(in srgb, var(--severity-low) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--severity-low) 32%, transparent);
 }
 
 .badge-medium {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.18);
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+  color: var(--severity-medium);
+  background: color-mix(in srgb, var(--severity-medium) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--severity-medium) 32%, transparent);
 }
 
 .badge-high {
-  color: #fb923c;
-  background: rgba(251, 146, 60, 0.18);
-  border: 1px solid rgba(251, 146, 60, 0.35);
-  text-shadow: 0 0 12px rgba(251, 146, 60, 0.4);
+  color: var(--severity-high);
+  background: color-mix(in srgb, var(--severity-high) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--severity-high) 32%, transparent);
 }
 
 .badge-critical {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.18);
-  border: 1px solid rgba(248, 113, 113, 0.35);
-  text-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+  color: var(--severity-critical);
+  background: color-mix(in srgb, var(--severity-critical) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--severity-critical) 32%, transparent);
 }
 
 .badge-complete {
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.18);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  text-shadow: 0 0 12px rgba(52, 211, 153, 0.4);
+  color: var(--severity-low);
+  background: color-mix(in srgb, var(--severity-low) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--severity-low) 32%, transparent);
 }
 
 /* ═══════════════════════════════════════════
@@ -937,11 +975,13 @@ select:focus {
 }
 
 /* ═══════════════════════════════════════════
-   Progress Bar
+   Progress Bar — brand-green fill on a visible neutral track.
+   Previous fill was a WHITE gradient with a white glow (dark-era
+   remnant): progress bars rendered as empty tracks on the light theme.
    ═══════════════════════════════════════════ */
 .progress-bar {
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-tertiary);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -950,8 +990,8 @@ select:focus {
   height: 100%;
   border-radius: var(--radius-full);
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.6) 100%);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-mid) 100%);
+  box-shadow: 0 0 8px rgba(22, 163, 74, 0.25);
 }
 
 /* ═══════════════════════════════════════════
@@ -1079,7 +1119,8 @@ td {
 }
 
 tr:hover td {
-  background: rgba(255, 255, 255, 0.03);
+  /* Theme-aware hover (was a white wash — invisible on light). */
+  background: var(--bg-card-hover);
   color: var(--text-primary);
 }
 
@@ -1279,10 +1320,10 @@ tr:hover td {
 @keyframes pulseGlow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.18);
   }
   50% {
-    box-shadow: 0 0 30px 6px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px 6px rgba(22, 163, 74, 0.1);
   }
 }
 
@@ -1304,11 +1345,15 @@ tr:hover td {
 }
 
 .skeleton {
-  background: linear-gradient(
+  /* Theme-aware shimmer. The previous white-on-white gradient (dark-era
+     remnant) rendered skeletons invisible on the light theme — loading
+     pages looked blank instead of "shaped like the content". */
+  background: var(--bg-tertiary);
+  background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.04) 25%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.04) 75%
+    transparent 25%,
+    var(--bg-elevated) 50%,
+    transparent 75%
   );
   background-size: 200% 100%;
   animation: shimmer 2s ease-in-out infinite;
@@ -1962,35 +2007,23 @@ tr:hover td {
    Glowing Status Indicators — pulsing color auras
    ═══════════════════════════════════════════ */
 
-/* Severity badge glows — static subtle glow, no pulsing animation */
-.badge-low {
-  box-shadow:
-    0 0 6px rgba(52, 211, 153, 0.2),
-    0 0 12px rgba(52, 211, 153, 0.06);
+/* Severity badge glows — derived from the same severity token as the badge
+   itself (was hardcoded dark-theme pastels that didn't match the new chips). */
+.badge-low,
+.badge-complete {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--severity-low) 14%, transparent);
 }
 
 .badge-medium {
-  box-shadow:
-    0 0 6px rgba(251, 191, 36, 0.2),
-    0 0 12px rgba(251, 191, 36, 0.06);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--severity-medium) 14%, transparent);
 }
 
 .badge-high {
-  box-shadow:
-    0 0 6px rgba(251, 146, 60, 0.2),
-    0 0 12px rgba(251, 146, 60, 0.06);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--severity-high) 14%, transparent);
 }
 
 .badge-critical {
-  box-shadow:
-    0 0 6px rgba(248, 113, 113, 0.2),
-    0 0 12px rgba(248, 113, 113, 0.06);
-}
-
-.badge-complete {
-  box-shadow:
-    0 0 6px rgba(52, 211, 153, 0.2),
-    0 0 12px rgba(52, 211, 153, 0.06);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--severity-critical) 14%, transparent);
 }
 
 /* Status dot glow (online indicator, etc.) */
@@ -2015,17 +2048,18 @@ tr:hover td {
   }
 }
 
-/* Stat delta indicators glow */
+/* Stat delta indicators — tint derived from the same severity token as the
+   text so light + dark themes both compose correctly. */
 .stat-delta-up {
   color: var(--success);
-  background: rgba(52, 211, 153, 0.12);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.15);
+  background: rgba(var(--success-rgb), 0.12);
+  box-shadow: 0 0 8px rgba(var(--success-rgb), 0.15);
 }
 
 .stat-delta-down {
   color: var(--error);
-  background: rgba(248, 113, 113, 0.12);
-  box-shadow: 0 0 8px rgba(248, 113, 113, 0.15);
+  background: rgba(var(--error-rgb), 0.12);
+  box-shadow: 0 0 8px rgba(var(--error-rgb), 0.15);
 }
 
 /* ═══════════════════════════════════════════
@@ -2211,7 +2245,7 @@ tr:hover td {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border: 1px dashed rgba(22, 163, 74, 0.28);
   animation: emptyStateRingSpin 20s linear infinite;
 }
 
@@ -2219,7 +2253,7 @@ tr:hover td {
   position: absolute;
   inset: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.12);
   animation: emptyStateRingSpin 15s linear infinite reverse;
 }
 
@@ -2238,12 +2272,10 @@ tr:hover td {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow:
-    0 0 20px rgba(255, 255, 255, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 1;
 }
@@ -2252,7 +2284,7 @@ tr:hover td {
   position: absolute;
   inset: -20px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(22, 163, 74, 0.06) 0%, transparent 70%);
   pointer-events: none;
   animation: emptyStateGlowPulse 4s ease-in-out infinite;
 }
@@ -2367,9 +2399,12 @@ tr:hover td {
   top: 0;
 }
 
-/* Focus ring — white */
+/* Focus ring — brand green. The previous rule was a white 50% outline
+   (dark-era remnant): on the light-only theme, keyboard focus was
+   literally invisible everywhere. WCAG 2.4.7 requires a visible focus
+   indicator; this one is also on-brand. */
 :focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
@@ -2694,11 +2729,15 @@ tr:hover td {
 }
 
 .glass-skeleton {
-  background: linear-gradient(
+  /* Theme-aware shimmer — same fix class as .skeleton above. This class
+     backs the shadcn <Skeleton> component, so the white-on-white remnant
+     meant EVERY design-system skeleton was invisible on the light theme. */
+  background: var(--bg-tertiary);
+  background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.03) 75%
+    transparent 25%,
+    var(--bg-elevated) 50%,
+    transparent 75%
   );
   background-size: 200% 100%;
   animation: glassShimmer 1.8s ease-in-out infinite;
@@ -2941,8 +2980,8 @@ tr:hover td {
 }
 
 .glass-feedback-info {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(var(--info-rgb), 0.05), transparent);
+  border: 1px solid rgba(var(--info-rgb), 0.2);
 }
 
 /* Glass Crack Pattern for Errors */
