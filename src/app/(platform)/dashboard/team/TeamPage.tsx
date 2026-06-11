@@ -23,6 +23,14 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { TeammateWallModal } from '@/components/pricing/TeammateWallModal';
 import dynamic from 'next/dynamic';
@@ -605,14 +613,18 @@ function MemberRow({
   onUpdate: () => void;
 }) {
   const [removing, setRemoving] = useState(false);
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
   const [changingRole, setChangingRole] = useState(false);
   const { showToast } = useToast();
 
   const canModify =
     isAdmin && member.role !== 'owner' && !(member.role === 'admin' && myRole !== 'owner');
 
+  // Per CLAUDE.md "Native browser dialogs banned" rule — the prior
+  // window.confirm() broke the modal stack on Safari mobile and read as
+  // 2008-vintage. Confirmation now runs through the shadcn <Dialog>.
   const handleRemove = async () => {
-    if (!confirm(`Remove ${member.displayName || member.email} from the team?`)) return;
+    setConfirmRemoveOpen(false);
     setRemoving(true);
     try {
       const res = await fetch(`/api/team/members?userId=${member.userId}`, { method: 'DELETE' });
@@ -721,7 +733,7 @@ function MemberRow({
               <option value="viewer">Viewer</option>
             </select>
             <button
-              onClick={handleRemove}
+              onClick={() => setConfirmRemoveOpen(true)}
               disabled={removing}
               title="Remove member"
               style={{
@@ -735,6 +747,100 @@ function MemberRow({
             >
               {removing ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
             </button>
+
+            <Dialog
+              open={confirmRemoveOpen}
+              onOpenChange={open => {
+                if (!removing) setConfirmRemoveOpen(open);
+              }}
+            >
+              <DialogContent
+                style={{
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderTop: '3px solid var(--error)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 0,
+                  maxWidth: 440,
+                  overflow: 'hidden',
+                  boxShadow: 'var(--shadow-lg)',
+                }}
+                showCloseButton={false}
+              >
+                <DialogHeader style={{ padding: '20px 24px 8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 'var(--radius-md)',
+                        background: 'color-mix(in srgb, var(--error) 12%, transparent)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Trash2 size={18} style={{ color: 'var(--error)' }} />
+                    </div>
+                    <DialogTitle
+                      style={{
+                        fontSize: 'var(--fs-md)',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        margin: 0,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      Remove {member.displayName || member.email} from the team?
+                    </DialogTitle>
+                  </div>
+                </DialogHeader>
+                <div style={{ padding: '0 24px 16px' }}>
+                  <DialogDescription
+                    style={{
+                      fontSize: 'var(--fs-sm)',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.55,
+                      margin: 0,
+                    }}
+                  >
+                    They lose access to the workspace immediately. Their documents and audit history
+                    stay with the organization.
+                  </DialogDescription>
+                </div>
+                <DialogFooter
+                  style={{
+                    padding: '12px 20px',
+                    background: 'var(--bg-secondary)',
+                    borderTop: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                    margin: 0,
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setConfirmRemoveOpen(false)}
+                    disabled={removing}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={handleRemove}
+                    disabled={removing}
+                  >
+                    {removing ? <Loader2 size={14} className="animate-spin" /> : 'Remove member'}
+                  </button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </>
         )}
       </div>

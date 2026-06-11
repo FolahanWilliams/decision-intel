@@ -11,6 +11,14 @@ import {
   CircleAlert,
   XCircle,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type OrgRef = { id: string; name: string; slug?: string | null };
 
@@ -129,17 +137,18 @@ export function SsoAdminClient({ orgs }: Props) {
     }
   };
 
-  const handleDelete = async (id: string, domain: string) => {
-    if (!activeOrgId) return;
-    if (
-      !confirm(
-        `Remove SSO configuration for ${domain}? Users signing in from this domain will fall back to password / Google OAuth.`
-      )
-    ) {
-      return;
-    }
+  // Per CLAUDE.md "Native browser dialogs banned" rule — confirmation runs
+  // through the shadcn <Dialog> instead of the prior window.confirm().
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; domain: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!activeOrgId || !pendingDelete) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/sso/admin/providers/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/sso/admin/providers/${pendingDelete.id}`, {
+        method: 'DELETE',
+      });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || `Delete failed (${res.status})`);
@@ -147,6 +156,9 @@ export function SsoAdminClient({ orgs }: Props) {
       await refresh(activeOrgId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Delete failed');
+    } finally {
+      setDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -465,7 +477,7 @@ export function SsoAdminClient({ orgs }: Props) {
                           </button>
                         )}
                         <button
-                          onClick={() => handleDelete(c.id, c.domain)}
+                          onClick={() => setPendingDelete({ id: c.id, domain: c.domain })}
                           className="button button-secondary"
                           style={{ fontSize: 12 }}
                         >
@@ -480,6 +492,101 @@ export function SsoAdminClient({ orgs }: Props) {
           )}
         </div>
       </div>
+
+      {/* Remove-SSO confirmation — danger-accent Dialog (canonical pattern
+          from the Documents delete dialog). */}
+      <Dialog
+        open={pendingDelete !== null}
+        onOpenChange={open => {
+          if (!deleting && !open) setPendingDelete(null);
+        }}
+      >
+        <DialogContent
+          style={{
+            background: 'var(--bg-card)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)',
+            borderTop: '3px solid var(--error)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 0,
+            maxWidth: 460,
+            overflow: 'hidden',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+          showCloseButton={false}
+        >
+          <DialogHeader style={{ padding: '20px 24px 8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--error) 12%, transparent)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Trash2 size={18} style={{ color: 'var(--error)' }} />
+              </div>
+              <DialogTitle
+                style={{
+                  fontSize: 'var(--fs-md)',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  lineHeight: 1.35,
+                }}
+              >
+                Remove SSO configuration for {pendingDelete?.domain}?
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div style={{ padding: '0 24px 16px' }}>
+            <DialogDescription
+              style={{
+                fontSize: 'var(--fs-sm)',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+                margin: 0,
+              }}
+            >
+              Users signing in from this domain will fall back to password / Google OAuth.
+            </DialogDescription>
+          </div>
+          <DialogFooter
+            style={{
+              padding: '12px 20px',
+              background: 'var(--bg-secondary)',
+              borderTop: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              gap: 8,
+              margin: 0,
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => setPendingDelete(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? 'Removing…' : 'Remove configuration'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
