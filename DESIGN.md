@@ -135,6 +135,8 @@ Padding `--gap-lg`. Centered. Maximum width `--container-sm` (480px). The icon s
 
 **Forbidden:** centered spinners on a blank page, "Loading..." text strings, skeleton-then-spinner, layout shifts when data arrives.
 
+**Enforced platform-wide 2026-06-11:** every route-level `loading.tsx` renders `<PageSkeleton />` (8 spinner-based ones migrated, 3 missing routes added); every in-component loading state on the major surfaces (doc detail, decisions detail, compare, team, settings dynamic tabs) is a layout-matched `<Skeleton>` composition with `aria-busy`. Spinners remain legal ONLY inside buttons (`Loader2` on an in-flight action). When adding a new route, copy any existing `loading.tsx` — they are all the same three lines.
+
 ## Density rules
 
 - **Maximum 3 metrics per row** above the fold. The status chip row in the screenshot has 6 chips ("Avg Quality 30 · Avg Noise 53 · Documents 8 · Analyzed 1 · Status Operational" twice over) — that's a violation. Collapse to 3 max.
@@ -201,6 +203,18 @@ Below 700px:
 - Hero card stays full-width.
 - Status chip row truncates to 3 items + a "More" affordance.
 - Page padding drops from `--gap-xl` to `--gap-md`.
+
+## Light-theme remnant discipline (locked 2026-06-11)
+
+The 2026-06-11 foundation sweep found ~15 dark-theme-era styles in `globals.css` that rendered **invisible or broken on the light-only theme** (white-on-white): the global `:focus-visible` ring, input/textarea/select focus borders, `.progress-bar-fill` (white gradient = empty-looking progress bars), `.skeleton` + `.glass-skeleton` (invisible skeletons), `tr:hover td`, the severity badges (dark-palette pastels + glow text-shadows), the empty-state chrome, `pulseGlow`, `.btn-lime`, input text color (brand green), and the `body::before/::after` ambient mesh (which ran a 30s infinite animation painting zero visible pixels).
+
+**The rule:** the light theme is the only theme styles are validated against. Any new CSS using white-opacity values (`rgba(255, 255, 255, …)`) for borders, backgrounds, shadows, or outlines on a selector NOT scoped to `.dark` is this drift class — it will render invisible. Dark-only decorative effects (ambient meshes, white speculars) get scoped to `.dark`. Severity-tinted chrome derives from the severity tokens via `color-mix` so it can never drift per theme.
+
+**Heading color:** `h1–h6` default to `var(--text-primary)` (ink). The old `var(--text-highlight)` (green) default was a dark-era fallthrough that left half the platform's page titles green and half ink (flagship pages override via `.text-gradient`). Green stays for metric values (`.score-value`, `.stat-card-value`) and accents — never as the heading default.
+
+**Buttons:** every platform button uses the `.btn` class system (`btn-primary` / `btn-secondary` / `btn-ghost` / `btn-danger` / `btn-danger-outline` — the last is the canonical delete ENTRY-POINT affordance; filled `btn-danger` is the confirm step). Hand-rolling a button with inline styles loses hover lift, focus ring, and disabled state for nothing.
+
+**Native dialogs:** platform `window.confirm` count is 0 as of 2026-06-11 (Team remove-member + SSO delete were the last two). Keep it at 0 — the danger-accent `<Dialog>` pattern from the Documents delete dialog is the template.
 
 ## Decision rules when conflicts arise
 

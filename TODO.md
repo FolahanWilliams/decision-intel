@@ -63,6 +63,16 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-11)
+
+**Light-theme foundation sweep + interaction-layer overhaul (founder "100x the UI/UX, boil the ocean"; full prose in CLAUDE.md 2026-06-11 lock + DESIGN.md "Light-theme remnant discipline").** Five commits, `39b0bb45` → `2ba6cc4c`, all gates green, pushed to main.
+
+- [x] **globals.css carried ~15 dark-era styles rendering INVISIBLE on the light-only theme** — keyboard focus rings (white 50% = invisible app-wide, WCAG fail), input focus states, progress-bar fills (white gradient = bars looked permanently empty), `.skeleton`/`.glass-skeleton` (every shadcn Skeleton invisible), table hovers, severity badges (dark pastels + glow shadows), empty-state chrome, input TEXT color (typed characters rendered brand green), ambient mesh (30s infinite animation painting zero pixels — now `.dark`-scoped, pure CPU win). All fixed token-derived.
+- [x] **Heading-color unification (visual change — eyeball /dashboard/decisions + /documents titles):** h1-h6 default green → ink; half the platform's titles were green via fallthrough, half ink via `.text-gradient`. Green stays for metric values.
+- [x] **Loading-state overhaul:** all 11 route `loading.tsx` = PageSkeleton (8 spinners migrated, 3 missing added); doc-detail/decisions-detail/compare/team/settings bare-text loaders → layout-matched skeletons, `aria-busy` throughout.
+- [x] **Platform `window.confirm` 2 → 0** (Team remove-member + SSO delete → danger-accent Dialog). Doc-detail hand-rolled buttons → `.btn` system + new `.btn-danger-outline` variant. borderRadius literals tokenized (Team + Submit). `::selection` brand tint, `accent-color`, `text-wrap: balance`.
+- [ ] **Deferred for founder eyeball / decision (recorded in the CLAUDE.md lock):** native `<select>` → shadcn `<Select>` (7 sites), hand-rolled tab buttons → `tab-chips`/TabBar (3 sites), compare-page Tailwind-hybrid re-skin, dialog-system consolidation (`dialog.tsx` vs `.modal-content`).
+
 ## Recently Completed (2026-06-07)
 
 **Argument Builder — the one MindForge principle, ported into the Sparring Room (full prose in CLAUDE.md "Argument Builder" lock).** Claim → Evidence → Counterargument → Rebuttal reasoning drill.
