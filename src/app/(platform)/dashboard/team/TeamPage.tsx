@@ -308,7 +308,7 @@ export default function TeamPage() {
               width: 48,
               height: 48,
               background: 'var(--accent-gradient)',
-              borderRadius: '14px',
+              borderRadius: 'var(--radius-xl)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -435,7 +435,7 @@ export default function TeamPage() {
                       fontSize: '11px',
                       padding: '2px 8px',
                       background: 'rgba(22, 163, 74, 0.12)',
-                      borderRadius: '12px',
+                      borderRadius: 'var(--radius-lg)',
                       color: 'var(--accent-primary)',
                       fontWeight: 600,
                     }}
@@ -588,7 +588,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
       style={{
         padding: 'var(--spacing-md)',
         background: 'var(--bg-secondary)',
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-md)',
       }}
     >
       <div className="text-xs text-muted" style={{ marginBottom: '4px' }}>
@@ -702,7 +702,7 @@ function MemberRow({
           style={{
             fontSize: '12px',
             padding: '3px 10px',
-            borderRadius: '12px',
+            borderRadius: 'var(--radius-lg)',
             background: member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'var(--bg-tertiary)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
@@ -723,7 +723,7 @@ function MemberRow({
                 padding: '4px 8px',
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--liquid-border)',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-sm)',
                 color: 'var(--text-secondary)',
                 cursor: 'pointer',
               }}
@@ -1069,7 +1069,7 @@ function CreateOrgModal({ onClose, onCreated }: { onClose: () => void; onCreated
                   padding: 'var(--spacing-md)',
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--liquid-border)',
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-md)',
                   color: 'var(--text-primary)',
                   fontSize: '14px',
                 }}
@@ -1104,7 +1104,7 @@ function CreateOrgModal({ onClose, onCreated }: { onClose: () => void; onCreated
                     padding: 'var(--spacing-md)',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--liquid-border)',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--radius-md)',
                     color: 'var(--text-primary)',
                     fontSize: '14px',
                   }}
@@ -1288,7 +1288,7 @@ function InviteModal({
               padding: 3,
               marginBottom: 'var(--spacing-lg)',
               background: 'var(--bg-secondary)',
-              borderRadius: '8px',
+              borderRadius: 'var(--radius-md)',
             }}
           >
             {(['single', 'bulk'] as const).map(m => (
@@ -1305,7 +1305,7 @@ function InviteModal({
                   fontSize: '13px',
                   fontWeight: 600,
                   border: 'none',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   background: mode === m ? 'var(--bg-card)' : 'transparent',
                   color: mode === m ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -1338,7 +1338,7 @@ function InviteModal({
                     padding: 'var(--spacing-md)',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--liquid-border)',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--radius-md)',
                     color: 'var(--text-primary)',
                     fontSize: '14px',
                   }}
@@ -1375,7 +1375,7 @@ function InviteModal({
                     padding: 'var(--spacing-md)',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--liquid-border)',
-                    borderRadius: '8px',
+                    borderRadius: 'var(--radius-md)',
                     color: 'var(--text-primary)',
                     fontSize: '14px',
                     resize: 'vertical',
@@ -1407,7 +1407,7 @@ function InviteModal({
                   padding: 'var(--spacing-md)',
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--liquid-border)',
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-md)',
                   color: 'var(--text-primary)',
                   fontSize: '14px',
                 }}
@@ -1430,7 +1430,7 @@ function InviteModal({
                 style={{
                   padding: 'var(--spacing-md)',
                   background: 'var(--bg-secondary)',
-                  borderRadius: '8px',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--border-color)',
                 }}
               >
@@ -1585,7 +1585,7 @@ function TeamActivityTab() {
                 fontSize: '11px',
                 padding: '2px 8px',
                 background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
+                borderRadius: 'var(--radius-lg)',
                 color: 'var(--text-highlight)',
                 fontWeight: 600,
               }}
@@ -1635,7 +1635,7 @@ function TeamActivityTab() {
                         fontSize: '12px',
                         fontWeight: 600,
                         padding: '2px 8px',
-                        borderRadius: '8px',
+                        borderRadius: 'var(--radius-md)',
                         background:
                           doc.latestScore >= 70
                             ? 'rgba(34, 197, 94, 0.12)'
@@ -1657,7 +1657,7 @@ function TeamActivityTab() {
                     style={{
                       fontSize: '11px',
                       padding: '2px 8px',
-                      borderRadius: '8px',
+                      borderRadius: 'var(--radius-md)',
                       background:
                         doc.status === 'analyzed' ? 'rgba(34, 197, 94, 0.1)' : 'var(--bg-tertiary)',
                       color: doc.status === 'analyzed' ? 'var(--success)' : 'var(--text-muted)',

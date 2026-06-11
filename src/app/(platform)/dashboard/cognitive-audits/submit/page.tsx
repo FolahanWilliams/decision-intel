@@ -351,7 +351,7 @@ export default function SubmitDecisionPage() {
                         onDrop={handleDrop}
                         style={{
                           border: `2px dashed ${dragActive ? 'var(--text-highlight)' : 'var(--border-color)'}`,
-                          borderRadius: '12px',
+                          borderRadius: 'var(--radius-lg)',
                           padding: '40px 20px',
                           textAlign: 'center',
                           cursor: 'pointer',
@@ -391,7 +391,7 @@ export default function SubmitDecisionPage() {
                           padding: '16px',
                           background: 'var(--bg-secondary)',
                           border: '1px solid var(--border-color)',
-                          borderRadius: '8px',
+                          borderRadius: 'var(--radius-md)',
                         }}
                       >
                         <FileAudio
@@ -435,7 +435,7 @@ export default function SubmitDecisionPage() {
                           style={{
                             height: '6px',
                             background: 'var(--bg-tertiary)',
-                            borderRadius: '3px',
+                            borderRadius: 'var(--radius-sm)',
                             overflow: 'hidden',
                           }}
                         >
