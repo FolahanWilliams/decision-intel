@@ -30,6 +30,12 @@ import { ALL_CASES } from './index';
 import { formatBiasName } from '@/lib/utils/labels';
 import { truncate } from '@/lib/utils/string';
 import { POSITIONING_EPISTEMIC_HONESTY } from '@/lib/constants/icp';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Derived — hyphenated-singular counts ('22-bias') are structurally
+// invisible to lint:counts (the regex needs whitespace + a plural noun),
+// so this AI-citable JSON-LD string derives instead of hardcoding.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 /** Outcome → verb map for headline templates. */
 const OUTCOME_VERB: Record<CaseStudy['outcome'], string> = {
@@ -183,7 +189,7 @@ export function generateCaseStudyFaqs(caseStudy: CaseStudy): Array<{ q: string; 
   // FAQ 4 (always present): how does DI's reasoning audit work?
   faqs.push({
     q: `What is Decision Intel's reasoning audit?`,
-    a: `Decision Intel runs a 12-node Recognition-Rigor Framework (R²F) pipeline on strategic memos, detecting cognitive biases from a 22-bias canonical taxonomy and producing a Decision Quality Index (DQI) score. The audit produces a hashed, tamper-evident Decision Provenance Record (DPR) suitable for audit-committee review.`,
+    a: `Decision Intel runs a 12-node Recognition-Rigor Framework (R²F) pipeline on strategic memos, detecting cognitive biases from a ${BIAS_COUNT}-bias canonical taxonomy and producing a Decision Quality Index (DQI) score. The audit produces a hashed, tamper-evident Decision Provenance Record (DPR) suitable for audit-committee review.`,
   });
 
   return faqs;

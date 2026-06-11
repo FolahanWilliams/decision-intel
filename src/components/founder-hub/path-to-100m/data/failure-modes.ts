@@ -157,10 +157,10 @@ export const FAILURE_MODES: FailureMode[] = [
       'Phase 1 dilutes the £249/mo wedge with non-decision-makers — junior strategic planners, generic mid-market C-suite without M&A budget, fractional-CSO-curious-not-fractional-CSO-actually. MQL-to-SQL conversion collapses to the 15-21% industry baseline. The Phase 2 mid-market motion has no warm-intro fuel because Individual users are NOT in the same buyer-class as the team-tier ICP. Word-of-mouth doesn’t compound across the boundary.',
     diExposure: 'critical',
     countermove: [
-      'Sign-up persona gating shipped 2026-05-04: 4 buyer-class-continuous personas (fractional CSO, mid-market Corp Dev, smaller-fund GP, PE-backed founder) + auto-redirect for "other" to a friendly waitlist',
+      'Sign-up persona gating shipped 2026-05-04: 4 buyer-class-continuous personas (fractional CSO, mid-market Corp Dev, smaller-fund GP, PE-backed founder); "other" gets FULL platform access + the generic overview but is cohort-tagged phase1HxcEligible=false (access-policy amendment 2026-05-19 — access ≠ cohort; the tag keeps non-wedge sign-ups out of the Vohra HXC measurement, never out of the product)',
       'Vohra HXC cohort filter — the % "very disappointed" metric is computed ONLY on phase1HxcEligible=true users; the noise from non-fits cannot dilute the signal',
       'Marketing copy + LinkedIn DM script discipline: every outreach explicitly addresses one of the four personas; refuse to broaden to "general strategy professionals"',
-      'Per-customer expansion-intent + referral-willingness tracking via the Vohra survey Q5 — surfaces non-fits early so they get the waitlist treatment, not the upgrade pitch',
+      'Per-customer expansion-intent + referral-willingness tracking via the Vohra survey Q5 — surfaces non-fits early so they stay out of the HXC cohort + the upgrade-pitch motion (full access, generic overview; never a waitlist per the 2026-05-19 amendment)',
     ],
     tripwire:
       'If sign-up form non-fit ("other") rate exceeds 25% of new sign-ups for 2 consecutive weeks, the Phase 1 traffic source is broken. Diagnose: are the LinkedIn DMs targeting the right cohort? Are events filling with non-buyer-class attendees? Are referrals coming from legitimate HXC users or from fringe accounts?',
