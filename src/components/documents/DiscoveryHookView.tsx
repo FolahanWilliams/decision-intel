@@ -25,6 +25,10 @@ import { useMemo } from 'react';
 import { ArrowRight, Download, Lock } from 'lucide-react';
 import type { AnalysisResult, BiasInstance } from '@/types';
 import { dqiColorFor, gradeFromScore } from '@/lib/utils/grade';
+// Bundle-safe snapshot (client component) — never import the full
+// case-studies library for one integer; hyphenated-singular '143-case'
+// is the lint:counts-blind drift shape, so derive instead of hardcoding.
+import { HISTORICAL_CASE_COUNT_SNAPSHOT as HISTORICAL_CASE_COUNT } from '@/lib/data/case-count';
 import {
   buildCostOfIgnoring,
   deriveDocumentType,
@@ -412,7 +416,7 @@ export function DiscoveryHookView({
         }}
       >
         Your closed outcome teaches the platform YOUR decision pattern. After 3 outcomes, the audit
-        calibrates to you — not the generic 143-case library.
+        calibrates to you — not the generic {HISTORICAL_CASE_COUNT}-case library.
       </p>
 
       <style jsx>{`

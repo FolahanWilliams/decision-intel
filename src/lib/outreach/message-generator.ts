@@ -1,8 +1,17 @@
 import { generateWithFallback } from '@/lib/ai/model-router';
 import { createLogger } from '@/lib/utils/logger';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import type { ExtractedProfile, GeneratedOutreach, IntentCallouts, OutreachIntent } from './types';
 
 const log = createLogger('MessageGenerator');
+
+// Derived — the generated DMs inherit whatever this prompt claims, and
+// hyphenated-singular counts ('22-bias' / '19-framework') are structurally
+// invisible to lint:counts. Server-side module, so direct canonical imports
+// are bundle-safe.
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 // Source of truth for the wedge personas + sequencing + pain framing:
 // src/lib/constants/icp.ts (PHASE_1_HXC_PERSONAS, ICP_WEDGE, ICP_CEILING,
@@ -11,7 +20,7 @@ const log = createLogger('MessageGenerator');
 // this prompt follows the same vocabulary.
 const FOUNDER_PITCH_CONTEXT = `DECISION INTEL — FOUNDER POSITIONING CONTEXT
 
-What it is: Decision Intel is the reasoning audit platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive reasoning audit in under 60 seconds. 22-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
+What it is: Decision Intel is the reasoning audit platform. Users upload strategic documents (M&A memos, board papers, strategy proposals) and get a comprehensive reasoning audit in under 60 seconds. ${BIAS_COUNT}-bias taxonomy (DI-B-001 to DI-B-022), DQI score, forgotten-questions detector, boardroom simulation, counterfactual replay.
 
 The pain (canonical phrasing — locked 2026-05-08): capital eroded by unaudited reasoning in strategic decisions. Money-line: reasoning is never objectively sound; it is either audited or unaudited. (Anchored in Mercier & Sperber argumentative theory + Kahneman & Klein 2009 conditions for trustworthy intuition.) Do NOT say "bad strategic decisions" or "flawed reasoning" — both trigger ego threat with elite decision-makers who view their intuition as their proprietary edge. Do NOT say "unaudited decisions" alone — drops the IP differentiator (Cloverpop logs decisions, IBM audits models — the word "reasoning" is what locks them out).
 
@@ -19,7 +28,7 @@ Who it's for (Phase 1 wedge — months 1-6, NOW, v3.5 ratified 2026-05-04): the 
 
 Where this is going (NOT the Phase 1 message — context only): Phase 2 bridge (months 6-12) is Sankore-class design partner pilots producing reference-grade DPRs. Phase 3-4 ceiling (12-24+ months) is F500 corporate strategy + corp dev M&A teams running cross-border acquisitions @ £50K-150K ACV. Do NOT pitch the ceiling to a wedge prospect — different motion, different price, different gate.
 
-Moat: per-org Brier-scored outcome calibration — once a customer logs enough decisions with outcomes, our engine learns which biases actually mattered for THEM specifically and recalibrates future DQI scores accordingly. The Recognition-Rigor Framework (Kahneman's debiasing + Klein's Recognition-Primed Decisions arbitrated in one pipeline) is the IP layer. The 19-framework cross-border regulatory map (G7 / EU / GCC / African markets including NDPR / CBN / WAEMU / PoPIA / SARB / ISA Nigeria 2007) is the moat layer Cloverpop and IBM watsonx.governance don't carry. Advised by a senior consultant who took Wiz from startup to $32B.
+Moat: per-org Brier-scored outcome calibration — once a customer logs enough decisions with outcomes, our engine learns which biases actually mattered for THEM specifically and recalibrates future DQI scores accordingly. The Recognition-Rigor Framework (Kahneman's debiasing + Klein's Recognition-Primed Decisions arbitrated in one pipeline) is the IP layer. The ${FRAMEWORK_COUNT}-framework cross-border regulatory map (G7 / EU / GCC / African markets including NDPR / CBN / WAEMU / PoPIA / SARB / ISA Nigeria 2007) is the moat layer Cloverpop and IBM watsonx.governance don't carry. Advised by a senior consultant who took Wiz from startup to $32B.
 
 Competitor reality: there is no direct competitor in reasoning auditing. Defensive lines (use verbatim if a competitor name comes up): "Cloverpop logs decisions; Decision Intel audits them." / "IBM audits the model; Decision Intel audits the human reasoning." The real competition is "do nothing" — teams don't audit the reasoning behind strategic decisions at all.
 
