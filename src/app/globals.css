@@ -830,6 +830,24 @@ pre {
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
+/* Outline danger — the softer danger-zone affordance (delete entry points
+   that confirm before acting). Filled .btn-danger stays the confirm step. */
+.btn-danger-outline {
+  background: transparent;
+  color: var(--severity-critical);
+  border: 1px solid color-mix(in srgb, var(--severity-critical) 55%, transparent);
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--severity-critical) 8%, transparent);
+  border-color: var(--severity-critical);
+  transform: translateY(-1px);
+}
+
+.btn-danger-outline:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 /* Secondary accent button — theme-aware (was a white-opacity wash). */
 .btn-lime {
   background: var(--bg-card);
@@ -856,7 +874,9 @@ select {
   padding: 0.625rem 1rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
-  color: var(--text-highlight);
+  /* Ink, not brand green — --text-highlight resolves to #16a34a, which made
+     every typed character render green (dark-era remnant). */
+  color: var(--text-primary);
   transition: all var(--transition-fast);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -869,7 +889,8 @@ textarea {
   padding: 0.625rem 1rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
-  color: var(--text-highlight);
+  /* Ink, not brand green — same fix class as input/select above. */
+  color: var(--text-primary);
   transition: all var(--transition-fast);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

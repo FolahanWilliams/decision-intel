@@ -943,23 +943,10 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         sharingSlot={
           <button
             type="button"
+            className="btn btn-secondary"
             onClick={() => {
               setShowSettings(false);
               setShowShareModal(true);
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '8px 14px',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 6,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
             }}
           >
             <Share2 size={13} /> Open share modal
@@ -982,21 +969,8 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
             {analysis?.id ? (
               <a
                 href={`/dashboard/decision-rooms?doc=${document.id}`}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 14px',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 6,
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
+                className="btn btn-secondary"
+                style={{ alignSelf: 'flex-start' }}
               >
                 Open decision rooms →
               </a>
@@ -1315,23 +1289,7 @@ function DeleteDocumentButton({
 
   if (!confirming) {
     return (
-      <button
-        type="button"
-        onClick={() => setConfirming(true)}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '8px 14px',
-          fontSize: 13,
-          fontWeight: 600,
-          color: 'var(--severity-critical)',
-          background: 'transparent',
-          border: '1px solid var(--severity-critical)',
-          borderRadius: 6,
-          cursor: 'pointer',
-        }}
-      >
+      <button type="button" className="btn btn-danger-outline" onClick={() => setConfirming(true)}>
         Delete document
       </button>
     );
@@ -1341,37 +1299,14 @@ function DeleteDocumentButton({
     <div style={{ display: 'flex', gap: 8 }}>
       <button
         type="button"
+        className="btn btn-danger"
         onClick={handleDelete}
         disabled={loading}
-        style={{
-          flex: 1,
-          padding: '8px 14px',
-          fontSize: 13,
-          fontWeight: 600,
-          color: '#fff',
-          background: 'var(--severity-critical)',
-          border: 'none',
-          borderRadius: 6,
-          cursor: loading ? 'wait' : 'pointer',
-          opacity: loading ? 0.6 : 1,
-        }}
+        style={{ flex: 1 }}
       >
         {loading ? 'Deleting…' : 'Confirm delete'}
       </button>
-      <button
-        type="button"
-        onClick={() => setConfirming(false)}
-        style={{
-          padding: '8px 14px',
-          fontSize: 13,
-          fontWeight: 500,
-          color: 'var(--text-secondary)',
-          background: 'transparent',
-          border: '1px solid var(--border-color)',
-          borderRadius: 6,
-          cursor: 'pointer',
-        }}
-      >
+      <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)}>
         Cancel
       </button>
     </div>
