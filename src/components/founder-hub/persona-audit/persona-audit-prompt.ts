@@ -163,7 +163,7 @@ export const PERSONA_ARCHETYPES: PersonaArchetype[] = [
     archetype: 'corp_dev_analyst',
     dailyVerbs: ['research', 'model', 'compare', 'pitch_internally'],
     uniqueAngle:
-      'DEPRECATED per GTM v3.5 sign-up persona gating (2026-05-04): junior-tier corp-dev analysts auto-redirect to the friendly waitlist on the sign-up form because they have no graduation path to F500 procurement. Do NOT pick this persona for a live audit. Kept for historical comparison only.',
+      'DEPRECATED per GTM v3.5 sign-up persona gating (2026-05-04): junior-tier corp-dev analysts are outside the marketed wedge + cohort-tagged phase1HxcEligible=false at sign-up (full platform access per the 2026-05-19 access amendment, but excluded from the Vohra HXC cohort) because they have no graduation path to F500 procurement. Do NOT pick this persona for a live audit. Kept for historical comparison only.',
   },
 ];
 

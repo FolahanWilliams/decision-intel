@@ -48,7 +48,7 @@ interface Props {
 
 const PERSONA_OPTIONS = [
   ...WEDGE_PERSONAS.map(p => ({ id: p.id, label: p.label })),
-  { id: 'other', label: 'Other / waitlist' },
+  { id: 'other', label: 'Other / non-wedge' },
 ];
 
 const KILL_BAND_COLOR: Record<string, string> = {

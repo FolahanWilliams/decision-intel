@@ -59,7 +59,7 @@ export const HONEST_PROBABILITY_PATH: RoadmapPhase[] = [
       valuation: 'Pre-validation; Phase 2 close + Sankore reference unlocks the seed conversation',
     },
     whatHasToBeTrue: [
-      'Sign-up gates to 4 buyer-class-continuous personas (fractional CSO / mid-market Corp Dev / smaller-fund GP / PE-backed founder); junior analysts auto-redirect to waitlist',
+      'Sign-up markets the 4 buyer-class-continuous personas (fractional CSO / mid-market Corp Dev / smaller-fund GP / PE-backed founder); non-wedge sign-ups get full access but are cohort-tagged phase1HxcEligible=false out of the Vohra HXC gate (2026-05-19 amendment — access ≠ cohort)',
       'Vohra "very disappointed" ≥40% on HXC cohort by month 4 — the canonical PMF graduation gate',
       'Outcome Gate auto-enforced on HXC users from day one (v3.5 lock criterion #3, shipped 2026-05-04)',
       '≥3 documented ROI case studies + anonymised DPR specimens generated from Individual customers',
