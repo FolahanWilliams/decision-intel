@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useDocuments } from '@/hooks/useDocuments';
 import { GitCompareArrows, Plus, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
@@ -163,7 +164,15 @@ export default function ComparePage() {
 
             {/* Available documents */}
             {docsLoading ? (
-              <p className="text-[var(--text-muted)] text-sm">Loading documents...</p>
+              // Skeleton matches the doc-pick button grid below (DESIGN.md loading pattern)
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2"
+                aria-busy="true"
+              >
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} style={{ height: 58, borderRadius: 'var(--radius-lg)' }} />
+                ))}
+              </div>
             ) : completeDocs.length === 0 && selectedIds.length === 0 ? (
               <div className="mt-4 p-12 text-center border-2 border-dashed border-[var(--border-color)] rounded-lg">
                 <p className="text-[var(--text-muted)]">
@@ -214,10 +223,22 @@ export default function ComparePage() {
             </div>
           )}
 
-          {/* Comparison Results */}
+          {/* Comparison Results — skeleton matches the results table shape */}
           {loading && (
-            <div className="text-center py-8 text-[var(--text-muted)]">
-              Loading comparison data...
+            <div
+              className={cn(
+                'p-6 rounded-xl',
+                'liquid-glass',
+                'border border-[var(--border-color)]'
+              )}
+              aria-busy="true"
+            >
+              <Skeleton className="h-5 w-[220px]" style={{ marginBottom: 20 }} />
+              <div className="stack-sm">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} style={{ height: 40, borderRadius: 'var(--radius-md)' }} />
+                ))}
+              </div>
             </div>
           )}
 

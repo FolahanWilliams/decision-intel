@@ -11,6 +11,7 @@
 
 import { use, useState } from 'react';
 import { useToast } from '@/components/ui/EnhancedToast';
+import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import {
   ChevronLeft,
@@ -48,7 +49,25 @@ export default function ContainerDetailPage({ params }: { params: Promise<{ id: 
   const { showToast } = useToast();
 
   if (isLoading) {
-    return <div style={{ padding: 24, color: 'var(--text-muted)' }}>Loading decision…</div>;
+    // Layout-matched skeleton (DESIGN.md loading-state pattern): back-link strip,
+    // page H1, composite hero, then the card stack — no reflow when data lands.
+    return (
+      <div style={{ padding: 24 }} aria-busy="true">
+        <Skeleton className="h-4 w-[140px]" style={{ marginBottom: 16 }} />
+        <Skeleton className="h-8 w-[320px]" style={{ marginBottom: 20 }} />
+        <Skeleton style={{ height: 150, borderRadius: 'var(--radius-xl)', marginBottom: 20 }} />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 20,
+          }}
+        >
+          <Skeleton style={{ height: 260, borderRadius: 'var(--radius-xl)' }} />
+          <Skeleton style={{ height: 260, borderRadius: 'var(--radius-xl)' }} />
+        </div>
+      </div>
+    );
   }
 
   if (error || !container) {

@@ -22,6 +22,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { TeammateWallModal } from '@/components/pricing/TeammateWallModal';
 import dynamic from 'next/dynamic';
@@ -30,9 +31,12 @@ import { createClientLogger } from '@/lib/utils/logger';
 const log = createClientLogger('TeamPage');
 
 const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
+  // DESIGN.md loading-state pattern: skeleton, never a centered spinner.
   loading: () => (
-    <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
-      <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
+    <div className="stack-sm" style={{ minHeight: 200 }} aria-busy="true">
+      <Skeleton style={{ height: 56, borderRadius: 'var(--radius-lg)' }} />
+      <Skeleton style={{ height: 56, borderRadius: 'var(--radius-lg)' }} />
+      <Skeleton style={{ height: 56, borderRadius: 'var(--radius-lg)' }} />
     </div>
   ),
 });
@@ -150,8 +154,18 @@ export default function TeamPage() {
           maxWidth: 900,
         }}
       >
-        <div className="flex items-center justify-center" style={{ minHeight: 300 }}>
-          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
+        {/* Layout-matched skeleton (DESIGN.md: skeleton, never a centered spinner):
+            breadcrumb strip, page header, seat meter, then member rows. */}
+        <div aria-busy="true">
+          <Skeleton className="h-4 w-[160px]" style={{ marginBottom: 20 }} />
+          <Skeleton className="h-8 w-[200px]" style={{ marginBottom: 8 }} />
+          <Skeleton className="h-4 w-[320px]" style={{ marginBottom: 24 }} />
+          <Skeleton style={{ height: 56, borderRadius: 'var(--radius-lg)', marginBottom: 20 }} />
+          <div className="stack-sm">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} style={{ height: 64, borderRadius: 'var(--radius-lg)' }} />
+            ))}
+          </div>
         </div>
       </div>
     );

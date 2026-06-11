@@ -31,8 +31,22 @@ import { BillingSection } from '@/components/ui/BillingSection';
 // ApiKeysSection cut 2026-05-10 streamlining batch (see SettingsForm body comment).
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { AccentCard } from '@/components/ui/AccentCard';
+import { Skeleton } from '@/components/ui/skeleton';
 import { DqiWeightsAdjustmentPanel } from '@/components/settings/DqiWeightsAdjustmentPanel';
 import { AmbientCaptureConsentPanel } from '@/components/settings/AmbientCaptureConsentPanel';
+
+/* Shared skeleton for dynamic settings tabs (DESIGN.md loading-state pattern:
+   skeleton, never a bare "Loading…" string) — card-stack shape matching the
+   settings tab bodies so nothing reflows when the chunk lands. */
+function SettingsTabSkeleton({ label }: { label: string }) {
+  return (
+    <div className="stack-md" style={{ padding: '8px 0' }} aria-busy="true" aria-label={label}>
+      {[...Array(3)].map((_, i) => (
+        <Skeleton key={i} style={{ height: 120, borderRadius: 'var(--radius-xl)' }} />
+      ))}
+    </div>
+  );
+}
 
 const IntegrationsTabContent = dynamic(
   () =>
@@ -40,33 +54,21 @@ const IntegrationsTabContent = dynamic(
       default: m.IntegrationMarketplace,
     })),
   {
-    loading: () => (
-      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
-        Loading integrations...
-      </div>
-    ),
+    loading: () => <SettingsTabSkeleton label="Loading integrations" />,
   }
 );
 
 const ComplianceTabContent = dynamic(
   () => import('@/app/(platform)/dashboard/settings/compliance/page'),
   {
-    loading: () => (
-      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
-        Loading compliance...
-      </div>
-    ),
+    loading: () => <SettingsTabSkeleton label="Loading compliance" />,
   }
 );
 
 const AuditLogTabContent = dynamic(
   () => import('@/components/settings/AuditLogInline').then(m => ({ default: m.AuditLogInline })),
   {
-    loading: () => (
-      <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>
-        Loading audit log...
-      </div>
-    ),
+    loading: () => <SettingsTabSkeleton label="Loading audit log" />,
   }
 );
 

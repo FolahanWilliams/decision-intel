@@ -26,8 +26,9 @@ import {
 } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Share2, FileText, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Share2, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ShareModal } from '@/components/ui/ShareModal';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -1130,19 +1131,42 @@ function AnalystLensView({
 /*                  Helper components                             */
 /* ────────────────────────────────────────────────────────────── */
 
+/* Layout-matched skeleton (DESIGN.md loading-state pattern: skeleton, never
+   a bare string — same shape as the final two-pane shell so nothing reflows
+   when the audit lands). */
 function LoadingState() {
   return (
-    <div
-      style={{
-        minHeight: 'calc(100vh - 64px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'var(--text-muted)',
-        fontSize: 14,
-      }}
-    >
-      Loading audit…
+    <div style={{ minHeight: 'calc(100vh - 64px)', padding: 24 }} aria-busy="true">
+      <Skeleton className="h-4 w-[240px]" style={{ marginBottom: 20 }} />
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: 20,
+        }}
+      >
+        {/* Left pane — document preview */}
+        <Skeleton style={{ height: 'min(68vh, 640px)', borderRadius: 'var(--radius-xl)' }} />
+        {/* Right pane — verdict band + top-3 fix tiles + tab bar + panel */}
+        <div className="stack-md">
+          <Skeleton style={{ height: 96, borderRadius: 'var(--radius-xl)' }} />
+          <div className="stack-sm">
+            <Skeleton style={{ height: 60, borderRadius: 'var(--radius-lg)' }} />
+            <Skeleton style={{ height: 60, borderRadius: 'var(--radius-lg)' }} />
+            <Skeleton style={{ height: 60, borderRadius: 'var(--radius-lg)' }} />
+          </div>
+          <div className="flex gap-sm">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-8 w-[88px]"
+                style={{ borderRadius: 'var(--radius-full)' }}
+              />
+            ))}
+          </div>
+          <Skeleton style={{ height: 240, borderRadius: 'var(--radius-xl)' }} />
+        </div>
+      </div>
     </div>
   );
 }
@@ -1181,20 +1205,16 @@ function ErrorState({ error }: { error: string | null }) {
   );
 }
 
+/* Tab-pane suspense fallback — generic content-shaped skeleton (heading +
+   three text rows + a panel block) instead of the prior static icon+string. */
 function PaneFallback({ label }: { label: string }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 32,
-        color: 'var(--text-muted)',
-        fontSize: 13,
-        gap: 8,
-      }}
-    >
-      <FileText size={14} /> {label}
+    <div className="stack-sm" style={{ padding: 24 }} aria-busy="true" aria-label={label}>
+      <Skeleton className="h-4 w-[38%]" />
+      <Skeleton className="h-3.5 w-[92%]" />
+      <Skeleton className="h-3.5 w-[78%]" />
+      <Skeleton className="h-3.5 w-[85%]" />
+      <Skeleton style={{ height: 120, borderRadius: 'var(--radius-lg)', marginTop: 8 }} />
     </div>
   );
 }
