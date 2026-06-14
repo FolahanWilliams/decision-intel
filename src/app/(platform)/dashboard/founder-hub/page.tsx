@@ -220,6 +220,16 @@ const SatPrepTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// 66-Day Protocol — founder-private "choose reality" check-in tracker
+// (Foundations cluster, sibling to Faith OS). Two ~15-second check-ins a day
+// grow a tree to full bloom at day 66. Locked 2026-06-14.
+const RealityProtocolTab = dynamic(
+  () =>
+    import('@/components/founder-hub/RealityProtocolTab').then(m => ({
+      default: m.RealityProtocolTab,
+    })),
+  { loading: tabLoader }
+);
 const VoiceActivityTab = dynamic(
   () =>
     import('@/components/founder-hub/VoiceActivityTab').then(m => ({
@@ -288,6 +298,7 @@ import {
   Handshake,
   Mic,
   Activity,
+  Sprout,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -324,6 +335,7 @@ type TabId =
   | 'founder_os'
   | 'faith_os'
   | 'sat_prep'
+  | 'reality_protocol'
   | 'todo';
 
 type TabGroup = 'Foundations' | 'Start' | 'Product' | 'Go-to-Market' | 'Intelligence' | 'Tools';
@@ -368,6 +380,13 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
   { id: 'faith_os', label: 'Faith OS', icon: <BookOpen size={16} />, group: 'Foundations' },
   // Personal study OS — SAT prep (founder-private; never on the customer dashboard).
   { id: 'sat_prep', label: 'SAT Prep', icon: <GraduationCap size={16} />, group: 'Foundations' },
+  // 66-Day Protocol — founder-private "choose reality" tracker (2026-06-14).
+  {
+    id: 'reality_protocol',
+    label: '66-Day Protocol',
+    icon: <Sprout size={16} />,
+    group: 'Foundations',
+  },
   // Start — guided 2-day walkthrough entry point
   { id: 'start', label: 'Start Here', icon: <Compass size={16} />, group: 'Start' },
   // GTM v3.5 §11 (RATIFIED 2026-05-05) — the cognitive-discipline surface
@@ -561,6 +580,14 @@ const SEARCH_INDEX: SearchEntry[] = [
       "Daily spiritual checkin + Today's Three (the day's three priorities), evening reflection, prayer journal, reading progress.",
     keywords:
       "faith os todays three today's three daily three priorities goals rule of three highlight commit evening reflection prayer journal scripture devotional spiritual checkin streak the build campaign quarter rocks weekly intentions",
+  },
+  {
+    tabId: 'reality_protocol',
+    section: '66-Day Protocol',
+    preview:
+      'Choose reality, build the person. Two 15-second check-ins a day (morning intention + night honest mark) grow a tree to full bloom at day 66. A slip never resets the tree.',
+    keywords:
+      '66 day protocol reality choose reality tree check-in checkin morning question night mark slip never resets streak habit lally 2010 automaticity bloom august 19 escape avoidance discipline scripture verse kjv proverbs 24:16 falleth seven times graduation phone out of the bedroom on-ramp purpose engine anti-goal prince king daily ritual personal private founder',
   },
   {
     tabId: 'start',
@@ -1939,6 +1966,11 @@ function renderTab(
     sat_prep: (
       <ErrorBoundary sectionName="SAT Prep">
         <SatPrepTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    reality_protocol: (
+      <ErrorBoundary sectionName="66-Day Protocol">
+        <RealityProtocolTab founderPass={FOUNDER_PASS} />
       </ErrorBoundary>
     ),
   };

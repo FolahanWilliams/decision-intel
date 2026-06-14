@@ -133,6 +133,21 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
     label: 'SAT Prep',
     aliases: ['sat prep', 'sat prep tab', 'sat study', 'sat tab', 'study for the sat'],
   },
+  {
+    id: 'reality_protocol',
+    label: '66-Day Protocol',
+    aliases: [
+      '66 day protocol',
+      'sixty-six',
+      'sixty six',
+      'reality protocol',
+      'choose reality',
+      'the tree',
+      'check-in tracker',
+      'morning check-in',
+      'night check-in',
+    ],
+  },
   // Intelligence
   { id: 'data_ecosystem', label: 'Data Ecosystem' },
   { id: 'case_library', label: 'Case Library' },
