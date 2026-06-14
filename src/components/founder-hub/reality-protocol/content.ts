@@ -377,3 +377,121 @@ export const CONSTRUCTION_SWAPS: ReadonlyArray<string> = [
   'Call a friend',
   'Play guitar',
 ];
+
+// ─────────────────────────────────────────────────────────────────────
+// THE URGE-MOMENT PROTOCOL — read this when tempted (System 2 online)
+// ─────────────────────────────────────────────────────────────────────
+//
+// Distilled from the GPT + Claude conversations. The point is NOT to start a
+// conversation (an AI confidant at the urge moment is just another screen to
+// consume — the same avoidance in a nicer outfit). The point is a fast READ
+// that pulls the slow, deliberate mind (System 2) back online: the urge runs
+// on System 1, and System 1 loses its grip the moment you make it answer a
+// real question. Read top to bottom, honestly, then act.
+
+export interface UrgeTruth {
+  title: string;
+  body: string;
+}
+
+export const URGE_PROTOCOL = {
+  /** First thing you see — permission to pause, and the calming fact. */
+  opener:
+    'Stop. You do not have to do anything right now. Breathe, and read this slowly before you touch anything. The urge is a wave: it peaks and passes on its own if you do not feed it.',
+
+  /** The decision-auditor questions. Answering them honestly, in order, is what
+   *  forces System 2 online — and that alone usually dissolves the pull. */
+  questions: [
+    'What am I feeling right now — and what am I unwilling to feel? Boredom, restlessness, loneliness, uncertainty, the gap between who I am and who I want to be?',
+    'What am I actually avoiding? What is the real task in front of me that I do not want to face?',
+    'Is this a reality decision, or an escape decision?',
+    'What would the person I am building toward do right now?',
+    'How will tomorrow morning feel if I do this — and how will it feel if I do not?',
+  ],
+
+  /** The truths that hold under pressure. Behavioural economics + your own
+   *  evidence, not willpower — these stay true no matter how you feel. */
+  truths: [
+    {
+      title: 'The pleasure is a lie System 1 is telling you.',
+      body: 'By the second and third time it does not even feel good — you said so yourself. Those reps were never about pleasure; they were about not returning to reality. So the "this will feel good" story is already false before you start.',
+    },
+    {
+      title: 'This is the discount curve snapping.',
+      body: 'Right now the near reward looks enormous and the cost looks like nothing. In an hour you will ask "why did I do that." That later question is your real preference talking — the version of you that is not being hijacked. Side with him.',
+    },
+    {
+      title: 'You are not the customer. You are the product.',
+      body: 'The feed and the on-ramp were engineered by people whose job is to harvest your attention and sell it. Resisting is not depriving yourself — it is refusing to be farmed. You know their motives. Act like someone who knows.',
+    },
+    {
+      title: 'It is the same muscle.',
+      body: 'This urge and the urge to build another framework instead of doing the real work are the same flinch: reach for the thing that removes the need to face something hard. Win this rep and you are training the exact capacity the whole company depends on.',
+    },
+    {
+      title: 'The cost is erosion, not explosion.',
+      body: 'One night is almost nothing. The interest rate on a thousand of them is the prince who never became king. You think in compounding — so apply it honestly to this.',
+    },
+  ] as ReadonlyArray<UrgeTruth>,
+
+  /** The close — the one action, and the reassurance that opening this already
+   *  was the hard part. */
+  close:
+    'The urge passes whether you feed it or not — but only one of those leaves you stronger tomorrow. Put the phone across the room and do the one thing you already chose. Opening this instead of the feed was the hard part, and you already did it.',
+
+  /** If already mid-slip — read THIS instead of spiralling (the AVE reframe). */
+  slipNote:
+    'Already slipped? Then this is the most important moment, not the worst one. A slip costs ten minutes; the belief that "the day is ruined" costs the whole day and turns one into four. Mark it honestly below and continue — a just man falleth seven times, and riseth up again.',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
+// WHAT YOU ARE REALLY BUILDING — identity construction, not abstinence
+// ─────────────────────────────────────────────────────────────────────
+//
+// The deepest reframe from the conversation: this is not a porn tracker. The
+// tree does not represent abstinence — it represents IDENTITY CONSTRUCTION,
+// and the system rewards BECOMING THE PERSON, not merely avoiding the
+// behaviour. That is already true of the design (the tree grows from showing
+// up; a slip never kills it). Surfaced here as reading + dynamic visualisation,
+// NEVER as new trackers — the daily ritual stays one morning question + one
+// night mark.
+
+/** The headline identity reframe. */
+export const IDENTITY_FRAME =
+  'This is not a porn tracker. The tree does not stand for abstinence — it stands for who you are becoming. The real objective is a world-class mind; the escape is just one obstacle on the path. So the tree grows from SHOWING UP, and a slip never kills it: you did not become the old person, you made one poor decision.';
+
+/** The tree-metaphor choice, three rows. Each day is a quiet vote between the
+ *  two columns. (Seed/Stimulus · Compounding/Consumption · Growth/Escape.) */
+export const CHOICE_TRIAD: ReadonlyArray<{ build: string; escape: string }> = [
+  { build: 'Seed', escape: 'Stimulus' },
+  { build: 'Compounding', escape: 'Consumption' },
+  { build: 'Growth', escape: 'Escape' },
+];
+
+/** The Prince & King — two trajectories that compound apart. Every day's
+ *  actions nudge one of them; the gap is invisible day to day and enormous
+ *  over years. This is a VISUALISATION of why the small daily choice matters —
+ *  NOT a tracked second timeline competing with the tree. */
+export const TRAJECTORY = {
+  kingLabel: 'The King',
+  kingInputs: ['read', 'train', 'build', 'reflect', 'connect', 'pray'],
+  princeLabel: 'The Prince',
+  princeInputs: ['scroll', 'avoid', 'escape', 'consume'],
+  caption:
+    'Not because you are bad — because trajectories compound. The prince who never became king does not lose the throne in a battle. He loses it to a thousand ordinary nights.',
+} as const;
+
+/** Person A / Person B — why the tree rewards becoming the person, not merely
+ *  avoiding the behaviour (the argument against a naive streak counter). */
+export const PERSON_CONTRAST = {
+  a: {
+    label: 'Abstains, but empty',
+    body: 'No escape — but all day scrolling, no purpose, no growth, no mission. A streak counter would reward this. It should not.',
+  },
+  b: {
+    label: 'Builds, slips once',
+    body: 'Reads, trains, builds, studies, prays, creates — and slips once after forty days. A streak counter would call this failure. It is not.',
+  },
+  verdict:
+    'The system rewards becoming the person, not merely avoiding the behaviour. That is why your tree grows from engagement and honesty, and a slip is just data — never a reset.',
+} as const;
