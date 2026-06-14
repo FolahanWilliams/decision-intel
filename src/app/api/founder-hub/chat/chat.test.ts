@@ -32,6 +32,25 @@ vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() }),
 }));
 
+// Partial-mock founder-auth: keep the REAL verifyFounderPass (the auth-gate
+// tests assert its 401/503 behaviour against process.env.FOUNDER_HUB_PASS),
+// but stub checkFounderHubLlmRateLimit. The real limiter is Supabase-DB-backed
+// (30 req / 60s on a single shared key). Locally the DB is unreachable so it
+// fails OPEN and every request is allowed; in CI DATABASE_URL is set, so the
+// ~16 authenticated POSTs in this file share one real 60s window and the
+// LAST tests (the sanitizer block) get 429'd → a 429 JSON body, not an SSE
+// stream → readStream() collects no `data:` chunks → empty output → the two
+// sanitizer assertions fail with ''. Per the CLAUDE.md "tests must mock the DB
+// boundaries or they fail in CI" lock, the cost-cap is a DB boundary this
+// test should not exercise. Always-allow here.
+vi.mock('@/lib/utils/founder-auth', async importOriginal => {
+  const actual = await importOriginal<typeof import('@/lib/utils/founder-auth')>();
+  return {
+    ...actual,
+    checkFounderHubLlmRateLimit: vi.fn(() => Promise.resolve(true)),
+  };
+});
+
 // The route calls buildRecentMeetingsBlock() on every request. When a
 // DB is reachable in CI with seed rows, the helper returns a non-empty
 // string and the chat injects TWO extra history entries (the meetings
