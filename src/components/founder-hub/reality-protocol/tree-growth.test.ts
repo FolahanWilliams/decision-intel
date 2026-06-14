@@ -15,6 +15,7 @@ import {
   PROTOCOL_TOTAL_DAYS,
   RISING_VERSE_REFS,
   VERSES,
+  LOOP_STAGES,
 } from './content';
 
 function m(date: string): RealityCheckinLite {
@@ -160,6 +161,26 @@ describe('selectVerse', () => {
     for (let i = 0; i < 40; i++) {
       const v = selectVerse({ dateIso: shiftIso('2026-06-14', i), kind: 'morning' });
       expect(VERSES.some(x => x.ref === v.ref)).toBe(true);
+    }
+  });
+});
+
+describe('LOOP_STAGES', () => {
+  it('has exactly one leverage stage — the on-ramp the viz highlights', () => {
+    // LoopViz centers the "cut here" callout + the reduced-motion pulse rest
+    // point on the single leverage stage; more than one would break that.
+    expect(LOOP_STAGES.filter(s => s.leverage)).toHaveLength(1);
+  });
+
+  it('marks the phone/feed on-ramp (stage 2) as the leverage point', () => {
+    const idx = LOOP_STAGES.findIndex(s => s.leverage);
+    expect(idx).toBe(1); // 0-indexed → the 2nd stage
+    expect(LOOP_STAGES[idx].band).toBe('buildup');
+  });
+
+  it('every stage is tagged buildup or damage', () => {
+    for (const s of LOOP_STAGES) {
+      expect(['buildup', 'damage']).toContain(s.band);
     }
   });
 });

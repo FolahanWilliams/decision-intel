@@ -40,11 +40,9 @@ export function ConvergenceViz() {
     <figure style={{ margin: '0 0 4px' }}>
       <svg
         viewBox="0 0 720 200"
-        width="100%"
-        height="auto"
         role="img"
         aria-label="InsurX and Decision Intel converge on the same shape: structural discipline brought into an analog, gut-feel market."
-        style={{ display: 'block' }}
+        style={{ display: 'block', width: '100%', height: 'auto' }}
       >
         <defs>
           <linearGradient id="sprint-conv-left" x1="0" y1="0" x2="1" y2="0">

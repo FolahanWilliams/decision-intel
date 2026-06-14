@@ -26,6 +26,9 @@ import {
   SLIP_REFRAME,
   RESEARCH_NOTE,
   PROTOCOL_START_ISO,
+  DIAGNOSIS_REFRAME,
+  INSANITY_QUOTE,
+  CONSTRUCTION_SWAPS,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -36,6 +39,7 @@ import {
   type CheckinKind,
 } from './reality-protocol/tree-growth';
 import { RealityTree, skyInfoFor, REALITY_GOLD } from './reality-protocol/RealityTree';
+import { LoopViz } from './reality-protocol/LoopViz';
 
 interface RealityCheckinRow {
   id?: string;
@@ -62,13 +66,15 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [sky] = useState(() => skyInfoFor(new Date().getHours()));
 
   const [morningOpen, setMorningOpen] = useState(false);
+  const [editingMorning, setEditingMorning] = useState(false);
   const [planText, setPlanText] = useState('');
   const [nightOpen, setNightOpen] = useState(false);
+  const [editingNight, setEditingNight] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pulse, setPulse] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [showProtocol, setShowProtocol] = useState(false);
+  const [showContext, setShowContext] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -171,13 +177,19 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
       escapePlan: planText.trim() || undefined,
       verseRef: mVerse.ref,
     });
-    if (ok) setMorningOpen(false);
+    if (ok) {
+      setMorningOpen(false);
+      setEditingMorning(false);
+    }
   };
 
   const doNight = async (stayedOnTrack: boolean) => {
     const nVerse = selectVerse({ dateIso: today, kind: 'night', slipped: !stayedOnTrack });
     const ok = await saveCheckin({ kind: 'night', stayedOnTrack, verseRef: nVerse.ref });
-    if (ok) setNightOpen(false);
+    if (ok) {
+      setNightOpen(false);
+      setEditingNight(false);
+    }
   };
 
   // ── styles (platform tokens) ──────────────────────────────────────────
@@ -210,10 +222,21 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     gap: 8,
     color: 'var(--text-secondary)',
     fontSize: 14,
     fontWeight: 600,
+  };
+  const changeLink: React.CSSProperties = {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-muted)',
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    fontSize: 12.5,
+    fontWeight: 600,
+    padding: 0,
   };
 
   if (loading) {
@@ -320,6 +343,33 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         Began {shortDate(PROTOCOL_START_ISO)} → blooms ≈ {shortDate(finishIso())}
       </div>
 
+      {/* standing principle — the change/inputs reframe (resonates) */}
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: 14,
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'italic',
+          fontSize: 13.5,
+          lineHeight: 1.5,
+          color: 'var(--text-secondary)',
+        }}
+      >
+        &ldquo;{INSANITY_QUOTE.text}&rdquo;
+        <span
+          style={{
+            display: 'block',
+            fontFamily: 'inherit',
+            fontStyle: 'normal',
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            marginTop: 4,
+          }}
+        >
+          — {INSANITY_QUOTE.attribution}
+        </span>
+      </div>
+
       {/* verse */}
       <div style={{ ...cardStyle, marginTop: 18 }}>
         <div
@@ -341,11 +391,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
       {/* check-ins */}
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* morning */}
-        {morningDone ? (
-          <div style={doneBox}>
-            <Check size={16} style={{ color: 'var(--success)' }} /> Morning check-in done
-          </div>
-        ) : morningOpen ? (
+        {morningOpen || editingMorning ? (
           <div style={cardStyle}>
             <div
               style={{
@@ -377,8 +423,35 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 marginBottom: 10,
               }}
             />
-            <button style={primaryBtn} onClick={() => void doMorning()} disabled={saving}>
-              Save and take the verse
+            <div className="reality-night-actions" style={{ display: 'flex', gap: 10 }}>
+              <button style={primaryBtn} onClick={() => void doMorning()} disabled={saving}>
+                Save and take the verse
+              </button>
+              {editingMorning && (
+                <button
+                  style={neutralBtn}
+                  onClick={() => {
+                    setEditingMorning(false);
+                    setPlanText('');
+                  }}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </div>
+        ) : morningDone ? (
+          <div style={doneBox}>
+            <Check size={16} style={{ color: 'var(--success)' }} /> Morning check-in done
+            <button
+              style={changeLink}
+              onClick={() => {
+                setPlanText(dayRec.morning?.escapePlan ?? '');
+                setEditingMorning(true);
+              }}
+            >
+              Change
             </button>
           </div>
         ) : (
@@ -389,16 +462,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         )}
 
         {/* night */}
-        {nightDone ? (
-          <div style={doneBox}>
-            <Check size={16} style={{ color: 'var(--success)' }} /> Night check-in done
-            {dayRec.night?.stayedOnTrack === true
-              ? ' · stayed on track'
-              : dayRec.night?.stayedOnTrack === false
-                ? ' · logged honestly'
-                : ''}
-          </div>
-        ) : nightOpen ? (
+        {nightOpen || editingNight ? (
           <div style={cardStyle}>
             {dayRec.morning?.escapePlan ? (
               <div
@@ -413,7 +477,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 <span style={{ color: 'var(--text-primary)' }}>{dayRec.morning.escapePlan}</span>
               </div>
             ) : null}
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div className="reality-night-actions" style={{ display: 'flex', gap: 10 }}>
               <button
                 style={{ ...primaryBtn, background: 'var(--success)' }}
                 onClick={() => void doNight(true)}
@@ -425,6 +489,27 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 I slipped
               </button>
             </div>
+            {editingNight && (
+              <button
+                style={{ ...changeLink, marginTop: 12 }}
+                onClick={() => setEditingNight(false)}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        ) : nightDone ? (
+          <div style={doneBox}>
+            <Check size={16} style={{ color: 'var(--success)' }} /> Night check-in done
+            {dayRec.night?.stayedOnTrack === true
+              ? ' · stayed on track'
+              : dayRec.night?.stayedOnTrack === false
+                ? ' · logged honestly'
+                : ''}
+            <button style={changeLink} onClick={() => setEditingNight(true)}>
+              Change
+            </button>
           </div>
         ) : (
           <button style={neutralBtn} onClick={() => setNightOpen(true)}>
@@ -433,6 +518,13 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
           </button>
         )}
       </div>
+
+      {/* mobile: stack the side-by-side action pairs on a narrow phone */}
+      <style>{`
+        @media (max-width: 420px) {
+          .reality-night-actions { flex-direction: column; }
+        }
+      `}</style>
 
       {error && (
         <div style={{ fontSize: 12.5, color: 'var(--error)', marginTop: 10, textAlign: 'center' }}>
@@ -468,10 +560,12 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         </div>
       )}
 
-      {/* the protocol — reference, collapsed by default (read once, then run) */}
-      <div style={{ marginTop: 22 }}>
+      {/* the context — diagnosis, the loop, the plan. Open by default (it's the
+          "everything you might need" depth); the daily check-in is above it, so
+          this never slows the ritual. Collapse it once it's internalised. */}
+      <div style={{ marginTop: 24 }}>
         <button
-          onClick={() => setShowProtocol(v => !v)}
+          onClick={() => setShowContext(v => !v)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -480,33 +574,129 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
             border: 'none',
             color: 'var(--text-secondary)',
             fontSize: 13,
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer',
             padding: 0,
           }}
         >
-          {showProtocol ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
-          The protocol
+          {showContext ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+          The diagnosis, the loop &amp; the plan
         </button>
-        {showProtocol && (
-          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {KEYSTONES.map((k, i) => (
-              <div key={i} style={cardStyle}>
-                <div
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    marginBottom: 4,
-                  }}
-                >
-                  {i + 1}. {k.title}
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  {k.body}
-                </div>
+        {showContext && (
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* what this actually is */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                What this actually is
               </div>
-            ))}
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {DIAGNOSIS_REFRAME}
+              </div>
+            </div>
+
+            {/* the loop (dynamic viz) */}
+            <div style={cardStyle}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 10,
+                }}
+              >
+                The loop you are breaking
+              </div>
+              <LoopViz />
+            </div>
+
+            {/* the four keystones */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                The four keystones
+              </div>
+              {KEYSTONES.map((k, i) => (
+                <div key={i} style={cardStyle}>
+                  <div
+                    style={{
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: 4,
+                    }}
+                  >
+                    {i + 1}. {k.title}
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                    {k.body}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* when the urge comes — construction swaps */}
+            <div style={cardStyle}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 4,
+                }}
+              >
+                When the urge comes
+              </div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.5,
+                  marginBottom: 10,
+                }}
+              >
+                The next action is already chosen. Pre-decide one of these in the morning, so there
+                is nothing to negotiate at 9pm.
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {CONSTRUCTION_SWAPS.map(s => (
+                  <span
+                    key={s}
+                    style={{
+                      fontSize: 12.5,
+                      color: 'var(--text-secondary)',
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 999,
+                      padding: '5px 12px',
+                    }}
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* the anti-goal */}
             <div style={{ ...cardStyle, borderLeft: '3px solid var(--text-muted)' }}>
               <div
                 style={{
@@ -524,6 +714,8 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 {ANTI_GOAL}
               </div>
             </div>
+
+            {/* what the evidence says */}
             <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
               {RESEARCH_NOTE}
             </div>
