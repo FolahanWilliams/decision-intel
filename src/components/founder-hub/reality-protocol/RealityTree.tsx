@@ -16,6 +16,7 @@
  */
 
 import type { CSSProperties } from 'react';
+import { CHECKINS_TO_BLOOM } from './content';
 
 // ---------- palette (illustration-local, intentional-dark) ----------
 const LINE = '#2E3447';
@@ -115,14 +116,137 @@ function renderSky(key: SkyKey) {
   return els;
 }
 
-function renderTree(p: number) {
+/**
+ * Draw the tree for a given check-in count `c` (0..CHECKINS_TO_BLOOM) and the
+ * continuous fill `p` (= c / CHECKINS_TO_BLOOM).
+ *
+ * The growth is driven so that EVERY single check-in adds one new, identifiable
+ * element — this is the founder ask (2026-06-14): the tree must visibly change
+ * every morning AND every night, the graduality is the point. The schedule
+ * tiles all CHECKINS_TO_BLOOM check-ins exactly:
+ *
+ *   c = 0            seed in the soil
+ *   c = 1..SPROUT    a sprout — taller each tap, a tiny leaf on the first few
+ *   then, on the canopy, one new element per check-in, persistent by index
+ *   (so each tap APPENDS growth rather than reshuffling):
+ *     · outer leaves   — leafing out
+ *     · inner foliage  — filling in lush
+ *     · blossoms       — the "suddenly" finale, full bloom at the last check-in
+ *
+ * On top of that, trunk height + canopy radius scale continuously with `p`, so
+ * even a tap that lands inside a saturated band still enlarges the tree a touch.
+ * Element positions key off the element INDEX (via `pseudo`), never the current
+ * count, so existing leaves/blossoms stay put and only the newest one appears.
+ *
+ * Phase sizes derive from CHECKINS_TO_BLOOM (the SSOT) so they can't drift if
+ * the protocol length ever changes, and the final blossom always lands exactly
+ * at full bloom.
+ */
+const SPROUT_CHECKINS = 8;
+const REMAINING = CHECKINS_TO_BLOOM - SPROUT_CHECKINS;
+const OUTER_MAX = Math.round(REMAINING * 0.4);
+const INNER_MAX = Math.round(REMAINING * 0.37);
+const BLOSSOM_START = SPROUT_CHECKINS + OUTER_MAX + INNER_MAX;
+const BLOSSOM_MAX = CHECKINS_TO_BLOOM - BLOSSOM_START; // the rest → last lands at bloom
+
+const clampInt = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
+
+export type TreePhase = 'seed' | 'sprout' | 'canopy';
+
+export interface TreeSignature {
+  phase: TreePhase;
+  /** The perceptible per-check-in change: count of discrete growth elements
+   *  drawn (sprout leaves in the sprout phase; outer + inner + blossom in the
+   *  canopy). One more appears with every single check-in until full bloom. */
+  growthCount: number;
+  sproutLeaves: number;
+  sproutHeight: number;
+  outer: number;
+  inner: number;
+  blossom: number;
+  branches: boolean;
+  trunkH: number;
+  trunkW: number;
+  canopyR: number;
+}
+
+/**
+ * PURE growth schedule for a check-in count — the single source for both the
+ * drawing (renderTree below) and the test that locks the founder invariant:
+ * EVERY check-in must visibly change the tree. (2026-06-14 founder ask.)
+ *
+ * The schedule tiles all CHECKINS_TO_BLOOM check-ins exactly so each tap adds
+ * one new identifiable element — a sprout leaf, then an outer leaf (leafing
+ * out), then inner foliage (filling in lush), then a blossom (the "suddenly"
+ * finale) — with the final blossom landing precisely at full bloom. Phase sizes
+ * derive from CHECKINS_TO_BLOOM (the SSOT) so they can't drift if the protocol
+ * length ever changes. Trunk + canopy also scale continuously so the size grows
+ * a touch even inside a saturated band.
+ */
+export function treeRenderSignature(checkins: number): TreeSignature {
+  // Guard against NaN / non-finite (Math.max(0, NaN) is NaN, not 0).
+  const c = Number.isFinite(checkins) ? Math.max(0, Math.round(checkins)) : 0;
+  if (c <= 0) {
+    return {
+      phase: 'seed',
+      growthCount: 0,
+      sproutLeaves: 0,
+      sproutHeight: 0,
+      outer: 0,
+      inner: 0,
+      blossom: 0,
+      branches: false,
+      trunkH: 0,
+      trunkW: 0,
+      canopyR: 0,
+    };
+  }
+  if (c <= SPROUT_CHECKINS) {
+    // A sprout: taller every tap, and a fresh little leaf on every tap too.
+    const sproutLeaves = Math.min(c, SPROUT_CHECKINS);
+    return {
+      phase: 'sprout',
+      growthCount: sproutLeaves,
+      sproutLeaves,
+      sproutHeight: 9 + c * 4.4,
+      outer: 0,
+      inner: 0,
+      blossom: 0,
+      branches: false,
+      trunkH: 0,
+      trunkW: 0,
+      canopyR: 0,
+    };
+  }
+  const t = Math.min(1, (c - SPROUT_CHECKINS) / Math.max(1, CHECKINS_TO_BLOOM - SPROUT_CHECKINS));
+  const outer = clampInt(c - SPROUT_CHECKINS, 0, OUTER_MAX);
+  const inner = clampInt(c - (SPROUT_CHECKINS + OUTER_MAX), 0, INNER_MAX);
+  const blossom = clampInt(c - BLOSSOM_START, 0, BLOSSOM_MAX);
+  return {
+    phase: 'canopy',
+    growthCount: outer + inner + blossom,
+    sproutLeaves: 0,
+    sproutHeight: 0,
+    outer,
+    inner,
+    blossom,
+    branches: t > 0.18,
+    trunkH: 46 + t * 140,
+    trunkW: 10 + t * 20,
+    canopyR: 32 + t * 60,
+  };
+}
+
+function renderTree(checkins: number) {
   const els: React.ReactNode[] = [];
   const baseX = 150;
   const baseY = 250;
+  const sig = treeRenderSignature(checkins);
   els.push(<ellipse key="soil" cx={baseX} cy={baseY + 7} rx={48} ry={12} fill={SOIL} />);
   els.push(<ellipse key="soil2" cx={baseX} cy={baseY + 4} rx={30} ry={7} fill={SOIL_LIGHT} />);
 
-  if (p <= 0) {
+  // c === 0 → a seed resting in the soil.
+  if (sig.phase === 'seed') {
     els.push(
       <ellipse
         key="seed"
@@ -136,46 +260,43 @@ function renderTree(p: number) {
     );
     return els;
   }
-  if (p < 0.1) {
-    const h = 10 + (p / 0.1) * 18;
+
+  // Sprout — taller every tap, a fresh little leaf on every tap.
+  if (sig.phase === 'sprout') {
+    const h = sig.sproutHeight;
+    const topY = baseY - h;
     els.push(
       <path
         key="stem"
-        d={`M${baseX} ${baseY} C ${baseX - 2} ${baseY - h * 0.5}, ${baseX + 1} ${baseY - h * 0.8}, ${baseX} ${baseY - h}`}
+        d={`M${baseX} ${baseY} C ${baseX - 2} ${baseY - h * 0.5}, ${baseX + 1} ${baseY - h * 0.8}, ${baseX} ${topY}`}
         stroke={LEAF}
         strokeWidth={3.2}
         fill="none"
         strokeLinecap="round"
       />
     );
-    els.push(
-      <ellipse
-        key="lf1"
-        cx={baseX - 7}
-        cy={baseY - h + 2}
-        rx={8}
-        ry={4}
-        fill={LEAF_LIGHT}
-        transform={`rotate(-32 ${baseX - 7} ${baseY - h + 2})`}
-      />
-    );
-    els.push(
-      <ellipse
-        key="lf2"
-        cx={baseX + 7}
-        cy={baseY - h + 1}
-        rx={8}
-        ry={4}
-        fill={LEAF}
-        transform={`rotate(32 ${baseX + 7} ${baseY - h + 1})`}
-      />
-    );
+    const denom = Math.max(1, sig.sproutLeaves - 1);
+    for (let i = 0; i < sig.sproutLeaves; i++) {
+      const side = i % 2 === 0 ? -1 : 1;
+      const ly = baseY - h * (0.38 + 0.54 * (i / denom));
+      const lx = baseX + side * 7;
+      els.push(
+        <ellipse
+          key={`sl${i}`}
+          cx={lx}
+          cy={ly}
+          rx={7.5}
+          ry={3.8}
+          fill={i % 2 ? LEAF : LEAF_LIGHT}
+          transform={`rotate(${side * 32} ${lx} ${ly})`}
+        />
+      );
+    }
     return els;
   }
 
-  const t = (p - 0.1) / 0.9;
-  const trunkH = 58 + t * 120;
-  const trunkW = 11 + t * 19;
+  // Canopy — trunk + branches + leaves + blossoms, all from the signature.
+  const { trunkH, trunkW, canopyR, branches, outer, inner, blossom } = sig;
   const topY = baseY - trunkH;
 
   els.push(
@@ -189,8 +310,8 @@ function renderTree(p: number) {
     />
   );
 
-  if (t > 0.2) {
-    const bl = 16 + t * 26;
+  if (branches) {
+    const bl = 16 + (trunkH / 186) * 26;
     els.push(
       <path
         key="br1"
@@ -213,55 +334,60 @@ function renderTree(p: number) {
     );
   }
 
-  const canopyR = 34 + t * 56;
   const cyTop = topY - canopyR * 0.32;
   els.push(
     <circle key="cfill" cx={baseX} cy={cyTop - canopyR * 0.1} r={canopyR * 0.66} fill={LEAF} />
   );
 
-  const layers = [
-    { col: LEAF_DARK, scale: 1.0, off: 6 },
-    { col: LEAF, scale: 0.86, off: 0 },
-    { col: LEAF_LIGHT, scale: 0.62, off: -7 },
-  ];
-  layers.forEach((L, li) => {
-    const n = Math.round(5 + t * 7);
-    for (let i = 0; i < n; i++) {
-      const ang = (i / n) * Math.PI * 2 + li * 0.55;
-      const rad = canopyR * L.scale * (0.45 + 0.5 * pseudo(i * 7 + li * 13));
-      const bx = baseX + Math.cos(ang) * rad * 0.95;
-      const by = cyTop + L.off - Math.sin(ang) * rad * 0.6 - canopyR * 0.1;
-      const br = canopyR * L.scale * (0.3 + 0.22 * pseudo(i * 5 + li * 3));
-      els.push(<circle key={`c${li}-${i}`} cx={bx} cy={by} r={br} fill={L.col} />);
-    }
-  });
-
-  if (p > 0.8) {
-    const bt = (p - 0.8) / 0.2;
-    const nb = Math.round(6 + bt * 16);
-    for (let i = 0; i < nb; i++) {
-      const ang = pseudo(i * 11) * Math.PI * 2;
-      const rad = canopyR * (0.2 + 0.72 * pseudo(i * 17));
-      const bx = baseX + Math.cos(ang) * rad * 0.9;
-      const by = cyTop - Math.sin(ang) * rad * 0.6 - canopyR * 0.1;
-      els.push(
-        <circle
-          key={`bl${i}`}
-          cx={bx}
-          cy={by}
-          r={2 + bt * 1.6}
-          fill={i % 3 === 0 ? BLOOM_LIGHT : BLOOM}
-          opacity={0.7 + 0.3 * bt}
-        />
-      );
-    }
+  // One new OUTER leaf per check-in (leafing out). Positioned by index, so each
+  // tap APPENDS a leaf; existing ones stay put.
+  for (let i = 0; i < outer; i++) {
+    const ang = pseudo(i * 2.3 + 1) * Math.PI * 2;
+    const rad = canopyR * (0.5 + 0.5 * pseudo(i * 7 + 2));
+    const bx = baseX + Math.cos(ang) * rad * 0.96;
+    const by = cyTop - Math.sin(ang) * rad * 0.62 - canopyR * 0.08;
+    const br = 6 + 4 * pseudo(i * 5 + 3);
+    const col = i % 3 === 0 ? LEAF_DARK : i % 3 === 1 ? LEAF : LEAF_LIGHT;
+    els.push(<circle key={`ol${i}`} cx={bx} cy={by} r={br} fill={col} />);
   }
+
+  // One new INNER cluster per check-in — filling the canopy in, deeper + smaller.
+  for (let i = 0; i < inner; i++) {
+    const ang = pseudo(i * 3.7 + 11) * Math.PI * 2;
+    const rad = canopyR * (0.15 + 0.55 * pseudo(i * 9 + 5));
+    const bx = baseX + Math.cos(ang) * rad * 0.9;
+    const by = cyTop - Math.sin(ang) * rad * 0.55 - canopyR * 0.06;
+    const br = 4 + 3 * pseudo(i * 4 + 2);
+    els.push(<circle key={`il${i}`} cx={bx} cy={by} r={br} fill={i % 2 ? LEAF_DARK : LEAF} />);
+  }
+
+  // One new BLOSSOM per check-in — the "suddenly" finale; the last lands at bloom.
+  for (let i = 0; i < blossom; i++) {
+    const ang = pseudo(i * 5.1 + 21) * Math.PI * 2;
+    const rad = canopyR * (0.2 + 0.7 * pseudo(i * 13 + 7));
+    const bx = baseX + Math.cos(ang) * rad * 0.92;
+    const by = cyTop - Math.sin(ang) * rad * 0.6 - canopyR * 0.08;
+    els.push(
+      <circle
+        key={`bl${i}`}
+        cx={bx}
+        cy={by}
+        r={3.3}
+        fill={i % 3 === 0 ? BLOOM_LIGHT : BLOOM}
+        opacity={0.92}
+      />
+    );
+  }
+
   return els;
 }
 
 export interface RealityTreeProps {
-  /** 0-1 tree fill. */
+  /** 0-1 tree fill (continuous size driver). */
   progress: number;
+  /** Total check-ins logged — the per-check-in growth driver (one new element
+   *  per tap). Falls back to a count derived from `progress` if omitted. */
+  totalCheckins?: number;
   sky: SkyInfo;
   /** Day N (engaged days, capped at 66). */
   dayNumber: number;
@@ -271,7 +397,19 @@ export interface RealityTreeProps {
   pulse?: boolean;
 }
 
-export function RealityTree({ progress, sky, dayNumber, stageLabel, pulse }: RealityTreeProps) {
+export function RealityTree({
+  progress,
+  totalCheckins,
+  sky,
+  dayNumber,
+  stageLabel,
+  pulse,
+}: RealityTreeProps) {
+  // The tree grows one element per check-in. Prefer the exact count; fall back
+  // to deriving it from progress (progress = checkins / CHECKINS_TO_BLOOM) for
+  // any caller that hasn't passed it yet.
+  const checkins =
+    typeof totalCheckins === 'number' ? totalCheckins : Math.round(progress * CHECKINS_TO_BLOOM);
   const bloom = progress >= 1;
   const heroStyle: CSSProperties = {
     position: 'relative',
@@ -349,7 +487,7 @@ export function RealityTree({ progress, sky, dayNumber, stageLabel, pulse }: Rea
         }}
       >
         {renderSky(sky.key)}
-        {renderTree(progress)}
+        {renderTree(checkins)}
       </svg>
     </div>
   );

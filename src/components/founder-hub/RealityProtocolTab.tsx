@@ -291,6 +291,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
       {/* tree hero */}
       <RealityTree
         progress={state.progress}
+        totalCheckins={state.totalCheckins}
         sky={sky}
         dayNumber={state.dayNumber}
         stageLabel={state.stageLabel}
