@@ -183,9 +183,8 @@ export function FounderHubMap({ activeJourney, visited, onNavigate, onToggleVisi
         <svg
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
           width="100%"
-          height="auto"
           preserveAspectRatio="xMidYMid meet"
-          style={{ display: 'block', maxWidth: '100%' }}
+          style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
           role="img"
           aria-label="Founder Hub map — every tab and its connections"
         >

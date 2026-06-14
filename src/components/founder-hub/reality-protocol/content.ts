@@ -290,3 +290,90 @@ export const SLIP_REFRAME =
  *  short on purpose; the full version lives in docs/66-day-protocol.md. */
 export const RESEARCH_NOTE =
   'The "21 days" rule is a myth (Maxwell Maltz, 1960, misread). The "66 days" is real but averaged — Lally et al. (2010): mean 66 days to automaticity, range 18-254, and missing a single day did not derail it. That last finding is what runs the slip rule: one miss is not a reset.';
+
+// ─────────────────────────────────────────────────────────────────────
+// THE DIAGNOSIS — what this actually is (the most motivating frame)
+// ─────────────────────────────────────────────────────────────────────
+
+/** The "same muscle" reframe (§1). The single most useful framing for the
+ *  founder specifically: the 9pm relapse and the founder move of building
+ *  another framework instead of running the real work are the SAME avoidance
+ *  reflex — so this is not a side-quest from the company. */
+export const DIAGNOSIS_REFRAME =
+  'This is not a lust problem. It is an attention, boredom, and avoidance problem — the urge shows up when you are idle and slightly bored, and the second and third time are not even about pleasure, they are about not returning to reality. The deepest cut: the 9pm relapse and reaching for another framework instead of running the real work are the same reflex. So this is not a side-quest from the company. Win the 9pm rep and you are training the exact capacity the work depends on.';
+
+/** Commonly attributed to Albert Einstein. The attribution is apocryphal (no
+ *  primary source), so we display the honest "attributed to" hedge — same
+ *  spirit as the 21-day-myth honesty above. The line still resonates, and this
+ *  is a private motivational surface, so it earns its place. */
+export const INSANITY_QUOTE = {
+  text: 'Insanity is doing the same thing over and over again and expecting different results.',
+  attribution: 'attributed to Albert Einstein',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
+// THE LOOP — the diagnosed escape cycle (rendered as a dynamic viz)
+// ─────────────────────────────────────────────────────────────────────
+
+export interface LoopStage {
+  short: string;
+  full: string;
+  /** The on-ramp. Porn is the MIDDLE of the loop, not the start — the chain
+   *  begins at the phone, so this is the leverage point: cut it here. */
+  leverage?: boolean;
+  /** Visual band: 'buildup' (the slide in) | 'damage' (the cost after escape). */
+  band: 'buildup' | 'damage';
+}
+
+export const LOOP_STAGES: ReadonlyArray<LoopStage> = [
+  {
+    short: 'Idle + bored',
+    full: 'Idle time — boredom, a little loneliness or uncertainty',
+    band: 'buildup',
+  },
+  {
+    short: 'Phone → feed',
+    full: 'Phone → social media — the on-ramp',
+    leverage: true,
+    band: 'buildup',
+  },
+  {
+    short: 'Attention fragments',
+    full: 'Dopamine-seeking; attention fragments',
+    band: 'buildup',
+  },
+  {
+    short: 'The urge',
+    full: 'The urge appears — the brain wins a negotiation, not a battle ("why not")',
+    band: 'buildup',
+  },
+  { short: 'Escape', full: 'Escape', band: 'damage' },
+  { short: 'Guilt', full: 'Guilt → reduced motivation', band: 'damage' },
+  {
+    short: 'Standards drop',
+    full: "More feed, more escape; the day's standards quietly drop",
+    band: 'damage',
+  },
+];
+
+/** The leverage-point lesson the viz exists to make obvious. */
+export const LOOP_LEVERAGE_NOTE =
+  'Porn is not the start of the loop — it is the middle. The chain begins at the phone. Cut the on-ramp (phone out of the bedroom) and the loop never gets going.';
+
+// ─────────────────────────────────────────────────────────────────────
+// WHEN THE URGE COMES — pre-decided construction swaps
+// ─────────────────────────────────────────────────────────────────────
+
+/** The escape→construction list. Not a screen to consult at the urge moment —
+ *  pre-decide from these in the morning so the next action is already chosen
+ *  (keystone 2). Meaning competes with escape. */
+export const CONSTRUCTION_SWAPS: ReadonlyArray<string> = [
+  'Read scripture for ten minutes',
+  'Go for a walk',
+  'Do pushups',
+  'Work on Decision Intel',
+  'Read an investing book',
+  'Voice-note an idea',
+  'Call a friend',
+  'Play guitar',
+];
