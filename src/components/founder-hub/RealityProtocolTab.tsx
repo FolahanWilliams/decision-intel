@@ -42,6 +42,8 @@ import {
   IDENTITY_FRAME,
   CHOICE_TRIAD,
   PERSON_CONTRAST,
+  PROTOCOL_SCOPE,
+  REPLACEMENT_PRINCIPLE,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -786,6 +788,62 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               </div>
             </div>
 
+            {/* the two commitments — porn to zero + social media ≤ 30 min/day */}
+            <div style={cardStyle}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 6,
+                }}
+              >
+                The two commitments
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {PROTOCOL_SCOPE}
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: 'var(--accent-primary)',
+                    background: 'color-mix(in srgb, var(--accent-primary) 9%, var(--bg-card))',
+                    border:
+                      '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-color))',
+                    borderRadius: 999,
+                    padding: '5px 12px',
+                  }}
+                >
+                  The escape → zero
+                </span>
+                <span
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: 'var(--accent-primary)',
+                    background: 'color-mix(in srgb, var(--accent-primary) 9%, var(--bg-card))',
+                    border:
+                      '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-color))',
+                    borderRadius: 999,
+                    padding: '5px 12px',
+                  }}
+                >
+                  Social media → ≤ 30 min / day
+                </span>
+              </div>
+            </div>
+
             {/* the loop (dynamic viz) */}
             <div style={cardStyle}>
               <div
@@ -951,7 +1009,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               ))}
             </div>
 
-            {/* when the urge comes — construction swaps */}
+            {/* replace the time — the rewiring mechanism (the King's inputs) */}
             <div style={cardStyle}>
               <div
                 style={{
@@ -959,22 +1017,25 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
-                  color: 'var(--text-muted)',
-                  marginBottom: 4,
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
                 }}
               >
-                When the urge comes
+                Replace the time — build the King
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {REPLACEMENT_PRINCIPLE}
               </div>
               <div
                 style={{
                   fontSize: 12.5,
                   color: 'var(--text-muted)',
                   lineHeight: 1.5,
-                  marginBottom: 10,
+                  margin: '12px 0 10px',
                 }}
               >
-                The next action is already chosen. Pre-decide one of these in the morning, so there
-                is nothing to negotiate at 9pm.
+                Pre-decide one each morning, and reach for it the moment the urge shows — these are
+                the King&apos;s inputs:
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {CONSTRUCTION_SWAPS.map(s => (

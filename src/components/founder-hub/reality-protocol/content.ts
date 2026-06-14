@@ -262,7 +262,7 @@ export interface Keystone {
 export const KEYSTONES: ReadonlyArray<Keystone> = [
   {
     title: 'Cut the on-ramp, not just the destination',
-    body: 'The phone does not come to the bed — it charges across the room at night. It is far cheaper to never start the chain than to break it at link four.',
+    body: 'The phone does not come to the bed — it charges across the room at night, and social media gets a hard cap: 30 minutes a day, intentional not infinite. The feed is the on-ramp to the escape, so it is far cheaper to never start the chain than to break it at link four.',
   },
   {
     title: 'Kill the in-the-moment decision',
@@ -277,6 +277,13 @@ export const KEYSTONES: ReadonlyArray<Keystone> = [
     body: 'A slip costs ten minutes. The belief that the day is ruined costs the day, and triggers the binge. So a slip is one data point: log it honestly, return to baseline immediately. No ruined-day tax, no reset. A just man falleth seven times, and riseth up again (Proverbs 24:16).',
   },
 ];
+
+/** The scope of the protocol — not only porn. Escape in every form, with the
+ *  feed as the on-ramp, and the explicit social-media target. "Stayed on track"
+ *  at the night check-in means BOTH. The WHY is already carried by the loop +
+ *  keystone 1; this just names the two concrete commitments. */
+export const PROTOCOL_SCOPE =
+  'This is not only about porn. The real target is escape in every form, and social media is the on-ramp to most of it. So there are two commitments, and "stayed on track" means both: the escape stays at zero, and social media stays under 30 minutes a day — intentional, not infinite. Cut the on-ramp and the whole chain rarely even starts.';
 
 /** The anti-goal — one paragraph, because the founder responds to it (§6). */
 export const ANTI_GOAL =
@@ -361,21 +368,31 @@ export const LOOP_LEVERAGE_NOTE =
   'Porn is not the start of the loop — it is the middle. The chain begins at the phone. Cut the on-ramp (phone out of the bedroom) and the loop never gets going.';
 
 // ─────────────────────────────────────────────────────────────────────
-// WHEN THE URGE COMES — pre-decided construction swaps
+// REPLACE THE TIME — the rewiring mechanism (build the King)
 // ─────────────────────────────────────────────────────────────────────
 
-/** The escape→construction list. Not a screen to consult at the urge moment —
- *  pre-decide from these in the morning so the next action is already chosen
- *  (keystone 2). Meaning competes with escape. */
+/** The core growth mechanism the founder named: rewiring is not subtraction,
+ *  it is REPLACEMENT. Removing the escape leaves a vacuum that pulls the old
+ *  behaviour back; you crowd it out by pouring the reclaimed time into
+ *  stimulating, useful, genuinely NEW things that build who you are becoming.
+ *  This is the King's-inputs side of the Prince/King trajectory. */
+export const REPLACEMENT_PRINCIPLE =
+  'Removing the escape leaves a vacuum — and a vacuum pulls the old behaviour straight back. Rewiring is not subtraction, it is REPLACEMENT. Take the reclaimed time and attention and pour it into stimulating, useful, genuinely new things that build who you are becoming. You do not white-knuckle the urge away; you crowd it out by being busy becoming the King. Meaning out-competes escape every time.';
+
+/** The King's inputs — the menu you replace the reclaimed time with. Weighted
+ *  toward growth + new + stimulating (not just "distract yourself"): the daily
+ *  fill AND the pre-decided urge-moment swap. */
 export const CONSTRUCTION_SWAPS: ReadonlyArray<string> = [
-  'Read scripture for ten minutes',
-  'Go for a walk',
-  'Do pushups',
-  'Work on Decision Intel',
-  'Read an investing book',
-  'Voice-note an idea',
-  'Call a friend',
-  'Play guitar',
+  'Build or ship something on Decision Intel',
+  'Learn a new skill — a course, a hard topic',
+  'Read a real book (strategy, investing, scripture)',
+  'Train hard — lift, run, pushups',
+  'Create — write, record, design, play guitar',
+  'Study — SAT, or something that stretches you',
+  'Get outside and move; let the mind wander',
+  'Have a real conversation — call a friend',
+  'Voice-note the idea you keep avoiding',
+  'Plan tomorrow before the day plans you',
 ];
 
 // ─────────────────────────────────────────────────────────────────────
