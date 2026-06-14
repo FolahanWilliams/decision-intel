@@ -255,6 +255,9 @@ export const RISING_VERSE_REFS: ReadonlyArray<string> = [
 export interface Keystone {
   title: string;
   body: string;
+  /** An applicable KJV anchor verse — "Thy word have I hid in mine heart"
+   *  (Ps 119:11): the word kept close to guard in the moment. */
+  verse: { ref: string; text: string };
 }
 
 /** The four keystones of the plan (§4 of the 66-Day Protocol). Read once,
@@ -263,18 +266,34 @@ export const KEYSTONES: ReadonlyArray<Keystone> = [
   {
     title: 'Cut the on-ramp, not just the destination',
     body: 'The phone does not come to the bed — it charges across the room at night, and social media gets a hard cap: 30 minutes a day, intentional not infinite. The feed is the on-ramp to the escape, so it is far cheaper to never start the chain than to break it at link four.',
+    verse: {
+      ref: 'Romans 13:14',
+      text: 'Put ye on the Lord Jesus Christ, and make not provision for the flesh, to fulfil the lusts thereof.',
+    },
   },
   {
     title: 'Kill the in-the-moment decision',
     body: 'The real pull is not having to decide what is next. So pre-decide: before the vulnerable window the next action is already chosen — a book, training, a build task, a walk. The morning question above IS this keystone.',
+    verse: {
+      ref: 'Daniel 1:8',
+      text: 'But Daniel purposed in his heart that he would not defile himself.',
+    },
   },
   {
     title: 'Rebuild the purpose engine',
     body: 'The streak that worked was not resistance, it was engagement — scripture, momentum, direction, and the urges went quiet on their own. The daily check-in ritual is the structural version of that.',
+    verse: {
+      ref: 'Matthew 6:33',
+      text: 'But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.',
+    },
   },
   {
     title: 'The slip protocol',
-    body: 'A slip costs ten minutes. The belief that the day is ruined costs the day, and triggers the binge. So a slip is one data point: log it honestly, return to baseline immediately. No ruined-day tax, no reset. A just man falleth seven times, and riseth up again (Proverbs 24:16).',
+    body: 'A slip costs ten minutes. The belief that the day is ruined costs the day, and triggers the binge. So a slip is one data point: log it honestly, return to baseline immediately. No ruined-day tax, no reset.',
+    verse: {
+      ref: 'Proverbs 24:16',
+      text: 'For a just man falleth seven times, and riseth up again.',
+    },
   },
 ];
 
@@ -284,6 +303,73 @@ export const KEYSTONES: ReadonlyArray<Keystone> = [
  *  keystone 1; this just names the two concrete commitments. */
 export const PROTOCOL_SCOPE =
   'This is not only about porn. The real target is escape in every form, and social media is the on-ramp to most of it. So there are two commitments, and "stayed on track" means both: the escape stays at zero, and social media stays under 30 minutes a day — intentional, not infinite. Cut the on-ramp and the whole chain rarely even starts.';
+
+// ─────────────────────────────────────────────────────────────────────
+// SCRIPTURE ANCHORS — a real, applicable KJV verse per part of the page
+// ─────────────────────────────────────────────────────────────────────
+//
+// "Thy word have I hid in mine heart, that I might not sin against thee"
+// (Psalm 119:11). The word kept close, section by section, to guard in the
+// moment. Every text below is KJV, quoted accurately (ellipses preserve the
+// real wording, never paraphrase). One SSOT; the tab renders these.
+
+export interface AnchorVerse {
+  ref: string;
+  text: string;
+}
+
+export const ANCHOR_VERSES: Record<string, AnchorVerse> = {
+  // The diagnosis — escape is a failure of self-rule; the walls are down.
+  diagnosis: {
+    ref: 'Proverbs 25:28',
+    text: 'He that hath no rule over his own spirit is like a city that is broken down, and without walls.',
+  },
+  // The two commitments — not mastered by anything; the on-ramp capped.
+  commitments: {
+    ref: '1 Corinthians 6:12',
+    text: 'All things are lawful unto me, but all things are not expedient... but I will not be brought under the power of any.',
+  },
+  // The loop — the escalation chain, named exactly.
+  loop: {
+    ref: 'James 1:14-15',
+    text: 'But every man is tempted, when he is drawn away of his own lust, and enticed. Then when lust hath conceived, it bringeth forth sin.',
+  },
+  // What you are really building — a new creature; identity construction.
+  identity: {
+    ref: '2 Corinthians 5:17',
+    text: 'If any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new.',
+  },
+  // The Prince & King — you reap what you sow; trajectories compound.
+  trajectory: {
+    ref: 'Galatians 6:7',
+    text: 'Be not deceived; God is not mocked: for whatsoever a man soweth, that shall he also reap.',
+  },
+  // Person A vs B — fruit comes from abiding/doing, not mere avoidance.
+  person: {
+    ref: 'John 15:5',
+    text: 'He that abideth in me, and I in him, the same bringeth forth much fruit: for without me ye can do nothing.',
+  },
+  // Replace the time — the swept, empty house ends worse; fill the vacuum.
+  replacement: {
+    ref: 'Luke 11:25-26',
+    text: 'And when he cometh, he findeth it swept and garnished... and the last state of that man is worse than the first.',
+  },
+  // The anti-goal — redeem the time; do not lose it to a thousand nights.
+  antiGoal: {
+    ref: 'Ephesians 5:16',
+    text: 'Redeeming the time, because the days are evil.',
+  },
+  // The urge moment — there is always a way of escape.
+  urge: {
+    ref: '1 Corinthians 10:13',
+    text: 'God is faithful, who will not suffer you to be tempted above that ye are able; but will with the temptation also make a way to escape.',
+  },
+  // The reason scripture anchors every part of this page.
+  word: {
+    ref: 'Psalm 119:11',
+    text: 'Thy word have I hid in mine heart, that I might not sin against thee.',
+  },
+};
 
 /** The anti-goal — one paragraph, because the founder responds to it (§6). */
 export const ANTI_GOAL =
