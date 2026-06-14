@@ -17,7 +17,16 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sprout, Sunrise, Moon, Check, RotateCcw, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Sprout,
+  Sunrise,
+  Moon,
+  Check,
+  RotateCcw,
+  ChevronDown,
+  ChevronRight,
+  Anchor,
+} from 'lucide-react';
 import {
   MORNING_QUESTION,
   MORNING_PLACEHOLDER,
@@ -29,6 +38,10 @@ import {
   DIAGNOSIS_REFRAME,
   INSANITY_QUOTE,
   CONSTRUCTION_SWAPS,
+  URGE_PROTOCOL,
+  IDENTITY_FRAME,
+  CHOICE_TRIAD,
+  PERSON_CONTRAST,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -40,6 +53,7 @@ import {
 } from './reality-protocol/tree-growth';
 import { RealityTree, skyInfoFor, REALITY_GOLD } from './reality-protocol/RealityTree';
 import { LoopViz } from './reality-protocol/LoopViz';
+import { TrajectoryViz } from './reality-protocol/TrajectoryViz';
 
 interface RealityCheckinRow {
   id?: string;
@@ -75,6 +89,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [pulse, setPulse] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [showContext, setShowContext] = useState(true);
+  const [showUrge, setShowUrge] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -286,6 +301,173 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         >
           {sky.label}
         </div>
+      </div>
+
+      {/* urge-moment entry — prominent + calm, the first thing reachable when
+          you visit to resist. Default collapsed so the daily ritual stays
+          clean; one tap opens the full System-2 read. */}
+      <div style={{ marginBottom: 16 }}>
+        <button
+          onClick={() => setShowUrge(v => !v)}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            border: '1px solid color-mix(in srgb, var(--accent-primary) 35%, var(--border-color))',
+            background: 'color-mix(in srgb, var(--accent-primary) 7%, var(--bg-card))',
+            color: 'var(--accent-primary)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          <Anchor size={16} />
+          Feeling the urge right now? Read this first
+          {showUrge ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+        </button>
+
+        {showUrge && (
+          <div
+            style={{ ...cardStyle, marginTop: 10, borderLeft: '3px solid var(--accent-primary)' }}
+          >
+            {/* opener — permission to pause */}
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                lineHeight: 1.6,
+              }}
+            >
+              {URGE_PROTOCOL.opener}
+            </div>
+
+            {/* audit questions — pull System 2 online */}
+            <div style={{ marginTop: 16 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                Ask yourself, honestly
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  marginBottom: 10,
+                  lineHeight: 1.5,
+                }}
+              >
+                Answering these pulls your slow, deliberate mind (System 2) back online — which is
+                usually all it takes.
+              </div>
+              <ol
+                style={{
+                  margin: 0,
+                  paddingLeft: 0,
+                  listStyle: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                }}
+              >
+                {URGE_PROTOCOL.questions.map((q, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      gap: 10,
+                      fontSize: 14,
+                      lineHeight: 1.55,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    <span
+                      style={{ flexShrink: 0, fontWeight: 700, color: 'var(--accent-primary)' }}
+                    >
+                      {i + 1}.
+                    </span>
+                    <span>{q}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* truths that hold under pressure */}
+            <div style={{ marginTop: 18 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 10,
+                }}
+              >
+                What is actually true
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {URGE_PROTOCOL.truths.map((t, i) => (
+                  <div key={i}>
+                    <div
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: 2,
+                      }}
+                    >
+                      {t.title}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                      {t.body}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* close — the one action */}
+            <div
+              style={{
+                marginTop: 18,
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card))',
+                fontSize: 14,
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                lineHeight: 1.6,
+              }}
+            >
+              {URGE_PROTOCOL.close}
+            </div>
+
+            {/* slip note — the AVE reframe if already mid-slip */}
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 12.5,
+                color: 'var(--text-muted)',
+                lineHeight: 1.55,
+                fontStyle: 'italic',
+              }}
+            >
+              {URGE_PROTOCOL.slipNote}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* tree hero */}
@@ -619,6 +801,122 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 The loop you are breaking
               </div>
               <LoopViz />
+            </div>
+
+            {/* what you are really building — identity construction */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                What you are really building
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {IDENTITY_FRAME}
+              </div>
+
+              {/* the choice triad — each day is a vote */}
+              <div
+                style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 7 }}
+                aria-label="Each day is a choice"
+              >
+                {CHOICE_TRIAD.map(row => (
+                  <div key={row.build} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span
+                      style={{
+                        flex: 1,
+                        textAlign: 'right',
+                        fontSize: 13.5,
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                      }}
+                    >
+                      {row.build}
+                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>or</span>
+                    <span
+                      style={{
+                        flex: 1,
+                        textAlign: 'left',
+                        fontSize: 13.5,
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      {row.escape}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* the Prince & the King — dynamic divergence */}
+              <div style={{ marginTop: 18 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--text-muted)',
+                    marginBottom: 10,
+                  }}
+                >
+                  The Prince &amp; the King
+                </div>
+                <TrajectoryViz />
+              </div>
+
+              {/* Person A vs Person B — reward becoming the person */}
+              <div
+                className="reality-night-actions"
+                style={{ marginTop: 18, display: 'flex', gap: 10 }}
+              >
+                {[PERSON_CONTRAST.a, PERSON_CONTRAST.b].map((p, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      flex: 1,
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: 4,
+                      }}
+                    >
+                      {p.label}
+                    </div>
+                    <div
+                      style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                    >
+                      {p.body}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 13,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.55,
+                  fontWeight: 500,
+                }}
+              >
+                {PERSON_CONTRAST.verdict}
+              </div>
             </div>
 
             {/* the four keystones */}
