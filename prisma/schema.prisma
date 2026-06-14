@@ -1594,6 +1594,39 @@ model FounderOsDailyReflection {
   @@index([userId, date])
 }
 
+/// 66-Day Protocol — founder-private "choose reality" check-in tracker
+/// (founder-hub `reality_protocol` tab, Foundations cluster). The behavioural
+/// scaffolding behind the personal operating plan: two ~15-second check-ins a
+/// day (morning intention + night honest mark) that grow a tree to full bloom
+/// at day 66. Single-user, partitioned by Supabase user.id like every other
+/// FounderOs* model. LOAD-BEARING INVARIANTS (the whole design — do not change):
+/// a slip is logged honestly but NEVER resets the tree or progress (no streak
+/// counter — the abstinence-violation trap is the enemy); the tree grows from
+/// SHOWING UP (check-ins), not from being perfect; exactly one morning question
+/// + one night mark (friction is the enemy; no extra inputs, no in-app AI).
+/// Day 66 = graduation; the tool is built to retire.
+///   kind          'morning' | 'night'.
+///   escapePlan    morning answer — "where will I want to escape, what instead".
+///   stayedOnTrack night mark — true = chose reality, false = slip (data, not a
+///                 reset). null on a morning row.
+/// One row per (userId, date, kind), upserted.
+model FounderOsRealityCheckin {
+  id            String   @id @default(cuid())
+  userId        String
+  date          String
+  kind          String
+  escapePlan    String?  @db.Text
+  stayedOnTrack Boolean?
+  note          String?  @db.Text
+  verseRef      String?  @db.VarChar(120)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, date, kind])
+  @@index([userId])
+  @@index([userId, date])
+}
+
 /// SAT Prep — founder-private study surface (founder-hub `sat_prep` tab).
 /// Single-user, partitioned by Supabase user.id like every other FounderOs*
 /// model. The error log is the heart: one row per attempted/missed question

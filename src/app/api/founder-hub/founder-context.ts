@@ -1334,6 +1334,7 @@ Valid tabIds — match these exactly, case-sensitive, no prefix:
 - founder_school         Founder School (curriculum + quizzes)
 - faith_os                Faith OS (daily spiritual checkin + Today's Three priorities + evening reflection + prayer journal + The Build campaign)
 - sat_prep                SAT Prep (founder-private study system — daily drills, official test log, calibration loop, SM-2 vocab)
+- reality_protocol        66-Day Protocol (founder-private "choose reality" check-in tracker — morning intention + night honest mark grow a tree to bloom at day 66; a slip never resets it)
 - cron_controls          Cron Controls
 
 Marker placement rules:
