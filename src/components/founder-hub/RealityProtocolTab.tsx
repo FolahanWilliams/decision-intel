@@ -44,6 +44,7 @@ import {
   PERSON_CONTRAST,
   PROTOCOL_SCOPE,
   REPLACEMENT_PRINCIPLE,
+  ANCHOR_VERSES,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -73,6 +74,29 @@ function shortDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   const dt = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1, 12, 0, 0));
   return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
+/** A small KJV anchor verse under a section — the word kept close, part by part
+ *  (Ps 119:11). Verse text is the SSOT in content.ts `ANCHOR_VERSES`. */
+function ScriptureAnchor({ verse }: { verse: { ref: string; text: string } }) {
+  return (
+    <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border-color)' }}>
+      <div
+        style={{
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'italic',
+          fontSize: 12.5,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.5,
+        }}
+      >
+        &ldquo;{verse.text}&rdquo;
+      </div>
+      <div style={{ fontSize: 11, color: REALITY_GOLD, marginTop: 4, letterSpacing: 0.3 }}>
+        {verse.ref}
+      </div>
+    </div>
+  );
 }
 
 export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
@@ -468,6 +492,8 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
             >
               {URGE_PROTOCOL.slipNote}
             </div>
+
+            <ScriptureAnchor verse={ANCHOR_VERSES.urge} />
           </div>
         )}
       </div>
@@ -786,6 +812,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {DIAGNOSIS_REFRAME}
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.diagnosis} />
             </div>
 
             {/* the two commitments — porn to zero + social media ≤ 30 min/day */}
@@ -842,6 +869,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                   Social media → ≤ 30 min / day
                 </span>
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.commitments} />
             </div>
 
             {/* the loop (dynamic viz) */}
@@ -859,6 +887,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 The loop you are breaking
               </div>
               <LoopViz />
+              <ScriptureAnchor verse={ANCHOR_VERSES.loop} />
             </div>
 
             {/* what you are really building — identity construction */}
@@ -878,6 +907,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {IDENTITY_FRAME}
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.identity} />
 
               {/* the choice triad — each day is a vote */}
               <div
@@ -928,6 +958,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                   The Prince &amp; the King
                 </div>
                 <TrajectoryViz />
+                <ScriptureAnchor verse={ANCHOR_VERSES.trajectory} />
               </div>
 
               {/* Person A vs Person B — reward becoming the person */}
@@ -975,6 +1006,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               >
                 {PERSON_CONTRAST.verdict}
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.person} />
             </div>
 
             {/* the four keystones */}
@@ -1005,6 +1037,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                   <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                     {k.body}
                   </div>
+                  <ScriptureAnchor verse={k.verse} />
                 </div>
               ))}
             </div>
@@ -1054,6 +1087,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                   </span>
                 ))}
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.replacement} />
             </div>
 
             {/* the anti-goal */}
@@ -1073,11 +1107,52 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                 {ANTI_GOAL}
               </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.antiGoal} />
             </div>
 
             {/* what the evidence says */}
             <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
               {RESEARCH_NOTE}
+            </div>
+
+            {/* why scripture anchors every part — the founder's reason */}
+            <div
+              style={{
+                marginTop: 6,
+                textAlign: 'center',
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-lg)',
+                background: 'color-mix(in srgb, var(--accent-primary) 5%, var(--bg-card))',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontStyle: 'italic',
+                  fontSize: 14,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.55,
+                }}
+              >
+                &ldquo;{ANCHOR_VERSES.word.text}&rdquo;
+              </div>
+              <div
+                style={{ fontSize: 11.5, color: REALITY_GOLD, marginTop: 6, letterSpacing: 0.3 }}
+              >
+                {ANCHOR_VERSES.word.ref}
+              </div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-muted)',
+                  marginTop: 8,
+                  lineHeight: 1.5,
+                }}
+              >
+                That is why a verse anchors every part above — the word kept close, to guard you in
+                the moment.
+              </div>
             </div>
           </div>
         )}

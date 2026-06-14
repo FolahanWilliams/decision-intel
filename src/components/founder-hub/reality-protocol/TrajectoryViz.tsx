@@ -17,8 +17,36 @@
 
 import { TRAJECTORY } from './content';
 
-const KING_PATH = 'M 30 105 C 130 100, 230 72, 330 28';
-const PRINCE_PATH = 'M 30 105 C 130 110, 230 150, 330 182';
+// Geometry: both lines start at the same point today (origin) and run to x=330.
+// The King COMPOUNDS — exponential growth (flat early, then accelerating up),
+// the truer shape for skills/relationships/equity that grow slowly then
+// suddenly. The Prince DECAYS LINEARLY — steady erosion, a straight line down
+// (a thousand ordinary nights, each costing about the same small amount).
+const X0 = 30;
+const X1 = 330;
+const Y_BASE = 105; // "today"
+const RISE = 77; // King reaches y = 28
+const FALL = 77; // Prince reaches y = 182
+const COMPOUND_K = 3; // curvature of the exponential (higher = more sudden)
+
+/** Exponential-growth polyline for the King — value (e^{k·t}−1)/(e^k−1) ∈ [0,1]
+ *  rising off the baseline; flat early, steep late. */
+function buildKingPath(segments = 28): string {
+  const denom = Math.exp(COMPOUND_K) - 1;
+  let d = '';
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const v = (Math.exp(COMPOUND_K * t) - 1) / denom;
+    const x = X0 + (X1 - X0) * t;
+    const y = Y_BASE - v * RISE;
+    d += `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)} `;
+  }
+  return d.trim();
+}
+
+const KING_PATH = buildKingPath();
+/** Linear decay for the Prince — a straight line down from today. */
+const PRINCE_PATH = `M ${X0} ${Y_BASE} L ${X1} ${Y_BASE + FALL}`;
 
 export function TrajectoryViz() {
   return (
@@ -33,7 +61,7 @@ export function TrajectoryViz() {
       <svg
         viewBox="0 0 360 210"
         role="img"
-        aria-label="Two trajectories from the same point today: the King rises as you read, train, build, reflect, connect and pray; the Prince falls as you scroll, avoid, escape and consume. The gap compounds over time."
+        aria-label="Two trajectories from the same point today: the King compounds upward (slow then sudden) as you read, train, build, reflect, connect and pray; the Prince declines in a steady straight line as you scroll, avoid, escape and consume. The gap widens over time."
         style={{ width: '100%', height: 'auto', display: 'block' }}
       >
         {/* baseline at 'today' */}
