@@ -1627,6 +1627,32 @@ model FounderOsRealityCheckin {
   @@index([userId, date])
 }
 
+/// 66-Day Protocol — the OPTIONAL evening reflection (2026-06-15). One row per
+/// (userId, date), all fields nullable. The descriptive 1-5 factor ratings
+/// (mind / energy / intention — column names MUST match REFLECTION_FACTORS[].id
+/// in content.ts) + the free-text note + tomorrow intention drive the read-only
+/// trend view. LOAD-BEARING: this NEVER feeds the tree — the tree math reads
+/// FounderOsRealityCheckin only; a missing reflection never reduces progress.
+/// Separate table (not a 3rd checkin `kind`) keeps the fast check-in ritual
+/// model pure. Additive + schema-drift tolerant: pre-migration the route fails
+/// soft to an empty trend.
+model FounderOsRealityReflection {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String
+  mind      Int?
+  energy    Int?
+  intention Int?
+  note      String?  @db.Text
+  tomorrow  String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+}
+
 /// SAT Prep — founder-private study surface (founder-hub `sat_prep` tab).
 /// Single-user, partitioned by Supabase user.id like every other FounderOs*
 /// model. The error log is the heart: one row per attempted/missed question

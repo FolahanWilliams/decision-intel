@@ -26,6 +26,8 @@ import {
   ChevronDown,
   ChevronRight,
   Anchor,
+  LineChart,
+  NotebookPen,
 } from 'lucide-react';
 import {
   MORNING_QUESTION,
@@ -49,6 +51,13 @@ import {
   DISCHARGE_FIRST,
   DISCHARGE_NOTE,
   ACCOUNTABILITY,
+  REFLECTION_FACTORS,
+  REFLECTION_SCALE_MAX,
+  REFLECTION_INTRO,
+  REFLECTION_NOTE_PROMPT,
+  REFLECTION_TOMORROW_PROMPT,
+  REFLECTION_TREND_NOTE,
+  type ReflectionFactor,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -58,6 +67,13 @@ import {
   todayIso,
   type CheckinKind,
 } from './reality-protocol/tree-growth';
+import {
+  summarizeReflections,
+  correlateFactorWithOutcome,
+  sparklinePath,
+  type ReflectionLite,
+  type ReflectionFactorId,
+} from './reality-protocol/reflection-trends';
 import { RealityTree, skyInfoFor, REALITY_GOLD } from './reality-protocol/RealityTree';
 import { LoopViz } from './reality-protocol/LoopViz';
 import { TrajectoryViz } from './reality-protocol/TrajectoryViz';
@@ -71,6 +87,32 @@ interface RealityCheckinRow {
   note?: string | null;
   verseRef?: string | null;
 }
+
+interface RealityReflectionRow extends ReflectionLite {
+  id?: string;
+  note?: string | null;
+  tomorrow?: string | null;
+}
+
+/** The in-progress evening reflection (factor ratings keyed by id + the two
+ *  free-text fields). All optional — the reflection is never required. */
+interface ReflectionDraft {
+  mind: number | null;
+  energy: number | null;
+  intention: number | null;
+  note: string;
+  tomorrow: string;
+}
+
+const EMPTY_REFLECTION_DRAFT: ReflectionDraft = {
+  mind: null,
+  energy: null,
+  intention: null,
+  note: '',
+  tomorrow: '',
+};
+
+const REFLECTION_FACTOR_IDS: ReadonlyArray<ReflectionFactorId> = REFLECTION_FACTORS.map(f => f.id);
 
 /** Short "14 Jun" style label without colliding with the canonical formatDate
  *  util (canonical-imports lint). Pure, local. */
@@ -106,6 +148,7 @@ function ScriptureAnchor({ verse }: { verse: { ref: string; text: string } }) {
 export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [loading, setLoading] = useState(true);
   const [checkins, setCheckins] = useState<RealityCheckinRow[]>([]);
+  const [reflections, setReflections] = useState<RealityReflectionRow[]>([]);
   const [today] = useState(() => todayIso());
   const [sky] = useState(() => skyInfoFor(new Date().getHours()));
 
@@ -121,20 +164,36 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [showContext, setShowContext] = useState(true);
   const [showUrge, setShowUrge] = useState(false);
 
+  // evening reflection (optional; separate from the fast marks; never feeds the tree)
+  const [reflectOpen, setReflectOpen] = useState(false);
+  const [editingReflect, setEditingReflect] = useState(false);
+  const [reflectDraft, setReflectDraft] = useState<ReflectionDraft>(EMPTY_REFLECTION_DRAFT);
+  const [savingReflect, setSavingReflect] = useState(false);
+  const [showTrend, setShowTrend] = useState(false);
+
   useEffect(() => {
     let active = true;
     (async () => {
+      const headers = { 'x-founder-pass': founderPass };
       try {
-        const res = await fetch('/api/founder-os/reality-checkin?days=90', {
-          headers: { 'x-founder-pass': founderPass },
-        });
-        if (!res.ok) throw new Error('load failed');
-        const json = await res.json();
-        if (active && Array.isArray(json?.data?.checkins)) {
-          setCheckins(json.data.checkins as RealityCheckinRow[]);
+        const [cRes, rRes] = await Promise.all([
+          fetch('/api/founder-os/reality-checkin?days=90', { headers }),
+          fetch('/api/founder-os/reality-reflection?days=90', { headers }),
+        ]);
+        if (cRes.ok) {
+          const json = await cRes.json();
+          if (active && Array.isArray(json?.data?.checkins)) {
+            setCheckins(json.data.checkins as RealityCheckinRow[]);
+          }
+        }
+        if (rRes.ok) {
+          const json = await rRes.json();
+          if (active && Array.isArray(json?.data?.reflections)) {
+            setReflections(json.data.reflections as RealityReflectionRow[]);
+          }
         }
       } catch {
-        // Server fails soft to []; a network error just leaves the seed state.
+        // Both endpoints fail soft to []; a network error leaves the seed state.
       } finally {
         if (active) setLoading(false);
       }
@@ -185,19 +244,62 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
     [founderPass, today, firePulse]
   );
 
+  const saveReflection = useCallback(async (): Promise<boolean> => {
+    setSavingReflect(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/founder-os/reality-reflection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
+        body: JSON.stringify({
+          date: today,
+          mind: reflectDraft.mind,
+          energy: reflectDraft.energy,
+          intention: reflectDraft.intention,
+          note: reflectDraft.note.trim() || undefined,
+          tomorrow: reflectDraft.tomorrow.trim() || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error('save failed');
+      const json = await res.json();
+      const saved = json?.data?.reflection as RealityReflectionRow | undefined;
+      if (saved) {
+        setReflections(prev => [...prev.filter(x => x.date !== saved.date), saved]);
+        setReflectOpen(false);
+        setEditingReflect(false);
+      }
+      return true;
+    } catch {
+      setError('Could not save your reflection. Try again.');
+      return false;
+    } finally {
+      setSavingReflect(false);
+    }
+  }, [founderPass, today, reflectDraft]);
+
   const resetAll = useCallback(async () => {
     setError(null);
     try {
-      const res = await fetch('/api/founder-os/reality-checkin?all=1', {
-        method: 'DELETE',
-        headers: { 'x-founder-pass': founderPass },
-      });
-      if (!res.ok) throw new Error('reset failed');
+      // Reset both the tree (check-ins) and the optional reflection log.
+      const [cRes, rRes] = await Promise.all([
+        fetch('/api/founder-os/reality-checkin?all=1', {
+          method: 'DELETE',
+          headers: { 'x-founder-pass': founderPass },
+        }),
+        fetch('/api/founder-os/reality-reflection?all=1', {
+          method: 'DELETE',
+          headers: { 'x-founder-pass': founderPass },
+        }),
+      ]);
+      if (!cRes.ok || !rRes.ok) throw new Error('reset failed');
       setCheckins([]);
+      setReflections([]);
       setConfirmReset(false);
       setPlanText('');
       setMorningOpen(false);
       setNightOpen(false);
+      setReflectDraft(EMPTY_REFLECTION_DRAFT);
+      setReflectOpen(false);
     } catch {
       setError('Could not reset. Try again.');
     }
@@ -208,6 +310,31 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const morningDone = Boolean(dayRec.morning);
   const nightDone = Boolean(dayRec.night);
   const slippedToday = nightDone && dayRec.night?.stayedOnTrack === false;
+
+  // evening reflection — optional, never feeds `state`/the tree above
+  const todayReflection = reflections.find(r => r.date === today);
+  const reflectionDone = Boolean(
+    todayReflection &&
+    (todayReflection.mind != null ||
+      todayReflection.energy != null ||
+      todayReflection.intention != null ||
+      todayReflection.note ||
+      todayReflection.tomorrow)
+  );
+  const trends = summarizeReflections(reflections, REFLECTION_FACTOR_IDS);
+  const hasTrendData = trends.some(t => t.count > 0);
+
+  const openReflectEditor = () => {
+    setReflectDraft({
+      mind: todayReflection?.mind ?? null,
+      energy: todayReflection?.energy ?? null,
+      intention: todayReflection?.intention ?? null,
+      note: todayReflection?.note ?? '',
+      tomorrow: todayReflection?.tomorrow ?? '',
+    });
+    setEditingReflect(true);
+    setReflectOpen(true);
+  };
 
   const verse = selectVerse({
     dateIso: today,
@@ -831,6 +958,394 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
           </div>
         </div>
       )}
+
+      {/* evening reflection — OPTIONAL, separate from the fast marks above, and
+          it NEVER feeds the tree. Here so progress is visible: watch the mind
+          grow over 66 days. Default collapsed so the daily ritual stays clean. */}
+      <div style={{ marginTop: 18 }}>
+        <button
+          onClick={() => {
+            if (reflectOpen) {
+              setReflectOpen(false);
+              setEditingReflect(false);
+            } else {
+              openReflectEditor();
+            }
+          }}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-card)',
+            color: 'var(--text-secondary)',
+            borderRadius: 'var(--radius-md)',
+            padding: '11px 14px',
+            fontSize: 13.5,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          <NotebookPen size={15} style={{ color: 'var(--accent-primary)' }} />
+          Evening reflection
+          <span style={{ fontWeight: 500, color: 'var(--text-muted)', fontSize: 12 }}>
+            · optional
+          </span>
+          {reflectionDone && !reflectOpen && (
+            <Check size={14} style={{ color: 'var(--success)', marginLeft: 2 }} />
+          )}
+          <span style={{ marginLeft: 'auto' }}>
+            {reflectOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+          </span>
+        </button>
+
+        {reflectOpen && (
+          <div style={{ ...cardStyle, marginTop: 10 }}>
+            <div
+              style={{
+                fontSize: 12.5,
+                color: 'var(--text-muted)',
+                lineHeight: 1.55,
+                marginBottom: 14,
+              }}
+            >
+              {REFLECTION_INTRO}
+            </div>
+
+            {/* the factor ratings — descriptive 1-5, never a grade */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {REFLECTION_FACTORS.map((f: ReflectionFactor) => {
+                const current = reflectDraft[f.id];
+                return (
+                  <div key={f.id}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                        marginBottom: 6,
+                      }}
+                    >
+                      <span
+                        style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)' }}
+                      >
+                        {f.label}
+                      </span>
+                      <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{f.help}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {Array.from({ length: REFLECTION_SCALE_MAX }, (_, i) => i + 1).map(v => {
+                        const active = current === v;
+                        return (
+                          <button
+                            key={v}
+                            onClick={() =>
+                              setReflectDraft(d => ({ ...d, [f.id]: d[f.id] === v ? null : v }))
+                            }
+                            aria-label={`${f.label} ${v} of ${REFLECTION_SCALE_MAX}`}
+                            style={{
+                              flex: 1,
+                              padding: '9px 0',
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: 14,
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              background: active ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                              color: active ? '#fff' : 'var(--text-muted)',
+                              border: `1px solid ${
+                                active ? 'var(--accent-primary)' : 'var(--border-color)'
+                              }`,
+                            }}
+                          >
+                            {v}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontSize: 11,
+                        color: 'var(--text-muted)',
+                        marginTop: 4,
+                      }}
+                    >
+                      <span>{f.low}</span>
+                      <span>{f.high}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* the honest note + the if-then for tomorrow */}
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                {REFLECTION_NOTE_PROMPT}
+              </div>
+              <textarea
+                value={reflectDraft.note}
+                onChange={e => setReflectDraft(d => ({ ...d, note: e.target.value }))}
+                rows={3}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 12px',
+                  fontSize: 13.5,
+                  lineHeight: 1.5,
+                  outline: 'none',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                }}
+              />
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                {REFLECTION_TOMORROW_PROMPT}
+              </div>
+              <input
+                value={reflectDraft.tomorrow}
+                onChange={e => setReflectDraft(d => ({ ...d, tomorrow: e.target.value }))}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 12px',
+                  fontSize: 13.5,
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            <div
+              className="reality-night-actions"
+              style={{ display: 'flex', gap: 10, marginTop: 14 }}
+            >
+              <button
+                style={primaryBtn}
+                onClick={() => void saveReflection()}
+                disabled={savingReflect}
+              >
+                {reflectionDone ? 'Update reflection' : 'Save reflection'}
+              </button>
+              <button
+                style={neutralBtn}
+                onClick={() => {
+                  setReflectOpen(false);
+                  setEditingReflect(false);
+                }}
+                disabled={savingReflect}
+              >
+                {editingReflect ? 'Close' : 'Cancel'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* your evolution — the read-only trend view (deterministic, never an AI
+          coach). The payoff: see the arc of your own mind over the 66 days. */}
+      <div style={{ marginTop: 12 }}>
+        <button
+          onClick={() => setShowTrend(v => !v)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          {showTrend ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+          <LineChart size={14} style={{ color: 'var(--accent-primary)' }} />
+          Your evolution
+        </button>
+
+        {showTrend && (
+          <div style={{ ...cardStyle, marginTop: 10 }}>
+            {!hasTrendData ? (
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Log a few evening reflections and your arc shows up here — a line per factor, so you
+                can watch your mind grow over the 66 days.
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {trends.map(t => {
+                    const factor = REFLECTION_FACTORS.find(f => f.id === t.id);
+                    if (!factor) return null;
+                    const values = t.series.map(p => p.value);
+                    const path = sparklinePath(values, 220, 36, REFLECTION_SCALE_MAX);
+                    const corr = correlateFactorWithOutcome(reflections, checkins, t.id);
+                    const up = t.delta != null && t.delta > 0.05;
+                    const down = t.delta != null && t.delta < -0.05;
+                    return (
+                      <div key={t.id}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'baseline',
+                            justifyContent: 'space-between',
+                            gap: 8,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 700,
+                              color: 'var(--text-primary)',
+                            }}
+                          >
+                            {factor.label}
+                          </span>
+                          <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                            {t.average != null ? `avg ${t.average.toFixed(1)}` : '—'}
+                            {t.delta != null && (up || down) ? (
+                              <span
+                                style={{
+                                  marginLeft: 8,
+                                  color: up ? 'var(--success)' : 'var(--text-muted)',
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {up ? '▲' : '▼'} {Math.abs(t.delta).toFixed(1)}
+                              </span>
+                            ) : null}
+                          </span>
+                        </div>
+                        <svg
+                          width="100%"
+                          viewBox="0 0 220 36"
+                          preserveAspectRatio="none"
+                          style={{ marginTop: 6, display: 'block', overflow: 'visible' }}
+                          aria-hidden="true"
+                        >
+                          <line
+                            x1="0"
+                            y1="35"
+                            x2="220"
+                            y2="35"
+                            stroke="var(--border-color)"
+                            strokeWidth="1"
+                          />
+                          {path && (
+                            <path
+                              d={path}
+                              fill="none"
+                              stroke={REALITY_GOLD}
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          )}
+                        </svg>
+                        {corr && (
+                          <div
+                            style={{
+                              fontSize: 11.5,
+                              color: 'var(--text-muted)',
+                              marginTop: 6,
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            On high-{factor.label.toLowerCase()} days you stayed on track{' '}
+                            {Math.round(corr.highRate * 100)}% of the time, vs{' '}
+                            {Math.round(corr.lowRate * 100)}% on low days (n={corr.highN}/
+                            {corr.lowN}).
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* the scannable run of your own words, newest first */}
+                <div style={{ marginTop: 18 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      color: 'var(--text-muted)',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Recent reflections
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {[...reflections]
+                      .filter(r => r.note || r.tomorrow)
+                      .sort((a, b) => b.date.localeCompare(a.date))
+                      .slice(0, 7)
+                      .map(r => (
+                        <div
+                          key={r.date}
+                          style={{ borderLeft: '2px solid var(--border-color)', paddingLeft: 10 }}
+                        >
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                            {shortDate(r.date)}
+                          </div>
+                          {r.note && (
+                            <div
+                              style={{
+                                fontSize: 13,
+                                color: 'var(--text-secondary)',
+                                lineHeight: 1.5,
+                                marginTop: 2,
+                              }}
+                            >
+                              {r.note}
+                            </div>
+                          )}
+                          {r.tomorrow && (
+                            <div
+                              style={{
+                                fontSize: 12.5,
+                                color: 'var(--text-primary)',
+                                lineHeight: 1.5,
+                                marginTop: 3,
+                              }}
+                            >
+                              → {r.tomorrow}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </>
+            )}
+            <div
+              style={{
+                fontSize: 11,
+                color: 'var(--text-muted)',
+                lineHeight: 1.5,
+                marginTop: 16,
+                paddingTop: 12,
+                borderTop: '1px solid var(--border-color)',
+              }}
+            >
+              {REFLECTION_TREND_NOTE}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* the context — diagnosis, the loop, the plan. Open by default (it's the
           "everything you might need" depth); the daily check-in is above it, so
