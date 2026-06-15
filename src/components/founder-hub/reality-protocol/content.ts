@@ -11,10 +11,17 @@
  *   - A slip is logged honestly but NEVER resets the tree or progress. There
  *     is no streak counter — the abstinence-violation trap ("the day's ruined,
  *     what's the point") is the real enemy, and a reset-counter manufactures it.
- *   - Exactly ONE morning question and ONE night mark. Friction is the enemy;
- *     the check-in must take ~15 seconds. No extra inputs, no "reality score",
- *     no second timeline, no in-app AI chat (at the urge moment you want fewer
- *     screens and a faster action, not a conversation).
+ *   - Exactly ONE morning question and ONE night mark in the FAST ritual.
+ *     Friction is the enemy; the check-in must take ~15 seconds. No in-app AI
+ *     chat (at the urge moment you want fewer screens and a faster action, not
+ *     a conversation).
+ *   - An OPTIONAL evening reflection (founder-decided 2026-06-15) adds
+ *     descriptive multi-factor ratings + a note + a tomorrow intention + a
+ *     read-only DETERMINISTIC trend view — so progress is visible and
+ *     motivating. It is SEPARATE from the fast marks and NEVER feeds the tree:
+ *     skipping it never reduces progress, the ratings never grade or gate the
+ *     tree, and synthesis is trend math, never an AI coach. The check-in ritual
+ *     above is untouched; this is an additive, opt-in layer that retires at 66.
  *   - Day 66 = graduation. The tool is built to retire, not to run forever.
  *
  * Verses are KJV (public domain). Translation choice is deliberate: the slip
@@ -666,3 +673,75 @@ export const ACCOUNTABILITY = {
   title: 'The one thing the tree cannot do',
   body: 'This tool keeps you honest with yourself. What it cannot do is put you in the light with someone else — and that is the single most powerful move there is, because secrecy is part of the fuel. The privacy of the act is what protects it; shame dies the moment it is spoken to a person you respect. You do not need to broadcast it. You need ONE human — a mentor, an older brother, someone in your faith — who knows, and who you can text "rough night, still in the fight" without it becoming an event. The app holds you accountable to yourself; the person holds you accountable to someone else. You need both. This is won in relationship, not in isolation.',
 } as const;
+
+// ─────────────────────────────────────────────────────────────────────
+// THE EVENING REFLECTION — optional, descriptive, never feeds the tree
+// ─────────────────────────────────────────────────────────────────────
+//
+// Added 2026-06-15 (founder-decided, "richer daily score" — he wants to SEE
+// the rebirth: visible progress on how his mind is growing is what motivates
+// him, and that is a real, evidence-backed motivator). The discipline that
+// keeps this from becoming a quantified-self spiral / a displacement:
+//   - It is OPTIONAL and SEPARATE from the fast morning/night marks. Skipping
+//     it never reduces progress and never blocks the daily ritual.
+//   - The ratings are DESCRIPTIVE self-observations ("how was it"), NOT grades.
+//     They NEVER feed the tree, never gate progress, never start a streak. The
+//     tree still grows ONLY from showing up; a slip still grows it.
+//   - Synthesis is DETERMINISTIC trend math (reflection-trends.ts), never an
+//     in-app AI coach. Correlations require a real sample floor before showing.
+//   - It retires at day 66 with the rest of the tool.
+
+/** The factors of the evening reflection. Each is a 1-REFLECTION_SCALE_MAX
+ *  DESCRIPTIVE rating (low → high anchors), never a grade. `id` MUST match the
+ *  nullable column name on FounderOsRealityReflection + the field the route
+ *  reads — a new factor is a new column + a new SSOT entry in lockstep. */
+export interface ReflectionFactor {
+  id: 'mind' | 'energy' | 'intention';
+  label: string;
+  /** Anchor at the bottom of the scale (value 1). */
+  low: string;
+  /** Anchor at the top of the scale (value REFLECTION_SCALE_MAX). */
+  high: string;
+  help: string;
+}
+
+export const REFLECTION_SCALE_MAX = 5;
+
+export const REFLECTION_FACTORS: ReadonlyArray<ReflectionFactor> = [
+  {
+    id: 'mind',
+    label: 'Mind',
+    low: 'Foggy, scattered',
+    high: 'Clear, sharp',
+    help: 'How clear and focused was your thinking today?',
+  },
+  {
+    id: 'energy',
+    label: 'Energy',
+    low: 'Flat, drained',
+    high: 'Charged, alive',
+    help: 'How was your drive — and did you hold it and aim it, or did it run you?',
+  },
+  {
+    id: 'intention',
+    label: 'Intention',
+    low: 'Pulled around',
+    high: 'Deliberate',
+    help: 'Did you run the day, or did the feed and the easy escape run you?',
+  },
+];
+
+/** The framing for the reflection surface — descriptive, not a report card. */
+export const REFLECTION_INTRO =
+  'Optional, and separate from the check-in above. Rate the day as you actually noticed it — not how well you performed — and leave a line for yourself. None of this touches the tree; it is here so you can watch your mind grow over the 66 days.';
+
+/** The two free-text prompts. `note` is the honest play-by-play; `tomorrow` is
+ *  the if-then formed from today (Gollwitzer — a plan built from real data). */
+export const REFLECTION_NOTE_PROMPT = 'How was today — your mind, your day? What did you notice?';
+export const REFLECTION_TOMORROW_PROMPT =
+  'One thing for tomorrow (e.g. "spent too long on the feed — phone stays in the hall after 8")';
+
+/** The honest framing of the trend view — it shows the arc, it does not judge
+ *  it, and it never claims a pattern off a handful of days. */
+export const REFLECTION_TREND_NOTE =
+  'Your own data, over time. The lines show the arc; they do not grade it. A pattern only shows once there is enough of it to mean something — noise dressed as insight is worse than nothing.';
