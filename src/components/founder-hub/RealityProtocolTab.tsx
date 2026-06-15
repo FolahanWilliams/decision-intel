@@ -59,8 +59,11 @@ import {
   REFLECTION_NOTE_PROMPT,
   REFLECTION_TOMORROW_PROMPT,
   REFLECTION_TREND_NOTE,
+  milestoneToReveal,
+  milestoneDaysAtOrBelow,
   type ReflectionFactor,
 } from './reality-protocol/content';
+import { MilestoneReveal } from './reality-protocol/MilestoneReveal';
 import {
   computeProtocolState,
   checkinsForDay,
@@ -116,6 +119,27 @@ const EMPTY_REFLECTION_DRAFT: ReflectionDraft = {
 };
 
 const REFLECTION_FACTOR_IDS: ReadonlyArray<ReflectionFactorId> = REFLECTION_FACTORS.map(f => f.id);
+
+/** Which milestone reveals have already been seen (founder-private, single
+ *  device). Read-only persistence; a wiped store just re-surfaces the moment. */
+const MILESTONE_SEEN_KEY = 'di-reality-milestone-seen-v1';
+function readSeenMilestones(): number[] {
+  try {
+    const raw = localStorage.getItem(MILESTONE_SEEN_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((n): n is number => typeof n === 'number') : [];
+  } catch {
+    // canonical localStorage / JSON.parse exception — default to "none seen".
+    return [];
+  }
+}
+function writeSeenMilestones(days: number[]): void {
+  try {
+    localStorage.setItem(MILESTONE_SEEN_KEY, JSON.stringify(days));
+  } catch {
+    // canonical localStorage exception — persistence is best-effort.
+  }
+}
 
 /** Short "14 Jun" style label without colliding with the canonical formatDate
  *  util (canonical-imports lint). Pure, local. */
@@ -188,6 +212,13 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [synthTooEarly, setSynthTooEarly] = useState<{ daysLogged: number; needed: number } | null>(
     null
   );
+
+  // Milestone reveals — surprise-on-arrival, never a countdown. Seen-state is
+  // lazy-read once; lazy init avoids touching localStorage during SSR.
+  const [seenMilestones, setSeenMilestones] = useState<number[]>([]);
+  useEffect(() => {
+    setSeenMilestones(readSeenMilestones());
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -312,6 +343,12 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
       if (!cRes.ok || !rRes.ok) throw new Error('reset failed');
       setCheckins([]);
       setReflections([]);
+      // a full reset re-arms the threshold moments from scratch
+      setSeenMilestones([]);
+      writeSeenMilestones([]);
+      setSynthResult(null);
+      setSynthTooEarly(null);
+      setSynthError(null);
       setConfirmReset(false);
       setPlanText('');
       setMorningOpen(false);
@@ -324,6 +361,9 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   }, [founderPass]);
 
   const state = computeProtocolState(checkins);
+  // The threshold moment, if one has just been crossed and not yet seen. Tied to
+  // the tree's own day count — no countdown, invisible until reached.
+  const milestone = milestoneToReveal(state.dayNumber, seenMilestones);
   // dayRec / the marks below are for the ACTIVE day (today, unless backfilling).
   const dayRec = checkinsForDay(checkins, activeDate);
   const morningDone = Boolean(dayRec.morning);
@@ -381,6 +421,14 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
       setNightOpen(false);
       setEditingNight(false);
     }
+  };
+
+  // Dismiss a milestone reveal for good — and every lower threshold with it, so
+  // an earlier ground can never surface after a later one.
+  const dismissMilestone = (shownDay: number) => {
+    const merged = Array.from(new Set([...seenMilestones, ...milestoneDaysAtOrBelow(shownDay)]));
+    setSeenMilestones(merged);
+    writeSeenMilestones(merged);
   };
 
   // Switch the day the marks/reflection write to. Close every open editor and
@@ -491,6 +539,20 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
 
   return (
     <div style={{ maxWidth: 560, margin: '0 auto' }}>
+      {/* the moment that waits at a threshold — only ever shown on arrival */}
+      {milestone && (
+        <MilestoneReveal
+          milestone={milestone}
+          onDismiss={() => dismissMilestone(milestone.day)}
+          onCapstone={() => {
+            void runSynthesis(true);
+            document
+              .getElementById('reality-synthesis')
+              ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        />
+      )}
+
       {/* header */}
       <div
         style={{
@@ -1495,7 +1557,10 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
 
       {/* synthesis — the retrospective AI pass over the whole journey. On-demand,
           reads only your own logged words, never the urge-moment chatbot. */}
-      <div style={{ ...cardStyle, marginTop: 24, borderLeft: `3px solid ${REALITY_GOLD}` }}>
+      <div
+        id="reality-synthesis"
+        style={{ ...cardStyle, marginTop: 24, borderLeft: `3px solid ${REALITY_GOLD}` }}
+      >
         <div
           style={{
             display: 'flex',

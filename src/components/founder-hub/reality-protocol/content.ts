@@ -388,6 +388,89 @@ export const ANCHOR_VERSES: Record<string, AnchorVerse> = {
   },
 };
 
+/**
+ * Milestone reveals — the surprise that waits at a threshold, NOT a countdown.
+ *
+ * LOAD-BEARING (the founder's two constraints, held together): something novel
+ * should be there at the grounds he names, AND "counting the days is counting
+ * to fail." The resolution: each reveal is INVISIBLE until reached — no "N days
+ * to go" anywhere, nothing to count toward. It fires the FIRST time the tree's
+ * own day count (`state.dayNumber`, the show-up number already on screen — NOT
+ * a new counter, NOT a clean-streak) crosses the threshold, then never nags
+ * again. It is a moment, not a badge: a ground-crossing he becomes someone at,
+ * never a streak to protect (the abstinence-violation trap the whole plan
+ * avoids). KJV verses, quoted accurately. The day-66 reveal frames the close as
+ * a sending, not a finish line — the tool retires, he does not (rule #5).
+ */
+export type MilestoneKind = 'ground' | 'threshold';
+export interface ProtocolMilestone {
+  /** Reveals the first time `dayNumber` reaches this. Sorted ascending. */
+  day: number;
+  kind: MilestoneKind;
+  eyebrow: string;
+  title: string;
+  /** Body paragraphs. */
+  lines: string[];
+  verse: AnchorVerse;
+}
+
+export const PROTOCOL_MILESTONES: ReadonlyArray<ProtocolMilestone> = [
+  {
+    day: 14,
+    kind: 'ground',
+    eyebrow: 'New ground',
+    title: 'Two weeks in.',
+    lines: [
+      'This is further than before. The roots are down now — you cannot see them, but the tree can no longer be pulled up the way it could on day three.',
+      'There is no streak here to guard, and everything to keep building. You are not avoiding a thing; you are becoming someone. Whatever tomorrow holds, today already proved the man who shows up for two weeks is real. He is you.',
+    ],
+    verse: {
+      ref: 'Jeremiah 17:7-8',
+      text: 'Blessed is the man that trusteth in the LORD... For he shall be as a tree planted by the waters, and that spreadeth out her roots by the river, and shall not see when heat cometh, but her leaf shall be green.',
+    },
+  },
+  {
+    day: PROTOCOL_TOTAL_DAYS,
+    kind: 'threshold',
+    eyebrow: 'The threshold',
+    title: 'Sixty-six days. The scaffolding comes off.',
+    lines: [
+      'This was never a finish line. You did not grow a tree — you became someone who tends one. The tool can retire now; you do not.',
+      'Read the whole arc back, then plant the next thing. The discipline that built these days is yours to carry into everything else. Go in peace, and keep going.',
+    ],
+    verse: {
+      ref: 'Numbers 6:24-26',
+      text: 'The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee: The LORD lift up his countenance upon thee, and give thee peace.',
+    },
+  },
+];
+
+/**
+ * The reveal to surface now: the highest threshold already reached that has not
+ * been seen, or null. Pure — `seen` is the list of milestone `day`s dismissed.
+ * Returns the LARGEST reached-unseen so a fresh device past several thresholds
+ * shows the most recent ground, not an old one. Dismissing one marks every
+ * lower threshold seen too (caller), so an earlier reveal never trails a later.
+ */
+export function milestoneToReveal(
+  dayNumber: number,
+  seen: ReadonlyArray<number>
+): ProtocolMilestone | null {
+  let best: ProtocolMilestone | null = null;
+  for (const m of PROTOCOL_MILESTONES) {
+    if (dayNumber >= m.day && !seen.includes(m.day)) {
+      if (best === null || m.day > best.day) best = m;
+    }
+  }
+  return best;
+}
+
+/** The set of `day`s to mark seen when `shown` is dismissed — it + everything
+ *  below it, so a lower reveal can never appear after a higher one. */
+export function milestoneDaysAtOrBelow(shownDay: number): number[] {
+  return PROTOCOL_MILESTONES.filter(m => m.day <= shownDay).map(m => m.day);
+}
+
 /** The anti-goal — one paragraph, because the founder responds to it (§6). */
 export const ANTI_GOAL =
   'Version B does not lose the throne in a battle. There is no villain and no catastrophe. He loses it to roughly a thousand ordinary nights where reality was slightly boring and the easy route was right there, each costing almost nothing. Think about the interest rate on a thousand small escapes. That is what produces the smart, articulate, still-talking-about-the-company 30-year-old who never became dangerous. Not explosion. Erosion. The scary part is not that it is hard. It is that it is easy and nearly invisible.';
