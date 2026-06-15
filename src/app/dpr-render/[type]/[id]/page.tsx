@@ -82,7 +82,14 @@ export default async function DprRenderPage({
   }
 
   const recordId = formatRecordId(data);
-  const verifyUrl = `https://decision-intel.com/verify/${recordId}`;
+  // "How to verify this record" points at the public DPR explainer, which
+  // documents the SHA-256 hash-comparison method. The prior per-record
+  // `/verify/{recordId}` URL pointed at a route that does not exist — it 404'd
+  // for crawlers AND humans (2026-06-15 Ahrefs audit). The record's own
+  // fingerprint stays visible in the integrity-fingerprint rows on the cover;
+  // a real per-record `/verify` endpoint is a separate, founder-gated build.
+  // Canonical www domain avoids the apex→www redirect the same audit flagged.
+  const verifyUrl = 'https://www.decision-intel.com/decision-provenance';
   const classification = computeClassification(type, clientSafe);
   const auditTimestamp = data.generatedAt.toISOString();
 

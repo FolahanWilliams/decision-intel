@@ -15,6 +15,7 @@
 import {
   ALL_CASES,
   isFailureOutcome,
+  getSlugForCase,
   type CaseStudy,
   type Industry,
 } from '@/lib/data/case-studies';
@@ -298,7 +299,7 @@ export function computeGenomeFromSeed(): BiasGenomeResult {
       biases: def.biases,
       caseCount: ALL_CASES.filter(c => c.toxicCombinations.includes(name)).length,
       caseExamples: examples.map(c => ({
-        slug: slugFor(c),
+        slug: getSlugForCase(c),
         company: c.company,
         year: c.year,
       })),
@@ -388,17 +389,6 @@ export function filterGenomeByIndustry(industry: Industry): BiasGenomeEntry[] {
 }
 
 // ─── Internal ──────────────────────────────────────────────────────────────
-
-// Keep in sync with `getSlugForCase` — avoid importing it here to keep this
-// module purely synchronous and tree-shakable at build time.
-function slugFor(c: CaseStudy): string {
-  return c.company
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/\s+&\s+/g, '-')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
 
 function buildInsight(args: {
   label: string;
