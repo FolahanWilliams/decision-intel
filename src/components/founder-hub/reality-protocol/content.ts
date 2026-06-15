@@ -515,9 +515,11 @@ export interface UrgeTruth {
 }
 
 export const URGE_PROTOCOL = {
-  /** First thing you see — permission to pause, and the calming fact. */
+  /** First thing you see — permission to pause, and the calming fact, with the
+   *  concrete timeframe (the most actionable anchor: a wave you can outlast,
+   *  not a force you must defeat). */
   opener:
-    'Stop. You do not have to do anything right now. Breathe, and read this slowly before you touch anything. The urge is a wave: it peaks and passes on its own if you do not feed it.',
+    'Stop. You do not have to do anything right now. Breathe, and read this slowly before you touch anything. The urge is a wave: it crests within minutes and passes on its own if you do not feed it — the spike is usually gone inside ten or fifteen. You are not trying to defeat it. You only have to outlast it.',
 
   /** HALT — the setup check you run BEFORE negotiating with the urge. Most of
    *  the time it is not really the escape you want; it is one of four states
