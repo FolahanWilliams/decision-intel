@@ -707,7 +707,10 @@ export interface ReflectionFactor {
   help: string;
 }
 
-export const REFLECTION_SCALE_MAX = 5;
+// 1-10 (bumped from 1-5 on 2026-06-15 — the founder found the day varies more
+// than five points capture). No migration: the Int? columns already hold 1-10,
+// and the selector + sparkline + API validation all derive from this SSOT.
+export const REFLECTION_SCALE_MAX = 10;
 
 export const REFLECTION_FACTORS: ReadonlyArray<ReflectionFactor> = [
   {

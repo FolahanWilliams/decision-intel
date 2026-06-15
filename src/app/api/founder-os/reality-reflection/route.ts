@@ -16,8 +16,8 @@
  *
  * POST /api/founder-os/reality-reflection
  *   Body: { date, mind?, energy?, intention?, note?, tomorrow? }
- *   Upserts the (userId, date) row. Each factor is a 1-5 int or null; out-of-
- *   range / non-numeric coerces to null. Idempotent.
+ *   Upserts the (userId, date) row. Each factor is a 1-REFLECTION_SCALE_MAX int
+ *   or null; out-of-range / non-numeric coerces to null. Idempotent.
  *
  * DELETE /api/founder-os/reality-reflection?all=1
  *   Founder-scoped reset of the reflection log (paired with the tracker reset).
@@ -27,14 +27,17 @@ import { prisma } from '@/lib/prisma';
 import { authenticateFounderOs } from '@/lib/founder-os/auth';
 import { apiSuccess, apiError } from '@/lib/utils/api-response';
 import { createLogger } from '@/lib/utils/logger';
+import { REFLECTION_SCALE_MAX } from '@/components/founder-hub/reality-protocol/content';
 
 const log = createLogger('FounderOsRealityReflection');
 
 export const dynamic = 'force-dynamic';
 
 const DATE_RX = /^\d{4}-\d{2}-\d{2}$/;
+// Scale bound derives from the SSOT (content.ts) so the API can never disagree
+// with the UI selector about the valid range. Was a local `SCALE_MAX = 5`.
 const SCALE_MIN = 1;
-const SCALE_MAX = 5;
+const SCALE_MAX = REFLECTION_SCALE_MAX;
 
 interface PostBody {
   date?: string;
@@ -45,7 +48,7 @@ interface PostBody {
   tomorrow?: unknown;
 }
 
-/** A valid 1-5 integer rating, or null. Descriptive — never a grade. */
+/** A valid 1-REFLECTION_SCALE_MAX integer rating, or null. Descriptive — never a grade. */
 function cleanScore(v: unknown): number | null {
   if (typeof v !== 'number' || !Number.isFinite(v)) return null;
   const n = Math.round(v);
