@@ -18,6 +18,25 @@ import {
 import { BIAS_EDUCATION, type BiasEducationContent } from '@/lib/constants/bias-education';
 import type { BiasCategory } from '@/types';
 
+// Deep-link hash resolver. Every bias card has id={taxonomyId} (DI-B-NNN), but
+// inbound links arrive in three forms: the canonical id (any case), and the
+// snake_case bias key (e.g. #confirmation_bias) used by the bias-genome table,
+// how-it-works featured cards, and the proof flagged-analysis panel. This map
+// lands all of them on the right card so none silently fail to scroll/expand.
+const HASH_TO_TAXONOMY_ID: Map<string, string> = (() => {
+  const m = new Map<string, string>();
+  for (const [key, bias] of Object.entries(BIAS_EDUCATION)) {
+    m.set(key.toLowerCase(), bias.taxonomyId);
+    m.set(bias.taxonomyId.toLowerCase(), bias.taxonomyId);
+  }
+  return m;
+})();
+
+function resolveTaxonomyHash(rawHash: string): string | null {
+  const h = rawHash.replace(/^#/, '').trim().toLowerCase();
+  return h ? (HASH_TO_TAXONOMY_ID.get(h) ?? null) : null;
+}
+
 const C = {
   navy: '#0F172A',
   navyLight: '#1E293B',
@@ -101,16 +120,20 @@ export function TaxonomyClient() {
   const [difficulty, setDifficulty] = useState<FilterDifficulty>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Deep-link support: open the bias matching #DI-B-NNN on mount/hash change.
+  // Deep-link support: open the bias matching the hash on mount/hash change.
+  // Robust to every inbound form — the canonical #DI-B-NNN in any case, AND a
+  // snake_case bias key (#confirmation_bias) which several marketing surfaces
+  // (bias-genome table, how-it-works featured cards, proof flagged-analysis,
+  // glossary) link with. resolveTaxonomyHash maps all of them to the card's id.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const apply = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash && /^DI-B-\d{3}$/.test(hash)) {
-        setExpandedId(hash);
+      const id = resolveTaxonomyHash(window.location.hash);
+      if (id) {
+        setExpandedId(id);
         // Let the expand animation start, then bring the row into view.
         requestAnimationFrame(() => {
-          const el = document.getElementById(hash);
+          const el = document.getElementById(id);
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
       }

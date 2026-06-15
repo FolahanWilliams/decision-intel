@@ -529,7 +529,6 @@ export function HowItWorksClient() {
               <FeaturedBiasCard
                 key={b.biasKey}
                 taxonomyId={b.taxonomyId}
-                biasKey={b.biasKey}
                 label={b.label}
                 description={b.description}
                 example={{

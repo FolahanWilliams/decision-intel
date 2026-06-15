@@ -1108,6 +1108,7 @@ export function PricingPageClient() {
             main cards so CSOs arriving via warm intro know the path
             exists without crowding the primary tiers. */}
         <div
+          id="design-partner"
           style={{
             maxWidth: 1160,
             margin: '20px auto 0',
@@ -1120,6 +1121,7 @@ export function PricingPageClient() {
             alignItems: 'center',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
+            scrollMarginTop: 90,
           }}
         >
           <div style={{ flex: 1, minWidth: 260 }}>

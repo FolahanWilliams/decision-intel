@@ -18,7 +18,6 @@ const C = {
 
 interface FeaturedBiasCardProps {
   taxonomyId: string;
-  biasKey: string;
   label: string;
   description: string;
   example: {
@@ -30,14 +29,13 @@ interface FeaturedBiasCardProps {
 
 export function FeaturedBiasCard({
   taxonomyId,
-  biasKey,
   label,
   description,
   example,
 }: FeaturedBiasCardProps) {
   return (
     <Link
-      href={`/taxonomy#${biasKey}`}
+      href={`/taxonomy#${taxonomyId}`}
       style={{
         display: 'flex',
         flexDirection: 'column',

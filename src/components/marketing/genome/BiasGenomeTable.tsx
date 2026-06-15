@@ -139,7 +139,7 @@ export function BiasGenomeTable({ entries, maxLift, scopeLabel }: BiasGenomeTabl
                   {e.label}
                   {e.taxonomyId && (
                     <Link
-                      href={`/taxonomy#${e.biasType}`}
+                      href={`/taxonomy#${e.taxonomyId}`}
                       style={{
                         fontSize: 10,
                         fontFamily: 'var(--font-mono, monospace)',
