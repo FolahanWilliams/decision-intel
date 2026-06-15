@@ -7,8 +7,8 @@
  *
  * LOAD-BEARING INVARIANT: this surface NEVER feeds the tree. The tree math
  * reads FounderOsRealityCheckin only; a reflection is a separate, optional
- * signal for the read-only trend view. The ratings are descriptive 1-5
- * self-observations, never a grade and never a streak.
+ * signal for the read-only trend view. The ratings are descriptive
+ * 1-REFLECTION_SCALE_MAX self-observations, never a grade and never a streak.
  *
  * GET /api/founder-os/reality-reflection?days=90
  *   Returns reflections within the last `days` days (default 90; max 366),

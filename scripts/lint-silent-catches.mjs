@@ -304,7 +304,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // 236 → 238 (Argument Builder · 2026-06-07): +2 canonical res.json() body-parse
 //     in ArgumentBuilder.tsx (generateClaim + grade) — each surfaces the API
 //     error to the founder; no write/grade swallowed.
-const SILENT_CATCH_BASELINE = 238;
+// 238 → 239 (Reality-protocol synthesis · 2026-06-15): +1 canonical res.json()
+//     body-parse in RealityProtocolTab.tsx runSynthesis — null surfaces the
+//     synthError; the synthesis route never writes, so nothing is swallowed.
+const SILENT_CATCH_BASELINE = 239;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

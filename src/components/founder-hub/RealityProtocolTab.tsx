@@ -28,6 +28,8 @@ import {
   Anchor,
   LineChart,
   NotebookPen,
+  CalendarDays,
+  Telescope,
 } from 'lucide-react';
 import {
   MORNING_QUESTION,
@@ -74,6 +76,7 @@ import {
   type ReflectionLite,
   type ReflectionFactorId,
 } from './reality-protocol/reflection-trends';
+import type { SynthesisResult } from './reality-protocol/synthesis';
 import { RealityTree, skyInfoFor, REALITY_GOLD } from './reality-protocol/RealityTree';
 import { LoopViz } from './reality-protocol/LoopViz';
 import { TrajectoryViz } from './reality-protocol/TrajectoryViz';
@@ -151,6 +154,12 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [reflections, setReflections] = useState<RealityReflectionRow[]>([]);
   const [today] = useState(() => todayIso());
   const [sky] = useState(() => skyInfoFor(new Date().getHours()));
+  // The day the check-in / reflection writes to. Defaults to today; a bounded
+  // date picker lets the founder backfill an earlier in-window day (e.g. day 1
+  // logged the morning after). Everything keys by (userId, date) already, so
+  // backdating is purely this UI state — the tree + hero stay ambient on today.
+  const [activeDate, setActiveDate] = useState(() => todayIso());
+  const isBackfill = activeDate !== today;
 
   const [morningOpen, setMorningOpen] = useState(false);
   const [editingMorning, setEditingMorning] = useState(false);
@@ -170,6 +179,15 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   const [reflectDraft, setReflectDraft] = useState<ReflectionDraft>(EMPTY_REFLECTION_DRAFT);
   const [savingReflect, setSavingReflect] = useState(false);
   const [showTrend, setShowTrend] = useState(false);
+
+  // on-demand synthesis — the retrospective AI pass over the whole journey.
+  // Never the urge-moment chatbot (banned); reads the accumulated corpus only.
+  const [synthLoading, setSynthLoading] = useState(false);
+  const [synthError, setSynthError] = useState<string | null>(null);
+  const [synthResult, setSynthResult] = useState<SynthesisResult | null>(null);
+  const [synthTooEarly, setSynthTooEarly] = useState<{ daysLogged: number; needed: number } | null>(
+    null
+  );
 
   useEffect(() => {
     let active = true;
@@ -221,7 +239,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         const res = await fetch('/api/founder-os/reality-checkin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
-          body: JSON.stringify({ date: today, ...payload }),
+          body: JSON.stringify({ date: activeDate, ...payload }),
         });
         if (!res.ok) throw new Error('save failed');
         const json = await res.json();
@@ -241,7 +259,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         setSaving(false);
       }
     },
-    [founderPass, today, firePulse]
+    [founderPass, activeDate, firePulse]
   );
 
   const saveReflection = useCallback(async (): Promise<boolean> => {
@@ -252,7 +270,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
         body: JSON.stringify({
-          date: today,
+          date: activeDate,
           mind: reflectDraft.mind,
           energy: reflectDraft.energy,
           intention: reflectDraft.intention,
@@ -275,7 +293,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
     } finally {
       setSavingReflect(false);
     }
-  }, [founderPass, today, reflectDraft]);
+  }, [founderPass, activeDate, reflectDraft]);
 
   const resetAll = useCallback(async () => {
     setError(null);
@@ -306,44 +324,45 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   }, [founderPass]);
 
   const state = computeProtocolState(checkins);
-  const dayRec = checkinsForDay(checkins, today);
+  // dayRec / the marks below are for the ACTIVE day (today, unless backfilling).
+  const dayRec = checkinsForDay(checkins, activeDate);
   const morningDone = Boolean(dayRec.morning);
   const nightDone = Boolean(dayRec.night);
   const slippedToday = nightDone && dayRec.night?.stayedOnTrack === false;
 
   // evening reflection — optional, never feeds `state`/the tree above
-  const todayReflection = reflections.find(r => r.date === today);
+  const activeReflection = reflections.find(r => r.date === activeDate);
   const reflectionDone = Boolean(
-    todayReflection &&
-    (todayReflection.mind != null ||
-      todayReflection.energy != null ||
-      todayReflection.intention != null ||
-      todayReflection.note ||
-      todayReflection.tomorrow)
+    activeReflection &&
+    (activeReflection.mind != null ||
+      activeReflection.energy != null ||
+      activeReflection.intention != null ||
+      activeReflection.note ||
+      activeReflection.tomorrow)
   );
   const trends = summarizeReflections(reflections, REFLECTION_FACTOR_IDS);
   const hasTrendData = trends.some(t => t.count > 0);
 
   const openReflectEditor = () => {
     setReflectDraft({
-      mind: todayReflection?.mind ?? null,
-      energy: todayReflection?.energy ?? null,
-      intention: todayReflection?.intention ?? null,
-      note: todayReflection?.note ?? '',
-      tomorrow: todayReflection?.tomorrow ?? '',
+      mind: activeReflection?.mind ?? null,
+      energy: activeReflection?.energy ?? null,
+      intention: activeReflection?.intention ?? null,
+      note: activeReflection?.note ?? '',
+      tomorrow: activeReflection?.tomorrow ?? '',
     });
     setEditingReflect(true);
     setReflectOpen(true);
   };
 
   const verse = selectVerse({
-    dateIso: today,
+    dateIso: activeDate,
     kind: nightDone ? 'night' : 'morning',
     slipped: slippedToday,
   });
 
   const doMorning = async () => {
-    const mVerse = selectVerse({ dateIso: today, kind: 'morning' });
+    const mVerse = selectVerse({ dateIso: activeDate, kind: 'morning' });
     const ok = await saveCheckin({
       kind: 'morning',
       escapePlan: planText.trim() || undefined,
@@ -356,13 +375,64 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
   };
 
   const doNight = async (stayedOnTrack: boolean) => {
-    const nVerse = selectVerse({ dateIso: today, kind: 'night', slipped: !stayedOnTrack });
+    const nVerse = selectVerse({ dateIso: activeDate, kind: 'night', slipped: !stayedOnTrack });
     const ok = await saveCheckin({ kind: 'night', stayedOnTrack, verseRef: nVerse.ref });
     if (ok) {
       setNightOpen(false);
       setEditingNight(false);
     }
   };
+
+  // Switch the day the marks/reflection write to. Close every open editor and
+  // clear drafts so stale today-state can't leak onto the backfilled day.
+  const selectActiveDate = (iso: string) => {
+    if (!iso || iso < PROTOCOL_START_ISO || iso > today) return;
+    setActiveDate(iso);
+    setMorningOpen(false);
+    setEditingMorning(false);
+    setNightOpen(false);
+    setEditingNight(false);
+    setReflectOpen(false);
+    setEditingReflect(false);
+    setPlanText('');
+    setReflectDraft(EMPTY_REFLECTION_DRAFT);
+    setError(null);
+  };
+
+  const runSynthesis = useCallback(
+    async (capstone: boolean) => {
+      setSynthLoading(true);
+      setSynthError(null);
+      setSynthTooEarly(null);
+      try {
+        const res = await fetch('/api/founder-os/reality-synthesis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-founder-pass': founderPass },
+          body: JSON.stringify({ capstone }),
+        });
+        const json = await res.json().catch(() => null);
+        // canonical res.json() body-parse exception — null below surfaces the error.
+        if (!res.ok || !json?.data) {
+          setSynthError(json?.error ?? 'Could not synthesize right now. Try again in a minute.');
+          return;
+        }
+        const data = json.data as
+          | { status: 'too_early'; daysLogged: number; needed: number }
+          | { status: 'ok'; synthesis: SynthesisResult };
+        if (data.status === 'too_early') {
+          setSynthTooEarly({ daysLogged: data.daysLogged, needed: data.needed });
+          setSynthResult(null);
+          return;
+        }
+        setSynthResult(data.synthesis);
+      } catch {
+        setSynthError('Could not synthesize right now. Try again in a minute.');
+      } finally {
+        setSynthLoading(false);
+      }
+    },
+    [founderPass]
+  );
 
   // ── styles (platform tokens) ──────────────────────────────────────────
   const cardStyle: React.CSSProperties = {
@@ -787,6 +857,82 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
         </div>
       </div>
 
+      {/* day selector — backfill an earlier in-window day (e.g. day 1 logged late) */}
+      <div
+        style={{
+          marginTop: 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: 10,
+        }}
+      >
+        <label
+          style={{
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <CalendarDays size={14} style={{ color: 'var(--text-muted)' }} />
+          Logging for
+          <input
+            type="date"
+            value={activeDate}
+            min={PROTOCOL_START_ISO}
+            max={today}
+            onChange={e => selectActiveDate(e.target.value)}
+            style={{
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              padding: '6px 10px',
+              fontSize: 13,
+              outline: 'none',
+            }}
+          />
+        </label>
+        {isBackfill && (
+          <button
+            onClick={() => selectActiveDate(today)}
+            style={{
+              fontSize: 12,
+              color: 'var(--accent-primary)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0,
+            }}
+          >
+            Back to today
+          </button>
+        )}
+      </div>
+      {isBackfill && (
+        <div
+          style={{
+            marginTop: 10,
+            padding: '10px 14px',
+            background: 'color-mix(in srgb, var(--warning) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 12.5,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+            textAlign: 'center',
+          }}
+        >
+          Backfilling{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>{shortDate(activeDate)}</strong>. Marks
+          and the reflection save to that day; the tree and verse stay on today.
+        </div>
+      )}
+
       {/* check-ins */}
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* morning */}
@@ -1013,7 +1159,7 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               {REFLECTION_INTRO}
             </div>
 
-            {/* the factor ratings — descriptive 1-5, never a grade */}
+            {/* the factor ratings — descriptive 1-10, never a grade */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {REFLECTION_FACTORS.map((f: ReflectionFactor) => {
                 const current = reflectDraft[f.id];
@@ -1342,6 +1488,195 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               }}
             >
               {REFLECTION_TREND_NOTE}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* synthesis — the retrospective AI pass over the whole journey. On-demand,
+          reads only your own logged words, never the urge-moment chatbot. */}
+      <div style={{ ...cardStyle, marginTop: 24, borderLeft: `3px solid ${REALITY_GOLD}` }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 11,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: REALITY_GOLD,
+          }}
+        >
+          <Telescope size={15} />
+          {state.bloom ? 'Your 66-day arc' : 'Synthesize the journey'}
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+            marginTop: 8,
+          }}
+        >
+          {state.bloom
+            ? 'Sixty-six days are in. Read the whole arc back: where you started, what actually moved the needle, and the one thing to carry forward.'
+            : 'When you have enough days logged, read your own reflections back as patterns — what the data says, in your words, plus one thing worth trying next. It only ever reads what you wrote.'}
+        </div>
+
+        <button
+          onClick={() => void runSynthesis(state.bloom)}
+          disabled={synthLoading}
+          style={{
+            marginTop: 14,
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            padding: '11px 16px',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: synthLoading ? 'wait' : 'pointer',
+            background: 'var(--accent-primary)',
+            color: '#fff',
+            opacity: synthLoading ? 0.7 : 1,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <Telescope size={15} />
+          {synthLoading
+            ? 'Reading your journey…'
+            : synthResult
+              ? 'Synthesize again'
+              : state.bloom
+                ? 'Read my 66-day arc'
+                : 'Synthesize my journey so far'}
+        </button>
+
+        {synthError && (
+          <div
+            style={{
+              marginTop: 12,
+              fontSize: 12.5,
+              color: 'var(--error)',
+              lineHeight: 1.5,
+            }}
+          >
+            {synthError}
+          </div>
+        )}
+
+        {synthTooEarly && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: '12px 14px',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 12.5,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+            }}
+          >
+            Not yet — there&rsquo;s a floor so the patterns are real, not noise. You&rsquo;ve logged
+            a reflection on{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>{synthTooEarly.daysLogged}</strong> day
+            {synthTooEarly.daysLogged === 1 ? '' : 's'}; come back at{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>{synthTooEarly.needed}</strong>. Keep
+            logging the evening reflection above.
+          </div>
+        )}
+
+        {synthResult && (
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* the arc — the one-paragraph through-line, set apart */}
+            <div
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                fontSize: 15,
+                lineHeight: 1.6,
+                color: 'var(--text-primary)',
+                paddingLeft: 14,
+                borderLeft: `2px solid ${REALITY_GOLD}`,
+              }}
+            >
+              {synthResult.arc}
+            </div>
+
+            {/* the patterns — what the data says, in your words */}
+            {synthResult.patterns.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {synthResult.patterns.map((p, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '12px 14px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: 4,
+                      }}
+                    >
+                      {p.title}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                      {p.detail}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* the one nudge — exactly one forward move, drawn from your own pattern */}
+            <div
+              style={{
+                background: 'color-mix(in srgb, var(--accent-primary) 8%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
+                borderRadius: 'var(--radius-md)',
+                padding: '14px 16px',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                One thing to try
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                  marginBottom: 8,
+                }}
+              >
+                {synthResult.nudge.observation}
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                {synthResult.nudge.action}
+              </div>
             </div>
           </div>
         )}
