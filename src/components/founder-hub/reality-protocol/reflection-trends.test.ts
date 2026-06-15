@@ -6,6 +6,8 @@ import {
   correlateFactorWithOutcome,
   sparklinePath,
   MIN_CORRELATION_N,
+  REFLECTION_HIGH,
+  REFLECTION_LOW,
   type ReflectionLite,
 } from './reflection-trends';
 import type { RealityCheckinLite } from './tree-growth';
@@ -19,12 +21,16 @@ function night(date: string, stayedOnTrack: boolean): RealityCheckinLite {
 }
 
 describe('factorValue', () => {
-  it('accepts 1-5 and rejects everything else', () => {
+  it('accepts 1-10 and rejects everything else', () => {
     expect(factorValue(r('2026-06-14', 3), 'mind')).toBe(3);
     expect(factorValue(r('2026-06-14', 1), 'mind')).toBe(1);
-    expect(factorValue(r('2026-06-14', 5), 'mind')).toBe(5);
+    expect(factorValue(r('2026-06-14', 10), 'mind')).toBe(10);
+    // 6-10 are valid on the 1-10 scale — before the bump a hardcoded `<= 5`
+    // silently dropped these from the whole trend + synthesis. This locks the fix.
+    expect(factorValue(r('2026-06-14', 6), 'mind')).toBe(6);
+    expect(factorValue(r('2026-06-14', 8), 'mind')).toBe(8);
     expect(factorValue(r('2026-06-14', 0), 'mind')).toBeNull();
-    expect(factorValue(r('2026-06-14', 6), 'mind')).toBeNull();
+    expect(factorValue(r('2026-06-14', 11), 'mind')).toBeNull();
     expect(factorValue({ date: '2026-06-14', mind: null }, 'mind')).toBeNull();
     expect(factorValue({ date: '2026-06-14' }, 'mind')).toBeNull();
   });
@@ -52,9 +58,9 @@ describe('summarizeFactor', () => {
 
   it('computes a positive delta when recent ratings rise above earlier ones', () => {
     const rows: ReflectionLite[] = [];
-    // 8 early low days (rating 2) then 4 recent high days (rating 5)
-    for (let i = 0; i < 8; i++) rows.push(r(`2026-06-${String(10 + i).padStart(2, '0')}`, 2));
-    for (let i = 0; i < 4; i++) rows.push(r(`2026-06-${String(20 + i).padStart(2, '0')}`, 5));
+    // 8 early low days (rating 3) then 4 recent high days (rating 8) — 1-10 scale
+    for (let i = 0; i < 8; i++) rows.push(r(`2026-06-${String(10 + i).padStart(2, '0')}`, 3));
+    for (let i = 0; i < 4; i++) rows.push(r(`2026-06-${String(20 + i).padStart(2, '0')}`, 8));
     const t = summarizeFactor(rows, 'mind');
     expect(t.recentAverage).not.toBeNull();
     expect(t.priorAverage).not.toBeNull();
@@ -73,8 +79,8 @@ describe('summarizeReflections', () => {
 
 describe('correlateFactorWithOutcome (honest N-floor)', () => {
   it('returns null below the sample floor on either side', () => {
-    // only 2 high days + 2 low days — under MIN_CORRELATION_N
-    const refl = [r('2026-06-14', 5), r('2026-06-15', 5), r('2026-06-16', 1), r('2026-06-17', 1)];
+    // only 2 high days (8 ≥ HIGH) + 2 low days (2 ≤ LOW) — under MIN_CORRELATION_N
+    const refl = [r('2026-06-14', 8), r('2026-06-15', 8), r('2026-06-16', 2), r('2026-06-17', 2)];
     const checks = [
       night('2026-06-14', true),
       night('2026-06-15', true),
@@ -88,15 +94,15 @@ describe('correlateFactorWithOutcome (honest N-floor)', () => {
   it('computes high vs low on-track rates once both buckets clear the floor', () => {
     const refl: ReflectionLite[] = [];
     const checks: RealityCheckinLite[] = [];
-    // 5 high-intention days, all on track; 5 low-intention days, all slips
+    // 5 high-intention days (8 ≥ HIGH), all on track; 5 low-intention days (2 ≤ LOW), all slips
     for (let i = 0; i < 5; i++) {
       const d = `2026-06-${String(10 + i).padStart(2, '0')}`;
-      refl.push(r(d, undefined, undefined, 5));
+      refl.push(r(d, undefined, undefined, 8));
       checks.push(night(d, true));
     }
     for (let i = 0; i < 5; i++) {
       const d = `2026-06-${String(20 + i).padStart(2, '0')}`;
-      refl.push(r(d, undefined, undefined, 1));
+      refl.push(r(d, undefined, undefined, 2));
       checks.push(night(d, false));
     }
     const c = correlateFactorWithOutcome(refl, checks, 'intention');
@@ -130,6 +136,17 @@ describe('sparklinePath', () => {
     const p = sparklinePath([1, 5], 100, 20, REFLECTION_SCALE_MAX);
     const ys = [...p.matchAll(/[ML][\d.]+ ([\d.]+)/g)].map(m => Number(m[1]));
     expect(ys[ys.length - 1]).toBeLessThan(ys[0]); // y shrinks as value rises
+  });
+});
+
+describe('high/low correlation buckets scale with the rating scale', () => {
+  it('track REFLECTION_SCALE_MAX — not frozen at the old 1-5 values (4/2)', () => {
+    // The bug this guards: leaving HIGH=4 / LOW=2 after the 1-10 bump would make
+    // a mid-scale 6 wrongly count as a "high" day. The thresholds must scale.
+    expect(REFLECTION_HIGH).toBeGreaterThan(REFLECTION_SCALE_MAX / 2);
+    expect(REFLECTION_LOW).toBeLessThan(REFLECTION_SCALE_MAX / 2);
+    expect(REFLECTION_HIGH).toBe(Math.round(REFLECTION_SCALE_MAX * 0.7));
+    expect(REFLECTION_LOW).toBe(Math.round(REFLECTION_SCALE_MAX * 0.3));
   });
 });
 

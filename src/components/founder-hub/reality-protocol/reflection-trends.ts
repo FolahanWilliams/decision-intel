@@ -2,9 +2,9 @@
  * 66-Day Protocol — pure reflection-trend math (2026-06-15).
  *
  * Deterministic, no I/O. Turns the optional FounderOsRealityReflection rows
- * (the descriptive 1-5 factor ratings) + the check-in rows into the read-only
- * "watch your mind grow" trend view. The DETERMINISTIC discipline is the whole
- * point — synthesis is trend arithmetic, NEVER an in-app AI coach.
+ * (the descriptive 1-REFLECTION_SCALE_MAX factor ratings) + the check-in rows
+ * into the read-only "watch your mind grow" trend view. The DETERMINISTIC
+ * discipline is the whole point — this trend math is NEVER an in-app AI coach.
  *
  * LOAD-BEARING: nothing here feeds the tree. The tree math lives in
  * tree-growth.ts and reads check-ins only; this module is read-only analysis
@@ -14,6 +14,7 @@
  */
 
 import type { RealityCheckinLite } from './tree-growth';
+import { REFLECTION_SCALE_MAX } from './content';
 
 export type ReflectionFactorId = 'mind' | 'energy' | 'intention';
 
@@ -25,9 +26,12 @@ export interface ReflectionLite {
   intention?: number | null;
 }
 
-/** ≥ this rating = the "high" bucket for a correlation; ≤ REFLECTION_LOW = low. */
-export const REFLECTION_HIGH = 4;
-export const REFLECTION_LOW = 2;
+/** ≥ this rating = the "high" bucket for a correlation; ≤ REFLECTION_LOW = low.
+ *  Derived from the scale max so the buckets scale with it — on 1-5 these were
+ *  4 / 2 (top-two / bottom-two); on 1-10 they are 7 / 3. Math.round of 0.7/0.3
+ *  reproduces the original 1-5 values exactly, so the change is scale-correct. */
+export const REFLECTION_HIGH = Math.round(REFLECTION_SCALE_MAX * 0.7);
+export const REFLECTION_LOW = Math.round(REFLECTION_SCALE_MAX * 0.3);
 
 /** Both buckets must clear this before a correlation renders. Below it, the
  *  signal is noise — surface nothing rather than a fabricated pattern. */
@@ -61,10 +65,14 @@ export interface OutcomeCorrelation {
   lowN: number;
 }
 
-/** A valid 1-5 reading for a factor, or null. */
+/** A valid 1-REFLECTION_SCALE_MAX reading for a factor, or null. The upper bound
+ *  derives from the SSOT — before the 1-10 bump this was a hardcoded `<= 5`,
+ *  which would have silently DROPPED every 6-10 rating from the trend + synthesis. */
 export function factorValue(r: ReflectionLite, id: ReflectionFactorId): number | null {
   const v = r[id];
-  return typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 5 ? v : null;
+  return typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= REFLECTION_SCALE_MAX
+    ? v
+    : null;
 }
 
 function mean(values: ReadonlyArray<number>): number | null {
