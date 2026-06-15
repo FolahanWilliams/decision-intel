@@ -45,6 +45,10 @@ import {
   PROTOCOL_SCOPE,
   REPLACEMENT_PRINCIPLE,
   ANCHOR_VERSES,
+  ENERGY_SURPLUS,
+  DISCHARGE_FIRST,
+  DISCHARGE_NOTE,
+  ACCOUNTABILITY,
 } from './reality-protocol/content';
 import {
   computeProtocolState,
@@ -370,6 +374,63 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               }}
             >
               {URGE_PROTOCOL.opener}
+            </div>
+
+            {/* move first — physical discharge before any thinking. At peak
+                charge System 1 is driving; burn it down with the body first. */}
+            <div
+              style={{
+                marginTop: 14,
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                Move first
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                {URGE_PROTOCOL.moveFirst}
+              </div>
+              <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                {DISCHARGE_FIRST.map(d => (
+                  <span
+                    key={d}
+                    style={{
+                      fontSize: 12,
+                      color: 'var(--text-secondary)',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 999,
+                      padding: '4px 11px',
+                    }}
+                  >
+                    {d}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* HALT — check the setup before negotiating with the urge */}
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 13,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.6,
+              }}
+            >
+              {URGE_PROTOCOL.halt}
             </div>
 
             {/* audit questions — pull System 2 online */}
@@ -815,6 +876,40 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               <ScriptureAnchor verse={ANCHOR_VERSES.diagnosis} />
             </div>
 
+            {/* the two-week wall — the energy surplus reframe (forge, not sink) */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                {ENERGY_SURPLUS.title}
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {ENERGY_SURPLUS.body}
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card))',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {ENERGY_SURPLUS.reframe}
+              </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.energy} />
+            </div>
+
             {/* the two commitments — porn to zero + social media ≤ 30 min/day */}
             <div style={cardStyle}>
               <div
@@ -1042,6 +1137,27 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               ))}
             </div>
 
+            {/* accountability — the one thing the tree cannot do (won in the
+                light, with one person, not in isolation) */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                {ACCOUNTABILITY.title}
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {ACCOUNTABILITY.body}
+              </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.accountability} />
+            </div>
+
             {/* replace the time — the rewiring mechanism (the King's inputs) */}
             <div style={cardStyle}>
               <div
@@ -1059,16 +1175,61 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {REPLACEMENT_PRINCIPLE}
               </div>
+
+              {/* first, discharge — physical reset before the forge */}
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--text-muted)',
+                    marginBottom: 6,
+                  }}
+                >
+                  First, discharge
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                  {DISCHARGE_NOTE}
+                </div>
+                <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                  {DISCHARGE_FIRST.map(d => (
+                    <span
+                      key={d}
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-secondary)',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 999,
+                        padding: '4px 11px',
+                      }}
+                    >
+                      {d}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               <div
                 style={{
                   fontSize: 12.5,
                   color: 'var(--text-muted)',
                   lineHeight: 1.5,
-                  margin: '12px 0 10px',
+                  margin: '14px 0 10px',
                 }}
               >
-                Pre-decide one each morning, and reach for it the moment the urge shows — these are
-                the King&apos;s inputs:
+                Then forge — pre-decide one each morning, and reach for it once the charge is down.
+                These are the King&apos;s inputs:
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {CONSTRUCTION_SWAPS.map(s => (

@@ -16,6 +16,12 @@ import {
   RISING_VERSE_REFS,
   VERSES,
   LOOP_STAGES,
+  ENERGY_SURPLUS,
+  DISCHARGE_FIRST,
+  DISCHARGE_NOTE,
+  ACCOUNTABILITY,
+  URGE_PROTOCOL,
+  ANCHOR_VERSES,
 } from './content';
 
 function m(date: string): RealityCheckinLite {
@@ -181,6 +187,38 @@ describe('LOOP_STAGES', () => {
   it('every stage is tagged buildup or damage', () => {
     for (const s of LOOP_STAGES) {
       expect(['buildup', 'damage']).toContain(s.band);
+    }
+  });
+});
+
+describe('two-week-wall additions (2026-06-15)', () => {
+  it('ENERGY_SURPLUS carries the title, diagnosis body, and forge-not-sink reframe', () => {
+    expect(ENERGY_SURPLUS.title.length).toBeGreaterThan(0);
+    expect(ENERGY_SURPLUS.body.length).toBeGreaterThan(0);
+    expect(ENERGY_SURPLUS.reframe.length).toBeGreaterThan(0);
+  });
+
+  it('DISCHARGE_FIRST is a non-empty physical-reset menu with a paired note', () => {
+    expect(DISCHARGE_FIRST.length).toBeGreaterThan(0);
+    expect(DISCHARGE_NOTE.length).toBeGreaterThan(0);
+  });
+
+  it('ACCOUNTABILITY names the one thing the solo tree cannot do', () => {
+    expect(ACCOUNTABILITY.title.length).toBeGreaterThan(0);
+    expect(ACCOUNTABILITY.body.length).toBeGreaterThan(0);
+  });
+
+  it('URGE_PROTOCOL gained the HALT setup-check and the move-first discharge cue', () => {
+    expect(URGE_PROTOCOL.halt.length).toBeGreaterThan(0);
+    expect(URGE_PROTOCOL.moveFirst.length).toBeGreaterThan(0);
+  });
+
+  it('the new anchor verses are the intended KJV references', () => {
+    expect(ANCHOR_VERSES.energy.ref).toBe('Isaiah 40:31');
+    expect(ANCHOR_VERSES.accountability.ref).toBe('James 5:16');
+    // every anchor verse still carries real text
+    for (const v of Object.values(ANCHOR_VERSES)) {
+      expect(v.text.length).toBeGreaterThan(0);
     }
   });
 });
