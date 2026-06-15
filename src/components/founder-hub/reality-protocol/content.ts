@@ -364,6 +364,16 @@ export const ANCHOR_VERSES: Record<string, AnchorVerse> = {
     ref: '1 Corinthians 10:13',
     text: 'God is faithful, who will not suffer you to be tempted above that ye are able; but will with the temptation also make a way to escape.',
   },
+  // The two-week wall — the strength returns; mount up, do not faint.
+  energy: {
+    ref: 'Isaiah 40:31',
+    text: 'They that wait upon the Lord shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary.',
+  },
+  // Accountability — won in the light, with another, not in isolation.
+  accountability: {
+    ref: 'James 5:16',
+    text: 'Confess your faults one to another, and pray one for another, that ye may be healed.',
+  },
   // The reason scripture anchors every part of this page.
   word: {
     ref: 'Psalm 119:11',
@@ -502,6 +512,17 @@ export const URGE_PROTOCOL = {
   opener:
     'Stop. You do not have to do anything right now. Breathe, and read this slowly before you touch anything. The urge is a wave: it peaks and passes on its own if you do not feed it.',
 
+  /** HALT — the setup check you run BEFORE negotiating with the urge. Most of
+   *  the time it is not really the escape you want; it is one of four states
+   *  wearing a mask. Name the real state and the urge often just dissolves. */
+  halt: 'First, check the setup. The urge almost always fires when you are Hungry, Angry, Lonely, or Tired — at night, in bed, alone, drained. Often it is not really about the escape at all; it is one of those four wearing a mask. Fix the actual state — eat, sleep, get up, call someone — and the urge frequently dissolves on its own.',
+
+  /** Move first — the physical discharge that comes BEFORE any thinking. At
+   *  peak charge you cannot reason your way calm; burn it down with the body
+   *  for 30-60s, THEN read on. (Full menu + the why: `DISCHARGE_FIRST`.) */
+  moveFirst:
+    'If the charge is high, move your body before you read another word — leave the bed, 20 push-ups, cold water, step outside. Thirty seconds drops the activation to where the rest of this can actually reach you.',
+
   /** The decision-auditor questions. Answering them honestly, in order, is what
    *  forces System 2 online — and that alone usually dissolves the pull. */
   questions: [
@@ -597,4 +618,51 @@ export const PERSON_CONTRAST = {
   },
   verdict:
     'The system rewards becoming the person, not merely avoiding the behaviour. That is why your tree grows from engagement and honesty, and a slip is just data — never a reset.',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
+// THE TWO-WEEK WALL — energy surplus, discharge-first, accountability
+// ─────────────────────────────────────────────────────────────────────
+//
+// Added 2026-06-15 from the founder's own report ("I can hit one or two weeks
+// easy, then I become restless, full of energy I don't know what to do with")
+// + the analysis that followed. The genuinely new finding vs the energy-only
+// frame: the 2-week restlessness is the DRIVE returning (a milestone, not a
+// warning) AND partly un-numbed feeling surfacing — so the move is not to
+// DRAIN the surplus (a treadmill) but to DISCHARGE then FORGE it (invest it).
+// All reading + copy — NO new tracked input, no AI, no second mark. Stays
+// inside every load-bearing invariant above.
+
+/** The two-week wall reframe — the most important thing to understand about
+ *  the post-acute phase, and the thing the founder is living right now. */
+export const ENERGY_SURPLUS = {
+  title: 'The two-week wall',
+  body: 'You can hit one or two weeks clean easily — then it gets harder, not easier: restless, full of energy you do not know what to do with. Understand this clearly, because it is the whole game: that is not the urge winning. It is your drive coming back online. For years the valve was always open, so you never had to HOLD your own charge; now it is returning all at once. And some of it is not even energy — it is the boredom, loneliness, and feeling you used to numb, surfacing to be felt for the first time. The restlessness is the gap between the old regulator being gone and the new life not yet load-bearing. Standing in that gap is not the obstacle. It is the work — the only place the new system ever gets built.',
+  /** The forge-not-sink reframe — the reframe that changes the fight. */
+  reframe:
+    'So do not try to DRAIN the surplus — burning it off is a treadmill. INVEST it. That full, restless feeling is capital: the first time you are holding your own charge instead of spending it. Learning to hold it and aim it is the entire skill of the King. Forge, do not sink.',
+} as const;
+
+/** Discharge-first — the physical reset that precedes any thinking or forge.
+ *  At peak charge System 1 is driving and your good arguments cannot reach it;
+ *  30-60s of physical discharge drops the activation to where reasoning works.
+ *  This is a physiological reset, NOT a distraction. Then pick a forge. */
+export const DISCHARGE_FIRST: ReadonlyArray<string> = [
+  'Leave the room — out of the bed, off the couch',
+  '20 push-ups, or one hard 60-second set',
+  'Cold water on the face, or a cold shower',
+  'Walk outside — actually outside, not the hallway',
+  'Three slow breaths, then move',
+];
+
+export const DISCHARGE_NOTE =
+  'When the charge spikes you cannot reason your way calm — the urge runs on System 1 and your best arguments cannot reach it yet. So move the body FIRST: thirty to sixty seconds of physical discharge drops the activation to where thinking works again. A physiological reset, not a distraction. THEN pick a forge from the list below. Discharge, then build.';
+
+/** Accountability — the single highest-leverage move, and the one thing a
+ *  solo tree cannot do. The prior plan argued for privacy; this reverses it.
+ *  Secrecy is part of the fuel; shame dies in the light. ONE human, not a
+ *  broadcast. Won in relationship, not isolation (James 5:16). */
+export const ACCOUNTABILITY = {
+  title: 'The one thing the tree cannot do',
+  body: 'This tool keeps you honest with yourself. What it cannot do is put you in the light with someone else — and that is the single most powerful move there is, because secrecy is part of the fuel. The privacy of the act is what protects it; shame dies the moment it is spoken to a person you respect. You do not need to broadcast it. You need ONE human — a mentor, an older brother, someone in your faith — who knows, and who you can text "rough night, still in the fight" without it becoming an event. The app holds you accountable to yourself; the person holds you accountable to someone else. You need both. This is won in relationship, not in isolation.',
 } as const;
