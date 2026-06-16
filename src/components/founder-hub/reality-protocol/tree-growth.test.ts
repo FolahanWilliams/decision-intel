@@ -20,6 +20,7 @@ import {
   DISCHARGE_FIRST,
   DISCHARGE_NOTE,
   ACCOUNTABILITY,
+  COUNTER_VOICE,
   URGE_PROTOCOL,
   ANCHOR_VERSES,
 } from './content';
@@ -220,5 +221,25 @@ describe('two-week-wall additions (2026-06-15)', () => {
     for (const v of Object.values(ANCHOR_VERSES)) {
       expect(v.text.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('counter-voice section (2026-06-16)', () => {
+  it('carries the body, the translation pairs, the discernment guardrail, and a close', () => {
+    expect(COUNTER_VOICE.title.length).toBeGreaterThan(0);
+    expect(COUNTER_VOICE.body.length).toBeGreaterThan(0);
+    expect(COUNTER_VOICE.translations.length).toBeGreaterThan(0);
+    for (const t of COUNTER_VOICE.translations) {
+      expect(t.line.length).toBeGreaterThan(0);
+      expect(t.meaning.length).toBeGreaterThan(0);
+    }
+    // the guardrail (discernment, not contempt) is load-bearing — must be present
+    expect(COUNTER_VOICE.discernment.toLowerCase()).toContain('discernment');
+    expect(COUNTER_VOICE.close.length).toBeGreaterThan(0);
+  });
+
+  it('anchors on 1 Peter 4:4 (they think it strange you no longer run with them)', () => {
+    expect(ANCHOR_VERSES.counterVoice.ref).toBe('1 Peter 4:4');
+    expect(ANCHOR_VERSES.counterVoice.text.toLowerCase()).toContain('strange');
   });
 });

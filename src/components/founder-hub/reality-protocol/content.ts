@@ -366,6 +366,11 @@ export const ANCHOR_VERSES: Record<string, AnchorVerse> = {
     ref: 'Ephesians 5:16',
     text: 'Redeeming the time, because the days are evil.',
   },
+  // The counter-voice — they think it strange you no longer run with them.
+  counterVoice: {
+    ref: '1 Peter 4:4',
+    text: 'They think it strange that ye run not with them to the same excess of riot, speaking evil of you.',
+  },
   // The urge moment — there is always a way of escape.
   urge: {
     ref: '1 Corinthians 10:13',
@@ -474,6 +479,46 @@ export function milestoneDaysAtOrBelow(shownDay: number): number[] {
 /** The anti-goal — one paragraph, because the founder responds to it (§6). */
 export const ANTI_GOAL =
   'Version B does not lose the throne in a battle. There is no villain and no catastrophe. He loses it to roughly a thousand ordinary nights where reality was slightly boring and the easy route was right there, each costing almost nothing. Think about the interest rate on a thousand small escapes. That is what produces the smart, articulate, still-talking-about-the-company 30-year-old who never became dangerous. Not explosion. Erosion. The scary part is not that it is hard. It is that it is easy and nearly invisible.';
+
+/**
+ * The counter-voice — the opposite view someone will press on you: that none of
+ * this is that deep, that you should ease off and rejoin the crowd. Named here
+ * so it stops landing as doubt and starts reading as the predictable social
+ * mechanism it is. The discipline (load-bearing): name the pull WITHOUT tipping
+ * into contempt — discernment, not disdain. A crab-pull wants you lower; a real
+ * friend wants you whole. The two-trap framing keeps it from becoming a license
+ * to look down on people or climb alone (the failure mode of this very idea).
+ */
+export const COUNTER_VOICE = {
+  title: 'The voices that want you average',
+  body: 'When you start to climb — cutting the escape, building, aiming higher than the people around you — some of them will not cheer. They will pull. Not always from malice: your climb is a quiet indictment of their stasis, and it is easier to close the gap by dragging you down than by climbing themselves. It is the crab bucket — one crab leaving threatens what the whole bucket believes is possible. "It is not that deep" is not an analysis; it is an anaesthetic. It is built to make caring feel embarrassing, because if caring is embarrassing then their not-caring gets to feel like wisdom instead of what it usually is: resignation in a nicer coat.',
+  /** The lines they use, translated — each one is their own ceiling, projected
+   *  onto you. (Quoted speech keeps the natural contraction; the read does not.) */
+  translations: [
+    {
+      line: "It's not that deep.",
+      meaning: 'Your caring makes my not-caring uncomfortable.',
+    },
+    {
+      line: "You're doing too much, you're being extra.",
+      meaning: 'You are making the gap visible, and I would rather you did not.',
+    },
+    {
+      line: "You're 16, relax, live a little.",
+      meaning: 'I coasted at your age and I need you to as well, so my coasting feels normal.',
+    },
+    {
+      line: 'Nobody actually lives like that.',
+      meaning: 'I do not, so to me it cannot be real.',
+    },
+  ],
+  /** Discernment, not contempt — the guardrail on the whole idea. */
+  discernment:
+    'Two traps, and most people fall into one. The first is internalising it — letting "not that deep" sand down your edge until you are back in the bucket, relieved to be understood again. The second is the opposite: deciding everyone is a crab, looking down on people, climbing alone and bitter. The way through is discernment, not contempt. Not every "take it easy" is a pull-down — some of it is real love that does not want you cruel to yourself, or burnt out. The test is simple: a crab-pull wants you LOWER; a real friend wants you WHOLE. Keep the few who want you whole close — this is what the accountability person is for — and let the rest pull at air.',
+  /** The close — let the trajectory be the answer; the road is narrow by design. */
+  close:
+    'So do not argue with the crowd, do not try to convert them, and do not take their ceiling as your own. You can be average and understood, or exceptional and misunderstood — feeling the pull is just the toll on the second road, and feeling it means you are actually on it. Let the trajectory be the whole answer. The narrow road is narrow precisely because most will not walk it; being thought strange for not running with them is the named, expected cost of the climb, not a sign you are doing it wrong.',
+} as const;
 
 /** The slip-night reframe shown inline after a slip is logged. */
 export const SLIP_REFRAME =
