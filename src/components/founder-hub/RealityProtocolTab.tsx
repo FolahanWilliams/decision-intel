@@ -37,6 +37,8 @@ import {
   KEYSTONES,
   ANTI_GOAL,
   COUNTER_VOICE,
+  COST_OF_INACTION,
+  EFT_TECHNIQUE,
   SLIP_REFRAME,
   RESEARCH_NOTE,
   PROTOCOL_START_ISO,
@@ -782,6 +784,25 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* see him — the EFT cue: out-vivid the urge with the future self */}
+            <div style={{ marginTop: 18 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                Then see him
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {EFT_TECHNIQUE.cue}
               </div>
             </div>
 
@@ -2266,6 +2287,109 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
               </div>
 
               <ScriptureAnchor verse={ANCHOR_VERSES.counterVoice} />
+            </div>
+
+            {/* the cost of inaction — what the feed actually costs (the WHY for
+                the social-media commitment) */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--text-muted)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 6,
+                }}
+              >
+                {COST_OF_INACTION.title}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {COST_OF_INACTION.body}
+              </div>
+
+              {/* the one vivid figure — illustrative, explicitly hedged */}
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {COST_OF_INACTION.compounding}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginTop: 12,
+                }}
+              >
+                {COST_OF_INACTION.proximity}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginTop: 10,
+                }}
+              >
+                {COST_OF_INACTION.residue}
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {COST_OF_INACTION.close}
+              </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.cost} />
+            </div>
+
+            {/* episodic future thinking — the move that beats the urge */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--accent-primary)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--accent-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                {EFT_TECHNIQUE.title}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {EFT_TECHNIQUE.body}
+              </div>
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card))',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {EFT_TECHNIQUE.cue}
+              </div>
+              <ScriptureAnchor verse={ANCHOR_VERSES.futureThinking} />
             </div>
 
             {/* what the evidence says */}
