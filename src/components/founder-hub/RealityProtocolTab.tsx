@@ -36,6 +36,7 @@ import {
   MORNING_PLACEHOLDER,
   KEYSTONES,
   ANTI_GOAL,
+  COUNTER_VOICE,
   SLIP_REFRAME,
   RESEARCH_NOTE,
   PROTOCOL_START_ISO,
@@ -2184,6 +2185,87 @@ export function RealityProtocolTab({ founderPass }: { founderPass: string }) {
                 {ANTI_GOAL}
               </div>
               <ScriptureAnchor verse={ANCHOR_VERSES.antiGoal} />
+            </div>
+
+            {/* the counter-voice — the opposite view the crowd will press on you */}
+            <div style={{ ...cardStyle, borderLeft: '3px solid var(--text-muted)' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: 'var(--text-muted)',
+                  marginBottom: 6,
+                }}
+              >
+                {COUNTER_VOICE.title}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {COUNTER_VOICE.body}
+              </div>
+
+              {/* what they say → what it means */}
+              <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {COUNTER_VOICE.translations.map(t => (
+                  <div
+                    key={t.line}
+                    style={{ borderLeft: '2px solid var(--border-color)', paddingLeft: 12 }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'italic',
+                        fontSize: 13.5,
+                        color: 'var(--text-primary)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      &ldquo;{t.line}&rdquo;
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        color: 'var(--text-muted)',
+                        lineHeight: 1.5,
+                        marginTop: 2,
+                      }}
+                    >
+                      → {t.meaning}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* discernment, not contempt — the guardrail */}
+              <div
+                style={{
+                  marginTop: 14,
+                  fontSize: 13,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {COUNTER_VOICE.discernment}
+              </div>
+
+              {/* the close — let the trajectory be the answer */}
+              <div
+                style={{
+                  marginTop: 12,
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'color-mix(in srgb, var(--accent-primary) 7%, var(--bg-card))',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {COUNTER_VOICE.close}
+              </div>
+
+              <ScriptureAnchor verse={ANCHOR_VERSES.counterVoice} />
             </div>
 
             {/* what the evidence says */}
