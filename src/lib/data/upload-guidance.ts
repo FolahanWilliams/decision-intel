@@ -67,9 +67,9 @@ export interface RoleUploadGuidance {
  */
 export const UPLOAD_UNIVERSAL = {
   whatCounts:
-    'If a person, committee, or board has to weigh a recommendation and decide on it — a memo, a deck, a model, a transcript, even an email — it is auditable. The audit reads the reasoning, not the file type.',
+    'If a person, committee, or board has to weigh a recommendation and decide on it, it is auditable. A memo, a deck, a model, a transcript, even an email all count. The audit reads the reasoning, not the file type.',
   strongUpload: [
-    'Paste or upload the real thing. A draft you actually wrote beats a polished sample — the audit works on the reasoning that is actually in it.',
+    'Paste or upload the real thing. A draft you actually wrote beats a polished sample, because the audit works on the reasoning that is actually in it.',
     'One to two pages is plenty. The recommendation, the rationale, and the risks are the sections that carry the signal.',
     'It works in hindsight too. Run it on a decision you have already made to see what the audit would have flagged against the outcome you now know.',
     'Around 50 words is the floor. Below that there is not enough reasoning to audit.',
@@ -111,7 +111,7 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
   },
   ma: {
     intro:
-      'Drop any artefact from a deal in flight — the audit recognises the IC memo, CIM, model, and diligence shapes and fires the patterns that sink committee votes.',
+      'Drop any artefact from a deal in flight. The audit recognises the IC memo, CIM, model, and diligence shapes and fires the patterns that sink committee votes.',
     brings: [
       {
         label: 'IC / decision memo',
@@ -126,7 +126,7 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
       {
         label: 'Synergy model',
         catch:
-          'Tests every synergy line for a named mechanism, an owner, and a 90-day milestone — the BCG bar most models miss.',
+          'Tests every synergy line for a named mechanism, an owner, and a 90-day milestone, the BCG bar most models miss.',
       },
       {
         label: 'Quality of Earnings (QofE)',
@@ -161,13 +161,13 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
       {
         label: 'Shut-down or wind-down call',
         catch:
-          'Names sunk-cost escalation — the "one more quarter" argument — and tests it against forward value.',
+          'Names sunk-cost escalation, the "one more quarter" argument, and tests it against forward value.',
       },
     ],
   },
   pe_vc: {
     intro:
-      'Drop any decision-grade memo your IC actually reads — pre-IC, source, growth-round, or fund-launch.',
+      'Drop any decision-grade memo your IC actually reads: pre-IC, source, growth-round, or fund-launch.',
     brings: [
       {
         label: 'Pre-IC / source memo',
@@ -191,7 +191,7 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
   },
   other: {
     intro:
-      'Anything strategic you actually wrote — a fundraise deck, a board update, a strategy memo, an investor email. The wow lands harder on your own content than on a sample.',
+      'Anything strategic you actually wrote: a fundraise deck, a board update, a strategy memo, an investor email. The wow lands harder on your own content than on a sample.',
     brings: [
       {
         label: 'Strategy memo or recommendation',
@@ -205,7 +205,7 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
       {
         label: 'A deck or one-pager',
         catch:
-          'Even a recommendation section or a pre-mortem is enough — the audit works on the reasoning, not the format.',
+          'Even a recommendation section or a pre-mortem is enough. The audit works on the reasoning, not the format.',
       },
     ],
   },
@@ -219,8 +219,8 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
  */
 export const DOC_TYPE_CATCH: Record<string, string> = {
   ic_memo:
-    'We scrutinise the vote document hardest — Synergy Mirage, Winner’s Curse, and whether the "reasons to decline" are taken seriously.',
-  cim: 'We apply the seller-halo filter — best-case projections and the competitive picture the seller left out.',
+    'We scrutinise the vote document hardest: Synergy Mirage, Winner’s Curse, and whether the "reasons to decline" are taken seriously.',
+  cim: 'We apply the seller-halo filter: best-case projections and the competitive picture the seller left out.',
   pitch_deck:
     'We watch for the narrative outrunning the numbers, TAM inflation, and logos standing in for analysis.',
   term_sheet:
@@ -228,8 +228,8 @@ export const DOC_TYPE_CATCH: Record<string, string> = {
   due_diligence:
     'We check whether findings just confirm the thesis and whether the real risks are buried below the positives.',
   lp_report:
-    'We watch for survivorship bias — winners highlighted, underperformers quietly minimised.',
-  qofe: 'We test the add-backs — recurring "one-time" items and aggressive owner-comp inflating adjusted EBITDA.',
+    'We watch for survivorship bias: winners highlighted, underperformers quietly minimised.',
+  qofe: 'We test the add-backs: recurring "one-time" items and aggressive owner-comp inflating adjusted EBITDA.',
   synergy_model:
     'We test every synergy line for a named mechanism, an owner, and a 90-day milestone.',
   integration_plan:
