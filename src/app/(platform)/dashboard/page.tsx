@@ -103,6 +103,8 @@ const DOCUMENT_TYPES: ReadonlyArray<{ value: string; label: string }> = [
   { value: 'other', label: 'Other' },
 ];
 import { getBiasPreview } from '@/lib/utils/bias-preview';
+import { getDocTypeCatch } from '@/lib/data/upload-guidance';
+import { UploadGuidancePanel } from '@/components/upload/UploadGuidancePanel';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
 import { Zap, Lock as LockIcon, Sparkles } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
@@ -1440,6 +1442,7 @@ export default function Dashboard() {
 
                     {(() => {
                       const preview = getBiasPreview(pendingFile.name, selectedDocType);
+                      const catchLine = getDocTypeCatch(selectedDocType);
                       return (
                         <div
                           style={{
@@ -1462,6 +1465,17 @@ export default function Dashboard() {
                             </span>
                           ))}{' '}
                           first.
+                          {catchLine && (
+                            <span
+                              style={{
+                                display: 'block',
+                                marginTop: 6,
+                                color: 'var(--text-secondary)',
+                              }}
+                            >
+                              {catchLine}
+                            </span>
+                          )}
                         </div>
                       );
                     })()}
@@ -1471,10 +1485,20 @@ export default function Dashboard() {
                       <div>
                         <label
                           className="text-xs text-muted font-medium"
-                          style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
+                          style={{ display: 'block', marginBottom: 4 }}
                         >
-                          Document Type <span className="text-muted">(optional)</span>
+                          Document Type{' '}
+                          <span className="text-muted" style={{ fontWeight: 400 }}>
+                            (optional — focuses the audit)
+                          </span>
                         </label>
+                        <p
+                          className="text-xs text-muted"
+                          style={{ margin: '0 0 6px', lineHeight: 1.45 }}
+                        >
+                          Pick the type and we zero in on what matters most for it. Skip it and we
+                          infer from your file.
+                        </p>
                         <select
                           value={selectedDocType}
                           onChange={e => setSelectedDocType(e.target.value)}
@@ -2032,6 +2056,25 @@ export default function Dashboard() {
                         Try a sample
                       </button>
                     </div>
+                  )}
+                  {/* "What can I upload?" guidance — the always-available
+                    answer to "is my document welcome here?" + "why does
+                    this matter?". Re-openable (unlike the dismissible
+                    first-run walkthrough); reads the upload-guidance SSOT.
+                    The sample CTA reuses the four-doors "Try a sample"
+                    behaviour so a "show me one first" user has a path. */}
+                  {!uploading && !pendingFile && (
+                    <UploadGuidancePanel
+                      role={onboardingRole}
+                      onTrySample={() => {
+                        const role = onboardingRole ?? 'other';
+                        const bundles = bundlesForRole(role);
+                        const firstBundle: SampleBundle | undefined = bundles[0];
+                        if (!firstBundle) return;
+                        setPasteSeed({ content: firstBundle.content, autoSubmit: false });
+                        setInlineMode('paste');
+                      }}
+                    />
                   )}
                 </>
               ) : uploading ? (
