@@ -1011,7 +1011,7 @@ export default function DemoPage() {
                   lineHeight: 1.55,
                 }}
               >
-                Pre-canned samples, same full audit flow, runs instantly &mdash; no LLM calls.
+                Pre-canned samples, same full audit flow, runs instantly. No LLM calls.
               </p>
             </div>
 
@@ -2384,7 +2384,7 @@ function DemoVideoSection() {
           lineHeight: 1.55,
         }}
       >
-        Watch a strategic memo move through the full pipeline &mdash; biases flagged, CEO questions
+        Watch a strategic memo move through the full pipeline: biases flagged, CEO questions
         predicted, DQI assigned. No signup.
       </p>
 
