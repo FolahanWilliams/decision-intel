@@ -30,6 +30,7 @@ import {
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import { DecisionDNAPreviewCard } from '@/components/dna/DecisionDNAPreviewCard';
 import { FirstRunInlineWalkthrough } from '@/components/onboarding/FirstRunInlineWalkthrough';
+import { RoleSwitcher } from '@/components/onboarding/RoleSwitcher';
 import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import {
   useFirstAuditExperience,
@@ -1005,6 +1006,10 @@ export default function Dashboard() {
             >
               {dashboardSubtitle}
             </p>
+            {/* Always-visible role indicator + switcher. The role drives
+                every persona-aware surface; a mis-tagged user can now see
+                and correct it, re-targeting the dashboard in the same tick. */}
+            <RoleSwitcher />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button
@@ -2066,6 +2071,7 @@ export default function Dashboard() {
                   {!uploading && !pendingFile && (
                     <UploadGuidancePanel
                       role={onboardingRole}
+                      defaultOpen={uploadedDocs.length === 0}
                       onTrySample={() => {
                         const role = onboardingRole ?? 'other';
                         const bundles = bundlesForRole(role);

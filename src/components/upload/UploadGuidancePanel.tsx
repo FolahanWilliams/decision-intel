@@ -27,25 +27,36 @@ interface Props {
   /** Drives the role-matched "documents you usually bring" list. */
   role: SampleRole | null;
   /**
+   * Initial open state when the user has no stored preference yet — pass
+   * true for the true first-run (zero-doc) case so a confused new user
+   * sees the guidance without having to find the toggle. An explicit
+   * user toggle (stored in localStorage) always wins over this.
+   */
+  defaultOpen?: boolean;
+  /**
    * Optional CTA to surface the role-matched sample library — when set,
    * a "Browse role-matched samples" link renders at the bottom.
    */
   onTrySample?: () => void;
 }
 
-export function UploadGuidancePanel({ role, onTrySample }: Props) {
-  const [open, setOpen] = useState(false);
+export function UploadGuidancePanel({ role, defaultOpen = false, onTrySample }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     // Defer the localStorage read out of the effect's synchronous body so
     // react-hooks/set-state-in-effect doesn't flag a cascading-render risk
-    // (same idiom as FirstRunInlineWalkthrough).
+    // (same idiom as FirstRunInlineWalkthrough). An explicit stored
+    // preference wins over defaultOpen; absence keeps the defaultOpen
+    // initial.
     const t = setTimeout(() => {
       try {
-        if (window.localStorage.getItem(STORAGE_KEY) === 'true') setOpen(true);
+        const stored = window.localStorage.getItem(STORAGE_KEY);
+        if (stored === 'true') setOpen(true);
+        else if (stored === 'false') setOpen(false);
       } catch {
-        // localStorage unavailable (private mode) — stay default-closed.
+        // localStorage unavailable (private mode) — keep the defaultOpen initial.
       }
     }, 0);
     return () => clearTimeout(t);
