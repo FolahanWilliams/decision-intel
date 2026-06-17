@@ -21,6 +21,8 @@ import {
   DISCHARGE_NOTE,
   ACCOUNTABILITY,
   COUNTER_VOICE,
+  COST_OF_INACTION,
+  EFT_TECHNIQUE,
   URGE_PROTOCOL,
   ANCHOR_VERSES,
 } from './content';
@@ -241,5 +243,35 @@ describe('counter-voice section (2026-06-16)', () => {
   it('anchors on 1 Peter 4:4 (they think it strange you no longer run with them)', () => {
     expect(ANCHOR_VERSES.counterVoice.ref).toBe('1 Peter 4:4');
     expect(ANCHOR_VERSES.counterVoice.text.toLowerCase()).toContain('strange');
+  });
+});
+
+describe('cost-of-inaction + EFT section (2026-06-16)', () => {
+  it('COST_OF_INACTION names opportunity cost and keeps the vivid figure HEDGED', () => {
+    expect(COST_OF_INACTION.title.length).toBeGreaterThan(0);
+    expect(COST_OF_INACTION.body.length).toBeGreaterThan(0);
+    expect(COST_OF_INACTION.proximity.length).toBeGreaterThan(0);
+    expect(COST_OF_INACTION.residue.length).toBeGreaterThan(0);
+    expect(COST_OF_INACTION.close.length).toBeGreaterThan(0);
+    // the ONE vivid figure must stay explicitly hedged — invented number, real
+    // shape (the honesty discipline; no false-precision dollar amount as fact)
+    const c = COST_OF_INACTION.compounding.toLowerCase();
+    expect(c).toContain('invented');
+    expect(c).toContain('shape');
+    // and it must NOT carry a fabricated to-the-cent figure
+    expect(COST_OF_INACTION.compounding).not.toMatch(/\$[\d,]+\.\d{2}/);
+  });
+
+  it('EFT_TECHNIQUE carries the body and the morning/urge cue', () => {
+    expect(EFT_TECHNIQUE.title.length).toBeGreaterThan(0);
+    expect(EFT_TECHNIQUE.body.length).toBeGreaterThan(0);
+    expect(EFT_TECHNIQUE.cue.length).toBeGreaterThan(0);
+  });
+
+  it('anchors on the intended KJV references (Luke 14:28 + Hebrews 12:2)', () => {
+    expect(ANCHOR_VERSES.cost.ref).toBe('Luke 14:28');
+    expect(ANCHOR_VERSES.cost.text.toLowerCase()).toContain('cost');
+    expect(ANCHOR_VERSES.futureThinking.ref).toBe('Hebrews 12:2');
+    expect(ANCHOR_VERSES.futureThinking.text.toLowerCase()).toContain('joy');
   });
 });

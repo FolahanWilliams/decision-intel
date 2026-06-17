@@ -371,6 +371,16 @@ export const ANCHOR_VERSES: Record<string, AnchorVerse> = {
     ref: '1 Peter 4:4',
     text: 'They think it strange that ye run not with them to the same excess of riot, speaking evil of you.',
   },
+  // The cost of inaction — count the cost before you build the tower.
+  cost: {
+    ref: 'Luke 14:28',
+    text: 'Which of you, intending to build a tower, sitteth not down first, and counteth the cost?',
+  },
+  // Episodic future thinking — the joy set before him powered the enduring.
+  futureThinking: {
+    ref: 'Hebrews 12:2',
+    text: 'Looking unto Jesus... who for the joy that was set before him endured the cross, despising the shame.',
+  },
   // The urge moment — there is always a way of escape.
   urge: {
     ref: '1 Corinthians 10:13',
@@ -518,6 +528,50 @@ export const COUNTER_VOICE = {
   /** The close — let the trajectory be the answer; the road is narrow by design. */
   close:
     'So do not argue with the crowd, do not try to convert them, and do not take their ceiling as your own. You can be average and understood, or exceptional and misunderstood — feeling the pull is just the toll on the second road, and feeling it means you are actually on it. Let the trajectory be the whole answer. The narrow road is narrow precisely because most will not walk it; being thought strange for not running with them is the named, expected cost of the climb, not a sign you are doing it wrong.',
+} as const;
+
+/**
+ * The cost of inaction — what the feed actually costs (2026-06-16). Gives the
+ * social-media ≤30-min commitment its WHY. Built on the REAL science from the
+ * "Cost of Inaction" report (opportunity-cost neglect + Ward et al. 2017
+ * proximity drain + attention residue), with the dollar figures deliberately
+ * REFUSED as facts — the report's $-to-the-cent numbers are false precision
+ * (arbitrary rate × assumed hours × fictional salary ramp). The ONE vivid
+ * figure kept (`compounding`) is hedged exactly like the 21-day myth + the
+ * "attributed to Einstein" line: the number is invented, the SHAPE is real.
+ * (Founder-chosen "honest + one vivid figure".)
+ */
+export const COST_OF_INACTION = {
+  title: 'What the feed actually costs',
+  body: 'When people price their phone, they name the bill — the data plan, the fifty a month. That is opportunity-cost neglect: the explicit cost is concrete, so it dominates, and the real cost — the time — is abstract, so you round it to zero. But the time IS the price. Two or three hours a day pulled into a feed is not "free because the phone is already paid for." It is the most expensive thing you own, spent on the one product engineered to give nothing back. The cost was never the money. It is the compounding.',
+  /** The one vivid figure — kept for motivation, hedged: invented number, real shape. */
+  compounding:
+    'Put a number on it, knowing the number is invented: value the hours at even a modest rate, pour them into building and skill instead, compound the gap across a career, and the difference between the man who reclaimed three hours a day and the man who fed them to the scroll runs comfortably into seven figures. Do not quote the figure — it is a fiction stacked on arbitrary assumptions. But the SHAPE is not a fiction. Erosion compounds exactly like interest, just pointed the wrong way.',
+  /** The real, replicated anchor — proximity drains you even unused. */
+  proximity:
+    'And it taxes you even when you are not on it. Ward and colleagues (2017): people scored measurably lower on memory and problem-solving with their phone merely face-down on the desk — silenced, untouched — than with it in another room. Suppressing the automatic pull to check it burns the exact resource you need to think. This is why the phone leaves the room, not just the hand: the cost is paid by its presence, not only its use.',
+  /** Attention residue — even a glance has a long tail. */
+  residue:
+    'Even a glance has a tail. Switching back from a distraction does not snap you back — the mind keeps idling on the interrupted thing, and the climb back to real depth takes far longer than the glance did. A feed checked "for one second" quietly costs the next twenty minutes of your actual mind.',
+  /** The close — the antidote is structure, and you already hold most of it. */
+  close:
+    'So the antidote is not willpower, it is structure — and you already hold most of it. Phone in another room (the cost of presence, paid down). One person who knows (the pledge that makes quitting public). The only layer you have not set is a real stake on failure. You do not need more discipline. You need the easy path and the right path to be the same path.',
+} as const;
+
+/**
+ * Episodic Future Thinking — the move that beats the urge (2026-06-16). The one
+ * genuinely net-new, fully-defensible technique from the report: vividly
+ * simulating the future self lowers delay discounting (a vague future is
+ * discounted steeply, a vivid one barely at all). It is the concrete version of
+ * the urge-question "what would the person I am building do" + the King/Prince
+ * viz — instead of asking it abstractly, you SEE him. Used at the morning
+ * question and the urge moment.
+ */
+export const EFT_TECHNIQUE = {
+  title: 'See him — the move that beats the urge',
+  body: 'The urge wins because its reward is vivid and now, while the future you are building for is abstract and far. So do not argue with the urge — out-vivid it. Instead of "I should not," picture HIM: the man at the end of these 66 days, and the years past them — what he has built, how his mind moves, who is around him, how it feels to be him. Hold it for ten seconds until it is real. The brain discounts a vague future steeply and a vivid one barely at all; making him concrete is what tips the scale.',
+  /** The one-line cue for the morning question + the urge moment. */
+  cue: 'At the morning question and the moment the urge hits: do not picture the thing you are resisting. Picture the King you are becoming, in detail — then ask what he does next.',
 } as const;
 
 /** The slip-night reframe shown inline after a slip is logged. */
