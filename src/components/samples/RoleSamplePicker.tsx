@@ -301,6 +301,23 @@ export function RoleSamplePicker({
               >
                 {b.summary}
               </div>
+              {/* hookCopy — the "why you'd run THIS one" line. Surfaced
+                  2026-06-17 (was authored but never rendered on the card,
+                  so a user couldn't tell Apex from Atlas). */}
+              <div
+                style={{
+                  fontSize: 11,
+                  fontStyle: 'italic',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.4,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {b.hookCopy}
+              </div>
               <div
                 style={{
                   display: 'flex',

@@ -73,6 +73,7 @@ import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-tr
 import { trackEvent } from '@/lib/analytics/track';
 import type { AnalysisResult } from '@/types';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
+import { UploadGuidancePanel } from '@/components/upload/UploadGuidancePanel';
 import { RetroProofPair } from '@/components/marketing/proof/RetroProofPair';
 
 /* ─── Color tokens (mirror landing page so the demo feels like the same product) ── */
@@ -719,6 +720,13 @@ export default function DemoPage() {
                 boxShadow: '0 14px 40px rgba(15,23,42,0.06)',
               }}
             >
+              {/* "What can I upload?" guidance — same SSOT as the dashboard,
+                  so the cold-acquisition surface and the in-app paste path
+                  tell the same story. role=null (no auth on /demo) renders
+                  the generic "anything strategic you wrote" guidance. */}
+              <div style={{ marginBottom: 14 }}>
+                <UploadGuidancePanel role={null} />
+              </div>
               <div style={{ marginBottom: 18 }}>
                 <RoleSamplePicker
                   fetchRole={false}

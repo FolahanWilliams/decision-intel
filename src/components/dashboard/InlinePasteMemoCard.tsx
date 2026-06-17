@@ -34,6 +34,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrainCircuit, Loader2, X, CheckCircle2 } from 'lucide-react';
 import { RoleSamplePicker } from '@/components/samples/RoleSamplePicker';
+import { UploadGuidancePanel } from '@/components/upload/UploadGuidancePanel';
+import { useOnboardingRole } from '@/hooks/useOnboardingRole';
 import { scanForPii, type ScanResult } from '@/lib/utils/redaction-scanner';
 import { RedactionPreModal, type RedactionTrailContext } from '@/components/ui/RedactionPreModal';
 import { postRedactionTrail, savePlaceholderMap } from '@/lib/utils/redaction-trail';
@@ -77,6 +79,7 @@ export function InlinePasteMemoCard({
   autoSubmit,
 }: InlinePasteMemoCardProps) {
   const router = useRouter();
+  const onboardingRole = useOnboardingRole();
   const [content, setContent] = useState(initialContent ?? '');
   const [phase, setPhase] = useState<'editing' | 'uploading' | 'analyzing' | 'done' | 'error'>(
     'editing'
@@ -264,6 +267,12 @@ export function InlinePasteMemoCard({
 
       {phase === 'editing' && (
         <>
+          {/* Same "what to upload?" guidance SSOT as the dashboard upload
+              zone + /demo, so every paste path tells one story. */}
+          <div style={{ marginBottom: 14 }}>
+            <UploadGuidancePanel role={onboardingRole} />
+          </div>
+
           <div style={{ marginBottom: 14 }}>
             <RoleSamplePicker
               fetchRole={true}
