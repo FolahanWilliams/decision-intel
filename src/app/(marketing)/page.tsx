@@ -425,10 +425,15 @@ export default function LandingPage() {
                   Refactored 2026-05-07 (twice): was a stacked column to
                   the right of WeWorkProofPanel; then a centered 2-card
                   horizontal row; NOW a 3-card pain → mechanism →
-                  solution flow. PROBLEM updated from generic Fortune
-                  500 cost framing to the canonical 70-90% deal-failure
-                  rate that VC GPs + Corp Dev heads + M&A teams all
-                  recognise immediately. PATTERN bridges to the SOLUTION
+                  solution flow. PROBLEM re-framed 2026-06-18 OFF the
+                  "70-90% of deals fail" attribution stat (indefensible +
+                  M&A-narrow) ONTO the spend-asymmetry insight (firms
+                  audit the information, almost nothing audits the
+                  judgment) — more defensible, more novel, and it travels
+                  to banks / any capital-commitment buyer. Canonical
+                  concept lives in icp.ts POSITIONING_SPEND_ASYMMETRY
+                  (rendered em-dash-free here per the landing cap).
+                  PATTERN bridges to the SOLUTION
                   by naming the failure mechanic (the four bias families)
                   so the reader sees pain → cause → fix in one row. */}
             <div
@@ -483,7 +488,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  70-90%
+                  $0
                 </p>
                 <p
                   style={{
@@ -493,8 +498,9 @@ export default function LandingPage() {
                     margin: '0 0 6px',
                   }}
                 >
-                  of M&amp;A and venture deals miss their thesis. Most failures trace back to bias
-                  patterns visible in the original memo nobody named at the time.
+                  is what most firms systematically spend auditing the judgment behind a major
+                  decision. Millions go to the data, the bankers, the diligence. The reasoning that
+                  actually commits the capital goes unchecked.
                 </p>
                 <p
                   style={{
@@ -505,7 +511,7 @@ export default function LandingPage() {
                     letterSpacing: '0.02em',
                   }}
                 >
-                  HBR &middot; KPMG
+                  The judgment gap, not the data gap.
                 </p>
               </div>
               {/* PATTERN — amber. The bridge card: surfaces the three
