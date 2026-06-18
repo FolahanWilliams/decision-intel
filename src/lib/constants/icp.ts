@@ -295,6 +295,52 @@ export const POSITIONING_PAIN_PHILOSOPHICAL_CLAIM =
   'Reasoning is never objectively sound; it is either audited or unaudited.';
 
 /**
+ * Spend-asymmetry wedge insight + trust gap + conviction-vs-bias money line
+ * (locked 2026-06-18 — validated at an angel networking event + a bank-side
+ * conversation; supersedes the "70-90% of deals fail" ATTRIBUTION framing on
+ * the pitch + the landing PROBLEM card).
+ *
+ * WHY THIS EXISTS. The "70-90% of M&A deals fail" headline was BOTH
+ * indefensible (you cannot prove a precise share of failures is attributable
+ * to the reasoning gaps DI audits — only the failure MECHANISMS are
+ * research-backed) AND self-limiting (it boxes the company into M&A when the
+ * category is every capital-commitment decision, banks included). The stronger,
+ * more novel, harder-to-argue wedge is the SPEND ASYMMETRY: firms pour millions
+ * into auditing the INFORMATION behind a decision and almost nothing into
+ * auditing the JUDGMENT that uses it. A bank-side angel sharpened the second
+ * half (POSITIONING_TRUST_GAP): even when judgment IS audited, the result is
+ * not trusted (internal audit / model risk is political, uncalibrated,
+ * unreproducible) — exactly the gap DI's reproducible + Brier-calibrated +
+ * tamper-evident architecture closes.
+ *
+ * DISCIPLINE (load-bearing):
+ * - Broaden the BUYER / decision class (M&A is the entry; bank credit +
+ *   investment committees are the same shape — judgment committing capital
+ *   under a regulatory record requirement). Keep the NOUN narrow: "reasoning
+ *   audit platform", NEVER "decision-making platform" (the horizontal trap).
+ * - QUANTIFY THE STAKES, NOT THE BLAME. Keep sourced, scoped stats (e.g.
+ *   "70-90% of acquisitions miss projected synergies — McKinsey/KPMG") as the
+ *   defensible synergy-realisation claim; never resurrect a fabricated
+ *   share-of-failures-we-cause number.
+ * - Same epistemic-honesty discipline as POSITIONING_EPISTEMIC_HONESTY: the
+ *   medium is the message — a pitch that refuses an indefensible stat
+ *   demonstrates the rigor the product sells.
+ *
+ * Marketing surfaces that render these MUST honour the em-dash cap (rewrite
+ * the dashes to commas/periods) — the SSOT here is the canonical CONCEPT, not
+ * a verbatim copy contract for em-dash-capped pages (same pattern as the
+ * hand-tuned landing hero copy).
+ */
+export const POSITIONING_SPEND_ASYMMETRY =
+  'Companies spend millions on bankers, lawyers, diligence, and data rooms — all auditing the information behind a decision. Almost no one systematically audits the judgment that turns that information into a final capital-commitment. That is the gap Decision Intel was built to close.';
+
+export const POSITIONING_TRUST_GAP =
+  'Even when judgment is audited, the result is rarely trusted — internal audit and model risk are political, uncalibrated, and unreproducible. Decision Intel makes the reasoning audit reproducible, calibrated, and tamper-evident, so the output survives the committee instead of getting waved away.';
+
+export const POSITIONING_CONVICTION_VS_BIAS =
+  'The biggest risk in a $500M decision is not a lack of information — it is the inability to tell conviction from bias. That is the one thing nobody audits, and the one thing Decision Intel does.';
+
+/**
  * Competitive defensive lines — the canonical responses when a buyer or
  * investor names Cloverpop / IBM watsonx as competitive. Locked alongside
  * the pain framing 2026-05-08 because the pain phrase deliberately
@@ -759,6 +805,12 @@ export function buildPositioningPromptBlock(): string {
     `PAIN FRAMING (locked 2026-05-08 — replaces the prior "bad strategic decisions" phrasing per NotebookLM master-KB synthesis):`,
     `Canonical pain phrase: "${POSITIONING_PAIN_FRAMING}"`,
     `Money-line philosophical claim (rehearsable): "${POSITIONING_PAIN_PHILOSOPHICAL_CLAIM}"`,
+    ``,
+    `WEDGE INSIGHT — LEAD WITH THIS, NOT A FAILURE-RATE STAT (locked 2026-06-18 — validated at an angel event + a bank conversation; replaces the indefensible "70-90% of deals fail" attribution headline):`,
+    `Spend-asymmetry (the novel, defensible problem framing — use as the pitch / cold-open problem beat): "${POSITIONING_SPEND_ASYMMETRY}"`,
+    `Trust gap (bank-validated; deploy when the buyer/investor mentions existing audit, model risk, or three-lines-of-defense): "${POSITIONING_TRUST_GAP}"`,
+    `Money line (the single sharpest investor sentence — the core value prop in one breath): "${POSITIONING_CONVICTION_VS_BIAS}"`,
+    `DISCIPLINE: broaden the decision CLASS (M&A is the entry; bank credit + investment committees are the same shape — judgment committing capital under a regulatory record requirement) but keep the NOUN narrow ("reasoning audit platform", never "decision-making platform"). Quantify the STAKES (trillions committed annually on committee judgment), never the BLAME (no fabricated share-of-failures-we-cause number). The sourced "70-90% of acquisitions miss projected synergies (McKinsey/KPMG)" stat stays valid as a SCOPED synergy-realisation claim — it is the attribution/headline use that is retired, not the cited synergy stat.`,
     ``,
     `Why "unaudited reasoning" beats "bad/flawed reasoning": elite decision-makers (CSO, M&A head, GP, PE-backed founder) view their intuition as their proprietary edge and reject framing that says their reasoning is broken. "Unaudited" names a missing process, not broken thinking — ego-safe + procurement-grade.`,
     ``,
