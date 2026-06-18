@@ -1648,6 +1648,14 @@ export default function LandingPage() {
             <Link href="/privacy" style={{ color: '#94A3B8', textDecoration: 'none' }}>
               Privacy Policy
             </Link>
+            <a
+              href="https://folahanwilliams.com"
+              target="_blank"
+              rel="noopener"
+              style={{ color: '#94A3B8', textDecoration: 'none' }}
+            >
+              Folahan Williams
+            </a>
           </div>
         </div>
       </footer>
