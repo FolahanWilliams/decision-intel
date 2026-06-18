@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { MarketingNav } from '@/components/marketing/MarketingNav';
+import { RoleRouter } from '@/components/marketing/RoleRouter';
 import { Reveal } from '@/components/ui/Reveal';
 
 /* Below-fold heavy components: split into async JS chunks via
@@ -707,6 +708,13 @@ export default function LandingPage() {
           }
         `}</style>
       </section>
+
+      {/* ── Role router — the 4 wedge personas → their /use workflow.
+          Solves "one homepage, five buyers" without touching the locked
+          hero / sign-in-first / category-claim. ─────────────────────── */}
+      <Reveal repeat>
+        <RoleRouter />
+      </Reveal>
 
       {/* ── Beat 02 — The Problem ─────────────────────────────────────── */}
       <Reveal repeat>
