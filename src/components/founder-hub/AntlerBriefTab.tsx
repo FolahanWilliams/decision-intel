@@ -1,10 +1,13 @@
 'use client';
 
 /**
- * AntlerBriefTab — one-page meeting prep for the Magnus Grimeland (Antler CEO)
- * inbound. Founder-hub-internal (admin-gated); names Antler/Magnus in the
- * content like the LRQA + Cornerstone briefs, while the visible tab label
- * stays role-neutral per the CLAUDE.md no-named-prospects rule.
+ * AntlerBriefTab — Antler research + approach brief. The June-2026 "Magnus
+ * Grimeland / Antler CEO inbound" was an IMPERSONATION (see the
+ * project-antler-magnus-inbound memory); this is the real-firm prep for
+ * pursuing Antler via the warm path that opened at a networking event (a VC
+ * offering an intro to Antler's London partners). Founder-hub-internal
+ * (admin-gated); names Antler/Magnus in the content like the LRQA + Cornerstone
+ * briefs, while the visible tab label stays role-neutral.
  *
  * Pure renderer over ANTLER_BRIEF (antler-brief-data.ts). Edit content there.
  */
@@ -88,7 +91,7 @@ export function AntlerBriefTab() {
     >
       {/* Header */}
       <div>
-        <div style={eyebrowStyle}>Investor brief · day-zero VC inbound</div>
+        <div style={eyebrowStyle}>Investor brief · Antler · research &amp; approach</div>
         <h1
           style={{
             fontSize: 'clamp(22px, 3vw, 30px)',
@@ -98,7 +101,7 @@ export function AntlerBriefTab() {
             letterSpacing: '-0.02em',
           }}
         >
-          Magnus Grimeland · Antler
+          Antler · research &amp; approach
         </h1>
         <p
           style={{
@@ -114,18 +117,22 @@ export function AntlerBriefTab() {
       </div>
 
       {/* Setup */}
-      <AccentCard accent="primary" title={<CardTitle>Why this is real signal</CardTitle>}>
+      <AccentCard
+        accent="warning"
+        tinted
+        title={<CardTitle>What happened · the real path</CardTitle>}
+      >
         <Bullets items={b.setup.points} />
       </AccentCard>
 
-      {/* Logistics */}
-      <AccentCard accent="info" title={<CardTitle>The meeting</CardTitle>}>
+      {/* The path */}
+      <AccentCard accent="info" title={<CardTitle>The path in</CardTitle>}>
         <KeyValList
           items={[
-            { k: 'Who', v: b.logistics.who },
-            { k: 'Format', v: b.logistics.format },
-            { k: 'Cc’d team', v: b.logistics.cc },
-            { k: 'Setup', v: b.logistics.practical },
+            { k: 'Path', v: b.logistics.who },
+            { k: 'Channel', v: b.logistics.format },
+            { k: 'Verify', v: b.logistics.cc },
+            { k: 'Discipline', v: b.logistics.practical },
           ]}
         />
       </AccentCard>

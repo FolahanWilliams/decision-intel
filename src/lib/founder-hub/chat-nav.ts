@@ -114,15 +114,15 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
   },
   {
     id: 'antler_brief',
-    label: 'Day-Zero VC · Inbound',
+    label: 'Day-Zero VC · Antler',
     aliases: [
       'antler',
       'magnus',
       'magnus grimeland',
       'antler brief',
-      'antler meeting',
+      'antler approach',
       'day-zero vc',
-      'vc inbound brief',
+      'antler research',
       'investor brief',
     ],
   },

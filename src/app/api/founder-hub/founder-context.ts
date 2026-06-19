@@ -1336,7 +1336,7 @@ Valid tabIds — match these exactly, case-sensitive, no prefix:
 - lrqa                   Assurance Firm warm-intro brief (founder-hub-internal)
 - cornerstone            Pre-Seed VC warm-intro brief (founder-hub-internal)
 - accountability_sprint  Accountability Sprint (Kristian Marcus 1-on-1 mentor brief + 4-week plan; founder-hub-internal)
-- antler_brief           Day-Zero VC · Inbound (Magnus Grimeland / Antler CEO cold-inbound meeting prep; founder-hub-internal). Use when founder asks about the Antler / Magnus meeting.
+- antler_brief           Day-Zero VC · Antler (real-firm research + approach brief; founder-hub-internal). NOTE: the June-2026 "Magnus Grimeland / Antler CEO" email was an IMPERSONATION (dead mailbox + wrong-owner domain) — there is NO real Antler meeting from it; the July-2 slot is cancelled. A REAL warm path opened (a networking-event VC offering an intro to Antler's London partners). Use when the founder asks about Antler / the scam / the real approach. Always frame: pursue Antler properly AFTER customers-before-investors fires; verify any Antler contact via @antler.co.
 - content                Content Studio
 - data_ecosystem         Data Ecosystem
 - case_library           Case Library

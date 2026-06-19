@@ -489,7 +489,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     // content names Magnus / Antler internally, like the LRQA + Cornerstone
     // briefs. Founder-hub is admin-gated, so the content naming is safe.
     id: 'antler_brief',
-    label: 'Day-Zero VC · Inbound',
+    label: 'Day-Zero VC · Antler',
     icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
