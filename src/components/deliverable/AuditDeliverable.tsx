@@ -195,7 +195,10 @@ export function AuditDeliverable({ deliverable, mode, primaryCta, analysisId }: 
 
       {activeId === 'graph' && analysisId ? (
         <section style={slideStyle}>
-          <DecisionNetworkPanel analysisId={analysisId} />
+          <DecisionNetworkPanel
+            findings={deliverable.reasoningRisks.findings}
+            dqi={deliverable.cover.dqi}
+          />
         </section>
       ) : null}
     </div>
