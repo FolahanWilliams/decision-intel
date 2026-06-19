@@ -36,7 +36,7 @@ export const ROLE_ROUTES = [
   {
     slug: 'fund-investment-thesis-audit',
     persona: 'Fund GP / Principal',
-    you: 'You make the calls your investors — and your track record — get judged on.',
+    you: 'You make the calls your investors, and your track record, get judged on.',
   },
   {
     slug: 'board-deck-pre-presentation-audit',
@@ -88,7 +88,7 @@ export function RoleRouter() {
               lineHeight: 1.6,
             }}
           >
-            Four ways in — each routes to the audit built for the decisions you actually make.
+            Four ways in. Each routes to the audit built for the decisions you actually make.
           </p>
         </div>
 
