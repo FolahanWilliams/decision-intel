@@ -112,6 +112,20 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
       'mentor brief',
     ],
   },
+  {
+    id: 'antler_brief',
+    label: 'Day-Zero VC · Inbound',
+    aliases: [
+      'antler',
+      'magnus',
+      'magnus grimeland',
+      'antler brief',
+      'antler meeting',
+      'day-zero vc',
+      'vc inbound brief',
+      'investor brief',
+    ],
+  },
   { id: 'content', label: 'Content Studio' },
   // Foundations
   {

@@ -267,6 +267,13 @@ const AccountabilitySprintTab = dynamic(
     })),
   { loading: tabLoader }
 );
+const AntlerBriefTab = dynamic(
+  () =>
+    import('@/components/founder-hub/AntlerBriefTab').then(m => ({
+      default: m.AntlerBriefTab,
+    })),
+  { loading: tabLoader }
+);
 const PathToHundredMillionTab = dynamic(
   () =>
     import('@/components/founder-hub/PathToHundredMillionTab').then(m => ({
@@ -329,6 +336,7 @@ type TabId =
   | 'lrqa'
   | 'cornerstone'
   | 'accountability_sprint'
+  | 'antler_brief'
   | 'path_to_100m'
   | 'voice_activity'
   | 'metrics'
@@ -473,6 +481,16 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'accountability_sprint',
     label: 'Accountability Sprint',
     icon: <Target size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    // Role-neutral label per CLAUDE.md no-named-prospects rule. The tab id
+    // keeps 'antler_brief' for founder-recall + stable deeplinks; the brief
+    // content names Magnus / Antler internally, like the LRQA + Cornerstone
+    // briefs. Founder-hub is admin-gated, so the content naming is safe.
+    id: 'antler_brief',
+    label: 'Day-Zero VC · Inbound',
+    icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
   { id: 'content', label: 'Content Studio', icon: <Zap size={16} />, group: 'Go-to-Market' },
@@ -1849,6 +1867,13 @@ function renderTab(
     accountability_sprint: (
       <ErrorBoundary sectionName="Accountability Sprint brief">
         <AccountabilitySprintTab />
+      </ErrorBoundary>
+    ),
+    antler_brief: (
+      // sectionName scrubbed of named prospect per CLAUDE.md no-named-prospects
+      // rule (the brief content names Magnus / Antler internally).
+      <ErrorBoundary sectionName="Day-zero VC inbound brief">
+        <AntlerBriefTab />
       </ErrorBoundary>
     ),
     content: (

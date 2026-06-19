@@ -123,6 +123,21 @@ if [ $DOC_SYNC_EXIT_CODE -ne 0 ]; then
 fi
 
 echo ""
+echo "🎨 Running Prettier --write on staged files..."
+echo ""
+
+# Locked 2026-06-19: Prettier was NOT in the pre-commit chain, so formatting
+# drifted on touched files until a CI `prettier --check` run bounced it back
+# (founder hit this on the dashboard + deliverable ships). Mirrors the
+# ESLint --fix pattern below: format staged source files in place, then
+# re-stage so the commit picks up the formatting. Auto-fix only — never blocks.
+STAGED_FOR_PRETTIER=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|json|css|md)$' || true)
+if [ -n "$STAGED_FOR_PRETTIER" ]; then
+    echo "$STAGED_FOR_PRETTIER" | xargs npx prettier --write --ignore-unknown
+    echo "$STAGED_FOR_PRETTIER" | xargs git add
+fi
+
+echo ""
 echo "🧹 Running ESLint --fix (auto-fix what we can, fail on remaining errors)..."
 echo ""
 

@@ -1336,6 +1336,7 @@ Valid tabIds — match these exactly, case-sensitive, no prefix:
 - lrqa                   Assurance Firm warm-intro brief (founder-hub-internal)
 - cornerstone            Pre-Seed VC warm-intro brief (founder-hub-internal)
 - accountability_sprint  Accountability Sprint (Kristian Marcus 1-on-1 mentor brief + 4-week plan; founder-hub-internal)
+- antler_brief           Day-Zero VC · Inbound (Magnus Grimeland / Antler CEO cold-inbound meeting prep; founder-hub-internal). Use when founder asks about the Antler / Magnus meeting.
 - content                Content Studio
 - data_ecosystem         Data Ecosystem
 - case_library           Case Library
