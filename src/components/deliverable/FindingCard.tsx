@@ -20,8 +20,8 @@
 'use client';
 
 import type { CSSProperties, ReactNode } from 'react';
-import { ChevronRight } from 'lucide-react';
-import type { Severity, ValueSuppressingChip } from '@/lib/deliverable/types';
+import { ChevronRight, History } from 'lucide-react';
+import type { Severity, ValueSuppressingChip, ReferenceClassEntry } from '@/lib/deliverable/types';
 import { ValueSuppressingPalette } from './ValueSuppressingPalette';
 
 interface FindingCardProps {
@@ -37,6 +37,9 @@ interface FindingCardProps {
   excerpt?: string;
   /** Optional value-at-stake or stat row at the bottom. */
   metaRow?: ReactNode;
+  /** Historical reference class — renders a compact "Seen before" teaser.
+   *  The clickable case list lives in the drawer. */
+  referenceClass?: ReferenceClassEntry[];
   /** "View audit trail" trigger label. Defaults to "View audit trail →". */
   drawerTriggerLabel?: string;
   /** Drawer open handler — when present, card becomes interactive. */
@@ -59,6 +62,7 @@ export function FindingCard({
   body,
   excerpt,
   metaRow,
+  referenceClass,
   drawerTriggerLabel = 'View audit trail',
   onOpenDrawer,
   style,
@@ -161,6 +165,30 @@ export function FindingCard({
           }}
         >
           {metaRow}
+        </div>
+      ) : null}
+
+      {/* Historical reference class — compact teaser (links live in the drawer) */}
+      {referenceClass && referenceClass.length > 0 ? (
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 11.5,
+            color: 'var(--text-muted, #64748B)',
+            lineHeight: 1.4,
+          }}
+        >
+          <History size={12} style={{ flexShrink: 0 }} />
+          <span>
+            Seen before ·{' '}
+            {referenceClass
+              .slice(0, 2)
+              .map(c => c.company)
+              .join(', ')}
+            {referenceClass.length > 2 ? ` +${referenceClass.length - 2}` : ''}
+          </span>
         </div>
       ) : null}
 

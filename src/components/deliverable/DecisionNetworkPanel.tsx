@@ -9,13 +9,15 @@
  * Click any node to open the reasoning behind it — the audit's explanation, the
  * verbatim memo excerpt, the fix, the compound patterns it feeds, AND a
  * historical reference class: where this same reasoning risk has shown up
- * before, drawn from the 143-case library (getCasesByBias). The reference
- * class is correlational grounding, never a causal claim about this memo
+ * before. The reference class is composed server-side (buildReferenceClass over
+ * the 143-case library) and carried on each finding, so this panel and the
+ * always-on FindingCards render the SAME cases — no client case-library import,
+ * no drift. It is correlational grounding, never a causal claim about this memo
  * (per the epistemic-honesty lock).
  *
  * Renders via the production 3D WebGL canvas (DecisionKnowledgeGraph3DCanvas,
- * reagraph) — lazy-loaded, so the heavy bundle (+ the case library) only ships
- * when the user opens this tab.
+ * reagraph) — lazy-loaded, so the heavy WebGL bundle only ships when the user
+ * opens this tab.
  */
 
 'use client';
@@ -24,12 +26,12 @@ import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Loader2, Network, ExternalLink } from 'lucide-react';
 import type { GraphEdge, GraphNode } from 'reagraph';
-import type { ReasoningRiskFinding, SCQAExecutiveSummary } from '@/lib/deliverable/types';
+import type {
+  ReasoningRiskFinding,
+  ReferenceClassEntry,
+  SCQAExecutiveSummary,
+} from '@/lib/deliverable/types';
 import { formatBiasName } from '@/lib/utils/labels';
-import { getCasesByBias } from '@/lib/data/case-studies';
-import { isFailureOutcome } from '@/lib/data/case-studies/types';
-import { getSlugForCase } from '@/lib/data/case-studies/slugs';
-import type { CaseStudy } from '@/lib/data/case-studies/types';
 
 const Canvas = dynamic(() => import('@/components/visualizations/DecisionKnowledgeGraph3DCanvas'), {
   ssr: false,
@@ -121,18 +123,6 @@ function buildDocumentGraph(
   return { nodes, edges };
 }
 
-/** Top historical cases (failures first, by impact) that carried this bias. */
-function referenceClass(biasKey: string): CaseStudy[] {
-  return [...getCasesByBias(biasKey)]
-    .sort((a, b) => {
-      const af = isFailureOutcome(a.outcome) ? 1 : 0;
-      const bf = isFailureOutcome(b.outcome) ? 1 : 0;
-      if (af !== bf) return bf - af;
-      return b.impactScore - a.impactScore;
-    })
-    .slice(0, 3);
-}
-
 interface NodeDetail {
   kind: 'decision' | 'bias';
   title: string;
@@ -142,7 +132,7 @@ interface NodeDetail {
   excerpt?: string;
   mitigation?: string;
   compounds?: { label: string; others: string[] }[];
-  cases?: CaseStudy[];
+  cases?: ReferenceClassEntry[];
   summary?: string;
 }
 
@@ -177,7 +167,7 @@ function detailForNode(
     excerpt: finding?.excerpt,
     mitigation: finding?.mitigation,
     compounds: compounds.length ? compounds : undefined,
-    cases: referenceClass(key),
+    cases: finding?.referenceClass,
   };
 }
 
@@ -425,7 +415,7 @@ function NodeDetailCard({ detail }: { detail: NodeDetail }) {
             {detail.cases.map(c => (
               <a
                 key={c.id}
-                href={`/case-studies/${getSlugForCase(c)}`}
+                href={`/case-studies/${c.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -445,7 +435,7 @@ function NodeDetailCard({ detail }: { detail: NodeDetail }) {
                     borderRadius: '50%',
                     flexShrink: 0,
                     marginTop: 5,
-                    background: c.impactDirection === 'negative' ? '#ef4444' : '#16a34a',
+                    background: c.direction === 'negative' ? '#ef4444' : '#16a34a',
                   }}
                 />
                 <span>

@@ -12,11 +12,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Brain, GitMerge } from 'lucide-react';
+import { Brain, GitMerge, ExternalLink } from 'lucide-react';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
 import type {
   ReasoningRiskFinding,
   ReasoningRisksBucket as ReasoningRisksBucketType,
+  ReferenceClassEntry,
 } from '@/lib/deliverable/types';
 import { ActionTitle } from '../ActionTitle';
 import { FindingCard } from '../FindingCard';
@@ -106,6 +107,7 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
                 </div>
               ) : undefined
             }
+            referenceClass={finding.referenceClass}
             onOpenDrawer={() => setActive(finding)}
           />
         ))}
@@ -145,6 +147,12 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
                     ))}
                   </ul>
                 }
+              />
+            ) : null}
+            {active.referenceClass && active.referenceClass.length > 0 ? (
+              <DrawerBlock
+                label="Where this has appeared before"
+                body={<ReferenceClassList entries={active.referenceClass} />}
               />
             ) : null}
             {active.valueAtStake ? (
@@ -246,6 +254,61 @@ function CountStrip({ bucket }: { bucket: ReasoningRisksBucketType }) {
           {item.value} {item.label}
         </span>
       ))}
+    </div>
+  );
+}
+
+function ReferenceClassList({ entries }: { entries: ReferenceClassEntry[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {entries.map(c => (
+          <a
+            key={c.id}
+            href={`/case-studies/${c.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 8,
+              fontSize: 13,
+              color: 'var(--text-secondary, #475569)',
+              textDecoration: 'none',
+              lineHeight: 1.45,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                flexShrink: 0,
+                marginTop: 6,
+                background: c.direction === 'negative' ? '#ef4444' : '#16a34a',
+              }}
+            />
+            <span>
+              <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{c.company}</strong> (
+              {c.year}) · {c.estimatedImpact}
+              <ExternalLink
+                size={11}
+                style={{
+                  marginLeft: 4,
+                  verticalAlign: 'middle',
+                  color: 'var(--text-muted, #64748B)',
+                }}
+              />
+            </span>
+          </a>
+        ))}
+      </div>
+      <p
+        style={{ margin: 0, fontSize: 11.5, color: 'var(--text-muted, #64748B)', lineHeight: 1.45 }}
+      >
+        A reference class — where this reasoning risk has shown up before — not a claim that it
+        caused this memo&rsquo;s outcome.
+      </p>
     </div>
   );
 }

@@ -59,6 +59,28 @@ export interface ValueAtStake {
 // BUCKET 1 — What the audit found (reasoning risks)
 // ──────────────────────────────────────────────────────────────────────
 
+/**
+ * A single historical case that carried this reasoning risk — the
+ * correlational reference class for a finding. Lean (serializable) shape so
+ * the deliverable payload stays small; the composer derives it from the
+ * 143-case library at compose time. NEVER a causal claim about this memo
+ * (epistemic-honesty lock) — it is "this pattern has appeared here before".
+ */
+export interface ReferenceClassEntry {
+  /** Case-study id (stable). */
+  id: string;
+  /** Display name, e.g. "WeWork". */
+  company: string;
+  /** Decision year. */
+  year: number;
+  /** Human impact label, e.g. "$40B valuation collapse". */
+  estimatedImpact: string;
+  /** URL-safe slug → /case-studies/[slug]. */
+  slug: string;
+  /** Outcome direction — drives the red/green marker. */
+  direction: 'positive' | 'negative';
+}
+
 export interface ReasoningRiskFinding {
   kind: 'bias' | 'compound_pattern';
   /** Canonical id — biasType for biases, patternLabel for patterns. */
@@ -77,6 +99,9 @@ export interface ReasoningRiskFinding {
   participatingBiases?: string[];
   /** Optional exposure (only when ticket size supplied). */
   valueAtStake?: ValueAtStake | null;
+  /** Top historical cases that carried this reasoning risk (bias findings
+   *  only; failures first, by impact). Correlational grounding, not cause. */
+  referenceClass?: ReferenceClassEntry[];
 }
 
 export interface ReasoningRisksBucket {

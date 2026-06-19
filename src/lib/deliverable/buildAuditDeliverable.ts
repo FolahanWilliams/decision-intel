@@ -30,6 +30,7 @@ import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
 import { computeFindingValueAtStake, formatExposureLabel } from './valueAtStake';
+import { buildReferenceClass } from './referenceClass';
 import {
   coverActionTitle,
   reasoningRisksActionTitle,
@@ -121,6 +122,7 @@ function bucketReasoningRisks(
         excerpt: b.excerpt ?? '',
         explanation: b.explanation ?? '',
         mitigation: b.suggestion ?? '',
+        referenceClass: buildReferenceClass(b.biasType, 3),
         valueAtStake: ticket
           ? computeFindingValueAtStake({
               ticketAmount: ticket.amount,
