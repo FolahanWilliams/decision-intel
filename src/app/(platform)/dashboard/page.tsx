@@ -1171,7 +1171,7 @@ export default function Dashboard() {
                     whileHover={{
                       y: -4,
                       boxShadow:
-                        '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                        '0 16px 36px rgba(15, 23, 42, 0.18)',
                     }}
                     style={{
                       borderTop: `2px solid ${stat.accentColor}`,
@@ -1194,7 +1194,7 @@ export default function Dashboard() {
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={{
                     y: -4,
-                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                    boxShadow: '0 16px 36px rgba(15, 23, 42, 0.18)',
                   }}
                   style={{ borderTop: `2px solid ${stat.accentColor}` }}
                 >
@@ -1489,7 +1489,7 @@ export default function Dashboard() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       <div>
                         <label
-                          className="text-xs text-muted font-medium"
+                          className="text-xs text-secondary font-medium"
                           style={{ display: 'block', marginBottom: 4 }}
                         >
                           Document Type{' '}
@@ -1510,8 +1510,8 @@ export default function Dashboard() {
                           style={{
                             width: '100%',
                             padding: '8px 10px',
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-color)',
                             borderRadius: 8,
                             color: 'var(--text-primary)',
                             fontSize: 13,
@@ -1528,7 +1528,7 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <label
-                          className="text-xs text-muted font-medium"
+                          className="text-xs text-secondary font-medium"
                           style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
                         >
                           Link to Deal <span className="text-muted">(optional)</span>
@@ -1539,8 +1539,8 @@ export default function Dashboard() {
                           style={{
                             width: '100%',
                             padding: '8px 10px',
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-color)',
                             borderRadius: 8,
                             color: 'var(--text-primary)',
                             fontSize: 13,
@@ -2157,10 +2157,6 @@ export default function Dashboard() {
                         <div
                           key={doc.id}
                           className="card"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            borderColor: 'rgba(255, 255, 255, 0.15)',
-                          }}
                         >
                           <div className="card-body flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -2172,7 +2168,7 @@ export default function Dashboard() {
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  background: 'rgba(255, 255, 255, 0.06)',
+                                  background: 'var(--bg-secondary)',
                                 }}
                               >
                                 <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
@@ -2266,7 +2262,7 @@ export default function Dashboard() {
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
-                                      background: 'rgba(255, 255, 255, 0.06)',
+                                      background: 'var(--bg-secondary)',
                                     }}
                                   >
                                     <FileText
