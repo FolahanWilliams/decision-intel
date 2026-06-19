@@ -57,7 +57,14 @@ export function CalibrationBaselineChart({
       >
         Calibration baseline · Tetlock anchored
       </div>
-      <div style={{ fontSize: 13, color: 'var(--text-secondary, #475569)', marginBottom: 14, lineHeight: 1.5 }}>
+      <div
+        style={{
+          fontSize: 13,
+          color: 'var(--text-secondary, #475569)',
+          marginBottom: 14,
+          lineHeight: 1.5,
+        }}
+      >
         Our Brier{' '}
         <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{meanBrier.toFixed(3)}</strong>{' '}
         across {sampleSize} historical decisions · {Math.round(classificationAccuracy * 100)}%
@@ -131,7 +138,10 @@ export function CalibrationBaselineChart({
       {/* Legend — wraps, so band names never collide */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 8 }}>
         {BANDS.map(band => (
-          <div key={band.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <div
+            key={band.label}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}
+          >
             <span
               style={{
                 width: 9,
@@ -141,7 +151,9 @@ export function CalibrationBaselineChart({
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: 11, color: 'var(--text-secondary, #475569)', fontWeight: 600 }}>
+            <span
+              style={{ fontSize: 11, color: 'var(--text-secondary, #475569)', fontWeight: 600 }}
+            >
               {band.label}
             </span>
             <span

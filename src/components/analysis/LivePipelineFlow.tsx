@@ -33,7 +33,12 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
-import { PIPELINE_NODES, ZONES, type PipelineNode, type PipelineZone } from '@/lib/data/pipeline-nodes';
+import {
+  PIPELINE_NODES,
+  ZONES,
+  type PipelineNode,
+  type PipelineZone,
+} from '@/lib/data/pipeline-nodes';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 const ICONS: Record<PipelineNode['iconName'], typeof Shield> = {

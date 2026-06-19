@@ -166,7 +166,15 @@ export function DecisionNetworkPanel({
             ? 'The reasoning risks, mapped around the decision'
             : 'A clean decision — no reasoning risks to map'}
         </h3>
-        <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.55, maxWidth: '54ch' }}>
+        <p
+          style={{
+            fontSize: 13.5,
+            color: 'var(--text-secondary)',
+            margin: 0,
+            lineHeight: 1.55,
+            maxWidth: '54ch',
+          }}
+        >
           {biasCount > 0
             ? 'This decision sits at the centre. Each spoke is a reasoning risk the audit found; the bigger, pulsing nodes are the critical ones, and the strands between them are the compound patterns that amplify each other. Drag to orbit; hover a node to read it.'
             : 'The audit surfaced no flagged reasoning risks on this memo, so the network is just the decision itself.'}
@@ -189,14 +197,29 @@ export function DecisionNetworkPanel({
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', fontSize: 11.5, color: 'var(--text-secondary)' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '6px 16px',
+          fontSize: 11.5,
+          color: 'var(--text-secondary)',
+        }}
+      >
         <LegendDot color="var(--text-secondary)" label="Decision" />
         <LegendDot color={SEVERITY_COLOR.critical} label="Critical bias" />
         <LegendDot color={SEVERITY_COLOR.high} label="High" />
         <LegendDot color={SEVERITY_COLOR.medium} label="Medium" />
         <LegendDot color={SEVERITY_COLOR.low} label="Low" />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 16, height: 2, background: 'var(--text-muted)', display: 'inline-block' }} />
+          <span
+            style={{
+              width: 16,
+              height: 2,
+              background: 'var(--text-muted)',
+              display: 'inline-block',
+            }}
+          />
           Compound pattern
         </span>
       </div>
@@ -207,7 +230,9 @@ export function DecisionNetworkPanel({
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      <span style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
+      <span
+        style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }}
+      />
       {label}
     </span>
   );

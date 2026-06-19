@@ -58,7 +58,12 @@ interface AuditDeliverableProps {
   analysisId?: string;
 }
 
-export function AuditDeliverable({ deliverable, mode, primaryCta, analysisId }: AuditDeliverableProps) {
+export function AuditDeliverable({
+  deliverable,
+  mode,
+  primaryCta,
+  analysisId,
+}: AuditDeliverableProps) {
   const density: 'standard' | 'dense' = mode === 'analyst' ? 'dense' : 'standard';
 
   // Build page manifest from the deliverable data

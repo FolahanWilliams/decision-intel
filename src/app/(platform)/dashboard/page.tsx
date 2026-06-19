@@ -1170,8 +1170,7 @@ export default function Dashboard() {
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                     whileHover={{
                       y: -4,
-                      boxShadow:
-                        '0 16px 36px rgba(15, 23, 42, 0.18)',
+                      boxShadow: '0 16px 36px rgba(15, 23, 42, 0.18)',
                     }}
                     style={{
                       borderTop: `2px solid ${stat.accentColor}`,
@@ -2154,10 +2153,7 @@ export default function Dashboard() {
                     {uploadedDocs
                       .filter(d => d.status === 'analyzing')
                       .map(doc => (
-                        <div
-                          key={doc.id}
-                          className="card"
-                        >
+                        <div key={doc.id} className="card">
                           <div className="card-body flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div
