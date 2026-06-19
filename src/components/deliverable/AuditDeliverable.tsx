@@ -26,7 +26,15 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { LayoutDashboard, ScrollText, Users, BarChart3, Wrench, ShieldCheck } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ScrollText,
+  Users,
+  BarChart3,
+  Wrench,
+  ShieldCheck,
+  Network,
+} from 'lucide-react';
 import type { AuditDeliverable as AuditDeliverableData } from '@/lib/deliverable/types';
 import { SCQAExecutiveSummary } from './SCQAExecutiveSummary';
 import { ReasoningRisksBucket } from './buckets/ReasoningRisksBucket';
@@ -34,6 +42,7 @@ import { StressTestBucket } from './buckets/StressTestBucket';
 import { HistoricalAnalogsBucket } from './buckets/HistoricalAnalogsBucket';
 import { CounterfactualsBucket } from './buckets/CounterfactualsBucket';
 import { ProvenanceBucket } from './buckets/ProvenanceBucket';
+import { DecisionNetworkPanel } from './DecisionNetworkPanel';
 import { DeliverablePageNav, type DeliverablePage } from './DeliverablePageNav';
 
 export type DeliverableViewMode = 'demo' | 'executive' | 'analyst';
@@ -44,9 +53,12 @@ interface AuditDeliverableProps {
   /** Single CTA for the cover — DR Choice Paradox discipline. The
    *  `/demo` surface uses this; in-product surfaces typically omit. */
   primaryCta?: { label: string; onClick: () => void };
+  /** Real analysis id. When present (in-product, not demo), unlocks the
+   *  7th "Decision network" tab — the document-scoped 3D decision graph. */
+  analysisId?: string;
 }
 
-export function AuditDeliverable({ deliverable, mode, primaryCta }: AuditDeliverableProps) {
+export function AuditDeliverable({ deliverable, mode, primaryCta, analysisId }: AuditDeliverableProps) {
   const density: 'standard' | 'dense' = mode === 'analyst' ? 'dense' : 'standard';
 
   // Build page manifest from the deliverable data
@@ -100,8 +112,19 @@ export function AuditDeliverable({ deliverable, mode, primaryCta }: AuditDeliver
         shortLabel: 'Provenance',
         icon: ShieldCheck,
       },
+      // 7th tab — only with a real analysis id (in-product, never demo).
+      ...(analysisId
+        ? [
+            {
+              id: 'graph',
+              label: 'Decision network',
+              shortLabel: 'Graph',
+              icon: Network,
+            } as DeliverablePage,
+          ]
+        : []),
     ];
-  }, [deliverable]);
+  }, [deliverable, analysisId]);
 
   const [activeId, setActiveId] = useState<string>('cover');
 
@@ -118,6 +141,7 @@ export function AuditDeliverable({ deliverable, mode, primaryCta }: AuditDeliver
         flexDirection: 'column',
         gap: 18,
         width: '100%',
+        minWidth: 0,
       }}
       className="audit-deliverable-shell"
     >
@@ -166,6 +190,12 @@ export function AuditDeliverable({ deliverable, mode, primaryCta }: AuditDeliver
       {activeId === 'provenance' ? (
         <section style={slideStyle}>
           <ProvenanceBucket bucket={deliverable.provenance} />
+        </section>
+      ) : null}
+
+      {activeId === 'graph' && analysisId ? (
+        <section style={slideStyle}>
+          <DecisionNetworkPanel analysisId={analysisId} />
         </section>
       ) : null}
     </div>

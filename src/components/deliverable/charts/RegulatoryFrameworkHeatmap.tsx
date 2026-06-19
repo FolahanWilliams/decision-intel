@@ -78,6 +78,7 @@ export function RegulatoryFrameworkHeatmap({ frameworks }: RegulatoryFrameworkHe
         border: '1px solid var(--border-color, #E2E8F0)',
         borderRadius: 12,
         padding: '14px 18px',
+        minWidth: 0,
       }}
     >
       <div
@@ -104,7 +105,7 @@ export function RegulatoryFrameworkHeatmap({ frameworks }: RegulatoryFrameworkHe
               key={region}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '160px 1fr',
+                gridTemplateColumns: '160px minmax(0, 1fr)',
                 gap: 14,
                 alignItems: 'center',
               }}

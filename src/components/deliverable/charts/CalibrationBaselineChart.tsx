@@ -1,18 +1,14 @@
 /**
- * CalibrationBaselineChart — horizontal Tetlock-band chart positioning
- * our Brier 0.258 against published forecasting benchmarks.
- * Locked 2026-05-20 (visual-deliverable rebuild).
+ * CalibrationBaselineChart — positions our Brier against published Tetlock
+ * forecasting benchmarks.
  *
- * Renders a horizontal axis from 0 (perfect calibration) to 0.35+
- * (poor) with four Tetlock-anchored bands:
- *   - Superforecaster ≤ 0.13 (green)
- *   - CIA analyst ~ 0.23 (amber)
- *   - Coin flip 0.25 (gray)
- *   - Poor > 0.35 (red)
- *
- * A circle marker positions the platform Brier (typically 0.258) on
- * the axis. Procurement-grade signal: gives the reader a place on a
- * recognized benchmark, not a number floating in space.
+ * Rebuilt 2026-06-19 (responsive). The prior version drew band labels as
+ * absolutely-positioned SVG <text> centered on each band with no collision
+ * handling — the ~26px-wide "CIA analyst / coin flip" band tried to hold a
+ * ~120px label, so labels overlapped and painted off the right edge of the
+ * pane. This version uses a pure HTML/flex track (proportional band segments
+ * + an absolutely-positioned marker) and a wrap legend BELOW it, so labels
+ * can never overlap and the whole thing fits any container width.
  */
 
 'use client';
@@ -37,15 +33,7 @@ export function CalibrationBaselineChart({
   sampleSize,
   classificationAccuracy,
 }: CalibrationBaselineChartProps) {
-  const width = 720;
-  const height = 130;
-  const PAD = { top: 30, right: 32, bottom: 38, left: 32 };
-  const innerW = width - PAD.left - PAD.right;
-  const trackY = PAD.top + 18;
-  const trackH = 22;
-
-  const xFor = (brier: number) => PAD.left + Math.min(1, brier / AXIS_MAX) * innerW;
-  const markerX = xFor(meanBrier);
+  const markerPct = Math.min(100, Math.max(0, (meanBrier / AXIS_MAX) * 100));
 
   return (
     <div
@@ -53,7 +41,8 @@ export function CalibrationBaselineChart({
         background: 'var(--bg-card, #FFFFFF)',
         border: '1px solid var(--border-color, #E2E8F0)',
         borderRadius: 12,
-        padding: '14px 18px 10px',
+        padding: '14px 18px 12px',
+        minWidth: 0,
       }}
     >
       <div
@@ -63,108 +52,110 @@ export function CalibrationBaselineChart({
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
           color: 'var(--text-muted, #64748B)',
-          marginBottom: 2,
+          marginBottom: 4,
         }}
       >
         Calibration baseline · Tetlock anchored
       </div>
-      <div
-        style={{
-          fontSize: 13,
-          color: 'var(--text-secondary, #475569)',
-          marginBottom: 6,
-        }}
-      >
+      <div style={{ fontSize: 13, color: 'var(--text-secondary, #475569)', marginBottom: 14, lineHeight: 1.5 }}>
         Our Brier{' '}
         <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{meanBrier.toFixed(3)}</strong>{' '}
         across {sampleSize} historical decisions · {Math.round(classificationAccuracy * 100)}%
         classification accuracy at the C/D grade boundary.
       </div>
 
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-        role="img"
-        aria-label={`Calibration baseline chart positioning Brier ${meanBrier} against Tetlock bands`}
-      >
-        {/* Band segments */}
-        {BANDS.map(band => {
-          const x = xFor(band.min);
-          const w = xFor(band.max) - x;
-          return (
-            <g key={band.label}>
-              <rect x={x} y={trackY} width={w} height={trackH} fill={band.color} opacity={0.18} />
-              <text
-                x={x + w / 2}
-                y={trackY + trackH + 16}
-                textAnchor="middle"
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  fill: band.color,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {band.label}
-              </text>
-              <text
-                x={x + w / 2}
-                y={trackY - 6}
-                textAnchor="middle"
-                style={{
-                  fontSize: 9.5,
-                  fontWeight: 700,
-                  fill: 'var(--text-muted, #64748B)',
-                  fontVariantNumeric: 'tabular-nums',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                ≤ {band.max.toFixed(2)}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Track border */}
-        <rect
-          x={PAD.left}
-          y={trackY}
-          width={innerW}
-          height={trackH}
-          fill="none"
-          stroke="var(--border-color, #E2E8F0)"
-          strokeWidth={1}
-        />
-
-        {/* Marker — our score */}
-        <line
-          x1={markerX}
-          y1={trackY - 8}
-          x2={markerX}
-          y2={trackY + trackH + 8}
-          stroke="var(--text-primary, #0F172A)"
-          strokeWidth={2}
-        />
-        <circle cx={markerX} cy={trackY + trackH / 2} r={9} fill="var(--text-primary, #0F172A)" />
-        <circle cx={markerX} cy={trackY + trackH / 2} r={4} fill="#FFFFFF" />
-
-        {/* Marker label */}
-        <text
-          x={markerX}
-          y={height - 6}
-          textAnchor="middle"
+      {/* Track — proportional band segments + a marker for our score. Pure
+          flex, so it scales to any width with zero overlap. */}
+      <div style={{ position: 'relative', paddingTop: 18, paddingBottom: 6 }}>
+        <div
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            fill: 'var(--text-primary, #0F172A)',
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '0.04em',
+            display: 'flex',
+            height: 16,
+            borderRadius: 8,
+            overflow: 'hidden',
+            border: '1px solid var(--border-color, #E2E8F0)',
           }}
         >
-          Decision Intel · {meanBrier.toFixed(3)}
-        </text>
-      </svg>
+          {BANDS.map(band => (
+            <div
+              key={band.label}
+              title={`${band.label} · ≤ ${band.max.toFixed(2)}`}
+              style={{
+                flexGrow: band.max - band.min,
+                flexBasis: 0,
+                background: band.color,
+                opacity: 0.28,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Marker — vertical line + dot + tabular label, clamped on-screen */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 6,
+            left: `${markerPct}%`,
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 800,
+              color: 'var(--text-primary, #0F172A)',
+              fontVariantNumeric: 'tabular-nums',
+              whiteSpace: 'nowrap',
+              marginBottom: 2,
+            }}
+          >
+            {meanBrier.toFixed(3)}
+          </span>
+          <span
+            style={{
+              width: 13,
+              height: 13,
+              borderRadius: '50%',
+              background: 'var(--text-primary, #0F172A)',
+              border: '3px solid var(--bg-card, #FFFFFF)',
+              boxShadow: '0 1px 3px rgba(15,23,42,0.3)',
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Legend — wraps, so band names never collide */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px', marginTop: 8 }}>
+        {BANDS.map(band => (
+          <div key={band.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+            <span
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 2,
+                background: band.color,
+                flexShrink: 0,
+              }}
+            />
+            <span style={{ fontSize: 11, color: 'var(--text-secondary, #475569)', fontWeight: 600 }}>
+              {band.label}
+            </span>
+            <span
+              style={{
+                fontSize: 10.5,
+                color: 'var(--text-muted, #64748B)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              ≤ {band.max.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

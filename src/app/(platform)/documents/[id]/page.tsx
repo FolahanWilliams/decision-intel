@@ -844,7 +844,11 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         rightPaneContent={
           executiveDeliverable ? (
             <ErrorBoundary sectionName="Executive deliverable">
-              <AuditDeliverable deliverable={executiveDeliverable} mode="executive" />
+              <AuditDeliverable
+                deliverable={executiveDeliverable}
+                mode="executive"
+                analysisId={analysis?.id}
+              />
             </ErrorBoundary>
           ) : (
             tabBody

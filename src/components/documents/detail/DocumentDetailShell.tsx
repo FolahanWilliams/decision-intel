@@ -456,12 +456,17 @@ export function DecisionDetailShell(props: DecisionDetailShellProps) {
             </div>
           )}
 
-          {/* Tab content */}
+          {/* Tab content. gridTemplateColumns: minmax(0, 1fr) caps the single
+              column at the pane width so a wide child (chart, matrix, SVG with
+              overflowing labels) can never push the right pane past the
+              viewport — the grid track shrinks instead of overflowing. */}
           <div
             className="doc-detail-v2-tab-content"
             style={{
               display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr)',
               gap: 16,
+              minWidth: 0,
             }}
           >
             {rightPaneContent}
