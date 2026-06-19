@@ -26,6 +26,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import {
   LayoutDashboard,
   ScrollText,
@@ -42,8 +43,30 @@ import { StressTestBucket } from './buckets/StressTestBucket';
 import { HistoricalAnalogsBucket } from './buckets/HistoricalAnalogsBucket';
 import { CounterfactualsBucket } from './buckets/CounterfactualsBucket';
 import { ProvenanceBucket } from './buckets/ProvenanceBucket';
-import { DecisionNetworkPanel } from './DecisionNetworkPanel';
 import { DeliverablePageNav, type DeliverablePage } from './DeliverablePageNav';
+
+// Lazy: the graph panel pulls in the reagraph WebGL canvas + the 143-case
+// library, so defer it to graph-tab open rather than every doc view.
+const DecisionNetworkPanel = dynamic(
+  () => import('./DecisionNetworkPanel').then(m => ({ default: m.DecisionNetworkPanel })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          minHeight: 320,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--text-muted)',
+          fontSize: 13,
+        }}
+      >
+        Loading the decision network…
+      </div>
+    ),
+  }
+);
 
 export type DeliverableViewMode = 'demo' | 'executive' | 'analyst';
 
