@@ -24,8 +24,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { LivePipelineGraph, PIPELINE_NODE_LABELS } from '@/components/ui/LivePipelineGraph';
-import { findPipelineLabel } from '@/components/ui/AnalysisProgressBar';
+import { LivePipelineFlow } from '@/components/analysis/LivePipelineFlow';
 
 export interface StepStatus {
   name: string;
@@ -74,29 +73,6 @@ export function AnalysisShell({
 }: AnalysisShellProps) {
   const currentStep = steps.find(s => s.status === 'running');
   const completedCount = steps.filter(s => s.status === 'complete').length;
-
-  // Derive node-label states from the current steps so the LivePipelineGraph
-  // below renders the moat visual instead of a generic pip row. Any step
-  // label that doesn't map onto a canonical pipeline node is skipped; the
-  // fallback aliases live in AnalysisProgressBar.STEP_TO_LABEL so the
-  // short ANALYSIS_STEPS names still resolve.
-  const nodeStates: Record<string, 'pending' | 'running' | 'complete'> = Object.fromEntries(
-    PIPELINE_NODE_LABELS.map(l => [l, 'pending' as const])
-  );
-  for (const step of steps) {
-    if (step.status === 'pending') continue;
-    const label = findPipelineLabel(step.name);
-    if (!label) continue;
-    // "complete" wins over "running" wins over "pending" for the same label
-    // (useful when multiple ANALYSIS_STEPS share a pipeline node).
-    const current = nodeStates[label];
-    const incoming: 'pending' | 'running' | 'complete' =
-      step.status === 'error' ? 'pending' : step.status;
-    if (incoming === 'complete' || current !== 'complete') {
-      if (incoming === 'running' && current === 'complete') continue;
-      nodeStates[label] = incoming;
-    }
-  }
 
   return (
     <div
@@ -270,24 +246,18 @@ export function AnalysisShell({
           </div>
         </motion.div>
 
-        {/* Pipeline viz — same 10-node graph the AnalysisProgressFloat
-            shows in its expanded state, embedded inline so the moat is
-            visible on every upload, not just in the floating notification. */}
+        {/* Pipeline viz — the canonical 12-node flow (mirrors /how-it-works),
+            driven by the stream's progress so it always advances correctly.
+            Same component the AnalysisProgressFloat shows when expanded. */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'center',
             marginBottom: 28,
-            maxWidth: 640,
+            maxWidth: 760,
             marginLeft: 'auto',
             marginRight: 'auto',
           }}
         >
-          <LivePipelineGraph
-            nodeStates={nodeStates}
-            progress={currentProgress}
-            biasCount={biasCount}
-          />
+          <LivePipelineFlow progress={currentProgress} biasCount={biasCount} />
         </div>
 
         {/* Progress bar */}

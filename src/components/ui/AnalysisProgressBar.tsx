@@ -11,7 +11,8 @@ import {
 } from 'react';
 import { Loader2, CheckCircle, X, FileText, ChevronUp, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { LivePipelineGraph, PIPELINE_NODE_LABELS } from './LivePipelineGraph';
+import { PIPELINE_NODE_LABELS } from './LivePipelineGraph';
+import { LivePipelineFlow } from '@/components/analysis/LivePipelineFlow';
 
 // ---------------------------------------------------------------------------
 // Types & Context
@@ -321,12 +322,7 @@ export function AnalysisProgressFloat() {
       ? 'var(--error)'
       : 'var(--accent-primary)';
 
-  const panelWidth = 'min(640px, 90vw)';
-
-  // When complete, mark all nodes complete
-  const nodeStates = isComplete
-    ? Object.fromEntries(PIPELINE_NODE_LABELS.map(l => [l, 'complete' as const]))
-    : activeAnalysis.nodeStates || {};
+  const panelWidth = 'min(720px, 92vw)';
 
   return (
     <div
@@ -342,10 +338,9 @@ export function AnalysisProgressFloat() {
         width: expanded && isAnalyzing ? panelWidth : undefined,
         minWidth: expanded && isAnalyzing ? undefined : '360px',
         maxWidth: expanded && isAnalyzing ? undefined : '480px',
-        background: 'rgba(5, 5, 5, 0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        background: 'var(--bg-card)',
         border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-lg)',
         borderRadius: 12,
         padding: '12px 16px',
         overflow: 'hidden',
@@ -423,8 +418,7 @@ export function AnalysisProgressFloat() {
 
       {/* Expanded pipeline graph */}
       {expanded && isAnalyzing ? (
-        <LivePipelineGraph
-          nodeStates={nodeStates}
+        <LivePipelineFlow
           progress={activeAnalysis.progress}
           biasCount={activeAnalysis.biasCount}
           noiseScore={activeAnalysis.noiseScore ?? undefined}
