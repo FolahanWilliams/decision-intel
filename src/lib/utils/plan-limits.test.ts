@@ -44,6 +44,8 @@ import {
   checkTeamSizeLimit,
   reserveAnalysisSlot,
   releaseAnalysisSlot,
+  effectiveUploadMaxMB,
+  STORAGE_MAX_UPLOAD_MB,
 } from './plan-limits';
 import { PLANS } from '@/lib/stripe';
 
@@ -236,5 +238,33 @@ describe('releaseAnalysisSlot', () => {
   it('swallows a missing-row delete (already swept by TTL) without throwing', async () => {
     resvDelete.mockRejectedValue(new Error('not found'));
     await expect(releaseAnalysisSlot('res-x')).resolves.toBeUndefined();
+  });
+});
+
+describe('effectiveUploadMaxMB', () => {
+  // The storage ceiling (commit e22893f, 2026-06-20) clamps every plan's
+  // upload cap to the real Supabase Storage limit. The effective cap must
+  // be min(plan cap, STORAGE_MAX_UPLOAD_MB) for every plan — so a 51-500MB
+  // file can't pass the plan gate then fail at the storage layer.
+  const PLAN_KEYS = ['free', 'pro', 'team', 'enterprise'] as const;
+
+  it('returns min(plan cap, storage ceiling) for every plan', () => {
+    for (const plan of PLAN_KEYS) {
+      expect(effectiveUploadMaxMB(plan)).toBe(
+        Math.min(PLANS[plan].maxUploadMB, STORAGE_MAX_UPLOAD_MB)
+      );
+    }
+  });
+
+  it('never exceeds the storage ceiling', () => {
+    for (const plan of PLAN_KEYS) {
+      expect(effectiveUploadMaxMB(plan)).toBeLessThanOrEqual(STORAGE_MAX_UPLOAD_MB);
+    }
+  });
+
+  it('never exceeds a plan above its own plan cap', () => {
+    for (const plan of PLAN_KEYS) {
+      expect(effectiveUploadMaxMB(plan)).toBeLessThanOrEqual(PLANS[plan].maxUploadMB);
+    }
   });
 });

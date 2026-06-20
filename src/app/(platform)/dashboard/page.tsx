@@ -1641,7 +1641,7 @@ export default function Dashboard() {
                         </p>
                         <Select
                           value={selectedDocType || undefined}
-                          onValueChange={setSelectedDocType}
+                          onValueChange={value => setSelectedDocType(value ?? '')}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select type…" />
@@ -1664,7 +1664,7 @@ export default function Dashboard() {
                         </label>
                         <Select
                           value={selectedDealId || undefined}
-                          onValueChange={setSelectedDealId}
+                          onValueChange={value => setSelectedDealId(value ?? '')}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a decision…" />
