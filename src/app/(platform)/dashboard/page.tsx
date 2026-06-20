@@ -80,6 +80,7 @@ import { AmbientSignalBanner } from '@/components/dashboard/AmbientSignalBanner'
 import { RippleAlertBanner } from '@/components/dashboard/RippleAlertBanner';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
+import { createClient as createSupabaseBrowserClient } from '@/utils/supabase/client';
 
 const log = createClientLogger('Dashboard');
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
@@ -171,6 +172,116 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
     if (err.message.length > 10 && err.message.length < 200) return err.message;
   }
   return 'An unexpected error occurred during document analysis.';
+}
+
+type UploadMeta = { documentType?: string; containerId?: string; frameId?: string };
+type UploadResult = { id: string; filename: string; cached?: boolean };
+
+// Files at/under this go through the normal multipart POST (has byte-level
+// progress). Larger files MUST bypass it: Vercel serverless functions reject a
+// request body over ~4.5MB at the edge before the function runs (no log, no
+// row — the "upload bar appeared then nothing happened" bug). 4MB leaves margin.
+const DIRECT_POST_MAX_BYTES = 4 * 1024 * 1024;
+
+/** Small files: standard multipart POST to /api/upload (with upload progress). */
+async function uploadSmallViaPost(
+  file: File,
+  meta: UploadMeta,
+  onProgress: (pct: number) => void
+): Promise<UploadResult> {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (meta.frameId) formData.append('frameId', meta.frameId);
+  if (meta.documentType) formData.append('documentType', meta.documentType);
+  if (meta.containerId) formData.append('containerId', meta.containerId);
+
+  return new Promise<UploadResult>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload');
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          resolve(JSON.parse(xhr.responseText));
+        } catch {
+          reject(new Error('Invalid server response'));
+        }
+      } else {
+        let errorMessage: string | undefined;
+        try {
+          errorMessage = JSON.parse(xhr.responseText).error;
+        } catch {
+          /* use status-based message */
+        }
+        const fakeRes = { status: xhr.status } as Response;
+        reject(new Error(errorMessage || getDetailedErrorMessage(null, fakeRes)));
+      }
+    };
+    xhr.onerror = () => reject(new TypeError('Failed to fetch'));
+    xhr.send(formData);
+  });
+}
+
+/**
+ * Large files: upload the bytes DIRECTLY to Supabase Storage via a signed URL
+ * (browser → Supabase, never through a Vercel function body), then finalize
+ * server-side. This is the only path that works for real CIMs / S-1s / board
+ * decks over ~4.5MB.
+ */
+async function uploadLargeViaStorage(
+  file: File,
+  meta: UploadMeta,
+  onProgress: (pct: number) => void
+): Promise<UploadResult> {
+  onProgress(5);
+  // 1) Tiny JSON request for a signed Storage upload URL.
+  const signRes = await fetch('/api/upload/create-signed-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filename: file.name,
+      fileType: file.type || 'application/octet-stream',
+      fileSize: file.size,
+      documentType: meta.documentType ?? null,
+      containerId: meta.containerId ?? null,
+    }),
+  });
+  const signData = await signRes.json().catch(() => null);
+  if (!signRes.ok || !signData?.documentId || !signData?.path || !signData?.token) {
+    throw new Error(signData?.error || `Could not start the upload (${signRes.status}).`);
+  }
+  onProgress(15);
+
+  // 2) Upload straight to Supabase Storage — bypasses the Vercel body limit.
+  const supabase = createSupabaseBrowserClient();
+  const { error: upErr } = await supabase.storage
+    .from(signData.bucket)
+    .uploadToSignedUrl(signData.path, signData.token, file, {
+      contentType: file.type || undefined,
+    });
+  if (upErr) {
+    throw new Error(`Direct upload to storage failed: ${upErr.message}`);
+  }
+  onProgress(75);
+
+  // 3) Finalize: server downloads from Storage, parses, persists.
+  const finRes = await fetch('/api/upload/finalize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      documentId: signData.documentId,
+      containerId: meta.containerId ?? null,
+      frameId: meta.frameId ?? null,
+    }),
+  });
+  const finData = await finRes.json().catch(() => null);
+  if (!finRes.ok || !finData?.id) {
+    throw new Error(finData?.error || `Could not finish processing the upload (${finRes.status}).`);
+  }
+  onProgress(100);
+  return { id: finData.id, filename: finData.filename, cached: finData.cached };
 }
 
 const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
@@ -716,56 +827,21 @@ export default function Dashboard() {
     const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
 
     try {
-      // Upload file with XHR for progress tracking
-      const formData = new FormData();
-      formData.append('file', file);
-      if (activeFrameId) {
-        formData.append('frameId', activeFrameId);
-      }
-      if (selectedDocType) {
-        formData.append('documentType', selectedDocType);
-      }
-      if (selectedDealId) {
-        // The upload route reads `containerId` (DecisionContainer) — `dealId`
+      // Acquire the uploaded document. Small files use the standard multipart
+      // POST (byte-level progress). Large files (> Vercel's ~4.5MB serverless
+      // body limit, which silently rejects them at the edge) upload directly to
+      // Supabase Storage then finalize server-side. Both yield { id, filename, cached? }.
+      const uploadMeta: UploadMeta = {
+        documentType: selectedDocType || undefined,
+        // The upload route reads `containerId` (DecisionContainer); `dealId`
         // is only its legacy fallback alias.
-        formData.append('containerId', selectedDealId);
-      }
-
-      const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>(
-        (resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/upload');
-
-          xhr.upload.onprogress = e => {
-            if (e.lengthComputable) {
-              setUploadProgress(Math.round((e.loaded / e.total) * 100));
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                resolve(JSON.parse(xhr.responseText));
-              } catch {
-                reject(new Error('Invalid server response'));
-              }
-            } else {
-              let errorMessage: string | undefined;
-              try {
-                const data = JSON.parse(xhr.responseText);
-                errorMessage = data.error;
-              } catch {
-                /* use status-based message */
-              }
-              const fakeRes = { status: xhr.status } as Response;
-              reject(new Error(errorMessage || getDetailedErrorMessage(null, fakeRes)));
-            }
-          };
-
-          xhr.onerror = () => reject(new TypeError('Failed to fetch'));
-          xhr.send(formData);
-        }
-      );
+        containerId: selectedDealId || undefined,
+        frameId: activeFrameId || undefined,
+      };
+      const uploadData =
+        file.size > DIRECT_POST_MAX_BYTES
+          ? await uploadLargeViaStorage(file, uploadMeta, setUploadProgress)
+          : await uploadSmallViaPost(file, uploadMeta, setUploadProgress);
 
       setUploadPhase('analyzing');
       // Don't reset progress to 0 — the analysis stream will drive progress from here

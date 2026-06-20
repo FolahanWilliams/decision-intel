@@ -307,7 +307,11 @@ const SCAN_DIR = join(ROOT, 'src');
 // 238 → 239 (Reality-protocol synthesis · 2026-06-15): +1 canonical res.json()
 //     body-parse in RealityProtocolTab.tsx runSynthesis — null surfaces the
 //     synthError; the synthesis route never writes, so nothing is swallowed.
-const SILENT_CATCH_BASELINE = 239;
+// 241 (2026-06-20 — large-file direct-to-storage upload): +2 canonical
+//     res.json().catch(() => null) body-parse class in the dashboard's
+//     uploadLargeViaStorage (create-signed-url + finalize responses) — each
+//     surfaces the API's error before throwing, nothing swallowed.
+const SILENT_CATCH_BASELINE = 241;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
