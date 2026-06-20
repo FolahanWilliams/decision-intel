@@ -146,8 +146,7 @@ const PRINCIPLES: PrincipleRow[] = [
     icon: Fingerprint,
     name: 'Fairness',
     definition: 'The AI system mitigates unintended discrimination across groups.',
-    mechanism:
-      'The 30+ cognitive-bias taxonomy covers multiple fairness-relevant biases (authority bias, in-group favouritism, halo effect, availability bias). Cross-framework regulatory mapping includes GDPR Article 22 (non-discrimination on automated decisions) and the EU AI Act\u2019s high-risk fairness provisions. Recalibration learns per-org failure patterns so fairness is auditable per customer.',
+    mechanism: `The ${BIAS_COUNT}-bias cognitive taxonomy covers multiple fairness-relevant biases (authority bias, in-group favouritism, halo effect, availability bias). Cross-framework regulatory mapping includes GDPR Article 22 (non-discrimination on automated decisions) and the EU AI Act\u2019s high-risk fairness provisions. Recalibration learns per-org failure patterns so fairness is auditable per customer.`,
     dprFields: ['Academic citations', 'Regulatory mapping (GDPR Art 22, EU AI Act)'],
   },
   {

@@ -227,7 +227,7 @@ export default function DecisionIntelForBoardsPage() {
           Decision Intel is the reasoning audit platform. It sits between the strategy team drafting
           a memo and the committee that will vote on it. Most tools audit your data; we audit the
           reasoning &mdash; and catch the fatal blind spots before the committee does. In roughly
-          sixty seconds, it scores thirty-plus cognitive biases, predicts the questions the CEO or
+          sixty seconds, it scores twenty-two cognitive biases, predicts the questions the CEO or
           board chair is most likely to ask, simulates five role-primed committee personas against
           the memo, and attaches every decision to a Decision Knowledge Graph that compounds over
           time.

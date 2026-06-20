@@ -497,8 +497,8 @@ export function HowItWorksClient() {
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <SectionHeader
             eyebrow="Bias detection"
-            title="Thirty-plus cognitive biases. Every detection citable."
-            body="Our taxonomy is published openly at /taxonomy (DI-B-001 onward, growing as the Kahneman-Klein paper-application sprint lands new detectors), extended with eleven strategy-specific biases drawn from Stanford VC and PE decision research. Every detection comes back with an excerpt, a severity, and a confidence score."
+            title={`${BIAS_COUNT} cognitive biases. Every detection citable.`}
+            body="Our taxonomy is published openly at /taxonomy (DI-B-001 onward, growing as the Kahneman-Klein paper-application sprint lands new detectors). Every detection comes back with an excerpt, a severity, and a confidence score."
           />
 
           <div
@@ -669,7 +669,7 @@ export function HowItWorksClient() {
           <SectionHeader
             eyebrow="Decision Quality Index"
             title="A FICO score for decisions. Zero to a hundred, A through F."
-            body="The final DQI is a weighted composite across six components. The weights are fixed and transparent; the scores inside each component are computed deterministically from the earlier pipeline outputs. Same inputs always produce the same DQI."
+            body="The final DQI is a weighted composite across seven components. The weights are fixed and transparent; the scores inside each component are computed deterministically from the earlier pipeline outputs. Same inputs always produce the same DQI."
           />
           <DqiComponentBars />
 
