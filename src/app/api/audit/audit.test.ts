@@ -115,10 +115,42 @@ describe('GET /api/audit', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 400 when export param is not csv', async () => {
+  it('returns the JSON logs list when export param is not csv', async () => {
+    // The inline "Recent Activity" card (AuditLogInline) reads this JSON path.
+    // It previously 400'd, so the card silently fell back to empty forever.
+    mockFindMany.mockResolvedValue([
+      {
+        id: 'log1',
+        action: 'VIEW_DOCUMENT',
+        resource: 'Document',
+        details: null,
+        createdAt: new Date('2026-01-15T10:00:00Z'),
+      },
+    ]);
+
     const req = new NextRequest('http://localhost/api/audit?export=json');
     const res = await GET(req);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(Array.isArray(body.logs)).toBe(true);
+    expect(body.logs).toHaveLength(1);
+    expect(body.logs[0].action).toBe('VIEW_DOCUMENT');
+  });
+
+  it('returns the JSON logs list for the inline card (no export param, ?limit=15)', async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    const req = new NextRequest('http://localhost/api/audit?limit=15');
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.logs).toEqual([]);
+    // limit is parsed + clamped into [1, 100]; the inline card passes 15.
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId: 'user_123' }, take: 15 })
+    );
   });
 
   it('returns CSV with correct headers', async () => {
