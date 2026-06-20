@@ -57,6 +57,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import useSWR from 'swr';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -172,6 +181,13 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
     if (err.message.length > 10 && err.message.length < 200) return err.message;
   }
   return 'An unexpected error occurred during document analysis.';
+}
+
+/** Human-readable file size — MB for ≥1MB (so a 5MB file isn't "5318.4 KB"). */
+function formatFileSize(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${bytes} B`;
 }
 
 type UploadMeta = { documentType?: string; containerId?: string; frameId?: string };
@@ -1508,7 +1524,7 @@ export default function Dashboard() {
                 }
               }}
             >
-              <DialogContent className="sm:max-w-md" showCloseButton>
+              <DialogContent className="sm:max-w-[520px]" showCloseButton>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2 text-base">
                     <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
@@ -1520,14 +1536,14 @@ export default function Dashboard() {
                 </DialogHeader>
 
                 {pendingFile && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                     {/* File preview */}
                     <div
                       className="flex items-center gap-md"
                       style={{
-                        padding: 'var(--spacing-md)',
+                        padding: 14,
                         background: 'var(--bg-card)',
-                        borderRadius: 8,
+                        borderRadius: 12,
                         border: '1px solid var(--border-color)',
                       }}
                     >
@@ -1558,7 +1574,7 @@ export default function Dashboard() {
                           {pendingFile.name}
                         </p>
                         <p className="text-xs text-muted">
-                          {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
+                          {formatFileSize(pendingFile.size)} ·{' '}
                           {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
                         </p>
                       </div>
@@ -1573,10 +1589,10 @@ export default function Dashboard() {
                             fontSize: 12,
                             color: 'var(--text-muted)',
                             lineHeight: 1.5,
-                            padding: '8px 12px',
+                            padding: '12px 14px',
                             background: 'rgba(22, 163, 74, 0.06)',
                             border: '1px solid rgba(22, 163, 74, 0.18)',
-                            borderRadius: 8,
+                            borderRadius: 12,
                           }}
                         >
                           Looks like a {preview.docTypeLabel} — we&apos;ll check for{' '}
@@ -1605,7 +1621,7 @@ export default function Dashboard() {
                     })()}
 
                     {/* Document type + Deal selectors — stacked for clarity */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                       <div>
                         <label
                           className="text-xs text-secondary font-medium"
@@ -1623,27 +1639,21 @@ export default function Dashboard() {
                           Pick the type and we zero in on what matters most for it. Skip it and we
                           infer from your file.
                         </p>
-                        <select
-                          value={selectedDocType}
-                          onChange={e => setSelectedDocType(e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '8px 10px',
-                            background: 'var(--bg-card)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 8,
-                            color: 'var(--text-primary)',
-                            fontSize: 13,
-                            outline: 'none',
-                          }}
+                        <Select
+                          value={selectedDocType || undefined}
+                          onValueChange={setSelectedDocType}
                         >
-                          <option value="">Select type...</option>
-                          {DOCUMENT_TYPES.map(t => (
-                            <option key={t.value} value={t.value}>
-                              {t.label}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select type…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {DOCUMENT_TYPES.map(t => (
+                              <SelectItem key={t.value} value={t.value}>
+                                {t.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div style={{ display: dealsList.length > 0 ? 'block' : 'none' }}>
                         <label
@@ -1652,60 +1662,58 @@ export default function Dashboard() {
                         >
                           Link to a decision <span className="text-muted">(optional)</span>
                         </label>
-                        <select
-                          value={selectedDealId}
-                          onChange={e => setSelectedDealId(e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '8px 10px',
-                            background: 'var(--bg-card)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 8,
-                            color: 'var(--text-primary)',
-                            fontSize: 13,
-                            outline: 'none',
-                          }}
+                        <Select
+                          value={selectedDealId || undefined}
+                          onValueChange={setSelectedDealId}
                         >
-                          <option value="">Select a decision...</option>
-                          {(() => {
-                            // Sort by updatedAt desc (proxy for "recently used");
-                            // pin top 3 at the top under a "Recent" optgroup, render
-                            // the rest alphabetically below so a CSO with 40+ deals
-                            // still finds the one they touched yesterday in one click.
-                            const byRecency = [...dealsList].sort((a, b) => {
-                              const aT = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-                              const bT = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-                              return bT - aT;
-                            });
-                            const recent = byRecency.slice(0, 3);
-                            const recentIds = new Set(recent.map(d => d.id));
-                            const rest = [...dealsList]
-                              .filter(d => !recentIds.has(d.id))
-                              .sort((a, b) => a.name.localeCompare(b.name));
-                            return (
-                              <>
-                                {recent.length > 0 && (
-                                  <optgroup label="Recent">
-                                    {recent.map(d => (
-                                      <option key={d.id} value={d.id}>
-                                        {d.name}
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                )}
-                                {rest.length > 0 && (
-                                  <optgroup label={recent.length > 0 ? 'All decisions' : undefined}>
-                                    {rest.map(d => (
-                                      <option key={d.id} value={d.id}>
-                                        {d.name}
-                                      </option>
-                                    ))}
-                                  </optgroup>
-                                )}
-                              </>
-                            );
-                          })()}
-                        </select>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a decision…" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(() => {
+                              // Sort by updatedAt desc (proxy for "recently used");
+                              // pin top 3 under a "Recent" group, render the rest
+                              // alphabetically below so a CSO with 40+ deals still
+                              // finds the one they touched yesterday in one click.
+                              const byRecency = [...dealsList].sort((a, b) => {
+                                const aT = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+                                const bT = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+                                return bT - aT;
+                              });
+                              const recent = byRecency.slice(0, 3);
+                              const recentIds = new Set(recent.map(d => d.id));
+                              const rest = [...dealsList]
+                                .filter(d => !recentIds.has(d.id))
+                                .sort((a, b) => a.name.localeCompare(b.name));
+                              return (
+                                <>
+                                  {recent.length > 0 && (
+                                    <SelectGroup>
+                                      <SelectLabel>Recent</SelectLabel>
+                                      {recent.map(d => (
+                                        <SelectItem key={d.id} value={d.id}>
+                                          {d.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectGroup>
+                                  )}
+                                  {rest.length > 0 && (
+                                    <SelectGroup>
+                                      {recent.length > 0 && (
+                                        <SelectLabel>All decisions</SelectLabel>
+                                      )}
+                                      {rest.map(d => (
+                                        <SelectItem key={d.id} value={d.id}>
+                                          {d.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectGroup>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
 
