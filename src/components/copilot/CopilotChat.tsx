@@ -142,7 +142,7 @@ export function CopilotChat({
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-5">
         {messages.length === 0 && (
           <div
             className="flex h-full items-center justify-center"
@@ -160,17 +160,19 @@ export function CopilotChat({
           return (
             <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
               <div
-                className="max-w-[80%] rounded-lg px-4 py-3"
+                className="max-w-[82%] rounded-2xl px-4 py-3"
                 style={
                   isUser
                     ? {
                         background: 'var(--accent-primary)',
                         color: 'white',
+                        borderBottomRightRadius: 6,
                       }
                     : {
                         background: 'var(--bg-elevated)',
                         color: 'var(--text-primary)',
                         border: '1px solid var(--border-color)',
+                        borderBottomLeftRadius: 6,
                       }
                 }
               >
@@ -179,7 +181,7 @@ export function CopilotChat({
                     <AgentBadge agentType={msg.agentType} />
                   </div>
                 )}
-                <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
+                <div className="copilot-md text-sm leading-relaxed">
                   {msg.role === 'agent' ? (
                     // rehype-sanitize: msg.content is LLM output (prompt-injectable).
                     // react-markdown v10 strips raw HTML by default; pinning the

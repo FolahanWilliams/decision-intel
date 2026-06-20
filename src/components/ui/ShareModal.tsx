@@ -323,13 +323,17 @@ export function ShareModal({
       }}
     >
       <DialogContent
-        className="card liquid-glass-premium w-full sm:max-w-md"
-        style={{ maxHeight: '85vh', overflowY: 'auto' }}
+        className="card liquid-glass-premium w-full sm:max-w-[560px]"
+        style={{ maxHeight: '88vh', overflowY: 'auto' }}
         showCloseButton
       >
         <DialogHeader>
-          <DialogTitle style={{ fontSize: '15px', fontWeight: 600 }}>Share & Export</DialogTitle>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>{documentName}</p>
+          <DialogTitle style={{ fontSize: '16px', fontWeight: 600 }}>
+            Share &amp; Export
+          </DialogTitle>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+            {documentName}
+          </p>
         </DialogHeader>
 
         {/* Tabs */}
@@ -337,6 +341,7 @@ export function ShareModal({
           className="flex"
           style={{
             borderBottom: '1px solid var(--border-color)',
+            marginTop: 4,
           }}
         >
           {(['export', 'share', 'manage'] as const).map(tab => (
@@ -362,14 +367,14 @@ export function ShareModal({
           ))}
         </div>
 
-        <div>
+        <div style={{ paddingTop: 16 }}>
           {/* Export Tab */}
           {activeTab === 'export' && (
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '8px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '12px',
               }}
             >
               {onExportBoardReport && (
@@ -451,9 +456,13 @@ export function ShareModal({
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>
                     Decision Provenance Record
                   </span>
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                    Signed + hashed record for your GC — fingerprints, model lineage, citations,
-                    regulatory mapping (EU AI Act Art 14, SEC, Basel III)
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+                    The procurement-grade record your General Counsel hands the audit committee.
+                    Hashed + tamper-evident, with cryptographic integrity fingerprints, the model
+                    lineage and prompt fingerprint behind the score, academic citations for every
+                    finding, and a 19-framework regulatory crosswalk (EU AI Act Art&nbsp;14, SEC AI
+                    disclosure, Basel&nbsp;III ICAAP, NDPR/CBN/WAEMU). The evidence trail that
+                    proves the reasoning was audited before the capital went out.
                   </span>
                 </Button>
               )}
@@ -469,8 +478,9 @@ export function ShareModal({
                   <FileText size={24} style={{ color: 'var(--error)' }} />
                 )}
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>Full PDF Report</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                  Every section, every bias
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                  Your working copy — every flagged bias with its memo excerpt, the DQI breakdown,
+                  stress-test verdicts, and counterfactuals
                 </span>
               </Button>
 

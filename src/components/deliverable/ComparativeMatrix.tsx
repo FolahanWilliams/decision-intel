@@ -59,6 +59,12 @@ export function ComparativeMatrix({
   const rowPadding = density === 'dense' ? '8px 12px' : '14px 16px';
   const fontSize = density === 'dense' ? 12.5 : 13.5;
 
+  // Grid template — fixed columns keep their width, flexible columns floor at
+  // a readable min via minmax (never starve to one-char-per-line). The
+  // container query in globals.css stacks the whole row into a card before
+  // even the floor would be hit.
+  const cmCols = columns.map(col => col.width ?? 'minmax(0, 1fr)').join(' ');
+
   if (rows.length === 0) {
     return (
       <div
@@ -78,6 +84,7 @@ export function ComparativeMatrix({
 
   return (
     <div
+      className="cm-table"
       style={{
         background: 'var(--bg-card, #FFFFFF)',
         border: '1px solid var(--border-color, #E2E8F0)',
@@ -87,28 +94,23 @@ export function ComparativeMatrix({
     >
       {/* Header row */}
       <div
-        style={{
-          display: 'flex',
-          padding: rowPadding,
-          background: 'var(--bg-secondary, #F8FAFC)',
-          borderBottom: '1px solid var(--border-color, #E2E8F0)',
-          fontSize: 11,
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          color: 'var(--text-muted, #64748B)',
-        }}
+        className="cm-header"
+        style={
+          {
+            '--cm-cols': cmCols,
+            padding: rowPadding,
+            background: 'var(--bg-secondary, #F8FAFC)',
+            borderBottom: '1px solid var(--border-color, #E2E8F0)',
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--text-muted, #64748B)',
+          } as React.CSSProperties
+        }
       >
         {columns.map(col => (
-          <div
-            key={col.key}
-            style={{
-              flex: col.width ? `0 0 ${col.width}` : '1 1 0',
-              minWidth: 0,
-              textAlign: col.align ?? 'left',
-              padding: '0 4px',
-            }}
-          >
+          <div key={col.key} style={{ minWidth: 0, textAlign: col.align ?? 'left' }}>
             {col.label}
           </div>
         ))}
@@ -118,6 +120,7 @@ export function ComparativeMatrix({
       {rows.map((row, idx) => (
         <div
           key={row.id}
+          className="cm-row"
           onClick={row.onOpenDrawer}
           role={row.onOpenDrawer ? 'button' : undefined}
           tabIndex={row.onOpenDrawer ? 0 : undefined}
@@ -131,19 +134,21 @@ export function ComparativeMatrix({
                 }
               : undefined
           }
-          style={{
-            display: 'flex',
-            padding: rowPadding,
-            borderBottom:
-              idx === rows.length - 1 ? 'none' : '1px solid var(--border-color, #E2E8F0)',
-            fontSize,
-            color: 'var(--text-primary, #0F172A)',
-            cursor: row.onOpenDrawer ? 'pointer' : 'default',
-            transition: 'background 120ms',
-            borderLeft: row.severityColor
-              ? `3px solid ${row.severityColor}`
-              : '3px solid transparent',
-          }}
+          style={
+            {
+              '--cm-cols': cmCols,
+              padding: rowPadding,
+              borderBottom:
+                idx === rows.length - 1 ? 'none' : '1px solid var(--border-color, #E2E8F0)',
+              fontSize,
+              color: 'var(--text-primary, #0F172A)',
+              cursor: row.onOpenDrawer ? 'pointer' : 'default',
+              transition: 'background 120ms',
+              borderLeft: row.severityColor
+                ? `3px solid ${row.severityColor}`
+                : '3px solid transparent',
+            } as React.CSSProperties
+          }
           onMouseEnter={e => {
             if (row.onOpenDrawer) {
               e.currentTarget.style.background = 'var(--bg-secondary, #F8FAFC)';
@@ -175,14 +180,15 @@ export function ComparativeMatrix({
             <div
               key={col.key}
               style={{
-                flex: col.width ? `0 0 ${col.width}` : '1 1 0',
                 minWidth: 0,
                 textAlign: col.align ?? 'left',
-                padding: '0 4px',
                 lineHeight: 1.5,
-                wordBreak: 'break-word',
+                overflowWrap: 'anywhere',
               }}
             >
+              {/* Column label — hidden in table mode, shown when the row
+                  stacks into a card on a narrow container. */}
+              <span className="cm-cell-label">{col.label}</span>
               {row.cells[col.key] ?? '—'}
             </div>
           ))}

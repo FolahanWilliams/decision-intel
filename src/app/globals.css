@@ -3194,3 +3194,126 @@ tr:hover td {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ComparativeMatrix (deliverable Stress-Test + Historical-Analogs tables).
+   A grid-based table whose flexible long-text column ('Key concern' /
+   objection) never collapses to one-char-per-line: it STACKS into per-row
+   cards once the matrix's own container is narrow. Container-query based, so
+   it reflows by the card width, not the viewport — correct for a table that
+   lives in a variable-width analysis rail. */
+.cm-table {
+  container-type: inline-size;
+}
+.cm-header,
+.cm-row {
+  display: grid;
+  grid-template-columns: var(--cm-cols, 1fr);
+  column-gap: 14px;
+  align-items: start;
+}
+.cm-cell-label {
+  display: none;
+}
+@container (max-width: 720px) {
+  .cm-header {
+    display: none;
+  }
+  .cm-row {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+  .cm-cell-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+}
+
+/* Copilot / chat markdown — the AI's responses render via react-markdown.
+   The project has no @tailwindcss/typography plugin, so `prose` classes are
+   no-ops; this gives the markdown clean, consistent spacing inside a chat
+   bubble (headings, paragraphs, lists, code, quotes) so messages don't render
+   squished with raw browser-default margins. */
+.copilot-md {
+  font-size: 14px;
+  line-height: 1.62;
+}
+.copilot-md > :first-child {
+  margin-top: 0;
+}
+.copilot-md > :last-child {
+  margin-bottom: 0;
+}
+.copilot-md p {
+  margin: 0 0 10px;
+}
+.copilot-md ul,
+.copilot-md ol {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.copilot-md li {
+  margin: 4px 0;
+}
+.copilot-md li > p {
+  margin: 0;
+}
+.copilot-md h1,
+.copilot-md h2,
+.copilot-md h3,
+.copilot-md h4 {
+  margin: 14px 0 6px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.copilot-md h1 {
+  font-size: 17px;
+}
+.copilot-md h2 {
+  font-size: 15.5px;
+}
+.copilot-md h3,
+.copilot-md h4 {
+  font-size: 14px;
+}
+.copilot-md strong {
+  font-weight: 700;
+}
+.copilot-md a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+}
+.copilot-md code {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.88em;
+  background: color-mix(in srgb, var(--text-muted) 14%, transparent);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.copilot-md pre {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.copilot-md pre code {
+  background: none;
+  padding: 0;
+}
+.copilot-md blockquote {
+  margin: 0 0 10px;
+  padding-left: 12px;
+  border-left: 3px solid var(--border-color);
+  color: var(--text-secondary);
+}
+.copilot-md hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 12px 0;
+}

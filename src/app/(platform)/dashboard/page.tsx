@@ -547,6 +547,31 @@ export default function Dashboard() {
     };
   }, [uploading]);
 
+  // Scroll the upload zone into view when the user picks "Analyze a document"
+  // from the NewDecisionModal — works whether they were already on /dashboard
+  // (custom event) or navigated here from elsewhere (sessionStorage flag).
+  useEffect(() => {
+    const focusUploadZone = () => {
+      const el = document.getElementById('upload-memo-zone');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    window.addEventListener('di-focus-upload-zone', focusUploadZone);
+    let raf = 0;
+    try {
+      if (sessionStorage.getItem('di-focus-upload-zone') === '1') {
+        sessionStorage.removeItem('di-focus-upload-zone');
+        // Defer until after first paint so the zone is laid out.
+        raf = window.setTimeout(focusUploadZone, 350);
+      }
+    } catch {
+      // sessionStorage blocked (private mode) — the custom-event path still works.
+    }
+    return () => {
+      window.removeEventListener('di-focus-upload-zone', focusUploadZone);
+      if (raf) window.clearTimeout(raf);
+    };
+  }, []);
+
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
     return uploadedDocs.filter(doc => {
@@ -1689,6 +1714,11 @@ export default function Dashboard() {
                   }}
                 />
               )}
+
+            {/* Scroll anchor — the "Analyze a document" action (NewDecisionModal)
+                scrolls here so the click always lands somewhere, even when the
+                user is already on /dashboard. */}
+            <div id="upload-memo-zone" aria-hidden style={{ scrollMarginTop: 84 }} />
 
             {/* Upload Zone - Enhanced with drag feedback */}
             <ErrorBoundary sectionName="Upload">

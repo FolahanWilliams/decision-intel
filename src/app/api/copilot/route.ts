@@ -119,13 +119,14 @@ export async function POST(request: NextRequest) {
         content: t.content,
       }));
     } else {
-      // Create new session
-      if (!decisionPrompt || typeof decisionPrompt !== 'string') {
-        return NextResponse.json(
-          { error: 'decisionPrompt is required for new sessions' },
-          { status: 400 }
-        );
-      }
+      // Create new session. A framed decisionPrompt is OPTIONAL — when the
+      // user just asks a question ("How do I run a retroactive audit?"), the
+      // Copilot works as free-form Q&A: the first message becomes the session
+      // prompt + title. No "frame a decision first" gate.
+      const effectivePrompt =
+        decisionPrompt && typeof decisionPrompt === 'string' && decisionPrompt.trim()
+          ? decisionPrompt.trim()
+          : message.trim();
 
       // Look up org membership
       let orgId: string | null = null;
@@ -143,8 +144,8 @@ export async function POST(request: NextRequest) {
         data: {
           userId,
           orgId,
-          decisionPrompt,
-          title: decisionPrompt.slice(0, 100),
+          decisionPrompt: effectivePrompt,
+          title: effectivePrompt.slice(0, 100),
         },
         select: { id: true, decisionPrompt: true, orgId: true },
       });

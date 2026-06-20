@@ -101,6 +101,22 @@ export function NewDecisionModal() {
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
+                  if (opt.key === 'analyze') {
+                    // The upload zone lives on /dashboard. If we're already
+                    // there, router.push is a no-op — so scroll to it instead;
+                    // otherwise navigate and let the dashboard scroll on mount.
+                    if (window.location.pathname === '/dashboard') {
+                      window.dispatchEvent(new CustomEvent('di-focus-upload-zone'));
+                    } else {
+                      try {
+                        sessionStorage.setItem('di-focus-upload-zone', '1');
+                      } catch {
+                        // private mode — navigation alone still lands them on the zone
+                      }
+                      router.push('/dashboard');
+                    }
+                    return;
+                  }
                   router.push(opt.href);
                 }}
                 style={{

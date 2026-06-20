@@ -1004,6 +1004,17 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
           documentName={document.filename}
           analysisData={{ score: analysis.overallScore, biases: analysis.biases }}
           onExportPdf={() => handleExportPdf(document, analysis, showToast)}
+          onExportProvenanceRecord={async () => {
+            // The flagship procurement artifact — hashed + tamper-evident DPR.
+            // The server endpoint gates by plan + audit-logs the export itself;
+            // it renders via headless Chromium. Opened synchronously to stay
+            // inside the click gesture (avoids pop-up blocking).
+            window.open(
+              `/api/documents/${document.id}/provenance-record?format=pdf`,
+              '_blank',
+              'noopener,noreferrer'
+            );
+          }}
           onExportCsv={() => handleExportCsv(document, analysis, showToast)}
           onExportMarkdown={() => handleExportMarkdown(document, analysis, biases)}
           onExportJson={() => handleExportJson(document, analysis, biases)}
