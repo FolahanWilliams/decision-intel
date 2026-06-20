@@ -169,7 +169,9 @@ export function VohraPMFSurveyModal() {
         else setOpen(value);
       }}
     >
-      <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto" showCloseButton>
+      {/* Height-cap + internal scroll come from the base DialogContent
+          (max-h-[90dvh] overflow-y-auto) so this is mobile-safe. */}
+      <DialogContent className="sm:max-w-[560px]" showCloseButton>
         <DialogHeader>
           <DialogTitle>Quick check-in: how is Decision Intel for you?</DialogTitle>
           <DialogDescription>
