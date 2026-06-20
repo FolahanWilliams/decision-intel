@@ -50,21 +50,26 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          // max-h-[90dvh] + overflow-y-auto make every modal mobile-safe: a
-          // modal taller than the screen caps to the viewport and scrolls
-          // internally instead of overflowing off-screen (which put the close
-          // button above the top edge with no way to reach it). `dvh` tracks the
-          // mobile browser's dynamic viewport (toolbars), so it's reliable on phones.
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl bg-background p-4 text-sm ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          // The OUTER box owns the boundary: a clean rounded shape, a visible
+          // border, and overflow-hidden so the rounded corners clip perfectly
+          // (no scrollbar squaring them off). It never scrolls itself — the
+          // inner wrapper does. max-h-[90dvh] keeps it on-screen on mobile;
+          // `dvh` tracks the browser's dynamic toolbars so it's reliable on phones.
+          'fixed top-1/2 left-1/2 z-50 flex max-h-[90dvh] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-border bg-background text-sm shadow-xl outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
           className
         )}
         {...props}
       >
-        {children}
+        {/* Inner wrapper holds the padding + does the scrolling, so the
+            scrollbar is inset from the rounded corners and the outer box stays
+            a clean card. min-h-0 lets it shrink + scroll inside the flex column. */}
+        <div className="grid min-h-0 gap-4 overflow-y-auto p-5">{children}</div>
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            render={<Button variant="ghost" className="absolute top-2 right-2" size="icon-sm" />}
+            render={
+              <Button variant="ghost" className="absolute top-2.5 right-2.5 z-10" size="icon-sm" />
+            }
           >
             <XIcon />
             <span className="sr-only">Close</span>
@@ -93,7 +98,10 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        '-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end',
+        // -mx-5/-mb-5 negate the inner wrapper's p-5 so the footer bleeds
+        // edge-to-edge (matching the rounded outer box); the outer overflow-hidden
+        // clips its bottom corners cleanly.
+        '-mx-5 -mb-5 flex flex-col-reverse gap-2 rounded-b-2xl border-t bg-muted/50 px-5 py-4 sm:flex-row sm:justify-end',
         className
       )}
       {...props}
