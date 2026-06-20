@@ -2,6 +2,11 @@ import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Self-host / single-tenant container builds set BUILD_STANDALONE=1 to emit a
+  // self-contained server bundle (.next/standalone) the Dockerfile runs. Vercel
+  // does NOT set this var, so the hosted build output is byte-identical and the
+  // fragile webpack memory envelope (see build-hang notes below) is untouched.
+  output: process.env.BUILD_STANDALONE === '1' ? 'standalone' : undefined,
   // TypeScript is validated in the build script via an explicit
   // `npx tsc --noEmit` invocation that runs BEFORE `next build`. Running
   // both the external tsc + Next.js's in-process type check stacks
