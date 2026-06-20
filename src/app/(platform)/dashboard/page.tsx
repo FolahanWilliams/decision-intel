@@ -47,7 +47,7 @@ import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
 import { InlinePasteMemoCard } from '@/components/dashboard/InlinePasteMemoCard';
 import { CsoDashboardRail } from '@/components/dashboard/CsoDashboardRail';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -236,6 +236,7 @@ export default function Dashboard() {
     return () => clearTimeout(handle);
   }, [error]);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const viewParam = searchParams.get('view');
   const initialView: DashboardView = viewParam === 'browse' ? 'browse' : 'upload';
   const [activeView, setActiveView] = useState<DashboardView>(initialView);
@@ -761,11 +762,15 @@ export default function Dashboard() {
       setUploadPhase('analyzing');
       // Don't reset progress to 0 — the analysis stream will drive progress from here
 
-      // If the server returned a cached result, skip streaming and
-      // directly revalidate the SWR cache so the existing document
-      // (with its completed analysis) appears immediately.
+      // If the server returned a cached result (same content hash — this exact
+      // document was already audited), skip streaming. Previously this was
+      // SILENT: the progress bar vanished and nothing visible happened, which
+      // reads as a broken upload. Now we tell the user + open the existing
+      // audit so the click always lands somewhere.
       if (uploadData.cached) {
         await mutateDocs(undefined, { revalidate: true });
+        showToast('You already audited this document — opening your existing audit.', 'info');
+        router.push(`/documents/${uploadData.id}`);
         return;
       }
 
@@ -837,6 +842,12 @@ export default function Dashboard() {
         // Always revalidate so the SWR cache picks up whatever state the
         // server left the document in (complete, error, or still analyzing).
         await mutateDocs(undefined, { revalidate: true });
+        // Don't leave the user staring at a vanished progress bar — the
+        // document was saved; point them to it.
+        showToast(
+          'The audit didn’t finish streaming — your document was saved. Open it to see the status or retry.',
+          'warning'
+        );
       }
     } catch (err) {
       log.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
