@@ -15,6 +15,24 @@ const log = createLogger('PlanLimits');
 export const ANALYSIS_RESERVATION_TTL_MS = 15 * 60 * 1000;
 
 /**
+ * Hard infrastructure ceiling on upload size, in MB — the Supabase project's
+ * Storage upload limit, which sits BELOW the higher plan caps until the project
+ * is upgraded. The plan `maxUploadMB` ladder (25 / 250 / 250 / 500) is the
+ * marketing/pricing intent; this is what the storage layer can ACTUALLY accept
+ * today, so the effective cap is the lower of the two.
+ *
+ * Currently 50 (Supabase free tier). When the project is upgraded (e.g. to Pro
+ * after the first paying customer), bump the `STORAGE_MAX_UPLOAD_MB` env var in
+ * Vercel (e.g. 500) and the cap + every "up to N MB" copy follows automatically.
+ */
+export const STORAGE_MAX_UPLOAD_MB = Number(process.env.STORAGE_MAX_UPLOAD_MB) || 50;
+
+/** Effective upload cap = the lower of the plan cap and the storage ceiling. */
+export function effectiveUploadMaxMB(plan: PlanType): number {
+  return Math.min(PLANS[plan].maxUploadMB, STORAGE_MAX_UPLOAD_MB);
+}
+
+/**
  * First instant of the current month in UTC. Quota windows MUST be UTC so the
  * month boundary doesn't drift on a non-UTC runtime (Vercel is UTC, but a
  * local-time `new Date()` + setDate/setHours would mis-count audits in the

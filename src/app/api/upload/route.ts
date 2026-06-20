@@ -14,7 +14,7 @@ import { logAudit } from '@/lib/audit';
 import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
 import { prewarmDocumentEmbedding } from '@/lib/rag/embeddings';
 import { INVESTMENT_DOCUMENT_TYPES } from '@/lib/prompts/investment-vertical';
-import { getUserPlan } from '@/lib/utils/plan-limits';
+import { getUserPlan, effectiveUploadMaxMB } from '@/lib/utils/plan-limits';
 import { PLANS } from '@/lib/stripe';
 
 const log = createLogger('UploadRoute');
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     // means model capacity is never the binding constraint; the
     // practical ceiling is Vercel Fluid Compute body size.
     const userPlan = await getUserPlan(userId);
-    const maxUploadMB = PLANS[userPlan].maxUploadMB;
+    const maxUploadMB = effectiveUploadMaxMB(userPlan);
     const MAX_FILE_SIZE = maxUploadMB * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       const sizeMb = (file.size / 1024 / 1024).toFixed(1);
@@ -118,9 +118,15 @@ export async function POST(request: NextRequest) {
           : userPlan === 'pro' || userPlan === 'team'
             ? 'Talk to sales at /pricing/quote for Enterprise 500MB uploads + signed-URL upload path for full data rooms.'
             : 'Talk to sales at /pricing/quote for a custom contract.';
+      // When the Supabase Storage ceiling is the binding constraint (below the
+      // plan cap), name it as the current cap rather than blaming the plan
+      // (an Enterprise user shouldn't read "Enterprise plan cap is 50MB").
+      const storageBound = maxUploadMB < PLANS[userPlan].maxUploadMB;
       return NextResponse.json(
         {
-          error: `File too large (${sizeMb}MB · ${planLabel} plan cap is ${maxUploadMB}MB). ${upgradeHint}`,
+          error: storageBound
+            ? `File too large (${sizeMb}MB · current upload cap is ${maxUploadMB}MB). Larger uploads are coming soon.`
+            : `File too large (${sizeMb}MB · ${planLabel} plan cap is ${maxUploadMB}MB). ${upgradeHint}`,
         },
         { status: 413 }
       );

@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PLANS, PlanType } from '@/lib/stripe';
 import { isAdminUserId } from '@/lib/utils/admin';
+import { effectiveUploadMaxMB } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 
@@ -107,9 +108,11 @@ export async function GET() {
         maxPages: limits.maxPages === Infinity ? -1 : limits.maxPages,
         biasTypes: limits.biasTypes,
         // Surfaced 2026-05-26 (soft-limit pass) so the dashboard
-        // upload-zone hints can show the user's actual plan cap
-        // ("up to 100 MB" on Individual) instead of a stale literal.
-        maxUploadMB: limits.maxUploadMB,
+        // upload-zone hints can show the user's actual cap. Effective cap =
+        // lower of the plan ladder and the Supabase Storage ceiling
+        // (STORAGE_MAX_UPLOAD_MB, currently 50MB) so the copy never promises
+        // more than the storage layer can accept.
+        maxUploadMB: effectiveUploadMaxMB(plan),
       },
     });
   } catch (error) {

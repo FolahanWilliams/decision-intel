@@ -6,8 +6,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
 import { INVESTMENT_DOCUMENT_TYPES } from '@/lib/prompts/investment-vertical';
-import { getUserPlan } from '@/lib/utils/plan-limits';
-import { PLANS } from '@/lib/stripe';
+import { getUserPlan, effectiveUploadMaxMB } from '@/lib/utils/plan-limits';
 
 const log = createLogger('UploadSignedUrl');
 
@@ -79,15 +78,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
     }
 
-    // Plan size cap (same ladder as the direct route).
+    // Effective upload cap = lower of the plan ladder and the Supabase Storage
+    // ceiling (same as the direct route).
     const userPlan = await getUserPlan(userId);
-    const maxUploadMB = PLANS[userPlan].maxUploadMB;
+    const maxUploadMB = effectiveUploadMaxMB(userPlan);
     if (fileSize > maxUploadMB * 1024 * 1024) {
       const sizeMb = (fileSize / 1024 / 1024).toFixed(1);
       return NextResponse.json(
-        {
-          error: `File too large (${sizeMb}MB · ${PLANS[userPlan].name} plan cap is ${maxUploadMB}MB).`,
-        },
+        { error: `File too large (${sizeMb}MB · current upload cap is ${maxUploadMB}MB).` },
         { status: 413 }
       );
     }
