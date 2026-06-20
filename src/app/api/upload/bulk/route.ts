@@ -233,9 +233,10 @@ async function processFilesAsync(
       // Generate content hash for deduplication
       const contentHash = createHash('sha256').update(content).digest('hex');
 
-      // Check for duplicate
-      const existing = await prisma.document.findUnique({
-        where: { contentHash },
+      // Check for duplicate — PER USER (dedup is per-account, not global, so
+      // one account holding a file never blocks another from uploading it).
+      const existing = await prisma.document.findFirst({
+        where: { contentHash, userId },
         select: { id: true, filename: true },
       });
 

@@ -52,7 +52,7 @@ model Document {
   uploadedAt            DateTime                    @default(now())
   status                String                      @default("pending")
   updatedAt             DateTime                    @updatedAt
-  contentHash           String?                     @unique
+  contentHash           String?
   orgId                 String?
   documentType          String? // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | qofe | synergy_model | integration_plan | other
   /// Type-aware structured parser output (locked 2026-05-09 — M&A cascade
@@ -128,6 +128,14 @@ model Document {
   @@index([parentDocumentId, versionNumber])
   @@index([deletionWarningSentAt])
   @@index([legalHoldId])
+  // Per-user content dedup (not global). The upload route dedups on
+  // { contentHash, userId }; a GLOBAL unique on contentHash meant one
+  // account holding a file (e.g. the WeWork sample on a test account)
+  // blocked every other account from uploading the same file — the
+  // insert collided and silently failed. Composite unique matches the
+  // dedup query. Applied to prod out-of-band 2026-06-20 (migration
+  // 20260620140000_document_per_user_content_hash).
+  @@unique([userId, contentHash])
 }
 
 /// Legal-hold register (2.1 deep). When a document is on hold the
