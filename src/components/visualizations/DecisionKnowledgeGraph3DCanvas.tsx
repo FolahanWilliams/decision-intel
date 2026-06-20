@@ -206,14 +206,25 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
   const [hoverNodeId, setHoverNodeId] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<string>('');
   const [hoverType, setHoverType] = useState<string>('');
+  // Rich hover detail (subtitle + one-line explanation + accent) when the node
+  // carries `data.detail` — lifts the tooltip from a bare "Label · TYPE" to the
+  // explanatory card the marketing hero graph shows. Falls back to label+type.
+  const [hoverDetail, setHoverDetail] = useState<{
+    subtitle?: string;
+    body?: string;
+    accent?: string;
+  } | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const handleNodePointerOver = useCallback(
     (node: InternalGraphNode) => {
       onNodePointerOver?.(node);
       setHoverNodeId(node.id);
       setHoverLabel((node.label as string) ?? node.id);
-      const t = (node.data as { type?: string } | undefined)?.type ?? '';
-      setHoverType(t);
+      const data = node.data as
+        | { type?: string; detail?: { subtitle?: string; body?: string; accent?: string } }
+        | undefined;
+      setHoverType(data?.type ?? '');
+      setHoverDetail(data?.detail ?? null);
     },
     [onNodePointerOver]
   );
@@ -221,6 +232,7 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
     (node: InternalGraphNode) => {
       onNodePointerOut?.(node);
       setHoverNodeId(null);
+      setHoverDetail(null);
     },
     [onNodePointerOut]
   );
@@ -376,7 +388,12 @@ const DecisionKnowledgeGraph3DCanvas = forwardRef<
       {hoverNodeId && !isRevealing && (
         <NodeHoverTooltip
           title={hoverLabel}
-          subtitle={hoverType ? hoverType.replace(/_/g, ' ').toUpperCase() : undefined}
+          subtitle={
+            hoverDetail?.subtitle ??
+            (hoverType ? hoverType.replace(/_/g, ' ').toUpperCase() : undefined)
+          }
+          body={hoverDetail?.body}
+          accent={hoverDetail?.accent}
           x={pointerPos.x}
           y={pointerPos.y}
         />

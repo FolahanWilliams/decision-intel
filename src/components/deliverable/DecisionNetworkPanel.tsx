@@ -74,17 +74,48 @@ const GRADE_COLOR: Record<string, string> = {
   F: '#b91c1c',
 };
 
+function severityLabel(s?: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Risk';
+}
+
+/** A one-line preview of a longer explanation, for the hover tooltip. */
+function hoverSnippet(text?: string, max = 150): string | undefined {
+  if (!text) return undefined;
+  const clean = text.trim().replace(/\s+/g, ' ');
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max);
+  const stop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+  if (stop > 70) return clean.slice(0, stop + 1);
+  const space = cut.lastIndexOf(' ');
+  return (space > 70 ? cut.slice(0, space) : cut) + '…';
+}
+
+/** Hover-tooltip payload carried on each node's `data.detail` — the canvas
+ *  reads this to render the explanatory card (parity with the hero graph). */
+interface NodeHoverDetail {
+  subtitle?: string;
+  body?: string;
+  accent?: string;
+}
+
 function buildDocumentGraph(
   findings: ReasoningRiskFinding[],
   dqi: SCQAExecutiveSummary['dqi']
 ): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const biasFindingByKey = new Map<string, ReasoningRiskFinding>();
+  for (const f of findings) if (f.kind === 'bias') biasFindingByKey.set(f.id, f);
+
+  const gradeColor = GRADE_COLOR[dqi.grade] ?? '#475569';
+  // The decision node's hover detail is finalised after we know the risk count;
+  // the node holds a reference to this object, so the later mutation is seen.
+  const decisionData: { type: string; detail?: NodeHoverDetail } = { type: 'analysis' };
   const nodes: GraphNode[] = [
     {
       id: 'decision',
       label: 'This decision',
-      fill: GRADE_COLOR[dqi.grade] ?? '#475569',
+      fill: gradeColor,
       size: 16,
-      data: { type: 'analysis' },
+      data: decisionData,
     } as GraphNode,
   ];
   const edges: GraphEdge[] = [];
@@ -93,12 +124,21 @@ function buildDocumentGraph(
   const ensureBiasNode = (key: string, label: string, severity: string) => {
     if (biasNodeIds.has(key)) return;
     biasNodeIds.add(key);
+    const f = biasFindingByKey.get(key);
+    const color = SEVERITY_COLOR[severity] ?? '#64748b';
+    const pct = f?.chip.pct;
+    const detail: NodeHoverDetail = {
+      subtitle: `${severityLabel(severity)} reasoning risk${pct != null ? ` · ${pct}% confidence` : ''}`,
+      body:
+        hoverSnippet(f?.explanation ?? f?.excerpt) ?? 'Click the node to read the full reasoning.',
+      accent: color,
+    };
     nodes.push({
       id: `b:${key}`,
       label,
-      fill: SEVERITY_COLOR[severity] ?? '#64748b',
+      fill: color,
       size: SEVERITY_SIZE[severity] ?? 7,
-      data: { type: 'bias_pattern', severity },
+      data: { type: 'bias_pattern', severity, detail },
     } as GraphNode);
     edges.push({ id: `e:dec:${key}`, source: 'decision', target: `b:${key}` } as GraphEdge);
   };
@@ -119,6 +159,16 @@ function buildDocumentGraph(
       } as GraphEdge);
     }
   }
+
+  const riskN = biasNodeIds.size;
+  decisionData.detail = {
+    subtitle: `Decision Quality Index ${dqi.score} · grade ${dqi.grade}`,
+    body:
+      riskN > 0
+        ? `${riskN} reasoning risk${riskN === 1 ? '' : 's'} mapped around this decision. Hover a node to preview it; click for the full reasoning.`
+        : 'No flagged reasoning risks on this memo.',
+    accent: gradeColor,
+  };
 
   return { nodes, edges };
 }
@@ -230,7 +280,7 @@ export function DecisionNetworkPanel({
           }}
         >
           {biasCount > 0
-            ? 'This decision sits at the centre. Each spoke is a reasoning risk the audit found; the bigger, pulsing nodes are the critical ones, and the strands between them are the compound patterns that amplify each other. Click any node to read the reasoning behind it.'
+            ? 'This decision sits at the centre. Each spoke is a reasoning risk the audit found; the bigger, pulsing nodes are the critical ones, and the strands between them are the compound patterns that amplify each other. Hover any node for a quick read of what it is; click it for the full reasoning, the memo excerpt, and where the risk has shown up before.'
             : 'The audit surfaced no flagged reasoning risks on this memo, so the network is just the decision itself.'}
         </p>
       </div>
@@ -263,7 +313,7 @@ export function DecisionNetworkPanel({
             padding: '4px 0',
           }}
         >
-          Click any node to read the reasoning behind it.
+          Hover any node to preview it; click to read the full reasoning.
         </div>
       )}
 
