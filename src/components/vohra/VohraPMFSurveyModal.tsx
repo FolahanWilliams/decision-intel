@@ -3,14 +3,16 @@
 /**
  * GTM v3.5 — Vohra PMF Survey Modal.
  *
- * Mounted on the platform layout. Polls /api/vohra-pmf/pending on mount
- * + every 60s; opens when a pending survey exists. Submits to
- * /api/vohra-pmf/respond, which records the canonical "very disappointed"
- * answer feeding the Phase 1 graduation gate.
+ * Mounted on the platform layout. Checks /api/vohra-pmf/pending ONCE on mount;
+ * opens when a pending survey exists AND the user hasn't snoozed it. Submits to
+ * /api/vohra-pmf/respond — the canonical "very disappointed" answer feeding the
+ * Phase 1 graduation gate.
  *
- * Dismissal: user can defer up to 3 times (each dismissal increments
- * dismissedCount on the server). On the 4th open, the dismiss CTA is
- * hidden — the user must complete the survey to close the modal.
+ * Dismissal is RESPECTED (rewritten 2026-06-20 — the prior version re-polled
+ * every 60s and re-opened a dismissed modal, then force-locked it after 3
+ * dismissals so the user couldn't close it at all). Now: closing (X or "Remind
+ * me later") snoozes the survey locally for SNOOZE_DAYS and it never re-opens
+ * within that window, and there is ALWAYS a way out — it never traps the user.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -38,11 +40,27 @@ interface PendingResponse {
 
 type VeryDisappointedValue = 'very_disappointed' | 'somewhat_disappointed' | 'not_disappointed';
 
-const POLL_INTERVAL_MS = 60_000;
+const SNOOZE_DAYS = 3;
+const SNOOZE_MS = SNOOZE_DAYS * 24 * 60 * 60 * 1000;
+const SNOOZE_KEY = 'di-vohra-snooze-until';
+
+function isSnoozed(): boolean {
+  try {
+    return Number(localStorage.getItem(SNOOZE_KEY) || '0') > Date.now();
+  } catch {
+    return false;
+  }
+}
+function setSnooze(): void {
+  try {
+    localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_MS));
+  } catch {
+    // private-mode Safari may throw — the in-session close still suppresses it
+  }
+}
 
 export function VohraPMFSurveyModal() {
   const [pendingId, setPendingId] = useState<string | null>(null);
-  const [forceShow, setForceShow] = useState(false);
   const [open, setOpen] = useState(false);
 
   // Form state
@@ -50,34 +68,30 @@ export function VohraPMFSurveyModal() {
   const [hxcType, setHxcType] = useState('');
   const [mainBenefit, setMainBenefit] = useState('');
   const [improvement, setImprovement] = useState('');
-  const [referralWillingness, setReferralWillingness] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const checkPending = useCallback(async () => {
+    if (isSnoozed()) return;
     try {
       const res = await fetch('/api/vohra-pmf/pending', { cache: 'no-store' });
       if (!res.ok) return;
       const parsed = (await res.json()) as PendingResponse;
       const pending = parsed.data?.pending ?? null;
-      if (pending) {
+      if (pending && !isSnoozed()) {
         setPendingId(pending.id);
-        setForceShow(pending.forceShow);
         setOpen(true);
-      } else {
-        setPendingId(null);
-        setOpen(false);
       }
-    } catch (_err1) {
-      // Silent — pending check failures are not user-facing
-      void _err1;
+    } catch {
+      // Silent — pending-check failures are not user-facing
     }
   }, []);
 
   useEffect(() => {
-    checkPending();
-    const interval = setInterval(checkPending, POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
+    // Check ONCE on mount. No 60s re-poll — re-opening an explicitly dismissed
+    // modal every minute is hostile; a freshly-triggered survey surfaces on the
+    // next full page load instead.
+    void checkPending();
   }, [checkPending]);
 
   const handleSubmit = async () => {
@@ -97,7 +111,6 @@ export function VohraPMFSurveyModal() {
           hxcType: hxcType.trim() || undefined,
           mainBenefit: mainBenefit.trim() || undefined,
           improvement: improvement.trim() || undefined,
-          referralWillingness: referralWillingness ?? undefined,
         }),
       });
       if (!res.ok) {
@@ -106,12 +119,10 @@ export function VohraPMFSurveyModal() {
       }
       setOpen(false);
       setPendingId(null);
-      // Reset form for next time
       setVeryDisappointed(null);
       setHxcType('');
       setMainBenefit('');
       setImprovement('');
-      setReferralWillingness(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Submission failed');
     } finally {
@@ -119,43 +130,55 @@ export function VohraPMFSurveyModal() {
     }
   };
 
-  const handleDismiss = async () => {
-    if (!pendingId || forceShow) return;
-    try {
-      await fetch('/api/vohra-pmf/dismiss', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ surveyId: pendingId }),
-      });
-    } catch (_err2) {
-      // Silent on dismiss failures — best effort
-      void _err2;
-    }
+  const handleDismiss = () => {
+    // Snooze locally FIRST so it can never re-open within the window, then
+    // close. The server dismiss call is best-effort analytics — it never blocks
+    // or reverses the close.
+    setSnooze();
     setOpen(false);
+    const id = pendingId;
+    if (id) {
+      void (async () => {
+        try {
+          await fetch('/api/vohra-pmf/dismiss', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ surveyId: id }),
+          });
+        } catch {
+          // best-effort — the local snooze already closed + suppressed the modal
+        }
+      })();
+    }
   };
 
   if (!pendingId) return null;
+
+  const radioOptions: Array<{ value: VeryDisappointedValue; label: string }> = [
+    { value: 'very_disappointed', label: 'Very disappointed' },
+    { value: 'somewhat_disappointed', label: 'Somewhat disappointed' },
+    { value: 'not_disappointed', label: 'Not disappointed' },
+  ];
 
   return (
     <Dialog
       open={open}
       onOpenChange={value => {
-        // If dismissals are forced, ignore close attempts other than submit
-        if (!value && forceShow) return;
+        // Closing is ALWAYS honoured — the modal never traps the user.
         if (!value) handleDismiss();
         else setOpen(value);
       }}
     >
-      <DialogContent className="max-w-xl">
+      <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto" showCloseButton>
         <DialogHeader>
           <DialogTitle>Quick check-in: how is Decision Intel for you?</DialogTitle>
           <DialogDescription>
-            Three minutes; one question that matters most. Your answer directly shapes what we build
-            next.
+            Two minutes; the first question is the one that matters most. Your answer directly
+            shapes what we build next.
           </DialogDescription>
         </DialogHeader>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 4 }}>
           <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
             <legend
               style={{
@@ -168,26 +191,20 @@ export function VohraPMFSurveyModal() {
               How would you feel if you could no longer use Decision Intel?
             </legend>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {(
-                [
-                  { value: 'very_disappointed', label: 'Very disappointed' },
-                  { value: 'somewhat_disappointed', label: 'Somewhat disappointed' },
-                  { value: 'not_disappointed', label: 'Not disappointed' },
-                ] as Array<{ value: VeryDisappointedValue; label: string }>
-              ).map(opt => (
+              {radioOptions.map(opt => (
                 <label
                   key={opt.value}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
-                    padding: '10px 12px',
+                    padding: '12px 14px',
                     border: `1px solid ${
                       veryDisappointed === opt.value
                         ? 'var(--accent-primary)'
                         : 'var(--border-color)'
                     }`,
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 'var(--radius-lg)',
                     cursor: 'pointer',
                     background:
                       veryDisappointed === opt.value
@@ -222,7 +239,7 @@ export function VohraPMFSurveyModal() {
               style={{
                 padding: '10px 12px',
                 border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--bg-card)',
                 color: 'var(--text-primary)',
                 fontSize: 14,
@@ -242,7 +259,7 @@ export function VohraPMFSurveyModal() {
               style={{
                 padding: '10px 12px',
                 border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--bg-card)',
                 color: 'var(--text-primary)',
                 fontSize: 14,
@@ -263,7 +280,7 @@ export function VohraPMFSurveyModal() {
               style={{
                 padding: '10px 12px',
                 border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--bg-card)',
                 color: 'var(--text-primary)',
                 fontSize: 14,
@@ -272,46 +289,13 @@ export function VohraPMFSurveyModal() {
             />
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-              On a scale of 0-10, how likely are you to refer Decision Intel to a peer right now?
-            </span>
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-              {Array.from({ length: 11 }, (_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setReferralWillingness(i)}
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 'var(--radius-md)',
-                    border: `1px solid ${
-                      referralWillingness === i ? 'var(--accent-primary)' : 'var(--border-color)'
-                    }`,
-                    background:
-                      referralWillingness === i
-                        ? 'color-mix(in srgb, var(--accent-primary) 12%, transparent)'
-                        : 'transparent',
-                    color: 'var(--text-primary)',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {i}
-                </button>
-              ))}
-            </div>
-          </label>
-
           {error && (
             <div
               style={{
                 padding: '10px 12px',
                 background: 'color-mix(in srgb, var(--error) 10%, transparent)',
                 border: '1px solid var(--error)',
-                borderRadius: 'var(--radius-md)',
+                borderRadius: 'var(--radius-lg)',
                 color: 'var(--error)',
                 fontSize: 13,
               }}
@@ -322,11 +306,9 @@ export function VohraPMFSurveyModal() {
         </div>
 
         <DialogFooter>
-          {!forceShow && (
-            <Button variant="ghost" onClick={handleDismiss} disabled={submitting}>
-              Remind me later
-            </Button>
-          )}
+          <Button variant="ghost" onClick={handleDismiss} disabled={submitting}>
+            Remind me later
+          </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitting || !veryDisappointed}
