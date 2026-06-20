@@ -51,9 +51,20 @@ vi.mock('@/lib/utils/plan-limits', () => ({
   checkAnalysisLimit: (...args: unknown[]) => mockCheckAnalysisLimit(...args),
   // getUserPlan added 2026-05-26 (soft-limit pass) — the upload route
   // now uses it to look up per-plan maxUploadMB. Default mock returns
-  // 'pro' so tests exercise the wedge-tier 100MB cap by default; the
-  // size-rejection test bumps to 100MB+ to fire the gate cleanly.
+  // 'pro' so tests exercise the wedge-tier 250MB cap by default; the
+  // size-rejection test bumps to 250MB+ to fire the gate cleanly.
   getUserPlan: (...args: unknown[]) => mockGetUserPlan(...args),
+  // effectiveUploadMaxMB added 2026-06-20 (storage-ceiling clamp, commit
+  // e22893f). The route gates on effectiveUploadMaxMB(plan) =
+  // min(plan cap, STORAGE_MAX_UPLOAD_MB). For unit-testing the per-plan
+  // message ladder in isolation we return the RAW plan cap (storage-
+  // unbounded), so `storageBound` stays false and the gate surfaces the
+  // "<Plan> plan cap is NMB" copy these tests lock. The Math.min storage
+  // clamp itself is env-driven and a separate concern (covered in
+  // plan-limits.test.ts). Without this export the route's
+  // effectiveUploadMaxMB() call throws → every size/type/create test 500s.
+  effectiveUploadMaxMB: (plan: string) =>
+    (({ free: 25, pro: 250, team: 250, enterprise: 500 }) as Record<string, number>)[plan] ?? 250,
 }));
 
 const mockParseFile = vi.fn();
