@@ -25,6 +25,8 @@
     "lint:counts": "node scripts/lint-counts.mjs",
     "lint:canonical-imports": "node scripts/lint-canonical-imports.mjs",
     "lint:doc-sync": "node scripts/lint-doc-sync.mjs",
+    "lint:tenant-isolation": "node scripts/lint-tenant-isolation.mjs",
+    "gen:rls": "node scripts/gen-rls-policies.mjs",
     "audit:platform": "node scripts/audit-platform.mjs",
     "audit:platform:write": "node scripts/audit-platform.mjs --write",
     "rotate:encryption-key": "tsx ./scripts/rotate-encryption-key.ts",
