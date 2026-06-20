@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useMemo,
   useRef,
   useEffect,
   ReactNode,
@@ -162,20 +163,37 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
     setActiveAnalysis(prev => (prev ? { ...prev, noiseScore: score } : prev));
   }, []);
 
+  // Memoize so the context value identity only changes when activeAnalysis
+  // changes — not on every provider render. The inline object literal here was
+  // re-created each render, re-rendering every consumer (UsageMeter, the audit
+  // surfaces) needlessly. Callbacks are all useCallback-stable.
+  const contextValue = useMemo(
+    () => ({
+      activeAnalysis,
+      startTracking,
+      updateProgress,
+      completeTracking,
+      errorTracking,
+      dismiss,
+      updateNodeState,
+      updateBiasCount,
+      updateNoiseScore,
+    }),
+    [
+      activeAnalysis,
+      startTracking,
+      updateProgress,
+      completeTracking,
+      errorTracking,
+      dismiss,
+      updateNodeState,
+      updateBiasCount,
+      updateNoiseScore,
+    ]
+  );
+
   return (
-    <AnalysisProgressContext.Provider
-      value={{
-        activeAnalysis,
-        startTracking,
-        updateProgress,
-        completeTracking,
-        errorTracking,
-        dismiss,
-        updateNodeState,
-        updateBiasCount,
-        updateNoiseScore,
-      }}
-    >
+    <AnalysisProgressContext.Provider value={contextValue}>
       {children}
     </AnalysisProgressContext.Provider>
   );

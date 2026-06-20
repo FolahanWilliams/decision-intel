@@ -19,6 +19,13 @@ import { PLANS } from '@/lib/stripe';
 
 const log = createLogger('UploadRoute');
 
+// Upload does the heaviest synchronous work on the request path — full PDF text
+// extraction (e.g. a 350-page WeWork S-1) + a second structured re-parse. It was
+// the ONLY analysis-adjacent route with no maxDuration, so it ran at Vercel's
+// short default and got SIGKILL'd mid-parse on large docs ("upload bar went,
+// then nothing happened"). Match the analyze routes' ceiling.
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
   try {
     const authClient = await createClient();

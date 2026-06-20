@@ -66,7 +66,20 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     if (searchParams.get('export') !== 'csv') {
-      return NextResponse.json({ error: 'Only ?export=csv is supported' }, { status: 400 });
+      // JSON list for the inline "Recent Activity" card (AuditLogInline). This
+      // path previously 400'd, so the card silently fell back to empty forever
+      // even though events are being written. Returns the user's own events.
+      const limit = Math.min(
+        Math.max(parseInt(searchParams.get('limit') || '15', 10) || 15, 1),
+        100
+      );
+      const logs = await prisma.auditLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        select: { id: true, action: true, resource: true, details: true, createdAt: true },
+      });
+      return NextResponse.json({ logs });
     }
 
     // Cap at 10,000 rows to prevent unbounded memory usage for large audit histories

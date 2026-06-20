@@ -21,7 +21,14 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           Skip to main content
         </a>
         <Ticker />
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Bound the sidebar+main row to the viewport (minus the 44px Ticker)
+            so MAIN scrolls internally and the sticky sidebar stays pinned.
+            Without an explicit height the body (min-height:100vh, not a bounded
+            flex column) lets the WINDOW scroll, which drags the sidebar off the
+            top. 100dvh handles mobile browser chrome correctly. */}
+        <div
+          style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100dvh - 44px)' }}
+        >
           <Sidebar />
           <main
             id="main-content"

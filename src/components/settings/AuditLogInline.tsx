@@ -1,15 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ShieldCheck,
   ShieldAlert,
   Download,
   Search,
   FileText,
-  LogIn,
+  Upload,
+  MessageSquare,
+  Bot,
+  Briefcase,
+  Share2,
   ClipboardList,
   Loader2,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -23,27 +28,64 @@ interface AuditEntry {
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
   EXPORT_PDF: <Download size={14} />,
+  EXPORT_CSV: <Download size={14} />,
   SCAN_DOCUMENT: <Search size={14} />,
   VIEW_DOCUMENT: <FileText size={14} />,
-  LOGIN: <LogIn size={14} />,
+  UPLOAD_DOCUMENT: <Upload size={14} />,
+  CHAT_MESSAGE: <MessageSquare size={14} />,
+  COPILOT_MESSAGE: <Bot size={14} />,
+  SHARE_LINK_CREATED: <Share2 size={14} />,
 };
+
+// Loose-match container/decision actions to one icon without listing each.
+function iconForAction(action: string): React.ReactNode {
+  if (ACTION_ICONS[action]) return ACTION_ICONS[action];
+  if (action.startsWith('CONTAINER_') || action.startsWith('PROSPECT_'))
+    return <Briefcase size={14} />;
+  return <ClipboardList size={14} />;
+}
+
+/** "just now" / "5m ago" / "2h ago" / date — makes the feed read as live. */
+function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  if (diff < 60_000) return 'just now';
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return new Date(iso).toLocaleDateString();
+}
 
 export function AuditLogInline() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   // Check admin status once on mount so the org-wide firehose shortcut
   // only renders for ADMIN_USER_IDS users. 401 / 403 / non-admin responses
   // all resolve to `false` — the link stays hidden and non-admins never
   // see an affordance they couldn't use.
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/audit?limit=15')
-      .then(r => (r.ok ? r.json() : { logs: [] }))
-      .then(data => setLogs(data.logs || []))
-      .catch(() => setLogs([]))
-      .finally(() => setLoading(false));
+  const loadLogs = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const res = await fetch('/api/audit?limit=15');
+      const data = res.ok ? await res.json() : { logs: [] };
+      setLogs(data.logs || []);
+    } catch {
+      // network blip — keep the prior list rather than blanking the feed
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void loadLogs();
+    // Gentle live refresh so the feed shows what's happening without hammering
+    // the endpoint (30s; cleared on unmount).
+    const id = window.setInterval(() => void loadLogs(), 30_000);
+    return () => window.clearInterval(id);
+  }, [loadLogs]);
 
   useEffect(() => {
     fetch('/api/admin/is-admin')
@@ -64,11 +106,34 @@ export function AuditLogInline() {
   return (
     <div>
       <div className="card mb-lg">
-        <div className="card-header">
+        <div
+          className="card-header"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        >
           <h3 className="flex items-center gap-sm">
             <ShieldCheck size={18} />
             Recent Activity
           </h3>
+          <button
+            onClick={() => void loadLogs()}
+            disabled={refreshing}
+            aria-label="Refresh activity"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              background: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: 999,
+              padding: '4px 10px',
+              cursor: refreshing ? 'default' : 'pointer',
+            }}
+          >
+            <RefreshCw size={12} className={refreshing ? 'animate-spin' : undefined} />
+            Refresh
+          </button>
         </div>
         <div className="card-body">
           {logs.length === 0 ? (
@@ -94,7 +159,7 @@ export function AuditLogInline() {
                   }}
                 >
                   <span style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
-                    {ACTION_ICONS[log.action] || <ClipboardList size={14} />}
+                    {iconForAction(log.action)}
                   </span>
                   <span style={{ flex: 1, fontWeight: 500, color: 'var(--text-primary)' }}>
                     {log.action.replace(/_/g, ' ')}
@@ -114,7 +179,7 @@ export function AuditLogInline() {
                     </span>
                   )}
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>
-                    {new Date(log.createdAt).toLocaleDateString()}
+                    {relativeTime(log.createdAt)}
                   </span>
                 </div>
               ))}
@@ -122,7 +187,7 @@ export function AuditLogInline() {
           )}
 
           <Link
-            href="/dashboard/settings?tab=audit-log"
+            href="/dashboard/audit-log"
             style={{
               display: 'block',
               textAlign: 'center',
