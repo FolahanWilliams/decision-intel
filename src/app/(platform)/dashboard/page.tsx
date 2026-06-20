@@ -61,6 +61,7 @@ import useSWR from 'swr';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
+import { useContainers } from '@/hooks/useContainers';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
@@ -266,18 +267,23 @@ export default function Dashboard() {
   // zone is now the single entry point and forwards multi-file drops here.
   const [bulkFiles, setBulkFiles] = useState<File[] | null>(null);
 
-  // Container list (replaces legacy useDeals) re-lands in Phase 2 of
-  // the DecisionContainer refactor. Until then the upload deal-selector
-  // dropdown reads from an empty list — uploads still work, just
-  // without the in-flight container-attach affordance.
-  const dealsList: ReadonlyArray<{
-    id: string;
-    name: string;
-    stage?: string;
-    updatedAt: string | Date;
-    fundName?: string | null;
-    targetCompany?: string | null;
-  }> = [];
+  // Live DecisionContainer list for the upload "Link to a decision" selector
+  // (completes the Phase-2 wiring the legacy useDeals stub left empty). The
+  // upload route accepts the chosen id as `containerId` and creates the
+  // DecisionContainerDocument join.
+  const { containers: containerSummaries } = useContainers({ status: 'active' }, 1, 100);
+  const dealsList = useMemo(
+    () =>
+      containerSummaries.map(c => ({
+        id: c.id,
+        name: c.name || c.targetCompany || c.decisionFrame?.slice(0, 60) || 'Untitled decision',
+        stage: c.stageId,
+        updatedAt: c.updatedAt,
+        fundName: c.fundName,
+        targetCompany: c.targetCompany,
+      })),
+    [containerSummaries]
+  );
 
   // Decision Frame context — when user comes from /decisions/new
   const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
@@ -720,7 +726,9 @@ export default function Dashboard() {
         formData.append('documentType', selectedDocType);
       }
       if (selectedDealId) {
-        formData.append('dealId', selectedDealId);
+        // The upload route reads `containerId` (DecisionContainer) — `dealId`
+        // is only its legacy fallback alias.
+        formData.append('containerId', selectedDealId);
       }
 
       const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>(
@@ -1561,12 +1569,12 @@ export default function Dashboard() {
                           ))}
                         </select>
                       </div>
-                      <div>
+                      <div style={{ display: dealsList.length > 0 ? 'block' : 'none' }}>
                         <label
                           className="text-xs text-secondary font-medium"
                           style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}
                         >
-                          Link to Deal <span className="text-muted">(optional)</span>
+                          Link to a decision <span className="text-muted">(optional)</span>
                         </label>
                         <select
                           value={selectedDealId}
@@ -1582,7 +1590,7 @@ export default function Dashboard() {
                             outline: 'none',
                           }}
                         >
-                          <option value="">Select deal...</option>
+                          <option value="">Select a decision...</option>
                           {(() => {
                             // Sort by updatedAt desc (proxy for "recently used");
                             // pin top 3 at the top under a "Recent" optgroup, render
@@ -1610,7 +1618,7 @@ export default function Dashboard() {
                                   </optgroup>
                                 )}
                                 {rest.length > 0 && (
-                                  <optgroup label={recent.length > 0 ? 'All deals' : undefined}>
+                                  <optgroup label={recent.length > 0 ? 'All decisions' : undefined}>
                                     {rest.map(d => (
                                       <option key={d.id} value={d.id}>
                                         {d.name}

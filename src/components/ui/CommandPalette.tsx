@@ -25,12 +25,10 @@ import {
   Sun,
   TrendingUp,
   Users,
-  Filter,
   Download,
   Copy,
   Shield,
   Target,
-  Presentation,
   Compass,
   Plus,
   Briefcase,
@@ -233,14 +231,6 @@ export function CommandPalette() {
         ],
       },
       {
-        id: 'bias-library',
-        label: 'Bias Library',
-        description: 'Learn about cognitive biases',
-        icon: <BookOpen size={16} />,
-        action: () => navigate('/dashboard/analytics?view=library'),
-        keywords: ['education', 'learn', 'bias', 'debiasing'],
-      },
-      {
         id: 'analytics-audits',
         label: 'Analytics — Cognitive Audits',
         description: 'Audit human decisions (Performance tab)',
@@ -405,8 +395,6 @@ export function CommandPalette() {
   );
 
   const firstDocId = documents?.[0]?.id;
-  const isOnDocumentDetailPage =
-    typeof window !== 'undefined' && /\/documents\/[^/]+/.test(window.location.pathname);
 
   // Action commands
   const actionCommands: CommandItem[] = useMemo(
@@ -470,21 +458,6 @@ export function CommandPalette() {
         },
         keywords: ['last', 'recent', 'latest', 'analysis', 'resume'],
       },
-      ...(isOnDocumentDetailPage
-        ? [
-            {
-              id: 'export-board-report',
-              label: 'Export Board Report',
-              description: 'Generate the 2-page board-ready PDF for this analysis',
-              icon: <Presentation size={16} />,
-              action: () => {
-                setOpen(false);
-                window.dispatchEvent(new Event('command-palette-export-board-report'));
-              },
-              keywords: ['board', 'export', 'pdf', 'report'],
-            },
-          ]
-        : []),
       {
         id: 'new-chat',
         label: 'New Chat Session',
@@ -595,20 +568,8 @@ export function CommandPalette() {
         keywords: ['share', 'link', 'url', 'copy'],
         rightHint: '⌘+Shift+C',
       },
-      {
-        id: 'filter-view',
-        label: 'Filter Current View',
-        description: 'Apply filters to current data',
-        icon: <Filter size={16} />,
-        action: () => {
-          window.dispatchEvent(new CustomEvent('command-palette-filter'));
-          setOpen(false);
-        },
-        keywords: ['filter', 'sort', 'search', 'refine'],
-        rightHint: '⌘+F',
-      },
     ],
-    [navigate, theme, setTheme, firstDocId, isOnDocumentDetailPage]
+    [navigate, theme, setTheme, firstDocId]
   );
 
   // Build groups with filtering

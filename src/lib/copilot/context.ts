@@ -6,6 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { buildDocumentAccessWhere } from '@/lib/utils/document-access';
 import { searchSimilarWithOutcomes } from '@/lib/rag/embeddings';
 import { learnCausalEdges } from '@/lib/learning/causal-learning';
 import { createLogger } from '@/lib/utils/logger';
@@ -329,10 +330,31 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
 export async function buildCopilotContext(
   userId: string,
   orgId: string | null,
-  decisionPrompt: string
+  decisionPrompt: string,
+  pinnedDocumentId?: string | null
 ): Promise<CopilotContext> {
+  // When the user pins a document, ground retrieval on THAT doc only — but
+  // RBAC-gate it first (an unguarded pinned id would leak a private doc's
+  // content through the LLM). Mirrors the /api/chat pinned path. If the user
+  // can't read the pinned doc, we return no RAG rather than leaking.
+  let pinnedAccessible = false;
+  if (pinnedDocumentId) {
+    try {
+      const access = await buildDocumentAccessWhere(pinnedDocumentId, userId);
+      const doc = await prisma.document.findFirst({
+        where: access.where,
+        select: { id: true },
+      });
+      pinnedAccessible = !!doc;
+    } catch (err) {
+      log.warn('Pinned-doc access check failed:', err);
+    }
+  }
+  // Pull more candidates when pinned so the post-filter still yields enough.
+  const ragLimit = pinnedDocumentId && pinnedAccessible ? 20 : 5;
+
   const [ragRaw, causalWeights, userProfile, recentOutcomes, decisionStyle] = await Promise.all([
-    searchSimilarWithOutcomes(decisionPrompt, userId, 5).catch(err => {
+    searchSimilarWithOutcomes(decisionPrompt, userId, ragLimit).catch(err => {
       log.warn('RAG search failed:', err);
       return [];
     }),
@@ -347,8 +369,16 @@ export async function buildCopilotContext(
     loadDecisionStyleProfile(userId),
   ]);
 
+  // Pinned mode: keep only the pinned doc's passages (or nothing if the user
+  // can't read it). Unpinned mode: cross-doc RAG as before.
+  const ragScoped = pinnedDocumentId
+    ? pinnedAccessible
+      ? ragRaw.filter(r => r.documentId === pinnedDocumentId).slice(0, 5)
+      : []
+    : ragRaw;
+
   // Map RAG results to copilot format
-  const ragResults: RAGResult[] = ragRaw.map(r => ({
+  const ragResults: RAGResult[] = ragScoped.map(r => ({
     documentId: r.documentId,
     filename: r.filename,
     score: r.score,

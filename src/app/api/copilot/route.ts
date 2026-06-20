@@ -64,11 +64,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const { sessionId, message, decisionPrompt, forcedAgent } = body as {
+    const { sessionId, message, decisionPrompt, forcedAgent, pinnedDocumentId } = body as {
       sessionId?: string;
       message: string;
       decisionPrompt?: string;
       forcedAgent?: string;
+      pinnedDocumentId?: string;
     };
 
     if (!message || typeof message !== 'string') {
@@ -170,7 +171,8 @@ export async function POST(request: NextRequest) {
       message,
       history,
       undefined,
-      validForcedAgent
+      validForcedAgent,
+      typeof pinnedDocumentId === 'string' && pinnedDocumentId ? pinnedDocumentId : null
     );
 
     const { agentType, sources } = turnResult;

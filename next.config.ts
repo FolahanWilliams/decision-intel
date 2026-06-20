@@ -50,11 +50,10 @@ const nextConfig: NextConfig = {
         destination: '/dashboard/analytics?view=intelligence',
         permanent: false,
       },
-      {
-        source: '/dashboard/bias-library',
-        destination: '/dashboard/analytics?view=library',
-        permanent: false,
-      },
+      // NOTE: no /dashboard/bias-library redirect — a dedicated Bias Library
+      // page shipped 2026-05-28 at that path. A redirect here (Next evaluates
+      // redirects() BEFORE filesystem routing) would orphan the real page +
+      // bounce the Sidebar/CommandPalette links to the Intelligence tab.
       // Phase A consolidation (2026-05-09 evening) — three sidebar surfaces
       // deleted as part of the platform-page refactor:
       //   - /dashboard/playbooks: orphaned feature, zero integration with

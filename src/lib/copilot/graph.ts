@@ -209,10 +209,13 @@ export async function prepareCopilotTurn(
   userMessage: string,
   history: CopilotTurnData[],
   existingContext?: CopilotContext,
-  forcedAgent?: CopilotAgentType
+  forcedAgent?: CopilotAgentType,
+  pinnedDocumentId?: string | null
 ): Promise<CopilotTurnResult> {
-  // Build context (reuse if provided, otherwise assemble fresh)
-  const context = existingContext ?? (await buildCopilotContext(userId, orgId, decisionPrompt));
+  // Build context (reuse if provided, otherwise assemble fresh). When a doc is
+  // pinned, the context is grounded on it (RBAC-gated inside buildCopilotContext).
+  const context =
+    existingContext ?? (await buildCopilotContext(userId, orgId, decisionPrompt, pinnedDocumentId));
 
   // Route to the appropriate agent
   const agentType = await routeToAgent(userMessage, history, forcedAgent);
