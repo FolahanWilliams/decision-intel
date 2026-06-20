@@ -64,6 +64,17 @@ export const FOUNDER_NAME = 'Folahan Williams';
 export const FOUNDER_TITLE = 'Founder';
 
 /**
+ * Founder's personal site. Surfaced on /about as a visible link and in the
+ * /about Person JSON-LD `sameAs` array — the reciprocal half of the
+ * folahanwilliams.com ↔ decision-intel.com entity link (the personal site
+ * links back to Decision Intel). Bidirectional `sameAs` is what lets search
+ * + answer engines disambiguate "Folahan Williams" as one entity across both
+ * domains. Plain URL (no trailing slash) so it composes cleanly into JSON-LD.
+ */
+export const FOUNDER_WEBSITE_URL = 'https://folahanwilliams.com';
+export const FOUNDER_WEBSITE_LABEL = 'folahanwilliams.com';
+
+/**
  * Procurement contact — the email address a Fortune 500 vendor-risk
  * team should write to with diligence questions. Currently the
  * shared inbox; can split if volume requires.

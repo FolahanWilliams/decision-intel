@@ -51,6 +51,8 @@ import {
   COMPLIANCE_CONTACT_EMAIL,
   COMPLIANCE_RESPONSE_SLA,
   FOUNDER_NARRATIVE_SHORT,
+  FOUNDER_WEBSITE_URL,
+  FOUNDER_WEBSITE_LABEL,
 } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
@@ -132,8 +134,30 @@ function FactRow({ label, children, icon }: FactRowProps) {
 }
 
 export default function AboutPage() {
+  // Person JSON-LD with a sameAs link to the founder's personal site — the
+  // reciprocal half of the folahanwilliams.com ↔ decision-intel.com entity
+  // link, so search + answer engines resolve "Folahan Williams" as one entity
+  // across both domains (the personal site carries the matching sameAs back).
+  const founderJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: FOUNDER_NAME,
+    jobTitle: `${FOUNDER_TITLE}, ${LEGAL_ENTITY_NAME}`,
+    url: FOUNDER_WEBSITE_URL,
+    sameAs: [FOUNDER_WEBSITE_URL],
+    worksFor: {
+      '@type': 'Organization',
+      name: LEGAL_ENTITY_NAME,
+      url: siteUrl,
+    },
+  };
+
   return (
     <main style={{ background: C.white, color: C.slate900, minHeight: '100vh' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(founderJsonLd) }}
+      />
       <MarketingNav />
 
       {/* HERO */}
@@ -304,6 +328,25 @@ export default function AboutPage() {
               <strong style={{ fontWeight: 700 }}>{FOUNDER_NAME}</strong>
               <span style={{ color: C.slate500 }}>, {FOUNDER_TITLE}</span>
               <div style={{ marginTop: 8, color: C.slate600 }}>{FOUNDER_NARRATIVE_SHORT}</div>
+              <div style={{ marginTop: 8 }}>
+                <a
+                  href={FOUNDER_WEBSITE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    color: C.slate900,
+                    fontWeight: 600,
+                    fontSize: 13,
+                    textDecoration: 'underline',
+                  }}
+                >
+                  <Globe size={13} strokeWidth={2.2} />
+                  {FOUNDER_WEBSITE_LABEL}
+                </a>
+              </div>
             </FactRow>
             <FactRow label="Procurement contact" icon={<Mail size={14} strokeWidth={2.2} />}>
               <a
