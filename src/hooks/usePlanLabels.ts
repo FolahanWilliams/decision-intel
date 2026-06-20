@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useBilling } from './useBilling';
 
 export interface PlanLabels {
   plan: string;
@@ -24,24 +24,9 @@ export interface PlanLabels {
  * component that needs to render plan-aware copy.
  */
 export function usePlanLabels(): PlanLabels {
-  const [plan, setPlan] = useState<string>('free');
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/billing')
-      .then(r => (r.ok ? r.json() : null))
-      .then(data => {
-        if (!cancelled && data?.plan) setPlan(data.plan);
-      })
-      .catch(err => console.warn('[usePlanLabels] billing fetch failed:', err))
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // Routes through the shared `useBilling` SWR hook so this no longer fires its
+  // own `/api/billing` request — every consumer dedupes to one.
+  const { plan, isLoading } = useBilling();
 
   const isTeamPlan = plan === 'team' || plan === 'enterprise';
 

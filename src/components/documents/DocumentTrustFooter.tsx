@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { ShieldCheck } from 'lucide-react';
 import { SOC2_RECEIPTS } from '@/lib/constants/trust-copy';
 import { PLANS } from '@/lib/stripe';
+import { useBilling } from '@/hooks/useBilling';
 
 interface DocumentTrustFooterProps {
   /** Document.uploadedAt — ISO string or Date. */
@@ -43,28 +44,11 @@ function isPlanKey(value: unknown): value is PlanKey {
  * color) so it's a procurement signal not a hero element.
  */
 export function DocumentTrustFooter({ uploadedAt }: DocumentTrustFooterProps) {
-  const [plan, setPlan] = useState<PlanKey>('free');
-  const [planLoaded, setPlanLoaded] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/billing')
-      .then(r => (r.ok ? r.json() : null))
-      .then(data => {
-        if (cancelled) return;
-        if (data?.plan && isPlanKey(data.plan)) {
-          setPlan(data.plan);
-        }
-        setPlanLoaded(true);
-      })
-      .catch(err => {
-        console.warn('[DocumentTrustFooter] /api/billing fetch failed:', err);
-        if (!cancelled) setPlanLoaded(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // Routed through the shared useBilling hook so it dedupes its /api/billing
+  // call with every other consumer (mirrors usePlanLabels).
+  const { plan: rawPlan, isLoading } = useBilling();
+  const plan: PlanKey = isPlanKey(rawPlan) ? rawPlan : 'free';
+  const planLoaded = !isLoading;
 
   const planConfig = PLANS[plan];
   const retentionDays = planConfig.retentionDays;

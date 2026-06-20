@@ -27,6 +27,7 @@ import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
 import { DensityToggle } from '@/components/DensityProvider';
 import { UsageMeter } from '@/components/billing/UsageMeter';
 import { FlywheelChips } from '@/components/ui/FlywheelChips';
+import { useBilling } from '@/hooks/useBilling';
 
 const SIDEBAR_COLLAPSED_KEY = 'di-sidebar-main-collapsed';
 const SIDEBAR_SECTIONS_KEY = 'di-sidebar-collapsed';
@@ -37,7 +38,9 @@ export default function Sidebar() {
   const viewParam = searchParams?.get('view') ?? null;
   const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [plan, setPlan] = useState<string>('free');
+  // Plan drives feature-gating of team-only nav items. Routed through the
+  // shared useBilling hook so it dedupes with every other /api/billing caller.
+  const { plan } = useBilling();
   // Sidebar clusters (2026-04-23 rework): Act / Reflect / Together matches
   // how a CSO's week actually runs — do the thing, learn from last quarter,
   // operate with the team. "Act" is non-collapsible top-level; "Reflect"
@@ -79,16 +82,6 @@ export default function Sidebar() {
       // localStorage may throw in private-mode Safari — silent fallback per CLAUDE.md fire-and-forget exceptions.
       void _err2;
     }
-  }, []);
-
-  // Fetch plan for feature-gating team-only nav items
-  useEffect(() => {
-    fetch('/api/billing')
-      .then(r => (r.ok ? r.json() : null))
-      .then(data => {
-        if (data?.plan) setPlan(data.plan);
-      })
-      .catch(err => console.warn('[Sidebar] billing fetch failed:', err));
   }, []);
 
   const isTeamPlan = plan === 'team' || plan === 'enterprise';

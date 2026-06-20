@@ -34,9 +34,7 @@ import {
 import { useToast } from '@/components/ui/EnhancedToast';
 import { TeammateWallModal } from '@/components/pricing/TeammateWallModal';
 import dynamic from 'next/dynamic';
-import { createClientLogger } from '@/lib/utils/logger';
-
-const log = createClientLogger('TeamPage');
+import { useBilling } from '@/hooks/useBilling';
 
 const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
   // DESIGN.md loading-state pattern: skeleton, never a centered spinner.
@@ -115,18 +113,11 @@ export default function TeamPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showTeammateWall, setShowTeammateWall] = useState(false);
-  const [plan, setPlan] = useState<string>('free');
   const [activeTab, setActiveTab] = useState<'members' | 'activity' | 'intelligence'>('members');
 
-  useEffect(() => {
-    fetch('/api/billing')
-      .then(r => (r.ok ? r.json() : null))
-      .then(data => {
-        if (data?.plan) setPlan(data.plan);
-      })
-      .catch(err => log.warn('billing fetch failed:', err));
-  }, []);
-
+  // Plan drives team-feature gating. Routed through the shared useBilling hook
+  // so it dedupes its /api/billing call with every other consumer.
+  const { plan } = useBilling();
   const isTeamPlan = plan === 'team' || plan === 'enterprise';
 
   const fetchTeam = useCallback(async () => {

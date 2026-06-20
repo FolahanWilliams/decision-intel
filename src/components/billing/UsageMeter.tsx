@@ -6,60 +6,22 @@
  * Hidden for enterprise / unlimited plans. At 80%+ usage shows a plan-aware
  * upgrade CTA: Free users see "Upgrade →"; Pro users see "Need more? Go Strategy →"
  * (mirrors the Teammate Wall language so the Pro → Strategy ladder reads as one
- * story). Fetches from /api/billing on mount; re-fetches when the window regains
- * focus so the meter stays fresh after a new analysis.
+ * story). Reads from the shared `useBilling` hook so the meter dedupes its
+ * /api/billing call with every other consumer instead of firing its own.
  */
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics/track';
-
-interface BillingResponse {
-  plan: string;
-  planName: string;
-  usage: {
-    analysesUsed: number;
-    analysesLimit: number; // -1 for unlimited
-    percentUsed: number;
-  };
-}
+import { useBilling } from '@/hooks/useBilling';
 
 interface UsageMeterProps {
   variant?: 'full' | 'compact';
 }
 
 export function UsageMeter({ variant = 'full' }: UsageMeterProps = {}) {
-  const [data, setData] = useState<BillingResponse | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const { billing: data, isLoading } = useBilling();
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchUsage = async () => {
-      try {
-        const res = await fetch('/api/billing', { cache: 'no-store' });
-        if (cancelled) return;
-        if (!res.ok) {
-          setLoaded(true);
-          return;
-        }
-        const json = (await res.json()) as BillingResponse;
-        if (cancelled) return;
-        setData(json);
-        setLoaded(true);
-      } catch {
-        if (!cancelled) setLoaded(true);
-      }
-    };
-    void fetchUsage();
-    const onFocus = () => void fetchUsage();
-    window.addEventListener('focus', onFocus);
-    return () => {
-      cancelled = true;
-      window.removeEventListener('focus', onFocus);
-    };
-  }, []);
-
-  if (!loaded || !data) return null;
+  if (isLoading || !data) return null;
   // For compact (sidebar) variant, still render a plan chip even if unlimited.
   if (data.usage.analysesLimit < 0 && variant === 'full') return null;
 
