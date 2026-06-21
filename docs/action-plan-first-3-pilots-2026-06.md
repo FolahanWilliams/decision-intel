@@ -103,9 +103,9 @@ Why it works, against each objection:
 
 - Only **locked-forward** calls count as track record; retro analyses are always labelled illustrative.
 - You **WILL** be wrong on individual calls — fine and expected. Calibration across many beats being right once (Tetlock's superforecasters are wrong constantly and still beat classified analysts ~30% because they're _calibrated_). Publish losses; the honesty is itself the moat against "you cherry-pick."
-- **Stay in the DI lane:** you audit the _reasoning behind a strategic decision_ and call whether it hits its _own stated milestones_ — NOT a stock price. For SpaceX: audit the IPO thesis's reasoning + the risks management underweights, and call the specific promised milestones. Judgment quality, not equity research.
+- **Stay in the DI lane — and score the FLAG, not the FORECAST (load-bearing; see Part 7.1 + Appendix A).** You audit the _reasoning_ in a public decision and flag a specific reasoning-risk (timeline optimism, inside-view dominance, narrative coherence). What gets Brier-scored is **whether the flagged risk materialised**, NOT whether you predicted the outcome or the stock price. "Will SpaceX hit its milestone?" is a _forecast_ — that puts you in a ring with every analyst and superforecaster, where the pipeline is mediocre by design. "Did the reasoning-risk we named actually bite, vs. base rate?" is a claim about your own _detection quality_ — which is exactly what the product is (`POSITIONING_EPISTEMIC_HONESTY`: correlated risk indicators, not causation, not price). Publish the false positives too (risk flagged, didn't bite); the false-positive/true-positive profile over N calls IS the moat artifact.
 
-**Verify before locking:** pull the live S-1 / announcement specifics (valuation, date, the exact milestones) before timestamping a call. _(Web search was down 2026-06-21 at writing; confirm SpaceX/Starlink IPO specifics from the actual filing before call #1.)_
+**Verified 2026-06-21 (this session, web search restored):** SpaceX IPO'd on Nasdaq (ticker **SPCX**) — priced **June 11 2026 at $135/share / ~$1.77T**, debuted June 12 closing **$161 (+19%)**, ~$75B raised (largest US IPO ever); public S-1 filed May 20 2026. The thesis, its reasoning-risks, the locked falsifiable proxies, and the exact "score the flag not the forecast" scoring are worked end-to-end in **Appendix A** — **call #1 is ready to lock.**
 
 ### 3b. The one product proof — DI vs a plain GPT prompt _(Claude Code's job — hand it a memo)_
 
@@ -189,10 +189,60 @@ That's a fundable company. The ambition was never the question; the sequence was
 
 ---
 
+## Part 7 — Three refinements from the 2026-06-21 review (sharpens the plan, doesn't replace it)
+
+The plan above is right. Three things the consensus (Rob + Cowork + the first repo pass) under-weighted, in priority order:
+
+**7.1 — Score the flag, not the forecast (the most important fix to the whole track-record play).** The public track record must Brier-score _whether the reasoning-risk DI flagged actually materialised_, NOT whether DI predicted the outcome or the price. The difference is the difference between two businesses: scoring outcomes makes you a _forecaster_ (you compete with Tetlock, Good Judgment, and every equity analyst — where the pipeline is mediocre by design, because it isn't a forecasting engine); scoring whether your flagged risks bite makes you a _bias-auditor whose detection is calibrated_ — which is the actual product, and the only claim `POSITIONING_EPISTEMIC_HONESTY` lets you make ("risk indicators correlated with poor outcomes; not causation; not price"). For SpaceX the two nearly coincide (the flag _is_ "the Starship timeline slips"), but the **framing of what you publish and score is everything**: "we flagged timeline-optimism gated on a 5/25-flight base rate; here's the dated falsifiable proxy; we score whether the risk bit, and we publish false positives." Worked in Appendix A.
+
+**7.2 — Sankore is not "the bridge." It is the single most important asset in this plan.** The 3 individual pilots prove **demand**; only an embedded relationship realistically produces **real calibration data inside 12 months**. Individuals are the _least_ likely cohort to log honest 90-day outcomes — that is the Cloverpop manual-logging trap CLAUDE.md already names, and outcome-logging is the _exact_ behaviour the moat depends on. Sankore's contractual outcome-gate + the retroactive seed over 30–50 already-closed decisions gives real outcome data on **day one**, not in a year. If you could keep only one workstream, keep Sankore. Treat it as **P0, starting week 1** — not "in parallel, later."
+
+**7.3 — Re-rank the credibility assets; "3 paid pilots" is the weakest of the four — don't make it the headline.** Three individuals at £249–999/mo reads as _lifestyle SaaS_ to a skeptical seed investor — CLAUDE.md's own "£300K/yr lifestyle utility, not the data asset" warning. The cheques prove willingness-to-pay (necessary, hard, real). But the assets that prove the _product works_ and actually move a seed check rank: **(1) the public Brier track record** (the thing no other pre-seed founder has) → **(2) the Sankore real-outcome reference** → **(3) the GPT-vs-pipeline depth proof** → **(4) the 3 paid cheques.** All four matter; lead the _investor_ story with 1–3 and use 4 as the "dog eats the food" floor. Practically: 3a (public track record) and Sankore start **week 1**, because they are the longest-pole, highest-value assets — not things that wait for the pilots to land.
+
+---
+
+## Appendix A — SpaceX (SPCX): public call #1, worked end-to-end
+
+_The concrete instantiation of §3a + §7.1. Every figure verified 2026-06-21 from the S-1 + IPO coverage (sources below). This is a template, not just one call — the structure repeats for every public decision you audit._
+
+**The decision audited:** SpaceX's S-1 IPO thesis — the reasoning the ~$1.77T valuation rests on. Public document, no confidentiality wall, outcome unknown, debuted 9 days before this audit. Perfectly in-bounds.
+
+**What the S-1 argues (the thesis):**
+
+- Reusable rockets cut launch cost ~$18,500/kg → ~$1,400/kg, unlocking Starlink → orbital AI → lunar → Mars ("railroad infrastructure for space").
+- ~$1.77T ≈ **60–70× forward revenue** on ~$25B 2026E revenue — coverage is explicit that this "prices 2030 outcomes": _Starlink at ~$40B revenue, Starship reusable at scale, and at least one of orbital-AI-compute or Mars optionality printing real numbers._
+- Starlink: **10.3M subscribers** (Mar 2026), doubled YoY; illustrative 30–50M scenarios.
+- Starship: stated near-term milestone is **first commercial payloads in H2 2026.**
+
+**What DI's pipeline flags (reasoning-risks, in-lane — not a valuation opinion):**
+
+1. **Inside-view dominance (DI-B-022).** Coverage frames the ask as "conviction that Musk delivers a 2030 set of milestones the market has never priced for any single CEO" — the literal _this one is special, comparables don't apply_. The reference class (60–70× forward revenue for outcomes 4 years out; one CEO across SpaceX + Tesla + xAI + X) is unfavourable.
+2. **Planning-fallacy / timeline optimism — the load-bearing, checkable flag.** The entire downstream thesis (V3 Starlink capacity, orbital AI, lunar, Mars) is gated on Starship at commercial scale. Base rate: **Starship flew 5 times in 2025 against a 25-flight target — 20% of plan.** Stated milestone: first commercial payload H2 2026.
+3. **Narrative coherence / illusion of validity (DI-B-021).** "$1.77T → 7th-biggest US company, above Tesla" is internally coherent (cheap launch → broadband → AI → Mars), and the coherence is manufacturing confidence the base rates don't support.
+4. **Reference-class / competition under-weighting.** Starlink ARPU fell $99 (2023) → $66 (Q1 2026); Amazon's Kuiper/Leo hit enterprise beta Apr 2026. The 30–50M-sub scenarios under-weight deceleration + price competition.
+
+**The locked, falsifiable call (the FLAG, dated — not a price target):**
+
+> _"DI flags that the SPCX valuation thesis is gated on a Starship timeline the reference class says is optimistic (5 of 25 planned flights in 2025). **Falsifiable proxy, locked 2026-06-21:** does the first commercial Starship payload fly by **Dec 31 2026** (the S-1's own 'H2 2026' milestone)? The reference-class base rate says it slips. Tracking it, win or lose."_
+
+- **3-month proxy (~Sep 2026):** does SpaceX's first post-IPO reporting reaffirm or quietly soften "H2 2026 commercial payload"? Is the test-flight cadence an H2 commercial debut requires actually happening?
+- **6-month proxy (Dec 31 2026):** did the first commercial Starship payload fly? _(primary)_ Secondary: did Starlink net-adds decelerate / ARPU keep falling?
+- **12-month (Jun 2027):** is the "2030-milestones-priced-today" gap narrowing or widening?
+
+**How it's scored — and why this is the entire point (§7.1 made concrete):**
+
+- DI is **not** predicting SPCX's share price. The stock could rip on Starlink alone _while_ the Starship timeline slips — and DI's flag would **still be validated**, because the flag was about the reasoning-risk, not the price.
+- Scored unit: **did the flagged risk materialise?** Starship commercial debut slips past Dec 31 2026 → flag confirmed. It flies on time → flag was a **false positive, publish it.** Across 10–15 calls you get an honest true-positive/false-positive profile on DI's detection — the only thing that answers "does it actually work," and the thing no other pre-seed founder can show.
+
+**Framing guardrail:** publish as _method_, never a hit-piece — "watch a locked, dated, falsifiable reasoning-audit play out in public," not "SpaceX is overvalued." DI admires the company and audits the _reasoning_, not the rocket. And because call #1 is N=1 with no track-record buffer (and SpaceX is the most-watched company on earth), **pair it with 1–2 lower-profile public calls** so the early record isn't all-in on a single hyped name — the calibration story needs N≥10 before any individual miss is just noise.
+
+---
+
 ### Sources / lineage
 
 - EU AI Act high-risk scope (Annex III) — corporate/M&A not in scope.
 - Prospective validity / Brier track record — Good Judgment Project (Tetlock): superforecasters beat classified analysts ~30%, calibrated over many, wrong often.
 - Structured Analytic Techniques + their manual cost — RAND assessment (the SAT/IC spine).
 - Repo machinery cited: `operational-proxy-gate.ts`, `PriorsCaptureCard`, Retroactive audit mode (`/dashboard/decisions/retroactive`), `vohra-pmf.ts`, `dqi.ts` (7-component), the WedgeProspect conversion ledger.
-- _SpaceX/Starlink IPO specifics: verify from the live filing before locking call #1 (web search unavailable at writing, 2026-06-21)._
+- SpaceX IPO specifics (verified 2026-06-21): priced $135 / ~$1.77T (June 11), debuted $161 / +19% (June 12), ticker SPCX, public S-1 May 20 2026 — [CNBC: $135 target / $1.77T](https://www.cnbc.com/2026/06/03/spacex-ipo-stock-price-roadshow-musk.html) · [CNBC: SPCX closes $161, +19%](https://www.cnbc.com/2026/06/12/spacex-ipo-spcx-live-updates.html) · [S-1 (SEC EDGAR)](https://www.sec.gov/Archives/edgar/data/1181412/000162828026036936/spaceexplorationtechnologi.htm) · [mostlymetrics S-1 breakdown](https://www.mostlymetrics.com/p/spacex-ipo-s1-breakdown).
+- Starship base rate (5 flights in 2025 vs 25-flight target) + Starlink ARPU $99→$66 + Kuiper competition — [TheNextWeb: Starlink growth maths](https://thenextweb.com/news/starlink-is-spacexs-cash-machine-but-the-maths-is-getting-harder) · [SpaceX IPO risk tracker](https://newmarketpitch.com/blogs/news/space-economy-spacex-ipo-risks).
