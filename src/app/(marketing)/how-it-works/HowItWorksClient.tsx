@@ -285,8 +285,8 @@ const RESEARCH_CITATIONS = [
     title: 'Stanford VC Initiative · Corporate Decision Research',
     year: 'ongoing',
     connection:
-      'Source for the 11 strategy-specific biases (entry-price anchor, thesis confirmation, winner\u2019s curse, management halo).',
-    featureName: '11 strategy biases',
+      'Informs the investment-context detection within the published taxonomy (entry-price anchoring, thesis confirmation, winner\u2019s curse, management halo).',
+    featureName: 'Investment-context detection',
   },
   {
     authorMonogram: 'RD',
@@ -509,12 +509,10 @@ export function HowItWorksClient() {
               marginBottom: 28,
             }}
           >
-            <StatPill value="30+" label="cognitive biases" />
             <StatPill
               value={String(BIAS_COUNT)}
-              label={`general (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`}
+              label={`cognitive biases (DI-B-001–${String(BIAS_COUNT).padStart(3, '0')})`}
             />
-            <StatPill value="11" label="strategy-specific" />
             <StatPill value="0" label="detections without an excerpt" />
           </div>
 

@@ -13,6 +13,11 @@ import {
   Globe,
 } from 'lucide-react';
 import Link from 'next/link';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+
+// Drift-safe bias count — derives from the canonical taxonomy (count-discipline
+// rule); never hardcode "30+" (deprecated per CR-3 2026-05-13, the taxonomy is 22).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 /**
  * Landing-page FAQ. Rebuild goals:
@@ -123,8 +128,9 @@ const ITEMS: FaqItem[] = [
     a: (
       <>
         ChatGPT gives one opinion from one model — it will confidently tell you the deck looks fine.
-        Decision Intel runs a multi-stage audit: 30+ domain-specific biases mapped to published
-        research, triangulated noise measurement, compound-risk scoring across interacting biases,
+        Decision Intel runs a multi-stage audit: {BIAS_COUNT} domain-specific biases mapped to
+        published research, triangulated noise measurement, compound-risk scoring across interacting
+        biases,
         and an outcome flywheel that recalibrates your scores with every confirmed result. The full
         methodology is documented at{' '}
         <Link href="/how-it-works" style={{ color: C.green, fontWeight: 600 }}>

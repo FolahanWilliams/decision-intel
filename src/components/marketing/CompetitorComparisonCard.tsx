@@ -5,10 +5,14 @@ import Link from 'next/link';
 import { ArrowRight, Check, Minus, X } from 'lucide-react';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 // Drift-safe framework count — derives from the registry so a new framework
 // addition flows into the comparison table without a copy edit.
 const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
+// Drift-safe bias count — derives from the canonical taxonomy (count-discipline
+// rule); never hardcode "30+" (deprecated per CR-3 2026-05-13, the taxonomy is 22).
+const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
 /**
  * "How We Compare" card for the landing page.
@@ -73,7 +77,7 @@ const PROFILES: CompetitorProfile[] = [
         dimension: 'Bias detection',
         themLabel: 'Not offered',
         themRating: 'none',
-        usLabel: '30+ types, automated',
+        usLabel: `${BIAS_COUNT} bias types, automated`,
         usRating: 'full',
       },
       {
