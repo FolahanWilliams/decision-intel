@@ -281,6 +281,13 @@ const PathToHundredMillionTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// Pilot Plan — the post-VC-pass re-foundation as a living surface: first 3 paid
+// pilots + the public prospective track record (SpaceX call ledger). Locked
+// 2026-06-21. SSOT in pilot-plan/pilot-plan-data.ts.
+const PilotPlanTab = dynamic(
+  () => import('@/components/founder-hub/PilotPlanTab').then(m => ({ default: m.PilotPlanTab })),
+  { loading: tabLoader }
+);
 import {
   Rocket,
   Brain,
@@ -306,6 +313,7 @@ import {
   Mic,
   Activity,
   Sprout,
+  Flag,
 } from 'lucide-react';
 import { card } from '@/components/founder-hub/shared-styles';
 import { AccordionSection } from '@/components/founder-hub/AccordionSection';
@@ -338,6 +346,7 @@ type TabId =
   | 'accountability_sprint'
   | 'antler_brief'
   | 'path_to_100m'
+  | 'pilot_plan'
   | 'voice_activity'
   | 'metrics'
   | 'founder_os'
@@ -408,6 +417,14 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'path_to_100m',
     label: 'Path to £100M Exits',
     icon: <Target size={16} />,
+    group: 'Start',
+  },
+  // Pilot Plan — the post-VC-pass re-foundation (locked 2026-06-21): first 3
+  // paid pilots + the public prospective track record (SpaceX call ledger).
+  {
+    id: 'pilot_plan',
+    label: 'Pilot Plan',
+    icon: <Flag size={16} />,
     group: 'Start',
   },
   // Product
@@ -621,6 +638,14 @@ const SEARCH_INDEX: SearchEntry[] = [
     preview: 'High-level narrative: the four moments we catch what others miss.',
     keywords:
       'overview narrative moat four moments elevator pitch positioning compounding decision knowledge graph dqi',
+  },
+  {
+    tabId: 'pilot_plan',
+    section: 'Pilot Plan — first 3 paid pilots',
+    preview:
+      'The post-VC-pass re-foundation: 3 paid pilots (who/why/how/price), the public prospective track record + SpaceX call ledger, the 3 refinements, the sequence.',
+    keywords:
+      'pilot plan first 3 paid pilots action plan re-foundation rob vc pass hindsight trap retro cold open public track record prospective brier spacex spcx call ledger score the flag not the forecast sankore p0 credibility re-rank sequence guardrails fundable solo gp fractional cso corp dev wedge',
   },
   {
     tabId: 'positioning_hub',
@@ -1956,6 +1981,11 @@ function renderTab(
     path_to_100m: (
       <ErrorBoundary sectionName="Path to £100M Exits">
         <PathToHundredMillionTab />
+      </ErrorBoundary>
+    ),
+    pilot_plan: (
+      <ErrorBoundary sectionName="Pilot Plan">
+        <PilotPlanTab />
       </ErrorBoundary>
     ),
     todo: (
