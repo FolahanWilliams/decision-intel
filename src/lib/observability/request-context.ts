@@ -45,7 +45,10 @@ export function newRequestId(headerValue?: string | null): string {
 }
 
 /** Run `fn` with a fresh request context active for everything it awaits. */
-export function runWithRequestContext<T>(ctx: RequestContext, fn: () => Promise<T> | T): Promise<T> | T {
+export function runWithRequestContext<T>(
+  ctx: RequestContext,
+  fn: () => Promise<T> | T
+): Promise<T> | T {
   return storage.run(ctx, fn);
 }
 
@@ -81,7 +84,9 @@ export function withRequestContext<Args extends unknown[]>(
         }
       })(),
     };
-    const res = await (runWithRequestContext(ctx, () => handler(req, ...rest)) as Promise<Response>);
+    const res = await (runWithRequestContext(ctx, () =>
+      handler(req, ...rest)
+    ) as Promise<Response>);
     try {
       res.headers.set('x-request-id', ctx.requestId);
     } catch {

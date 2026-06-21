@@ -68,7 +68,7 @@ export function withTenantContext<T>(
   ctx: TenantContext,
   fn: (tx: TxClient) => Promise<T>
 ): Promise<T> {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     await applyContext(tx, { userId: ctx.userId, orgId: ctx.orgId, bypass: false });
     return fn(tx);
   }, TXN_OPTS);
@@ -80,7 +80,7 @@ export function withTenantContext<T>(
  * Use sparingly and never with request-derived input as the only guard.
  */
 export function withRlsBypass<T>(fn: (tx: TxClient) => Promise<T>): Promise<T> {
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async tx => {
     await applyContext(tx, { bypass: true });
     return fn(tx);
   }, TXN_OPTS);
