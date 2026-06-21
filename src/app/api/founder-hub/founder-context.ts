@@ -1326,6 +1326,7 @@ Valid tabIds — match these exactly, case-sensitive, no prefix:
 - founder_os             Founder OS (commitment record, streak grid, event prep, build-in-public)
 - unicorn_roadmap        Unicorn Roadmap (honest probability path + hard-truth risks)
 - path_to_100m           Path to £100M Exits (strengths/weaknesses, role playbooks, investor metrics)
+- pilot_plan             Pilot Plan (the post-VC-pass re-foundation: first 3 paid pilots + the public prospective track record / SpaceX call ledger + the score-the-flag-not-the-forecast discipline; founder-hub-internal). Use when the founder asks about the pilot plan, the first paying customers, the public track record / calls, the SpaceX call, or how to answer the VC pass.
 - overview               Product Overview
 - product_deep           Pipeline & Scoring
 - research               Research & Foundations

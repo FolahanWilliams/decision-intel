@@ -126,6 +126,23 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
       'investor brief',
     ],
   },
+  {
+    id: 'pilot_plan',
+    label: 'Pilot Plan',
+    aliases: [
+      'pilot plan',
+      'first 3 pilots',
+      'first three pilots',
+      'paid pilots',
+      'pilot strategy',
+      'action plan',
+      're-foundation',
+      'public calls',
+      'public track record',
+      'spacex call',
+      'first customers plan',
+    ],
+  },
   { id: 'content', label: 'Content Studio' },
   // Foundations
   {
