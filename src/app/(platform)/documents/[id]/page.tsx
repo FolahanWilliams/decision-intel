@@ -925,7 +925,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         onClose={() => setShowSettings(false)}
         methodologySlot={
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-            DQI methodology v2.1.0 · 6 weighted components · noise jury (3 frames ×{' '}
+            DQI methodology v2.4.0 · 7 weighted components · noise jury (3 frames ×{' '}
             {analysis?.noiseScore != null ? Math.round(analysis.noiseScore) : '—'} mean) ·
             validity-aware weight shift per Kahneman & Klein 2009.
           </div>

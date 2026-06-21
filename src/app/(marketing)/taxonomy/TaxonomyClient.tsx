@@ -603,7 +603,7 @@ export function TaxonomyClient() {
                 lineHeight: 1.15,
               }}
             >
-              Run these twenty biases on your next strategic memo.
+              Run these {entries.length} biases on your next strategic memo.
             </h2>
             <p
               style={{

@@ -32,7 +32,7 @@ const DQI_COMPONENTS: Array<{
 }> = [
   {
     label: 'Bias Load',
-    weight: 28,
+    weight: 22,
     measures:
       'Severity-weighted count of detected cognitive biases, normalized to document complexity.',
     color: C.red,
@@ -60,8 +60,7 @@ const DQI_COMPONENTS: Array<{
   {
     label: 'Compliance Risk',
     weight: 13,
-    measures:
-      'Inverse of the seven-framework regulatory exposure score from the Verification node.',
+    measures: 'Inverse of the regulatory exposure score from the Verification node.',
     color: C.green,
   },
   {
@@ -70,6 +69,13 @@ const DQI_COMPONENTS: Array<{
     measures:
       'Pattern match against 143 historical cases. Prior failure signatures drag the score down.',
     color: C.slate600,
+  },
+  {
+    label: 'Compound Risk',
+    weight: 6,
+    measures:
+      'Interaction-matrix amplification when biases co-occur — the toxic-combination signal beyond the individual biases.',
+    color: C.slate500,
   },
 ];
 
@@ -138,7 +144,7 @@ export function DqiComponentBars() {
           marginBottom: 4,
         }}
       >
-        DQI v2.0.0 · six weighted components
+        DQI v2.4.0 · seven weighted components
       </div>
       <div
         style={{
