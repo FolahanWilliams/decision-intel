@@ -88,6 +88,7 @@ import { computeGenomeFromSeed } from '@/lib/data/bias-genome-seed';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 
 // Bias count derived from BIAS_EDUCATION (count-discipline rule); when DI-B-023
 // lands the marketing copy picks it up automatically. The interaction matrix
@@ -110,8 +111,7 @@ const R2F_DETECTORS = [
     label: 'Validity',
     technicalLabel: 'Validity Classifier',
     body: 'Classifies the decision domain into high / medium / low / zero validity. High-validity domains have stable rules and rapid feedback (chess, weather forecasting one week out). Low-validity domains are noisy with delayed feedback (M&A, market entry, long-horizon strategy). Most strategic memos sit in the low / zero band.',
-    dqiShift:
-      'Confidence-language is penalised harder in low-validity domains (the same rhetorical certainty that scores neutrally on a high-validity decision becomes an Illusion-of-Validity flag in low-validity contexts). Methodology v2.1.0.',
+    dqiShift: `Confidence-language is penalised harder in low-validity domains (the same rhetorical certainty that scores neutrally on a high-validity decision becomes an Illusion-of-Validity flag in low-validity contexts). Methodology ${METHODOLOGY_VERSION}.`,
     anchor:
       'Anchor: Kahneman & Klein, "Conditions for Intuitive Expertise: A Failure to Disagree" (American Psychologist, 2009) · first condition.',
   },

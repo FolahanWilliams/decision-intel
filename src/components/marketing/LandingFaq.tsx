@@ -130,9 +130,8 @@ const ITEMS: FaqItem[] = [
         ChatGPT gives one opinion from one model — it will confidently tell you the deck looks fine.
         Decision Intel runs a multi-stage audit: {BIAS_COUNT} domain-specific biases mapped to
         published research, triangulated noise measurement, compound-risk scoring across interacting
-        biases,
-        and an outcome flywheel that recalibrates your scores with every confirmed result. The full
-        methodology is documented at{' '}
+        biases, and an outcome flywheel that recalibrates your scores with every confirmed result.
+        The full methodology is documented at{' '}
         <Link href="/how-it-works" style={{ color: C.green, fontWeight: 600 }}>
           /how-it-works
         </Link>

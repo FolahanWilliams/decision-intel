@@ -56,6 +56,7 @@ import {
 } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 
 // Framework count derived from registry per CLAUDE.md count-discipline rule:
 // when a new African / EM framework lands the about page picks it up
@@ -243,7 +244,7 @@ export default function AboutPage() {
               {
                 icon: <Gauge size={20} color={C.green} strokeWidth={2.25} />,
                 title: 'Decision Quality Index',
-                body: 'Composite score from 7 weighted components, validity-aware, methodology v2.1.0 stamped on every result.',
+                body: `Composite score from 7 weighted components, validity-aware, methodology ${METHODOLOGY_VERSION} stamped on every result.`,
               },
               {
                 icon: <ScrollText size={20} color={C.green} strokeWidth={2.25} />,
