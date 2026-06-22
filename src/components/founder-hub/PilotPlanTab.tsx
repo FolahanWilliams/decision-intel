@@ -171,6 +171,22 @@ export function PilotPlanTab() {
         </p>
       </div>
 
+      {/* Focus — the two named lanes + sprint intensity. The founder’s own
+          discipline: named targets, not a broad campaign; don’t spread thin. */}
+      <AccentCard accent="primary" title={<CardTitle>{p.focus.headline}</CardTitle>}>
+        <Bullets items={p.focus.lanes} />
+        <p
+          style={{
+            margin: '12px 0 0',
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.55,
+          }}
+        >
+          {p.focus.note}
+        </p>
+      </AccentCard>
+
       {/* Next move — the one thing this week */}
       <AccentCard accent="primary" tinted title={<CardTitle>Do this week</CardTitle>}>
         <Para>{p.nextMove}</Para>
@@ -225,8 +241,8 @@ export function PilotPlanTab() {
         </div>
       </AccentCard>
 
-      {/* The three pilots */}
-      <div style={eyebrowStyle}>The three paid pilots</div>
+      {/* The pilots — two named lanes + opportunistic */}
+      <div style={eyebrowStyle}>The pilots · two named lanes + opportunistic</div>
       {p.pilots.map(pilot => (
         <AccentCard
           key={pilot.name}
@@ -278,8 +294,8 @@ export function PilotPlanTab() {
         </AccentCard>
       ))}
 
-      {/* Sankore P0 */}
-      <AccentCard accent="danger" tinted title={<CardTitle>{p.sankore.headline}</CardTitle>}>
+      {/* Sankore — highest-ceiling stretch (re-weighted 2026-06-22, founder call) */}
+      <AccentCard accent="info" tinted title={<CardTitle>{p.sankore.headline}</CardTitle>}>
         <Para>{p.sankore.body}</Para>
       </AccentCard>
 

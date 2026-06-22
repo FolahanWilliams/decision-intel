@@ -70,12 +70,29 @@ export interface CredibilityAsset {
   status: 'have' | 'building' | 'todo';
 }
 
+export interface Focus {
+  headline: string;
+  lanes: readonly string[];
+  note: string;
+}
+
 export const PILOT_PLAN = {
   headline: 'The plan to land the first 3 paid pilots — and earn the track record funding needs.',
   thesis:
     'Re-alignment to the wedge you already chose, not re-invention. Rob did not break the strategy; he broke a deck that wandered back to the ceiling (confidential F500 M&A — the one buyer structurally closed to you this year). Re-found on the wedge, manufacture a public prospective track record on the side, and real funding is on the table.',
   provenance:
-    'Built 2026-06-21 from the VC pass (Rob / Hustle Fund), the Cowork re-foundation thread, and the repo-grounded review. Full prose: docs/action-plan-first-3-pilots-2026-06.md.',
+    'Built 2026-06-21 from the VC pass (Rob / Hustle Fund), the Cowork re-foundation thread, and the repo-grounded review. Re-weighted 2026-06-22 to the founder’s decisions: two NAMED lanes, Sankore as a stretch (not the week-1 anchor), 3 paying cheques as the bar, full-summer sprint. Full prose: docs/action-plan-first-3-pilots-2026-06.md.',
+
+  // ─── The focus — WHO, exactly, and at what intensity. The founder’s own
+  //     discipline: named targets, not a broad campaign; don’t spread thin. ───
+  focus: {
+    headline: 'Two named lanes this summer — specific people, not a campaign.',
+    lanes: [
+      'Lane A — ONE specific solo GP / angel. Warmest path: Rob’s Hustle Fund / Angel Squad network (he just engaged — ask for the intro). Owns their deal data; cleanest ROI ("it flagged a risk on a deal I’d have done").',
+      'Lane B — ONE specific fractional CSO / strategy consultant. LinkedIn-findable, constant memo flow, their name is on every board memo. Value: "walk into the board Q&A already ready for the two risks it flagged."',
+    ],
+    note: 'Corp dev / PE-backed founder is OPPORTUNISTIC — take it if it comes warm, don’t run it as a third campaign. The whole point is clarity on WHO + WHY, not volume: "I’m targeting this person from here, that person from there." Full-summer sprint: DI is the priority through ~August — 8–10 personalised outreach/week (top of the 1-1-1 cadence, never cold-at-scale), 2 public calls/month, buyer conversations as the daily job.',
+  } as Focus,
 
   // ─── The diagnosis, settled. Stop re-litigating; act. ───
   diagnosis: [
@@ -107,7 +124,7 @@ export const PILOT_PLAN = {
   pilots: [
     {
       name: 'Solo GP / small-fund principal / active angel',
-      tag: 'Best wedge',
+      tag: 'Lane A · named target',
       who: 'An individual running their own deal flow at a £5–100M fund, a syndicate lead, or a serious angel who writes/approves investment memos and owns the decision.',
       why: 'Owns the data outright (no GC, no procurement); investment bias is the most-documented domain on earth; enough decisions to calibrate; pays from a personal/fund card; reputation rides on judgment, so a private red-team is valuable to them.',
       how: 'Rob’s Hustle Fund / Angel Squad network is a direct line to exactly this person — he just engaged, so ask. Plus Mr. Gabe’s investor network and targeted DMs. Open with the retro: "Send me one deal you passed on that you regret and one you did that went sideways. I’ll run our audit and show you what the reasoning looked like in hindsight. 20 min, no pitch."',
@@ -120,7 +137,7 @@ export const PILOT_PLAN = {
     },
     {
       name: 'Fractional CSO / independent strategy consultant',
-      tag: 'Constant memo flow',
+      tag: 'Lane B · named target',
       who: 'Someone running 3–5 client engagements who produces strategy memos and board recommendations for a living.',
       why: 'Their product IS judgment quality; their name is on every memo; they own the workflow; personal budget; constant memo flow. Catching what the client’s board will catch before delivery is directly in their self-interest.',
       how: 'LinkedIn (findable + active); retro cold-open on a past, anonymised engagement; Strategy World London / conference 1:1s.',
@@ -131,7 +148,7 @@ export const PILOT_PLAN = {
     },
     {
       name: 'Mid-market Head of Corp Dev / PE-backed founder',
-      tag: 'Pays personally',
+      tag: 'Opportunistic · not a third campaign',
       who: 'Head of Corp Dev at a $50–500M-revenue scale-up, or a PE-backed founder/CEO with personal-decisive budget, doing 1–3 deals a year.',
       why: 'High-stakes, personal budget pre-team, owns their own deal memos. NOT the F500 GC (closed) — the individual operator who can just buy it for their own work.',
       how: 'Mr. Reiner’s network (US); warm intros; retro cold-open on a closed deal.',
@@ -142,8 +159,8 @@ export const PILOT_PLAN = {
   ] as Pilot[],
 
   sankore: {
-    headline: 'Sankore is P0 — the single most important asset in this plan, not "the bridge."',
-    body: 'The 3 individual cheques prove DEMAND; only an embedded relationship realistically produces real calibration data inside 12 months. Individuals are the LEAST likely cohort to log honest 90-day outcomes — the Cloverpop manual-logging trap, and outcome-logging is the exact behaviour the moat depends on. Sankore’s contractual outcome-gate + the retroactive seed over 30–50 already-closed decisions gives real outcome data on day one, not in a year. If you could keep only one workstream, keep Sankore. Start it week 1. Lead with the relationship/embed, not the monthly rate; take money if offered, but access + data is the prize.',
+    headline: 'Sankore is the highest-CEILING stretch — chase it hard, but it is NOT the anchor.',
+    body: 'The honest tension, settled (founder call, 2026-06-22): Sankore has the highest ceiling of anything in this plan — the 3 individual cheques prove DEMAND, but only an embedded relationship realistically produces real calibration data inside 12 months (individuals are the LEAST likely cohort to log honest 90-day outcomes — the Cloverpop manual-logging trap, and outcome-logging is the exact behaviour the moat depends on; Sankore’s contractual outcome-gate + the retroactive seed over 30–50 already-closed decisions gives real outcome data on day one). BUT it is not signed — and you cannot make an unsigned MoU the spine of a 90-day plan. So: pursue Sankore hard in parallel (it is the moat accelerant, and if the MoU signs it RE-RANKS to P0 and reshapes the sequence), but ANCHOR the 60–90 days on the two named individual lanes you control. Your fallback for getting at least SOME outcome data without it: the individual pilots’ operational-proxy gate forces a falsifiable ≤90-day call at vote time. Lead Sankore with the relationship/embed, not the monthly rate; take money if offered, but access + data is the prize.',
   },
 
   // ─── Three refinements from the 2026-06-21 review. Sharpen, don't replace. ───
@@ -155,13 +172,14 @@ export const PILOT_PLAN = {
     },
     {
       n: 2,
-      title: 'Sankore is P0, not parallel.',
-      body: 'See above. Treat the embed as the highest-priority workstream, starting week 1 — it is the only realistic path to real calibration data in 12 months. The individual pilots prove the wedge; Sankore proves the moat.',
+      title: 'Sankore is the highest-ceiling stretch — chase it, but don’t make it the spine.',
+      body: 'The prior draft argued Sankore is P0 (the only realistic real-calibration-data source in 12 months — true). The founder’s call (2026-06-22): it is not signed, so it cannot anchor the 90 days. Resolution: pursue Sankore hard in parallel (highest ceiling; re-ranks to P0 the day the MoU signs), but anchor on the two named individual lanes you control. The individual pilots prove the wedge; Sankore, IF it lands, proves the moat. Don’t gate the sprint on an unsigned deal.',
     },
     {
       n: 3,
-      title: 'Re-rank the credibility assets — "3 paid pilots" is the weakest of the four.',
-      body: 'Three individuals at £249–999/mo reads as lifestyle SaaS to a skeptical seed investor (your own "£300K/yr lifestyle utility" warning). The cheques prove willingness-to-pay (necessary, hard). But the assets that prove the PRODUCT WORKS and move a check rank: (1) public Brier track record → (2) Sankore real-outcome reference → (3) the GPT-vs-pipeline depth proof → (4) the 3 paid cheques. Lead the investor story with 1–3; use 4 as the "dog eats the food" floor. So 1 and 2 start week 1 — they are the longest-pole, highest-value assets.',
+      title:
+        'The 3 cheques are the BAR investors named — but not the strongest credibility signal.',
+      body: 'Three individuals at £249–999/mo reads as lifestyle SaaS to a skeptical seed investor (your own "£300K/yr lifestyle utility" warning). The cheques prove willingness-to-pay (necessary, hard, and the literal bar you were given) — but they don’t prove the product WORKS. The proofs that do, in order of what you control: (1) public Brier track record → (2) the GPT-vs-pipeline depth proof → (3) the 3 paid cheques, with Sankore the wildcard that leaps to the top the day it signs. Lead the investor story with 1–2 (controllable, start week 1) + the cheques as the floor; treat Sankore as upside, not the plan.',
     },
   ] as Refinement[],
 
@@ -259,25 +277,25 @@ export const PILOT_PLAN = {
     {
       rank: 1,
       asset: 'Public Brier track record',
-      note: 'The thing no other pre-seed founder has, and the only honest answer to "how do I know it works." Start week 1.',
+      note: 'The thing no other pre-seed founder has, and the only honest answer to "how do I know it works." Fully in your control. Start week 1.',
       status: 'building',
     },
     {
       rank: 2,
-      asset: 'Sankore real-outcome reference',
-      note: 'Embedded relationship → real calibration data on day one via the retroactive seed. P0. Start week 1.',
-      status: 'building',
+      asset: 'GPT-vs-pipeline depth proof',
+      note: 'One real memo, one non-obvious catch the pipeline makes that a plain GPT prompt misses. Kills "it’s a sophisticated Claude wrapper." Fully in your control. Build week 1.',
+      status: 'todo',
     },
     {
       rank: 3,
-      asset: 'GPT-vs-pipeline depth proof',
-      note: 'One real memo, one non-obvious catch the pipeline makes that a plain GPT prompt misses. The rebuttal to "the product seems light."',
+      asset: 'The 3 paid cheques',
+      note: 'The bar investors named — proves willingness-to-pay (necessary, hard). Land them via the two named lanes. The "dog eats the food" floor, not the headline.',
       status: 'todo',
     },
     {
       rank: 4,
-      asset: 'The 3 paid cheques',
-      note: 'Proves willingness-to-pay — necessary, hard, real. The "dog eats the food" floor, NOT the headline.',
+      asset: 'Sankore real-outcome reference',
+      note: 'Highest CEILING — real calibration data + a logo via the retroactive seed. But a STRETCH (unsigned). Chase it hard; the day it lands it leaps to the top.',
       status: 'todo',
     },
   ] as CredibilityAsset[],
@@ -288,16 +306,18 @@ export const PILOT_PLAN = {
       window: 'Weeks 1–2 — clear the deck, load the gun',
       items: [
         'Ship the safe credibility cleanups (done: 7-component DQI + 22-bias counts swept). Park the pitch deck — it is not the blocker.',
+        'Open the two named lanes: pick ONE specific solo GP / angel (ask Rob for the intro) and ONE specific fractional CSO; send each the retro cold-open.',
         'Build the one product proof (GPT vs pipeline).',
         'Publish public call #1 (SpaceX) — lock + timestamp via the proxy gate.',
-        'Start the Sankore embed conversation (P0).',
+        'Open the Sankore conversation — high-ceiling stretch; pursue, but don’t gate the plan on it.',
       ],
     },
     {
       window: 'Weeks 2–8 — first cheque',
       items: [
-        'Retro-cold-open outreach to Pilots 1–3. 5–10 personalised conversations/week; log every one in the WedgeProspect ledger (an empty ledger IS the displacement signal).',
-        'Publish call #2 (pair the high-profile SpaceX call with a lower-profile one).',
+        'Full-summer sprint: 8–10 personalised conversations/week across the two named lanes (top of the 1-1-1 cadence, never cold-at-scale); corp dev only if it comes warm. Log every one in the WedgeProspect ledger (an empty ledger IS the displacement signal).',
+        'Run the reverse-pilot in every call (the $300M→$3B motion): ask what they’d pay to solve + what it would take for them to become a buyer; get the ROI metric from THEIR mouth, hit it, come back with "I did what you said — ready?"',
+        '2 public calls/month — pair the high-profile SpaceX call with a lower-profile one (the calibration story needs N before any single miss is just noise).',
         'Target: one signed paid pilot.',
       ],
     },
@@ -337,5 +357,5 @@ export const PILOT_PLAN = {
   ] as readonly string[],
 
   nextMove:
-    'This week: lock SpaceX call #1 AND start the Sankore conversation — same week. The public call costs an afternoon (the machine is built) and is the asset that most directly neutralises the VC pass.',
+    'This week, three moves: (1) lock SpaceX call #1 — an afternoon, the machine is already built, and it is the asset that most directly neutralises the VC pass; (2) open BOTH named lanes — one specific solo GP / angel (ask Rob for the intro) and one specific fractional CSO — with the retro cold-open; (3) open the Sankore conversation in parallel (upside, not the spine). Then run the reverse-pilot in every reply: what would they pay to solve, and what would make them a buyer?',
 } as const;
