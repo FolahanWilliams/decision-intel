@@ -16,6 +16,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { ShieldCheck } from 'lucide-react';
 import type { BiasInstance } from '@/types';
 import {
   SeverityEdgeCard,
@@ -29,6 +30,7 @@ import {
   type ToxicCombinationEdge,
 } from '../primitives';
 import { formatBiasName } from '@/lib/utils/labels';
+import { CLEAN_AUDIT } from '@/lib/data/clean-audit-copy';
 
 const SEVERITY_RANK: Record<string, number> = {
   critical: 4,
@@ -137,6 +139,11 @@ export function FindingsTab(props: FindingsTabProps) {
 
   return (
     <div style={{ display: 'grid', gap: 18 }}>
+      {/* Clean-audit reassurance — leads the tab when zero biases surfaced
+          so the user reads "verified clean" before they read four zeros.
+          Copy SSOT: clean-audit-copy.ts. */}
+      {biases.length === 0 && <CleanAuditPanel />}
+
       {/* Bias frequency strip */}
       <BiasFrequencyStrip counts={counts} total={biases.length} />
 
@@ -168,26 +175,13 @@ export function FindingsTab(props: FindingsTabProps) {
         <SynergyDefensibilityPanel summary={synergyDefensibility} />
       )}
 
-      {/* Per-bias catalogue */}
-      <div style={{ display: 'grid', gap: 12 }}>
-        <SectionEyebrow label={`All findings · ${biases.length}`} />
-        {sorted.length === 0 ? (
-          <div
-            style={{
-              padding: 24,
-              textAlign: 'center',
-              color: 'var(--text-muted)',
-              fontSize: 13,
-              border: '1px dashed var(--border-color)',
-              borderRadius: 'var(--radius-md, 8px)',
-              fontStyle: 'italic',
-            }}
-          >
-            No biases detected on this audit. Either the memo is exceptionally clean — or the
-            analysis is still in flight.
-          </div>
-        ) : (
-          sorted.map(bias => (
+      {/* Per-bias catalogue — only when there are findings. The zero-bias
+          case is handled by the CleanAuditPanel at the top of the tab, so
+          we no longer show a terse "nothing detected" placeholder here. */}
+      {sorted.length > 0 && (
+        <div style={{ display: 'grid', gap: 12 }}>
+          <SectionEyebrow label={`All findings · ${biases.length}`} />
+          {sorted.map(bias => (
             <BiasFindingCard
               key={bias.id}
               bias={bias}
@@ -195,10 +189,200 @@ export function FindingsTab(props: FindingsTabProps) {
               onClick={onBiasClick}
               taxonomyId={taxonomyIdByType?.[bias.biasType]}
             />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+/* ---------------- Clean-audit reassurance panel ---------------- */
+
+/**
+ * Shown at the top of the Findings tab when an audit surfaces zero biases.
+ * Reframes "empty" as a verified, valuable result, explains what the audit
+ * actually did so "nothing found" reads as rigor, names what the clean
+ * record gives the user, and tells them what to do next. All copy reads
+ * from the CLEAN_AUDIT SSOT (clean-audit-copy.ts) so it cannot drift from
+ * the dashboard post-upload reveal.
+ */
+function CleanAuditPanel() {
+  return (
+    <section
+      style={{
+        border: '1px solid var(--border-color)',
+        borderLeft: '3px solid var(--success)',
+        borderRadius: 'var(--radius-md, 8px)',
+        background:
+          'linear-gradient(135deg, color-mix(in srgb, var(--success) 6%, transparent), transparent)',
+        padding: '18px 20px',
+        display: 'grid',
+        gap: 14,
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 34,
+            height: 34,
+            borderRadius: 'var(--radius-md, 8px)',
+            background: 'color-mix(in srgb, var(--success) 14%, transparent)',
+            color: 'var(--success)',
+            flexShrink: 0,
+          }}
+        >
+          <ShieldCheck size={19} />
+        </span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'var(--success)',
+              marginBottom: 4,
+            }}
+          >
+            {CLEAN_AUDIT.eyebrow}
+          </div>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 600,
+              lineHeight: 1.35,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.01em',
+              fontFamily: '"Source Serif 4", "Source Serif Pro", Georgia, serif',
+            }}
+          >
+            {CLEAN_AUDIT.headline}
+          </h3>
+        </div>
+      </div>
+
+      {/* Why a clean pass is worth having */}
+      <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+        {CLEAN_AUDIT.why}
+      </p>
+
+      {/* What the audit actually did */}
+      <div
+        style={{
+          fontSize: 12,
+          lineHeight: 1.55,
+          color: 'var(--text-muted)',
+          padding: '10px 12px',
+          background: 'var(--bg-secondary)',
+          borderRadius: 6,
+        }}
+      >
+        {CLEAN_AUDIT.whatRan}
+      </div>
+
+      {/* What the clean result gives you */}
+      <div style={{ display: 'grid', gap: 8 }}>
+        <CleanSubheading label="What this gives you" />
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 6 }}>
+          {CLEAN_AUDIT.means.map((line, i) => (
+            <li
+              key={i}
+              style={{
+                display: 'flex',
+                gap: 8,
+                fontSize: 12.5,
+                lineHeight: 1.55,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <span style={{ color: 'var(--success)', flexShrink: 0, fontWeight: 700 }}>·</span>
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* What to do next */}
+      <div style={{ display: 'grid', gap: 8 }}>
+        <CleanSubheading label="What to do next" />
+        <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 8 }}>
+          {CLEAN_AUDIT.nextSteps.map((step, i) => (
+            <li key={i} style={{ display: 'flex', gap: 10 }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 20,
+                  height: 20,
+                  borderRadius: 999,
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--success)',
+                  color: 'var(--success)',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  fontVariantNumeric: 'tabular-nums',
+                  flexShrink: 0,
+                }}
+              >
+                {i + 1}
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {step.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 1.5,
+                    color: 'var(--text-secondary)',
+                    marginTop: 2,
+                  }}
+                >
+                  {step.detail}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Honesty caveat */}
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11.5,
+          lineHeight: 1.55,
+          color: 'var(--text-muted)',
+          fontStyle: 'italic',
+          borderTop: '1px solid var(--border-color)',
+          paddingTop: 12,
+        }}
+      >
+        {CLEAN_AUDIT.honesty}
+      </p>
+    </section>
+  );
+}
+
+function CleanSubheading({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        fontWeight: 800,
+        letterSpacing: '0.14em',
+        textTransform: 'uppercase',
+        color: 'var(--text-muted)',
+      }}
+    >
+      {label}
+    </span>
   );
 }
 

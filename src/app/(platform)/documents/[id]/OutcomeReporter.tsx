@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { formatDate } from '@/lib/utils/format-date';
 
 interface OutcomeData {
   analysisId: string;
@@ -221,19 +222,26 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
           <TrendingUp size={16} style={{ color: 'var(--text-secondary)' }} />
           <span style={{ fontSize: '13px', fontWeight: 600 }}>Decision Outcome</span>
           {existing ? (
-            <span
-              style={{
-                fontSize: '11px',
-                padding: '2px 10px',
-                borderRadius: '10px',
-                background: `${outcomeOption?.color}20`,
-                color: outcomeOption?.color,
-                fontWeight: 600,
-                textTransform: 'capitalize',
-              }}
-            >
-              {existing.outcome.replace('_', ' ')}
-            </span>
+            <>
+              <span
+                style={{
+                  fontSize: '11px',
+                  padding: '2px 10px',
+                  borderRadius: '10px',
+                  background: `${outcomeOption?.color}20`,
+                  color: outcomeOption?.color,
+                  fontWeight: 600,
+                  textTransform: 'capitalize',
+                }}
+              >
+                {existing.outcome.replace('_', ' ')}
+              </span>
+              {existing.outcome === 'too_early' && (
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                  revisit when it resolves
+                </span>
+              )}
+            </>
           ) : (
             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
               {daysSinceAnalysis < 7
@@ -288,6 +296,27 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         <div
           style={{ padding: '0 18px 18px', display: 'flex', flexDirection: 'column', gap: '16px' }}
         >
+          {existing && (
+            <div
+              style={{
+                fontSize: '12px',
+                lineHeight: 1.5,
+                color: 'var(--text-secondary)',
+                padding: '8px 12px',
+                background: `${outcomeOption?.color || 'var(--accent-primary)'}10`,
+                borderRadius: '8px',
+                border: `1px solid ${outcomeOption?.color || 'var(--accent-primary)'}30`,
+              }}
+            >
+              You last reported{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>
+                {outcomeOption?.label ?? existing.outcome.replace('_', ' ')}
+              </strong>
+              {existing.reportedAt ? ` on ${formatDate(existing.reportedAt)}` : ''}. Update the
+              fields below if it has changed.
+            </div>
+          )}
+
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
             Reporting outcomes improves future analysis accuracy. Your feedback teaches the AI which
             biases were real, which personas were most accurate, and what patterns lead to success
@@ -348,6 +377,34 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               })}
             </div>
           </div>
+
+          {outcome === 'too_early' && (
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                fontSize: '12px',
+                lineHeight: 1.55,
+                color: 'var(--text-secondary)',
+                padding: '10px 12px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--bg-elevated)',
+                borderLeft: '3px solid var(--text-muted)',
+                borderRadius: '8px',
+              }}
+            >
+              <Clock
+                size={15}
+                style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 1 }}
+              />
+              <span>
+                &ldquo;Too early&rdquo; is the honest answer when the decision has not matured yet.
+                Most strategic calls resolve in 60 to 90 days. Log it now, then come back and update
+                it when the result lands. That update is the data point that sharpens your
+                calibration, so the next clean memo means more.
+              </span>
+            </div>
+          )}
 
           {outcome && outcome !== 'too_early' && (
             <>

@@ -12,6 +12,7 @@ import { DiscoverySynthesisLine } from '@/components/analysis/DiscoverySynthesis
 import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
 import { formatBiasName } from '@/lib/utils/labels';
 import { severityColor } from '@/lib/utils/severity';
+import { CLEAN_AUDIT } from '@/lib/data/clean-audit-copy';
 // Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
 // sync with the canonical DQIResult shape without forcing the dqi module
 // onto the post-upload reveal critical path.
@@ -587,8 +588,36 @@ export function InlineAnalysisResultCard({
               </ol>
             </>
           ) : (
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Reasoning chain scanned — no high-risk cognitive patterns surfaced.
+            <div
+              style={{
+                display: 'flex',
+                gap: 10,
+                padding: '12px 14px',
+                background: 'color-mix(in srgb, var(--success) 6%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--success) 22%, transparent)',
+                borderRadius: 'var(--radius-md, 8px)',
+              }}
+            >
+              <CheckCircle
+                size={16}
+                style={{ color: 'var(--success)', flexShrink: 0, marginTop: 1 }}
+              />
+              <div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    marginBottom: 3,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {CLEAN_AUDIT.headline}
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                  {CLEAN_AUDIT.inlineBody}
+                </div>
+              </div>
             </div>
           )}
         </div>
