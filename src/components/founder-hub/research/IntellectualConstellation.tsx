@@ -2,12 +2,27 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Filter } from 'lucide-react';
+import {
+  Search,
+  X,
+  Filter,
+  Route,
+  ChevronLeft,
+  ChevronRight,
+  Spline,
+  Quote,
+  Swords,
+} from 'lucide-react';
 import {
   THINKERS,
   CATEGORY_META,
+  LINEAGE,
+  LINEAGE_KIND_META,
+  THINKER_DEPTH,
+  ARGUMENT_PATH,
   type Thinker,
   type ThinkerCategory,
+  type LineageKind,
 } from '@/lib/data/research-foundations';
 
 // ─── SVG layout constants ──────────────────────────────────────────
@@ -52,12 +67,45 @@ function computePositions(): NodePosition[] {
 }
 
 const POSITIONS = computePositions();
+const POSITION_BY_ID = new Map(POSITIONS.map(p => [p.thinker.id, p]));
+const THINKER_BY_ID = new Map(THINKERS.map(t => [t.id, t]));
+
+// Reverse lineage index: target id → who draws on it.
+interface IncomingEdge {
+  from: string;
+  kind: LineageKind;
+  note: string;
+}
+const REVERSE_LINEAGE: Record<string, IncomingEdge[]> = (() => {
+  const r: Record<string, IncomingEdge[]> = {};
+  for (const [from, edges] of Object.entries(LINEAGE)) {
+    for (const e of edges) {
+      (r[e.to] ??= []).push({ from, kind: e.kind, note: e.note });
+    }
+  }
+  return r;
+})();
+
+const ALL_EDGES = Object.entries(LINEAGE).flatMap(([from, edges]) =>
+  edges.map(e => ({ from, to: e.to, kind: e.kind }))
+);
+
+// Quadratic curve bowed gently toward the hub, so threads read as a web.
+function edgePath(a: NodePosition, b: NodePosition): string {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2;
+  const cx = mx + (CENTER - mx) * 0.22;
+  const cy = my + (CENTER - my) * 0.22;
+  return `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
+}
 
 export function IntellectualConstellation() {
   const [selectedId, setSelectedId] = useState<string | null>(THINKERS[0].id);
   const [activeCategory, setActiveCategory] = useState<ThinkerCategory | 'all'>('all');
   const [shippedFilter, setShippedFilter] = useState<'all' | 'shipped' | 'roadmap'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAllThreads, setShowAllThreads] = useState(false);
+  const [tourStep, setTourStep] = useState<number | null>(null);
 
   const filteredIds = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -77,8 +125,45 @@ export function IntellectualConstellation() {
 
   const selected = useMemo(() => THINKERS.find(t => t.id === selectedId) ?? null, [selectedId]);
 
+  const activeEdges = useMemo(() => {
+    if (showAllThreads) {
+      return ALL_EDGES.map(e => ({ ...e, faint: true }));
+    }
+    if (!selectedId) return [];
+    const out = (LINEAGE[selectedId] ?? []).map(e => ({
+      from: selectedId,
+      to: e.to,
+      kind: e.kind,
+      faint: false,
+    }));
+    const inc = (REVERSE_LINEAGE[selectedId] ?? []).map(e => ({
+      from: e.from,
+      to: selectedId,
+      kind: e.kind,
+      faint: false,
+    }));
+    return [...out, ...inc];
+  }, [selectedId, showAllThreads]);
+
   const shippedCount = THINKERS.filter(t => t.shipped).length;
   const totalCount = THINKERS.length;
+
+  // ─── Guided tour ("Walk the argument") ───
+  function startTour() {
+    setTourStep(0);
+    setShowAllThreads(false);
+    setSelectedId(ARGUMENT_PATH[0].id);
+  }
+  function goTour(next: number) {
+    const clamped = Math.max(0, Math.min(ARGUMENT_PATH.length - 1, next));
+    setTourStep(clamped);
+    setSelectedId(ARGUMENT_PATH[clamped].id);
+  }
+  function pickNode(id: string) {
+    setSelectedId(id);
+    // Manual navigation leaves tour mode (unless they clicked the current beat).
+    if (tourStep !== null && ARGUMENT_PATH[tourStep]?.id !== id) setTourStep(null);
+  }
 
   return (
     <section
@@ -91,22 +176,168 @@ export function IntellectualConstellation() {
       }}
     >
       {/* Header */}
-      <div style={{ marginBottom: 14 }}>
-        <div
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          marginBottom: 14,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 2,
+            }}
+          >
+            Intellectual Constellation
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+            {totalCount} thinkers across four rings, {shippedCount} shipped into the product. Click
+            any node to see its lineage and the rebuttal it arms you with.
+          </div>
+        </div>
+        <button
+          onClick={startTour}
           style={{
-            fontSize: 15,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '7px 12px',
+            fontSize: 12,
             fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginBottom: 2,
+            color: '#fff',
+            background: 'var(--accent-primary)',
+            border: '1px solid var(--accent-primary)',
+            borderRadius: 'var(--radius-md)',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
           }}
         >
-          Intellectual Constellation
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-          {totalCount} thinkers across four rings. {shippedCount} are shipped into the product;{' '}
-          {totalCount - shippedCount} are roadmap. Click any node.
-        </div>
+          <Route size={13} />
+          Walk the argument
+        </button>
       </div>
+
+      {/* Tour banner */}
+      <AnimatePresence>
+        {tourStep !== null && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginBottom: 14 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div
+              style={{
+                padding: 14,
+                background: 'color-mix(in srgb, var(--accent-primary) 9%, var(--bg-card))',
+                border: '1px solid var(--accent-primary)',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginBottom: 6,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: 'var(--accent-primary)',
+                  }}
+                >
+                  The argument · step {tourStep + 1} of {ARGUMENT_PATH.length} ·{' '}
+                  {ARGUMENT_PATH[tourStep].title}
+                </span>
+                <button
+                  onClick={() => setTourStep(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                  }}
+                >
+                  <X size={12} /> Exit
+                </button>
+              </div>
+              <div
+                style={{
+                  fontSize: 13.5,
+                  lineHeight: 1.55,
+                  color: 'var(--text-primary)',
+                  marginBottom: 10,
+                }}
+              >
+                {ARGUMENT_PATH[tourStep].beat}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={() => goTour(tourStep - 1)}
+                  disabled={tourStep === 0}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '5px 10px',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: tourStep === 0 ? 'var(--text-muted)' : 'var(--text-primary)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm, 4px)',
+                    cursor: tourStep === 0 ? 'not-allowed' : 'pointer',
+                    opacity: tourStep === 0 ? 0.5 : 1,
+                  }}
+                >
+                  <ChevronLeft size={12} /> Back
+                </button>
+                <button
+                  onClick={() =>
+                    tourStep === ARGUMENT_PATH.length - 1 ? setTourStep(null) : goTour(tourStep + 1)
+                  }
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '5px 10px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#fff',
+                    background: 'var(--accent-primary)',
+                    border: '1px solid var(--accent-primary)',
+                    borderRadius: 'var(--radius-sm, 4px)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {tourStep === ARGUMENT_PATH.length - 1 ? 'Finish' : 'Next'}
+                  {tourStep !== ARGUMENT_PATH.length - 1 && <ChevronRight size={12} />}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Filters */}
       <div
@@ -162,6 +393,28 @@ export function IntellectualConstellation() {
             </button>
           )}
         </div>
+
+        {/* Show-all-threads toggle */}
+        <button
+          onClick={() => setShowAllThreads(v => !v)}
+          title="Show every lineage thread at once"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '5px 10px',
+            fontSize: 11,
+            fontWeight: 600,
+            color: showAllThreads ? '#fff' : 'var(--text-secondary)',
+            background: showAllThreads ? 'var(--text-primary)' : 'var(--bg-card)',
+            border: `1px solid ${showAllThreads ? 'var(--text-primary)' : 'var(--border-color)'}`,
+            borderRadius: 'var(--radius-sm, 4px)',
+            cursor: 'pointer',
+          }}
+        >
+          <Spline size={12} />
+          All threads
+        </button>
 
         {/* Shipped filter */}
         <div style={{ display: 'flex', gap: 4 }}>
@@ -265,7 +518,7 @@ export function IntellectualConstellation() {
             height: 'auto',
           }}
           role="img"
-          aria-label="Intellectual constellation of Decision Intel thinkers"
+          aria-label="Intellectual constellation of Decision Intel thinkers and the lineage between them"
         >
           <defs>
             <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
@@ -288,6 +541,25 @@ export function IntellectualConstellation() {
               opacity={0.35}
             />
           ))}
+
+          {/* Lineage edges (under the nodes) */}
+          {activeEdges.map((e, i) => {
+            const a = POSITION_BY_ID.get(e.from);
+            const b = POSITION_BY_ID.get(e.to);
+            if (!a || !b) return null;
+            const color = CATEGORY_META[a.thinker.category].color;
+            return (
+              <path
+                key={`edge-${e.from}-${e.to}-${i}`}
+                d={edgePath(a, b)}
+                fill="none"
+                stroke={color}
+                strokeWidth={e.faint ? 1 : 1.6}
+                opacity={e.faint ? 0.1 : 0.55}
+                strokeLinecap="round"
+              />
+            );
+          })}
 
           {/* Center DI hub */}
           <circle cx={CENTER} cy={CENTER} r={80} fill="url(#center-glow)" />
@@ -334,9 +606,9 @@ export function IntellectualConstellation() {
                 key={t.id}
                 opacity={opacity}
                 style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
-                onClick={() => setSelectedId(t.id)}
+                onClick={() => pickNode(t.id)}
               >
-                {/* Connection line to center for selected */}
+                {/* Faint "feeds the hub" line for the selected node */}
                 {isSelected && (
                   <line
                     x1={CENTER}
@@ -346,7 +618,7 @@ export function IntellectualConstellation() {
                     stroke={meta.color}
                     strokeWidth={1}
                     strokeDasharray="2 4"
-                    opacity={0.5}
+                    opacity={0.22}
                   />
                 )}
                 {/* Selected halo */}
@@ -459,8 +731,8 @@ export function IntellectualConstellation() {
           <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Roadmap</span>
         </div>
         <span style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-          · Rings (inner → outer): cognitive foundations · decision structuring · comms & GTM ·
-          strategy & moat
+          · Threads = lineage (who built on whom). Rings (inner → outer): cognitive foundations ·
+          decision structuring · comms & GTM · strategy & moat
         </span>
       </div>
 
@@ -552,10 +824,228 @@ export function IntellectualConstellation() {
             >
               {selected.surface}
             </div>
+
+            {/* Lineage */}
+            <LineageSection id={selected.id} onPick={pickNode} />
+
+            {/* Depth: quote, mechanism, in-the-room rebuttal */}
+            {THINKER_DEPTH[selected.id] && (
+              <DepthSection
+                accent={CATEGORY_META[selected.category].color}
+                depth={THINKER_DEPTH[selected.id]}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+function LineageSection({ id, onPick }: { id: string; onPick: (id: string) => void }) {
+  const out = LINEAGE[id] ?? [];
+  const inc = REVERSE_LINEAGE[id] ?? [];
+  if (out.length === 0 && inc.length === 0) return null;
+  return (
+    <>
+      <DetailLabel>Lineage</DetailLabel>
+      <div style={{ display: 'grid', gap: 6, marginBottom: 6 }}>
+        {out.map((e, i) => (
+          <LineageRow
+            key={`out-${i}`}
+            heading="Draws on"
+            target={THINKER_BY_ID.get(e.to)?.shortName ?? e.to}
+            kind={e.kind}
+            note={e.note}
+            onClick={() => onPick(e.to)}
+          />
+        ))}
+        {inc.map((e, i) => (
+          <LineageRow
+            key={`in-${i}`}
+            heading="Influences"
+            target={THINKER_BY_ID.get(e.from)?.shortName ?? e.from}
+            kind={e.kind}
+            note={e.note}
+            onClick={() => onPick(e.from)}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function LineageRow({
+  heading,
+  target,
+  kind,
+  note,
+  onClick,
+}: {
+  heading: string;
+  target: string;
+  kind: LineageKind;
+  note: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        textAlign: 'left',
+        padding: '7px 10px',
+        background: 'var(--bg-elevated, var(--bg-secondary))',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-sm, 4px)',
+        cursor: 'pointer',
+        width: '100%',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: 'var(--text-muted)',
+          }}
+        >
+          {heading}
+        </span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+          {target}
+        </span>
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            textTransform: 'lowercase',
+            color: 'var(--accent-primary)',
+            padding: '1px 6px',
+            background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+            borderRadius: 3,
+          }}
+        >
+          {LINEAGE_KIND_META[kind].label}
+        </span>
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.45, marginTop: 3 }}>
+        {note}
+      </div>
+    </button>
+  );
+}
+
+function DepthSection({
+  accent,
+  depth,
+}: {
+  accent: string;
+  depth: (typeof THINKER_DEPTH)[string];
+}) {
+  return (
+    <>
+      {/* Quote */}
+      <div
+        style={{
+          marginTop: 10,
+          padding: '10px 12px',
+          background: 'var(--bg-elevated, var(--bg-secondary))',
+          borderLeft: `3px solid ${accent}`,
+          borderRadius: 'var(--radius-sm, 4px)',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 7 }}>
+          <Quote size={14} style={{ color: accent, flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <div
+              style={{
+                fontSize: 13,
+                fontStyle: 'italic',
+                lineHeight: 1.5,
+                color: 'var(--text-primary)',
+              }}
+            >
+              {depth.quote}
+            </div>
+            <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 4 }}>
+              {depth.quoteSource}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <DetailLabel>What Decision Intel operationalizes</DetailLabel>
+      <DetailBody>{depth.mechanism}</DetailBody>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+          fontSize: 9,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--text-muted)',
+          marginBottom: 5,
+          marginTop: 8,
+        }}
+      >
+        <Swords size={11} /> In the room
+      </div>
+      <div style={{ display: 'grid', gap: 8 }}>
+        <div
+          style={{
+            padding: '8px 10px',
+            background: 'color-mix(in srgb, var(--warning) 10%, transparent)',
+            borderLeft: '3px solid var(--warning)',
+            borderRadius: 'var(--radius-sm, 4px)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--warning)',
+              marginBottom: 3,
+            }}
+          >
+            They say
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+            {depth.objection}
+          </div>
+        </div>
+        <div
+          style={{
+            padding: '8px 10px',
+            background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+            borderLeft: '3px solid var(--accent-primary)',
+            borderRadius: 'var(--radius-sm, 4px)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: 'var(--accent-primary)',
+              marginBottom: 3,
+            }}
+          >
+            You answer
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-primary)', lineHeight: 1.5 }}>
+            {depth.rebuttal}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
