@@ -18,6 +18,14 @@
  *   FORECAST (did we predict the outcome / price?).
  */
 
+import { PUBLIC_CALLS } from '@/lib/data/public-calls';
+
+// The PublicCall types + the calls now live in the canonical public SSOT
+// (@/lib/data/public-calls), shared with the public /track-record page so the
+// founder-hub ledger and the public page can never drift. Re-exported here for
+// back-compat with existing importers (PilotPlanTab).
+export type { PublicCall, PublicCallStatus } from '@/lib/data/public-calls';
+
 export interface DiagnosisPoint {
   title: string;
   body: string;
@@ -43,24 +51,6 @@ export interface Refinement {
 export interface SequencePhase {
   window: string;
   items: readonly string[];
-}
-
-export type PublicCallStatus =
-  | 'locked' // call published + proxy locked, not yet due
-  | 'tracking' // a proxy window has opened, watching
-  | 'confirmed' // the flagged risk materialised (true positive)
-  | 'false_positive' // the flagged risk did NOT bite (publish it anyway)
-  | 'mixed';
-
-export interface PublicCall {
-  id: string;
-  subject: string;
-  dateLocked: string;
-  flag: string;
-  proxy: string;
-  dueDate: string;
-  status: PublicCallStatus;
-  result?: string;
 }
 
 export interface CredibilityAsset {
@@ -258,19 +248,9 @@ export const PILOT_PLAN = {
 
   // ─── The LIVING ledger. Add a row when you lock a call; update status +
   //     result as the proxy dates land. This is the moat, accumulating in public. ───
-  publicCalls: [
-    {
-      id: 'spcx-2026-06',
-      subject: 'SpaceX (SPCX) S-1 IPO thesis',
-      dateLocked: '2026-06-21',
-      flag: 'Valuation gated on a Starship timeline the reference class (5/25 flights in 2025) says is optimistic.',
-      proxy:
-        'First commercial Starship payload flies by Dec 31 2026 (the S-1’s own "H2 2026" milestone).',
-      dueDate: '2026-12-31',
-      status: 'locked',
-      result: undefined,
-    },
-  ] as PublicCall[],
+  // The living ledger now lives in the canonical SSOT @/lib/data/public-calls
+  // (shared with the public /track-record page). Add calls THERE.
+  publicCalls: PUBLIC_CALLS,
 
   // ─── The four credibility assets, re-ranked (refinement #3). ───
   credibility: [

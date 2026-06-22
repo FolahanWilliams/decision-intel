@@ -12,12 +12,8 @@
  */
 
 import { AccentCard } from '@/components/ui/AccentCard';
-import {
-  PILOT_PLAN,
-  type PublicCall,
-  type PublicCallStatus,
-  type CredibilityAsset,
-} from './pilot-plan/pilot-plan-data';
+import { PILOT_PLAN, type CredibilityAsset } from './pilot-plan/pilot-plan-data';
+import { type PublicCall, CALL_STATUS_META } from '@/lib/data/public-calls';
 
 const eyebrowStyle: React.CSSProperties = {
   fontSize: 11,
@@ -62,13 +58,8 @@ function Para({ children }: { children: React.ReactNode }) {
   );
 }
 
-const CALL_STATUS_META: Record<PublicCallStatus, { label: string; color: string }> = {
-  locked: { label: 'Locked', color: 'var(--info)' },
-  tracking: { label: 'Tracking', color: 'var(--warning)' },
-  confirmed: { label: 'Flag confirmed', color: 'var(--success)' },
-  false_positive: { label: 'False positive', color: 'var(--text-muted)' },
-  mixed: { label: 'Mixed', color: 'var(--warning)' },
-};
+// CALL_STATUS_META now imported from the canonical SSOT (@/lib/data/public-calls),
+// shared with the public /track-record page.
 
 const ASSET_STATUS_META: Record<CredibilityAsset['status'], { label: string; color: string }> = {
   have: { label: 'Have', color: 'var(--success)' },
@@ -207,15 +198,29 @@ export function PilotPlanTab() {
             lineHeight: 1.5,
           }}
         >
-          Add a row when you lock a call; update status + result as the proxy dates land. Score the
-          FLAG (did the reasoning-risk materialise?), never the forecast. Publish the false
-          positives.
+          Add a call in <code>src/lib/data/public-calls.ts</code>; update status + result as the
+          proxy dates land. Score the FLAG (did the reasoning-risk materialise?), never the
+          forecast. Publish the false positives. This same SSOT renders the public page.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {p.publicCalls.map(call => (
             <CallRow key={call.id} call={call} />
           ))}
         </div>
+        <a
+          href="/track-record"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-block',
+            marginTop: 14,
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'var(--info)',
+          }}
+        >
+          View the public page · /track-record →
+        </a>
       </AccentCard>
 
       {/* Diagnosis */}
