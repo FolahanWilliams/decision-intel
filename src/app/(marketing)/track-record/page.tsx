@@ -413,9 +413,59 @@ function CallCard({ call }: { call: PublicCall }) {
       <CallField label="Flag" body={call.flag} />
       <CallField label="Falsifiable proxy" body={call.proxy} />
       {call.result && <CallField label="Result" body={call.result} color={meta.color} />}
+
+      {call.proxyLadder && call.proxyLadder.length > 0 && (
+        <div style={{ marginTop: 16, borderTop: `1px solid ${C.slate100}`, paddingTop: 14 }}>
+          <div style={ladderHeadingStyle}>Monitoring ladder</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {call.proxyLadder.map((step, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <span style={ladderWindowStyle}>{step.window}</span>
+                <span style={{ fontSize: 13, lineHeight: 1.5, color: C.slate600, flex: 1 }}>
+                  {step.question}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {call.scoringNote && (
+        <div
+          style={{
+            marginTop: 14,
+            padding: '11px 13px',
+            background: C.slate50,
+            border: `1px solid ${C.slate200}`,
+            borderRadius: 8,
+          }}
+        >
+          <div style={ladderHeadingStyle}>How this is scored</div>
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: C.slate600 }}>
+            {call.scoringNote}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const ladderHeadingStyle: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  color: C.slate400,
+  marginBottom: 8,
+};
+
+const ladderWindowStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: C.slate700,
+  flexShrink: 0,
+  width: 132,
+  paddingTop: 1,
+};
 
 function CallField({ label, body, color }: { label: string; body: string; color?: string }) {
   return (

@@ -41,6 +41,8 @@ export interface PublicCall {
   dueDate: string; // ISO date the proxy resolves
   status: PublicCallStatus;
   result?: string; // filled when the proxy resolves (wins AND losses)
+  proxyLadder?: { window: string; question: string }[]; // the monitoring sequence, optional
+  scoringNote?: string; // how this specific call is scored (the flag, not the price), optional
 }
 
 export const CALL_STATUS_META: Record<
@@ -88,5 +90,24 @@ export const PUBLIC_CALLS: PublicCall[] = [
     dueDate: '2026-12-31',
     status: 'locked',
     result: undefined,
+    proxyLadder: [
+      {
+        window: '3-month · ~Sep 2026',
+        question:
+          'Does the first post-IPO reporting reaffirm or quietly soften the "H2 2026 commercial payload" milestone, and is the test-flight cadence an H2 commercial debut would require actually happening?',
+      },
+      {
+        window: '6-month · Dec 31 2026',
+        question:
+          'Did the first commercial Starship payload fly? (primary) Secondary: did Starlink net-adds decelerate or ARPU keep falling?',
+      },
+      {
+        window: '12-month · Jun 2027',
+        question:
+          'Is the gap between the 2030 milestones priced in today and what has actually shipped narrowing or widening?',
+      },
+    ],
+    scoringNote:
+      'We are not predicting the share price. The stock could rise on Starlink alone while the Starship timeline slips, and the flag would still be validated, because the flag was about the reasoning-risk, not the price. The scored unit is simple: did the flagged risk materialise?',
   },
 ];
