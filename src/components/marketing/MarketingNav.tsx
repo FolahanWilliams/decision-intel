@@ -42,6 +42,7 @@ import {
   Microscope,
   Scale,
   ShieldCheck,
+  Target,
   Workflow,
   Activity,
   X,
@@ -186,6 +187,13 @@ const MENUS: MegaMenu[] = [
             description:
               'Procurement-grade Brier evidence over the case library, with reproducibility seed.',
             href: '/calibration',
+          },
+          {
+            icon: Target,
+            label: 'Track record',
+            description:
+              'Public, dated, falsifiable reasoning-audit calls, scored on the flag, not the forecast.',
+            href: '/track-record',
           },
           {
             icon: Scale,

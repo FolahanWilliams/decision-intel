@@ -49,6 +49,7 @@ const STATIC_ROUTES: ReadonlyArray<{
   { path: '/how-it-works', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/proof', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/track-record', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/case-studies', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/demo', priority: 0.8, changeFrequency: 'monthly' },
   // Tier 2 — the IP / methodology moat surfaces
