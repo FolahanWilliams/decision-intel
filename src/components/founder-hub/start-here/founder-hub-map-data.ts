@@ -229,7 +229,7 @@ export const NODES: MapNode[] = [
     x: 0.27,
     y: 0.82,
     whatItsFor:
-      '37-thinker constellation: Kahneman, Klein, Sibony, Tetlock, Strebulaev, and 32 others.',
+      '42-thinker constellation with lineage edges: Kahneman, Klein, Meehl, Heuer, Tetlock, Ferrucci, and the threads between them.',
     payoff: 'Anchors the IP claim. The Noise moment alone is a Monday-morning sales line.',
     minutes: 25,
     prerequisites: ['overview'],

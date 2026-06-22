@@ -39,6 +39,50 @@ export interface Thinker {
   year: number; // publication year of the seminal work
 }
 
+// ─── Lineage: the edges between thinkers (who built on / argued with whom) ──
+// Keyed by source thinker id; each edge points to the EARLIER / underlying idea.
+// This is what turns the constellation from a star-field into a map of ideas.
+export type LineageKind =
+  | 'builds_on' // extends or descends from
+  | 'synthesizes' // reconciles two traditions into one
+  | 'adversarial' // the documented public disagreement (Kahneman ↔ Klein)
+  | 'measures' // makes the prior idea testable
+  | 'mechanizes'; // turns the by-hand technique into a machine
+
+export interface LineageEdge {
+  to: string; // target thinker id (the idea this one draws on)
+  kind: LineageKind;
+  note: string; // one line: what the relationship actually is
+}
+
+export const LINEAGE_KIND_META: Record<LineageKind, { label: string; verb: string }> = {
+  builds_on: { label: 'Builds on', verb: 'extends' },
+  synthesizes: { label: 'Synthesizes', verb: 'reconciles' },
+  adversarial: { label: 'Adversarial collaboration', verb: 'argued with' },
+  measures: { label: 'Makes testable', verb: 'measures' },
+  mechanizes: { label: 'Mechanizes', verb: 'automates' },
+};
+
+// ─── Per-node depth: the quote, the mechanism, and the room-tested rebuttal ──
+// Authored for the defensibility SPINE (cognitive + IC tradecraft + moat).
+// The detail card renders these only when present, so softer GTM nodes keep
+// their existing origin/summary/why without padded filler.
+export interface ThinkerDepth {
+  quote: string; // the seminal line
+  quoteSource: string; // attribution
+  mechanism: string; // the precise thing Decision Intel operationalizes
+  objection: string; // the skeptic's challenge, steelmanned
+  rebuttal: string; // how you answer it in the room
+}
+
+// ─── The guided path: the ~7 nodes that, in order, ARE the argument for DI ──
+export interface ArgumentBeat {
+  id: string; // thinker id
+  step: number; // 1..N order
+  title: string; // the beat in three words
+  beat: string; // the narrative line for this step
+}
+
 export const CATEGORY_META: Record<ThinkerCategory, { label: string; color: string; bg: string }> =
   {
     cognitive: {
@@ -167,6 +211,67 @@ export const THINKERS: Thinker[] = [
     ring: 1,
     year: 1763,
   },
+  {
+    id: 'meehl-clinical-statistical',
+    name: 'Paul Meehl — Clinical vs Statistical Prediction',
+    shortName: 'Meehl',
+    origin:
+      'Clinical versus Statistical Prediction (1954). Reviewed ~20 studies; simple actuarial formulas matched or beat trained clinicians. Replicated for sixty years (Grove et al. 2000).',
+    summary:
+      'A mechanical rule, even a crude one, equals or beats expert clinical judgment in study after study. The advantage comes from consistency: the formula never has a bad day.',
+    why: 'The uncomfortable premise the DQI rests on. A transparent, consistent scoring model beats inconsistent expert gut — which is the only reason a decision-quality SCORE is defensible at all.',
+    surface: 'DQI composite scoring engine (mechanical, consistent, reproducible)',
+    shipped: true,
+    category: 'cognitive',
+    ring: 1,
+    year: 1954,
+  },
+  {
+    id: 'dawes-improper-linear',
+    name: 'Robyn Dawes — The Robust Beauty of Improper Linear Models',
+    shortName: 'Dawes',
+    origin:
+      'The Robust Beauty of Improper Linear Models in Decision Making (American Psychologist, 1979).',
+    summary:
+      'Even models with arbitrary or equal weights outperform expert judgment. The gain comes from consistency, not from perfectly tuned weights — so the weights barely need to be "right."',
+    why: 'Defends the DQI against "your weights are arbitrary." Dawes’ finding: it does not matter much — consistently applying ANY reasonable weighting is the edge.',
+    surface: 'DQI weighting model + the held-out distribution check that proves stability',
+    shipped: true,
+    category: 'cognitive',
+    ring: 1,
+    year: 1979,
+  },
+  {
+    id: 'dietvorst-algorithm-aversion',
+    name: 'Berkeley Dietvorst — Algorithm Aversion',
+    shortName: 'Dietvorst',
+    origin:
+      'Algorithm Aversion (2015) and Overcoming Algorithm Aversion (2016), Wharton, J. Exp. Psychol.: General.',
+    summary:
+      'People abandon a model the moment they see it err, even when it beats them. The fix: let them adjust it slightly. A model they can tune is a model they will actually use.',
+    why: 'Explains the "false precision" objection AND its cure. User-adjustable DQI weights are not a feature — they are the documented antidote to algorithm aversion.',
+    surface: 'User-adjustable DQI weights (the Dietvorst 2016 fix), DqiWeightOverride',
+    shipped: true,
+    category: 'cognitive',
+    ring: 1,
+    year: 2015,
+  },
+  {
+    id: 'ferrucci',
+    name: 'David Ferrucci — Watson & Elemental Cognition',
+    shortName: 'Ferrucci',
+    origin:
+      'Led IBM Watson (2011 Jeopardy! win); founded Elemental Cognition (2015). Hybrid neuro-symbolic systems that reason over evidence and expose the trail.',
+    summary:
+      'A machine earns trust only when it shows its evidence and its confidence, not just an answer. Ferrucci’s arc runs from answer-machines to reasoning-machines a human can audit.',
+    why: 'The endpoint of the Tetlock hybrid thesis. The machine does not replace the analyst — it makes fifty-year-old tradecraft instant AND shows the evidence trail. Exactly what the metaJudge + Decision Provenance Record do.',
+    surface:
+      'metaJudge final-verdict node, Decision Provenance Record (evidence + confidence trail)',
+    shipped: true,
+    category: 'cognitive',
+    ring: 1,
+    year: 2011,
+  },
 
   // ─── Ring 2: Decision structuring frameworks ─────────────────────
   {
@@ -227,6 +332,21 @@ export const THINKERS: Thinker[] = [
     category: 'structuring',
     ring: 2,
     year: 1973,
+  },
+  {
+    id: 'heuer-sats',
+    name: 'Richards Heuer — Psychology of Intelligence Analysis & SATs',
+    shortName: 'Heuer · SATs',
+    origin:
+      'Psychology of Intelligence Analysis (CIA, 1999); Structured Analytic Techniques (Heuer & Pherson, 2010). Brought Tversky–Kahneman into the intelligence community.',
+    summary:
+      'Analysis of Competing Hypotheses, Key Assumptions Check, devil’s advocacy, pre-mortem, red team — a documented suite the CIA runs BY HAND because the manual version is slow, political, and expensive.',
+    why: 'The provenance that answers "is this just a GPT wrapper?" Decision Intel automates fifty years of intelligence-community tradecraft. The substance is Structured Analytic Techniques, made instant.',
+    surface: 'Pre-mortem cards, Red Team role, reference-class — the shipped + roadmap SAT suite',
+    shipped: false,
+    category: 'structuring',
+    ring: 2,
+    year: 1999,
   },
   {
     id: 'ulysses-contracts',
@@ -610,6 +730,362 @@ export const THINKERS: Thinker[] = [
     category: 'moat',
     ring: 4,
     year: 2015,
+  },
+];
+
+// ─── LINEAGE: directed edges, source id → the ideas it draws on ───────────
+// Each edge points BACKWARD to the underlying / earlier idea. This is the
+// graph the constellation draws when a node is selected.
+export const LINEAGE: Record<string, LineageEdge[]> = {
+  'kahneman-sibony-noise': [
+    {
+      to: 'tversky-kahneman-s1s2',
+      kind: 'builds_on',
+      note: 'Kahneman’s later program — from biased judgment to variable judgment.',
+    },
+  ],
+  'klein-rpd': [
+    {
+      to: 'tversky-kahneman-s1s2',
+      kind: 'adversarial',
+      note: 'The 2009 Kahneman–Klein adversarial collaboration: naturalistic expertise vs heuristics-and-biases, reconciled into “audit, don’t replace.”',
+    },
+  ],
+  'annie-duke-bets': [
+    {
+      to: 'tversky-kahneman-s1s2',
+      kind: 'builds_on',
+      note: 'Resulting bias = confusing outcome quality with decision quality.',
+    },
+  ],
+  'tetlock-superforecasting': [
+    {
+      to: 'bayes',
+      kind: 'measures',
+      note: 'Brier scores make calibration a Bayesian, testable number.',
+    },
+    {
+      to: 'klein-rpd',
+      kind: 'synthesizes',
+      note: 'Hybrid human-machine beats either alone — Kahneman’s rigor × Klein’s recognition.',
+    },
+  ],
+  'dawes-improper-linear': [
+    {
+      to: 'meehl-clinical-statistical',
+      kind: 'builds_on',
+      note: 'Improper (even equal) weights still beat clinicians — consistency is the edge.',
+    },
+  ],
+  'dietvorst-algorithm-aversion': [
+    {
+      to: 'dawes-improper-linear',
+      kind: 'builds_on',
+      note: 'Why people reject the Meehl–Dawes finding — and the fix: let them tune the model.',
+    },
+  ],
+  ferrucci: [
+    {
+      to: 'tetlock-superforecasting',
+      kind: 'mechanizes',
+      note: 'The machine endpoint of the hybrid thesis — instant, and it shows its evidence.',
+    },
+    {
+      to: 'meehl-clinical-statistical',
+      kind: 'builds_on',
+      note: 'A mechanical model that explains its reasoning trail.',
+    },
+  ],
+  'heuer-sats': [
+    {
+      to: 'tversky-kahneman-s1s2',
+      kind: 'builds_on',
+      note: 'Heuer brought heuristics-and-biases into CIA tradecraft.',
+    },
+  ],
+  'pre-mortem': [
+    { to: 'klein-rpd', kind: 'builds_on', note: 'Klein’s prospective-hindsight tool.' },
+    {
+      to: 'heuer-sats',
+      kind: 'builds_on',
+      note: 'Adopted into the Structured Analytic Techniques suite.',
+    },
+  ],
+  'red-team': [
+    {
+      to: 'heuer-sats',
+      kind: 'builds_on',
+      note: 'Institutionalised dissent — a core Structured Analytic Technique.',
+    },
+  ],
+  'reference-class': [
+    {
+      to: 'tversky-kahneman-s1s2',
+      kind: 'builds_on',
+      note: 'The outside view corrects base-rate neglect.',
+    },
+    { to: 'heuer-sats', kind: 'builds_on', note: 'A standard analytic technique.' },
+  ],
+  'strebulaev-vc': [
+    {
+      to: 'wisdom-crowds',
+      kind: 'builds_on',
+      note: 'Independence beats consensus — the diversity condition, applied to VC.',
+    },
+  ],
+  'category-design': [
+    {
+      to: 'thiel-zero-to-one',
+      kind: 'builds_on',
+      note: 'The contrarian truth becomes a new category.',
+    },
+  ],
+  'aggregation-theory': [
+    {
+      to: 'helmer-7-powers',
+      kind: 'builds_on',
+      note: 'Data network effects = Cornered Resource + Process Power.',
+    },
+  ],
+};
+
+// ─── PER-NODE DEPTH: the quote, the mechanism, and the room-tested rebuttal ──
+// Authored for the defensibility spine. Softer GTM nodes intentionally omitted
+// (their origin/summary/why already carry them) — no padded filler.
+export const THINKER_DEPTH: Record<string, ThinkerDepth> = {
+  'tversky-kahneman-s1s2': {
+    quote:
+      '“The confidence people have in their beliefs is not a measure of the quality of the evidence.”',
+    quoteSource: 'Kahneman, Thinking, Fast and Slow (2011)',
+    mechanism:
+      'The bias taxonomy detected across the pipeline maps each flag to a specific paper in this program — anchoring, availability, representativeness, loss aversion, confirmation.',
+    objection: '“My team are experienced operators, not undergrads in a lab experiment.”',
+    rebuttal:
+      'These effects replicate hardest in exactly the high-stakes, low-feedback settings executives work in. Expertise narrows some biases and widens others — overconfidence, the inside view. The audit names which.',
+  },
+  'kahneman-sibony-noise': {
+    quote: '“Wherever there is judgment, there is noise — and usually more of it than you think.”',
+    quoteSource: 'Kahneman, Sibony & Sunstein, Noise (2021)',
+    mechanism:
+      'The triple-judge engine measures decision variance directly; the NoiseTax component of the DQI is the scalar.',
+    objection: '“Noise is academic — show me it costs real money.”',
+    rebuttal:
+      'The book’s own underwriter study found 55% variance where executives expected 10%. On a £50M decision, that spread IS the money. We measure it per memo, not as a slogan.',
+  },
+  'klein-rpd': {
+    quote:
+      '“Experts size up a situation and recognize a workable course of action — they do not compare a list of options.”',
+    quoteSource: 'Klein, Sources of Power (1998)',
+    mechanism:
+      'The Pattern Recognition surface mines historical analog cases so the audit AMPLIFIES expert recognition instead of overriding it. This is Klein’s half of R²F.',
+    objection: '“So you admit intuition works — then why audit it?”',
+    rebuttal:
+      'Klein and Kahneman settled this together in 2009: intuition is trustworthy only in high-validity, fast-feedback environments. Strategic M&A is the opposite. The audit tells you which regime you are in.',
+  },
+  'tetlock-superforecasting': {
+    quote:
+      '“The strongest predictor of rising into the superforecaster ranks is perpetual beta — the degree to which one updates beliefs.”',
+    quoteSource: 'Tetlock & Gardner, Superforecasting (2015)',
+    mechanism:
+      'Brier-scored calibration on logged decisions; the personal calibration dashboard and its Bronze→Platinum tiers. The hybrid human-machine setup the IARPA tournaments proved best IS the product architecture.',
+    objection: '“You can’t Brier-score a one-off strategic call — there is no tournament.”',
+    rebuttal:
+      'You score the flag, not the forecast: did the reasoning-risk we named materialise? Logged over many decisions, that calibrates. We never claim to predict the price.',
+  },
+  'annie-duke-bets': {
+    quote: '“The quality of a decision and the quality of its outcome are two different things.”',
+    quoteSource: 'Duke, Thinking in Bets (2018)',
+    mechanism:
+      'The DQI scores the decision, not the result; resulting-bias callouts + the outcome-reporting loop keep the two separate, so a good process that got unlucky is still scored well.',
+    objection: '“Founders are paid on outcomes, not process scores.”',
+    rebuttal:
+      'Exactly why you need the split. Over many decisions, process quality is the only thing you control; outcomes regress to it. The score is the leading indicator the P&L lags.',
+  },
+  bayes: {
+    quote:
+      '“Update the prior with the likelihood of the evidence — belief should move only as far as the evidence warrants.”',
+    quoteSource: 'Bayes (1763), formalised by Laplace, Jeffreys, Jaynes',
+    mechanism:
+      'Blind priors captured in Decision Rooms BEFORE evidence arrives create a clean audit trail of belief change — the bayesian-priors engine scores the update.',
+    objection: '“Nobody actually computes Bayes in a board meeting.”',
+    rebuttal:
+      'You do not have to. Capturing the prior cleanly and measuring how far it moved is the whole value — it surfaces anchoring and motivated updating without anyone touching a formula.',
+  },
+  'meehl-clinical-statistical': {
+    quote:
+      '“There is no controversy in social science that shows so large a body of qualitatively diverse studies coming out so uniformly… as the comparison of clinical and actuarial prediction.”',
+    quoteSource: 'Meehl (1986), reflecting on his 1954 monograph',
+    mechanism:
+      'The DQI composite IS the actuarial model: a fixed, transparent rule applied identically to every memo. Mechanical by design — the source of the edge, not a limitation.',
+    objection: '“A formula can’t capture strategic nuance the way a seasoned CSO can.”',
+    rebuttal:
+      'Sixty years of replication say the seasoned judge loses to the formula — because the human is inconsistent, not because the formula is smart. The model never has a bad morning. We do not remove the CSO; we give them the consistent baseline.',
+  },
+  'dawes-improper-linear': {
+    quote: '“The whole trick is to know what variables to look at and then to know how to add.”',
+    quoteSource: 'Dawes, The Robust Beauty of Improper Linear Models (1979)',
+    mechanism:
+      'The DQI weights are defensible precisely because Dawes proved exact weights barely matter; the held-out distribution check shows the score is stable across reasonable weightings.',
+    objection: '“Your weights are arbitrary, so the score is arbitrary.”',
+    rebuttal:
+      'Dawes’ result is that improper — even equal — weights still beat experts. Arbitrary-but-consistent is the point. And per Dietvorst, you can tune them yourself; the ranking barely moves.',
+  },
+  'dietvorst-algorithm-aversion': {
+    quote:
+      '“People are more willing to use an imperfect algorithm if they can adjust it, even just a little.”',
+    quoteSource: 'Dietvorst, Simmons & Massey, Overcoming Algorithm Aversion (2016)',
+    mechanism:
+      'User-adjustable DQI weights (DqiWeightOverride). The slider is the literal Dietvorst fix — give the expert a little control and they keep using the model that beats them.',
+    objection: '“If I can change the weights, what is the model even for?”',
+    rebuttal:
+      'The model anchors you to a consistent baseline; your adjustment is bounded and logged. You get the consistency edge of the formula AND the engagement that stops you abandoning it the first time it surprises you.',
+  },
+  ferrucci: {
+    quote:
+      '“The goal isn’t a system that answers — it’s a system that reasons, and can show you why.”',
+    quoteSource: 'Ferrucci, on Elemental Cognition’s thesis',
+    mechanism:
+      'The metaJudge final verdict + the Decision Provenance Record: a machine verdict carrying its evidence quotes, confidence, and reasoning trail — auditable, not a black box.',
+    objection: '“This is just an LLM with a clever prompt — a wrapper.”',
+    rebuttal:
+      'A wrapper returns an opinion. This returns a calibrated, evidence-cited, tamper-evident record built on a documented 50-year technique. The defensibility is the provenance + the calibration data, not the model call.',
+  },
+  'heuer-sats': {
+    quote:
+      '“Analysts should be self-conscious about their reasoning process… and the techniques that can improve it.”',
+    quoteSource: 'Heuer, Psychology of Intelligence Analysis (CIA, 1999)',
+    mechanism:
+      'Pre-mortem, competing hypotheses, key-assumptions check and red team are SATs Heuer codified; DI automates the suite (pre-mortem shipped, ACH/red-team on the roadmap).',
+    objection: '“Strategy isn’t spycraft — why should an IC technique apply to my deal?”',
+    rebuttal:
+      'The CIA adopted these BECAUSE the analysts were brilliant and still wrong — the same failure mode as a smart deal team. The techniques are domain-general debiasing. We did not invent them; we made them instant.',
+  },
+  'pre-mortem': {
+    quote:
+      '“Imagine we are a year into the future. We implemented the plan as it now exists. The outcome was a disaster. Write a brief history of that disaster.”',
+    quoteSource: 'Klein, Performing a Project Premortem (HBR, 2007)',
+    mechanism:
+      'Pre-Mortem Scenario Cards generate the prospective-hindsight failure narrative directly from the memo’s flagged risks.',
+    objection: '“We already do a risks slide.”',
+    rebuttal:
+      'A risks slide asks “what could go wrong?” — optimism suppresses the honest answer. Prospective hindsight (“it already failed; write why”) reliably surfaces more, and franker, failure causes. Different question, different output.',
+  },
+  'red-team': {
+    quote:
+      '“If nine men agree, the role of the tenth is to disagree, no matter how improbable his reasoning.”',
+    quoteSource: 'The 10th Man rule, Israeli military intelligence (post-1973)',
+    mechanism:
+      'A forced-dissent Red Team role in Decision Rooms makes structured disagreement a first-class primitive — the system absorbs the political cost of being the contrarian.',
+    objection: '“My team will say they already challenge each other.”',
+    rebuttal:
+      'Voluntarily, the contrarian pays a political tax and usually stays quiet. Strebulaev’s data shows consensus committees underperform. Assigning dissent to the system, not a person, is the unlock.',
+  },
+  'reference-class': {
+    quote:
+      '“The single most important piece of advice for improving a forecast is to take the outside view.”',
+    quoteSource: 'Kahneman & Tversky; Flyvbjerg, on reference-class forecasting',
+    mechanism:
+      'The Outside View card surfaces the base rate of comparable historical decisions from the case library, against the memo’s inside-view projection.',
+    objection: '“This deal is genuinely different from the comparables.”',
+    rebuttal:
+      'Everyone’s deal is. The inside-view feeling of uniqueness is exactly the bias reference-class forecasting corrects. We show the base rate; you argue, on the record, why you beat it.',
+  },
+  'helmer-7-powers': {
+    quote:
+      '“A Power is a condition that creates the potential for persistent differential returns.”',
+    quoteSource: 'Helmer, 7 Powers (2016)',
+    mechanism:
+      'The Moat Strength table maps DI’s calibrated behavioural data to Cornered Resource + Process Power — the two of Helmer’s seven that a commodity-LLM era leaves standing.',
+    objection: '“With GPT-N, anyone rebuilds your audit in a weekend.”',
+    rebuttal:
+      'They rebuild the prompt, not the moat. The asset is the accumulating decision→outcome dataset (Cornered Resource) and the workflow embeddedness (Process Power) — neither of which a weekend buys.',
+  },
+  'aggregation-theory': {
+    quote:
+      '“Value accrues to whoever aggregates demand and owns the data it generates, not whoever controls supply.”',
+    quoteSource: 'Ben Thompson, Stratechery (Aggregation Theory)',
+    mechanism:
+      'Every logged decision + outcome feeds the per-org calibration data — a network effect that compounds with use and cannot be copied from outside.',
+    objection: '“You have no data yet, so you have no moat yet.”',
+    rebuttal:
+      'Correct, and we say so. The moat is downstream of traction — which is precisely why the plan is to get embedded and earn the calibration data, not to claim a moat we have not built.',
+  },
+  'category-design': {
+    quote:
+      '“Category kings capture the majority of the category’s economics. Win the category, not the product.”',
+    quoteSource: 'Ramadan, Peterson, Lochhead & Maney, Play Bigger (2016)',
+    mechanism:
+      'The DQI is the category primitive — a 0–100 decision-quality score nobody else publishes; reinforced as “the reasoning audit platform” across every surface.',
+    objection: '“Inventing a category is just marketing — buyers want a tool that works.”',
+    rebuttal:
+      'The category is pole position, not the moat — we are clear on that. But the buyer who has language for the problem (“unaudited reasoning”) buys faster. The category sells; the calibration data defends.',
+  },
+  'strebulaev-vc': {
+    quote:
+      '“The best venture investors are not consensus seekers. Unanimous approval is a warning sign, not a green light.”',
+    quoteSource: 'Strebulaev & Dmitriev, The Venture Mindset (2024)',
+    mechanism:
+      'Blind-prior Decision Rooms + consensus scoring flag the unanimous-approval toxic pattern directly — independence before discussion, Strebulaev’s exact prescription.',
+    objection: '“Disagreement just slows the committee down.”',
+    rebuttal:
+      'Strebulaev’s data: consensus committees have LOWER hit rates. The cost is not speed, it is correlated error. Capturing independent priors before the room converges is the cheapest fix there is.',
+  },
+  'thiel-zero-to-one': {
+    quote: '“What important truth do very few people agree with you on?”',
+    quoteSource: 'Thiel, Zero to One (2014)',
+    mechanism:
+      'The contrarian truth grounds the pitch narrative: executive teams believe their decisions are rational; they are riddled with measurable noise and bias nobody audits.',
+    objection: '“If the truth is real, why hasn’t a bigger player taken it?”',
+    rebuttal:
+      'Incumbents are structurally conflicted or sell the opposite — confidence, not doubt. Last-mover advantage in a category no one else wants to name is the Thiel play.',
+  },
+};
+
+// ─── THE ARGUMENT: the 7 nodes that, in order, ARE the case for Decision Intel.
+// "Walk the argument" steps through these — disease → fix → synthesis →
+// provenance → measurement → machine → moat.
+export const ARGUMENT_PATH: ArgumentBeat[] = [
+  {
+    id: 'tversky-kahneman-s1s2',
+    step: 1,
+    title: 'The disease',
+    beat: 'Start with the disease. Human judgment is not occasionally wrong — it is systematically, predictably wrong, in ways that repeat across every executive committee.',
+  },
+  {
+    id: 'meehl-clinical-statistical',
+    step: 2,
+    title: 'The uncomfortable cure',
+    beat: 'The cure, proven since 1954: a simple, consistent mechanical model beats expert gut — which is the only reason a decision-quality SCORE can exist at all.',
+  },
+  {
+    id: 'klein-rpd',
+    step: 3,
+    title: 'The synthesis',
+    beat: 'But experts hold real, pattern-matched intuition. So the move is not to replace judgment. The synthesis — Kahneman’s rigor × Klein’s recognition — is to audit it.',
+  },
+  {
+    id: 'heuer-sats',
+    step: 4,
+    title: 'The provenance',
+    beat: 'This is not novel — it is provenance. The CIA has run these exact techniques by hand for fifty years: pre-mortem, competing hypotheses, red team. Slow, political, expensive.',
+  },
+  {
+    id: 'tetlock-superforecasting',
+    step: 5,
+    title: 'The measurement',
+    beat: 'And it is testable. Calibration and Brier scores prove whether the audit actually improves outcomes. Hybrid human-machine beats either alone.',
+  },
+  {
+    id: 'ferrucci',
+    step: 6,
+    title: 'The machine',
+    beat: 'The machine makes the fifty-year-old tradecraft instant — and shows its evidence trail. That is Decision Intel: automated Structured Analytic Techniques you can audit.',
+  },
+  {
+    id: 'aggregation-theory',
+    step: 7,
+    title: 'The moat',
+    beat: 'The model is a commodity. The moat is the calibrated outcome data that compounds with every decision logged — a cornered resource no wrapper can copy.',
   },
 ];
 
