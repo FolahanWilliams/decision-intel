@@ -1540,6 +1540,7 @@ export default function LandingPage() {
             links={[
               { label: 'Case Studies', href: '/case-studies' },
               { label: 'Proof', href: '/proof' },
+              { label: 'Track record', href: '/track-record' },
               { label: 'FAQ', href: '/faq' },
               { label: 'Compare', href: '/compare' },
               { label: 'Workflows', href: '/use' },

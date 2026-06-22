@@ -1252,6 +1252,29 @@ const baseline = computePlatformCalibrationBaseline();
             number across machines and dates.
           </div>
         </div>
+        {/* Seed baseline (retro) → prospective track record cross-link */}
+        <div
+          style={{
+            marginTop: 22,
+            padding: '14px 18px',
+            background: 'rgba(22, 163, 74, 0.06)',
+            border: `1px solid ${C.greenBorder}`,
+            borderRadius: 10,
+            fontSize: 14,
+            lineHeight: 1.6,
+            color: C.slate700,
+          }}
+        >
+          The seed Brier above is retrospective, computed over the case library. Where the same
+          method runs forward, locked in public before the outcome is known:{' '}
+          <Link
+            href="/track-record"
+            style={{ color: C.green, fontWeight: 600, textDecoration: 'none' }}
+          >
+            the prospective track record
+          </Link>
+          .
+        </div>
       </section>
 
       {/* Epistemic honesty — correlation, not causation. Locked 2026-05-31

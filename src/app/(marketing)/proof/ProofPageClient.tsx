@@ -649,6 +649,17 @@ export function ProofPageClient() {
               Upload the same document you&apos;re preparing for your next board or steering
               committee. Get the 60-second audit: same methodology, your memo.
             </p>
+            <p style={{ fontSize: 13, color: C.slate300, margin: '12px 0 0', maxWidth: 640 }}>
+              This is the engine in hindsight. See it run forward, locked in public before the
+              outcome is known:{' '}
+              <Link
+                href="/track-record"
+                style={{ color: C.green, fontWeight: 600, textDecoration: 'underline' }}
+              >
+                the prospective track record
+              </Link>
+              .
+            </p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Link
