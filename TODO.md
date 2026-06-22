@@ -64,6 +64,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-22)
+
+**Core-flow polish — clean-audit reassurance + outcome-flow clarity (founder "boil the ocean, explain thoroughly why and what to do" on the reassurance tab; full prose in CLAUDE.md "Clean-audit reassurance + outcome-flow clarity" lock).** All gates green (tsc 0 non-e2e · positioning · counts 73 · silent-catches 241 · canonical-imports · prettier · audit-platform 0 new findings).
+
+- [x] **New SSOT** [clean-audit-copy.ts](src/lib/data/clean-audit-copy.ts) (`CLEAN_AUDIT`) — the result-time sibling of the upload-guidance calibration framing. Reframes a zero-bias audit from a NULL result into a VERIFIED one (the asymmetric-tail argument), explains what the audit actually did so "nothing found" reads as rigor, names what the clean record gives the user (the hashed/tamper-evident DPR IS the deliverable), keeps the epistemic-honesty caveat (correlated risk indicators, not a promise of a good outcome), and tells the user what to do next. Em-dash-clean + count-derived (`${BIAS_COUNT}`).
+- [x] **FindingsTab** — `CleanAuditPanel` (success-accent, thorough) leads the tab when zero biases surfaced, before the four-zero strip; the terse "nothing detected" placeholder is suppressed in the clean case.
+- [x] **InlineAnalysisResultCard** — dashboard post-upload reveal clean-state upgraded from a one-liner to the SSOT headline + body in a success-tinted card.
+- [x] **OutcomeReporter** — (1) "You last reported X on [date]" edit-vs-create eyebrow; (2) "too early" return cue (in-form note + a muted "revisit when it resolves" header reminder on an existing too-early outcome). No schema/API/pipeline change.
+
 ## Recently Completed (2026-06-11)
 
 **Light-theme foundation sweep + interaction-layer overhaul (founder "100x the UI/UX, boil the ocean"; full prose in CLAUDE.md 2026-06-11 lock + DESIGN.md "Light-theme remnant discipline").** Five commits, `39b0bb45` → `2ba6cc4c`, all gates green, pushed to main.
