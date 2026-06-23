@@ -64,7 +64,8 @@ export type DeckId =
   | 'learning_efficiency'
   | 'personal_social_archetypes'
   | 'common_mistakes'
-  | 'corp_dev';
+  | 'corp_dev'
+  | 'vc_pass';
 
 export type CardDifficulty = 'foundation' | 'core' | 'advanced';
 export type CardMode = 'flashcard' | 'recall' | 'apply';
@@ -139,6 +140,15 @@ export interface RecallGradeResult {
 // ─── Decks ──────────────────────────────────────────────────────────
 
 export const DECKS: EducationDeck[] = [
+  {
+    id: 'vc_pass',
+    label: 'The VC Pass',
+    description:
+      "Rob's 6 objections — the set every credible buyer raises: hindsight, no-security, EU-AI-Act, AI-waffle, no-moat, no-traction. Drill the agree-then-reframe answer until it is muscle memory, so you do not scramble when the next Rob shows up.",
+    iconName: 'AlertCircle',
+    color: '#DC2626',
+    order: 0,
+  },
   {
     id: 'di_vocabulary',
     label: 'DI Vocabulary',
@@ -2806,7 +2816,90 @@ const CORP_DEV_CARDS: EducationCard[] = [
 
 // ─── Aggregator + Helpers ───────────────────────────────────────
 
+// ─── The VC Pass — Rob's 6 objections, drilled until they are muscle memory.
+//     Each canonicalAnswer encodes AGREE → REFRAME → PROOF so the grader scores
+//     the structure, not just the content. Source: Pilot Plan theRobPass. ───
+const VC_PASS_CARDS: EducationCard[] = [
+  {
+    id: 'vc_pass_hindsight',
+    deckId: 'vc_pass',
+    prompt:
+      'A credible VC says: "Finding anchoring in WeWork\'s S-1 when you already know it failed is textbook hindsight bias." How do you answer?',
+    canonicalAnswer:
+      'AGREE first — the retro case library is a teaching aid, never proof; finding a bias in a known failure proves nothing, and you label every retro illustrative. Then REFRAME to the forward move: lock a reasoning-risk flag on a LIVE public decision, in advance, with a falsifiable test and a due date, and publish the misses. "Judge the hit rate, not the hindsight." Then PROOF: the public prospective track record (/track-record), first call locked 2026-06-21 due Dec 31, plus the cold-open that runs the audit on the buyer\'s OWN closed deal, not a famous failure. Forensic, not predictive: the retro IS the data.',
+    hint: 'Concede the hindsight point fully, then pivot to forward + dated + falsifiable + published-misses.',
+    difficulty: 'advanced',
+    applicationContext:
+      "A VC or credible buyer raises the hindsight objection on a call (Rob's actual pass).",
+    source: 'Pilot Plan theRobPass; Rob / Hustle Fund pass 2026-06-21',
+    tag: 'vc_pass',
+  },
+  {
+    id: 'vc_pass_security',
+    deckId: 'vc_pass',
+    prompt:
+      '"Who puts a confidential, market-sensitive M&A memo into a third-party tool with no security or compliance accreditation?"',
+    canonicalAnswer:
+      "AGREE — nobody should, and you are not asking them to. Then REFRAME the wedge: it runs on PUBLIC decisions and the buyer's own ALREADY-CLOSED deals, so no live confidential upload is needed to prove value. Confidential F500 M&A is the CEILING, not the entry; it opens after SOC 2 and references, not before. Then PROOF: the retro cold-open (run it on a deal already closed) + SOC 2 Type I on the Q4 2026 roadmap (/trust). The wedge sits structurally OUTSIDE the confidentiality wall by design — that is the point, not a gap.",
+    hint: 'Turn the objection into the design: the wedge needs no confidential upload.',
+    difficulty: 'advanced',
+    applicationContext: 'A buyer or GC raises the data-security wall before any pilot.',
+    source: 'Pilot Plan theRobPass; CLAUDE.md wedge lock',
+    tag: 'vc_pass',
+  },
+  {
+    id: 'vc_pass_eu_ai_act',
+    deckId: 'vc_pass',
+    prompt: '"What has the EU AI Act got to do with cognitive biases in an M&A deal?"',
+    canonicalAnswer:
+      'AGREE fully — nothing at the wedge, and you have cut it. Then REFRAME: the Act governs AI SYSTEMS in eight defined high-risk areas; a human M&A reasoning call is not one of them. It is only live at the regulated-record ceiling (banks, audit committees), never for an individual operator. Leading the wedge with it was borrowed authority that COST credibility with exactly the sophisticated reader you need. Then PROOF: cut from every wedge surface (positioning lock), kept only at the Phase-4 procurement ceiling where it genuinely binds. Naming your own overreach is itself the credibility move.',
+    hint: 'Concede it is irrelevant at the wedge; naming your own overreach builds trust.',
+    difficulty: 'advanced',
+    applicationContext: 'A sharp reader calls out regulatory name-dropping that does not bind.',
+    source: 'Pilot Plan theRobPass; CLAUDE.md regulatory-tailwinds lock',
+    tag: 'vc_pass',
+  },
+  {
+    id: 'vc_pass_ai_waffle',
+    deckId: 'vc_pass',
+    prompt: '"The deck reads as something Claude wrote — lots of AI waffle."',
+    canonicalAnswer:
+      'AGREE on the deck — fair hit, it buried the substance under category nouns. Then REFRAME to the substance: 50-year-old intelligence-community tradecraft — pre-mortem, competing hypotheses, red team, the Structured Analytic Techniques the CIA runs by hand, automated. The fix is plain language: what we catch, on whose decision, scored how. Then PROOF: the R²F / SAT lineage (Heuer, Meehl, Tetlock, Ferrucci), provenance not invention, and the track record proving the catch in concrete, dated terms a CFO can check. Never answer waffle with more waffle — answer it with a number and a name.',
+    hint: 'Do not defend the prose; replace it with the SAT lineage + a concrete, dated proof.',
+    difficulty: 'advanced',
+    applicationContext: 'A buyer dismisses the pitch as generic AI marketing.',
+    source: 'Pilot Plan theRobPass; Intellectual Constellation (SAT lineage)',
+    tag: 'vc_pass',
+  },
+  {
+    id: 'vc_pass_no_moat',
+    deckId: 'vc_pass',
+    prompt: '"I don\'t see depth to the product and I don\'t see a moat."',
+    canonicalAnswer:
+      'AGREE honestly — the audit engine IS replicable; a team rebuilds the prompt in weeks, and pretending otherwise destroys trust. Then REFRAME: the moat is not the engine, it is what accumulates once embedded — per-org decision→outcome calibration data, workflow embeddedness, and a five-ingredient bundle where four (founder narrative, embedded time, real calibrated data, network) are unrepeatable. The moat is DOWNSTREAM of traction, which is exactly why the plan is one deep pilot, not more features. Then PROOF: the defensibility vectors + the five-ingredient bundle. "No moat yet, earned by getting embedded" beats any flattered non-moat.',
+    hint: 'Concede the engine is a wrapper; the moat is the accumulating bundle, downstream of traction.',
+    difficulty: 'advanced',
+    applicationContext: 'An investor probes defensibility / the "just a GPT wrapper" suspicion.',
+    source: 'Pilot Plan theRobPass; defensibility vectors + 5-ingredient bundle',
+    tag: 'vc_pass',
+  },
+  {
+    id: 'vc_pass_no_traction',
+    deckId: 'vc_pass',
+    prompt:
+      '"You haven\'t made commercial traction. Get a signed paid pilot from a credible buyer, then take that forward."',
+    canonicalAnswer:
+      'AGREE completely — that is the only thing that matters now, and it is the whole plan, not a side-note. Then REFRAME to show it is already the spine: two named lanes, a free retro on a closed deal to get in the door, convert to a paid pilot, no more product until that is signed. Then PROOF: the Pilot Plan — two named lanes, the retro-to-pilot motion, the month-4 kill criterion. Do NOT get defensive or pitch more features; agree, show the focused motion, and ask for the ONE thing that helps (an intro to exactly this buyer). This objection is a gift: it tells you what to do next.',
+    hint: 'Do not defend; agree, show the focused motion, and ask for the intro.',
+    difficulty: 'advanced',
+    applicationContext: 'The closing line of most VC passes — turn it into an ask.',
+    source: 'Pilot Plan theRobPass; the signed-paid-pilot directive',
+    tag: 'vc_pass',
+  },
+];
+
 export const ALL_CARDS: EducationCard[] = [
+  ...VC_PASS_CARDS,
   ...DI_VOCABULARY_CARDS,
   ...BUYER_PERSONAS_CARDS,
   ...MAALOUF_PRINCIPLES_CARDS,
