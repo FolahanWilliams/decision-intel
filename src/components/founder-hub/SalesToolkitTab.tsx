@@ -27,6 +27,7 @@ import { CialdiniInfluenceWheel } from './sales/CialdiniInfluenceWheel';
 import { BuyingCommitteeMap } from './sales/BuyingCommitteeMap';
 import { DealStallDiagnosticTree } from './sales/DealStallDiagnosticTree';
 import { SalesMovesGrid } from './sales/SalesMovesGrid';
+import { MeddicVisualization } from './sales/MeddicVisualization';
 import {
   SALES_FRAMEWORK_GAPS,
   AGE_ASYMMETRY_TACTICS,
@@ -97,6 +98,15 @@ export function SalesToolkitTab() {
           are all here so the founder reads ONE surface in the back of
           an Uber on the way to a London networking event. */}
       <DiscoveryPitchPanel />
+
+      <Section
+        icon={<Compass size={16} />}
+        title="MEDDIC · qualify the pilot"
+        subtitle="The enterprise qualification framework mapped to the DI sale. Click each letter for the discovery questions, how it applies to your wedge buyer, and the DI proof. Then mark each one for a live prospect — the weak links are exactly what to close before the next call. Synthesised from the master-KB MEDDIC-to-DI breakdown."
+        accent="#16A34A"
+      >
+        <MeddicVisualization />
+      </Section>
 
       <Section
         icon={<Rocket size={16} />}

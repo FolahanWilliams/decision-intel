@@ -781,6 +781,14 @@ const SEARCH_INDEX: SearchEntry[] = [
     keywords:
       'sales toolkit discovery questions email templates demo flow outreach prospecting qualification',
   },
+  {
+    tabId: 'sales',
+    section: 'MEDDIC · qualify the pilot',
+    preview:
+      'The MEDDIC qualification framework mapped to the DI sale: discovery questions, DI application, and proof per letter. Mark each one for a live prospect and see the weak links.',
+    keywords:
+      'meddic meddpicc qualify qualification deal pilot metrics economic buyer decision criteria process identify pain champion discovery questions enterprise sales framework proof dpr dqi r2f retro audit boardroom twin wedge gp cso corp dev close next weak links deal health',
+  },
   // Closing Lab — Maalouf + Satyam + brutal-honest critique synthesis.
   // Surfaced as 5 distinct search entries so a query for "fastest
   // converters" or "silent objections" or "pressure without pressure"
