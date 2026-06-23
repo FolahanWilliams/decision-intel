@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
@@ -1070,41 +1070,154 @@ const SEARCH_INDEX: SearchEntry[] = [
   },
 ];
 
+const SEARCH_RESULT_LIMIT = 24;
+
+function escapeRegexLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Wrap each matched token in the text with a highlight mark. Builds React nodes
+// (no dangerouslySetInnerHTML) by splitting on a capturing alternation: the
+// matched groups land on odd indices.
+function highlightTokens(text: string, tokens: string[]): React.ReactNode {
+  const valid = tokens
+    .map(escapeRegexLiteral)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  if (valid.length === 0) return text;
+  const parts = text.split(new RegExp(`(${valid.join('|')})`, 'ig'));
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <mark
+        key={i}
+        style={{
+          background: 'color-mix(in srgb, var(--accent-primary) 24%, transparent)',
+          color: 'var(--text-primary)',
+          borderRadius: 3,
+          padding: '0 2px',
+          fontWeight: 600,
+        }}
+      >
+        {part}
+      </mark>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
+const SEARCH_FIELD_WEIGHTS = {
+  section: { exact: 12, prefix: 9, substr: 6 },
+  keywords: { exact: 7, prefix: 5, substr: 3 },
+  preview: { exact: 4, prefix: 3, substr: 1 },
+};
+
+function fieldTokenScore(
+  field: string,
+  words: string[],
+  tok: string,
+  w: { exact: number; prefix: number; substr: number }
+): number {
+  if (words.includes(tok)) return w.exact;
+  if (words.some(word => word.startsWith(tok))) return w.prefix;
+  if (field.includes(tok)) return w.substr;
+  return 0;
+}
+
+// Ranked, multi-term (AND) scoring: EVERY token must match somewhere, or the
+// entry is dropped (-1). A match in the section title ranks above keywords
+// above preview; a whole-word match above a word-prefix above a raw substring.
+function scoreSearchEntry(entry: SearchEntry, tokens: string[]): number {
+  const section = entry.section.toLowerCase();
+  const keywords = entry.keywords.toLowerCase();
+  const preview = entry.preview.toLowerCase();
+  const sectionWords = section.split(/[^a-z0-9]+/i).filter(Boolean);
+  const keywordWords = keywords.split(/[^a-z0-9]+/i).filter(Boolean);
+  const previewWords = preview.split(/[^a-z0-9]+/i).filter(Boolean);
+  let total = 0;
+  for (const tok of tokens) {
+    const best = Math.max(
+      fieldTokenScore(section, sectionWords, tok, SEARCH_FIELD_WEIGHTS.section),
+      fieldTokenScore(keywords, keywordWords, tok, SEARCH_FIELD_WEIGHTS.keywords),
+      fieldTokenScore(preview, previewWords, tok, SEARCH_FIELD_WEIGHTS.preview)
+    );
+    if (best === 0) return -1;
+    total += best;
+  }
+  return total;
+}
+
 function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId) => void }) {
-  const q = query.toLowerCase().trim();
-  if (!q) return null;
+  const tokens = useMemo(() => query.toLowerCase().trim().split(/\s+/).filter(Boolean), [query]);
+
+  const matches = useMemo(() => {
+    if (tokens.length === 0) return [];
+    return SEARCH_INDEX.map(entry => ({ entry, score: scoreSearchEntry(entry, tokens) }))
+      .filter(m => m.score >= 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, SEARCH_RESULT_LIMIT);
+  }, [tokens]);
+
+  const [selected, setSelected] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Reset the highlighted result whenever the query changes. Deferred via
+  // setTimeout(…, 0) to satisfy react-hooks/set-state-in-effect (codebase idiom).
+  useEffect(() => {
+    const t = setTimeout(() => setSelected(0), 0);
+    return () => clearTimeout(t);
+  }, [query]);
 
   // Click handler that deep-links into the matching accordion section when
   // sectionId is set. Sets the URL hash BEFORE onJump so when the new tab's
   // AccordionSection mounts, its hashchange-aware effect catches it and
   // auto-opens + scrolls. (B1 lock 2026-04-28.)
-  const jumpToEntry = (entry: SearchEntry) => {
-    if (entry.sectionId && typeof window !== 'undefined') {
-      const targetHash = `#${entry.sectionId}`;
-      // Replace the hash unconditionally so consecutive clicks on the same
-      // section re-fire the hashchange listener inside AccordionSection.
-      if (window.location.hash === targetHash) {
-        // Same hash twice in a row — clear then re-set on next tick so the
-        // event fires again (the user clicked search expecting a re-scroll).
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-        requestAnimationFrame(() => {
-          window.location.hash = targetHash;
-        });
-      } else {
-        // rAF wrap matches the same-hash branch and sidesteps the
-        // react-hooks/immutability lint flag on direct hash assignment.
+  const jumpToEntry = useCallback(
+    (entry: SearchEntry) => {
+      if (entry.sectionId && typeof window !== 'undefined') {
+        const targetHash = `#${entry.sectionId}`;
+        // Replace then re-set so consecutive clicks on the same section re-fire
+        // the hashchange listener inside AccordionSection.
+        if (window.location.hash === targetHash) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
         requestAnimationFrame(() => {
           window.location.hash = targetHash;
         });
       }
-    }
-    onJump(entry.tabId);
-  };
+      onJump(entry.tabId);
+    },
+    [onJump]
+  );
 
-  const matches = SEARCH_INDEX.filter(entry => {
-    const haystack = `${entry.section} ${entry.preview} ${entry.keywords}`.toLowerCase();
-    return haystack.includes(q);
-  });
+  // Keyboard navigation: ↑ ↓ to move through results, Enter to jump. Works while
+  // the cursor is in the search box (a single-line input ignores ↑ ↓).
+  useEffect(() => {
+    if (matches.length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelected(s => Math.min(s + 1, matches.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelected(s => Math.max(s - 1, 0));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const m = matches[selected];
+        if (m) jumpToEntry(m.entry);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [matches, selected, jumpToEntry]);
+
+  // Keep the highlighted result scrolled into view.
+  useEffect(() => {
+    const node = listRef.current?.children[selected] as HTMLElement | undefined;
+    node?.scrollIntoView({ block: 'nearest' });
+  }, [selected]);
+
+  if (tokens.length === 0) return null;
 
   if (matches.length === 0) {
     return (
@@ -1135,34 +1248,33 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
         <Search size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
           {matches.length} section{matches.length === 1 ? '' : 's'} match &quot;
-          <strong style={{ color: 'var(--accent-primary)' }}>{query}</strong>&quot; — click to jump.
+          <strong style={{ color: 'var(--accent-primary)' }}>{query}</strong>&quot;
+          <span style={{ color: 'var(--text-muted)' }}> · ↑↓ to navigate, ↵ to jump</span>
         </span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {matches.map(entry => {
+      <div ref={listRef} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {matches.map(({ entry }, idx) => {
           const tab = TABS.find(t => t.id === entry.tabId);
+          const isSel = idx === selected;
           return (
             <button
               key={`${entry.tabId}-${entry.section}`}
               onClick={() => jumpToEntry(entry)}
+              onMouseEnter={() => setSelected(idx)}
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 12,
                 padding: 14,
                 borderRadius: 10,
-                border: '1px solid var(--border-primary, #222)',
-                background: 'var(--bg-secondary, #111)',
+                border: `1px solid ${isSel ? 'var(--accent-primary)' : 'var(--border-primary, #222)'}`,
+                background: isSel
+                  ? 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-secondary, #111))'
+                  : 'var(--bg-secondary, #111)',
                 color: 'var(--text-primary)',
                 textAlign: 'left',
                 cursor: 'pointer',
-                transition: 'border-color 0.15s, transform 0.15s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = 'var(--border-primary, #222)';
+                transition: 'border-color 0.15s, background 0.15s',
               }}
             >
               <div style={{ marginTop: 2, color: 'var(--accent-primary)' }}>{tab?.icon}</div>
@@ -1180,9 +1292,11 @@ function SearchResults({ query, onJump }: { query: string; onJump: (tabId: TabId
                   {tab?.label}
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>
-                  {entry.section}
+                  {highlightTokens(entry.section, tokens)}
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{entry.preview}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  {highlightTokens(entry.preview, tokens)}
+                </div>
               </div>
             </button>
           );
