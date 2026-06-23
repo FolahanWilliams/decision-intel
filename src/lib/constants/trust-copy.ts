@@ -335,7 +335,7 @@ export const AUDIT_LOG_RETENTION_TIERS = [
   },
 ];
 export const AUDIT_LOG_RETENTION_BODY =
-  'Every audit log entry is immutable, append-only, and timestamped at write. Entries are queryable via the AdminAuditLog UI inside the customer account and exportable as a single JSON bundle via the account-data export endpoint (Enterprise tier). The retention window starts at the entry write timestamp; expired entries are archived to cold storage for an additional 90 days before cryptographic destruction. When a customer leaves the platform, the active retention window survives the contract end-date so post-departure regulatory queries can still be answered.';
+  'Every audit log entry is immutable, append-only, and timestamped at write. Entries are queryable via the AdminAuditLog UI inside the customer account and exportable as a single JSON bundle via the account-data export endpoint (Enterprise tier). The retention window starts at the entry write timestamp; expired entries are archived to cold storage for an additional 90 days before permanent deletion. When a customer leaves the platform, the active retention window survives the contract end-date so post-departure regulatory queries can still be answered.';
 
 /**
  * Vendor-risk questionnaire shape — locked 2026-05-05 (James persona ask,
@@ -454,7 +454,7 @@ export const BIAS_GENOME_OWNERSHIP = [
   {
     label: 'Platform-aggregated: outcome metadata only',
     value: 'Anonymised · opt-in',
-    body: 'Bias Genome cohort signals are derived exclusively from outcome METADATA: bias type, decision-domain class, predicted-vs-realised quality, time-to-outcome window. Document content, persona names, deal terms, and any text fragments are NEVER part of the cohort signal. Aggregation happens server-side after k-anonymity guards (≥3 contributing organisations per signal). The aggregation is opt-in and can be disabled per organisation in Settings &rsaquo; Org without affecting the rest of the product.',
+    body: 'Bias Genome cohort signals are derived exclusively from outcome METADATA: bias type, decision-domain class, predicted-vs-realised quality, time-to-outcome window. Document content, persona names, deal terms, and any text fragments are NEVER part of the cohort signal. When cross-organisation aggregation activates it runs server-side behind a k-anonymity floor of at least 3 contributing organisations per signal, so no single organisation is identifiable; today the Bias Genome is computed on a seed corpus, not customer data. The aggregation is opt-in and can be disabled per organisation in Settings &rsaquo; Org without affecting the rest of the product.',
   },
   {
     label: 'Withdrawal path',

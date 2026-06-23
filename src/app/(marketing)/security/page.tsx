@@ -35,8 +35,16 @@ import {
   EVIDENTIARY_STANDARD_CONTINUITY_BODY,
 } from '@/lib/constants/trust-copy';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
+
+// Framework count — derived from the canonical registry (same as /faq, /onepager,
+// /about, /ai-verify, /llms.txt) so the count can NEVER drift. Used by the two
+// claims declared BEFORE the local FRAMEWORKS array (metadata + the TRUST_SPINE
+// label), which cannot read FRAMEWORKS.length due to TDZ. The in-body counts read
+// the local FRAMEWORKS.length, which mirrors the registry (both currently 19).
+const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 
 // Bias taxonomy size — derived from BIAS_EDUCATION per the canonical
 // count-discipline pattern (mirrors {FRAMEWORKS.length} used in the same
@@ -48,8 +56,7 @@ const BIAS_TAXONOMY_SIZE = Object.keys(BIAS_EDUCATION).length;
 
 export const metadata: Metadata = {
   title: 'Security · Decision Intel',
-  description:
-    'Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, 19 regulatory frameworks mapped flag-by-flag across G7, EU, GCC and African markets, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.',
+  description: `Enterprise-grade security posture on a founder budget. AES-256-GCM at rest with keyVersion rotation, TLS 1.2+ in transit, immutable audit log, ${FRAMEWORK_COUNT} regulatory frameworks mapped flag-by-flag across G7, EU, GCC and African markets, and a Decision Provenance Record (EU AI Act Article 14 aligned) your GC can walk into a regulator meeting with.`,
   alternates: { canonical: `${siteUrl}/security` },
   openGraph: {
     title: 'Security · Decision Intel',
@@ -98,10 +105,9 @@ const TRUST_SPINE: Array<{ icon: LucideIcon; label: string; body: string }> = [
   },
   {
     icon: FileCheck2,
-    // Count must match FRAMEWORKS.length declared below (currently 19 with
-    // ISA Nigeria 2007). Hardcoded literal because TRUST_SPINE is declared
-    // before FRAMEWORKS; update both in lockstep when adding entries.
-    label: '19 regulatory frameworks, provision-level',
+    // Derived from the registry (FRAMEWORK_COUNT) so it can never drift, even
+    // though TRUST_SPINE is declared before the local FRAMEWORKS array.
+    label: `${FRAMEWORK_COUNT} regulatory frameworks, provision-level`,
     body: 'Every flag we surface carries a citation across SOX §404, GDPR Article 22, EU AI Act Annex III, Basel III, FCA Consumer Duty, SEC Reg D, and LPOA. Your GC can defend each flag against its source.',
   },
   {
