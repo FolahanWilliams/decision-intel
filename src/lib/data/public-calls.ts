@@ -18,6 +18,16 @@
  *   (See POSITIONING_EPISTEMIC_HONESTY in icp.ts — correlated risk indicators,
  *   not causation.)
  *
+ * PROXIMITY OVER FAME (the 2026-06-23 sharpening — Rob's clarity lesson):
+ *   The value is the RISK SHAPE, not the famous name. Your customer (a solo GP,
+ *   a fractional CSO, a mid-market corp-dev head) never audits a mega-cap; they
+ *   audit their own memos. A public decision earns its place ONLY as a checkable
+ *   instance of a reasoning-risk that recurs in the BUYER's own decisions — so
+ *   every call carries a `mirrors` line naming whose decision it resembles and
+ *   why. PREFER calls that visibly resemble the buyer's world (a growth-round
+ *   thesis, a market entry, a mid-market acquisition) over mega-cap flexes; a
+ *   famous name buys attention, a buyer-shaped call buys belief.
+ *
  * TO ADD A CALL: copy a block below, give it a unique `id`, write the `flag`
  * (the reasoning-risk), a falsifiable `proxy` with a real `dueDate`, set
  * `status: 'locked'`. As the proxy date lands, flip the status and fill
@@ -43,6 +53,7 @@ export interface PublicCall {
   result?: string; // filled when the proxy resolves (wins AND losses)
   proxyLadder?: { window: string; question: string }[]; // the monitoring sequence, optional
   scoringNote?: string; // how this specific call is scored (the flag, not the price), optional
+  mirrors?: string; // the proximity bridge: why this decision's reasoning-risk is the BUYER's risk too
 }
 
 export const CALL_STATUS_META: Record<
@@ -109,5 +120,7 @@ export const PUBLIC_CALLS: PublicCall[] = [
     ],
     scoringNote:
       'We are not predicting the share price. The stock could rise on Starlink alone while the Starship timeline slips, and the flag would still be validated, because the flag was about the reasoning-risk, not the price. The scored unit is simple: did the flagged risk materialise?',
+    mirrors:
+      'You will never audit a $1.77T IPO. But a GP backing a late-stage round, and a CSO defending a market-entry memo, face the same shape of risk: a coherent narrative gated on a timeline the reference class says is optimistic. This is a public, checkable instance of the exact reasoning-risk your own decisions carry.',
   },
 ];

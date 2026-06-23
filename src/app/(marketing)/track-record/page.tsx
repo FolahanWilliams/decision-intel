@@ -162,7 +162,9 @@ export default function TrackRecordPage() {
         >
           Every call below names a specific reasoning-risk in a public decision, a falsifiable test,
           and a due date, all published in advance. We score whether the risk we flagged
-          materialised, not whether we predicted the price. And we publish the calls we get wrong.
+          materialised, not whether we predicted the price, and we publish the calls we get wrong.
+          The decisions are public and checkable; the reasoning-risk each one names is the shape
+          that recurs in the memos and deals you actually work on.
         </p>
         <nav
           aria-label="Track record sections"
@@ -194,6 +196,12 @@ export default function TrackRecordPage() {
         <SectionEyebrow icon={<Target size={13} strokeWidth={2.25} />} text="The method" />
         <h2 style={h2Style}>Score the flag, not the forecast.</h2>
         <div style={{ maxWidth: 820, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <p style={{ ...bodyStyle, color: C.slate700, fontWeight: 500 }}>
+            Why this exists: you should not have to take our word that the audit catches what a
+            committee misses. So the call is made in public, in advance, with a falsifiable test and
+            a due date, and the result is published either way. Check the hit rate. That is the only
+            honest proof a reasoning audit can offer before it is in your workflow.
+          </p>
           <p style={bodyStyle}>
             A forecaster predicts the outcome. Decision Intel is a reasoning auditor: it names the
             specific reasoning-risk a committee should pressure-test, and the public test is simply
@@ -413,6 +421,21 @@ function CallCard({ call }: { call: PublicCall }) {
       <CallField label="Flag" body={call.flag} />
       <CallField label="Falsifiable proxy" body={call.proxy} />
       {call.result && <CallField label="Result" body={call.result} color={meta.color} />}
+
+      {call.mirrors && (
+        <div
+          style={{
+            marginTop: 14,
+            padding: '12px 14px',
+            background: C.greenSoft,
+            border: `1px solid ${C.greenBorder}`,
+            borderRadius: 8,
+          }}
+        >
+          <div style={ladderHeadingStyle}>Why this is your risk too</div>
+          <div style={{ fontSize: 13.5, lineHeight: 1.55, color: C.slate700 }}>{call.mirrors}</div>
+        </div>
+      )}
 
       {call.proxyLadder && call.proxyLadder.length > 0 && (
         <div style={{ marginTop: 16, borderTop: `1px solid ${C.slate100}`, paddingTop: 14 }}>

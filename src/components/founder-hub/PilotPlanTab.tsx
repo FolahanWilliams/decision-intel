@@ -120,6 +120,14 @@ function CallRow({ call }: { call: PublicCall }) {
           <strong>Result:</strong> {call.result}
         </div>
       )}
+      {call.mirrors && (
+        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <strong style={{ color: 'var(--accent-primary)' }}>
+            Mirrors (the buyer&apos;s risk):
+          </strong>{' '}
+          {call.mirrors}
+        </div>
+      )}
     </div>
   );
 }
