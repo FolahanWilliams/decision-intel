@@ -66,6 +66,12 @@ export interface Focus {
   note: string;
 }
 
+export interface RobPassPoint {
+  objection: string; // the verbatim VC-pass objection
+  answer: string; // the ruthless, buyer-grounded spoken answer (agree, then reframe)
+  proof: string; // the asset that backs the answer
+}
+
 export const PILOT_PLAN = {
   headline: 'The plan to land the first 3 paid pilots — and earn the track record funding needs.',
   thesis:
@@ -83,6 +89,58 @@ export const PILOT_PLAN = {
     ],
     note: 'Corp dev / PE-backed founder is OPPORTUNISTIC — take it if it comes warm, don’t run it as a third campaign. The whole point is clarity on WHO + WHY, not volume: "I’m targeting this person from here, that person from there." Full-summer sprint: DI is the priority through ~August — 8–10 personalised outreach/week (top of the 1-1-1 cadence, never cold-at-scale), 2 public calls/month, buyer conversations as the daily job.',
   } as Focus,
+
+  // ─── The pass, line by line. Rob's six objections (the set every credible
+  //     buyer raises) → the ruthless answer (agree, then reframe) → the proof
+  //     asset. Rehearse this; never re-derive it live. This is "not scrambling
+  //     when the next Rob shows up." ───
+  theRobPass: [
+    {
+      objection:
+        'Finding "anchoring" in WeWork\'s S-1 when you already know it failed is textbook hindsight bias.',
+      answer:
+        'Agreed — the retro library is a teaching aid, never proof, and I label it illustrative every time. So the real proof is FORWARD: I lock a reasoning-risk flag on a live public decision, in advance, with a falsifiable test and a due date, and I publish the misses. Judge the hit rate, not the hindsight.',
+      proof:
+        "The public prospective track record (/track-record): first call locked 2026-06-21, due Dec 31. Plus the cold-open that runs the audit on the buyer's OWN closed deal, not a famous failure.",
+    },
+    {
+      objection:
+        'Who puts a confidential, market-sensitive M&A memo into a third-party tool with no security or compliance accreditation?',
+      answer:
+        "Nobody, and I am not asking them to. The wedge runs on PUBLIC decisions and the buyer's own ALREADY-CLOSED deals — no live confidential upload needed to prove value. Confidential F500 M&A is the ceiling, not the entry; it opens after SOC 2 and references, not before.",
+      proof:
+        'The retro cold-open (run it on a deal you have already closed) + SOC 2 Type I on the Q4 2026 roadmap (/trust). The wedge sits structurally outside the confidentiality wall by design.',
+    },
+    {
+      objection: 'What has the EU AI Act got to do with cognitive biases in an M&A deal?',
+      answer:
+        'Nothing at the wedge — you are right, and I have cut it. The Act governs AI SYSTEMS in eight defined high-risk areas; a human M&A reasoning call is not one of them. It is only live at the regulated-record ceiling (banks, audit committees), never for an individual operator. Leading the wedge with it was borrowed authority that cost credibility.',
+      proof:
+        'Cut from every wedge surface (positioning lock); kept only at the Phase-4 procurement ceiling where it genuinely binds.',
+    },
+    {
+      objection: 'The deck reads as something Claude wrote — lots of AI waffle.',
+      answer:
+        'Fair hit on the deck. The substance under it is not waffle: it is 50-year-old intelligence-community tradecraft — pre-mortem, competing hypotheses, red team, the Structured Analytic Techniques the CIA runs by hand, automated. The deck buried that under category nouns. The fix is plain language: what we catch, on whose decision, scored how.',
+      proof:
+        'The R²F / SAT lineage (Heuer, Meehl, Tetlock, Ferrucci), provenance not invention, on the Intellectual Constellation. The track record proves the catch in concrete, dated terms a CFO can check.',
+    },
+    {
+      objection: 'I do not see depth to the product and I do not see a moat.',
+      answer:
+        'Straight answer: the audit engine IS replicable, a team rebuilds the prompt in weeks, and I will not pretend otherwise. The moat is not the engine; it is what accumulates once embedded: the per-org decision→outcome calibration data, the workflow embeddedness, and a five-ingredient bundle where four (founder narrative, embedded time, real calibrated data, network) are unrepeatable. The moat is downstream of traction, which is exactly why the plan is one deep pilot, not more features.',
+      proof:
+        'The defensibility vectors + the five-ingredient bundle (Path to $100M tab). Honest framing: no moat yet, it is earned by getting embedded.',
+    },
+    {
+      objection:
+        'You have not made commercial traction. Get a signed paid pilot from a credible buyer, then take that forward.',
+      answer:
+        'Agreed — that is the only thing that matters now, and it is the whole plan, not a side-note. Two named lanes, a free retro on a closed deal to get in the door, convert to a paid pilot. No more product until that is signed.',
+      proof:
+        'This Pilot Plan: two named lanes, the retro-to-pilot motion, the month-4 kill criterion. The directive, made the spine.',
+    },
+  ] as RobPassPoint[],
 
   // ─── The diagnosis, settled. Stop re-litigating; act. ───
   diagnosis: [

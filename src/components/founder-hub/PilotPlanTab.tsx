@@ -254,6 +254,55 @@ export function PilotPlanTab() {
         </div>
       </AccentCard>
 
+      {/* The pass, line by line — the rehearsable demolition */}
+      <AccentCard
+        accent="danger"
+        title={<CardTitle>The pass, line by line · how you answer the next Rob</CardTitle>}
+      >
+        <p
+          style={{
+            margin: '0 0 12px',
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.5,
+          }}
+        >
+          Rob&apos;s six objections are the set every credible buyer raises. Agree first, then
+          reframe, then point at the proof. Rehearse it; never re-derive it live.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {p.theRobPass.map((pt, i) => (
+            <div
+              key={i}
+              style={{
+                borderLeft: '2px solid var(--error)',
+                paddingLeft: 12,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 5,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontStyle: 'italic',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.5,
+                }}
+              >
+                &ldquo;{pt.objection}&rdquo;
+              </div>
+              <div style={{ fontSize: 13.5, color: 'var(--text-primary)', lineHeight: 1.55 }}>
+                {pt.answer}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                <strong style={{ color: 'var(--accent-primary)' }}>Proof:</strong> {pt.proof}
+              </div>
+            </div>
+          ))}
+        </div>
+      </AccentCard>
+
       {/* The pilots — two named lanes + opportunistic */}
       <div style={eyebrowStyle}>The pilots · two named lanes + opportunistic</div>
       {p.pilots.map(pilot => (
