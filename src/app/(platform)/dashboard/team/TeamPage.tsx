@@ -50,6 +50,9 @@ const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligen
 interface TeamMember {
   id: string;
   userId: string;
+  // The org this membership belongs to. GET /api/team returns it (full include
+  // on organization.members); the remove call scopes by it.
+  orgId: string;
   email: string;
   displayName: string | null;
   role: string;
