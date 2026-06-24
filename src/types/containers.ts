@@ -210,7 +210,17 @@ export interface ContainerCrossReferenceRun {
   documentSnapshot: Array<{ documentId: string; analysisId: string }>;
   findings:
     | ContainerCrossReferenceFinding[]
-    | { findings: ContainerCrossReferenceFinding[]; summary?: string };
+    | {
+        findings: ContainerCrossReferenceFinding[];
+        summary?: string;
+        // Truncation accounting from the cross-reference agent. Surfaced as a
+        // "partial scan" banner so a deal team reading "no conflicts" knows the
+        // scan didn't see the whole CIM (a dangerous false-clean otherwise).
+        truncationReport?: {
+          truncatedDocs?: Array<{ documentName: string }>;
+          excludedDocs?: Array<{ documentName: string }>;
+        };
+      };
   conflictCount: number;
   highSeverityCount: number;
   status: 'running' | 'complete' | 'error';

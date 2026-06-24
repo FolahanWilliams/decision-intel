@@ -44,6 +44,25 @@ function extractFindings(
   return [];
 }
 
+/**
+ * Pull the truncation accounting out of the wrapped findings shape. The agent
+ * caps total input (an 80-200pg CIM can overflow the budget); when it does, a
+ * deal team reading "no conflicts" must be told the scan was PARTIAL — otherwise
+ * the missing synergy table reads as a false-clean. Returns the truncated +
+ * excluded doc names, or null when nothing was truncated.
+ */
+function extractTruncationReport(
+  raw: ContainerCrossReferenceRun['findings']
+): { truncatedDocs: string[]; excludedDocs: string[] } | null {
+  if (!raw || Array.isArray(raw) || typeof raw !== 'object') return null;
+  const report = 'truncationReport' in raw ? raw.truncationReport : undefined;
+  if (!report) return null;
+  const truncatedDocs = (report.truncatedDocs ?? []).map(d => d.documentName).filter(Boolean);
+  const excludedDocs = (report.excludedDocs ?? []).map(d => d.documentName).filter(Boolean);
+  if (truncatedDocs.length === 0 && excludedDocs.length === 0) return null;
+  return { truncatedDocs, excludedDocs };
+}
+
 function severityRank(s: string): number {
   if (s === 'critical') return 4;
   if (s === 'high') return 3;
@@ -91,6 +110,7 @@ export function ContainerCrossReferenceCard({
     );
   }
 
+  const truncation = extractTruncationReport(run.findings);
   const runDate = new Date(run.runAt);
   const ageHours = Math.round((mountTime - runDate.getTime()) / (1000 * 60 * 60));
   const ageLabel =
@@ -155,6 +175,37 @@ export function ContainerCrossReferenceCard({
           </div>
         </div>
       </div>
+
+      {truncation && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 8,
+            padding: 10,
+            marginBottom: 12,
+            background: 'color-mix(in srgb, var(--warning) 8%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: 'var(--fs-xs)',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+          }}
+        >
+          <AlertCircle size={14} style={{ color: 'var(--warning)', flexShrink: 0, marginTop: 2 }} />
+          <span>
+            <strong style={{ color: 'var(--text-primary)' }}>Partial scan.</strong> Some documents
+            exceeded the analysis budget, so this run did not read them in full.{' '}
+            {truncation.excludedDocs.length > 0 && (
+              <>Excluded: {truncation.excludedDocs.join(', ')}. </>
+            )}
+            {truncation.truncatedDocs.length > 0 && (
+              <>Truncated: {truncation.truncatedDocs.join(', ')}. </>
+            )}
+            Treat &ldquo;no conflicts&rdquo; as provisional for these documents.
+          </span>
+        </div>
+      )}
 
       {findings.length === 0 ? (
         <div
