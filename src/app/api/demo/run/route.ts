@@ -190,7 +190,21 @@ export async function POST(req: NextRequest) {
 
         // Same analyzeDocument the demo already called — its real
         // per-node ProgressUpdate callbacks now stream out as SSE.
-        const result = await analyzeDocument(documentId, update => send(update));
+        //
+        // CRITICAL: analyzeDocument fires its OWN internal
+        // `type:'complete'` carrying the BARE AnalysisResult (overallScore at
+        // the top level). The client expects the WRAPPED shape this route
+        // emits below ({ documentId, analysisId, result }) and reads
+        // `data.result.overallScore` — so the bare event would resolve
+        // `data.result` to undefined and throw, leaving the spinner stuck
+        // forever on every cache-miss (= every real prospect's novel paste).
+        // Drop the internal complete here; the route's own wrapped complete
+        // (below) is the single terminal event the client receives. Every
+        // other update (step / bias / noise / progress) streams through.
+        const result = await analyzeDocument(documentId, update => {
+          if (update.type === 'complete') return;
+          send(update);
+        });
 
         // analyzeDocument persists the Analysis row itself. Fetch its ID
         // so the wow-sequence UI can deep-link / claim the audit on
