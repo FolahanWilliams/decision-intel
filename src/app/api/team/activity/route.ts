@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 
 const log = createLogger('TeamActivity');
 
@@ -39,11 +40,14 @@ export async function GET() {
     const memberUserIds = members.map(m => m.userId);
     const memberMap = new Map(members.map(m => [m.userId, m.displayName || m.email.split('@')[0]]));
 
-    // Fetch recent team documents (shared across org)
+    // Fetch recent documents the VIEWER can actually see: their own (any
+    // visibility) + TEAM-visible org docs — never teammates' PRIVATE docs. The
+    // previous OR:[{orgId},{userId in members}] surfaced teammates' private doc
+    // filenames + DQI scores to any org member (a private-doc leak). (The audit
+    // log below is the team activity log, not document content — left as-is.)
+    const { where: docAccessWhere } = await buildDocumentAccessFilter(user.id);
     const documents = await prisma.document.findMany({
-      where: {
-        OR: [{ orgId: membership.orgId }, { userId: { in: memberUserIds } }],
-      },
+      where: docAccessWhere,
       orderBy: { updatedAt: 'desc' },
       take: 20,
       include: {
