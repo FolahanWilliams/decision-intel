@@ -1005,15 +1005,51 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
           analysisData={{ score: analysis.overallScore, biases: analysis.biases }}
           onExportPdf={() => handleExportPdf(document, analysis, showToast)}
           onExportProvenanceRecord={async () => {
-            // The flagship procurement artifact — hashed + tamper-evident DPR.
-            // The server endpoint gates by plan + audit-logs the export itself;
-            // it renders via headless Chromium. Opened synchronously to stay
-            // inside the click gesture (avoids pop-up blocking).
-            window.open(
-              `/api/documents/${document.id}/provenance-record?format=pdf`,
-              '_blank',
-              'noopener,noreferrer'
-            );
+            // The flagship procurement artefact — hashed + tamper-evident DPR,
+            // rendered server-side via headless Chromium. The endpoint gates by
+            // plan (402 for non-Pro) and audit-logs the export itself.
+            //
+            // We FETCH + download the blob rather than window.open: window.open
+            // surfaced the raw 402/500 JSON body in a new tab to free-plan +
+            // every-error user — the flagship export failing as a tab of
+            // {"error":"UPGRADE_REQUIRED"} for the broadest segment. On a
+            // gate/error we now surface a real toast; on success we download the
+            // PDF. (A download-attribute anchor click is not pop-up-blocked, so
+            // the async fetch is safe here.)
+            try {
+              const res = await fetch(`/api/documents/${document.id}/provenance-record?format=pdf`);
+              if (res.status === 402) {
+                const body = await res.json().catch(() => null);
+                showToast(
+                  body?.message ??
+                    'The Decision Provenance Record export is a Pro-plan feature. Upgrade to generate the board-ready record.',
+                  'error'
+                );
+                return;
+              }
+              if (!res.ok) {
+                const body = await res.json().catch(() => null);
+                showToast(
+                  body?.message ??
+                    `Could not generate the record (${res.status}). Please try again.`,
+                  'error'
+                );
+                return;
+              }
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = window.document.createElement('a');
+              a.href = url;
+              a.download = `${document.filename.replace(/\.[^.]+$/, '')}-decision-provenance-record.pdf`;
+              window.document.body.appendChild(a);
+              a.click();
+              a.remove();
+              URL.revokeObjectURL(url);
+              showToast('Decision Provenance Record exported', 'success');
+            } catch (err) {
+              log.error('Failed to export Decision Provenance Record:', err);
+              showToast('Could not reach the export service. Please try again.', 'error');
+            }
           }}
           onExportCsv={() => handleExportCsv(document, analysis, showToast)}
           onExportMarkdown={() => handleExportMarkdown(document, analysis, biases)}

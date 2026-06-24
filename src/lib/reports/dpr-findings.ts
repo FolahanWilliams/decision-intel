@@ -175,9 +175,16 @@ function computeConfidence(
 }
 
 function prettyBiasLabel(biasType: string): string {
+  // Guard empty segments (leading/trailing/double underscore): w[0] would be
+  // undefined and .toUpperCase() would throw, crashing the ENTIRE /dpr-render
+  // server component → a blank/failed export PDF. Canonical taxonomy biasTypes
+  // are clean snake_case, but a legacy / LLM-emitted malformed biasType (the
+  // codebase normalizes biasTypes elsewhere precisely because they drift) must
+  // never take down the whole DPR for that audit.
   return biasType
     .split('_')
-    .map(w => w[0].toUpperCase() + w.slice(1))
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
