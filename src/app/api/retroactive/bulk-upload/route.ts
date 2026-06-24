@@ -32,10 +32,17 @@ import { apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { parseFile } from '@/lib/utils/file-parser';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
-import { detectDocumentRole } from '@/lib/retroactive/outcomeExtractor';
+import {
+  detectDocumentRole,
+  extractOutcomeDraftDeterministic,
+} from '@/lib/retroactive/outcomeExtractor';
 import { extractEntities, inferDocumentDate } from '@/lib/retroactive/entityExtractor';
 import { pairBulkDocuments } from '@/lib/retroactive/bulkPairing';
-import type { UploadedHistoricalDoc, BulkPairingResult } from '@/lib/retroactive/types';
+import type {
+  UploadedHistoricalDoc,
+  BulkPairingResult,
+  ExtractedOutcomeDraft,
+} from '@/lib/retroactive/types';
 
 const log = createLogger('RetroactiveBulkUpload');
 
@@ -195,6 +202,36 @@ export async function POST(req: NextRequest) {
 
   // Run the pairing engine
   const pairing: BulkPairingResult = pairBulkDocuments({ docs: uploadedDocs });
+
+  // Populate the deterministic outcome draft per pair — THE cold-open value
+  // ("we extract the known outcome from your closed deal, no 90-day wait").
+  // Without this, every pair arrives with no draft, so the wizard shows no
+  // direction badge + the form's outcome summary always starts empty, forcing
+  // 100% manual entry — the exact magic the retro DM sells, absent.
+  //
+  // Tier-1 ONLY here (pure regex over the OUTCOME doc's own text): no LLM,
+  // no API key, no round-trip, no cost at bulk time. The extractor NEVER
+  // fabricates (returns null on no signal → the user fills it in manually),
+  // and the user confirms + edits every surfaced draft. The container kind
+  // isn't chosen yet, so try each base kind and keep the highest-confidence
+  // draft (patterns filter by kind + universal 'any' signals). The Tier-2 LLM
+  // refinement stays available via the separate /extract-outcome endpoint.
+  const EXTRACT_KINDS = ['investment', 'acquisition', 'strategic'] as const;
+  for (const pair of pairing.pairs) {
+    if (!pair.outcomeDoc) continue;
+    let best: ExtractedOutcomeDraft | null = null;
+    for (const kind of EXTRACT_KINDS) {
+      const draft = extractOutcomeDraftDeterministic({
+        sourceDocumentId: pair.outcomeDoc.documentId,
+        content: pair.outcomeDoc.content,
+        kind,
+      });
+      if (draft && (!best || draft.extractionConfidence > best.extractionConfidence)) {
+        best = draft;
+      }
+    }
+    if (best) pair.outcomeDraft = best;
+  }
 
   log.info(
     `Bulk upload by ${userId}: ${uploadedDocs.length}/${files.length} processed, ` +
