@@ -40,8 +40,14 @@ export async function GET(req: NextRequest) {
 
     for (const org of orgs) {
       if (!org.orgId) continue;
-      const patternsLearned = await learnToxicPatterns(org.orgId);
-      results.push({ orgId: org.orgId, patternsLearned });
+      // Per-org isolation: one org throwing must not abort the learning sweep
+      // for every org after it in the loop.
+      try {
+        const patternsLearned = await learnToxicPatterns(org.orgId);
+        results.push({ orgId: org.orgId, patternsLearned });
+      } catch (err) {
+        log.error(`Toxic-pattern learning failed for org ${org.orgId}; continuing:`, err);
+      }
     }
 
     const totalPatterns = results.reduce((sum, r) => sum + r.patternsLearned, 0);

@@ -35,8 +35,13 @@ export async function GET(req: NextRequest) {
     const results: Array<{ orgId: string; edgesCreated: number }> = [];
 
     for (const org of orgs) {
-      const edgesCreated = await inferTemporalEdges(org.id);
-      results.push({ orgId: org.id, edgesCreated });
+      // Per-org isolation: one org throwing must not abort the sweep for the rest.
+      try {
+        const edgesCreated = await inferTemporalEdges(org.id);
+        results.push({ orgId: org.id, edgesCreated });
+      } catch (err) {
+        log.error(`Edge inference failed for org ${org.id}; continuing:`, err);
+      }
     }
 
     const total = results.reduce((s, r) => s + r.edgesCreated, 0);
