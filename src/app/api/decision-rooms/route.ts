@@ -137,6 +137,11 @@ export async function POST(request: NextRequest) {
       'executive_committee',
       'strategy_review',
       'ma_committee',
+      // The pre-commitment "attack" room — the create dropdown offers it and
+      // DecisionRoomCard renders a distinctive red badge gated on this exact
+      // value. It was missing here, so the type was persisted as null and the
+      // badge could never render (the shipped convention was dead end-to-end).
+      'pre_commitment',
       'general',
     ];
     const validType =

@@ -369,6 +369,10 @@ export default function SharedAnalysisPage() {
 
       if (res.status === 401 && data.requiresPassword) {
         setRequiresPassword(true);
+        // A 401 AFTER the user submitted a password = wrong password. Surface
+        // it — a form that silently clears with no feedback reads as broken on
+        // a shared sales artefact. On the initial prompt (no pwd) stay silent.
+        if (pwd) setError('Incorrect password. Please try again.');
         setLoading(false);
         return;
       }
