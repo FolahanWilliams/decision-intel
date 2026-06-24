@@ -478,6 +478,7 @@ export default function TeamPage() {
           onClose={() => setShowInviteModal(false)}
           onChanged={fetchTeam}
           seatsRemaining={seatsRemaining}
+          orgId={org?.id}
         />
       )}
 
@@ -1152,10 +1153,14 @@ function InviteModal({
   onClose,
   onChanged,
   seatsRemaining,
+  orgId,
 }: {
   onClose: () => void;
   onChanged: () => void;
   seatsRemaining: number | null;
+  // The displayed org — sent with the invite so the server scopes the
+  // owner/admin check to THIS org (closes the multi-org cross-tenant hole).
+  orgId?: string;
 }) {
   const [mode, setMode] = useState<'single' | 'bulk'>('single');
   const [email, setEmail] = useState('');
@@ -1175,7 +1180,7 @@ function InviteModal({
       const res = await fetch('/api/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), role }),
+        body: JSON.stringify({ email: email.trim(), role, orgId }),
       });
       if (res.ok) {
         showToast(`Invite sent to ${email}`, 'success');
@@ -1213,7 +1218,7 @@ function InviteModal({
       const res = await fetch('/api/team/invite/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emails, role }),
+        body: JSON.stringify({ emails, role, orgId }),
       });
       const data = await res.json();
       if (res.ok) {

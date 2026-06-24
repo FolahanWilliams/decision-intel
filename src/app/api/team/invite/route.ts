@@ -29,6 +29,10 @@ class SeatLimitError extends Error {
 const InviteSchema = z.object({
   email: z.string().email(),
   role: z.enum(['admin', 'member', 'viewer']).default('member'),
+  // The org the client is acting on (the UI always has it from GET /api/team).
+  // Optional for back-compat; when present, the membership lookup is scoped to
+  // it so a multi-org owner/admin can't invite into the wrong org.
+  orgId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -62,11 +66,20 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { email, role } = InviteSchema.parse(body);
+    const { email, role, orgId } = InviteSchema.parse(body);
 
-    // Must be owner or admin — include org to avoid extra query when sending invite email
+    // Must be owner or admin OF THE TARGETED ORG. When the client passes the org
+    // it's displaying, scope the lookup to it so a multi-org owner/admin can't
+    // invite into / consume the seats of a DIFFERENT org than the UI shows (the
+    // unscoped findFirst returned a non-deterministic org — a cross-tenant
+    // invite/seat hole). Falls back to the single-org lookup when orgId is
+    // omitted (back-compat, no regression).
     const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id, role: { in: ['owner', 'admin'] } },
+      where: {
+        userId: user.id,
+        role: { in: ['owner', 'admin'] },
+        ...(orgId ? { orgId } : {}),
+      },
       include: { organization: { select: { id: true, name: true } } },
     });
     if (!membership) {

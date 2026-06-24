@@ -29,6 +29,10 @@ const MAX_BULK_EMAILS = 50;
 const BulkInviteSchema = z.object({
   emails: z.array(z.string()).min(1).max(MAX_BULK_EMAILS),
   role: z.enum(['admin', 'member', 'viewer']).default('member'),
+  // The org the client is acting on (optional, back-compat). When present, the
+  // membership lookup is scoped to it so a multi-org owner/admin can't bulk-
+  // invite into / consume the seats of the wrong org.
+  orgId: z.string().optional(),
 });
 
 const emailShape = z.string().email();
@@ -59,11 +63,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { emails, role } = BulkInviteSchema.parse(body);
+    const { emails, role, orgId: targetOrgId } = BulkInviteSchema.parse(body);
 
-    // Must be owner or admin — load org for the invite email.
+    // Must be owner or admin OF THE TARGETED ORG. Scoped to the org the client
+    // is displaying when provided, so a multi-org owner/admin can't bulk-invite
+    // into / consume the seats of the wrong org (the unscoped findFirst returned
+    // a non-deterministic org). Back-compat falls back to the single-org lookup.
     const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id, role: { in: ['owner', 'admin'] } },
+      where: {
+        userId: user.id,
+        role: { in: ['owner', 'admin'] },
+        ...(targetOrgId ? { orgId: targetOrgId } : {}),
+      },
       include: { organization: { select: { id: true, name: true } } },
     });
     if (!membership) {
