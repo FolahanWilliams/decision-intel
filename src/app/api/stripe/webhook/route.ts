@@ -10,6 +10,30 @@ function isRecord(val: unknown): val is Record<string, unknown> {
   return typeof val === 'object' && val !== null;
 }
 
+/**
+ * Stripe SDK v21 removed `current_period_end` from the Subscription object and
+ * moved it onto each subscription ITEM (sub.items.data[].current_period_end).
+ * Reading the old top-level path returns undefined, so currentPeriodEnd was
+ * written null on EVERY paid subscription (the customer was still upgraded —
+ * gating is status-based — but the renewal/expiry boundary was lost). Read the
+ * item-level field first, falling back to the legacy top-level for any older
+ * API-version payload that still carries it.
+ */
+function extractSubscriptionPeriodEnd(sub: unknown): Date | null {
+  if (!isRecord(sub)) return null;
+  const items = sub.items;
+  if (isRecord(items) && Array.isArray(items.data) && items.data.length > 0) {
+    const first = items.data[0];
+    if (isRecord(first) && typeof first.current_period_end === 'number') {
+      return new Date(first.current_period_end * 1000);
+    }
+  }
+  if (typeof sub.current_period_end === 'number') {
+    return new Date(sub.current_period_end * 1000);
+  }
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
@@ -52,10 +76,7 @@ export async function POST(request: NextRequest) {
         if (userId && customerId && subscriptionId) {
           // Fetch subscription details for period end
           const sub = await getStripe().subscriptions.retrieve(subscriptionId);
-          const periodEnd =
-            isRecord(sub) && typeof sub.current_period_end === 'number'
-              ? new Date(sub.current_period_end * 1000)
-              : null;
+          const periodEnd = extractSubscriptionPeriodEnd(sub);
 
           await prisma.subscription.upsert({
             where: { stripeSubscriptionId: subscriptionId },
@@ -180,10 +201,7 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const sub = event.data.object as Stripe.Subscription;
         const subscriptionId = sub.id;
-        const updatedPeriodEnd =
-          isRecord(sub) && typeof sub.current_period_end === 'number'
-            ? new Date(sub.current_period_end * 1000)
-            : null;
+        const updatedPeriodEnd = extractSubscriptionPeriodEnd(sub);
 
         const updatedStatus =
           sub.status === 'trialing' ? 'trialing' : sub.cancel_at_period_end ? 'canceled' : 'active';

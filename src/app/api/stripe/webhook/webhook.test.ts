@@ -183,7 +183,11 @@ describe('POST /api/stripe/webhook', () => {
       );
       mockSubscriptionsRetrieve.mockResolvedValue({
         status: 'active',
-        current_period_end: 1700000000,
+        // Stripe SDK v21 shape: current_period_end lives on the subscription
+        // ITEM, not the top level. (This mock previously fabricated it at the
+        // top level, which masked the production bug where the webhook read the
+        // gone-in-v21 top-level field and wrote null on every paid sub.)
+        items: { data: [{ current_period_end: 1700000000 }] },
       });
 
       const res = await POST(createWebhookRequest());
@@ -258,7 +262,11 @@ describe('POST /api/stripe/webhook', () => {
       );
       mockSubscriptionsRetrieve.mockResolvedValue({
         status: 'active',
-        current_period_end: 1700000000,
+        // Stripe SDK v21 shape: current_period_end lives on the subscription
+        // ITEM, not the top level. (This mock previously fabricated it at the
+        // top level, which masked the production bug where the webhook read the
+        // gone-in-v21 top-level field and wrote null on every paid sub.)
+        items: { data: [{ current_period_end: 1700000000 }] },
       });
 
       const res = await POST(createWebhookRequest());
