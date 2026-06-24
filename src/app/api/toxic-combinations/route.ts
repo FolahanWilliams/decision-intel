@@ -23,17 +23,31 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
-  const orgId = searchParams.get('orgId');
   const status = searchParams.get('status') || 'active';
   const analysisId = searchParams.get('analysisId');
   const limit = Math.max(1, Math.min(parseInt(searchParams.get('limit') || '50', 10) || 50, 100));
 
   try {
+    // Scope to what the caller actually owns: combinations from their own
+    // analyses + their org's combinations. The previous code trusted a
+    // CLIENT-SUPPLIED ?orgId (and returned EVERY org's combinations when it was
+    // omitted) — a cross-tenant read of other orgs' analysis summaries +
+    // document filenames. The analysisId filter is ANDed with the ownership OR,
+    // so it can't be used to read another tenant's analysis either.
+    const membership = await prisma.teamMember.findFirst({
+      where: { userId: user.id },
+      select: { orgId: true },
+    });
+    const userOrgId = membership?.orgId ?? null;
+
     const combinations = await prisma.toxicCombination.findMany({
       where: {
-        ...(orgId ? { orgId } : {}),
-        ...(analysisId ? { analysisId } : {}),
         status,
+        ...(analysisId ? { analysisId } : {}),
+        OR: [
+          { analysis: { document: { userId: user.id } } },
+          ...(userOrgId ? [{ orgId: userOrgId }] : []),
+        ],
       },
       orderBy: { toxicScore: 'desc' },
       take: limit,
@@ -85,6 +99,30 @@ export async function PATCH(req: NextRequest) {
         { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
         { status: 400 }
       );
+    }
+
+    // Ownership gate: the caller may only mutate a combination owned by their
+    // org OR derived from one of their own analyses. Without this, any
+    // authenticated user could acknowledge/mitigate ANY org's combination by id
+    // (a cross-tenant write).
+    const existing = await prisma.toxicCombination.findUnique({
+      where: { id },
+      select: {
+        orgId: true,
+        analysis: { select: { document: { select: { userId: true } } } },
+      },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+    const membership = await prisma.teamMember.findFirst({
+      where: { userId: user.id },
+      select: { orgId: true },
+    });
+    const ownsByOrg = !!existing.orgId && existing.orgId === membership?.orgId;
+    const ownsByAnalysis = existing.analysis?.document?.userId === user.id;
+    if (!ownsByOrg && !ownsByAnalysis) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const updated = await prisma.toxicCombination.update({
