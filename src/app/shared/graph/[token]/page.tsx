@@ -714,80 +714,85 @@ export default function SharedGraphPage() {
           />
           <StatTile
             label="Network density"
-            value={`${(r.metrics.density * 100).toFixed(1)}%`}
+            value={`${((r.metrics.density ?? 0) * 100).toFixed(1)}%`}
             sub={`${r.metrics.nodeCount} nodes · ${r.metrics.edgeCount} edges`}
             icon={<Network size={14} />}
             accent={C.slate500}
           />
         </div>
 
-        {/* Risk state */}
-        <section
-          style={{
-            background: C.white,
-            border: `1px solid ${C.slate200}`,
-            borderRadius: 12,
-            padding: 20,
-            marginBottom: 28,
-            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
-          }}
-        >
-          <div
+        {/* Risk state — gated on r.riskState so a malformed/empty snapshot
+            (e.g. a no-org user's graph share, whose fallback snapshot carries
+            only metrics) renders the empty banner above instead of crashing
+            the whole public viewer on undefined.overallRisk. */}
+        {r.riskState && (
+          <section
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              marginBottom: 8,
-              flexWrap: 'wrap',
+              background: C.white,
+              border: `1px solid ${C.slate200}`,
+              borderRadius: 12,
+              padding: 20,
+              marginBottom: 28,
+              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
             }}
           >
-            <h2
+            <div
               style={{
-                margin: 0,
-                fontSize: 14,
-                fontWeight: 700,
-                color: C.navy,
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                marginBottom: 8,
+                flexWrap: 'wrap',
               }}
             >
-              Risk state
-            </h2>
-            <RiskBadge risk={r.riskState.overallRisk} />
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: C.slate700,
-              marginBottom: 12,
-              lineHeight: 1.5,
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
-          >
-            Risk score {r.riskState.riskScore.toFixed(1)} · trend {r.riskState.trend}
-          </div>
-          {r.riskState.factors.length > 0 && (
-            <ul
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.navy,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                Risk state
+              </h2>
+              <RiskBadge risk={r.riskState.overallRisk} />
+            </div>
+            <div
               style={{
-                margin: 0,
-                paddingLeft: 18,
                 fontSize: 13,
                 color: C.slate700,
-                lineHeight: 1.6,
+                marginBottom: 12,
+                lineHeight: 1.5,
+                fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              {r.riskState.factors.slice(0, 5).map((f, i) => (
-                <li key={i}>
-                  <strong style={{ color: C.navy }}>{f.factor}.</strong> {f.description}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+              Risk score {r.riskState.riskScore.toFixed(1)} · trend {r.riskState.trend}
+            </div>
+            {r.riskState.factors.length > 0 && (
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 18,
+                  fontSize: 13,
+                  color: C.slate700,
+                  lineHeight: 1.6,
+                }}
+              >
+                {r.riskState.factors.slice(0, 5).map((f, i) => (
+                  <li key={i}>
+                    <strong style={{ color: C.navy }}>{f.factor}.</strong> {f.description}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
 
         {/* Top influential nodes */}
-        {r.topNodes.length > 0 && (
+        {(r.topNodes?.length ?? 0) > 0 && (
           <section
             style={{
               background: C.white,
@@ -866,7 +871,7 @@ export default function SharedGraphPage() {
         )}
 
         {/* Anti-patterns */}
-        {r.antiPatterns.length > 0 && (
+        {(r.antiPatterns?.length ?? 0) > 0 && (
           <section
             style={{
               background: C.white,
