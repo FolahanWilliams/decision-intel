@@ -74,6 +74,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ challenge: payload.challenge });
     }
 
+    // Slack re-delivers an event when our 3s ack is slow (this route does
+    // synchronous DB work). Re-processing a retry double-posts nudges +
+    // double-creates decision frames (the pre-decision / thread-monitoring
+    // branch has no content-hash guard). Ack the retry without reprocessing —
+    // the original delivery already did (or is doing) the work.
+    if (req.headers.get('x-slack-retry-num')) {
+      return NextResponse.json({ ok: true });
+    }
+
     // Handle event callbacks
     if (payload.type === 'event_callback') {
       // App Home tab opened — always process (not channel-specific)

@@ -94,14 +94,19 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const targetUserId = searchParams.get('userId');
+    const orgId = searchParams.get('orgId');
 
     if (!targetUserId) {
       return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
     }
 
-    // Find requester's membership
+    // Find requester's membership IN THE TARGETED ORG. Scoped to the org the
+    // client is displaying when provided, so a multi-org user's remove/leave
+    // hits the right org instead of a non-deterministic findFirst (the same
+    // cross-org hole fixed on the invite routes). Back-compat: falls back to
+    // the single-org lookup when orgId is omitted.
     const requester = await prisma.teamMember.findFirst({
-      where: { userId: user.id },
+      where: { userId: user.id, ...(orgId ? { orgId } : {}) },
     });
     if (!requester) {
       return NextResponse.json({ error: 'You are not in a team' }, { status: 404 });

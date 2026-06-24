@@ -619,7 +619,9 @@ function MemberRow({
     setConfirmRemoveOpen(false);
     setRemoving(true);
     try {
-      const res = await fetch(`/api/team/members?userId=${member.userId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/team/members?userId=${member.userId}&orgId=${member.orgId}`, {
+        method: 'DELETE',
+      });
       if (res.ok) {
         showToast('Member removed', 'success');
         onUpdate();
