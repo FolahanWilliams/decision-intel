@@ -164,9 +164,11 @@ export async function GET() {
                 },
               });
             } catch (createErr) {
-              // Document.contentHash is `@unique` across the whole table.
-              // A cross-org collision is rare but possible; log and skip so a
-              // single collision doesn't abort the whole sync run.
+              // Document has @@unique([userId, contentHash]) (per-user, NOT a
+              // global unique — migrated 2026-06-20). A P2002 here means THIS
+              // user already holds that content (e.g. uploaded the same file
+              // manually), not a cross-org collision; log and skip so a single
+              // dedup collision doesn't abort the whole sync run.
               const code = (createErr as { code?: string }).code;
               if (code === 'P2002') {
                 log.warn(
