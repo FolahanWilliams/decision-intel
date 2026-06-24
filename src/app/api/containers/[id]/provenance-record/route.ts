@@ -16,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { renderDprPdf } from '@/lib/reports/render-dpr-pdf';
 import { assembleProvenanceRecordData } from '@/lib/reports/provenance-record-data';
+import { getUserPlan, getOrgPlan } from '@/lib/utils/plan-limits';
 
 const log = createLogger('ContainerProvenanceRoute');
 
@@ -75,6 +76,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const clientSafe = url.searchParams.get('clientSafe') === '1';
 
     if (format === 'pdf') {
+      // DPR PDF export is a Pro-plan feature (CLAUDE.md DPR lock; mirrors the
+      // /api/documents/[id]/provenance-record gate verbatim). The container
+      // route is the migration successor to the Pro-gated packages/deals
+      // provenance routes and had silently dropped the gate — a paywall bypass
+      // for the flagship procurement artefact. JSON (the data) stays available.
+      const effectivePlan = orgId ? await getOrgPlan(orgId) : await getUserPlan(user.id);
+      if (effectivePlan === 'free') {
+        return NextResponse.json(
+          {
+            error: 'UPGRADE_REQUIRED',
+            message: 'Decision Provenance Record export requires the Pro plan or higher.',
+            requiredPlan: 'pro',
+          },
+          { status: 402 }
+        );
+      }
+
       const baseUrl = `${url.protocol}//${url.host}`;
       const renderUrl = `${baseUrl}/dpr-render/document/${leadAnalysis.id}${clientSafe ? '?clientSafe=1' : ''}`;
       const result = await renderDprPdf({
