@@ -98,7 +98,11 @@ export async function GET(request: NextRequest) {
     const documents = await prisma.document
       .findMany({
         where: {
-          OR: [{ userId: user.id }, ...(orgId ? [{ orgId }] : [])],
+          // Account export = the data subject's OWN data (GDPR Art 20
+          // portability). The previous OR included EVERY org doc regardless of
+          // visibility, so any org member's export leaked teammates' PRIVATE
+          // documents (+ their analyses/outcomes below). Scope to the user.
+          userId: user.id,
           deletedAt: null,
         },
         select: {
@@ -123,7 +127,7 @@ export async function GET(request: NextRequest) {
     const analyses = await prisma.analysis
       .findMany({
         where: {
-          document: { OR: [{ userId: user.id }, ...(orgId ? [{ orgId }] : [])] },
+          document: { userId: user.id },
         },
         select: {
           id: true,
@@ -155,7 +159,7 @@ export async function GET(request: NextRequest) {
     // ── Outcome records (DecisionOutcome model) ──────────────────────
     const outcomes = await prisma.decisionOutcome
       .findMany({
-        where: { OR: [{ userId: user.id }, ...(orgId ? [{ orgId }] : [])] },
+        where: { userId: user.id },
         select: {
           id: true,
           analysisId: true,
@@ -182,7 +186,7 @@ export async function GET(request: NextRequest) {
     //    download per-analysis at /api/documents/[id]/provenance-record) ──
     const dprs = await prisma.decisionProvenanceRecord
       .findMany({
-        where: { OR: [{ userId: user.id }, ...(orgId ? [{ orgId }] : [])] },
+        where: { userId: user.id },
         select: {
           id: true,
           analysisId: true,

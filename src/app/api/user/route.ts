@@ -34,7 +34,10 @@ export async function DELETE() {
     const rateLimitResult = await checkRateLimit(userId, '/api/user/delete', {
       windowMs: 60 * 60 * 1000,
       maxRequests: 2,
-      failMode: 'open',
+      // Fail CLOSED on an irreversible erasure path (the export route already
+      // does). On a rate-limiter outage, block rather than allow unbounded
+      // deletion attempts.
+      failMode: 'closed',
     });
     if (!rateLimitResult.success) {
       return NextResponse.json(
@@ -131,6 +134,14 @@ export async function DELETE() {
 
       // Team membership (remove from team, don't delete the org)
       await schemaDriftSafe(() => tx.teamMember.deleteMany({ where: { userId } }));
+
+      // API credentials — load-bearing for erasure: without this, LIVE API keys
+      // survived account deletion (a security + GDPR Art 17 gap). ApiKey is a
+      // leaf table (no child FKs), so it deletes safely here. (DecisionRoom /
+      // DecisionContainer / OutreachArtifact / WedgeProspect are also
+      // user-owned orphans but carry child rows — they need FK-order care and
+      // are a separate follow-up.)
+      await schemaDriftSafe(() => tx.apiKey.deleteMany({ where: { userId } }));
 
       // Product A: Documents cascade to Analyses, BiasInstances, Embeddings
       await tx.auditLog.deleteMany({ where: { userId } });
