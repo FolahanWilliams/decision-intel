@@ -35,29 +35,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
     }
 
-    // Update the bias instance with user rating
-    const bias = await prisma.biasInstance.update({
+    // Verify ownership BEFORE writing. The previous code UPDATEd userRating on
+    // any bias by id and only checked ownership afterward — a write-before-check
+    // IDOR: a user could poison another tenant's bias userRating (which feeds
+    // the cross-org feedback aggregates) and merely receive a 403 after the
+    // write had already landed.
+    const existing = await prisma.biasInstance.findUnique({
       where: { id: biasId },
-      data: { userRating: rating },
-      include: {
-        analysis: {
-          include: {
-            document: true,
-          },
-        },
-      },
+      include: { analysis: { include: { document: true } } },
     });
-
-    // Verify ownership
-    if (bias.analysis.document.userId !== user.id) {
+    if (!existing) {
+      return NextResponse.json({ error: 'Bias not found' }, { status: 404 });
+    }
+    if (existing.analysis.document.userId !== user.id) {
       const membership = await prisma.teamMember.findFirst({
         where: { userId: user.id },
       });
-
-      if (!membership || membership.orgId !== bias.analysis.document.orgId) {
+      if (!membership || membership.orgId !== existing.analysis.document.orgId) {
         return NextResponse.json({ error: 'Access denied' }, { status: 403 });
       }
     }
+
+    // Ownership verified — now write (biasType/severity are scalars on the
+    // update result, so no relation include is needed here).
+    const bias = await prisma.biasInstance.update({
+      where: { id: biasId },
+      data: { userRating: rating },
+    });
 
     // Log audit trail
     await prisma.auditLog.create({
@@ -121,6 +125,25 @@ export async function GET(req: NextRequest) {
 
     if (!analysisId) {
       return NextResponse.json({ error: 'Analysis ID is required' }, { status: 400 });
+    }
+
+    // Ownership: the analysis's document must be owned by the caller or their
+    // org. The previous code returned ANY analysis's biases by analysisId with
+    // no ownership check (a cross-tenant read of another tenant's bias metadata).
+    const owner = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: { document: { select: { userId: true, orgId: true } } },
+    });
+    if (!owner) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+    if (owner.document.userId !== user.id) {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId: user.id },
+      });
+      if (!membership || membership.orgId !== owner.document.orgId) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
     }
 
     // Get all biases with ratings for this analysis
