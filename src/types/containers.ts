@@ -179,19 +179,27 @@ export interface ContainerOutcomeShape {
  * cross-reference agent + cross-reference UI components continue
  * to consume it without rewrite.
  */
+// Mirrors the cross-reference agent's emitted CrossRefFinding shape
+// (src/lib/agents/cross-reference.ts), which is what's actually persisted on
+// DecisionContainerCrossReference.findings. The earlier title/description/
+// resolution/id fields were NEVER emitted, so the card rendered every conflict
+// with a blank headline + body (a false-clean on the M&A differentiator);
+// aligned to the real shape 2026-06-24.
 export interface ContainerCrossReferenceFinding {
-  id: string;
   type: string;
   severity: 'critical' | 'high' | 'medium' | 'low';
-  title: string;
-  description: string;
+  /** Human-readable headline summarising the conflict. */
+  summary: string;
   claims: Array<{
     documentId: string;
     documentName: string;
     excerpt: string;
     analysisId?: string;
   }>;
-  resolution: string;
+  /** One-sentence reason this matters for the decision. */
+  whyItMatters: string;
+  /** One-sentence question the deal team should answer to resolve it. */
+  resolutionQuestion: string;
 }
 
 export interface ContainerCrossReferenceRun {

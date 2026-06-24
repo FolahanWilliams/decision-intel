@@ -172,8 +172,8 @@ export function ContainerCrossReferenceCard({
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {findings.map(finding => (
-            <FindingRow key={finding.id} finding={finding} documentMap={documentMap} />
+          {findings.map((finding, i) => (
+            <FindingRow key={i} finding={finding} documentMap={documentMap} />
           ))}
         </div>
       )}
@@ -218,7 +218,7 @@ function FindingRow({
               marginBottom: 4,
             }}
           >
-            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{finding.title}</span>
+            <span style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{finding.summary}</span>
             <span
               style={{
                 fontSize: 'var(--fs-3xs)',
@@ -249,7 +249,7 @@ function FindingRow({
               lineHeight: 1.5,
             }}
           >
-            {finding.description}
+            {finding.whyItMatters}
           </p>
         </div>
       </div>
@@ -304,7 +304,7 @@ function FindingRow({
         </div>
       )}
 
-      {finding.resolution && (
+      {finding.resolutionQuestion && (
         <div
           style={{
             marginTop: 8,
@@ -329,7 +329,7 @@ function FindingRow({
           >
             Resolve
           </span>
-          {finding.resolution}
+          {finding.resolutionQuestion}
         </div>
       )}
     </div>
