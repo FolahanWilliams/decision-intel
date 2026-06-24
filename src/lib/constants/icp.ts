@@ -757,7 +757,10 @@ export function buildIcpPromptBlock(): string {
   const avoid = `${ICP_AVOID.label}: ${ICP_AVOID.audience} ${ICP_AVOID.why}`;
   const sequence = ICP_SEQUENCING.join(' ');
   const retro = `RETRO POST-MORTEM COLD-OPEN (lead the deal-team wedge personas with this, not "audit your next memo"): ${RETRO_POSTMORTEM_COLD_OPEN.motion} ${RETRO_POSTMORTEM_COLD_OPEN.logoMechanic} ${RETRO_POSTMORTEM_COLD_OPEN.boutiquesNote}`;
-  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE} ${retro}`;
+  const leadLabel =
+    getPhase1Persona(BEACHHEAD_FOCUS.leadPersona)?.label ?? BEACHHEAD_FOCUS.leadPersona;
+  const beachhead = `BEACHHEAD FOCUS (the antidote to "spread too thin", and the gatekeeper-not-author lens): of the four wedge personas, LEAD with the fiduciary GATEKEEPER who is accountable for the call but does NOT author it — ${leadLabel} (${BEACHHEAD_FOCUS.oneBuyer}). The author-leaning personas (corp-dev head, PE-backed founder) champion their own live deal, so open them on the RETRO of a CLOSED deal, never by grading their live memo. One buyer, one motion (${BEACHHEAD_FOCUS.oneMotion}), one proof (${BEACHHEAD_FOCUS.oneProof}). This sharpens the wedge; it does NOT pivot it — ${BEACHHEAD_FOCUS.notThis}`;
+  return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE} ${retro} ${beachhead}`;
 }
 
 /**
@@ -980,6 +983,100 @@ export function getPhase1Persona(id: string | null | undefined): Phase1Persona |
   if (!id) return undefined;
   return PHASE_1_PERSONAS.find(p => p.id === id);
 }
+
+/**
+ * Gatekeeper-vs-author axis (locked 2026-06-24 — the ONE genuinely-additive
+ * insight from the June-2026 independent "Auditing the reasoning, not the data"
+ * strategy brief, mapped onto the LOCKED v3.5 wedge).
+ *
+ * The brief's sharpest finding: sell to the fiduciary GATEKEEPER who is
+ * accountable for decision quality but does NOT author the decision; selling to
+ * the AUTHOR (who champions their own live deal) is the structural trap that has
+ * sunk decision-software before. This SHARPENS the wedge — it does NOT pivot it:
+ *
+ *   - The beachhead is the INDIVIDUAL gatekeeper (the solo GP / smaller-fund
+ *     principal who IS the IC-decision-maker on the £249 individual tier), NOT a
+ *     multi-partner enterprise IC committee — that committee is the Phase-2/3
+ *     BRIDGE, and leading there now is Premature Enterprise Escalation.
+ *   - The author-leaning personas (corp-dev head, PE-backed founder) are NOT
+ *     cut; they are de-risked by the RETRO cold-open (run the audit on a CLOSED
+ *     deal: forensic, not grading their live memo) + the ego-safe
+ *     "unaudited reasoning, not flawed reasoning" framing (POSITIONING_PAIN_FRAMING).
+ *   - The category stays "the reasoning audit platform" — do NOT churn to the
+ *     brief's "Decision Assurance" candidate (the locked noun is owned by
+ *     consistent repetition; the brief itself endorses "reasoning audit").
+ *
+ * gatekeeperScore: 0 (pure author / champions own deal) → 1 (pure gatekeeper /
+ * accountable for the call, does not author it). approach: 'forward' = lead with
+ * the next-memo audit (their genuine workflow); 'retro' = lead with the
+ * closed-deal post-mortem to sidestep the author ego-threat.
+ */
+export const WEDGE_GATEKEEPER_AXIS: ReadonlyArray<{
+  persona: Exclude<Phase1PersonaId, 'other'>;
+  gatekeeperScore: number;
+  axisRole: 'gatekeeper' | 'mixed' | 'author';
+  accountability: string;
+  approach: 'forward' | 'retro';
+  approachNote: string;
+}> = [
+  {
+    persona: 'smaller_fund_gp',
+    gatekeeperScore: 0.9,
+    axisRole: 'gatekeeper',
+    accountability:
+      'Owns the capital-allocation call and answers to LPs for it. Accountable for decision quality without being the memo author — the textbook fiduciary gatekeeper, and the brief’s #1 beachhead.',
+    approach: 'forward',
+    approachNote:
+      'LEAD beachhead. A forward audit on the next IC memo is genuinely their workflow; the LP-fiduciary frame — a defensible record of how the call was stress-tested — is the hook. This is the individual GP, not a multi-partner committee.',
+  },
+  {
+    persona: 'fractional_cso',
+    gatekeeperScore: 0.7,
+    axisRole: 'gatekeeper',
+    accountability:
+      'Hired precisely to be the rigorous outside check on a client’s reasoning — paid to audit, not to champion. Their scrutiny IS their edge.',
+    approach: 'forward',
+    approachNote:
+      'Forward audit on the next client memo fits their retainer. DI makes them the most rigorous voice in their client’s room without spending their own credibility.',
+  },
+  {
+    persona: 'midmarket_corp_dev',
+    gatekeeperScore: 0.35,
+    axisRole: 'author',
+    accountability:
+      'Authors the IC memo AND owns the deal’s momentum — structurally a champion of the thing being audited. The brief’s named trap if sold as grading their live deal.',
+    approach: 'retro',
+    approachNote:
+      'Lead with the RETRO on a deal they have ALREADY closed — forensic, not predictive, so it never grades a live thesis. Frame the artefact as the record that protects them when the board asks, never a verdict on their judgment.',
+  },
+  {
+    persona: 'pe_backed_founder',
+    gatekeeperScore: 0.25,
+    axisRole: 'author',
+    accountability:
+      'Is the decision — champions their own strategy and board narrative. The most author-leaning of the wedge, so the ego-threat risk is highest here.',
+    approach: 'retro',
+    approachNote:
+      'Open on a closed strategic bet — one that held up AND one that went sideways. The good one is ego-safe; the bad one is where the value detonates. Never "audit your live board deck".',
+  },
+];
+
+/**
+ * The narrowing discipline — the antidote to "spread too thin" (locked
+ * 2026-06-24 alongside WEDGE_GATEKEEPER_AXIS). One buyer, one motion, one proof.
+ * Lead persona is resolved from PHASE_1_PERSONAS so the label never drifts.
+ */
+export const BEACHHEAD_FOCUS = {
+  leadPersona: 'smaller_fund_gp' as Exclude<Phase1PersonaId, 'other'>,
+  oneBuyer:
+    'The individual fiduciary gatekeeper — the solo GP / smaller-fund principal who owns the capital call and answers to LPs. Accountable, but not the memo author.',
+  oneMotion:
+    'The retro cold-open — run the audit on a deal they have already closed (one that held up AND one that went sideways). Forensic, not predictive.',
+  oneProof:
+    'The DPR specimen — the hashed, board-ready record they keep. Five of these are the reference deck that opens the Phase-2 bridge.',
+  notThis:
+    'NOT a multi-partner enterprise IC committee (that is the bridge, not the wedge). NOT "Decision Assurance" (do not churn the locked category). NOT a fifth persona — the four are already the spread-too-thin edge; narrow WITHIN them, never add.',
+} as const;
 
 /**
  * Returns true if the given persona id is HXC-eligible (one of the four

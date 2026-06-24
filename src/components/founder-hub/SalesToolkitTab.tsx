@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Zap,
   Compass,
+  Crosshair,
 } from 'lucide-react';
 import type { StrategicPrinciple } from '@/lib/data/sales-toolkit';
 import { PitchReframeToggle } from './sales/PitchReframeToggle';
@@ -28,6 +29,7 @@ import { BuyingCommitteeMap } from './sales/BuyingCommitteeMap';
 import { DealStallDiagnosticTree } from './sales/DealStallDiagnosticTree';
 import { SalesMovesGrid } from './sales/SalesMovesGrid';
 import { MeddicVisualization } from './sales/MeddicVisualization';
+import { BeachheadFocusPanel } from './sales/BeachheadFocusPanel';
 import {
   SALES_FRAMEWORK_GAPS,
   AGE_ASYMMETRY_TACTICS,
@@ -90,6 +92,22 @@ function Section({ icon, title, subtitle, accent, children }: SectionProps) {
 export function SalesToolkitTab() {
   return (
     <div>
+      {/* Beachhead focus (locked 2026-06-24) — mounts FIRST because the
+          deepest answer to "spread too thin" is WHO, and it precedes the
+          discovery + qualify flow below. The gatekeeper-not-author lens
+          (the one additive insight from the June-2026 strategy brief) plots
+          the four wedge personas so the founder leads with the gatekeeper
+          and de-risks the author personas via the retro cold-open. Reads the
+          icp.ts SSOT (WEDGE_GATEKEEPER_AXIS + BEACHHEAD_FOCUS). */}
+      <Section
+        icon={<Crosshair size={16} />}
+        title="The beachhead · gatekeeper, not author"
+        subtitle="The antidote to spread-too-thin: one buyer. Of your four wedge personas, lead with the fiduciary gatekeeper who is accountable for the call but does not author it — and open the author-leaning personas on a retro of a closed deal, never by grading their live memo. Click any persona on the spectrum."
+        accent="#16A34A"
+      >
+        <BeachheadFocusPanel />
+      </Section>
+
       {/* Discovery + tailored-pitch hybrid motion (v3.3 lock 2026-05-01) —
           mounts at the TOP because it is the most-load-bearing pre-event
           reference for the next 90 days. Discovery FIRST within every
