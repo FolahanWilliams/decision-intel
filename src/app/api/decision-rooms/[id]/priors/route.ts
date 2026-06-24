@@ -153,6 +153,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         }
         return {
           ...bp,
+          // SECURITY: `confidence` (0-100) is the core blind signal — strip it
+          // (alongside the already-hidden action + reasoning) so a participant
+          // hitting this endpoint pre-reveal cannot read everyone else's
+          // confidence and anchor on it, which is the exact failure the
+          // blind-prior mechanism exists to prevent.
+          confidence: null,
           defaultAction: userHasSubmitted
             ? '[hidden until all submit]'
             : '[submit your prior first]',

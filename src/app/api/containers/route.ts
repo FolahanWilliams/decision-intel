@@ -109,10 +109,19 @@ export async function GET(request: NextRequest) {
     if (stageIdParam) where.stageId = stageIdParam;
     if (sectorParam) where.sector = sectorParam;
     if (searchParam && searchParam.trim().length > 0) {
-      where.OR = [
-        { name: { contains: searchParam, mode: 'insensitive' } },
-        { decisionFrame: { contains: searchParam, mode: 'insensitive' } },
-        { targetCompany: { contains: searchParam, mode: 'insensitive' } },
+      // SECURITY: AND the search as its OWN nested OR — NEVER reassign
+      // where.OR, which silently drops the tenancy scope on line 105
+      // ([{ orgId }, { ownerUserId }]) and returns matching containers across
+      // ALL orgs/users (cross-tenant leak). Top-level where fields are AND-ed,
+      // so this resolves to: (tenancy OR) AND status AND (search OR).
+      where.AND = [
+        {
+          OR: [
+            { name: { contains: searchParam, mode: 'insensitive' } },
+            { decisionFrame: { contains: searchParam, mode: 'insensitive' } },
+            { targetCompany: { contains: searchParam, mode: 'insensitive' } },
+          ],
+        },
       ];
     }
     if (ticketSizeMin || ticketSizeMax) {
