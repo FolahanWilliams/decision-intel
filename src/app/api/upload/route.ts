@@ -15,6 +15,7 @@ import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-type
 import { prewarmDocumentEmbedding } from '@/lib/rag/embeddings';
 import { INVESTMENT_DOCUMENT_TYPES } from '@/lib/prompts/investment-vertical';
 import { getUserPlan, effectiveUploadMaxMB } from '@/lib/utils/plan-limits';
+import { buildDocumentAccessFilter } from '@/lib/utils/document-access';
 import { PLANS } from '@/lib/stripe';
 
 const log = createLogger('UploadRoute');
@@ -555,21 +556,13 @@ export async function GET(request: NextRequest) {
     const page = Math.max(parseInt(searchParams.get('page') || '1', 10) || 1, 1);
     const skip = (page - 1) * limit;
 
-    // Include org-scoped documents if user belongs to a team
-    let where: { userId?: string; OR?: Array<Record<string, unknown>> } = { userId };
-    try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId },
-        select: { orgId: true },
-      });
-      if (membership?.orgId) {
-        where = {
-          OR: [{ userId }, { orgId: membership.orgId }],
-        };
-      }
-    } catch {
-      // Schema drift — fall back to userId-only
-    }
+    // Visibility-aware access filter: the user's own docs (any visibility) +
+    // TEAM-visible org docs + explicitly-granted docs — NEVER teammates' PRIVATE
+    // docs. The previous raw OR:[{userId},{orgId}] listed every org doc
+    // regardless of visibility, leaking teammates' private documents to any team
+    // member (the same class as the account-export leak fixed `fd812ea6`). Also
+    // adds deletedAt:null (the old filter showed soft-deleted docs too).
+    const { where } = await buildDocumentAccessFilter(userId);
 
     const [documents, total] = await Promise.all([
       prisma.document.findMany({
