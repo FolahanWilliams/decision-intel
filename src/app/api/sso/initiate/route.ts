@@ -77,7 +77,10 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase.auth.signInWithSSO({
       domain,
       options: {
-        redirectTo: new URL('/auth/callback', req.nextUrl.origin).toString(),
+        // Must be /api/auth/callback (the real route that runs
+        // exchangeCodeForSession) — /auth/callback does not exist, so enterprise
+        // SSO users 404'd after a successful SAML auth.
+        redirectTo: new URL('/api/auth/callback', req.nextUrl.origin).toString(),
       },
     });
 

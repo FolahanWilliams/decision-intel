@@ -77,8 +77,13 @@ export async function GET(request: NextRequest) {
         }
         const channel = process.env.SLACK_ALERT_CHANNEL;
         if (!channel) {
-          log.warn(`Nudge ${nudge.id} has no channel configured, skipping`);
-          continue;
+          // Route through the failure path (catch below) rather than a bare
+          // `continue` — a bare continue writes nothing, so the nudge keeps
+          // deliveredAt:null + failureCount unchanged and is re-selected EVERY
+          // run forever, a zombie pool that starves the take:20 slots. Throwing
+          // increments failureCount + backs off so it ages out via MAX_RETRIES
+          // until the channel is configured.
+          throw new Error('no Slack channel configured');
         }
         payload.channel = channel;
         const delivered = await deliverSlackNudge(payload, teamId);

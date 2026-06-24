@@ -66,7 +66,17 @@ export async function GET(request: NextRequest) {
     }> = [];
 
     for (const orgId of orgIds) {
-      const result = await runFullRecalibration(orgId);
+      // Per-org isolation: this was the ONLY unguarded await in the loop (the
+      // causal-edge + twin blocks below are already individually try/caught), so
+      // one org throwing here aborted the entire weekly moat recalibration for
+      // every org after it. Skip the failed org; the rest still recalibrate.
+      let result: Awaited<ReturnType<typeof runFullRecalibration>>;
+      try {
+        result = await runFullRecalibration(orgId);
+      } catch (err) {
+        log.error(`Recalibration failed for org ${orgId ?? 'global'}; continuing:`, err);
+        continue;
+      }
       results.push({ orgId, ...result });
 
       // Persist learned causal edges and org causal model (Moat 1)
