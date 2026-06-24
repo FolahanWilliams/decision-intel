@@ -25,12 +25,12 @@
 
 Corporate strategy teams, M&A departments, and executive committees make high-stakes decisions — acquisitions, divestments, strategic initiatives, post-merger integration plans — based on strategy memos and diligence documents riddled with cognitive biases that nobody systematically detects. Research by Daniel Kahneman (_Noise: A Flaw in Human Judgment_) reveals that **professionals evaluating identical information routinely reach wildly different conclusions** — a phenomenon called _decision noise_.
 
-**The numbers are stark:**
+**The gap is judgment, not information:**
 
-- 70–90% of M&A transactions fail to create expected value (Harvard Business Review)
-- Decision-makers anchored to initial assumptions hold failing positions 40% longer than optimal
-- Competitive dynamics trigger winner's curse in **65% of cases** (Malmendier & Tate, 2008)
-- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** deal rationale
+- Firms pour millions into auditing the _information_ behind a strategic decision (data rooms, diligence, financial models) and almost nothing into auditing the _judgment_ that uses it. The biggest risk in a $500M decision is not a lack of information; it is the inability to tell conviction from bias.
+- 70–90% of acquisitions miss their projected synergies (McKinsey / KPMG). The failure mechanism is reasoning that outran the evidence — often visible in the original memo before the committee ever voted.
+- Overconfident CEOs systematically overpay for acquisitions and destroy value at announcement (Malmendier & Tate, _Who Makes Acquisitions?_, JFE 2008): bias as a named, documented cause.
+- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** deal rationale.
 
 Most deal teams have no way to:
 
@@ -1184,7 +1184,7 @@ On any analyzed document, open the **Replay** tab to:
 
 Navigate to `/dashboard/bias-library` to:
 
-- Browse all 20 cognitive biases with real-world examples (Kodak, Bay of Pigs, Theranos, etc.)
+- Browse all 22 cognitive biases (DI-B-001 → DI-B-022) with real-world examples (Kodak, Bay of Pigs, Theranos, etc.)
 - Learn 3 actionable debiasing techniques for each bias
 - See which biases have appeared in your own documents
 - Filter by category and search by name
