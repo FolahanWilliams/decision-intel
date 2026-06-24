@@ -38,13 +38,18 @@ interface FirstAuditExperience {
 }
 
 // Module-level cache so multiple consumers on the same page don't
-// fan out fetches. The count CAN change (when an audit completes);
-// callers SHOULD call refresh() after an audit lands or pass
-// `optimisticTotalDocs` from the dashboard's existing totalDocs SWR.
+// fan out fetches. The count CAN change (when an audit completes), so
+// callers pass `optimisticTotalDocs` from the dashboard's existing
+// totalDocs SWR — that prop is the authoritative live count and bypasses
+// this fetch entirely. (There is no refresh(); the optimistic prop IS the
+// refresh mechanism.)
 let cached: number | null = null;
 let inflight: Promise<number | null> | null = null;
 
 async function fetchTotalDocs(): Promise<number | null> {
+  // Serve the cache so a second consumer doesn't re-fetch (this early-return
+  // was missing, defeating the cache's purpose — every mount re-hit /stats).
+  if (cached !== null) return cached;
   if (inflight) return inflight;
   inflight = fetch('/api/documents/stats')
     .then(r => (r.ok ? r.json() : null))
@@ -70,6 +75,11 @@ async function fetchTotalDocs(): Promise<number | null> {
  */
 export function useFirstAuditExperience(optimisticTotalDocs?: number | null): FirstAuditExperience {
   const [serverTotal, setServerTotal] = useState<number | null>(cached);
+  // Distinguishes "the fetch hasn't returned yet" from "the fetch returned
+  // null" (a network/parse failure). Without it, a null result leaves
+  // `loading` true FOREVER (total stays null), sticking the consumer on a
+  // skeleton. Initialised true when the cache is already warm.
+  const [resolved, setResolved] = useState<boolean>(cached !== null);
 
   // Fetch the server total only when no optimistic count is provided.
   // When the optimistic count is present, it's the authoritative source
@@ -80,6 +90,7 @@ export function useFirstAuditExperience(optimisticTotalDocs?: number | null): Fi
     void fetchTotalDocs().then(t => {
       if (cancelled) return;
       setServerTotal(t);
+      setResolved(true);
     });
     return () => {
       cancelled = true;
@@ -87,7 +98,10 @@ export function useFirstAuditExperience(optimisticTotalDocs?: number | null): Fi
   }, [optimisticTotalDocs]);
 
   const total = optimisticTotalDocs ?? serverTotal;
-  const loading = total == null;
+  // Loading only while we genuinely don't know yet: no optimistic count AND
+  // the fetch hasn't resolved. A resolved-but-null fetch ends loading (the
+  // surface degrades to "not first visit" rather than spinning forever).
+  const loading = total == null && optimisticTotalDocs == null && !resolved;
 
   return {
     isFirstVisit: total === 0,
