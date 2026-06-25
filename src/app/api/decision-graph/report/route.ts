@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { userHasOrgAccess } from '@/lib/utils/org-access';
 import { generateGraphReport } from '@/lib/reports/graph-report';
 import { generateGraphNarrative } from '@/lib/reports/graph-narrative';
 import { createLogger } from '@/lib/utils/logger';
@@ -28,6 +29,10 @@ export async function GET(req: NextRequest) {
 
   if (!orgId) {
     return NextResponse.json({ error: 'orgId is required' }, { status: 400 });
+  }
+
+  if (!(await userHasOrgAccess(user.id, orgId))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

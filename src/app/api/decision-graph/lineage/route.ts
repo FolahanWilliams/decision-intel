@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { userHasOrgAccess } from '@/lib/utils/org-access';
 import { generateLineageExport, lineageToCSV } from '@/lib/reports/lineage-export';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -26,6 +27,10 @@ export async function GET(req: NextRequest) {
 
   if (!orgId) {
     return NextResponse.json({ error: 'orgId is required' }, { status: 400 });
+  }
+
+  if (!(await userHasOrgAccess(user.id, orgId))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   // Default date range: last 90 days

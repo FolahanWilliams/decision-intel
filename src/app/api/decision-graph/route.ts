@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { userHasOrgAccess } from '@/lib/utils/org-access';
 import { buildDecisionGraph } from '@/lib/graph/graph-builder';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -55,6 +56,10 @@ export async function GET(req: NextRequest) {
   // (filters to documents owned by this user with no org). This unblocks
   // solo Free/Individual users who never join an org but still want to
   // see their Personal Decision History.
+
+  if (orgId && !(await userHasOrgAccess(user.id, orgId))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   try {
     const result = await buildDecisionGraph({

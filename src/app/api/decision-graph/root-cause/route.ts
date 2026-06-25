@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { userHasOrgAccess } from '@/lib/utils/org-access';
 import { attributeRootCauses } from '@/lib/graph/root-cause';
 
 export async function GET(req: NextRequest) {
@@ -23,6 +24,10 @@ export async function GET(req: NextRequest) {
 
   if (!analysisId || !orgId) {
     return NextResponse.json({ error: 'analysisId and orgId are required' }, { status: 400 });
+  }
+
+  if (!(await userHasOrgAccess(user.id, orgId))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const attributions = await attributeRootCauses(analysisId, orgId);

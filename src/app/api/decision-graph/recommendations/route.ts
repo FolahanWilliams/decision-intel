@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { userHasOrgAccess } from '@/lib/utils/org-access';
 import { generateRecommendations } from '@/lib/graph/recommendations';
 
 export async function GET(req: NextRequest) {
@@ -23,6 +24,10 @@ export async function GET(req: NextRequest) {
 
   if (!analysisId || !orgId) {
     return NextResponse.json({ error: 'analysisId and orgId are required' }, { status: 400 });
+  }
+
+  if (!(await userHasOrgAccess(user.id, orgId))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const recommendations = await generateRecommendations(analysisId, orgId);
