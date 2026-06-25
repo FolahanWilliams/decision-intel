@@ -171,8 +171,9 @@ describe('POST /api/founder-hub/chat', () => {
   // The route maps prior turns into a single GatewayMessage[] passed to
   // streamChat({ model, messages, ... }). The recent-meetings block is
   // mocked empty in beforeEach, so the deterministic message prefix is
-  // exactly two `system` grounding messages (FOUNDER_CONTEXT + persona),
-  // then the (filtered, truncated) prior turns, then the new user message.
+  // exactly three `system` grounding messages (FOUNDER_CONTEXT + the
+  // buildPositioningPromptBlock() positioning block + persona), then the
+  // (filtered, truncated) prior turns, then the new user message.
   function streamChatMessages(): Array<{ role: string; content: string }> {
     const callArgs = mockStreamChat.mock.calls[0]?.[0] as
       | { messages: Array<{ role: string; content: string }> }
@@ -210,8 +211,8 @@ describe('POST /api/founder-hub/chat', () => {
     ];
     await POST(makeRequest({ message: 'Test', history }, PASS));
     const messages = streamChatMessages();
-    // 2 system grounding messages + 2 valid prior turns + 1 new user message.
-    expect(messages.length).toBe(5);
+    // 3 system grounding messages + 2 valid prior turns + 1 new user message.
+    expect(messages.length).toBe(6);
     const contents = messages.map(m => m.content);
     expect(contents).toContain('Valid');
     expect(contents).toContain('Also valid');
@@ -227,8 +228,8 @@ describe('POST /api/founder-hub/chat', () => {
     }));
     await POST(makeRequest({ message: 'Test', history }, PASS));
     const messages = streamChatMessages();
-    // 2 system grounding messages + last 20 prior turns + 1 new user message.
-    expect(messages.length).toBe(23);
+    // 3 system grounding messages + last 20 prior turns + 1 new user message.
+    expect(messages.length).toBe(24);
     const contents = messages.map(m => m.content);
     // The oldest 10 turns are dropped; Message 10 is the first one kept.
     expect(contents).not.toContain('Message 9');
