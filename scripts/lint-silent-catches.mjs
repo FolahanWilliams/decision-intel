@@ -311,7 +311,14 @@ const SCAN_DIR = join(ROOT, 'src');
 //     res.json().catch(() => null) body-parse class in the dashboard's
 //     uploadLargeViaStorage (create-signed-url + finalize responses) — each
 //     surfaces the API's error before throwing, nothing swallowed.
-const SILENT_CATCH_BASELINE = 241;
+// 243 (2026-06-25 nightly — flagship DPR export error-path, commit 309726f):
+//     +2 canonical res.json().catch(() => null) body-parse class in
+//     documents/[id]/page.tsx onExportProvenanceRecord (the 402 + the !res.ok
+//     branches) — each parses the error body to surface the real message in a
+//     toast, falling back to a default string. No write/delivery swallowed;
+//     the DPR fix shipped the catches without bumping the baseline, so the
+//     pre-commit gate was failing on main.
+const SILENT_CATCH_BASELINE = 243;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /
