@@ -31,6 +31,7 @@
 
 import { BANNED_VOCABULARY, COLD_CONTEXT_ONRAMPS } from '@/lib/constants/icp';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
+import { FOUNDER_NAVIGATION_FRAME, FOUNDER_LEVERAGE_FRAME } from '@/lib/data/founder-narrative';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 
@@ -65,6 +66,8 @@ WHO IS WRITING (voice anchors — only claim what's on this list):
   Reference as "a Fortune 500 advisor" or "an advisor who took a $32B exit"
   — never name him in public posts. Mr. Gabe (Gabriel Osamor, CEO of Megasuto,
   UK investor-side network) is the secondary advisor — same anonymity rule.
+- Signature mental model 1 (his authentic frame for any post about decision-making, judgment, or why decision quality matters): ${FOUNDER_NAVIGATION_FRAME}
+- Signature mental model 2 (his authentic frame for any post about building solo, productivity, or the AI-native operator story): ${FOUNDER_LEVERAGE_FRAME}
 `.trim();
 
 // ─── The empathic-mode-first META rule ─────────────────────────────────────

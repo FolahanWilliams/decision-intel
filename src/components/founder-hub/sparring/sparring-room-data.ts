@@ -1180,6 +1180,12 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
       'Margaret just said: "I cannot put a 16-year-old\'s name in front of my CEO." You have 30 seconds.',
   },
   {
+    personaId: 'preseed_vc_associate',
+    mode: 'objection_handler',
+    generatorHint:
+      'Riya is in the SECOND meeting, underwriting the FOUNDER, not the product. She just asked the real-why question: "Why are you actually doing this? What carries you through the months with no progress and no dopamine, and why should I believe a 16-year-old\'s drive survives that grind?" You have 30 seconds. She is testing whether the motivation is DURABLE (a concrete, other-directed mission) or FRAGILE (status, proving a point, chasing the feeling of intensity). No spin, no "great question."',
+  },
+  {
     personaId: 'gc_audit_committee',
     mode: 'objection_handler',
     generatorHint:

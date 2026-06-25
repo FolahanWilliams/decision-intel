@@ -219,6 +219,22 @@ export function AiNativeMatrix() {
         ))}
       </div>
 
+      <p
+        style={{
+          marginTop: 16,
+          fontSize: 'var(--fs-sm)',
+          color: 'var(--text-secondary)',
+          lineHeight: 1.55,
+        }}
+      >
+        The meta-point under every column:{' '}
+        <strong>AI amplifies competence, it does not create it.</strong> GPT-N+1 makes column one
+        (the wrapper) cheaper to clone, but the moats in the other columns are accumulated
+        competence and data no model release hands a competitor for free. It is the same wind that
+        let one operator ship this whole platform alone, available to every competitor, and still
+        not enough without the bundle above.
+      </p>
+
       <div
         style={{
           marginTop: 12,

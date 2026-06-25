@@ -54,6 +54,7 @@ import {
   FOUNDER_WEBSITE_URL,
   FOUNDER_WEBSITE_LABEL,
 } from '@/lib/constants/company-info';
+import { FOUNDER_NAVIGATION_FRAME } from '@/lib/data/founder-narrative';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
@@ -201,6 +202,30 @@ export default function AboutPage() {
             steering-committee objections it&rsquo;ll face, runs what-if interventions against a{' '}
             {HISTORICAL_CASE_COUNT}-case public reference library, and compounds confirmed outcomes
             back into a calibrated Decision Quality Index your audit committee can defend.
+          </p>
+        </div>
+      </section>
+
+      {/* THE BELIEF — the navigation philosophy behind the platform. SSOT:
+          FOUNDER_NAVIGATION_FRAME in founder-narrative.ts. Enterprise-voiced +
+          em-dash-clean; the PERSONAL mission (retire-my-parents) deliberately
+          stays founder-private, never on this cold-procurement surface. */}
+      <section style={{ padding: '0 24px 56px', background: C.white }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: C.slate500,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              marginBottom: 16,
+            }}
+          >
+            The belief behind the platform
+          </div>
+          <p style={{ fontSize: 18, lineHeight: 1.65, color: C.slate600, margin: 0 }}>
+            {FOUNDER_NAVIGATION_FRAME}
           </p>
         </div>
       </section>

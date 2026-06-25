@@ -27,6 +27,7 @@ import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { WEIGHTS, METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
+import { buildFounderWhyBlock } from '@/lib/data/founder-narrative';
 
 const ICP_BLOCK = buildIcpPromptBlock();
 const EXPANSION_BLOCK = `${ICP_SEQUENCING.join(' ')} ${ICP_SEQUENCING_RULE}`;
@@ -265,6 +266,10 @@ Sales Toolkit routing rules (when the founder asks the chat the LEFT, surface th
 - Sell the Bias Genome to investors: "World's first dataset of which cognitive biases predict failure, by industry."
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
+
+=== FOUNDER WHY + MENTAL MODELS ===
+
+${buildFounderWhyBlock()}
 
 === VELOCITY & SCOPE CALIBRATION (locked 2026-05-09) ===
 
