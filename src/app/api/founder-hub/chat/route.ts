@@ -21,6 +21,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { verifyFounderPass, checkFounderHubLlmRateLimit } from '@/lib/utils/founder-auth';
 import { parseFile } from '@/lib/utils/file-parser';
 import { FOUNDER_CONTEXT } from '../founder-context';
+import { buildPositioningPromptBlock } from '@/lib/constants/icp';
 import { buildRecentMeetingsBlock } from '@/lib/founder-hub/recent-meetings-context';
 import { getThinkingPartner, isThinkingPartnerId } from '@/lib/data/thinking-partners';
 
@@ -179,6 +180,14 @@ export async function POST(req: NextRequest) {
 
     const messages: GatewayMessage[] = [
       { role: 'system', content: FOUNDER_CONTEXT },
+      // Newest LOCKED positioning beats — spend-asymmetry, the conviction-vs-bias
+      // money line, the epistemic-honesty causality rebuttal, the Tetlock
+      // calibration leg, AOM, ex-ante narration, and the DQI black-box rebuttal.
+      // The SSOT lives in icp.ts's buildPositioningPromptBlock(); until now it was
+      // defined-but-never-called, so the chat coached the OLDER hardcoded category
+      // claim only. Loaded as grounding so every persona reasons through the
+      // current positioning, not a generation-old one.
+      { role: 'system', content: buildPositioningPromptBlock() },
       { role: 'system', content: persona.systemPrompt },
     ];
     if (recentMeetingsBlock) {

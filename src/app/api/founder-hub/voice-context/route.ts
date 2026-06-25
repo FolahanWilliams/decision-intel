@@ -31,6 +31,7 @@ import {
 } from '@/lib/data/thinking-partners';
 import { buildRecentMeetingsBlock } from '@/lib/founder-hub/recent-meetings-context';
 import { FOUNDER_CONTEXT } from '../founder-context';
+import { buildPositioningPromptBlock } from '@/lib/constants/icp';
 import {
   splitFounderContextSections,
   assembleFounderContextSections,
@@ -181,6 +182,15 @@ export async function GET(req: NextRequest) {
     // drop turn 2+ latency by 50-70%.
     systemPromptParts: [
       { role: 'system', content: VOICE_FOUNDER_IDENTITY_CORE },
+      // 1b. Newest LOCKED positioning beats (spend-asymmetry, conviction-vs-bias,
+      //     epistemic-honesty causality rebuttal, Tetlock calibration leg, AOM,
+      //     ex-ante narration, DQI black-box rebuttal). UNIVERSAL + STATIC like
+      //     the core above, so it EXTENDS the cacheable prefix (never per-persona,
+      //     never per-call) — cache-hit preserved. It was defined-but-never-called
+      //     before, so voice rehearsal (esp. the skeptical-investor persona) was
+      //     drilling the OLDER hardcoded positioning. The voice addendum below
+      //     still controls terseness; this is reference grounding, not output.
+      { role: 'system', content: buildPositioningPromptBlock() },
       ...(sliceResult.content ? [{ role: 'system' as const, content: sliceResult.content }] : []),
       { role: 'system', content: persona.systemPrompt + voiceAddendum },
       ...(recentMeetingsBlock ? [{ role: 'system' as const, content: recentMeetingsBlock }] : []),
