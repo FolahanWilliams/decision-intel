@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { resolveAnalysisAccess } from '@/lib/utils/document-access';
 
 const log = createLogger('AttributionAPI');
 
@@ -26,6 +27,14 @@ export async function GET(req: NextRequest) {
     const analysisId = req.nextUrl.searchParams.get('analysisId');
     if (!analysisId) {
       return NextResponse.json({ error: 'analysisId is required' }, { status: 400 });
+    }
+
+    // Ownership: the caller must own (or org-share) the analysis. Without this
+    // the route returned another tenant's attribution lineage — linked analyses'
+    // filenames, DQI scores, bias types and outcomes — for any analysisId.
+    const access = await resolveAnalysisAccess(analysisId, user.id);
+    if (!access) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
     }
 
     try {
