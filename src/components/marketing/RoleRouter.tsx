@@ -2,15 +2,21 @@ import Link from 'next/link';
 import { getUseCaseBySlug } from '@/lib/data/use-cases';
 
 /**
- * Homepage role-router — the four Phase-1 wedge personas (v3.5), each routed
- * into its matching /use workflow. Deliberately WEDGE-NARROWED: F500 CSO and GC
- * are the ceiling, not the marketed cold-context door, so they are not listed.
- * Persona "you" copy is ego-safe per the pain-framing lock — it names the
- * stakes a buyer owns, never "broken thinking". Workflow names + CTAs are read
- * from the use-cases SSOT (no drift); only the persona framing lives here.
+ * Homepage role-router — LEADS with the Phase-1 ETA owner-operator wedge
+ * (searcher / independent sponsor / serial acquirer, per the 2026-06-26 ICP
+ * pivot) routed to /use/owner-operator-deal-audit, then the three BRIDGE
+ * personas (corp dev / fund GP / fractional CSO) for organic homepage traffic
+ * that self-selects. Deliberately wedge-LED, NOT F500 CSO / GC (those are the
+ * Phase-4 ceiling, not the cold door — the fractional CSO card is the bridge,
+ * never the enterprise ceiling). Persona "you" copy is ego-safe per the
+ * pain-framing lock — it names the stakes a buyer owns, never "broken
+ * thinking". Workflow names + CTAs are read from the use-cases SSOT (no
+ * drift); only the persona framing lives here.
  *
- * Solves the "one homepage, five buyers" conversion gap without touching the
- * locked hero / sign-in-first / category-claim decisions.
+ * Solves the "one homepage, many buyers" conversion gap without touching the
+ * locked hero / sign-in-first / category-claim decisions. The dedicated ETA
+ * DM-landing page is /use/owner-operator-deal-audit (Layer 1); this re-point
+ * is Layer 2 — the homepage stays coherent for an ETA buyer who clicks in.
  */
 
 const C = {
@@ -24,9 +30,9 @@ const C = {
 
 export const ROLE_ROUTES = [
   {
-    slug: 'strategic-memo-audit',
-    persona: 'Fractional CSO',
-    you: 'You run three to five client engagements, and every memo you send out carries your name.',
+    slug: 'owner-operator-deal-audit',
+    persona: 'Searcher / Sponsor / Operator',
+    you: "You're the buyer, the operator, and the only check on the deal, with no one to catch what you can't see before you sign.",
   },
   {
     slug: 'm-and-a-bias-audit',
@@ -39,9 +45,9 @@ export const ROLE_ROUTES = [
     you: 'You make the calls your investors, and your track record, get judged on.',
   },
   {
-    slug: 'board-deck-pre-presentation-audit',
-    persona: 'PE-backed Founder / CEO',
-    you: 'You present to a board that pressure-tests every claim before you walk in.',
+    slug: 'strategic-memo-audit',
+    persona: 'Fractional CSO',
+    you: 'You run three to five client engagements, and every memo you send out carries your name.',
   },
 ] as const;
 
