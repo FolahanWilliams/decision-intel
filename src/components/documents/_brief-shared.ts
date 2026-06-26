@@ -54,6 +54,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   cim: 'CIM',
   pitch_deck: 'pitch deck',
   financial_model: 'financial model',
+  acquisition_thesis: 'acquisition thesis',
 };
 
 export function formatBiasName(key: string): string {

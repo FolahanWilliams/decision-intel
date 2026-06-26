@@ -56,6 +56,14 @@ export const INVESTMENT_DOCUMENT_TYPES = [
   'fund_prospectus', // Formal LP-facing fund document: structure, terms, GP track record, strategy
   'lp_ask_deck', // Pitch deck for LP fundraise — narrative + commitments-to-date + ask
   'regulatory_filing', // Fund-domicile-specific filings (Form ADV, AIFMD, fund constitution)
+  // ETA / owner-operator extension (ICP pivot 2026-06-26). The single-company
+  // acquisition thesis an independent sponsor / self-funded searcher / serial
+  // acquirer writes + shops to capital partners. Distinct failure modes: deal
+  // fever, LOI-price anchoring, winner's curse, SBA debt-service optimism (DSCR),
+  // operating-thesis overconfidence, cultural-fit neglect. The operator decides
+  // ALONE (no IC), so the audit must catch what an IC would have. Additive
+  // detection overlay only — no new biases, no methodology bump.
+  'acquisition_thesis', // Owner-operator deal memo / search-fund acquisition thesis on a target
 ] as const;
 
 export type InvestmentDocumentType = (typeof INVESTMENT_DOCUMENT_TYPES)[number];
@@ -173,7 +181,30 @@ CRITICAL: a CIM is a marketing document, not an objective baseline. The DQI for 
 
 NAMED M&A TOXIC COMBINATIONS to flag explicitly:
 - "The Conglomerate Fallacy" — when the CIM presents the target as a strategic fit without operational overlap with the typical acquirer's core.
-- "The Synergy Mirage" — when synergy projections appear in the CIM without named operational mechanism + owner + milestone (rare in CIM but does happen in seller-prepared synergy models attached to CIM).`,
+- "The Synergy Mirage" — when synergy projections appear in the CIM without named operational mechanism + owner + milestone (rare in CIM but does happen in seller-prepared synergy models attached to CIM).
+
+OWNER-OPERATOR DEAL-SCREENING CONTEXT: when the reader is an independent sponsor / self-funded searcher / serial acquirer using this CIM as a top-of-funnel Go/No-Go screen (before spending on diligence), prioritise the EARLY deal-killers: customer concentration, key-person dependency, unsupportable add-backs, and any seller-incentive signal that warrants walking away NOW rather than burning broken-deal cost. The value is saving them the diligence spend on a doomed target.`,
+
+  // ─── ETA / owner-operator extension (ICP pivot 2026-06-26) ─────────────────
+
+  acquisition_thesis: `DOCUMENT TYPE: OWNER-OPERATOR ACQUISITION THESIS / SEARCH-FUND DEAL MEMO
+This is the deal memo of an owner-operator buying a company to run it themselves — an independent / fundless sponsor, a self-funded searcher (ETA), or a serial / roll-up acquirer. CRITICAL CONTEXT that changes the scrutiny: this buyer decides ALONE. There is NO investment committee to catch a blind spot — the operator IS the IC. The downside is personal and total (a self-funded searcher personally guarantees the acquisition loan; an independent sponsor's reputation with capital partners is the whole business). So the reasoning errors an institutional IC would normally catch must be caught HERE, in the memo, at draft time. Scrutinise for the failure modes that actually kill these deals (~40-50% of signed LOIs collapse in diligence; ~70% of failures trace to behavioral error, not the market):
+
+- DEAL FEVER / AUCTION FEVER — as search capital and personal money burn, urgency rises and red flags get rationalised away to avoid killing the deal. Flag escalating-commitment language, upside/synergy optimism that GROWS as the process advances, and any sign diligence findings are being explained away. (Optimism + Sunk Cost + Planning Fallacy.)
+- LOI-PRICE ANCHORING — is the valuation still anchored to the LOI price even after diligence revealed impairment (unsupportable add-backs, customer concentration, margin decay)? Flag a price/multiple that does not move when the evidence moves. (Anchoring.)
+- CONFIRMATION IN DILIGENCE — once the operator has fallen in love with the target, diligence becomes a verification exercise, not a truth-seeking one. Flag asymmetric evidence-gathering (only confirming data sought) and downside scenarios given less depth than the upside. (Confirmation + Illusion of Validity.)
+- WINNER'S CURSE — in a competitive process the winning bid is by definition the highest estimate of value; a solo operator competing against lower-cost-of-capital buyers overpays. Flag competitive-process language ("preempting another buyer", "strategic necessity") driving the bid above intrinsic value.
+- ADVERSE-SELECTION / SELLER-INCENTIVE NEGLECT — the seller knows more about the business and is incentivised to present it favorably. Flag a thesis that takes the seller's framing at face value with no structural protection (escrow, earn-out tied to retention, reps & warranties) against the information asymmetry. (Inside-View Dominance — apply the Seller-Halo Filter.)
+- SBA / DEBT-SERVICE OPTIMISM — for a leveraged owner-operator deal, does the debt-service model survive a stress test? Flag a Debt-Service-Coverage-Ratio that only clears the lender's floor (typically ~1.20-1.25x) on aggressive seller-adjusted add-backs the lender will reject, or an unhedged variable-rate structure. A DSCR under ~1.20x under stress is a catastrophic funding-gap risk at close. (Optimism + Planning Fallacy.)
+- OPERATING-THESIS OVERCONFIDENCE (OVERPLACEMENT) — first-time operators systematically over-believe their ability to modernise a legacy business quickly. Flag year-one EBITDA-margin-expansion or growth projections with no detailed, step-by-step operating plan and capex schedule. (Overconfidence + Inside-View Dominance, DI-B-022.)
+- CULTURAL-FIT / TRANSITION NEGLECT — the single most common cause of post-close failure (60-70% of failed transitions). Flag the ABSENCE of any analysis of the people / culture / key-person / tribal-knowledge dynamics — an org chart and a financial model with no transition or retention plan is the canonical Yale "Scott Duncan" search-fund-bankruptcy pattern. (Planning Fallacy + Inside-View Dominance — a structural-assumptions gap, not just a stated bias.)
+
+THE OPERATOR IS THE IC. Where the ic_memo overlay asks "does the committee push back," here ask "what would a rigorous investment committee have asked that this solo operator has no one to ask?" The value is catching the fatal flaw BEFORE they sign a personal guarantee — name the missing process, never call the operator's judgment broken (they are not less capable; they are structurally without the second set of eyes an institutional buyer has).
+
+NAMED M&A TOXIC COMBINATIONS to flag explicitly when the underlying biases co-occur:
+- "The Winner's Curse" — Anchoring + Overconfidence: competitive-process language driving the bid above intrinsic value.
+- "The Sunk Ship" — Sunk Cost + Anchoring: "we have already spent $X on diligence / months on the search" justifying continuing past the point the evidence supports.
+- "Reference-Class Blindness" — Inside-View Dominance + Planning Fallacy + Overconfidence: "this business is different / I can fix it" overriding what the base rate of first-time-operator turnarounds says.`,
 
   // ─── M&A workflow extensions (2026-05-09 P1 lock) ──────────────────────────
 

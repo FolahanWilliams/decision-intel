@@ -252,6 +252,8 @@ export const DOC_TYPE_CATCH: Record<string, string> = {
   lp_ask_deck: 'We watch for commitment-momentum anchoring and the "strategic LP" halo.',
   regulatory_filing:
     'We check disclosure consistency and the jurisdiction-specific gates that are easy to miss.',
+  acquisition_thesis:
+    'We catch the deal-killers a solo buyer has no IC to catch: deal fever, LOI-price anchoring, the winner’s curse, an SBA debt-service model that only clears on add-backs the lender will reject, and the cultural-fit blind spot — before you sign a personal guarantee.',
   other: 'We run the full bias audit on the reasoning, whatever the format.',
 };
 
