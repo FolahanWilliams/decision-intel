@@ -42,6 +42,7 @@ async function fetchRole(): Promise<EmptyStateRole | null> {
         role === 'ma' ||
         role === 'bizops' ||
         role === 'pe_vc' ||
+        role === 'eta' ||
         role === 'other'
       ) {
         cached = role;

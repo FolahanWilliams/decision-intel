@@ -7,7 +7,7 @@ import { isHxcEligible, phase1PersonaToOnboardingRole } from '@/lib/constants/ic
 
 const log = createLogger('OnboardingRoute');
 
-const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'other'] as const;
+const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'eta', 'other'] as const;
 
 // GTM ICP pivot (locked 2026-06-26) — Phase 1 buyer-class-continuous persona
 // COHORT tagging (not an access gate). The wedge is now the ETA / owner-operator

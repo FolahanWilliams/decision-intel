@@ -21,7 +21,7 @@ import { useOnboardingRole, setOnboardingRole } from '@/hooks/useOnboardingRole'
 import { ROLE_LABEL } from '@/lib/data/sample-bundles';
 import type { EmptyStateRole } from '@/lib/onboarding/role-empty-states';
 
-const ROLES: EmptyStateRole[] = ['cso', 'ma', 'bizops', 'pe_vc', 'other'];
+const ROLES: EmptyStateRole[] = ['cso', 'ma', 'bizops', 'pe_vc', 'eta', 'other'];
 
 export function RoleSwitcher() {
   const role = useOnboardingRole();

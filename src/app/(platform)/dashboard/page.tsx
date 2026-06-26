@@ -305,6 +305,7 @@ const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
   ma: "Pre-IC audit on every memo — Synergy Mirage, Conglomerate Fallacy, Winner's Curse",
   bizops: 'Quality gates on every recurring strategic recommendation',
   pe_vc: 'IC memos and portfolio reviews, audited live',
+  eta: 'Your acquisition thesis, stress-tested before you sign',
   other: 'Decision intelligence overview',
 };
 
@@ -317,6 +318,7 @@ const ROLE_DASHBOARD_HEADLINE: Record<EmptyStateRole, string> = {
   ma: 'IC-ready, before IC.',
   bizops: 'Quality gates on every strategic call.',
   pe_vc: 'Audited before the partners&rsquo; room.',
+  eta: 'Caught before you sign.',
   other: 'Strategic memos, audited in 60 seconds.',
 };
 

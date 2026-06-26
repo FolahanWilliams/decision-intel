@@ -29,7 +29,7 @@ import {
 
 const TOUR_TRIGGER_KEY = 'decision-intel-launch-tour';
 
-type TourRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
+type TourRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'eta' | 'other';
 
 /**
  * Role-routed tour stops (4.2 deep). All four tours run on the dashboard
@@ -261,6 +261,45 @@ const TOUR_STEPS_BY_ROLE: Record<TourRole, Step[]> = {
       ),
     },
   ],
+  eta: [
+    {
+      ...SHARED_STOP_UPLOAD,
+      icon: <Upload size={18} />,
+      title: 'Drop your acquisition thesis',
+      content: (
+        <>
+          Upload your deal memo, search-fund thesis, or a target CIM. The audit catches the failure
+          modes that kill owner-operator deals — deal fever, LOI-price anchoring, the winner&apos;s
+          curse, SBA debt-service optimism, and the cultural-fit blind spot — before you sign. You
+          decide alone with no IC; this is the second set of eyes that catches what a committee
+          would.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_USAGE,
+      icon: <Gauge size={18} />,
+      title: 'Your audit budget',
+      content: (
+        <>
+          Every audit counts against your monthly plan; the pill warns you before the cap. Per-deal
+          pricing is there too when a single live deal is all you need this month.
+        </>
+      ),
+    },
+    {
+      ...SHARED_STOP_ANALYTICS,
+      icon: <ShieldCheck size={18} />,
+      title: 'Your calibration record',
+      content: (
+        <>
+          Under Analytics: a hashed, tamper-evident record of every audit, plus the Outcome Flywheel
+          where you log the 90-day post-close proxy and watch your own underwriting calibration
+          compound deal over deal — the track record only you can build.
+        </>
+      ),
+    },
+  ],
   other: [
     {
       ...SHARED_STOP_UPLOAD,
@@ -304,6 +343,7 @@ const TOUR_NAME_BY_ROLE: Record<TourRole, string> = {
   ma: 'dashboard-tour-ma',
   bizops: 'dashboard-tour-bizops',
   pe_vc: 'dashboard-tour-pe-vc',
+  eta: 'dashboard-tour-eta',
   other: 'dashboard-tour',
 };
 
@@ -524,6 +564,7 @@ function isTourRole(value: unknown): value is TourRole {
     value === 'ma' ||
     value === 'bizops' ||
     value === 'pe_vc' ||
+    value === 'eta' ||
     value === 'other'
   );
 }
@@ -614,6 +655,7 @@ export function OnboardingTourProvider({ children }: { children: React.ReactNode
           { tour: 'dashboard-tour-ma', steps: TOUR_STEPS_BY_ROLE.ma },
           { tour: 'dashboard-tour-bizops', steps: TOUR_STEPS_BY_ROLE.bizops },
           { tour: 'dashboard-tour-pe-vc', steps: TOUR_STEPS_BY_ROLE.pe_vc },
+          { tour: 'dashboard-tour-eta', steps: TOUR_STEPS_BY_ROLE.eta },
         ]}
         shadowRgb="15, 23, 42"
         shadowOpacity="0.55"

@@ -59,6 +59,12 @@ const STARTER_DECISION_PROMPTS: Record<EmptyStateRole, string[]> = {
     'Which decisions are overdue for outcome reporting and why?',
     'What’s the highest-ROI fix to the recurring bias my team keeps showing?',
   ],
+  eta: [
+    'What is the one assumption in this thesis most likely to blow up in diligence?',
+    'Stress-test the debt-service model — does the DSCR still clear if the add-backs get rejected?',
+    'Where am I anchored to the LOI price even though diligence moved the evidence?',
+    'What would a rigorous investment committee ask that I have no one to ask?',
+  ],
   other: [
     'What patterns do you see in my decision-making?',
     'What biases were most commonly found across my documents?',

@@ -16,7 +16,7 @@ import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
-export type EmptyStateRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
+export type EmptyStateRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'eta' | 'other';
 export type EmptyStateSurface = 'dashboard' | 'deals' | 'decision-log' | 'analytics';
 
 interface SurfaceCopy {
@@ -45,6 +45,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       description:
         'Upload a pre-IC memo, source memo, growth-round CIM, or pre-commitment review. The audit catches the patterns that kill fund returns — anchoring on a single comparable transaction, overconfidence on growth-curve extrapolation, narrative-fallacy on regulatory tailwinds — and produces a hashed, tamper-evident Decision Provenance Record your LPs (including NDPR / WAEMU / CMA Kenya-regulated LPs) can read.',
     },
+    eta: {
+      title: 'Audit your acquisition thesis before you sign',
+      description:
+        'Upload your deal memo, search-fund thesis, or a target CIM. The audit catches the failure modes that kill owner-operator deals: deal fever, LOI-price anchoring, overpaying when you win a competitive process, an SBA debt-service model that only clears on add-backs the lender will reject, operating-thesis overconfidence, and the cultural-fit blind spot. You decide alone with no investment committee, so this is the second set of eyes that catches what a committee would, before you sign a personal guarantee.',
+    },
     other: {
       title: 'Audit something you actually wrote',
       description: `Paste or upload anything strategic you have in front of you — a fundraise deck, a board update, a strategy memo, a market-entry recommendation, an investor email. Sixty seconds later you'll see the ${BIAS_COUNT}-bias R²F audit on YOUR text, the questions a committee would ask, and a hashed, tamper-evident Decision Provenance Record. The wow lands harder on your own content than on a canned sample.`,
@@ -70,6 +75,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       title: 'No deals yet',
       description:
         'Each deal is the IC-shape decision unit — source memo + financial model + management presentation + counsel review. Cross-doc cross-reference flags inconsistencies (CIM says 40% growth, model assumes 15%) and a composite Deal DQI lives on the deal page. Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting.',
+    },
+    eta: {
+      title: 'No deals yet',
+      description:
+        'Bundle the documents that compose a single acquisition: the target CIM plus your thesis plus the financial model plus the SBA or debt model plus counsel review. Cross-doc cross-reference flags inconsistencies (the CIM says 30 percent growth, your model assumes 12) and a composite Deal DQI lives on the deal page, so the deal-killers surface before you commit diligence spend.',
     },
     other: {
       title: 'No deals yet',
@@ -98,6 +108,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       description:
         'Capture every IC vote, pass decision, follow-on call, and pre-commit review. The log surfaces fund-level patterns — which biases recur at IC, which calls were over-confident, which structural assumptions held — and feeds your Brier calibration quarter over quarter.',
     },
+    eta: {
+      title: 'Your decision log is empty',
+      description:
+        'Track every deal you sign, walk away from, or pass on. The log surfaces YOUR recurring blind spots across deals, where deal fever or operating-thesis overconfidence shows up, and closes the calibration loop when you log the 90-day post-close proxy and the realised outcome. Over time it becomes a record of your own underwriting discipline.',
+    },
     other: {
       title: 'Your decision log is empty',
       description:
@@ -124,6 +139,11 @@ const COPY: Record<EmptyStateSurface, Record<EmptyStateRole, SurfaceCopy>> = {
       title: 'No analytics yet',
       description:
         'Analytics aggregate DQI across deals, recurring biases at IC, counterfactual ROI scenarios, and the Outcome Flywheel where realised exits recalibrate prior IC convictions. Brier-calibrated DQI compounds quarter over quarter — the calibration data your LPs increasingly want to see in the annual report.',
+    },
+    eta: {
+      title: 'No analytics yet',
+      description:
+        'Analytics surface YOUR DQI across deals, the failure modes that recur in your theses, and the Outcome Flywheel where realised post-close outcomes recalibrate your prior convictions. Your personal calibration trend compounds deal over deal, a track record of how disciplined your underwriting actually is.',
     },
     other: {
       title: 'No analytics yet',

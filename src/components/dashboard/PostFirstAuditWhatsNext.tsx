@@ -51,6 +51,7 @@ const HEADLINE_BY_ROLE: Record<EmptyStateRole, string> = {
   ma: 'Now make this useful for IC',
   bizops: 'Now compound the discipline',
   pe_vc: 'Now turn this into a record',
+  eta: 'Now make it catch the next one',
   other: 'Now make the most of it',
 };
 
@@ -60,6 +61,7 @@ const SUBHEAD_BY_ROLE: Record<EmptyStateRole, string> = {
   bizops: 'Set up the workflow once, run the discipline on every recurring strategic call.',
   pe_vc:
     'Group the IC supporting documents, connect data sources, share with LPs as a procurement-grade record.',
+  eta: 'Group the deal documents, automate ingest, and build the one thing only you can: a calibration record of your own underwriting across deals.',
   other: 'Three high-leverage moves to extend the audit you just ran.',
 };
 

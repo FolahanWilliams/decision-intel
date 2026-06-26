@@ -24,6 +24,7 @@ import {
   Briefcase,
   TrendingUp,
   Landmark,
+  Telescope,
   Users,
   ArrowRight,
   Loader2,
@@ -40,6 +41,7 @@ const ROLE_LABEL: Record<SampleRole, string> = {
   ma: 'M&A / Corp Dev',
   bizops: 'BizOps / FP&A',
   pe_vc: 'PE / Venture / Fund',
+  eta: 'Search / Acquire (ETA)',
   other: 'Mixed library',
 };
 
@@ -48,6 +50,7 @@ const ROLE_ICON: Record<SampleRole, typeof Compass> = {
   ma: Briefcase,
   bizops: TrendingUp,
   pe_vc: Landmark,
+  eta: Telescope,
   other: Users,
 };
 
@@ -56,6 +59,7 @@ const ROLE_TAG_LABEL: Record<SampleRole, string> = {
   ma: 'M&A',
   bizops: 'BizOps',
   pe_vc: 'PE / VC',
+  eta: 'ETA',
   other: 'Mixed',
 };
 
@@ -66,6 +70,7 @@ const ROLE_PITCH: Record<SampleRole, string> = {
     'Three planning-grade memos: a buy-vs-build re-platform, an FY26 R&D budget recommendation, and a regional-hub shutdown call. The biases the audit catches map onto the patterns that produce miss-the-quarter forecasts.',
   pe_vc:
     'Two IC-grade memos: a Pan-African consumer-staples roll-up with FX-cycle exposure, and a Series-B growth round into a Nairobi neo-bank with multi-jurisdiction regulatory risk. Decision-grade memos of the shape your IC actually reads.',
+  eta: 'Two owner-operator deal memos: a self-funded searcher acquisition thesis with an SBA debt-service stretch, and an independent-sponsor deal memo shaped for the raise. Each is authored to fire the failure modes that kill these deals — deal fever, LOI-price anchoring, overpaying in a competitive process, SBA debt-service optimism, and cultural-fit neglect. Paste one, click Run, and see what a solo buyer with no IC would have missed before signing.',
   other:
     'Paste or upload something you actually wrote — a fundraise deck, a board update, a strategy memo, an investor email — and watch a real reasoning audit run on it in 60 seconds. The samples below are a fallback if you want to see one first, but the wow lands harder on your own content.',
 };
@@ -102,6 +107,7 @@ export function FirstRunInlineWalkthrough({ visible, onLoadAndRun, onLoadOnly }:
           data.onboardingRole === 'ma' ||
           data.onboardingRole === 'bizops' ||
           data.onboardingRole === 'pe_vc' ||
+          data.onboardingRole === 'eta' ||
           data.onboardingRole === 'other'
         ) {
           setRole(data.onboardingRole);

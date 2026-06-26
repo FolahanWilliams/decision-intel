@@ -96,7 +96,7 @@ export function defaultContainerKindForRole(
   role: string | null | undefined
 ): DecisionContainerKind | undefined {
   if (role === 'pe_vc' || role === 'cso') return 'investment';
-  if (role === 'ma') return 'acquisition';
+  if (role === 'ma' || role === 'eta') return 'acquisition';
   if (role === 'bizops') return 'strategic';
   return undefined;
 }

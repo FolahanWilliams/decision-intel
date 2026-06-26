@@ -6,6 +6,7 @@ import {
   Briefcase,
   TrendingUp,
   Landmark,
+  Telescope,
   Users,
   BookOpen,
   ArrowRight,
@@ -48,6 +49,7 @@ const ROLE_ICONS: Record<SampleRole, typeof Compass> = {
   ma: Briefcase,
   bizops: TrendingUp,
   pe_vc: Landmark,
+  eta: Telescope,
   other: Users,
 };
 
@@ -56,6 +58,7 @@ const ROLE_TOGGLE_LABEL: Record<Exclude<SampleRole, 'other'>, string> = {
   ma: 'M&A',
   bizops: 'BizOps',
   pe_vc: 'PE / VC',
+  eta: 'ETA',
 };
 
 export function RoleSamplePicker({
@@ -83,6 +86,7 @@ export function RoleSamplePicker({
           data.onboardingRole === 'ma' ||
           data.onboardingRole === 'bizops' ||
           data.onboardingRole === 'pe_vc' ||
+          data.onboardingRole === 'eta' ||
           data.onboardingRole === 'other'
         ) {
           setRole(data.onboardingRole);
@@ -152,7 +156,7 @@ export function RoleSamplePicker({
         </div>
         {!hideRoleToggle && (
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {(['cso', 'ma', 'bizops', 'pe_vc'] as const).map(r => {
+            {(['cso', 'ma', 'bizops', 'pe_vc', 'eta'] as const).map(r => {
               const Icon = ROLE_ICONS[r];
               const active = role === r;
               return (

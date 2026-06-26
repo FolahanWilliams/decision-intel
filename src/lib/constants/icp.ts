@@ -1098,27 +1098,25 @@ export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> = PHASE_1_PERSON
  * from it atomically — so the entire cascade keeps working unchanged while
  * sign-up itself reflects the locked HXC narrowing.
  *
- * Mapping rationale (the ETA wedge — locked 2026-06-26):
- *   independent_sponsor  → ma   (audits acquisition theses; deal-shaped surfaces)
- *   self_funded_searcher → ma   (same acquisition workflow)
- *   serial_acquirer      → ma   (same)
+ * Mapping rationale (the ETA wedge — locked 2026-06-26; the dedicated 'eta'
+ * owner-operator role shipped 2026-06-26 as product-layer piece 2):
+ *   independent_sponsor  → eta  (owner-operator: acquisition thesis, decides alone, no IC)
+ *   self_funded_searcher → eta  (same)
+ *   serial_acquirer      → eta  (same)
  *   other                → other (no downstream personalization)
- * A dedicated owner-operator role + ETA sample bundles is the queued product
- * layer (gated on the persona-specific-failure-mode research, now in hand).
  */
-export type OnboardingRoleId = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
+export type OnboardingRoleId = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'eta' | 'other';
 
 export function phase1PersonaToOnboardingRole(persona: Phase1PersonaId): OnboardingRoleId {
   switch (persona) {
     case 'self_funded_searcher':
     case 'independent_sponsor':
     case 'serial_acquirer':
-      // All three ETA wedge personas audit ACQUISITION theses, so the 'ma'
-      // onboarding role (acquisition / deal workflow) is the closest fit — its
-      // sample bundles + empty states are deal-shaped. Refining a dedicated
-      // owner-operator role + ETA sample bundles is queued for the product-layer
-      // ship (gated on the Deep Research on persona-specific failure modes).
-      return 'ma';
+      // All three ETA wedge personas map to the dedicated owner-operator 'eta'
+      // role: the acquisition_thesis doc type, ETA sample bundles, owner-operator
+      // empty states + tour. They audit an acquisition thesis they decide on
+      // ALONE — deal-shaped, but distinct from the corp-dev 'ma' experience.
+      return 'eta';
     case 'other':
       return 'other';
   }

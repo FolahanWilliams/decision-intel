@@ -189,6 +189,32 @@ export const UPLOAD_GUIDANCE_BY_ROLE: Record<SampleRole, RoleUploadGuidance> = {
       },
     ],
   },
+  eta: {
+    intro:
+      'Bring the deal you are working — your thesis, the target CIM, the debt model. You decide alone with no IC, so the audit is the second set of eyes that catches what a committee would, before you sign.',
+    brings: [
+      {
+        label: 'Acquisition thesis / deal memo',
+        catch:
+          'The document you raise on and stake a personal guarantee on. Catches deal fever, LOI-price anchoring, operating-thesis overconfidence, and the cultural-fit blind spot at draft time.',
+      },
+      {
+        label: 'Target CIM',
+        catch:
+          'Applies the seller-halo filter as a fast Go / No-Go screen — the deal-killers that warrant walking away before you spend on diligence.',
+      },
+      {
+        label: 'SBA / debt-service model',
+        catch:
+          'Stress-tests the DSCR: flags a coverage ratio that only clears on add-backs the lender will reject, a funding gap at close.',
+      },
+      {
+        label: 'Quality of Earnings (QofE)',
+        catch:
+          'Flags recurring "one-time" add-backs and aggressive owner-comp adjustments inflating adjusted EBITDA.',
+      },
+    ],
+  },
   other: {
     intro:
       'Anything strategic you actually wrote: a fundraise deck, a board update, a strategy memo, an investor email. The wow lands harder on your own content than on a sample.',

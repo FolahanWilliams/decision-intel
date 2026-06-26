@@ -25,7 +25,7 @@
  * compliance overlay where appropriate).
  */
 
-export type SampleRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
+export type SampleRole = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'eta' | 'other';
 
 export interface SampleBundle {
   /** URL-safe identifier, used by /case-studies/sample/[slug]. */
@@ -1330,6 +1330,87 @@ Proceed to anchor-LP documentation and broader LP outreach. Target first close S
 
 // ─── Public exports ─────────────────────────────────────────────────
 
+// ─── ETA / owner-operator bundles (2) — ICP pivot 2026-06-26 ───────────
+// Owner-operator acquisition theses (independent sponsor / self-funded
+// searcher). Shaped to fire the failure modes that kill these deals so the
+// ETA buyer pastes a sample and sees what a solo buyer with no IC would have
+// missed. Self-value: the audit catches THEIR blind spot, not a record for a
+// third party to trust.
+
+const ETA_SEARCH_KEYSTONE: SampleBundle = {
+  slug: 'eta-search-keystone-self-funded',
+  role: 'eta',
+  title: 'Project Keystone — self-funded search acquisition thesis',
+  summary:
+    'A searcher buying a regional industrial-services business with an SBA loan he personally guarantees — see what the audit catches before he signs.',
+  hookCopy:
+    'The owner-operator deal memo. Paste it and watch the audit catch the deal fever, the DSCR stretch, and the cultural-fit blind spot a solo buyer has no IC to catch.',
+  expectedBiases: [
+    'optimism_bias',
+    'anchoring_bias',
+    'sunk_cost_fallacy',
+    'inside_view_dominance',
+    'confirmation_bias',
+  ],
+  expectedDqi: 45,
+  content: `# Project Keystone — Acquisition Thesis (self-funded search)
+
+## The decision
+After 14 months of search, I am recommending we move to a binding LOI on Keystone Mechanical Services, a regional commercial-HVAC installation and maintenance business, at the agreed price of $4.6M (5.1x TTM adjusted EBITDA of $900K). Financing: a 10-year SBA 7(a) loan of $3.45M, a $700K seller note on standby, and $450K of my own equity, personally guaranteed. I intend to step in as owner-operator CEO at close.
+
+## Why now
+This is the right business. I have screened over 200 teasers and signed three prior LOIs that died in diligence; the search fund is 14 months in and the runway matters. Keystone is the cleanest operator I have seen: 31 years in business, a recurring maintenance-contract base, and an owner ready to retire. Waiting risks losing it to the other buyer the broker mentioned is circling.
+
+## The business
+Keystone serves about 140 commercial accounts across two metro markets. Roughly 58% of revenue is recurring maintenance contracts; the rest is installation project work. The founder, who is 64, has run it hands-on for three decades and knows every major customer personally.
+
+## Financials and the add-backs
+Reported EBITDA is $640K. Adjusted EBITDA of $900K reflects add-backs for the founder's above-market compensation ($140K), personal vehicle and travel ($60K), and one-time legal expenses ($60K). At $4.6M the multiple is 5.1x adjusted, in line with the LOI we signed three weeks ago. The diligence QofE flagged that the top two customers are 34% of revenue, but the price reflects the quality of the recurring base, so I have held the multiple.
+
+## Debt service
+On the adjusted-EBITDA base, the deal services the SBA debt at a DSCR of 1.18x. The lender's stated floor is 1.20x, but I am confident the add-backs are defensible and that the first-year operating improvements will carry coverage comfortably above the floor.
+
+## The operating plan
+I expect to grow EBITDA roughly 20% in year one. My MBA training and operations background let me modernize the scheduling and dispatch (still run on paper), tighten the maintenance-contract renewal process, and add a second sales rep. I have run larger teams in a corporate setting and am confident I can professionalize a business this size quickly.
+
+## Risks
+Customer concentration is the main one, but the relationships are sticky and the contracts auto-renew. Execution risk is manageable given my background.
+
+## Recommendation
+Proceed to close. This is the deal the search has been looking for.`,
+};
+
+const ETA_SPONSOR_RIDGELINE: SampleBundle = {
+  slug: 'eta-sponsor-ridgeline-independent',
+  role: 'eta',
+  title: 'Ridgeline Partners — independent-sponsor deal memo',
+  summary:
+    'An independent sponsor shopping a competitive-process deal to family offices — see what the audit catches before the backers do.',
+  hookCopy:
+    'The memo a fundless sponsor raises on. Paste it and watch the audit flag the winner-curse anchoring and the seller-incentive blind spot before a family office does.',
+  expectedBiases: ['overconfidence_bias', 'anchoring_bias', 'confirmation_bias', 'halo_effect'],
+  expectedDqi: 47,
+  content: `# Ridgeline Partners — Independent Sponsor Deal Memo
+
+## The opportunity
+We are raising $14M of equity from family-office partners to acquire Summit Logistics, a last-mile delivery operator, at an enterprise value of $38M (8.2x TTM EBITDA of $4.6M). This memo is the basis for the raise. We have signed an LOI at this price following a competitive sell-side process and have 30 days to confirm financing.
+
+## Why we win
+Summit was run as a banked, competitive process with four bidders. We won at 8.2x. We were comfortable stretching to win because the asset is a strategic fit with our thesis and the window to own a scaled last-mile platform in this region will not come again. Paying a turn above where we would normally anchor is justified by the scarcity of assets of this quality.
+
+## The thesis
+Last-mile demand is structurally growing. Summit has a blue-chip customer base and a management team the seller assures us will stay. The sell-side materials project 18% revenue CAGR over the plan, driven by e-commerce tailwinds and two named new-customer wins that are described as near-certain.
+
+## Diligence
+Our diligence has confirmed the thesis. The customer references were strong, the management presentation was impressive, and the projections are supported by the e-commerce trend data the seller provided. We did not find anything that changes our view of the value.
+
+## Returns
+At 8.2x entry and the management plan, we model a 3.1x gross MOIC over five years. The plan assumes the two named new customers close on schedule and that margins hold as volume scales.
+
+## The ask
+We are seeking $14M of equity at standard sponsor economics. The LOI price is set; we need to confirm the raise within 30 days to hold the deal.`,
+};
+
 export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   CSO_BRAZIL_ENTRY,
   CSO_PHOENIX_DEFER,
@@ -1347,6 +1428,8 @@ export const SAMPLE_BUNDLES: readonly SampleBundle[] = [
   PE_KENYA_FINTECH_GROWTH,
   PE_LAGOS_MIXED_USE_DEVELOPMENT,
   PE_PAN_AFRICAN_AGRICULTURE_FUND_LAUNCH,
+  ETA_SEARCH_KEYSTONE,
+  ETA_SPONSOR_RIDGELINE,
 ] as const;
 
 export const SAMPLE_BUNDLES_BY_SLUG: Readonly<Record<string, SampleBundle>> = Object.fromEntries(
@@ -1358,7 +1441,7 @@ export function bundlesForRole(role: SampleRole | null | undefined): SampleBundl
     // Show one of each role so a fresh visitor without a role still sees
     // the breadth. Filter-based rather than literal indices so adding
     // new bundles per role can't silently break the no-role branch.
-    const roles: Exclude<SampleRole, 'other'>[] = ['cso', 'ma', 'bizops', 'pe_vc'];
+    const roles: Exclude<SampleRole, 'other'>[] = ['cso', 'ma', 'bizops', 'pe_vc', 'eta'];
     return roles
       .map(r => SAMPLE_BUNDLES.find(b => b.role === r))
       .filter((b): b is SampleBundle => b !== undefined);
@@ -1371,5 +1454,6 @@ export const ROLE_LABEL: Record<SampleRole, string> = {
   ma: 'M&A / Corp Dev',
   bizops: 'BizOps / FP&A',
   pe_vc: 'PE / Venture / Fund',
+  eta: 'Search / Acquire (ETA)',
   other: 'Mixed selection',
 };
