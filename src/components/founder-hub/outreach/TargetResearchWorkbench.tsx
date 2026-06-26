@@ -47,18 +47,16 @@ interface Props {
 }
 
 const PERSONA_LABEL_SHORT: Record<PersonaIdOrOther, string> = {
-  fractional_cso: 'Fractional CSO',
-  midmarket_corp_dev: 'Corp Dev Head',
-  smaller_fund_gp: 'Fund GP',
-  pe_backed_founder: 'PE-backed CEO',
+  independent_sponsor: 'Indie sponsor',
+  self_funded_searcher: 'Searcher (ETA)',
+  serial_acquirer: 'Serial acquirer',
   other: 'Manual review',
 };
 
 const PERSONA_ACCENT: Record<PersonaIdOrOther, string> = {
-  fractional_cso: '#16A34A',
-  midmarket_corp_dev: '#0EA5E9',
-  smaller_fund_gp: '#A855F7',
-  pe_backed_founder: '#EAB308',
+  independent_sponsor: '#16A34A',
+  self_funded_searcher: '#0EA5E9',
+  serial_acquirer: '#A855F7',
   other: '#64748B',
 };
 
@@ -325,40 +323,35 @@ export function TargetResearchWorkbench({ founderPass }: Props) {
                   marginBottom: 16,
                 }}
               >
-                {(
-                  [
-                    'fractional_cso',
-                    'midmarket_corp_dev',
-                    'smaller_fund_gp',
-                    'pe_backed_founder',
-                  ] as const
-                ).map(pid => (
-                  <div
-                    key={pid}
-                    style={{
-                      padding: '8px 10px',
-                      background: 'var(--bg-card)',
-                      border: '1px solid var(--border-color)',
-                      borderTop: `3px solid ${PERSONA_ACCENT[pid]}`,
-                      borderRadius: 'var(--radius-sm)',
-                    }}
-                  >
+                {(['independent_sponsor', 'self_funded_searcher', 'serial_acquirer'] as const).map(
+                  pid => (
                     <div
+                      key={pid}
                       style={{
-                        fontSize: 10,
-                        color: 'var(--text-muted)',
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
+                        padding: '8px 10px',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        borderTop: `3px solid ${PERSONA_ACCENT[pid]}`,
+                        borderRadius: 'var(--radius-sm)',
                       }}
                     >
-                      {PERSONA_LABEL_SHORT[pid]}
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: 'var(--text-muted)',
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {PERSONA_LABEL_SHORT[pid]}
+                      </div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {summary.byPersona[pid]}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {summary.byPersona[pid]}
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
                 {summary.byPersona.other > 0 && (
                   <div
                     style={{

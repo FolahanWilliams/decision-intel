@@ -34,7 +34,7 @@ function mkResponses(
   };
   return spec.map(s => ({
     veryDisappointed: map[s.pmf],
-    phase1PersonaAtTime: s.persona ?? 'fractional_cso',
+    phase1PersonaAtTime: s.persona ?? 'independent_sponsor',
   }));
 }
 
@@ -189,12 +189,12 @@ describe('aggregateHxcCohortMetrics — kill threshold (<30% on N ≥ 5)', () =>
       for (let i = 0; i < vd; i++)
         cohort.push({
           veryDisappointed: 'very_disappointed',
-          phase1PersonaAtTime: 'fractional_cso',
+          phase1PersonaAtTime: 'independent_sponsor',
         });
       for (let i = 0; i < others; i++)
         cohort.push({
           veryDisappointed: 'not_disappointed',
-          phase1PersonaAtTime: 'fractional_cso',
+          phase1PersonaAtTime: 'independent_sponsor',
         });
       responses.push(...cohort);
       const m = aggregateHxcCohortMetrics(cohort, WINDOW_START, WINDOW_END);
@@ -209,27 +209,25 @@ describe('aggregateHxcCohortMetrics — per-persona breakdown', () => {
   it('reports respondents + veryDisappointedPct for every HXC persona', () => {
     const m = aggregateHxcCohortMetrics(
       mkResponses([
-        { pmf: 'vd', persona: 'fractional_cso' },
-        { pmf: 'sd', persona: 'fractional_cso' },
-        { pmf: 'vd', persona: 'midmarket_corp_dev' },
-        { pmf: 'vd', persona: 'midmarket_corp_dev' },
-        { pmf: 'nd', persona: 'smaller_fund_gp' },
+        { pmf: 'vd', persona: 'independent_sponsor' },
+        { pmf: 'sd', persona: 'independent_sponsor' },
+        { pmf: 'vd', persona: 'self_funded_searcher' },
+        { pmf: 'vd', persona: 'self_funded_searcher' },
+        { pmf: 'nd', persona: 'serial_acquirer' },
       ]),
       WINDOW_START,
       WINDOW_END
     );
-    // 4 HXC personas in the breakdown (fractional_cso / midmarket_corp_dev /
-    // smaller_fund_gp / pe_backed_founder) — never includes 'other'.
-    expect(m.cohortBreakdown).toHaveLength(4);
+    // 3 HXC personas in the breakdown (independent_sponsor / self_funded_searcher
+    // / serial_acquirer) — never includes 'other'.
+    expect(m.cohortBreakdown).toHaveLength(3);
     const map = new Map(m.cohortBreakdown.map(b => [b.personaId, b]));
-    expect(map.get('fractional_cso')?.respondents).toBe(2);
-    expect(map.get('fractional_cso')?.veryDisappointedPct).toBe(50);
-    expect(map.get('midmarket_corp_dev')?.respondents).toBe(2);
-    expect(map.get('midmarket_corp_dev')?.veryDisappointedPct).toBe(100);
-    expect(map.get('smaller_fund_gp')?.respondents).toBe(1);
-    expect(map.get('smaller_fund_gp')?.veryDisappointedPct).toBe(0);
-    expect(map.get('pe_backed_founder')?.respondents).toBe(0);
-    expect(map.get('pe_backed_founder')?.veryDisappointedPct).toBe(0);
+    expect(map.get('independent_sponsor')?.respondents).toBe(2);
+    expect(map.get('independent_sponsor')?.veryDisappointedPct).toBe(50);
+    expect(map.get('self_funded_searcher')?.respondents).toBe(2);
+    expect(map.get('self_funded_searcher')?.veryDisappointedPct).toBe(100);
+    expect(map.get('serial_acquirer')?.respondents).toBe(1);
+    expect(map.get('serial_acquirer')?.veryDisappointedPct).toBe(0);
   });
 
   it('does not include "other" persona in the HXC breakdown', () => {
@@ -306,18 +304,18 @@ describe('aggregateHxcCohortMetrics — rounding', () => {
   it('per-persona pct rounds independently of cohort pct', () => {
     const m = aggregateHxcCohortMetrics(
       mkResponses([
-        { pmf: 'vd', persona: 'fractional_cso' },
-        { pmf: 'sd', persona: 'fractional_cso' },
-        { pmf: 'sd', persona: 'fractional_cso' },
+        { pmf: 'vd', persona: 'independent_sponsor' },
+        { pmf: 'sd', persona: 'independent_sponsor' },
+        { pmf: 'sd', persona: 'independent_sponsor' },
       ]),
       WINDOW_START,
       WINDOW_END
     );
     // Cohort: 1/3 → 33
     expect(m.veryDisappointedPct).toBe(33);
-    // Fractional CSO subset: 1/3 → 33
-    expect(m.cohortBreakdown.find(b => b.personaId === 'fractional_cso')?.veryDisappointedPct).toBe(
-      33
-    );
+    // Independent-sponsor subset: 1/3 → 33
+    expect(
+      m.cohortBreakdown.find(b => b.personaId === 'independent_sponsor')?.veryDisappointedPct
+    ).toBe(33);
   });
 });

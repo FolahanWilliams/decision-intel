@@ -1,38 +1,38 @@
 /**
- * Event prep — Phase 1 wedge calendar + 4-persona DM scaffolding.
+ * Outreach engine — the ETA / owner-operator wedge motion (locked 2026-06-26).
  *
- * Locked 2026-05-05 (deep nightly audit Section 9.1). Strategy World London
- * (June 9-10 BAFTA) is the v3.5 §2 calendar-gated forcing function: "the
- * single highest-signal CSO event. Should not be missed." Phase 1 acquisition
- * mix (CLAUDE.md GTM Phase 1 wedge block) targets 5-10 personalised LinkedIn
- * DMs/week to the 4 wedge personas + 2 London events/month maximum (Sharran
- * 1-1-1 traffic-source discipline).
+ * The ICP pivoted from the smaller-fund-GP gatekeeper to the ETA / owner-operator
+ * layer: independent sponsor (lead), self-funded searcher (#2 + UK access),
+ * serial acquirer (lowest churn). The PRIMARY motion is ONLINE + daily —
+ * Searchfunder DMs + LinkedIn + the free live-deal audit offer — because the
+ * founder runs the community GTM mostly online; the in-person rooms below are
+ * the periodic, replaceable layer (founder's own call). The funnel math (the
+ * Execution Kit): ~40 real conversations → ~15 free audits on live memos → 5
+ * closes (~10-12%), ask for a referral at every win. Leading indicator: number
+ * of free audits actually RUNNING on real memos — that, not demos, predicts
+ * revenue 4-6 weeks out.
  *
  * What this module provides:
- *   1. EVENTS — the 5 v3.5-named London events with countdown-aware metadata
- *   2. WEDGE_PERSONAS — 4 Phase 1 buyer-class-continuous personas with
- *      industry hints + canonical 143-case bias references
- *   3. DM_TEMPLATES — verbatim cold-context drafts the founder edits, NOT
- *      R²F / DPR / DQI vocabulary (cold context per CLAUDE.md)
- *   4. INDUSTRY_BIAS_CROSSWALK — which case-study bias to lead with for
- *      each industry the persona works in
- *   5. ACTION_CADENCE — 5-10 DMs/week + 4-line follow-up cadence + 35-day
- *      pre-event prep arc
+ *   1. EVENTS — the periodic London / EU ETA in-person rooms (dates approximate
+ *      until the founder confirms on each org's site — see each rationale)
+ *   2. WEDGE_PERSONAS — the 3 ETA buyer-class-continuous personas with
+ *      ETA-specific self-articulated pain + canonical 143-case bias hooks
+ *   3. DM_TEMPLATES — verbatim drafts the founder edits. LEAD FORWARD on the
+ *      FREE live-deal audit (not the retro): for the ETA wedge the audit is
+ *      fundraising leverage they WANT, so no ego-threat to manage. Plain
+ *      language — never "DPR" / "R²F" / "DQI" / "reasoning audit platform" on
+ *      a first DM (CLAUDE.md cold-context rule); the bridge sentence comes
+ *      after they reply.
+ *   4. ACTION_CADENCE — the online channel funnel + 5-10 DMs/week + the
+ *      referral-at-the-aha-moment flywheel + the in-person prep arc
  *
  * Why this lives at /lib/data: the event-prep card on Founder OS reads from
  * here, and any future surface (chat coaching, outreach hub, weekly digest)
  * can compose against the same SSOT without duplicating persona + DM copy.
  *
- * Update HERE when (a) the event lineup shifts (new London event lands or
- * one cancels), (b) the 4 wedge personas change (per CLAUDE.md ICP lock),
- * (c) DM templates fall flat in the wild and the founder rewrites them.
- *
- * Vocabulary discipline (CLAUDE.md cold-context rule):
- *   - DM templates use plain language: "60-second audit", "strategic memo",
- *     "blind spots", "audit committee questions" — NEVER "DPR", "R²F",
- *     "Decision Quality Index", "reasoning audit platform" on first DM.
- *   - The bridge sentence ("audit your reasoning before the room does")
- *     is allowed once the prospect replies; not in the opener.
+ * Update HERE when (a) the event lineup / dates shift (founder confirms a real
+ * date), (b) the wedge personas change (per CLAUDE.md ICP lock), (c) DM
+ * templates fall flat in the wild and the founder rewrites them.
  */
 
 export interface PrepEvent {
@@ -53,7 +53,7 @@ export interface PrepEvent {
    * Sharran 1-1-1 traffic-source discipline.
    */
   priority: 'highest' | 'high' | 'medium';
-  /** Which of the 4 wedge personas this event is densest in. */
+  /** Which ETA wedge personas this event is densest in. */
   primaryPersonas: WedgePersonaId[];
   /**
    * The pre-event prep arc start — number of weeks before the event when
@@ -64,11 +64,7 @@ export interface PrepEvent {
   rationale: string;
 }
 
-export type WedgePersonaId =
-  | 'fractional_cso'
-  | 'midmarket_corp_dev'
-  | 'smaller_fund_gp'
-  | 'pe_backed_founder';
+export type WedgePersonaId = 'independent_sponsor' | 'self_funded_searcher' | 'serial_acquirer';
 
 export interface WedgePersona {
   id: WedgePersonaId;
@@ -129,119 +125,138 @@ export interface DmTemplate {
 // EVENTS — Phase 1 wedge calendar (v3.5 §2)
 // ============================================================================
 
+// NOTE on dates: these are the ETA in-person rooms the Execution Kit names,
+// but the exact 2026/2027 dates are NOT yet confirmed — the startDate/endDate
+// below are APPROXIMATE next-occurrence placeholders (first-of-month) so the
+// countdown chip renders, and every rationale flags "confirm the exact date".
+// FOUNDER ACTION: verify each on the org's site and correct the date here.
+// The PRIMARY motion is online (Searchfunder + LinkedIn + the free-audit
+// offer, see ACTION_CADENCE) — these rooms are the periodic, replaceable layer.
 export const EVENTS: PrepEvent[] = [
   {
-    id: 'strategy_world_london_2026',
-    name: 'Strategy World London',
-    startDate: '2026-06-09',
-    endDate: '2026-06-10',
-    venue: 'BAFTA, 195 Piccadilly',
-    priority: 'highest',
-    primaryPersonas: ['fractional_cso', 'midmarket_corp_dev'],
+    id: 'iese_search_fund_conf_2026',
+    name: 'IESE International Search Fund Conference',
+    startDate: '2026-10-01',
+    endDate: '2026-10-01',
+    venue: 'IESE, Barcelona',
+    priority: 'medium',
+    primaryPersonas: ['self_funded_searcher', 'independent_sponsor'],
+    prepArcWeeks: 5,
+    rationale:
+      'APPROXIMATE date (~Oct, confirm on iese.edu). The global search-fund room — worth a flight if budget allows. Searchers + their backers in one place; lead with the free live-deal audit, never a pitch.',
+  },
+  {
+    id: 'gerald_edelman_eta_awards_2026',
+    name: 'Gerald Edelman ETA / Search Fund Awards',
+    startDate: '2026-11-01',
+    endDate: '2026-11-01',
+    venue: 'London (confirm)',
+    priority: 'high',
+    primaryPersonas: ['self_funded_searcher', 'independent_sponsor'],
+    prepArcWeeks: 5,
+    rationale:
+      'APPROXIMATE date (~Nov, confirm with Gerald Edelman). A UK room full of searchers AND their named backers — vendor-accessible via sponsorship. Pre-book coffees; offer the free audit on a live deal.',
+  },
+  {
+    id: 'lbs_eta_conference_2027',
+    name: 'LBS Entrepreneurship Through Acquisition Conference',
+    startDate: '2027-04-01',
+    endDate: '2027-04-01',
+    venue: 'London Business School',
+    priority: 'high',
+    primaryPersonas: ['self_funded_searcher', 'independent_sponsor'],
     prepArcWeeks: 6,
     rationale:
-      'v3.5 §2 lock: the single highest-signal CSO event. Pre-book 5+ 1:1 coffees with target-persona attendees, NOT booth + waiting. Each conversation = 20-min audit on a real strategic memo.',
+      'APPROXIMATE date (~April, confirm with LBS ETA Club). Densest UK searcher room + their backers. Vendor-accessible via sponsorship. The discovery-first, free-audit motion.',
   },
   {
-    id: 'ai_in_business_2026_05_14',
-    name: 'AI in Business Conference',
-    startDate: '2026-05-14',
-    endDate: '2026-05-14',
-    venue: 'Prospero House, Borough',
-    priority: 'high',
-    primaryPersonas: ['fractional_cso'],
-    prepArcWeeks: 3,
+    id: 'rollupeurope_serial_acquirer_symposium_2027',
+    name: 'Serial Acquirer Symposium (RollUpEurope)',
+    startDate: '2027-06-01',
+    endDate: '2027-06-01',
+    venue: 'Marylebone, London',
+    priority: 'highest',
+    primaryPersonas: ['serial_acquirer', 'independent_sponsor'],
+    prepArcWeeks: 6,
     rationale:
-      'High-signal for fractional CSOs and mid-market Heads of Strategic Planning. Position the audit as the rigour layer their AI-assisted memos already need.',
-  },
-  {
-    id: 'responsible_ai_2026_06_23',
-    name: 'Responsible AI Conference',
-    startDate: '2026-06-23',
-    endDate: '2026-06-23',
-    venue: 'London (TBC)',
-    priority: 'high',
-    primaryPersonas: ['fractional_cso', 'midmarket_corp_dev'],
-    prepArcWeeks: 4,
-    rationale:
-      'Regulatory tailwinds audience (EU AI Act Aug 2026 enforcement). Discovery-FIRST motion; pivot to "audit committee evidence record" framing if the conversation surfaces a procurement-stage prospect.',
-  },
-  {
-    id: 'momentum_ai_2026_06_29',
-    name: 'Momentum AI',
-    startDate: '2026-06-29',
-    endDate: '2026-06-30',
-    venue: 'London (TBC)',
-    priority: 'high',
-    primaryPersonas: ['midmarket_corp_dev', 'smaller_fund_gp'],
-    prepArcWeeks: 4,
-    rationale: 'M&A + fund partner density. Lead with the cross-border regulatory mapping pitch.',
-  },
-  {
-    id: 'ai_summit_london_2026_06_10',
-    name: 'AI Summit London',
-    startDate: '2026-06-10',
-    endDate: '2026-06-11',
-    venue: 'ExCeL London, E16',
-    priority: 'medium',
-    primaryPersonas: ['midmarket_corp_dev', 'pe_backed_founder'],
-    prepArcWeeks: 4,
-    rationale:
-      'Lower signal-per-conversation than Strategy World London (overlapping date) but high volume. Use only if you can run BOTH events without breaking the 1-1-1 traffic-source discipline.',
+      'APPROXIMATE date (~June, confirm with RollUpEurope). ~200 of EXACTLY these buyers in one London room — the best in-person bet. Sponsor or attend; pre-book coffees, run live audits, ask for referrals at the aha moment.',
   },
 ];
 
 // ============================================================================
-// WEDGE_PERSONAS — the 4 Phase 1 buyer-class-continuous personas
+// WEDGE_PERSONAS — the 3 ETA / owner-operator wedge personas
 // ============================================================================
 
 export const WEDGE_PERSONAS: WedgePersona[] = [
   {
-    id: 'fractional_cso',
-    label: 'Fractional CSO',
-    band: '3-5 client engagements · regular memo flow',
-    industries: ['technology', 'financial_services', 'manufacturing', 'retail', 'healthcare'],
+    id: 'independent_sponsor',
+    label: 'Independent / fundless sponsor',
+    band: 'No committed fund · self-funds diligence · raises ~85% equity from family offices / HNWs',
+    industries: ['technology', 'financial_services', 'manufacturing', 'healthcare', 'retail'],
     selfArticulatedPain:
-      'I write 4-6 strategic memos a month across 3-5 clients. Each client expects board-grade rigour. I do this alone. The memos that go sideways are the ones where I missed something obvious in retrospect — and I never see it until the client tells me.',
-    canonicalBiasHooks: [
-      {
-        bias: 'Confirmation Bias',
-        case: 'Kodak digital photography exit (1989)',
-        whatItDid:
-          'leadership filtered every market signal through the existing-film-business lens',
-      },
-      {
-        bias: 'Sunk-Cost Fallacy',
-        case: 'Blockbuster declining the Netflix acquisition (2000)',
-        whatItDid: 'protected the in-store rental investment instead of the strategic option',
-      },
-      {
-        bias: 'Anchoring Bias',
-        case: 'Nokia smartphone strategy (2007-2010)',
-        whatItDid:
-          'anchored on Symbian dominance instead of the iPhone-shaped market that was forming',
-      },
-    ],
-  },
-  {
-    id: 'midmarket_corp_dev',
-    label: 'Head of Corporate Development / M&A (mid-market)',
-    band: '$50M-$500M revenue scale-up · personal-decisive budget',
-    industries: ['technology', 'financial_services', 'manufacturing', 'healthcare'],
-    selfArticulatedPain:
-      "I run 6-8 live deal threads at any time. IC every Thursday. The memos that get killed in IC are the ones with a blind spot we should have caught — confirmation bias on the management team, anchoring on the seller's price, narrative coherence that doesn't survive the CFO's first counterfactual.",
+      "I self-fund my diligence and shop every deal memo to family offices to raise the equity. My reputation with those capital partners IS my business — if a deal I raised on goes sideways, the next raise is harder. The memos that lose me a backer are the ones with a blind spot they spotted and I didn't.",
     canonicalBiasHooks: [
       {
         bias: 'Illusion of Validity',
         case: 'WeWork S-1 (2019)',
         whatItDid:
-          'narrative coherence created false confidence; the metrics were aestheticised, not anchored to base rates',
+          'narrative coherence created false confidence — the memo raised on a story the base rates did not support',
+      },
+      {
+        bias: "Overconfidence (Winner's Curse)",
+        case: 'AOL-Time Warner merger (2000)',
+        whatItDid:
+          'the synergy case assumed convergence economics already breaking; the bidder who wins the auction is the one who over-estimated value',
       },
       {
         bias: 'Inside-View Dominance',
         case: 'Daimler-Chrysler merger (1998)',
         whatItDid:
-          'projections rejected reference-class data on cross-cultural automotive mergers — "this case is special"',
+          'projections rejected the reference class on integrations like this one — "this deal is special"',
+      },
+    ],
+  },
+  {
+    id: 'self_funded_searcher',
+    label: 'Self-funded searcher (ETA)',
+    band: 'One company · SBA / acquisition loan personally guaranteed · no investment committee',
+    industries: ['manufacturing', 'technology', 'healthcare', 'retail', 'financial_services'],
+    selfArticulatedPain:
+      "I'm searching for one company to buy with a loan I'll personally guarantee. One decision, total ruin if I'm wrong, and no investment committee behind me. Multiple LOIs die in diligence before one closes — and the ones that scare me most are the ones where I'd already fallen in love with the business.",
+    canonicalBiasHooks: [
+      {
+        bias: 'Confirmation Bias',
+        case: 'Kodak digital photography exit (1989)',
+        whatItDid:
+          'once you love the target, diligence becomes a verification exercise instead of a truth-seeking one',
+      },
+      {
+        bias: 'Optimism Bias',
+        case: 'Boeing 737 MAX certification (2018)',
+        whatItDid:
+          'cost + timeline projections systematically underweighted the tail — the debt-service model that only works in the best case',
+      },
+      {
+        bias: 'Inside-View Dominance',
+        case: 'Daimler-Chrysler merger (1998)',
+        whatItDid:
+          'the operating thesis assumed "I can modernise this legacy business easily" against a reference class that says first-time operators usually cannot',
+      },
+    ],
+  },
+  {
+    id: 'serial_acquirer',
+    label: 'Serial acquirer / roll-up operator',
+    band: 'Buy-and-build under one platform · repeated acquisition theses · continuous deal flow',
+    industries: ['technology', 'financial_services', 'manufacturing', 'healthcare', 'retail'],
+    selfArticulatedPain:
+      "I run a buy-and-build — repeated acquisition theses under one platform. The risk isn't any single deal; it's that my proven playbook stops fitting a target that's structurally different, and I apply it anyway because it worked the last ten times.",
+    canonicalBiasHooks: [
+      {
+        bias: 'Inside-View Dominance',
+        case: 'GE–Alstom power acquisition (2015)',
+        whatItDid:
+          'the seasoned deal machine applied its proven roll-up playbook to a target the reference class flagged as different — "we have integrated a hundred of these" overrode "this one is not those"',
       },
       {
         bias: 'Overconfidence',
@@ -249,66 +264,10 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
         whatItDid: 'synergy estimates assumed convergence economics that were already breaking',
       },
       {
-        bias: 'Inside-View Dominance',
-        case: 'GE–Alstom power acquisition (2015)',
+        bias: 'Anchoring Bias',
+        case: 'Nokia smartphone strategy (2007-2010)',
         whatItDid:
-          'the seasoned deal machine applied its proven roll-up playbook to a target the reference class flagged as structurally different — "we have integrated a hundred of these" overrode "this one is not those"',
-      },
-    ],
-  },
-  {
-    id: 'smaller_fund_gp',
-    label: 'GP / principal at smaller fund',
-    band: '£5M-£100M AUM · active deal flow OR LP-governance pressure',
-    industries: ['technology', 'financial_services', 'healthcare', 'retail'],
-    selfArticulatedPain:
-      "Every deal I write up goes to my LPs as part of the quarterly letter. When a deal goes wrong, the LPs don't ask whether I had bad luck — they ask whether the IC memo flagged the risk and the team ignored it, or whether we never saw it. I can't always tell which is which from my own notes.",
-    canonicalBiasHooks: [
-      {
-        bias: 'Halo Effect',
-        case: 'Theranos investor decisions (2014-2016)',
-        whatItDid:
-          'positive signal on founder credentials propagated unchallenged through every diligence dimension',
-      },
-      {
-        bias: 'Authority Bias',
-        case: 'FTX investor decisions (2021-2022)',
-        whatItDid:
-          "Tier-1 backers' presence overruled standard governance + financial-controls due diligence",
-      },
-      {
-        bias: 'Planning Fallacy',
-        case: 'Quibi launch (2020)',
-        whatItDid:
-          'go-to-market timeline assumed best-case adoption curves; reference class on streaming launches was ignored',
-      },
-    ],
-  },
-  {
-    id: 'pe_backed_founder',
-    label: 'PE-backed mid-market CEO / founder',
-    band: 'Personal-decisive budget · operating under PE governance cadence',
-    industries: ['technology', 'manufacturing', 'healthcare', 'retail', 'financial_services'],
-    selfArticulatedPain:
-      "Every quarter I present to a PE board that asks two questions I can predict and one I can't. The unpredictable question is always rooted in something I already wrote in the memo but framed in a way that made the risk look smaller than it was. I want that question caught at draft time, not in the boardroom.",
-    canonicalBiasHooks: [
-      {
-        bias: 'Optimism Bias',
-        case: 'Boeing 737 MAX certification (2018)',
-        whatItDid:
-          'cost + timeline projections systematically underweighted catastrophic-tail risk',
-      },
-      {
-        bias: 'Loss Aversion (mis-framed)',
-        case: 'Long-Term Capital Management (1998)',
-        whatItDid:
-          'positions framed as defending existing returns instead of evaluated as fresh allocations on current data',
-      },
-      {
-        bias: 'Status Quo Bias',
-        case: 'Sears retail strategy (2005-2018)',
-        whatItDid:
-          'capital allocation defended the legacy footprint past the point where reference-class retailers had pivoted',
+          "anchored on the prior platform's economics instead of the market that was actually forming",
       },
     ],
   },
@@ -320,48 +279,37 @@ export const WEDGE_PERSONAS: WedgePersona[] = [
 
 export const DM_TEMPLATES: DmTemplate[] = [
   {
-    personaId: 'fractional_cso',
+    personaId: 'independent_sponsor',
     opener:
-      "Hi {name} — saw your post on {topic}. Quick context: I've been auditing strategic memos for the same blind spots that killed Kodak's digital exit and Blockbuster's Netflix decision — confirmation, sunk-cost, anchoring. The pattern is identical across industries; only the surface details change. Happy to run a 60-second audit on your next client memo if useful (no slides, no pitch). Just paste the memo, get back a list of biases the audit committee will catch first.",
+      "Hi {name} — saw you're {raising on / closing} a {sector} deal. I built a tool that runs a deal memo through a reasoning audit (Kahneman / Klein based) and flags the one assumption most likely to blow up in diligence, or scare off a capital partner, before they see it. Happy to run it free on a live memo of yours and just send you what it catches. No pitch, no logo on it, yours to keep. Worth a look?",
     curiosityReply:
-      "Sure — easiest path: paste the memo at decision-intel.com (no login needed for the first one). You'll get back a structured audit in under a minute: biases flagged with confidence scores, the questions a sceptical reviewer would ask, and the passages where the reasoning gets thin. If anything in the audit lands hard, I'd love a 20-min call to compare notes — what looked obvious from the outside vs. what you saw at draft time.",
+      "Easiest path: send me your current deal memo (redacted / anonymised is totally fine), or paste it at decision-intel.com/demo. In ~60 seconds you get back the top cognitive biases showing up in the reasoning with the exact lines, a Decision Quality score (think FICO, for the decision), the reference-class base rate for deals like this (the outside view), and the single highest-priority thing to fix before you take it to capital partners. Free, yours to keep, unbranded. If it's useful we can talk; if not, you've lost 20 minutes.",
     discoveryAsk:
-      "Want to do a 20-min call this week or next? No agenda from my side. I'll ask 4 questions about how strategic memos move from draft to client review at your firm — workflow questions, not sales questions. If anything I learn maps onto something the audit can fix at draft time, I'll show you; if not, I'll send you the closest historical cases I have on file for your blind spots.",
+      "Before I run it, quick 15 min? Not a pitch — Mom-Test, I just want your world: tell me about the last deal you walked away from, or wish you had, and what your diligence almost missed. And when a deal goes sideways after you've raised the equity, what does that cost you with those backers next time you raise? Then I'll run the audit on your live deal and show you one thing you'd have missed.",
     introducerFollowUp:
-      'Hi {introducer} — quick note that {prospect} and I had a great 20-min on {date}. Came out of it with {one-specific-insight}. Genuinely useful for both sides. Will keep you posted as the conversation develops; if {prospect} mentions us back to you, the framing they responded to was {framing}. Thanks again for the bridge.',
+      "Glad that was useful. Quick ask — who's one other sponsor or searcher you respect who's mid-deal right now? I'll run the same free audit on their memo and surface one thing they'd have missed. Easy intro if you're up for it: \"Been using this to pressure-test my deal reasoning before I take it to capital partners — it caught a flaw I'd have missed. Worth 15 minutes, want an intro?\"",
   },
   {
-    personaId: 'midmarket_corp_dev',
+    personaId: 'self_funded_searcher',
     opener:
-      "Hi {name} — congrats on {recent-deal-or-thread}. Not pitching software — asking for 20 min of hindsight. Let me run my audit over two deals you've ALREADY closed: one you feel good about, one that went sideways. I'll show you what it flags in the original IC memo — the narrative coherence that didn't survive the CFO's first counterfactual, the inside-view projections that skipped the base rate (the WeWork / Daimler-Chrysler patterns). Free, no slides, you keep the output. It's forensic, not predictive — I'm not asking you to bet on me, just to let me read the past. Sharp, we talk. If not, you've lost 20 minutes.",
+      "Hi {name} — saw you're searching in {sector}. I built a tool that runs a deal memo through a reasoning audit (Kahneman / Klein based) and flags the one assumption most likely to blow up in diligence, before you sign a loan you personally guarantee. Happy to run it free on a live memo of yours and just send you what it catches. No pitch, yours to keep. Worth a look?",
     curiosityReply:
-      "Easiest path: paste a memo from one of those closed deals at decision-intel.com — first audit is free. You'll get back a structured artefact: bias-by-bias confidence scores, the cross-document conflicts (deal terms vs. management projections), the structural assumptions a sceptical CFO would pressure-test. If you'd rather see the WeWork audit first as a calibration point, here's the link {link to /demo or DPR sample}.",
+      "Easiest path: send me your current deal memo (redacted is fine), or paste it at decision-intel.com/demo. In ~60 seconds you get back the cognitive biases in the reasoning with the exact lines, a Decision Quality score (think FICO, for the decision), the reference-class base rate for deals like this, and the single highest-priority thing to fix before you take it to your lender or co-investors. Free, yours to keep — it also makes you look institutional to the people you're borrowing from, without the team a fund has.",
     discoveryAsk:
-      "Want to compare notes for 20 min? I'll ask 4 questions about how memos move from draft to IC at your firm — pre-IC review patterns, who catches what when, the post-mortems that landed. If the audit can compress that loop, I'll show you on a real recent deal (anonymised, your call). If not, I'll send you the 3 historical cases closest to your active threads.",
+      "Quick 15 min before I run it? Not a pitch — I just want to hear about the last deal you walked away from, or wish you had, and what your diligence almost missed. Then I'll run the audit on your live thesis and show you one thing you'd have missed. The one that scares you most is usually the one you'd already fallen in love with.",
     introducerFollowUp:
-      "Hi {introducer} — wanted to close the loop: {prospect} and I had a substantive 20-min on {date}. The audit lands hardest for them around {pain-they-articulated}. Sending them the {WeWork or Dangote} DPR specimen as the next artefact. Will keep you posted on whether they pilot. If you have one more name in the {industry} space who's running into the same memo-quality friction, I'd value the intro.",
+      "Glad that was useful. Quick ask — who's one other searcher or sponsor you respect who's mid-deal right now? I'll run the same free audit on their memo and surface one thing they'd have missed. Easy intro: \"Been using this to pressure-test my deal reasoning before I sign — it caught a flaw I'd have missed. Worth 15 minutes, want an intro?\"",
   },
   {
-    personaId: 'smaller_fund_gp',
+    personaId: 'serial_acquirer',
     opener:
-      "Hi {name} — saw your {recent-LP-letter or deal-thread}. Not pitching a tool — asking for a post-mortem. Let me run my audit over two IC decisions you've already CLOSED: one that worked, one that didn't. I'll show you what it flags in the original memo — the halo effect off a Tier-1 backer, the authority bias your LPs asked about after the fact (the Theranos / FTX patterns). Free, you keep the output. Forensic, not predictive — I'm reading the past, not touching your live book. Lands, we talk; if not, no harm. The output doubles as the kind of evidence record an LP audit committee asks for.",
+      "Hi {name} — saw the buy-and-build you're running in {sector}. I built a tool that runs each acquisition thesis through a reasoning audit (Kahneman / Klein based) and flags where your proven playbook stops fitting a target that's structurally different, before you've committed. Happy to run it free on a live deal memo. No pitch, yours to keep. Worth a look?",
     curiosityReply:
-      'Easiest path: paste a memo from one of those closed IC decisions at decision-intel.com — first audit is free. The artefact you get back is the kind of structured evidence record an LP audit committee asks for: bias-by-bias confidence scores, the cross-document conflicts, the structural assumptions a sceptical LP would pressure-test. Useful as a pre-IC checklist or as the cover-page of the LP quarterly.',
+      'Easiest path: send me a live deal memo or even an early teaser / CIM, or paste it at decision-intel.com/demo. You get back a fast read — the cognitive biases in the reasoning with the exact lines, a Decision Quality score (think FICO, for the decision), the reference-class base rate, and the highest-priority thing to fix. Across repeated deals it becomes a screening triage: a quick Go / No-Go before you spend on diligence. Free, yours to keep.',
     discoveryAsk:
-      "Want to do 20 min this week or next? Discovery, not pitch. I'll ask 4 questions about how IC memos move from draft to LP-letter at your firm — what your LPs ask post-mortem when a deal goes wrong, who catches what at draft time, the calibration loops you've already built. If the audit compresses any of that, I'll show you on a real recent decision (anonymised). If not, I'll send the 3 historical cases closest to your portfolio.",
+      "Quick 15 min? Not a pitch — I want to hear how a thesis moves from teaser to committed in your shop, and the deal where the playbook that worked ten times didn't fit the eleventh. Then I'll run the audit on a live one and show you one thing it flags. The risk is never one deal; it's applying the proven playbook to the target that's structurally different.",
     introducerFollowUp:
-      "Hi {introducer} — closing the loop: {prospect} and I had a useful 20-min on {date}. Their LP-letter quality is the angle that landed hardest. Sending them the audit on {anonymised-recent-deal-they-shared} as the next artefact. Will keep you posted. If there's one more GP in the {region/sector} space running into the same LP-questioning friction, I'd value the bridge.",
-  },
-  {
-    personaId: 'pe_backed_founder',
-    opener:
-      "Hi {name} — saw the {recent-quarterly-or-news}. Not pitching software — asking for 20 min of hindsight. Let me run my audit over two board decisions you've already made and CLOSED: one that went well, one that went sideways. I'll show you what it flags in the original memo — the optimism bias on cost / timeline, the loss-aversion mis-framing (the Boeing 737 MAX / LTCM patterns), all visible at draft time. Free, you keep the output. Forensic, not predictive: I'm not asking you to bet on me, just to let me read the past. Sharp, we talk — and the output works as the cover page of your next board pack.",
-    curiosityReply:
-      "Easiest path: paste the memo from one of those closed decisions at decision-intel.com — first audit is free. You'll get back a structured evidence record: bias-by-bias confidence scores, the structural assumptions a sceptical PE chair would pressure-test, the audit-committee-grade questions surfaced as a pre-flight checklist. Useful as the cover page of any quarterly board pack.",
-    discoveryAsk:
-      "Want 20 min this week or next? Discovery, not pitch. I'll ask 4 questions about how strategy memos move from draft to PE board at your firm — the question patterns your chair surfaces, the post-mortems that landed, the questions you wish you'd anticipated. If the audit can fix any of that at draft time, I'll show you. If not, I'll send the 3 historical cases closest to your operating model.",
-    introducerFollowUp:
-      "Hi {introducer} — quick close-the-loop: {prospect} and I had a substantive 20-min on {date}. The framing that landed hardest was {framing}. Sending them the audit on {anonymised-recent-strategy-memo} as the next artefact. Will keep you posted. If there's one more PE-backed founder in your network running the same board-memo cadence, I'd value the bridge.",
+      'Glad that was useful. Quick ask — who\'s one other operator running a buy-and-build, or a sponsor / searcher mid-deal, who I should run this for free? Easy intro: "Been using this as a standing check on every acquisition thesis — it caught a flaw I\'d have missed. Worth 15 minutes, want an intro?"',
   },
 ];
 
@@ -370,46 +318,110 @@ export const DM_TEMPLATES: DmTemplate[] = [
 // ============================================================================
 
 export const ACTION_CADENCE = {
-  /** CLAUDE.md GTM Phase 1 wedge: 5-10 personalised LinkedIn DMs/week. */
+  /** 5-10 personalised DMs/week (Searchfunder + LinkedIn) to the ETA wedge. */
   weeklyDmTarget: { min: 5, max: 10 },
-  /** Sharran 1-1-1 traffic-source discipline cap (CLAUDE.md). */
+  /** 1-1-1 traffic-source discipline cap on in-person events (online is the daily motion). */
   monthlyEventCap: 2,
-  /** Mr. Reiner / Mr. Gabe warm-intro discipline (CLAUDE.md). */
+  /** Referral / follow-up after a win — keep it short. */
   followUpToIntroducerLines: 4,
-  /** Pre-event prep arc by week (highest-priority event = Strategy World London). */
+  /**
+   * The 90-day funnel math (the Execution Kit). The LEADING indicator to watch
+   * weekly is freeAuditsRunning — that, not demos, predicts revenue 4-6 weeks
+   * out. Rule: every working day produces at least one new real conversation
+   * with a sponsor or searcher.
+   */
+  funnel: {
+    conversations: 40, // real chats with the ICP
+    freeAuditsRunning: 15, // on their LIVE memos — the leading indicator
+    closes: 5, // ~10-12% of conversations
+    referralRule: 'ask at every win, right after a real finding lands (the aha moment)',
+  },
+  /**
+   * The ONLINE channels — the primary daily motion. The in-person rooms in
+   * EVENTS are the periodic, replaceable layer. Ranked by leverage for a
+   * no-warm-intros founder (the Execution Kit channel priority).
+   */
+  onlineChannels: [
+    {
+      rank: 1,
+      channel: 'Searchfunder.com',
+      firstAction:
+        'Join free; complete a credible profile; DM ~5 active searchers/sponsors a week; answer questions in threads. Densest online channel, ~10k members.',
+      cadence: 'this week, then daily',
+    },
+    {
+      rank: 2,
+      channel: 'LinkedIn',
+      firstAction:
+        'Value-first DMs to UK ETA / sponsors (LBS ETA Club, Gerald Edelman network, Orca). Post 2x/week — a teardown of a famous failed deal run through the audit.',
+      cadence: 'daily',
+    },
+    {
+      rank: 3,
+      channel: 'UK ETA podcast (Found & Funded)',
+      firstAction:
+        'Pitch yourself as a guest doing a live "reasoning teardown" of an anonymised deal memo — winner\'s curse, management halo, inside-view dominance. Cheap, warm credibility with exactly this community.',
+      cadence: 'pitch once, high ROI',
+    },
+  ],
+  /** The 90-day plan (the Execution Kit) — weeks, not an event countdown. */
+  ninetyDayPlan: [
+    {
+      weeks: '1-2',
+      focus:
+        'Set the table: join Searchfunder + credible profile; build a list of 40 named sponsors/searchers; post one credibility teardown; register for / pitch one ETA event + one podcast.',
+    },
+    {
+      weeks: '3-6',
+      focus:
+        'Conversations to free audits: 15-20 outreach touches/week; run the free live-deal audit for anyone who sends a memo; Mom-Test discovery first, pitch second; sign the first 1-2 founding members.',
+    },
+    {
+      weeks: '7-10',
+      focus:
+        'Close + start the flywheel: close toward 5 paying; ask every happy user for one referral at the aha moment; turn the best result into an anonymised case study.',
+    },
+    {
+      weeks: '11-13',
+      focus:
+        'Tighten + compound: write down which message / channel / objection worked; double down on the one channel that produced the most audits; line up the next 10 from referrals.',
+    },
+  ],
+  /** Pre-event prep arc by week for an in-person ETA room (RollUpEurope / LBS / GE / IESE). */
   prepArc: [
     {
       weeksBeforeEvent: 6,
       action:
-        'Pull the published attendee list. Filter to the 4 wedge personas. Target 20-30 names.',
+        'Pull the attendee / member list (Searchfunder surfaces many). Filter to the 3 ETA wedge personas. Target 20-30 names.',
     },
     {
       weeksBeforeEvent: 5,
-      action: 'Match each name to industry → canonical bias hook from the 143-case library.',
+      action: 'Match each name to sector → canonical bias hook from the 143-case library.',
     },
     {
       weeksBeforeEvent: 4,
       action:
-        'Send first wave of 10 DMs (highest-priority names). Use opener template, edit per-prospect.',
+        'Send first wave of ~10 DMs (highest-priority names). Lead with the FREE live-deal audit, edit per-prospect.',
     },
     {
       weeksBeforeEvent: 3,
-      action: 'Send second wave of 10 DMs. Track replies. Convert 3-5 to 20-min discovery calls.',
+      action:
+        'Send second wave of ~10 DMs. Track replies. Convert to free audits on live memos (the leading indicator).',
     },
     {
       weeksBeforeEvent: 2,
       action:
-        'Run the discovery calls. Learn what the prospect cares about; do NOT pitch yet. Capture quotes.',
+        'Run the discovery calls (Mom-Test). Learn what the prospect cares about; pitch second. Capture quotes.',
     },
     {
       weeksBeforeEvent: 1,
       action:
-        "Pre-book 5+ 1:1 coffees at the event. Send a calendar pin: 'Coffee at {venue}, {time}. Will run a live audit on a memo you bring.'",
+        "Pre-book 5+ 1:1 coffees at the event. Send a pin: 'Coffee at {venue}, {time}. Bring a live deal memo, I'll run the audit and surface one thing you'd have missed.'",
     },
     {
       weeksBeforeEvent: 0,
       action:
-        'Run the event. Live-audit memos at the coffees. Follow-up email same day with the audit artefact + 4-line note.',
+        'Run the room. Live-audit memos at the coffees. Ask for a referral at the aha moment. Same-day follow-up with the audit + a referral ask.',
     },
   ],
 } as const;

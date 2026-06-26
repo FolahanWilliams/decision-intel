@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { FileText, Upload, Telescope, Handshake, Layers, Users } from 'lucide-react';
+import { FileText, Upload, Compass, Telescope, Handshake, Layers, Users } from 'lucide-react';
 import { PHASE_1_PERSONAS, type Phase1PersonaId } from '@/lib/constants/icp';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';

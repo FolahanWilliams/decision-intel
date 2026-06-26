@@ -20,39 +20,33 @@ import {
 // ─── classifyByRole ────────────────────────────────────────────────────
 
 describe('classifyByRole', () => {
-  it('matches a corp-dev head', () => {
-    expect(classifyByRole('Head of Corporate Development').persona).toBe('midmarket_corp_dev');
-    expect(classifyByRole('VP, M&A').persona).toBe('midmarket_corp_dev');
-    expect(classifyByRole('Director of M & A').persona).toBe('midmarket_corp_dev');
+  it('matches a self-funded searcher', () => {
+    expect(classifyByRole('Self-funded searcher').persona).toBe('self_funded_searcher');
+    expect(classifyByRole('Search Fund Principal').persona).toBe('self_funded_searcher');
+    expect(classifyByRole('Acquisition entrepreneur (ETA)').persona).toBe('self_funded_searcher');
   });
 
-  it('matches a fractional CSO', () => {
-    expect(classifyByRole('Fractional CSO').persona).toBe('fractional_cso');
-    expect(classifyByRole('Strategy Consultant').persona).toBe('fractional_cso');
-    expect(classifyByRole('Independent Strategy Advisor').persona).toBe('fractional_cso');
+  it('matches a serial acquirer', () => {
+    expect(classifyByRole('Serial acquirer').persona).toBe('serial_acquirer');
+    expect(classifyByRole('Roll-up operator').persona).toBe('serial_acquirer');
+    expect(classifyByRole('Building a holdco').persona).toBe('serial_acquirer');
   });
 
-  it('matches a smaller-fund GP', () => {
-    expect(classifyByRole('General Partner').persona).toBe('smaller_fund_gp');
-    expect(classifyByRole('Managing Partner').persona).toBe('smaller_fund_gp');
-    expect(classifyByRole('Principal at Acme Ventures').persona).toBe('smaller_fund_gp');
+  it('matches an independent sponsor', () => {
+    expect(classifyByRole('Independent Sponsor').persona).toBe('independent_sponsor');
+    expect(classifyByRole('Fundless sponsor').persona).toBe('independent_sponsor');
   });
 
-  it('matches a PE-backed CEO / founder', () => {
-    expect(classifyByRole('CEO').persona).toBe('pe_backed_founder');
-    expect(classifyByRole('Founder & CEO').persona).toBe('pe_backed_founder');
-    expect(classifyByRole('Managing Director').persona).toBe('pe_backed_founder');
-  });
-
-  it('classifies an established Chief Strategy Officer as fractional_cso', () => {
-    // The CSO role pattern is intentionally the secondary fractional_cso
-    // match — same memo cadence template applies.
-    expect(classifyByRole('Chief Strategy Officer').persona).toBe('fractional_cso');
+  it('classifies a generic CEO / founder via the catch-all as independent_sponsor', () => {
+    // The CEO / founder / operator catch-all defaults to the lead persona —
+    // likely a searcher who closed or a sponsor between deals.
+    expect(classifyByRole('CEO').persona).toBe('independent_sponsor');
+    expect(classifyByRole('Founder & Operating Partner').persona).toBe('independent_sponsor');
   });
 
   it('falls back to company pattern when role missing', () => {
     const result = classifyByRole('', 'Acme Ventures');
-    expect(result.persona).toBe('smaller_fund_gp');
+    expect(result.persona).toBe('independent_sponsor');
     expect(result.why).toContain('classified by company');
   });
 
@@ -63,7 +57,13 @@ describe('classifyByRole', () => {
   });
 
   it('always includes a non-empty rationale', () => {
-    for (const input of ['CEO', 'General Partner', 'Software Engineer', '', 'Fractional CSO']) {
+    for (const input of [
+      'CEO',
+      'Independent Sponsor',
+      'Software Engineer',
+      '',
+      'Serial acquirer',
+    ]) {
       const result = classifyByRole(input);
       expect(result.why.length).toBeGreaterThan(10);
     }
@@ -79,10 +79,9 @@ describe('pickBiasHook', () => {
 
   it('returns a hook with a case name + bias for each wedge persona', () => {
     for (const persona of [
-      'fractional_cso',
-      'midmarket_corp_dev',
-      'smaller_fund_gp',
-      'pe_backed_founder',
+      'independent_sponsor',
+      'self_funded_searcher',
+      'serial_acquirer',
     ] as const) {
       const hook = pickBiasHook(persona);
       expect(hook).not.toBeNull();
@@ -97,20 +96,20 @@ describe('pickBiasHook', () => {
 
 describe('generateOpener', () => {
   it('substitutes {name} with the first name', () => {
-    const result = generateOpener('fractional_cso', 'Marcus Reynolds');
+    const result = generateOpener('independent_sponsor', 'Marcus Reynolds');
     expect(result).not.toBeNull();
     expect(result!.text).toContain('Marcus');
     expect(result!.text).not.toContain('{name}');
   });
 
   it('falls back to whole-name when no space', () => {
-    const result = generateOpener('fractional_cso', 'Adaeze');
+    const result = generateOpener('independent_sponsor', 'Adaeze');
     expect(result!.text).toContain('Adaeze');
   });
 
   it('reports unsubstituted tokens as pendingSubstitutions', () => {
-    const result = generateOpener('midmarket_corp_dev', 'Damien Park');
-    // The midmarket_corp_dev opener has {recent-deal-or-thread}
+    const result = generateOpener('self_funded_searcher', 'Damien Park');
+    // The self_funded_searcher opener has a {sector} token left to fill
     expect(result!.pendingSubstitutions.length).toBeGreaterThan(0);
     expect(result!.pendingSubstitutions[0]).not.toContain('{');
     expect(result!.pendingSubstitutions[0]).not.toContain('}');
@@ -127,10 +126,10 @@ describe('researchProspect', () => {
   it('composes classify + pick + generate', () => {
     const result = researchProspect({
       name: 'Damien Park',
-      title: 'Head of Corporate Development',
+      title: 'Independent Sponsor',
       company: 'Marlin Industries',
     });
-    expect(result.persona).toBe('midmarket_corp_dev');
+    expect(result.persona).toBe('independent_sponsor');
     expect(result.biasHook).not.toBeNull();
     expect(result.opener).not.toBeNull();
     expect(result.opener).toContain('Damien');
@@ -222,18 +221,18 @@ Aisha Okafor, GP
 describe('summarizeResearch', () => {
   it('counts by persona + ready/needs-review', () => {
     const researched = [
-      researchProspect({ name: 'A', title: 'Head of Corp Dev' }),
-      researchProspect({ name: 'B', title: 'Fractional CSO' }),
-      researchProspect({ name: 'C', title: 'General Partner' }),
-      researchProspect({ name: 'D', title: 'CEO' }),
+      researchProspect({ name: 'A', title: 'Independent Sponsor' }),
+      researchProspect({ name: 'B', title: 'Self-funded searcher' }),
+      researchProspect({ name: 'C', title: 'Serial acquirer running a roll-up' }),
+      researchProspect({ name: 'D', title: 'CEO' }), // catch-all → independent_sponsor
       researchProspect({ name: 'E', title: 'Designer' }),
     ];
     const summary = summarizeResearch(researched);
     expect(summary.total).toBe(5);
-    expect(summary.byPersona.midmarket_corp_dev).toBe(1);
-    expect(summary.byPersona.fractional_cso).toBe(1);
-    expect(summary.byPersona.smaller_fund_gp).toBe(1);
-    expect(summary.byPersona.pe_backed_founder).toBe(1);
+    // 'Independent Sponsor' + 'CEO' (catch-all) both map to independent_sponsor.
+    expect(summary.byPersona.independent_sponsor).toBe(2);
+    expect(summary.byPersona.self_funded_searcher).toBe(1);
+    expect(summary.byPersona.serial_acquirer).toBe(1);
     expect(summary.byPersona.other).toBe(1);
     expect(summary.ready).toBe(4);
     expect(summary.needsReview).toBe(1);

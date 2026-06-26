@@ -25,16 +25,16 @@ function caseFixture(over: Partial<CaseStudy> = {}): CaseStudy {
 
 const PERSONAS: WedgePersona[] = [
   {
-    id: 'fractional_cso',
-    label: 'Fractional CSO',
+    id: 'independent_sponsor',
+    label: 'Independent sponsor',
     band: 'b',
     industries: ['technology', 'financial_services', 'manufacturing', 'retail', 'healthcare'],
     selfArticulatedPain: 'p',
     canonicalBiasHooks: [],
   },
   {
-    id: 'midmarket_corp_dev',
-    label: 'Head of Corp Dev',
+    id: 'self_funded_searcher',
+    label: 'Self-funded searcher',
     band: 'b',
     industries: ['technology', 'financial_services', 'manufacturing', 'healthcare'],
     selfArticulatedPain: 'p',
@@ -44,15 +44,15 @@ const PERSONAS: WedgePersona[] = [
 
 const TEMPLATES: DmTemplate[] = [
   {
-    personaId: 'fractional_cso',
+    personaId: 'independent_sponsor',
     opener: 'Hi {name} — saw {topic}. Quick context...',
     curiosityReply: '',
     discoveryAsk: '',
     introducerFollowUp: '',
   },
   {
-    personaId: 'midmarket_corp_dev',
-    opener: 'Hi {name} — congrats on the {recent-deal-or-thread}. Reason for the DM...',
+    personaId: 'self_funded_searcher',
+    opener: 'Hi {name} — saw you are searching in {sector}...',
     curiosityReply: '',
     discoveryAsk: '',
     introducerFollowUp: '',
@@ -115,14 +115,14 @@ describe('pickAnchorCase', () => {
 
 describe('matchPersona', () => {
   it('returns the first persona (array-order priority) covering the industry', () => {
-    expect(matchPersona('technology', PERSONAS)?.id).toBe('fractional_cso');
+    expect(matchPersona('technology', PERSONAS)?.id).toBe('independent_sponsor');
   });
   it('falls through to a later persona when the first does not cover it', () => {
     const narrow: WedgePersona[] = [
       { ...PERSONAS[0], industries: ['retail'] },
       { ...PERSONAS[1], industries: ['healthcare'] },
     ];
-    expect(matchPersona('healthcare', narrow)?.id).toBe('midmarket_corp_dev');
+    expect(matchPersona('healthcare', narrow)?.id).toBe('self_funded_searcher');
   });
   it('returns null when no persona covers the industry', () => {
     expect(matchPersona('aerospace', PERSONAS)).toBeNull();
@@ -154,7 +154,7 @@ describe('buildProspectShortlist', () => {
     expect(out).toHaveLength(1);
     expect(out[0].anchorCaseCompany).toBe('Kodak');
     expect(out[0].anchorCaseSlug).toBe('kodak');
-    expect(out[0].personaId).toBe('fractional_cso');
+    expect(out[0].personaId).toBe('independent_sponsor');
     expect(out[0].dmOpener).toContain('BigCo acquires SmallCo'); // opener prefilled with intel
     // structural anti-own-deal guarantee: the anchor is one of the injected cases
     expect([pub.company]).toContain(out[0].anchorCaseCompany);

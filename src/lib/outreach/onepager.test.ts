@@ -46,9 +46,11 @@ describe('selectOnepagerAnchor', () => {
 describe('pickOnepagerArchetypeId', () => {
   it('routes fund / GP / cross-border to cross_border_reality', () => {
     expect(pickOnepagerArchetypeId('Financial Services', 'Fund GP')).toBe('cross_border_reality');
-    expect(pickOnepagerArchetypeId('Technology', 'CSO', 'smaller_fund_gp')).toBe(
-      'cross_border_reality'
-    );
+    // ETA persona ids carry no cross-border keyword, so the signal comes from
+    // the sector/role (here an emerging-markets sector with a searcher persona).
+    expect(
+      pickOnepagerArchetypeId('Emerging markets manufacturing', 'Searcher', 'self_funded_searcher')
+    ).toBe('cross_border_reality');
     expect(pickOnepagerArchetypeId('Pan-African retail', 'Corp Dev')).toBe('cross_border_reality');
   });
 

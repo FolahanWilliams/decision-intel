@@ -1,12 +1,12 @@
 /**
  * Target Research — pure-function workbench helpers for pre-event prep.
  *
- * Shipped 2026-05-27 for Strategy World London (BAFTA, June 9-10, T-13d).
- * Operationalises the T-2w to T-1w prep-arc actions named in
+ * Shipped 2026-05-27; pivoted to the ETA / owner-operator wedge 2026-06-26.
+ * Operationalises the prep-arc actions named in
  * src/lib/data/event-prep.ts ACTION_CADENCE.prepArc:
- *   - "Pull the published attendee list. Filter to the 4 wedge personas."
- *   - "Match each name to industry → canonical bias hook from 143-case library."
- *   - "Send first wave of 10 DMs (highest-priority names)."
+ *   - "Pull the attendee / member list. Filter to the 3 ETA wedge personas."
+ *   - "Match each name to sector → canonical bias hook from 143-case library."
+ *   - "Send first wave of ~10 DMs (highest-priority names)."
  *
  * Architecture:
  *   1. classifyByRole — role-string heuristic → wedge persona id
@@ -64,37 +64,30 @@ const ROLE_PATTERNS: Array<{
   why: string;
 }> = [
   {
-    persona: 'midmarket_corp_dev',
+    persona: 'self_funded_searcher',
     matches:
-      /\b(corp(orate)?\s*dev(elopment)?|(director|head|vp|svp|lead)[\s,]+(of\s+)?m\s*&?\s*a|m\s*&?\s*a[\s,]+(lead|head|director)|vp[\s,]+m\s*&?\s*a|svp[\s,]+(corp|m\s*&?\s*a))\b/i,
-    why: 'Role names a corp-dev or M&A function — the canonical mid-market head buyer.',
+      /\b(search\s*fund|searcher|self-?funded\s+search|entrepreneur(ship)?\s+through\s+acquisition|\beta\b|acquisition\s+entrepreneur)\b/i,
+    why: 'Role names a search fund / ETA / acquisition entrepreneur — the self-funded searcher.',
   },
   {
-    persona: 'fractional_cso',
+    persona: 'serial_acquirer',
     matches:
-      /\b(fractional\s+(cso|cstrategy|cmo|chief)|fractional\s+(chief\s+)?strategy|strategy\s+(consultant|advisor|fractional)|independent\s+(strategy|cso))\b/i,
-    why: 'Role names a fractional / consultant strategy role — multi-client memo cadence.',
+      /\b(serial\s+acquirer|roll-?up|buy-?and-?build|holdco|holding\s+co(mpany)?|permanent\s+capital)\b/i,
+    why: 'Role names a roll-up / buy-and-build / holdco operator — the serial acquirer.',
   },
   {
-    persona: 'smaller_fund_gp',
+    persona: 'independent_sponsor',
     matches:
-      /\b(general\s+partner|gp\b|managing\s+partner|founding\s+partner|principal\s+at|partner\s+at\s+\w+\s+(capital|ventures|fund|partners)|portfolio\s+partner)\b/i,
-    why: 'Role names a fund partner / GP / principal — IC-memo cadence with LP scrutiny.',
+      /\b(independent\s+sponsor|fundless\s+sponsor|deal\s+sponsor|\bsponsor\b|private\s+investor)\b/i,
+    why: 'Role names an independent / fundless sponsor — the lead wedge persona.',
   },
+  // Catch-all for CEO / founder / operating roles — likely a searcher who closed
+  // or a sponsor between deals; default to the lead persona (independent sponsor).
   {
-    persona: 'pe_backed_founder',
+    persona: 'independent_sponsor',
     matches:
-      /\b(ceo|chief\s+executive|founder\s*&?\s*(ceo|coo)|managing\s+director|chief\s+operating)\b/i,
-    why: 'Role names a CEO / founder / MD — likely PE-backed mid-market operating cadence.',
-  },
-  // Catch-all for chief-strategy-officer at established companies (typically
-  // F500 ceiling, not Phase 1 wedge — but still close enough to fractional_cso
-  // for opener purposes; the founder can re-classify manually.
-  {
-    persona: 'fractional_cso',
-    matches:
-      /\b(chief\s+strategy\s+officer|cso\b|head\s+of\s+strategic\s+planning|svp\s+strategy|vp\s+strategy)\b/i,
-    why: 'Role names a CSO / strategy head — closest persona match is fractional_cso (the same memo-cadence template fits).',
+      /\b(ceo|chief\s+executive|founder|owner-?operator|managing\s+director|operating\s+partner)\b/i,
+    why: 'Role names a CEO / founder / operator — closest wedge match is the independent-sponsor opener.',
   },
 ];
 
@@ -106,9 +99,9 @@ const COMPANY_PATTERNS: Array<{
   why: string;
 }> = [
   {
-    persona: 'smaller_fund_gp',
-    matches: /\b(capital|ventures|partners|fund|management|holdings)\b/i,
-    why: 'Company name reads as a fund / capital allocator.',
+    persona: 'independent_sponsor',
+    matches: /\b(capital|partners|holdings|holdco|acquisitions?|ventures|group)\b/i,
+    why: 'Company name reads as a sponsor / acquisition vehicle.',
   },
 ];
 
@@ -146,7 +139,7 @@ export function classifyByRole(
     persona: 'other',
     why:
       roleStr.length > 0 || companyStr.length > 0
-        ? 'Role / company did not match any of the 4 wedge personas. Flag for manual review.'
+        ? 'Role / company did not match any of the ETA wedge personas. Flag for manual review.'
         : 'No role or company provided. Add one to enable classification.',
   };
 }
@@ -339,10 +332,9 @@ export interface ResearchSummary {
 
 export function summarizeResearch(researched: ResearchedProspect[]): ResearchSummary {
   const byPersona: Record<PersonaIdOrOther, number> = {
-    fractional_cso: 0,
-    midmarket_corp_dev: 0,
-    smaller_fund_gp: 0,
-    pe_backed_founder: 0,
+    independent_sponsor: 0,
+    self_funded_searcher: 0,
+    serial_acquirer: 0,
     other: 0,
   };
   for (const r of researched) {

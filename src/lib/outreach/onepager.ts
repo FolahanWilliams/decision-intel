@@ -57,10 +57,13 @@ export function pickOnepagerArchetypeId(
   role: string,
   personaId?: WedgePersonaId
 ): PostArchetypeId {
-  const blob = `${sector} ${role}`.toLowerCase();
-  const crossBorder =
-    personaId === 'smaller_fund_gp' ||
-    /\bfund\b|\bgp\b|\blp\b|cross-border|pan-african|emerging market|\bem\b/.test(blob);
+  // personaId folded into the blob so the cross-border archetype still fires on
+  // a fund/cross-border signal in the role; no ETA persona is inherently
+  // cross-border, so the keyword regex (not a persona equality) drives it.
+  const blob = `${sector} ${role} ${personaId ?? ''}`.toLowerCase();
+  const crossBorder = /\bfund\b|\bgp\b|\blp\b|cross-border|pan-african|emerging market|\bem\b/.test(
+    blob
+  );
   return crossBorder ? 'cross_border_reality' : 'billion_dollar_autopsy';
 }
 
