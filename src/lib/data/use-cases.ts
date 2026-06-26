@@ -349,6 +349,76 @@ export const USE_CASES: UseCase[] = [
     ctaLabel: 'Audit an acquisition thesis',
   },
   {
+    slug: 'owner-operator-deal-audit',
+    workflow: 'Owner-operator deal audit',
+    eyebrow: 'For searchers, independent sponsors, and holdco operators',
+    targetPersona: 'Self-funded searcher + Independent sponsor + Serial acquirer',
+    oneLiner:
+      "Audit your acquisition thesis before you sign the personal guarantee — catch the deal-killer your gut misses when there's no IC to check you.",
+    scqa: {
+      situation:
+        "You found the business. The LOI is close. You're the buyer, the operator, and the investment committee, all at once.",
+      complication:
+        "There's no one in the room to push back. The deals that scare you most are the ones you've already fallen in love with, and the assumption that sinks the deal is the one you can't see from inside your own thesis.",
+      question:
+        'Where does this thesis fail to defend itself — before you sign a personal guarantee against it?',
+      answer: `Decision Intel runs a ${BIAS_COUNT}-bias Recognition-Rigor Framework audit tuned to the failure modes that kill owner-operator deals: deal fever, LOI-price anchoring, SBA debt-service optimism, winner's curse, and cultural-fit neglect. The second set of eyes you don't have.`,
+    },
+    steps: [
+      {
+        n: 1,
+        title: 'Paste your deal memo',
+        detail:
+          'Paste the acquisition thesis or drop the CIM, the pro-forma, or the SBA model. The audit runs in about 60 seconds.',
+      },
+      {
+        n: 2,
+        title: 'See what it caught',
+        detail: `Decision Quality Index score, ${BIAS_COUNT}-bias detection, and the named failure modes that kill owner-operator deals, each with the verbatim line from your memo that triggered it.`,
+      },
+      {
+        n: 3,
+        title: 'Read the hardening questions',
+        detail:
+          "Every finding ships with the exact question a sharp investor, or a lender stress-testing your DSCR, would ask if they read this cold. The questions you'd rather hear from the audit than at the closing table.",
+      },
+      {
+        n: 4,
+        title: 'Strengthen the thesis',
+        detail:
+          "Rewrite the flagged passages and re-audit to watch the score move. Walk into your next conversation having already pressure-tested the assumption they'll poke first.",
+      },
+      {
+        n: 5,
+        title: 'Keep the record',
+        detail:
+          'Export the Decision Provenance Record: a hashed, tamper-evident record of how you reasoned. Your own underwriting trail, deal after deal, and the calibration record only you can build.',
+      },
+    ],
+    whyItMatters:
+      "When you're the only one underwriting the deal, the failure mode is rarely a number you missed. It's the assumption you fell in love with and never made yourself defend. A fund has an investment committee to force that defense; you have an SBA loan you'll personally guarantee and a thesis you wrote from the inside. The audit is the structural second opinion the solo buyer can't supply alone, fired the same way on every deal, so the one you're sure about gets the same scrutiny as the one you're nervous about.",
+    relatedCaseSlugs: ['wework', 'aol-time-warner', 'long-term-capital-management'],
+    faq: [
+      {
+        q: "Should I run this on a live deal or one I've already closed?",
+        a: "Lead with a live deal you're underwriting now, that's where it earns its keep, before you sign. You can also run it on a deal you've already closed to see how your reasoning held up, which is how you build a calibration record across your deals over time.",
+      },
+      {
+        q: 'I know my own biases and my judgment is my edge, so why would I need this?',
+        a: "Your judgment is the edge, and the audit doesn't replace it. It gives the edge the one thing a solo buyer doesn't have: a second set of eyes on the single assumption that costs a deal. A fund partner has an investment committee to play that role; you don't. The audit is the risk desk, not a verdict on your thinking.",
+      },
+      {
+        q: 'Can I keep my deal private?',
+        a: "Yes. Documents are encrypted at rest with AES-256-GCM, the anonymizer runs first so a counterparty name or a price can be redacted before anything downstream sees it, and on the Free and Individual tiers you're private by default. Nothing about your deal feeds anything cross-org unless you opt in.",
+      },
+      {
+        q: 'Does it read the SBA model and the CIM, not just the memo?',
+        a: "Yes. Drop the pro-forma, the QofE, or the CIM alongside the thesis. The audit reads the add-backs and the debt-service assumptions, and the cross-document scan flags where the memo's story and the model's numbers don't agree, which is the gap a lender finds at the worst possible time.",
+      },
+    ],
+    ctaLabel: 'Audit a live deal',
+  },
+  {
     slug: 'decision-pre-mortem',
     workflow: 'Decision pre-mortem',
     eyebrow: 'For any high-stakes decision, before commitment',
