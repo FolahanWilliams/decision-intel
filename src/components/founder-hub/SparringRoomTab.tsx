@@ -92,10 +92,10 @@ const MAX_HISTORY = 50;
 
 export function SparringRoomTab({ founderPass }: Props) {
   const [step, setStep] = useState<FlowStep>('setup');
-  // Default to a Phase 1 HXC persona (Item 1 lock 2026-05-07). Was
-  // 'mid_market_pe_associate' which is now tagged as expansion — that
-  // surfaced the wrong wedge as the first-rehearsal default.
-  const [personaId, setPersonaId] = useState<BuyerPersonaId>('fractional_cso');
+  // Default to the lead Phase 1 HXC persona — the independent sponsor, the
+  // ETA-wedge lead (ICP pivot 2026-06-26). Was 'fractional_cso', now an
+  // expansion/bridge persona; landing there would surface the wrong wedge.
+  const [personaId, setPersonaId] = useState<BuyerPersonaId>('independent_sponsor');
   const [mode, setMode] = useState<ScenarioMode>('cold_first_meeting');
   const [isWarmContext, setIsWarmContext] = useState<boolean>(false);
   const [brief, setBrief] = useState<ScenarioBrief | null>(null);

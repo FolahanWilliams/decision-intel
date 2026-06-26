@@ -20,17 +20,22 @@
 // ─── Types ──────────────────────────────────────────────────────────
 
 export type BuyerPersonaId =
-  // Phase 1 HXC wedge personas (locked v3.5 GTM 2026-05-04). These are
-  // the four buyer-class-continuous personas the £249/mo wedge motion
-  // targets. Sparring Room defaults to one of these.
+  // Phase 1 HXC wedge — the ETA / owner-operator layer (pivoted 2026-06-26;
+  // see the CLAUDE.md "ICP PIVOT — ETA / OWNER-OPERATOR WEDGE" lock). These
+  // are the personas the £249/mo wedge motion now targets; the Sparring Room
+  // defaults to one of these. Drill these BEFORE every ETA event / DM wave.
+  | 'independent_sponsor'
+  | 'self_funded_searcher'
+  | 'serial_acquirer'
+  // Bridge / expansion personas — useful rehearsal but NOT the Phase 1 wedge.
+  // The OLD four wedge personas (fractional CSO, mid-market corp dev, smaller-
+  // fund GP, PE-backed founder) are now the Phase-2/3 BRIDGE (the Sankore-style
+  // design-partner path that DOES graduate to the F500 ceiling). Plus Phase 4
+  // ceiling buyers (F500 CSO + GC) + advisor / investor pathways.
   | 'fractional_cso'
   | 'midmarket_corp_dev'
   | 'smaller_fund_gp'
   | 'pe_backed_founder'
-  // Expansion personas — useful for rehearsal but NOT the Phase 1 wedge.
-  // Phase 4 ceiling buyers (F500 CSO + GC), Phase 2-3 bridge personas
-  // (Pan-African fund partner, mid-market PE associate), advisor /
-  // investor pathways (boutique M&A, pre-seed VC).
   | 'mid_market_pe_associate'
   | 'boutique_ma_advisor'
   | 'f500_cso'
@@ -42,15 +47,16 @@ export type BuyerPersonaId =
  * Persona tier — drives the Sparring Room UI grouping (Phase 1 HXC
  * surfaced first, expansion personas below). Item 1 lock 2026-05-07.
  *
- * `phase1_hxc` — one of the four locked v3.5 HXC wedge personas. Founder
- *   should rehearse against these BEFORE any high-signal CSO event
- *   (Strategy World London June 9-10 BAFTA is the canonical T-33d
- *   calendar leverage moment).
+ * `phase1_hxc` — one of the three ETA / owner-operator wedge personas
+ *   (independent sponsor / self-funded searcher / serial acquirer; pivoted
+ *   2026-06-26). Founder should rehearse against these BEFORE any ETA event
+ *   or DM wave — the audit is fundraising leverage they WANT, so the rep is
+ *   the free-live-deal-audit cold-open, not a bias-check pitch.
  *
- * `expansion` — useful rehearsal but NOT the Phase 1 wedge. Includes
- *   Phase 4 ceiling buyers (F500 CSO + GC), Phase 2-3 bridge personas
- *   (Pan-African fund partner, mid-market PE associate), and advisor /
- *   investor pathways (boutique M&A, pre-seed VC associate).
+ * `expansion` — useful rehearsal but NOT the Phase 1 wedge. Includes the OLD
+ *   four wedge personas (now the Phase-2/3 BRIDGE: fractional CSO, mid-market
+ *   corp dev, smaller-fund GP, PE-backed founder), Phase 4 ceiling buyers
+ *   (F500 CSO + GC), and advisor / investor pathways (boutique M&A, pre-seed VC).
  */
 export type PersonaTier = 'phase1_hxc' | 'expansion';
 
@@ -240,14 +246,148 @@ export interface SparringSessionResult {
 // ─── Buyer Personas ────────────────────────────────────────────────
 
 export const BUYER_PERSONAS: BuyerPersona[] = [
-  // ─── Phase 1 HXC wedge (locked v3.5 GTM 2026-05-04) ───────────────
-  // Four buyer-class-continuous personas at £249/mo. Surfaced first in
-  // the Sparring Room UI. Drill these BEFORE every high-signal event.
+  // ─── Phase 1 HXC wedge — the ETA / owner-operator layer ───────────
+  // (pivoted 2026-06-26; CLAUDE.md "ICP PIVOT — ETA / OWNER-OPERATOR
+  // WEDGE"). The three personas the £249/mo wedge motion now targets;
+  // surfaced first in the Sparring Room UI. The rep is the FREE
+  // live-deal-audit cold-open — the audit is fundraising leverage they
+  // WANT, so lead forward, never a bias-check pitch.
+  {
+    id: 'independent_sponsor',
+    label: 'Independent sponsor',
+    archetype: 'Priya',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'Independent / fundless sponsor doing 1-3 lower-middle-market deals a year without a committed fund. Self-funds diligence; shops each deal memo to family offices and HNWs to raise ~85% of the equity. Reputation with capital providers IS the business — a deal that goes sideways makes the next raise harder. The £249/mo is a personal card; the audit is fundraising leverage, not overhead.',
+    primaryConcern:
+      'I am raising on this memo. I need it to survive what a sophisticated family office will pressure-test — and I need to look institutional without the analyst bench a fund has. If a backer spots a hole I missed, I lose the raise and the relationship.',
+    verbalStyle:
+      'Polished, relationship-driven, deal-fluent. Talks about "the raise", "my LPs", "the cap stack", "sponsor economics". Confident but reads the room; will spend real time if the value is for THEIR raise, not your product. Low patience for anything that sounds like it is grading their judgment.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'the raise',
+      'family office',
+      'cap stack',
+      'sponsor economics',
+      'LOI',
+      'QofE',
+      'management presentation',
+      'carry',
+      'co-invest',
+      'broken-deal cost',
+    ],
+    triggerWords: [
+      'AI-powered',
+      'reasoning layer',
+      'enterprise platform',
+      'bias check',
+      'your judgment is flawed',
+      'decision hygiene',
+    ],
+    topSilentObjections: [
+      'I know my biases — my judgment is my edge. Why pay to have it second-guessed?',
+      'Will this actually help me RAISE, or is it just another tool for me?',
+      'Is the output something I can hand a family office, or is it only for my eyes?',
+    ],
+    ticketBand:
+      '£249/mo Individual personally-paid · the audit is fundraising leverage · per-deal $499-$4,999 on-ramp',
+    conversionSpeed: 'fast',
+    color: '#16A34A',
+  },
+  {
+    id: 'self_funded_searcher',
+    label: 'Self-funded searcher (ETA)',
+    archetype: 'Tom',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'Self-funded searcher (ETA) hunting for one company to buy with an SBA or equivalent acquisition loan he will personally guarantee. One decision, total ruin if wrong, no investment committee behind him. Multiple LOIs die in diligence before one closes; search capital is burning. Recent MBA or ex-operator. The £249/mo is trivial against a life-altering self-guaranteed bet.',
+    primaryConcern:
+      'I am about to sign a loan that could ruin me, on a company I might already be in love with. I have no IC to catch my blind spot. I need a second set of eyes before I sign — and I need to look institutional to the lender and co-investors.',
+    verbalStyle:
+      'Earnest, self-aware about being a first-timer, hungry. Talks about "the search", "the SBA loan", "DSCR", "the seller", "deal fever". Knows he could be wrong, which makes him unusually open — but anxious about cost and time. Will give you a real conversation if you respect the burn rate.',
+    defaultSkepticism: 'low',
+    nativeVocabulary: [
+      'the search',
+      'SBA',
+      'DSCR',
+      'seller note',
+      'add-backs',
+      'QofE',
+      'deal fever',
+      'LOI',
+      'personal guarantee',
+      'owner-operator',
+    ],
+    triggerWords: [
+      'enterprise',
+      'procurement',
+      'multi-stakeholder',
+      'reasoning layer',
+      'your judgment is flawed',
+      'AI-powered',
+    ],
+    topSilentObjections: [
+      'I am burning search capital — is this 20 minutes or a vendor evaluation?',
+      'Will this actually catch the thing that kills the deal in diligence?',
+      'I already know the textbook biases — what does this add over my own checklist?',
+    ],
+    ticketBand:
+      '£249/mo Individual personally-paid · trivial vs a self-guaranteed bet · per-deal on-ramp',
+    conversionSpeed: 'fast',
+    color: '#0EA5E9',
+  },
+  {
+    id: 'serial_acquirer',
+    label: 'Serial acquirer / roll-up',
+    archetype: 'Gus',
+    tier: 'phase1_hxc',
+    rolePlayIntro:
+      'Operator running a buy-and-build — repeated acquisition theses under one platform, several deals a year, continuous flow. Has a proven playbook from the last ten deals. The risk is not any single deal; it is applying the proven playbook to the target that is structurally different. The £249/mo is a platform card; continuous deals make the subscription continuous, not episodic — the lowest-churn of the three.',
+    primaryConcern:
+      'My playbook worked ten times. The eleventh deal that does not fit it is the one that hurts. I want a standing check on every thesis that flags where the reference class says this one is different — without slowing the machine.',
+    verbalStyle:
+      'Decisive, process-minded, repeat-game operator. Talks about "the platform", "the playbook", "the next tuck-in", "integration", "the model". Low patience for fluff; values anything that speeds disciplined decisions across volume.',
+    defaultSkepticism: 'medium',
+    nativeVocabulary: [
+      'the platform',
+      'buy-and-build',
+      'tuck-in',
+      'the playbook',
+      'integration',
+      'thesis',
+      'multiple arbitrage',
+      'the model',
+      'pipeline',
+      'add-on',
+    ],
+    triggerWords: [
+      'AI-powered',
+      'reasoning layer',
+      'change management',
+      'enterprise rollout',
+      'your judgment is flawed',
+      'bias check',
+    ],
+    topSilentObjections: [
+      'I have done this 50 times — what does a tool tell me I do not already know?',
+      'Will this slow my deal cadence? Speed across volume is my edge.',
+      'Is this a standing check across every deal, or a one-off audit I will forget?',
+    ],
+    ticketBand:
+      '£249/mo Individual / platform card · continuous deal flow = lowest churn · upgrades to Strategy as the roll-up adds heads',
+    conversionSpeed: 'medium',
+    color: '#A855F7',
+  },
+
+  // ─── Phase 2/3 BRIDGE (the OLD wedge personas, re-tiered 2026-06-26) ─
+  // These four were the v3.5 Phase-1 wedge; they are now the Sankore-style
+  // BRIDGE that DOES graduate to the F500 ceiling. Valid rehearsal, but NOT
+  // the current cold-DM wedge — drill the ETA personas above first.
   {
     id: 'fractional_cso',
     label: 'Fractional CSO',
     archetype: 'Marcus',
-    tier: 'phase1_hxc',
+    tier: 'expansion',
     rolePlayIntro:
       'Independent fractional Chief Strategy Officer running 3-5 mid-market CEO clients simultaneously. Ex-MBB (Bain or McKinsey, 7 years). Charges $30-60K/quarter per client for board-prep and strategic-memo work. The £249/mo Individual tier comes out of personal corporate-card budget, no procurement gate.',
     primaryConcern:
@@ -287,7 +427,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'midmarket_corp_dev',
     label: 'Mid-market corp dev head',
     archetype: 'Damien',
-    tier: 'phase1_hxc',
+    tier: 'expansion',
     rolePlayIntro:
       'Head of Corporate Development at a $200M-revenue scale-up running 3-5 acquisitions per year. Reports to the CEO. Has personal corporate-card authority for $5-50K tooling budget pre-team-procurement (the team-procurement gate fires above $50K). Just got back from his fourth post-LOI walk-away in 18 months because the diligence missed something obvious in retrospect.',
     primaryConcern:
@@ -329,7 +469,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'smaller_fund_gp',
     label: 'Small-fund GP / principal',
     archetype: 'Aisha',
-    tier: 'phase1_hxc',
+    tier: 'expansion',
     rolePlayIntro:
       'GP at a £40M AUM emerging-manager fund (could be UK growth equity, US seed, or Pan-African mid-market). 3 prior funds as associate; first fund at the principal level. Active deal flow (1-2 IC memos / month) AND an LP committee that requires written reasoning trails post-investment. The £249/mo comes from the management fee personally before any team-tier procurement gate.',
     primaryConcern:
@@ -370,7 +510,7 @@ export const BUYER_PERSONAS: BuyerPersona[] = [
     id: 'pe_backed_founder',
     label: 'PE-backed founder / CEO',
     archetype: 'Henrik',
-    tier: 'phase1_hxc',
+    tier: 'expansion',
     rolePlayIntro:
       'CEO of a $80M-revenue PE-backed business, 18 months into the hold period. PE sponsor on the board with monthly board meetings and a quarterly value-creation plan review. Has personal-decisive budget under $5K/mo (the sponsor gate fires above that). Just had a board call where his strategy memo got picked apart on a bias the board chair flagged that he could have caught earlier.',
     primaryConcern:
@@ -1012,6 +1152,48 @@ export interface ScenarioTemplate {
 }
 
 export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
+  // ── ETA wedge · cold first meeting + objection handler (pivot 2026-06-26) ──
+  // The core ETA rep: the FREE live-deal-audit cold-open (lead FORWARD — the
+  // audit is fundraising leverage they want, not a bias-check they resent) +
+  // the load-bearing "I know my biases / my judgment is my edge" objection.
+  // NEVER call their reasoning flawed; that detonates the call.
+  {
+    personaId: 'independent_sponsor',
+    mode: 'cold_first_meeting',
+    generatorHint:
+      "Priya-class independent / fundless sponsor on a first call — she responded to a Searchfunder/LinkedIn DM offering a FREE audit on a live deal memo. She is mid-raise on a lower-middle-market deal, shopping the memo to family offices. She took 15 minutes because the offer was 'free, yours to keep, no pitch', NOT because she wants software. She opens guarded-but-curious: 'okay, what is this exactly?' Generate her opener + 3 questions she would ask if Folahan framed the audit as fundraising LEVERAGE (a record she hands a family office), never as a bias-check on her judgment. The win is her agreeing to send a real, redacted memo to run.",
+  },
+  {
+    personaId: 'independent_sponsor',
+    mode: 'objection_handler',
+    generatorHint:
+      "Priya-class independent sponsor mid-call. She just delivered the load-bearing ETA objection: 'I know my biases — my judgment is my edge. Why would I pay to have it second-guessed?' This is make-or-break. Generate her exact objection phrasing + the follow-ups she would push if Folahan handles it WELL: agree the judgment IS the edge, reframe to a trader's risk desk (a second set of eyes on the one blind spot that costs a deal), close on 'I would want to know my reasoning held up before I wired the money' and 'the output is what you hand the family office'. If the response calls her reasoning flawed or broken in any way, she ends the call.",
+  },
+  {
+    personaId: 'self_funded_searcher',
+    mode: 'cold_first_meeting',
+    generatorHint:
+      "Tom-class self-funded searcher on a first call (responded to the free-audit DM). Burning search capital, has a live LOI he is nervous about, no IC behind him. Unusually open because he KNOWS he could be wrong, but anxious about time and cost. He opens earnest: 'thanks for this, how does it work?' Generate his opener + 3 questions he would ask if Folahan framed it as 'catch the fatal flaw before you sign a loan you personally guarantee' and 'look institutional to the lender and co-investors without the team a fund has'. The win is him sending the live memo.",
+  },
+  {
+    personaId: 'self_funded_searcher',
+    mode: 'objection_handler',
+    generatorHint:
+      "Tom-class searcher mid-call, hesitating: 'I am burning search capital — is this 20 minutes or a vendor evaluation? And I already know the textbook biases.' Generate his exact hesitation + the follow-ups if Folahan handles it with JOLT (de-risk, never pile on fear): '20 minutes on a deal you are already working, it does not add to your plate, it pressure-tests it', plus 'knowing the textbook biases and catching them in your own live memo under deal fever are different things — that is exactly the gap a searcher with no IC has'. The win is the free audit running.",
+  },
+  {
+    personaId: 'serial_acquirer',
+    mode: 'cold_first_meeting',
+    generatorHint:
+      "Gus-class serial acquirer / roll-up operator on a first call. Continuous deal flow, proven playbook from 50 deals, took the call because the free-audit offer was low-friction. His bar: 'does this slow my cadence?' He opens decisive: 'I have done this a lot, what is the angle?' Generate his opener + 3 questions he would ask if Folahan framed it as a standing check on every thesis that flags where the reference class says this one is different, without slowing the machine, plus the deal-screening triage (a fast Go / No-Go on a CIM before diligence spend). The win is him running it on the next live thesis.",
+  },
+  {
+    personaId: 'serial_acquirer',
+    mode: 'objection_handler',
+    generatorHint:
+      "Gus-class serial acquirer mid-call: 'I have done this 50 times — what does a tool tell me I do not already know? And speed is my edge, I cannot slow down.' Generate his exact objection + the follow-ups if Folahan handles it (Kahneman and Klein 2009: experience is sharpest in high-validity repeat games and weakest on the deal that is structurally different, the 'this one is not those' case; the audit PROTECTS the playbook by flagging where it does not fit, and it SPEEDS disciplined decisions across volume rather than slowing them). Never frame his experience as a bias problem.",
+  },
+
   // ── Networking event · in-person (London-events focus 2026-04-28) ──
   {
     personaId: 'f500_cso',

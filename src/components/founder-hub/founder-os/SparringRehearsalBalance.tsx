@@ -35,17 +35,16 @@ const HISTORY_KEY = 'di-sparring-room-history-v1';
 // The four Phase 1 HXC personas locked in v3.5 (mirrors PHASE_1_HXC_PERSONAS
 // in icp.ts; mirrors BUYER_PERSONAS tier='phase1_hxc' in sparring-room-data).
 // Hardcoded here (not imported) because Sparring's HistoryEntry uses string
-// keys — the widget only needs to match the four ids without round-tripping
-// through the Sparring data file.
+// keys — the widget only needs to match the three ETA wedge ids without
+// round-tripping through the Sparring data file.
 const HXC_PERSONAS: Array<{
-  id: 'fractional_cso' | 'midmarket_corp_dev' | 'smaller_fund_gp' | 'pe_backed_founder';
+  id: 'independent_sponsor' | 'self_funded_searcher' | 'serial_acquirer';
   shortLabel: string;
   archetype: string;
 }> = [
-  { id: 'fractional_cso', shortLabel: 'Fractional CSO', archetype: 'Marcus' },
-  { id: 'midmarket_corp_dev', shortLabel: 'Mid-mkt corp dev', archetype: 'Damien' },
-  { id: 'smaller_fund_gp', shortLabel: 'Smaller-fund GP', archetype: 'Aisha' },
-  { id: 'pe_backed_founder', shortLabel: 'PE-backed founder', archetype: 'Henrik' },
+  { id: 'independent_sponsor', shortLabel: 'Indie sponsor', archetype: 'Priya' },
+  { id: 'self_funded_searcher', shortLabel: 'Searcher (ETA)', archetype: 'Tom' },
+  { id: 'serial_acquirer', shortLabel: 'Serial acquirer', archetype: 'Gus' },
 ];
 
 interface SparringHistoryEntry {
