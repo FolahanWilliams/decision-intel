@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { FileText, Upload, Compass, Briefcase, Landmark, Building2, Users } from 'lucide-react';
+import { FileText, Upload, Telescope, Handshake, Layers, Users } from 'lucide-react';
 import { PHASE_1_PERSONAS, type Phase1PersonaId } from '@/lib/constants/icp';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
@@ -54,18 +54,17 @@ interface WelcomeModalProps {
 }
 
 /**
- * Icon map by HXC persona. Lucide icons chosen to read at 14px:
- *   fractional_cso     → Compass    (strategist navigating multiple engagements)
- *   midmarket_corp_dev → Briefcase  (deal-flow operator)
- *   smaller_fund_gp    → Landmark   (institutional capital allocator)
- *   pe_backed_founder  → Building2  (operating CEO inside a portfolio company)
- *   other              → Users      (generic / catch-all — FULL access, not gated)
+ * Icon map by HXC persona (the ETA wedge — locked 2026-06-26). Lucide icons
+ * chosen to read at 14px:
+ *   independent_sponsor  → Handshake  (raising the equity from capital partners — the LEAD)
+ *   self_funded_searcher → Telescope  (searching for the one company to own)
+ *   serial_acquirer      → Layers     (stacking acquisitions in a buy-and-build)
+ *   other                → Users      (generic / catch-all — FULL access, not gated)
  */
-const PERSONA_ICON: Record<Phase1PersonaId, typeof Compass> = {
-  fractional_cso: Compass,
-  midmarket_corp_dev: Briefcase,
-  smaller_fund_gp: Landmark,
-  pe_backed_founder: Building2,
+const PERSONA_ICON: Record<Phase1PersonaId, typeof Telescope> = {
+  independent_sponsor: Handshake,
+  self_funded_searcher: Telescope,
+  serial_acquirer: Layers,
   other: Users,
 };
 
@@ -84,40 +83,32 @@ const VALUE_PROPS_BY_PERSONA: Record<
   Phase1PersonaId,
   { eyebrow: string; headline: string; bullets: string[] }
 > = {
-  fractional_cso: {
-    eyebrow: 'For fractional CSOs',
-    headline: 'Audits the strategic memos behind every client engagement, in 60 seconds each.',
+  independent_sponsor: {
+    eyebrow: 'For independent sponsors',
+    headline:
+      'The verifiable reasoning record you raise on, handed to a family office as fundraising collateral.',
     bullets: [
-      `${BIAS_COUNT}-bias R²F detection on board recommendations + market-entry memos`,
-      "Decision Provenance Record per engagement — defensible artefact your client's audit committee can pull up",
-      'Portfolio Bias Heatmap across all 3-5 client engagements compounds quarter over quarter',
+      `${BIAS_COUNT}-bias R²F detection on your deal memo, with the exact lines flagged`,
+      `Reference-class base rate on deals like yours, against a ${HISTORICAL_CASE_COUNT}-case failure library, the outside view your pitch needs`,
+      'A hashed, tamper-evident Decision Provenance Record, a costly signal a sloppy team cannot fake',
     ],
   },
-  midmarket_corp_dev: {
-    eyebrow: 'For mid-market corp dev',
-    headline: 'The audit that survives the diligence-integration handoff.',
+  self_funded_searcher: {
+    eyebrow: 'For self-funded searchers',
+    headline: 'Catch the fatal flaw in your thesis before you sign a self-guaranteed loan.',
     bullets: [
-      'Synergy Mirage detector — flags claims missing mechanism, owner, or 90-day milestone',
-      'Cross-doc conflict scan across CIM + QofE + IC memo + integration plan',
-      'PMI Tracker: every IC memo claim auto-tracked as a Brier-scored prediction post-close',
+      `${BIAS_COUNT}-bias R²F detection on your deal memo, the second set of eyes you do not have`,
+      'Reference-class forecast on deals like yours, the outside view your gut skips under deal fever',
+      'A Decision Provenance Record that makes you look institutional to the lender and co-investors, without the team a fund has',
     ],
   },
-  smaller_fund_gp: {
-    eyebrow: 'For smaller-fund GPs',
-    headline: `Pre-IC audit on every memo, against a ${HISTORICAL_CASE_COUNT}-case M&A and venture failure library.`,
+  serial_acquirer: {
+    eyebrow: 'For serial acquirers',
+    headline: 'Standing decision discipline across every acquisition in the buy-and-build.',
     bullets: [
-      'Reference-class forecast — outside view to counter inside-view optimism',
-      'Pre-IC blind-prior voting in Decision Rooms surfaces disagreement before the meeting',
-      'LP-grade DPR — hashed, tamper-evident, mapped to NDPR / WAEMU / CMA Kenya for cross-border governance',
-    ],
-  },
-  pe_backed_founder: {
-    eyebrow: 'For PE-backed founders',
-    headline: 'Audits the strategic memo before the operating partner reads it.',
-    bullets: [
-      `${BIAS_COUNT}-bias detection on board recommendations + acquisition memos`,
-      'Predicted operating-partner questions before the meeting (pre-board pre-mortem)',
-      'Decision Knowledge Graph survives team transitions, sponsor turnover, and LP audits',
+      'Deal-screening triage, a fast read on a CIM before you spend on diligence',
+      `${BIAS_COUNT}-bias R²F detection plus a cross-doc conflict scan on every thesis`,
+      'A calibration record that compounds across deals, the moat that sharpens with every acquisition',
     ],
   },
   other: {

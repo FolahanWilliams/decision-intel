@@ -759,7 +759,7 @@ export function buildIcpPromptBlock(): string {
   const retro = `RETRO POST-MORTEM COLD-OPEN (lead the deal-team wedge personas with this, not "audit your next memo"): ${RETRO_POSTMORTEM_COLD_OPEN.motion} ${RETRO_POSTMORTEM_COLD_OPEN.logoMechanic} ${RETRO_POSTMORTEM_COLD_OPEN.boutiquesNote}`;
   const leadLabel =
     getPhase1Persona(BEACHHEAD_FOCUS.leadPersona)?.label ?? BEACHHEAD_FOCUS.leadPersona;
-  const beachhead = `BEACHHEAD FOCUS (the antidote to "spread too thin", and the gatekeeper-not-author lens): of the four wedge personas, LEAD with the fiduciary GATEKEEPER who is accountable for the call but does NOT author it — ${leadLabel} (${BEACHHEAD_FOCUS.oneBuyer}). The author-leaning personas (corp-dev head, PE-backed founder) champion their own live deal, so open them on the RETRO of a CLOSED deal, never by grading their live memo. One buyer, one motion (${BEACHHEAD_FOCUS.oneMotion}), one proof (${BEACHHEAD_FOCUS.oneProof}). This sharpens the wedge; it does NOT pivot it — ${BEACHHEAD_FOCUS.notThis}`;
+  const beachhead = `BEACHHEAD FOCUS (the ETA / owner-operator wedge — locked 2026-06-26, the audit-as-LEVERAGE inversion): LEAD with ${leadLabel} (${BEACHHEAD_FOCUS.oneBuyer}). The ego-threat the gatekeeper-not-author lens worried about INVERTS here — these are authors, but the audit is fundraising leverage they WANT (they shop the memo to capital partners to raise), so lead FORWARD on the live deal they are raising on, no retro needed. One buyer, one motion (${BEACHHEAD_FOCUS.oneMotion}), one proof (${BEACHHEAD_FOCUS.oneProof}). ${BEACHHEAD_FOCUS.notThis} CONTINUITY-CHASM DISCIPLINE (load-bearing): this wedge funds + proves + accumulates the Bias Genome data moat; it does NOT graduate to F500 (that is the Sankore mid-market BRIDGE). Keep the product governance-grade core; never build searcher-only capital-raising features. The EU AI Act Annex III ceiling moved to Dec 2027 (Digital Omnibus), giving an 18-month window to build the moat before the ceiling buyers are legally compelled.`;
   return `${wedge} ${bridge} ${ceiling} ${avoid} Sequencing — ${sequence} ${ICP_SEQUENCING_RULE} ${retro} ${beachhead}`;
 }
 
@@ -871,10 +871,9 @@ export function buildFounderNotesIcpLine(): string {
 // post-survey HXC computation all read from PHASE_1_PERSONAS by import.
 
 export type Phase1PersonaId =
-  | 'fractional_cso'
-  | 'midmarket_corp_dev'
-  | 'smaller_fund_gp'
-  | 'pe_backed_founder'
+  | 'self_funded_searcher'
+  | 'independent_sponsor'
+  | 'serial_acquirer'
   | 'other';
 
 export interface Phase1Persona {
@@ -884,7 +883,7 @@ export interface Phase1Persona {
   // One-line description visible below the label in the sign-up form.
   description: string;
   // Whether this persona counts for the HXC cohort (the Vohra survey filter).
-  // 'other' is FALSE; the four buyer-class-continuous personas are TRUE.
+  // 'other' is FALSE; the three buyer-class-continuous personas are TRUE.
   hxcEligible: boolean;
   // The "buyer-class-continuous" graduation path — what they upgrade INTO
   // at Phase 2 / 3.
@@ -899,59 +898,46 @@ export interface Phase1Persona {
 
 export const PHASE_1_PERSONAS: ReadonlyArray<Phase1Persona> = [
   {
-    id: 'fractional_cso',
-    label: 'Fractional CSO / strategy consultant',
-    description: 'Independent strategist running 3-5 client engagements with regular memo flow.',
-    hxcEligible: true,
-    graduationPath:
-      'Brings DI to one of their client firms as a Strategy tier (£1,999-£4,999/mo) team-tier engagement. The fractional CSO becomes the internal champion + power user.',
-    preferredSpecimen: 'either',
-    budgetSignal:
-      'Personal card / consulting expense; £249/mo absorbs into existing client retainer billing.',
-    dealVolumeSignal:
-      '3-5 active engagements × 4-8 strategic memos / year per client = 15-30 memos / year.',
-  },
-  {
-    id: 'midmarket_corp_dev',
-    label: 'Head of Corp Dev / M&A at scale-up',
+    id: 'self_funded_searcher',
+    label: 'Self-funded searcher (ETA)',
     description:
-      'Owns the IC memo workflow at a $50M-$500M revenue company, paying personally pre-team-budget.',
+      'Raising / closing on one company via an SBA or equivalent acquisition loan you personally guarantee. One decision, total ruin if wrong, and no investment committee behind you.',
     hxcEligible: true,
     graduationPath:
-      'Authorises team-tier purchase at the same firm OR moves to a larger firm and brings the tool. Same buying motion as F500 ceiling at smaller scale.',
+      'Refers peers across the ETA community (Searchfunder, LBS / Gerald Edelman, the UK search-fund podcasts); the operating company they buy becomes a Strategy-tier account post-close. This is the WEDGE, NOT the F500 ceiling path — it funds + proves + accumulates the calibration moat (see the Continuity-Chasm discipline in BEACHHEAD_FOCUS).',
     preferredSpecimen: 'wework',
     budgetSignal:
-      'Personal card; divisional discretionary spend up to £5K-£10K/yr without procurement.',
+      'Personal card; £249/mo is trivial against a life-altering self-guaranteed bet. Already buys £99-£999/mo SMB-operator tooling personally.',
     dealVolumeSignal:
-      '1-3 acquisitions / year + ongoing build-vs-buy decisions = 6-12 strategic memos / year.',
+      'Multiple LOIs screened and several die in diligence before one closes — a steady memo flow during the search (the ~40-50% LOI-collapse rate is the felt pain).',
   },
   {
-    id: 'smaller_fund_gp',
-    label: 'GP / principal at smaller fund',
+    id: 'independent_sponsor',
+    label: 'Independent / fundless sponsor',
     description:
-      'Partner at £5M-£100M AUM PE / VC / family-office fund with active deal flow OR LP-governance pressure.',
+      'Doing deals without a committed fund — you self-fund diligence and shop the deal memo to family offices / HNWs to raise ~85% of the equity. Your reputation with capital providers IS the business.',
     hxcEligible: true,
     graduationPath:
-      'Fund itself becomes a Strategy-tier customer at Phase 2 / 3. Fund partner refers to portfolio CSOs (LP-pressure-driven governance asks compound through portfolio).',
+      'The audit record is fundraising collateral, so a strong raise compounds the next; the family offices behind them are the capital-layer expansion. Highest-VALUE wedge persona — the audit is leverage they WANT, not a bias-check they resent (the inversion that makes this ICP work).',
+    preferredSpecimen: 'wework',
+    budgetSignal:
+      'Personal card; the audit is fundraising leverage, not overhead. The ~$50k typical broken-deal cost makes a £249 check trivial.',
+    dealVolumeSignal:
+      'Multiple LOIs / deal memos shopped to capital providers per year; the memo is BOTH the audited artifact and the raise collateral (a costly, verifiable signal a sloppy team cannot fake).',
+  },
+  {
+    id: 'serial_acquirer',
+    label: 'Serial acquirer / roll-up operator',
+    description:
+      'Running a buy-and-build under one platform — repeated acquisition theses, each a high-stakes capital-commitment memo.',
+    hxcEligible: true,
+    graduationPath:
+      'Volume buyer — the platform becomes a Strategy-tier team account as the roll-up adds heads, and the calibration record compounds across deals. Lowest-CHURN wedge persona: continuous deal flow, so the subscription does not lapse between deals.',
     preferredSpecimen: 'dangote',
     budgetSignal:
-      'Personal-decisive at GP level; fund management fee covers tooling line items <£5K/yr.',
+      'Personal / platform card; repeated deals make the subscription continuous, not episodic — the natural answer to the between-deal churn risk.',
     dealVolumeSignal:
-      '4-10 deals / year × 5-7 year hold cycle = 20-70 closed outcomes within 5 years (within Convergence Threshold range).',
-  },
-  {
-    id: 'pe_backed_founder',
-    label: 'PE-backed founder / CEO',
-    description:
-      'Founder at PE-backed mid-market firm, owning the strategic memo and IC-presentation workflow.',
-    hxcEligible: true,
-    graduationPath:
-      'CEO authorises team-tier upgrade for full strategy team. PE sponsor may mandate adoption across portfolio if reference is strong.',
-    preferredSpecimen: 'wework',
-    budgetSignal:
-      'Founder personal card OR company tooling line; under board / investor reporting threshold.',
-    dealVolumeSignal:
-      '2-6 board-level memos / year + acquisition memos when active = 6-15 memos / year.',
+      'Multiple acquisitions / year under the platform = the highest memo volume + the lowest churn of the three.',
   },
   {
     id: 'other',
@@ -1020,44 +1006,34 @@ export const WEDGE_GATEKEEPER_AXIS: ReadonlyArray<{
   approachNote: string;
 }> = [
   {
-    persona: 'smaller_fund_gp',
-    gatekeeperScore: 0.9,
-    axisRole: 'gatekeeper',
-    accountability:
-      'Owns the capital-allocation call and answers to LPs for it. Accountable for decision quality without being the memo author — the textbook fiduciary gatekeeper, and the brief’s #1 beachhead.',
-    approach: 'forward',
-    approachNote:
-      'LEAD beachhead. A forward audit on the next IC memo is genuinely their workflow; the LP-fiduciary frame — a defensible record of how the call was stress-tested — is the hook. This is the individual GP, not a multi-partner committee.',
-  },
-  {
-    persona: 'fractional_cso',
-    gatekeeperScore: 0.7,
-    axisRole: 'gatekeeper',
-    accountability:
-      'Hired precisely to be the rigorous outside check on a client’s reasoning — paid to audit, not to champion. Their scrutiny IS their edge.',
-    approach: 'forward',
-    approachNote:
-      'Forward audit on the next client memo fits their retainer. DI makes them the most rigorous voice in their client’s room without spending their own credibility.',
-  },
-  {
-    persona: 'midmarket_corp_dev',
-    gatekeeperScore: 0.35,
+    persona: 'independent_sponsor',
+    gatekeeperScore: 0.2,
     axisRole: 'author',
     accountability:
-      'Authors the IC memo AND owns the deal’s momentum — structurally a champion of the thing being audited. The brief’s named trap if sold as grading their live deal.',
-    approach: 'retro',
+      'Authors the deal memo AND owns the raise — but their reputation with capital providers IS the business, so a verifiable reasoning record is fiduciary self-interest, not a grade on their ego.',
+    approach: 'forward',
     approachNote:
-      'Lead with the RETRO on a deal they have ALREADY closed — forensic, not predictive, so it never grades a live thesis. Frame the artefact as the record that protects them when the board asks, never a verdict on their judgment.',
+      'LEAD HERE on VALUE. Forward audit on the LIVE deal they are raising on — the audit is fundraising collateral they hand a family office, a costly-verifiable signal a sloppy team cannot fake. The ego-threat inverts: they WANT the record because it helps them raise. This inversion is what makes the wedge work.',
   },
   {
-    persona: 'pe_backed_founder',
-    gatekeeperScore: 0.25,
+    persona: 'self_funded_searcher',
+    gatekeeperScore: 0.3,
     axisRole: 'author',
     accountability:
-      'Is the decision — champions their own strategy and board narrative. The most author-leaning of the wedge, so the ego-threat risk is highest here.',
-    approach: 'retro',
+      'Authors the thesis on a company they will personally own with a self-guaranteed loan — but self-identifies as a fallible first-timer with no investment committee, so openness is structurally high.',
+    approach: 'forward',
     approachNote:
-      'Open on a closed strategic bet — one that held up AND one that went sideways. The good one is ego-safe; the bad one is where the value detonates. Never "audit your live board deck".',
+      'LEAD HERE on ACCESS (the ETA community is the densest UK channel). Forward audit on the live thesis is welcome because they KNOW they could be wrong and have no IC to catch it. Frame: "catch the fatal flaw before you sign your life away" + "look institutional to the lender and co-investors without the team a fund has".',
+  },
+  {
+    persona: 'serial_acquirer',
+    gatekeeperScore: 0.4,
+    axisRole: 'mixed',
+    accountability:
+      'Repeated acquisition theses under one platform — a process-discipline buyer who has institutionalised "how we decide" across deals.',
+    approach: 'forward',
+    approachNote:
+      'LEAD HERE on RETENTION (continuous deal flow means the subscription does not lapse). Forward audit as the standing decision-discipline layer across the buy-and-build; the calibration record compounds into the moat fastest here.',
   },
 ];
 
@@ -1067,29 +1043,47 @@ export const WEDGE_GATEKEEPER_AXIS: ReadonlyArray<{
  * Lead persona is resolved from PHASE_1_PERSONAS so the label never drifts.
  */
 export const BEACHHEAD_FOCUS = {
-  leadPersona: 'smaller_fund_gp' as Exclude<Phase1PersonaId, 'other'>,
+  leadPersona: 'independent_sponsor' as Exclude<Phase1PersonaId, 'other'>,
   oneBuyer:
-    'The individual fiduciary gatekeeper — the solo GP / smaller-fund principal who owns the capital call and answers to LPs. Accountable, but not the memo author.',
+    'The independent / fundless sponsor — author of the deal memo AND of the raise, who shops it to family offices to fund ~85% of the equity. The audit is fundraising leverage they WANT, not a bias-check they resent (the inversion that makes this wedge work). Searcher / ETA is the sharp #2 and the densest UK access channel; serial acquirer is the lowest-churn sibling.',
   oneMotion:
-    'The retro cold-open — run the audit on a deal they have already closed (one that held up AND one that went sideways). Forensic, not predictive.',
+    'The free live-deal audit — run their CURRENT deal memo through the engine, free, and surface one specific thing they would have missed. Reciprocity + proof on their own data + risk off the table (JOLT) + urgency anchored to a deal they are raising on right now. Mom-Test discovery first, pitch second.',
   oneProof:
-    'The DPR specimen — the hashed, board-ready record they keep. Five of these are the reference deck that opens the Phase-2 bridge.',
+    'The DPR — the hashed, tamper-evident reasoning record they hand a capital partner as fundraising collateral. A win plus a referral at the aha moment is the flywheel; five wins are a deck that sells itself.',
   notThis:
-    'NOT a multi-partner enterprise IC committee (that is the bridge, not the wedge). NOT "Decision Assurance" (do not churn the locked category). NOT a fifth persona — the four are already the spread-too-thin edge; narrow WITHIN them, never add.',
+    'NOT the smaller-fund GP (the data killed that proxy: speed-buyer, no personal skin, author ego-threat). NOT a multi-partner enterprise IC committee (that is the bridge, not the wedge). NOT "Decision Assurance" (do not churn the locked category). NEVER build searcher-only capital-raising features — keep the core governance-grade.',
+  // CONTINUITY-CHASM DISCIPLINE (locked 2026-06-26 — the master-KB load-bearing
+  // warning, the one thing neither the strategy brief nor the web research
+  // caught). The ETA wedge does NOT graduate to the £50K-£150K F500 ceiling: a
+  // searcher pitching a family office is a different procurement ecosystem than
+  // a CSO pitching an audit committee, and a "this helped me raise my SBA deal"
+  // reference does not transfer. The wedge has EXACTLY THREE jobs —
+  //   (1) CASHFLOW + the fastest paid-yes (the flywheel to ~100 / ~£300k ARR),
+  //   (2) PRODUCT PROOF (the audit catches real flaws on real deals),
+  //   (3) the BIAS GENOME data moat (the ~30 closed outcomes/firm the Outcome
+  //       Gate accumulates — the only thing software cannot trivially recreate).
+  // "Graduate to F500" is NOT one of them. The path to the ceiling stays the
+  // Sankore-style mid-market BRIDGE, whose reference-grade DPRs DO transfer to
+  // enterprise governance. So keep the product governance-grade core (DPR +
+  // Outcome Gate + 19-framework regulatory map + Brier calibration); the sponsor
+  // uses that SAME artifact as fundraising leverage. The wedge funds + proves +
+  // accumulates the moat; it does NOT dictate the product. The EU AI Act Annex
+  // III high-risk deadline (Digital Omnibus → 2 Dec 2027) is the 18-month window
+  // to build that moat before the ceiling buyers are legally compelled to buy.
 } as const;
 
 /**
- * Returns true if the given persona id is HXC-eligible (one of the four
- * buyer-class-continuous personas). Used by the Vohra HXC filter and the
- * Phase 1 metrics dashboard.
+ * Returns true if the given persona id is HXC-eligible (one of the three
+ * ETA-wedge buyer-class-continuous personas). Used by the Vohra HXC filter and
+ * the Phase 1 metrics dashboard.
  */
 export function isHxcEligible(id: string | null | undefined): boolean {
   return Boolean(getPhase1Persona(id)?.hxcEligible);
 }
 
 /**
- * The HXC subset (the four continuous personas), excluding 'other'. Use
- * this for sign-up gating where you only want to show the four allowed
+ * The HXC subset (the three ETA-wedge continuous personas), excluding 'other'.
+ * Use this for sign-up gating where you only want to show the three allowed
  * personas, with 'other' rendered separately as an opt-out path.
  */
 export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> = PHASE_1_PERSONAS.filter(
@@ -1104,25 +1098,27 @@ export const PHASE_1_HXC_PERSONAS: ReadonlyArray<Phase1Persona> = PHASE_1_PERSON
  * from it atomically — so the entire cascade keeps working unchanged while
  * sign-up itself reflects the locked HXC narrowing.
  *
- * Mapping rationale:
- *   fractional_cso     → cso       (CSO downstream surfaces: strategic memo + board pack)
- *   midmarket_corp_dev → ma        (M&A workflow overlay: 9 doc types + 5 toxic combos)
- *   pe_backed_founder  → ma        (their primary memo workflow is acquisitions + IC)
- *   smaller_fund_gp    → pe_vc     (PE / VC / fund overlay)
- *   other              → other     (no downstream personalization)
+ * Mapping rationale (the ETA wedge — locked 2026-06-26):
+ *   independent_sponsor  → ma   (audits acquisition theses; deal-shaped surfaces)
+ *   self_funded_searcher → ma   (same acquisition workflow)
+ *   serial_acquirer      → ma   (same)
+ *   other                → other (no downstream personalization)
+ * A dedicated owner-operator role + ETA sample bundles is the queued product
+ * layer (gated on the persona-specific-failure-mode research, now in hand).
  */
 export type OnboardingRoleId = 'cso' | 'ma' | 'bizops' | 'pe_vc' | 'other';
 
 export function phase1PersonaToOnboardingRole(persona: Phase1PersonaId): OnboardingRoleId {
   switch (persona) {
-    case 'fractional_cso':
-      return 'cso';
-    case 'midmarket_corp_dev':
+    case 'self_funded_searcher':
+    case 'independent_sponsor':
+    case 'serial_acquirer':
+      // All three ETA wedge personas audit ACQUISITION theses, so the 'ma'
+      // onboarding role (acquisition / deal workflow) is the closest fit — its
+      // sample bundles + empty states are deal-shaped. Refining a dedicated
+      // owner-operator role + ETA sample bundles is queued for the product-layer
+      // ship (gated on the Deep Research on persona-specific failure modes).
       return 'ma';
-    case 'pe_backed_founder':
-      return 'ma';
-    case 'smaller_fund_gp':
-      return 'pe_vc';
     case 'other':
       return 'other';
   }

@@ -38,10 +38,9 @@ const AXIS_LABEL: Record<AxisRole, string> = {
 
 // Display-only short labels (the SSOT labels are long). Presentation, not data.
 const SHORT: Record<Exclude<Phase1PersonaId, 'other'>, string> = {
-  smaller_fund_gp: 'Fund GP',
-  fractional_cso: 'Fractional CSO',
-  midmarket_corp_dev: 'Corp-dev head',
-  pe_backed_founder: 'PE-backed founder',
+  independent_sponsor: 'Indie sponsor',
+  self_funded_searcher: 'Searcher (ETA)',
+  serial_acquirer: 'Serial acquirer',
 };
 
 const ROWS = WEDGE_GATEKEEPER_AXIS.map(a => ({

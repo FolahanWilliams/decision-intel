@@ -9,16 +9,17 @@ const log = createLogger('OnboardingRoute');
 
 const ROLE_VALUES = ['cso', 'ma', 'bizops', 'pe_vc', 'other'] as const;
 
-// GTM v3.5 — Phase 1 buyer-class-continuous persona COHORT tagging (not an
-// access gate). 'other' gets FULL platform access with the generic overview;
-// it is tagged phase1HxcEligible=false so it is EXCLUDED from the Vohra
-// graduation-gate cohort (signal integrity), NOT from the platform. The four
-// continuous personas are HXC-eligible. Access != cohort.
+// GTM ICP pivot (locked 2026-06-26) — Phase 1 buyer-class-continuous persona
+// COHORT tagging (not an access gate). The wedge is now the ETA / owner-operator
+// layer: independent sponsor (lead), self-funded searcher, serial acquirer.
+// 'other' gets FULL platform access with the generic overview; it is tagged
+// phase1HxcEligible=false so it is EXCLUDED from the Vohra graduation-gate
+// cohort (signal integrity), NOT from the platform. The three continuous
+// personas are HXC-eligible. Access != cohort.
 const PHASE_1_PERSONA_VALUES = [
-  'fractional_cso',
-  'midmarket_corp_dev',
-  'smaller_fund_gp',
-  'pe_backed_founder',
+  'independent_sponsor',
+  'self_funded_searcher',
+  'serial_acquirer',
   'other',
 ] as const;
 
