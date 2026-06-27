@@ -136,8 +136,8 @@ export default function UseHubPage() {
             }}
           >
             Strategic memo, IC memo, board deck, fund thesis, M&amp;A acquisition, pre-mortem. Each
-            workflow runs through the same Recognition-Rigor Framework pipeline — calibrated against
-            the same 143-case reference library — with the overlays specific to that artefact class.
+            workflow runs through the same Recognition-Rigor Framework pipeline, calibrated against
+            the same 143-case reference library, with the overlays specific to that artefact class.
           </p>
 
           {/* Quick jump strip */}
