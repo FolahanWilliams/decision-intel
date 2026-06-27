@@ -50,7 +50,7 @@ export function DqiEstimateCard({ dqi }: { dqi: CaseDqiEstimate }) {
           >
             {dqi.grade}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', marginTop: 4 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#64748B', marginTop: 4 }}>
             {dqi.score}/100
           </span>
         </div>

@@ -28,7 +28,7 @@ function OutcomeIcon({ status }: { status: string }) {
     case 'partial_success':
       return <CheckCircle className="w-4 h-4 text-yellow-500" />;
     default:
-      return <Clock className="w-4 h-4" style={{ color: '#94A3B8' }} />;
+      return <Clock className="w-4 h-4" style={{ color: '#64748B' }} />;
   }
 }
 
@@ -122,7 +122,7 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
           <OutcomeIcon status={study.outcome.status} />
           <span style={{ color: '#475569' }}>{outcomeLabel(study.outcome.status)}</span>
           {study.outcome.confirmedBiasCount > 0 && (
-            <span className="ml-auto" style={{ color: '#94A3B8' }}>
+            <span className="ml-auto" style={{ color: '#64748B' }}>
               {study.outcome.confirmedBiasCount}/{study.totalBiases} confirmed
             </span>
           )}

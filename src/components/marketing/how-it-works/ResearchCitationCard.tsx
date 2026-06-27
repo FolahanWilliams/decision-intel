@@ -76,7 +76,7 @@ export function ResearchCitationCard({
             style={{
               fontSize: 11,
               fontWeight: 500,
-              color: C.slate400,
+              color: C.slate500,
               marginTop: 1,
               fontFamily: 'var(--font-mono, monospace)',
             }}
@@ -125,7 +125,7 @@ export function ResearchCitationCard({
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
-            color: C.slate400,
+            color: C.slate500,
           }}
         >
           Powers

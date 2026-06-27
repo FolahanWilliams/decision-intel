@@ -737,7 +737,7 @@ export function PricingPageClient() {
                       style={{
                         fontSize: 15,
                         fontWeight: 500,
-                        color: C.slate400,
+                        color: C.slate500,
                       }}
                     >
                       {priceSuffix}
@@ -748,7 +748,7 @@ export function PricingPageClient() {
                   <div
                     style={{
                       fontSize: 12,
-                      color: C.slate400,
+                      color: C.slate500,
                       marginTop: -6,
                     }}
                   >
@@ -1201,6 +1201,12 @@ export function PricingPageClient() {
           </p>
 
           <div
+            // tabIndex + role/label so keyboard users can scroll the wide
+            // comparison table and screen readers announce it (axe
+            // scrollable-region-focusable).
+            tabIndex={0}
+            role="region"
+            aria-label="Plan comparison: every capability, every tier"
             style={{
               overflowX: 'auto',
               WebkitOverflowScrolling: 'touch',
@@ -1427,7 +1433,7 @@ export function PricingPageClient() {
                   <ChevronDown
                     size={18}
                     style={{
-                      color: C.slate400,
+                      color: C.slate500,
                       transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
                       transition: 'transform 0.2s',
                       flexShrink: 0,
@@ -1515,7 +1521,7 @@ function CellValue({ value }: { value: string | boolean }) {
   if (value === false) {
     return (
       <div style={{ textAlign: 'center' }}>
-        <Minus size={14} style={{ color: C.slate400 }} />
+        <Minus size={14} style={{ color: C.slate500 }} />
       </div>
     );
   }

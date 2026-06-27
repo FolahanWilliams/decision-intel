@@ -349,11 +349,17 @@ export default function GlossaryPage() {
             category; the canonical phrasing is the citable source.
           </p>
 
-          <dl style={{ display: 'flex', flexDirection: 'column', gap: 16, margin: 0 }}>
+          {/* role=list + dfn (the element for the defining instance of a term)
+              rather than dl/dt/dd: the rich card layout (code badge, "also
+              known as", source link) can't satisfy axe's definition-list /
+              dlitem direct-child rules, and dfn is the more correct semantic
+              for a glossary term anyway. */}
+          <div role="list" style={{ display: 'flex', flexDirection: 'column', gap: 16, margin: 0 }}>
             {PLATFORM_VOCABULARY.map(entry => (
               <article
                 key={entry.termCode}
                 id={entry.termCode.toLowerCase()}
+                role="listitem"
                 style={{
                   background: C.white,
                   border: `1px solid ${C.slate200}`,
@@ -371,16 +377,17 @@ export default function GlossaryPage() {
                     marginBottom: 4,
                   }}
                 >
-                  <dt
+                  <dfn
                     style={{
                       fontSize: 19,
                       fontWeight: 700,
+                      fontStyle: 'normal',
                       color: C.slate900,
                       letterSpacing: '-0.01em',
                     }}
                   >
                     {entry.term}
-                  </dt>
+                  </dfn>
                   <span
                     style={{
                       fontSize: 11,
@@ -400,7 +407,7 @@ export default function GlossaryPage() {
                     Also known as: {entry.alternates.join(', ')}
                   </div>
                 ) : null}
-                <dd
+                <div
                   style={{
                     margin: 0,
                     marginTop: 8,
@@ -411,7 +418,7 @@ export default function GlossaryPage() {
                   }}
                 >
                   {entry.definition}
-                </dd>
+                </div>
                 {entry.source ? (
                   <Link
                     href={entry.source.href}
@@ -431,7 +438,7 @@ export default function GlossaryPage() {
                 ) : null}
               </article>
             ))}
-          </dl>
+          </div>
         </div>
       </section>
 

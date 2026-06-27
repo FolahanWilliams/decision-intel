@@ -223,19 +223,20 @@ export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, siz
           const isDimmed = hoveredBias && !connectedToHover.has(node.id);
           const color = SEVERITY_COLORS[node.severity] ?? SEVERITY_COLORS.default;
 
+          // Presentational node: the parent <svg role="img"> already carries the
+          // accessible name for the whole graphic, and this graph renders inside a
+          // clickable case-study card <Link>. Per-node role="button" + tabIndex made
+          // the nodes focusable controls nested inside that link (axe
+          // nested-interactive) for a mouse-only hover nicety, so the interactivity
+          // attributes are dropped; mouse-hover highlight stays.
           return (
             <motion.g
               key={node.id}
-              role="button"
-              tabIndex={0}
-              aria-label={`Bias: ${node.label}${node.isPrimary ? ' (primary)' : ''}`}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 0.1 + i * 0.06 }}
-              style={{ cursor: 'pointer', outline: 'none' }}
+              style={{ cursor: 'pointer' }}
               onMouseEnter={() => setHoveredBias(node.id)}
-              onFocus={() => setHoveredBias(node.id)}
-              onBlur={() => setHoveredBias(null)}
             >
               {/* Outer glow for primary */}
               {node.isPrimary && (

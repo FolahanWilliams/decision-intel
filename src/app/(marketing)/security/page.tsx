@@ -2397,7 +2397,10 @@ export default function SecurityPage() {
             }}
           >
             Right-to-delete (GDPR Art. 17) requests are processed within 30 days. Send to{' '}
-            <a href="mailto:privacy@decision-intel.com" style={{ color: C.green }}>
+            <a
+              href="mailto:privacy@decision-intel.com"
+              style={{ color: C.green, textDecoration: 'underline' }}
+            >
               privacy@decision-intel.com
             </a>{' '}
             or use the in-app Delete button on any document.

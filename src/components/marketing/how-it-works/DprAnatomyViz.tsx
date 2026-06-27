@@ -225,7 +225,7 @@ export function DprAnatomyViz() {
                     type="button"
                     onClick={() => setActiveId(isActive ? null : section.id)}
                     aria-expanded={isActive}
-                    aria-controls={`dpr-section-${section.id}`}
+                    aria-controls="dpr-section-detail"
                     style={{
                       width: '100%',
                       background: isActive ? C.greenLight : C.white,
@@ -299,8 +299,10 @@ export function DprAnatomyViz() {
         </div>
       </div>
 
-      {/* RIGHT — active-section detail panel */}
-      <div className="dpr-anatomy-detail">
+      {/* RIGHT — active-section detail panel. Stable id every left-rail button's
+          aria-controls points at (the panel swaps content; only one renders at a
+          time), so the IDREF always resolves (axe aria-valid-attr-value). */}
+      <div className="dpr-anatomy-detail" id="dpr-section-detail">
         <AnimatePresence mode="wait">
           {activeId ? (
             <DprSectionDetail key={activeId} section={SECTIONS.find(s => s.id === activeId)!} />

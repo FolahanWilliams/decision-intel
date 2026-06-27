@@ -641,7 +641,7 @@ export default function PrivacyPage() {
                       style={{
                         fontSize: 10,
                         fontWeight: 700,
-                        color: C.slate400,
+                        color: C.slate500,
                         textTransform: 'uppercase',
                         letterSpacing: '0.1em',
                         marginBottom: 5,
@@ -664,7 +664,7 @@ export default function PrivacyPage() {
                       style={{
                         fontSize: 10,
                         fontWeight: 700,
-                        color: C.slate400,
+                        color: C.slate500,
                         textTransform: 'uppercase',
                         letterSpacing: '0.1em',
                         marginBottom: 5,
@@ -1385,7 +1385,7 @@ function LifecycleStep({
           style={{
             fontSize: 11,
             fontWeight: 800,
-            color: C.slate400,
+            color: C.slate500,
             fontFamily: 'var(--font-mono, monospace)',
             letterSpacing: '0.1em',
           }}
@@ -1448,7 +1448,7 @@ function FineprintCard({
           style={{
             fontSize: 11,
             fontWeight: 700,
-            color: C.slate400,
+            color: C.slate500,
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             fontFamily: 'var(--font-mono, monospace)',

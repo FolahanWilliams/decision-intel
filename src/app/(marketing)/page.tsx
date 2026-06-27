@@ -227,7 +227,9 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h4
+      {/* h3 (not h4) so the footer heading doesn't skip a level after the
+          body's h2 sections (axe heading-order). */}
+      <h3
         style={{
           fontSize: 13,
           fontWeight: 700,
@@ -238,7 +240,7 @@ function FooterColumn({
         }}
       >
         {heading}
-      </h4>
+      </h3>
       {links.map(l => (
         <a
           key={l.label}

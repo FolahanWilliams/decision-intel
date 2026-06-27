@@ -82,7 +82,7 @@ export function FeaturedBiasCard({
         >
           {taxonomyId}
         </span>
-        <ArrowUpRight size={14} style={{ color: C.slate400 }} />
+        <ArrowUpRight size={14} style={{ color: C.slate500 }} />
       </div>
 
       <div
@@ -121,7 +121,7 @@ export function FeaturedBiasCard({
       >
         <span style={{ fontSize: 11, fontWeight: 600, color: C.slate900 }}>
           {example.company}
-          <span style={{ color: C.slate400, fontWeight: 500, marginLeft: 6 }}>
+          <span style={{ color: C.slate500, fontWeight: 500, marginLeft: 6 }}>
             · {example.year}
           </span>
         </span>
@@ -129,7 +129,7 @@ export function FeaturedBiasCard({
           style={{
             fontSize: 10,
             fontWeight: 600,
-            color: C.slate400,
+            color: C.slate500,
             textTransform: 'uppercase',
             letterSpacing: '0.08em',
           }}

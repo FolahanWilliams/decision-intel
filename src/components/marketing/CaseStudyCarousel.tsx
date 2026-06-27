@@ -267,7 +267,7 @@ export function CaseStudyCarousel({ embedded = false }: { embedded?: boolean } =
                     </div>
                   )}
                   {c.primaryBias && (
-                    <div style={{ fontSize: 11, color: C.slate400, marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, color: C.slate500, marginBottom: 8 }}>
                       {formatBiasName(c.primaryBias)}
                     </div>
                   )}
