@@ -130,6 +130,16 @@ const ClosingLabTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// The Human Pitch — sell to humans, not procurement forms. Analogies (with
+// dynamic vizzes), plain-English framing per audience, the bias-leverage
+// persuasion system, and the jargon/credibility guardrails. Locked 2026-06-28.
+const HumanPitchTab = dynamic(
+  () =>
+    import('@/components/founder-hub/HumanPitchTab').then(m => ({
+      default: m.HumanPitchTab,
+    })),
+  { loading: tabLoader }
+);
 // Sparring Room — live sales-rep practice (paste Wispr Flow transcript →
 // 15-dim Sales DQI grading + buyer-perspective simulation). v3 locked 2026-04-28.
 const SparringRoomTab = dynamic(
@@ -330,6 +340,7 @@ type TabId =
   | 'sales'
   | 'outreach_hub'
   | 'closing_lab'
+  | 'human_pitch'
   | 'sparring_room'
   | 'education_room'
   | 'content'
@@ -452,6 +463,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'closing_lab',
     label: 'Closing Lab',
     icon: <Target size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'human_pitch',
+    label: 'The Human Pitch',
+    icon: <Handshake size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -832,6 +849,23 @@ const SEARCH_INDEX: SearchEntry[] = [
       'What to kill / hide / move to enterprise · the simplified landing→demo→audit→checkout funnel · 3 phrases that kill deals.',
     keywords:
       'closing lab cut list 80 percent kill hide feature flag enterprise tier simplified funnel landing demo audit checkout four step never say phrases ai decision intelligence platform 12 node langgraph customize whatever you need',
+  },
+  // The Human Pitch — analogies + plain-English framing + persuasion system.
+  {
+    tabId: 'human_pitch',
+    section: 'The Human Pitch · Analogies that land in one sentence',
+    preview:
+      'You audit the money, not the thinking that spent it · the co-pilot · the spell-checker for the billion-dollar typo · the smoke detector. Each with a dynamic viz.',
+    keywords:
+      'human pitch analogy analogies viz visualization plain english no jargon audit the money not the reasoning thinking spent it co-pilot second set of eyes spell checker typo smoke detector asymmetric tail blind spot sell to humans system 1 emotion',
+  },
+  {
+    tabId: 'human_pitch',
+    section: 'The Human Pitch · Frame per audience + persuasion system + guardrails',
+    preview:
+      'The searcher/sponsor, the fractional CSO, the bank ceiling — what to say and what never to say · the bias-leverage books (Shotton/Cialdini/Persuasion in B2B) · jargon swaps · credibility traps.',
+    keywords:
+      'human pitch framing per audience searcher sponsor operator eta fractional cso consultant bank f500 ceiling cold open say this not this persuasion bias leverage shotton choice factory cialdini influence persuasion in b2b system 1 first sell relief not rigor fomu loss aversion social proof jargon swap r2f dqi dpr translate human credibility guardrail overclaim never say trusted family office reasoning flawed',
   },
   // Sparring Room — live sales-rep practice. Wispr Flow voice → grade.
   {
@@ -1981,6 +2015,11 @@ function renderTab(
     closing_lab: (
       <ErrorBoundary sectionName="Closing Lab">
         <ClosingLabTab />
+      </ErrorBoundary>
+    ),
+    human_pitch: (
+      <ErrorBoundary sectionName="The Human Pitch">
+        <HumanPitchTab />
       </ErrorBoundary>
     ),
     sparring_room: (

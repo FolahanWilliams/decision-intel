@@ -69,6 +69,18 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
   { id: 'sales', label: 'Sales Toolkit' },
   { id: 'closing_lab', label: 'Closing Lab', aliases: ['closing lab tab'] },
   {
+    id: 'human_pitch',
+    label: 'The Human Pitch',
+    aliases: [
+      'human pitch',
+      'analogies',
+      'plain english pitch',
+      'framing tab',
+      'no jargon',
+      'speak human',
+    ],
+  },
+  {
     id: 'sparring_room',
     label: 'Sparring Room',
     aliases: ['sparring tab', 'sales rehearsal', 'rehearsal room', 'practice room'],
