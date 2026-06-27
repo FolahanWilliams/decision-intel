@@ -277,7 +277,7 @@ export function LandingFaq() {
               <ChevronDown
                 size={18}
                 style={{
-                  color: C.slate400,
+                  color: C.slate500,
                   flexShrink: 0,
                   transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform 0.2s',

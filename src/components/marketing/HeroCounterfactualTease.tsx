@@ -91,7 +91,7 @@ export function HeroCounterfactualTease() {
           }}
         >
           <span style={{ color: '#475569', fontWeight: 500 }}>Remove {current.bias}</span>
-          <span style={{ color: '#94A3B8' }}>→</span>
+          <span style={{ color: '#64748B' }}>→</span>
           <span style={{ color: '#16A34A', fontWeight: 700 }}>{current.lift}</span>
           <span
             className="hero-counterfactual-tease__label"

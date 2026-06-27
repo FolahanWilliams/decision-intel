@@ -8,6 +8,7 @@ const C = {
   slate100: '#F1F5F9',
   slate200: '#E2E8F0',
   slate400: '#94A3B8',
+  slate500: '#64748B',
   slate600: '#475569',
   slate900: '#0F172A',
   green: '#16A34A',
@@ -65,7 +66,7 @@ export function CaseSelector({ cases, activeSlug }: CaseSelectorProps) {
             fontWeight: 700,
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
-            color: C.slate400,
+            color: C.slate500,
             whiteSpace: 'nowrap',
           }}
         >

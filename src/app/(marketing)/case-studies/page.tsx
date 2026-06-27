@@ -203,7 +203,7 @@ function Stat({ value, label }: { value: string; label: string }) {
           fontWeight: 600,
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
-          color: '#94A3B8',
+          color: '#64748B',
           marginTop: 6,
         }}
       >
