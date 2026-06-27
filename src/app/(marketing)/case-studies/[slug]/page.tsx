@@ -392,7 +392,10 @@ export default async function CaseStudyDetailPage({
         />
       ))}
 
-      <article
+      {/* <main> (was <article>): gives the page its required main landmark
+          without a wrapper that would re-indent the whole content (axe
+          landmark-one-main / region). */}
+      <main
         style={{
           maxWidth: 880,
           margin: '0 auto',
@@ -419,7 +422,8 @@ export default async function CaseStudyDetailPage({
         <header style={{ marginBottom: 40 }}>
           <div
             style={{
-              display: 'inline-flex',
+              display: 'flex',
+              flexWrap: 'wrap',
               alignItems: 'center',
               gap: 8,
               marginBottom: 16,
@@ -1305,7 +1309,7 @@ export default async function CaseStudyDetailPage({
             </div>
           </section>
         ) : null}
-      </article>
+      </main>
     </div>
   );
 }

@@ -468,6 +468,20 @@ body {
   color: var(--text-primary);
 }
 
+/* Marketing horizontal-overflow guard. A content-driven viz, grid, or long
+   token occasionally pushes a few px past the viewport on a phone, producing a
+   sideways scrollbar (flagged across 8 marketing pages by the 2026-06 mobile
+   audit). `overflow-x: clip` (NOT `hidden`) prevents the sideways scroll
+   WITHOUT establishing a scroll container — so `position: sticky` nav still
+   works and `overflow-y` stays `visible`. This is the belt-and-braces root
+   guard; the worst offenders are also fixed at source (e.g. the case-study
+   header pill row wraps). Scoped to .marketing-page so the platform app is
+   untouched. position: relative makes it the clip containing block. */
+.marketing-page {
+  overflow-x: clip;
+  position: relative;
+}
+
 /* Ambient gradient mesh — monochrome white/gray for clean glass refraction.
    No colored gradients: glass refracts neutral light only.
    DARK-ONLY: white radials at 2-4% opacity are literally invisible on the

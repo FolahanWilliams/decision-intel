@@ -202,6 +202,7 @@ function RatingIcon({ rating }: { rating: Rating }) {
   if (rating === 'full') {
     return (
       <span
+        role="img"
         aria-label="Full capability"
         style={{
           width: 18,
@@ -222,6 +223,7 @@ function RatingIcon({ rating }: { rating: Rating }) {
   if (rating === 'partial') {
     return (
       <span
+        role="img"
         aria-label="Partial capability"
         style={{
           width: 18,
@@ -241,6 +243,7 @@ function RatingIcon({ rating }: { rating: Rating }) {
   }
   return (
     <span
+      role="img"
       aria-label="Not offered"
       style={{
         width: 18,

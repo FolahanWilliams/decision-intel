@@ -1201,6 +1201,12 @@ export function PricingPageClient() {
           </p>
 
           <div
+            // tabIndex + role/label so keyboard users can scroll the wide
+            // comparison table and screen readers announce it (axe
+            // scrollable-region-focusable).
+            tabIndex={0}
+            role="region"
+            aria-label="Plan comparison: every capability, every tier"
             style={{
               overflowX: 'auto',
               WebkitOverflowScrolling: 'touch',

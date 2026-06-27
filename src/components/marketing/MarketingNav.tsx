@@ -368,9 +368,11 @@ export function MarketingNav() {
           href="/"
           style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
         >
+          {/* Decorative: the adjacent "Decision Intel" text span is the link's
+              accessible name, so an alt here is redundant (axe image-redundant-alt). */}
           <Image
             src="/logo.png"
-            alt="Decision Intel"
+            alt=""
             width={28}
             height={28}
             style={{ borderRadius: 6, objectFit: 'cover' }}
