@@ -79,20 +79,24 @@ describe('selectors — never return an ended event', () => {
 });
 
 describe('BAFTA-day-2 regression — a highest-priority multi-day event is NOT dropped for a lower-priority overlap on its final day', () => {
-  it('returns the highest-priority event on its own final day', () => {
-    const highest = EVENTS.find(e => e.priority === 'highest' && e.startDate !== e.endDate);
-    // Loud (not silent) — if the calendar ever lacks a multi-day highest event,
-    // update this test rather than letting it vacuously pass.
-    expect(
-      highest,
-      'expected a multi-day highest-priority event (BAFTA-class) in EVENTS'
-    ).toBeDefined();
+  // Synthetic fixture (per the file header philosophy + the prior block's own
+  // note): the real EVENTS calendar no longer carries a multi-day 'highest'
+  // event after the 2026-06-26 ETA pivot rotated BAFTA/Strategy World out, so
+  // the selection logic is locked against an injected calendar rather than a
+  // date-rotating one. `getHighestPriorityUpcomingEvent` accepts an optional
+  // events arg precisely for this.
+  const multiDayHighest = mkEvent('2026-06-09', '2026-06-10', 'highest', 'BAFTA-class 2-day');
+  const lowerPriorityOverlap = mkEvent('2026-06-10', '2026-06-10', 'high', 'Single-day overlap');
+  const calendar = [lowerPriorityOverlap, multiDayHighest]; // unsorted on purpose
 
-    const finalDay = at(highest!.endDate + 'T12:00:00Z');
+  it('returns the highest-priority event on its own final day', () => {
+    const finalDay = at(multiDayHighest.endDate + 'T12:00:00Z');
     // Before the fix: the highest event had daysUntil < 0 on its final day → was
     // filtered out → a lower-priority OVERLAPPING event (or null) was returned.
-    expect(hasEventEnded(highest!, finalDay)).toBe(false);
-    expect(getHighestPriorityUpcomingEvent(finalDay)?.priority).toBe('highest');
-    expect(getHighestPriorityUpcomingEvent(finalDay)?.startDate).toBe(highest!.startDate);
+    expect(hasEventEnded(multiDayHighest, finalDay)).toBe(false);
+    expect(getHighestPriorityUpcomingEvent(finalDay, calendar)?.priority).toBe('highest');
+    expect(getHighestPriorityUpcomingEvent(finalDay, calendar)?.startDate).toBe(
+      multiDayHighest.startDate
+    );
   });
 });
