@@ -81,6 +81,19 @@ export const TAB_NAV_TARGETS: TabNavTarget[] = [
     ],
   },
   {
+    id: 'buyer_brief',
+    label: 'Buyer Brief',
+    aliases: [
+      'buyer brief',
+      'know their world',
+      'know the buyer',
+      'buyer intelligence',
+      'searcher world',
+      'their field',
+      'insider vocabulary',
+    ],
+  },
+  {
     id: 'sparring_room',
     label: 'Sparring Room',
     aliases: ['sparring tab', 'sales rehearsal', 'rehearsal room', 'practice room'],

@@ -140,6 +140,16 @@ const HumanPitchTab = dynamic(
     })),
   { loading: tabLoader }
 );
+// Buyer Brief — know the searcher's world like an insider (vocabulary,
+// economics with confidence tags, journey, fears, credibility moves) so the
+// founder earns trust on the first call before pitching. Locked 2026-06-28.
+const BuyerBriefTab = dynamic(
+  () =>
+    import('@/components/founder-hub/BuyerBriefTab').then(m => ({
+      default: m.BuyerBriefTab,
+    })),
+  { loading: tabLoader }
+);
 // Sparring Room — live sales-rep practice (paste Wispr Flow transcript →
 // 15-dim Sales DQI grading + buyer-perspective simulation). v3 locked 2026-04-28.
 const SparringRoomTab = dynamic(
@@ -341,6 +351,7 @@ type TabId =
   | 'outreach_hub'
   | 'closing_lab'
   | 'human_pitch'
+  | 'buyer_brief'
   | 'sparring_room'
   | 'education_room'
   | 'content'
@@ -469,6 +480,12 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode; group: TabG
     id: 'human_pitch',
     label: 'The Human Pitch',
     icon: <Handshake size={16} />,
+    group: 'Go-to-Market',
+  },
+  {
+    id: 'buyer_brief',
+    label: 'Buyer Brief',
+    icon: <BookOpen size={16} />,
     group: 'Go-to-Market',
   },
   {
@@ -866,6 +883,23 @@ const SEARCH_INDEX: SearchEntry[] = [
       'The searcher/sponsor, the fractional CSO, the bank ceiling — what to say and what never to say · the bias-leverage books (Shotton/Cialdini/Persuasion in B2B) · jargon swaps · credibility traps.',
     keywords:
       'human pitch framing per audience searcher sponsor operator eta fractional cso consultant bank f500 ceiling cold open say this not this persuasion bias leverage shotton choice factory cialdini influence persuasion in b2b system 1 first sell relief not rigor fomu loss aversion social proof jargon swap r2f dqi dpr translate human credibility guardrail overclaim never say trusted family office reasoning flawed',
+  },
+  // Buyer Brief — know the searcher's world like an insider.
+  {
+    tabId: 'buyer_brief',
+    section: 'Buyer Brief · who they are + their fears + the journey',
+    preview:
+      'The self-funded searcher / sponsor: ex-MBB/banker, confident in the spreadsheet, lonely in the chair, signing a personal guarantee. Their fears in their own words + the emotional journey (sell at LOI/deciding).',
+    keywords:
+      'buyer brief know their world searcher sponsor eta who they are imposter syndrome personal guarantee fears emotional arc journey sourcing LOI diligence raise deciding operating sell here credibility trust first call expert in their field',
+  },
+  {
+    tabId: 'buyer_brief',
+    section: 'Buyer Brief · insider vocabulary + economics to know cold + credibility moves',
+    preview:
+      'Speak the language (CIM, QoE, Proof of Cash, SDE, add-backs, PG, SBA 7(a), set-off, NWC peg, deal fever) with plain definitions; the numbers to quote right (SBA $5M, Yale 2.5x, attribute the 57%/19%); how to turn it into trust on the call.',
+    keywords:
+      'buyer brief vocabulary insider terms CIM QoE quality of earnings proof of cash SDE EBITDA add-backs personal guarantee PG SBA 7a customer concentration set-off seller note NWC peg deal-breakers unsavory facts deal fever broken-deal costs economics numbers know cold IBBA multiples stanford yale 2.5x do not quote attribute credibility moves what good looks like never oversell certainty',
   },
   // Sparring Room — live sales-rep practice. Wispr Flow voice → grade.
   {
@@ -2020,6 +2054,11 @@ function renderTab(
     human_pitch: (
       <ErrorBoundary sectionName="The Human Pitch">
         <HumanPitchTab />
+      </ErrorBoundary>
+    ),
+    buyer_brief: (
+      <ErrorBoundary sectionName="Buyer Brief">
+        <BuyerBriefTab />
       </ErrorBoundary>
     ),
     sparring_room: (
