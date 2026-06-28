@@ -1639,6 +1639,47 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Enterprise nod — a quiet seed for the Fortune 500 ceiling (12-24mo
+            out, per the locked revenue-ceiling lock). Deliberately a text
+            link, NEVER a competing CTA: it signals the individual buyer is
+            buying on enterprise-grade institutional logic, and gives a future
+            corporate buyer a way in without distracting the wedge buyer.
+            "Fortune 500" is a persona-class noun (allowed); no named prospect.
+            "infrastructure" not "certified" per the SOC-2 vocabulary lock. */}
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '20px 24px',
+            borderTop: `1px solid ${C.navyLight}`,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 10,
+            fontSize: 13.5,
+            color: C.slate400,
+            textAlign: 'center',
+            lineHeight: 1.6,
+          }}
+        >
+          <span>
+            Built on governance-grade reasoning-audit infrastructure. Operating at Fortune 500 scale?
+          </span>
+          <Link
+            href="/pricing"
+            style={{
+              color: C.white,
+              textDecoration: 'none',
+              fontWeight: 600,
+              borderBottom: `1px solid ${C.green}`,
+              paddingBottom: 1,
+            }}
+          >
+            Explore Decision Intel for enterprise →
+          </Link>
+        </div>
+
         <div
           style={{
             maxWidth: 1200,
