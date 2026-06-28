@@ -64,6 +64,16 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-06-28)
+
+**ETA wedge · broker-narrative-tells overlay + live sales-call script (founder-approved "highest ROI overlay improvement" + add to Founder Hub). Pure prompt-overlay + founder-hub data/UI; zero `src/lib/agents/` / DQI / schema change; non-ETA audits byte-identical.**
+
+- [x] **Broker-narrative-tells overlay** — added a `SELLER-DECK / BROKER-NARRATIVE TELLS` block to the `acquisition_thesis` DOC_TYPE_OVERLAY in [investment-vertical.ts](src/lib/prompts/investment-vertical.ts) (sharpens the existing ADVERSE-SELECTION / Seller-Halo filter). 7 named tells — smoothed cyclicality, diversification-that-isn't, growth-opportunity-as-owed, owner-dependency-masked-as-turnkey, add-back inflation, hockey-stick-detached-from-actuals, deferred-capex-as-margin — each mapped to EXISTING biases + canonical named patterns (no new taxonomy, no new pattern, no methodology bump). Scoped to `acquisition_thesis` (where ETA users are steered), so non-ETA audits stay byte-identical — same discipline as piece-1. Ego-safe: every tell is a risk indicator to PRESSURE-TEST, never "the seller lied."
+- [x] **ETA live sales-call script** — new `ETA_CALL_SCRIPT` (4 steps: dig-for-anxiety → reframe-the-missing-second-set-of-eyes → live-audit-on-their-real-CIM → referral-then-no-brainer-close) + `ETA_BROKER_TELLS` (call ammunition mirroring the overlay) + `ETA_CALL_PRINCIPLES` (the 4 lock-clean guardrails) in [discovery-pitch-toolkit.ts](src/lib/data/discovery-pitch-toolkit.ts). Rendered at the TOP of [DiscoveryPitchPanel](src/components/founder-hub/sales/DiscoveryPitchPanel.tsx) (Founder Hub → Sales Toolkit) as the current-wedge motion. Lock-clean: leads self-value (not "a record investors trust" — trust-gap discipline), value-at-stake not a fabricated multiple, risk-indicator framing not "disaster"/causation, referral-at-the-aha-moment, per-deal on-ramp offered alongside the subscription.
+- [x] Gates: 4 pre-commit lints clean (positioning · silent-catches 243 · counts 73 · canonical-imports) + tsc clean.
+- [ ] **Founder-gated follow-up (surfaced, not silently skipped):** extending the same broker-tells to the broad `cim` overlay would sharpen ALL CIM audits but shifts behavior on an existing widely-used doc type — needs a held-out DQI distribution check before/after, which the sandbox can't run (the dqi-distribution-check uses synthetic memos that don't exercise the bias-detective LLM call). Route through the founder with a real held-out run.
+- [x] **Lockstep rule:** the 7 tells live in TWO places — the `acquisition_thesis` overlay (audit behavior) + `ETA_BROKER_TELLS` (sales ammunition). Edit both in lockstep.
+
 ## Recently Completed (2026-06-22)
 
 **Core-flow polish — clean-audit reassurance + outcome-flow clarity (founder "boil the ocean, explain thoroughly why and what to do" on the reassurance tab; full prose in CLAUDE.md "Clean-audit reassurance + outcome-flow clarity" lock).** All gates green (tsc 0 non-e2e · positioning · counts 73 · silent-catches 241 · canonical-imports · prettier · audit-platform 0 new findings).

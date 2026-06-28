@@ -502,3 +502,136 @@ export const WHAT_30_CONVERSATIONS_PRODUCE = [
   'A real conversion rate (5-8% baseline; if higher, the wedge is unusually warm; if lower, the wedge is wrong).',
   'Pattern-match across 10+ before declaring the motion working. If the pattern does not converge, the wedge is wrong, not the questions.',
 ];
+
+// ─── ETA wedge · live sales-call script (locked 2026-06-28) ──────────
+//
+// The ICP pivot (2026-06-26) made the ETA / owner-operator layer the
+// Phase-1 wedge (independent sponsor / self-funded searcher / serial
+// acquirer). The cold-discovery Mom-Test motion above still governs the
+// FIRST touch (DM / event / warm intro); the PERSONA_OPENERS above are
+// the older bridge-phase personas (their ETA migration is a separately
+// recorded follow-up). THIS is the warmer, current-wedge motion: the
+// live sales call once a searcher has agreed to bring a CIM they're
+// actively looking at. Same discovery-first discipline (listen > talk),
+// plus the live-audit aha moment + the referral-at-the-finding close.
+//
+// LOCK-CLEAN GUARDRAILS baked into every line (the four things a
+// sophisticated searcher's skepticism punishes — pull any of them and
+// the next finding stops being believed):
+//   1. Lead SELF-VALUE ("catch YOUR blind spot / walk in prepared"),
+//      never "a record investors trust" — at pre-revenue the output is
+//      not a trusted third-party artefact yet (credibility/trust-gap
+//      discipline; earned later, not claimed now).
+//   2. Quantify the STAKES, not a fabricated multiple — value-at-stake
+//      on THIS deal's ticket, never "pays for itself 50x" (false
+//      precision, same class as the retired 70-90%-fail headline).
+//   3. Name a RISK INDICATOR to pressure-test, never declare the deal a
+//      "disaster" or assert causation (epistemic-honesty lock — the
+//      restraint is what makes the finding land with a skeptic).
+//   4. Ask for the REFERRAL at the aha moment, right after a real
+//      finding lands — that IS the referral moment, not the contract.
+
+export interface EtaCallStep {
+  step: 1 | 2 | 3 | 4;
+  label: string;
+  /** The verbatim line(s) to say on the call. Lock-clean. */
+  say: string;
+  /** Why this step works / what it is doing. */
+  why: string;
+  /** The guardrail — what NOT to say, mapped to a named lock. */
+  avoid: string;
+}
+
+export const ETA_CALL_SCRIPT: EtaCallStep[] = [
+  {
+    step: 1,
+    label: 'Dig for the anxiety',
+    say: "How many CIMs or broker decks are you working through right now? When you open one, what's the thing you most worry you'll miss — knowing it's your own name on the personal guarantee, not a fund's?",
+    why: 'Specific-instance, past-behavior discovery (their real pipeline, their named fear). The personal-guarantee reference surfaces the asymmetric-risk anxiety without you asserting it. Write down the blind spot in THEIR words — it is your live-audit target in step 3.',
+    avoid:
+      "Do not pitch yet. Do not say 'software' / 'AI' / 'reasoning layer'. You are finding out whether the pain is real and specific, not selling.",
+  },
+  {
+    step: 2,
+    label: 'Reframe — the missing second set of eyes',
+    say: "A PE fund has a floor of analysts to tear a CIM apart and an investment committee to pressure-test the thesis before anyone signs. As a self-funded searcher you do all of that alone — there is no second set of eyes between you and the personal guarantee. That gap is what I work on.",
+    why: 'Names the structural asymmetry (the operator IS the IC) without ego-threat — it is not "you miss things," it is "you have no one to ask." Sets up the audit as the missing process, not a judgment on their thinking.',
+    avoid:
+      'Do not say their judgment is flawed or that they are inexperienced — that is the ego-threat that kills it. The frame is "a process you are missing," never "thinking you got wrong."',
+  },
+  {
+    step: 3,
+    label: 'Live audit on THEIR real CIM (the aha)',
+    say: "Bring a CIM you are actually looking at and let's run it now. — Here: the deck calls the revenue diversified, but the audit flags that the three largest accounts sit in the same cyclical end-market. That is a customer-concentration risk worth pressure-testing in diligence before you anchor on the LOI price. It is not a verdict on the deal — it is the first thing I would verify.",
+    why: 'The live audit on THEIR real deal is the leading indicator that predicts whether they convert — not a generic demo. The finding lands because it is their deal. The risk-indicator framing ("worth pressure-testing," "first thing I would verify") is what a skeptic believes.',
+    avoid:
+      'Do not overclaim — never "this just saved you from a disaster" or assert the deal is dead. Name the indicator + what to verify. The restraint IS the close; the moment you over-sell, a sophisticated searcher stops trusting the next finding.',
+  },
+  {
+    step: 4,
+    label: 'Referral first, then the no-brainer close',
+    say: "[The instant the finding lands] — who else in your search group is staring at CIMs this week? They should run their current one through this too. — And for you: it is £249 a month, or you can run a single live deal through it on its own. If it stops you anchoring on one bad LOI, the exposure it just flagged on this one deal already dwarfs either price. Want me to get you set up so you can run tonight's pipeline through it?",
+    why: 'The referral ask fires at the aha moment (the finding), not the contract — that is when they are most convinced. The close offers BOTH the subscription AND the per-deal on-ramp (the per-deal option matches the searcher\'s episodic value and lowers the yes-threshold during a search plateau). Value-at-stake on THIS deal, never a fabricated multiple.',
+    avoid:
+      'Do not claim a made-up ROI ("pays for itself for 50 years"). Anchor to the real exposure the audit just flagged on this deal. Do not force subscription-only — offer per-deal; for a searcher mid-search it converts better.',
+  },
+];
+
+export interface EtaBrokerTell {
+  /** The tell, named (mirrors the acquisition_thesis overlay). */
+  tell: string;
+  /** Plain-language version — what to actually say on the call. */
+  plain: string;
+  /** The bias / pattern the audit maps it to, so you can name it. */
+  mapsTo: string;
+}
+
+// Live-call ammunition — the seller-narrative tells the audit now flags on
+// an acquisition_thesis upload (mirrors the SELLER-DECK / BROKER-NARRATIVE
+// TELLS block in investment-vertical.ts; edit both in lockstep). Every tell
+// is a risk indicator to PRESSURE-TEST, never an accusation the seller lied.
+export const ETA_BROKER_TELLS: EtaBrokerTell[] = [
+  {
+    tell: 'Smoothed cyclicality',
+    plain: 'Steady-growth line over a business that is actually seasonal or cyclical — ask for the period-by-period numbers, not the CAGR.',
+    mapsTo: 'Survivorship + Anchoring',
+  },
+  {
+    tell: "Diversification that isn't",
+    plain: '"Diversified revenue" whose own named customers all sit in one cyclical end-market or one channel.',
+    mapsTo: 'Illusion of Validity + Halo Effect',
+  },
+  {
+    tell: 'Growth-opportunity-as-owed',
+    plain: '"Untapped white space / just needs a motivated owner" priced into today\'s multiple — that growth is work YOU would have to create and fund.',
+    mapsTo: 'Overconfidence + Inside-View Dominance',
+  },
+  {
+    tell: 'Owner-dependency masked as turnkey',
+    plain: '"Absentee-ready / turnkey" where the seller\'s relationships and tribal knowledge actually carry the revenue and there is no management layer underneath.',
+    mapsTo: 'Inside-View Dominance (DI-B-022)',
+  },
+  {
+    tell: 'Add-back inflation',
+    plain: '"Adjusted EBITDA" leaning on add-backs that recur — the SBA/lender rejects them and the debt-service math breaks at close.',
+    mapsTo: 'Anchoring + Optimism',
+  },
+  {
+    tell: 'Hockey-stick detached from actuals',
+    plain: 'A projection inflecting sharply upward with no mechanism tying it to the trailing 3-year actuals.',
+    mapsTo: 'Planning Fallacy + Optimism',
+  },
+  {
+    tell: 'Deferred-capex-as-margin',
+    plain: 'High margins partly produced by under-investment — "well-maintained / low-capex" with no capex schedule hides a liability you inherit at close.',
+    mapsTo: 'Optimism + Sunk Ship',
+  },
+];
+
+export const ETA_CALL_PRINCIPLES: string[] = [
+  'Lead self-value — "catch YOUR blind spot / walk in prepared," never "a record investors already trust." The trust is earned once you have a track record, not claimed on call one.',
+  'Quantify the stakes, not a multiple — anchor to the exposure on THIS deal\'s ticket. Never "pays for itself 50x" (a fabricated number is the first thing a sharp searcher discounts).',
+  'Name a risk indicator to verify, never declare the deal a disaster — the restraint is what makes a skeptic believe the finding.',
+  'Ask for the referral the instant a real finding lands — the aha moment is the referral moment, not the contract moment.',
+  'Offer the per-deal on-ramp alongside the subscription — episodic searchers say yes faster to a single live-deal run than to a recurring fee during a dry spell.',
+];
