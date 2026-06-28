@@ -1,29 +1,33 @@
 'use client';
 
 /**
- * EtaCostCalculator — the cost-of-inaction tool for live ETA sales calls.
+ * EtaCostCalculator — the DECISION COST tool for live ETA sales calls.
  *
- * The motion (from the ETA sales-playbook research pack): you do NOT pitch the
- * price. You screen-share this, punch in THEIR real deal, and let the risk
- * numbers dwarf the £249. Self-persuasion creates urgency; being told creates
- * resistance — so the prospect says the number out loud, not you.
+ * The reframe (founder's job-to-be-done crystallization, 2026-06-28): the cost
+ * that hurts isn't the deal you close — it's the months, fees, and optionality
+ * poured into the deals that DIED. That is "decision cost", and it's denominated
+ * in the searcher's own currency (QoE, legal, advisor time, forgone salary),
+ * not in "bias". You screen-share this, punch in THEIR funnel, and let them
+ * total it out loud — self-persuasion creates urgency; being told creates
+ * resistance.
  *
- * Lock discipline baked in: the PG exposure caps at the real SBA 7(a)
- * acquisition reality ($5M), the verdict is value-at-stake from the user's OWN
- * inputs (never a fabricated "pays for itself 50×" multiple), and it is
- * labelled an illustration, not financial advice. USD throughout — the deal
- * economics (SBA / multiples) are US-shaped; the price line is the $249/£249
- * Individual tier.
+ * Guardrail discipline (load-bearing): the frame-back is CONDITIONAL on the
+ * user's OWN numbers ("IF catching one dead deal before the QoE spend"), NEVER
+ * a fabricated efficacy rate ("DI cuts your dead-deal cost 50%"). Decision Intel
+ * surfaces risk indicators correlated with bad outcomes — it cannot promise to
+ * catch a specific miss, and the copy says so (same epistemic-honesty discipline
+ * as the retired failure-rate stat). The PG exposure on the deal you DO sign
+ * stays as a secondary block (the winner's-curse half of decision cost), capped
+ * at the real SBA 7(a) acquisition reality ($5M). USD throughout; labelled an
+ * illustration, not financial advice.
  */
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 const SBA_ACQUISITION_CAP = 5_000_000; // real SBA 7(a) acquisition cap (NOT $10M)
 
 const fmt = (n: number) =>
   '$' + Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
-
-const fmtPct = (n: number) => (n < 1 ? n.toFixed(2) : n.toFixed(1)) + '%';
 
 interface NumFieldProps {
   label: string;
@@ -97,6 +101,23 @@ function RangeField({ label, value, onChange, min, max, suffix = '%' }: RangeFie
   );
 }
 
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        color: 'var(--text-muted)',
+        margin: '18px 0 8px',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function ResultCard({
   label,
   value,
@@ -137,26 +158,34 @@ function ResultCard({
 }
 
 export function EtaCostCalculator() {
+  // the deals that die — the decision-cost drain (the lead frame)
+  const [dead, setDead] = useState(3);
+  const [broken, setBroken] = useState(12_000);
+  const [months, setMonths] = useState(8);
+  const [salary, setSalary] = useState(200_000);
+  // the one you sign — the winner's-curse half (secondary)
   const [ebitda, setEbitda] = useState(1_500_000);
   const [mult, setMult] = useState(4);
   const [overstate, setOverstate] = useState(25);
   const [inj, setInj] = useState(10);
   const [cash, setCash] = useState(50);
-  const [months, setMonths] = useState(8);
-  const [salary, setSalary] = useState(200_000);
-  const [dead, setDead] = useState(2);
-  const [broken, setBroken] = useState(20_000);
   const [price, setPrice] = useState(249);
 
+  // decision cost of the deals that died
+  const deadDrain = dead * broken;
+  const timeCost = (salary / 12) * months;
+  const decisionCostSoFar = deadDrain + timeCost;
+
+  // exposure on the one you close
   const ev = ebitda * mult;
   const overpay = mult * (ebitda * (overstate / 100));
   const injection = ev * (inj / 100);
   const personalCash = injection * (cash / 100);
   const pg = Math.min(Math.max(ev - injection, 0), SBA_ACQUISITION_CAP);
-  const brokenTotal = dead * broken;
-  const timeCost = (salary / 12) * months;
+
+  // the price + the CONDITIONAL frame-back (one avoided dead deal vs a year of DI)
   const annual = price * 12;
-  const pctOfOverpay = overpay > 0 ? (annual / overpay) * 100 : 0;
+  const oneAvoidedPayback = annual > 0 ? broken / annual : 0;
 
   return (
     <div
@@ -178,7 +207,7 @@ export function EtaCostCalculator() {
           color: 'var(--accent-primary)',
         }}
       >
-        Cost-of-inaction calculator · screen-share on the call
+        Decision Cost calculator · screen-share on the call
       </div>
       <p
         style={{
@@ -188,22 +217,45 @@ export function EtaCostCalculator() {
           margin: '8px 0 0',
         }}
       >
-        Punch in <em>their</em> real deal and let them say the number out loud. The whole move:{' '}
-        <strong style={{ color: 'var(--text-primary)' }}>
-          they calculate what the problem already costs them
-        </strong>{' '}
-        — then £249 is a rounding error. You pay $10–15k for a QoE to audit the{' '}
-        <em>seller&rsquo;s</em> numbers; this audits the part that signs the personal guarantee —
-        your reasoning about them.
+        The cost that hurts isn&rsquo;t the deal you close — it&rsquo;s the months and fees you pour
+        into the deals that <strong style={{ color: 'var(--text-primary)' }}>die</strong>. Punch in{' '}
+        <em>their</em> funnel and let them total it out loud. A $10&ndash;15k QoE audits the{' '}
+        <em>seller&rsquo;s</em> numbers; this is about the part that decides whether you ever wire a
+        dollar &mdash; your read on the deal.
       </p>
 
-      {/* inputs */}
+      {/* inputs — the deals that die (lead) */}
+      <SectionLabel>The deals that die</SectionLabel>
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: '14px 20px',
-          marginTop: 16,
+        }}
+      >
+        <NumField label="Deals that died after diligence" value={dead} onChange={setDead} />
+        <NumField
+          label="Out-of-pocket per dead deal ($)"
+          value={broken}
+          onChange={setBroken}
+          step={2_500}
+        />
+        <NumField label="Months searching so far" value={months} onChange={setMonths} />
+        <NumField
+          label="Prior annual salary / opp. cost ($)"
+          value={salary}
+          onChange={setSalary}
+          step={10_000}
+        />
+      </div>
+
+      {/* inputs — the one you sign (secondary) */}
+      <SectionLabel>The one you sign</SectionLabel>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '14px 20px',
         }}
       >
         <NumField
@@ -234,73 +286,61 @@ export function EtaCostCalculator() {
           min={0}
           max={100}
         />
-        <NumField label="Months searching so far" value={months} onChange={setMonths} />
-        <NumField
-          label="Prior annual salary / opp. cost ($)"
-          value={salary}
-          onChange={setSalary}
-          step={10_000}
-        />
-        <NumField label="Dead deals reaching diligence" value={dead} onChange={setDead} />
-        <NumField
-          label="Cost per broken deal ($)"
-          value={broken}
-          onChange={setBroken}
-          step={2_500}
-        />
         <NumField label="Decision Intel price ($/mo)" value={price} onChange={setPrice} step={10} />
       </div>
 
-      {/* results */}
+      {/* headline — the decision cost already behind them */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 12,
           marginTop: 18,
           paddingTop: 16,
           borderTop: '1px solid var(--border-color)',
         }}
       >
         <ResultCard
-          label="Enterprise value (what they'd pay)"
-          value={fmt(ev)}
-          sub="EBITDA × multiple"
-          tone="neutral"
-        />
-        <ResultCard
-          label="Overpayment if EBITDA is overstated"
-          value={fmt(overpay)}
-          sub="multiple × phantom earnings"
+          label="Decision cost already behind you"
+          value={fmt(decisionCostSoFar)}
+          sub="dead-deal spend + forgone salary while searching"
           tone="bad"
         />
+      </div>
+
+      {/* results — the two halves */}
+      <SectionLabel>Where it went</SectionLabel>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 12,
+        }}
+      >
         <ResultCard
-          label="Your personal cash wiped if it fails"
-          value={fmt(personalCash)}
-          sub="the part that's literally your savings"
+          label="Dead-deal diligence drain"
+          value={fmt(deadDrain)}
+          sub="dead deals × out-of-pocket each"
           tone="bad"
-        />
-        <ResultCard
-          label="Personal-guarantee exposure"
-          value={'up to ' + fmt(pg)}
-          sub="unlimited — home, savings, wages"
-          tone="bad"
-        />
-        <ResultCard
-          label="Already sunk on dead-deal diligence"
-          value={fmt(brokenTotal)}
-          sub="dead deals × cost each"
-          tone="warn"
         />
         <ResultCard
           label="Forgone salary while searching"
           value={fmt(timeCost)}
-          sub="opportunity cost so far"
+          sub="opportunity cost of the months"
           tone="warn"
+        />
+        <ResultCard
+          label="Overpayment if EBITDA is off"
+          value={fmt(overpay)}
+          sub="on the one you DO close"
+          tone="warn"
+        />
+        <ResultCard
+          label="Personal-guarantee exposure"
+          value={'up to ' + fmt(pg)}
+          sub={'your cash at risk: ' + fmt(personalCash)}
+          tone="bad"
         />
       </div>
 
-      {/* verdict — value-at-stake from THEIR inputs, never a fabricated multiple */}
+      {/* verdict — CONDITIONAL frame-back on THEIR numbers, never a fabricated rate */}
       <div
         style={{
           marginTop: 16,
@@ -314,18 +354,21 @@ export function EtaCostCalculator() {
         }}
       >
         A year of Decision Intel is{' '}
-        <strong style={{ color: 'var(--accent-primary)' }}>{fmt(annual)}</strong> — about{' '}
-        <strong>{fmtPct(pctOfOverpay)}</strong> of what you&rsquo;d overpay if the EBITDA is off{' '}
-        <strong>{overstate}%</strong>, and less than one <strong>{fmt(broken)}</strong> broken-deal
-        QoE. If it stops one bad LOI before you anchor on the price, the exposure it just flagged on{' '}
-        <em>this</em> deal already dwarfs the subscription.
+        <strong style={{ color: 'var(--accent-primary)' }}>{fmt(annual)}</strong>. Catch{' '}
+        <strong>one</strong> dead deal before the <strong>{fmt(broken)}</strong> diligence spend, or
+        walk a week earlier on the months you&rsquo;d have burned, and you&rsquo;ve covered{' '}
+        <strong>{oneAvoidedPayback.toFixed(1)}×</strong> the subscription. The{' '}
+        <strong>{fmt(decisionCostSoFar)}</strong> already behind you is the price of searching
+        without a second set of eyes.
       </div>
 
       <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '10px 0 0', lineHeight: 1.5 }}>
-        Transparent illustration, not financial advice. Overpayment = multiple × (EBITDA ×
-        overstatement). PG exposure caps the display at the real SBA 7(a) acquisition reality (up to
-        $5M), not the cumulative $10M stacking limit. The point is the prospect inputs their own
-        deal and says the number — never lead with the price.
+        A what-if on your own numbers, not financial advice and not a promise: Decision Intel
+        surfaces the risk indicators a committee would pressure-test before committing capital; it
+        can&rsquo;t guarantee it catches a specific miss. Decision cost = dead-deal spend + forgone
+        salary; PG exposure caps the display at the real SBA 7(a) acquisition reality (up to $5M).
+        Let the prospect input their own funnel and say the number &mdash; never lead with the
+        price.
       </p>
     </div>
   );
