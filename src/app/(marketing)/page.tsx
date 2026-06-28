@@ -684,6 +684,124 @@ export default function LandingPage() {
         `}</style>
       </section>
 
+      {/* ── Decision Cost — the pain quantified in the customer's currency.
+          Grok/GPT inspo (2026-06-28): a "decision cost" beat right after the
+          hero. HONEST by construction — names the cost CATEGORIES, never a
+          fabricated total or a customer outcome (no customer-outcome proof to
+          cite yet; the honest proof is the retro audit on /demo, not a
+          fabricated $19M customer card like Cloverpop's).
+          em-dash-free per the landing cap. ─────────────────────────────── */}
+      <Reveal repeat>
+        <section
+          style={{
+            background: C.white,
+            borderTop: `1px solid ${C.slate200}`,
+            padding: '72px 24px',
+          }}
+        >
+          <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
+            <p
+              style={{
+                fontSize: 12,
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: C.green,
+                marginBottom: 14,
+              }}
+            >
+              Decision cost
+            </p>
+            <h2
+              className="marketing-display"
+              style={{
+                fontSize: 'clamp(28px, 3.8vw, 40px)',
+                color: C.slate900,
+                lineHeight: 1.1,
+                margin: '0 0 16px',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              The deal that fails isn&rsquo;t the expensive part.
+            </h2>
+            <p
+              style={{
+                fontSize: 17,
+                color: C.slate600,
+                lineHeight: 1.6,
+                maxWidth: 640,
+                margin: '0 auto 28px',
+              }}
+            >
+              It&rsquo;s the diligence on the ones that died, the LOIs that went nowhere, the months
+              you can&rsquo;t get back. The bill compounds long before the deal you actually close.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: 10,
+                marginBottom: 28,
+              }}
+            >
+              {[
+                'The QoE and accounting',
+                'Legal fees',
+                'Advisor time',
+                'Travel and meetings',
+                'Months of your own work',
+                'The deals you couldn’t even look at',
+              ].map(item => (
+                <span
+                  key={item}
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    color: C.slate700,
+                    background: C.slate50,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 999,
+                    padding: '8px 16px',
+                  }}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+            <p
+              style={{
+                fontSize: 16,
+                color: C.slate700,
+                lineHeight: 1.6,
+                maxWidth: 620,
+                margin: '0 auto',
+                fontWeight: 500,
+              }}
+            >
+              Decision Intel cuts the avoidable part. It surfaces the risks early, on the deal in
+              front of you, before the diligence is spent.
+            </p>
+            <Link
+              href="/demo"
+              onClick={() => trackEvent('decision_cost_demo_clicked')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginTop: 18,
+                fontSize: 14.5,
+                fontWeight: 700,
+                color: C.green,
+                textDecoration: 'none',
+              }}
+            >
+              See what it caught on a real deal <ArrowRight size={15} />
+            </Link>
+          </div>
+        </section>
+      </Reveal>
+
       {/* ── Role router — the 4 wedge personas → their /use workflow.
           Solves "one homepage, five buyers" without touching the locked
           hero / sign-in-first / category-claim. ─────────────────────── */}
