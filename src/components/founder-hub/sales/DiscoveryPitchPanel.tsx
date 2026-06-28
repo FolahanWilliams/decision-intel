@@ -26,6 +26,9 @@ import {
   ChevronDown,
   ChevronRight,
   GitBranch,
+  PhoneCall,
+  Search,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   DISCOVERY_QUESTIONS,
@@ -37,6 +40,9 @@ import {
   DISCOVERY_DISCIPLINE_RULES,
   FOLLOWUP_EMAIL_TEMPLATE,
   WHAT_30_CONVERSATIONS_PRODUCE,
+  ETA_CALL_SCRIPT,
+  ETA_BROKER_TELLS,
+  ETA_CALL_PRINCIPLES,
   type PainPattern,
   type PersonaId,
 } from '@/lib/data/discovery-pitch-toolkit';
@@ -75,6 +81,205 @@ export function DiscoveryPitchPanel() {
         title="Pre-event reference · the only thing you read in the Uber"
         body="Your one job: find out if their pain is real. Discovery questions ALL FOUR before any pitch. Then pivot with tailored language keyed to what they revealed. The 30-conversation pattern surfaces from the data — don't try to extract it in the first meeting."
       />
+
+      {/* ─── ETA wedge · live sales-call script (current Phase-1 motion) ───
+          Placed first because the ETA / owner-operator layer is the current
+          wedge (ICP pivot 2026-06-26). The persona openers + pain patterns
+          further down are the older bridge-phase content (their ETA migration
+          is a recorded follow-up). Reads from ETA_CALL_SCRIPT / ETA_BROKER_TELLS
+          / ETA_CALL_PRINCIPLES in discovery-pitch-toolkit.ts. */}
+      <div
+        style={{
+          background: C.greenSoft,
+          border: `1px solid ${C.greenBorder}`,
+          borderLeft: `3px solid ${C.green}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 16,
+          marginBottom: 18,
+        }}
+      >
+        <div style={blockEyebrow(C.green)}>
+          <PhoneCall size={11} /> ETA wedge · live sales-call script · current Phase-1 motion
+        </div>
+        <p
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            margin: '0 0 14px 0',
+          }}
+        >
+          The warmer motion — once a self-funded searcher / sponsor agrees to bring a CIM they&rsquo;re
+          actively looking at. Discovery first, then the live audit on <em>their</em> real deal (the
+          leading indicator that predicts conversion, not a generic demo), then the referral the
+          instant a finding lands. The persona openers below are bridge-phase; this is the wedge.
+        </p>
+
+        {ETA_CALL_SCRIPT.map(s => (
+          <div
+            key={s.step}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '34px 1fr',
+              gap: 12,
+              marginBottom: 14,
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              padding: 12,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: C.green,
+                lineHeight: 1,
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+              }}
+            >
+              {s.step}
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  color: C.green,
+                  marginBottom: 6,
+                }}
+              >
+                {s.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontStyle: 'italic',
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.55,
+                  marginBottom: 6,
+                }}
+              >
+                &ldquo;{s.say}&rdquo;
+              </div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                  marginBottom: 4,
+                }}
+              >
+                <strong style={{ color: 'var(--text-primary)' }}>Why:</strong> {s.why}
+              </div>
+              <div style={{ fontSize: 11.5, color: C.red, lineHeight: 1.5 }}>
+                <strong>Avoid:</strong> {s.avoid}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Broker-narrative tells — live-call ammunition, mirrors the
+            acquisition_thesis overlay */}
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderLeft: `3px solid ${C.amber}`,
+            borderRadius: 'var(--radius-sm)',
+            padding: 12,
+            marginBottom: 12,
+          }}
+        >
+          <div style={blockEyebrow(C.amber)}>
+            <Search size={11} /> Broker-narrative tells · what the audit flags on a CIM upload
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              lineHeight: 1.5,
+              marginBottom: 10,
+            }}
+          >
+            Tag a broker CIM as an <strong>acquisition thesis</strong> on upload so these fire. Each
+            is a risk indicator to <em>pressure-test</em>, never an accusation the seller lied.
+          </div>
+          {ETA_BROKER_TELLS.map(t => (
+            <div
+              key={t.tell}
+              style={{
+                marginBottom: 10,
+                paddingBottom: 10,
+                borderBottom: '1px dashed var(--border-color)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                  marginBottom: 2,
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  {t.tell}
+                </span>
+                <span
+                  style={{
+                    fontSize: 9.5,
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '2px 6px',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {t.mapsTo}
+                </span>
+              </div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {t.plain}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Lock-clean guardrails */}
+        <div
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderLeft: `3px solid ${C.indigo}`,
+            borderRadius: 'var(--radius-sm)',
+            padding: 12,
+          }}
+        >
+          <div style={blockEyebrow(C.indigo)}>
+            <ShieldCheck size={11} /> Guardrails · the 4 things a sophisticated searcher punishes
+          </div>
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 18,
+              fontSize: 11.5,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.55,
+            }}
+          >
+            {ETA_CALL_PRINCIPLES.map(p => (
+              <li key={p} style={{ marginBottom: 5 }}>
+                {p}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       {/* Mom Discovery Test framework dynamic viz — interactive SVG flow.
           Mounts at the top so the visual lives next to the text-based reference;
