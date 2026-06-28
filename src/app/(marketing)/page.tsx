@@ -323,9 +323,9 @@ export default function LandingPage() {
                 marginBottom: 22,
               }}
             >
-              The fatal flaw isn&rsquo;t in the numbers.{' '}
+              Attack your own thesis{' '}
               <span style={{ color: C.green, fontStyle: 'italic' }}>
-                It&rsquo;s in the reasoning.
+                before you commit the capital.
               </span>
             </h1>
             <p
@@ -340,9 +340,9 @@ export default function LandingPage() {
                 fontWeight: 500,
               }}
             >
-              Institutional teams attack a thesis before they commit capital. Decision Intel gives
-              you the same discipline: it names the blind spot in your memo before the outcome
-              forces the lesson.
+              Institutional investors never bet on one person&rsquo;s conviction. Decision Intel
+              gives you that same discipline, solo: it surfaces the blind spot you&rsquo;re standing
+              too close to see in your own memo, in 60 seconds.
             </p>
             <div
               style={{

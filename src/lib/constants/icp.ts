@@ -56,9 +56,16 @@ export const POSITIONING_HERO_PRIMARY = 'Decision Intel is the reasoning audit p
  * the sentence completed — and a lot of them went to /faq looking for the
  * answer the hero didn't give). Per the empathic-mode-first + Problem→Solution
  * →Value rules — which the category-claim H1 (a WARM-context move) overrode on
- * the COLDEST surface — the homepage now leads with the JOB: the buyer's pain
- * ("the fatal flaw isn't where you're looking") + the outcome (commit before
- * it's irreversible). "Reasoning audit" is demoted to the MECHANISM layer: it
+ * the COLDEST surface — the homepage now leads with the JOB-TO-BE-DONE: the
+ * institutional discipline ("attack your own thesis before you commit the
+ * capital") + the regret-reduction outcome (catch what you're missing before
+ * it's irreversible). Sharpened 2026-06-28 from the prior problem-reframe H1
+ * ("the fatal flaw isn't in the numbers") to the outcome/discipline statement,
+ * per the founder's job-to-be-done crystallization (nobody buys a reasoning
+ * audit; they buy confidence they're not missing something before committing
+ * capital — the Stripe/Figma "sell the outcome, not the mechanism" move). The
+ * numbers-vs-reasoning reframe now lives in the homepage PROBLEM card, not the
+ * H1. "Reasoning audit" is demoted to the MECHANISM layer: it
  * stays the protected category noun site-wide (/how-it-works, /r2f-standard,
  * pricing) + in the homepage SOLUTION card + footer; it is just no longer the
  * cold H1. POSITIONING_HERO_PRIMARY remains the canonical category claim for
@@ -66,8 +73,8 @@ export const POSITIONING_HERO_PRIMARY = 'Decision Intel is the reasoning audit p
  * the reader has already earned the category vocabulary.
  */
 export const POSITIONING_HERO_JOB_LED = {
-  h1: "The fatal flaw isn't in the numbers. It's in the reasoning.",
-  sub: 'Institutional teams attack a thesis before they commit capital. Decision Intel gives you the same discipline: it names the blind spot in your memo before the outcome forces the lesson.',
+  h1: 'Attack your own thesis before you commit the capital.',
+  sub: "Institutional investors never bet on one person's conviction. Decision Intel gives you that same discipline, solo: it surfaces the blind spot you're standing too close to see in your own memo, in 60 seconds.",
   cta: 'Pressure-test a decision',
 };
 
