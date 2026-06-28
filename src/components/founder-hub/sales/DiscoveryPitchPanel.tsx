@@ -43,6 +43,8 @@ import {
   ETA_CALL_SCRIPT,
   ETA_BROKER_TELLS,
   ETA_CALL_PRINCIPLES,
+  DECISION_COST_DISCOVERY,
+  ETA_FOUNDING_OFFER,
   type PainPattern,
   type PersonaId,
 } from '@/lib/data/discovery-pitch-toolkit';
@@ -83,9 +85,191 @@ export function DiscoveryPitchPanel() {
         body="Your one job: find out if their pain is real. Discovery questions ALL FOUR before any pitch. Then pivot with tailored language keyed to what they revealed. The 30-conversation pattern surfaces from the data — don't try to extract it in the first meeting."
       />
 
+      {/* ─── ETA wedge · DECISION COST discovery (run BEFORE the pitch) ───
+          The discovery half: make the searcher RATIONALIZE their own decision
+          cost (months + fees on dead deals + the regret of the late miss),
+          then reveal DI as the IC they don't have. NotebookLM 809f5104
+          synthesis, Mom-Test + JOLT grounded. Reads DECISION_COST_DISCOVERY +
+          ETA_FOUNDING_OFFER from discovery-pitch-toolkit.ts (edit there). */}
+      <div
+        style={{
+          background: C.greenSoft,
+          border: `1px solid ${C.greenBorder}`,
+          borderLeft: `3px solid ${C.green}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 16,
+          marginBottom: 18,
+        }}
+      >
+        <div style={blockEyebrow(C.green)}>
+          <Search size={11} /> ETA wedge · Decision Cost discovery · run this BEFORE the pitch
+        </div>
+        <p
+          style={{
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            margin: '0 0 14px 0',
+          }}
+        >
+          Nobody buys a &ldquo;reasoning audit.&rdquo; They buy confidence they are not missing
+          something before committing irreversible capital. Make them total their OWN decision cost
+          first &mdash; the months and fees bled on dead deals, the regret of the late miss &mdash;
+          then DI reveals itself as the IC they don&rsquo;t have. Facts not opinions; ego-safe; on
+          hesitation take risk OFF the table, never dial up FOMO.
+        </p>
+
+        {DECISION_COST_DISCOVERY.map(s => (
+          <div
+            key={s.stage}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '34px 1fr',
+              gap: 12,
+              marginBottom: 12,
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              padding: 12,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: C.green,
+                lineHeight: 1,
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+              }}
+            >
+              {s.stage}
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: C.green,
+                  }}
+                >
+                  {s.label}
+                </span>
+                <span
+                  style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    color: s.kind === 'ask' ? C.indigo : C.amber,
+                    border: `1px solid ${s.kind === 'ask' ? C.indigoBorder : C.amberBorder}`,
+                    background: s.kind === 'ask' ? C.indigoSoft : C.amberSoft,
+                    borderRadius: 4,
+                    padding: '1px 5px',
+                  }}
+                >
+                  {s.kind === 'ask' ? 'ASK' : 'SAY'}
+                </span>
+              </div>
+              {s.ask.map((q, i) => (
+                <div
+                  key={i}
+                  style={{
+                    fontSize: 13,
+                    fontStyle: 'italic',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.5,
+                    marginBottom: 5,
+                  }}
+                >
+                  &ldquo;{q}&rdquo;
+                </div>
+              ))}
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5,
+                  marginTop: 4,
+                }}
+              >
+                {s.extracts}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.45,
+                  marginTop: 5,
+                }}
+              >
+                <strong style={{ color: C.red }}>Guardrail · </strong>
+                {s.guardrail}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* The irresistible founding offer */}
+        <div
+          style={{
+            marginTop: 6,
+            background: 'color-mix(in srgb, var(--accent-primary) 8%, var(--bg-card))',
+            border: `1px solid ${C.greenBorder}`,
+            borderRadius: 'var(--radius-sm)',
+            padding: 14,
+          }}
+        >
+          <div style={blockEyebrow(C.green)}>
+            <ShieldCheck size={11} /> {ETA_FOUNDING_OFFER.headline} · what makes call one a yes
+          </div>
+          <div style={{ marginTop: 8 }}>
+            {ETA_FOUNDING_OFFER.lines.map((l, i) => (
+              <div
+                key={i}
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--text-primary)',
+                  lineHeight: 1.5,
+                  marginBottom: 6,
+                  paddingLeft: 12,
+                  position: 'relative',
+                }}
+              >
+                <span style={{ position: 'absolute', left: 0, color: C.green }}>·</span>
+                {l}
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              marginTop: 8,
+            }}
+          >
+            <strong style={{ color: 'var(--text-primary)' }}>Why it&rsquo;s irresistible: </strong>
+            {ETA_FOUNDING_OFFER.whyIrresistible}
+          </div>
+          <div
+            style={{
+              fontSize: 11.5,
+              color: 'var(--text-muted)',
+              lineHeight: 1.5,
+              marginTop: 6,
+            }}
+          >
+            {ETA_FOUNDING_OFFER.founding}
+          </div>
+        </div>
+      </div>
+
       {/* ─── ETA wedge · live sales-call script (current Phase-1 motion) ───
-          Placed first because the ETA / owner-operator layer is the current
-          wedge (ICP pivot 2026-06-26). The persona openers + pain patterns
+          The PITCH half — runs after the Decision Cost discovery above. The
+          ETA / owner-operator layer is the current wedge (ICP pivot 2026-06-26).
+          The persona openers + pain patterns
           further down are the older bridge-phase content (their ETA migration
           is a recorded follow-up). Reads from ETA_CALL_SCRIPT / ETA_BROKER_TELLS
           / ETA_CALL_PRINCIPLES in discovery-pitch-toolkit.ts. */}

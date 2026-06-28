@@ -554,7 +554,7 @@ export const ETA_CALL_SCRIPT: EtaCallStep[] = [
   {
     step: 2,
     label: 'Reframe — the missing second set of eyes',
-    say: "A PE fund has a floor of analysts to tear a CIM apart and an investment committee to pressure-test the thesis before anyone signs. As a self-funded searcher you do all of that alone — there is no second set of eyes between you and the personal guarantee. That gap is what I work on.",
+    say: 'A PE fund has a floor of analysts to tear a CIM apart and an investment committee to pressure-test the thesis before anyone signs. As a self-funded searcher you do all of that alone — there is no second set of eyes between you and the personal guarantee. That gap is what I work on.',
     why: 'Names the structural asymmetry (the operator IS the IC) without ego-threat — it is not "you miss things," it is "you have no one to ask." Sets up the audit as the missing process, not a judgment on their thinking.',
     avoid:
       'Do not say their judgment is flawed or that they are inexperienced — that is the ego-threat that kills it. The frame is "a process you are missing," never "thinking you got wrong."',
@@ -571,7 +571,7 @@ export const ETA_CALL_SCRIPT: EtaCallStep[] = [
     step: 4,
     label: 'Referral first, then the no-brainer close',
     say: "[The instant the finding lands] — who else in your search group is staring at CIMs this week? They should run their current one through this too. — And for you: it is £249 a month, or you can run a single live deal through it on its own. If it stops you anchoring on one bad LOI, the exposure it just flagged on this one deal already dwarfs either price. Want me to get you set up so you can run tonight's pipeline through it?",
-    why: 'The referral ask fires at the aha moment (the finding), not the contract — that is when they are most convinced. The close offers BOTH the subscription AND the per-deal on-ramp (the per-deal option matches the searcher\'s episodic value and lowers the yes-threshold during a search plateau). Value-at-stake on THIS deal, never a fabricated multiple.',
+    why: "The referral ask fires at the aha moment (the finding), not the contract — that is when they are most convinced. The close offers BOTH the subscription AND the per-deal on-ramp (the per-deal option matches the searcher's episodic value and lowers the yes-threshold during a search plateau). Value-at-stake on THIS deal, never a fabricated multiple.",
     avoid:
       'Do not claim a made-up ROI ("pays for itself for 50 years"). Anchor to the real exposure the audit just flagged on this deal. Do not force subscription-only — offer per-deal; for a searcher mid-search it converts better.',
   },
@@ -593,37 +593,44 @@ export interface EtaBrokerTell {
 export const ETA_BROKER_TELLS: EtaBrokerTell[] = [
   {
     tell: 'Smoothed cyclicality',
-    plain: 'Steady-growth line over a business that is actually seasonal or cyclical — ask for the period-by-period numbers, not the CAGR.',
+    plain:
+      'Steady-growth line over a business that is actually seasonal or cyclical — ask for the period-by-period numbers, not the CAGR.',
     mapsTo: 'Survivorship + Anchoring',
   },
   {
     tell: "Diversification that isn't",
-    plain: '"Diversified revenue" whose own named customers all sit in one cyclical end-market or one channel.',
+    plain:
+      '"Diversified revenue" whose own named customers all sit in one cyclical end-market or one channel.',
     mapsTo: 'Illusion of Validity + Halo Effect',
   },
   {
     tell: 'Growth-opportunity-as-owed',
-    plain: '"Untapped white space / just needs a motivated owner" priced into today\'s multiple — that growth is work YOU would have to create and fund.',
+    plain:
+      '"Untapped white space / just needs a motivated owner" priced into today\'s multiple — that growth is work YOU would have to create and fund.',
     mapsTo: 'Overconfidence + Inside-View Dominance',
   },
   {
     tell: 'Owner-dependency masked as turnkey',
-    plain: '"Absentee-ready / turnkey" where the seller\'s relationships and tribal knowledge actually carry the revenue and there is no management layer underneath.',
+    plain:
+      '"Absentee-ready / turnkey" where the seller\'s relationships and tribal knowledge actually carry the revenue and there is no management layer underneath.',
     mapsTo: 'Inside-View Dominance (DI-B-022)',
   },
   {
     tell: 'Add-back inflation',
-    plain: '"Adjusted EBITDA" leaning on add-backs that recur — the SBA/lender rejects them and the debt-service math breaks at close.',
+    plain:
+      '"Adjusted EBITDA" leaning on add-backs that recur — the SBA/lender rejects them and the debt-service math breaks at close.',
     mapsTo: 'Anchoring + Optimism',
   },
   {
     tell: 'Hockey-stick detached from actuals',
-    plain: 'A projection inflecting sharply upward with no mechanism tying it to the trailing 3-year actuals.',
+    plain:
+      'A projection inflecting sharply upward with no mechanism tying it to the trailing 3-year actuals.',
     mapsTo: 'Planning Fallacy + Optimism',
   },
   {
     tell: 'Deferred-capex-as-margin',
-    plain: 'High margins partly produced by under-investment — "well-maintained / low-capex" with no capex schedule hides a liability you inherit at close.',
+    plain:
+      'High margins partly produced by under-investment — "well-maintained / low-capex" with no capex schedule hides a liability you inherit at close.',
     mapsTo: 'Optimism + Sunk Ship',
   },
 ];
@@ -634,4 +641,142 @@ export const ETA_CALL_PRINCIPLES: string[] = [
   'Name a risk indicator to verify, never declare the deal a disaster — the restraint is what makes a skeptic believe the finding.',
   'Ask for the referral the instant a real finding lands — the aha moment is the referral moment, not the contract moment.',
   'Offer the per-deal on-ramp alongside the subscription — episodic searchers say yes faster to a single live-deal run than to a recurring fee during a dry spell.',
+  'On hesitation, take risk OFF the table — NEVER dial up FOMO. JOLT: 56% of lost deals trace to fear-of-messing-up, not status-quo bias; pushing "you\'ll miss this deal" on a buyer already terrified of the personal guarantee INCREASES the loss. Pivot to "run it on a deal you\'ve already closed first — zero risk, just see if it would have caught anything."',
 ];
+
+// ── The DECISION COST discovery sequence ────────────────────────────────────
+// Locked 2026-06-28 — NotebookLM master-KB `809f5104` synthesis, cross-validated
+// against the Mom Test + JOLT + the ETA wedge, sharpening the GPT/Cowork
+// discovery flow with the failure modes they missed.
+//
+// The job-to-be-done reframe (founder's crystallization): nobody buys a
+// "reasoning audit"; they buy confidence they are not missing something before
+// committing irreversible capital. This sequence makes the searcher RATIONALIZE
+// their own DECISION COST (months + fees bled on dead deals + the regret of the
+// late miss), THEN reveals DI as the IC they don't have. Run it BEFORE the pitch
+// (ETA_CALL_SCRIPT is the pitch half). Lock-clean throughout: Mom-Test
+// facts-not-opinions, ego-safe (unaudited-not-flawed), the conditional close
+// never invents a savings rate, and the JOLT safety-net governs every hesitation.
+export interface DiscoveryStage {
+  stage: number;
+  label: string;
+  /** The verbatim question(s) to ask — facts + past pain, never opinions. A
+   *  reveal stage carries the line to SAY instead. */
+  ask: string[];
+  /** Whether this is a question stage or a thing you say (reveal / close). */
+  kind: 'ask' | 'say';
+  /** What it surfaces + why it works. */
+  extracts: string;
+  /** The Mom Test / JOLT / ego-safe discipline for this stage. */
+  guardrail: string;
+}
+
+export const DECISION_COST_DISCOVERY: DiscoveryStage[] = [
+  {
+    stage: 0,
+    label: 'Qualify — is the pain acute?',
+    kind: 'ask',
+    ask: [
+      "What's the last thing you paid for, or tried, to catch deal-killers earlier in diligence — and did it actually work?",
+    ],
+    extracts:
+      'Mom Test qualification. If they have never tried to solve "catch it earlier" (a second advisor, a checklist, a search-group buddy), the pain is not acute yet — note it and do not force the sell. If they HAVE tried, the pain is real and you have found your wedge.',
+    guardrail:
+      'Facts about past behaviour, never "would you pay for...". A polite disqualify on a non-fit protects your time AND your discovery data.',
+  },
+  {
+    stage: 1,
+    label: 'The funnel (just listen)',
+    kind: 'ask',
+    ask: [
+      'In a typical month, how many CIMs or broker decks do you work through?',
+      'How many get to serious diligence?',
+      'How many LOIs have you written?',
+      'How many have actually closed?',
+    ],
+    extracts:
+      'Their real funnel — the denominator. Most of what they review dies, and each death cost them. This sets up the decision-cost maths in stage 2.',
+    guardrail: 'Write the numbers down. Do not react, do not pitch, do not teach.',
+  },
+  {
+    stage: 2,
+    label: 'Quantify the decision cost (let THEM total it)',
+    kind: 'ask',
+    ask: [
+      'Walk me through the last deal you had under LOI that fell apart in diligence — what was the exact moment you realised you had to walk?',
+      'Between legal, the QofE, advisor time, travel, and your own time, how much did you burn before you pulled the plug?',
+      'And how many of those have there been?',
+    ],
+    extracts:
+      'They say the number out loud. Broken-deal spend runs ~$50k/searcher in the research — it dwarfs $249/mo, but only if THEY total it. Self-persuasion creates urgency; being told creates resistance. Let the silence sit after they answer.',
+    guardrail:
+      'Never total it for them — prompt the categories (legal / QofE / travel / your own time) and let them add it up. Do not flinch at the number.',
+  },
+  {
+    stage: 3,
+    label: 'The killer question — "the clues were already there"',
+    kind: 'ask',
+    ask: [
+      'When you finally killed that deal, what was the one red flag that surprised you most — and looking back, were the clues already sitting there in the original CIM or the first management meeting?',
+    ],
+    extracts:
+      'The realisation: the gap was not a lack of DATA, it was interpretation, time, or a second opinion. This is the exact gap DI fills — and it lands ego-safe ("you were too close to see it," never "you missed it because you are a poor analyst"). Surface it in THEIR words; do not say it for them.',
+    guardrail:
+      'Let them reach the conclusion themselves. The instant you say "see, you were biased / overconfident" you trigger ego threat and lose them. Their judgment is their edge — you protect it, you never indict it.',
+  },
+  {
+    stage: 4,
+    label: 'The regret (the emotional stakes)',
+    kind: 'ask',
+    ask: [
+      "What's the most expensive thing you've ever missed — or watched another searcher miss?",
+      "If you'd seen it on day one instead of week six, what would have changed?",
+    ],
+    extracts:
+      'Fear of messing up (FOMU) — the JOLT finding that 56% of lost deals are fear-of-failure, not status-quo bias. With their own name on the personal guarantee, this is a painkiller, not a vitamin. Now they are emotionally invested.',
+    guardrail:
+      'Their words, said safely in the third person ("another searcher") if it lets them be honest. Match the fear, never amplify it into a sales-y "imagine the disaster".',
+  },
+  {
+    stage: 5,
+    label: 'The honest reveal (self-value, no over-claim)',
+    kind: 'say',
+    ask: [
+      "A PE fund never bets on one person's conviction — there's an investment committee that attacks the thesis before a dollar moves. Solo, you do all of that alone. Decision Intel is that second set of eyes: it pressure-tests the thinking behind a deal in 60 seconds and surfaces the blind spot you're standing too close to see, before you've burned the diligence. It doesn't make the call for you — it's the committee you don't have.",
+    ],
+    extracts:
+      'Self-value (the IC you lack), the mechanism stated honestly (it surfaces; you decide), and zero claim that DI is smarter than them. This is the "institutional discipline, solo" anchor.',
+    guardrail:
+      'Never "we catch what you can\'t" or "we prevent bad deals." It is the process / second opinion you are missing — full stop. Pre-revenue, you cannot claim DI is already trusted by capital partners.',
+  },
+  {
+    stage: 6,
+    label: 'The conditional close + the founding offer',
+    kind: 'say',
+    ask: [
+      "Send me the deal you're looking at right now, plus one that went sideways. I'll run a 60-second audit on both, free, on a call with you. If it surfaces one thing you hadn't pressure-tested, that's worth more than the $249 a month — and if it's clean, you keep the tamper-evident record to hand your capital partners as proof of your rigour. No pressure: want to start with a deal you've already closed, so it's zero-risk?",
+    ],
+    extracts:
+      'Conditional value (their judgment, their number — never a fabricated savings rate), risk reversal (the retro deal = zero-risk proof), and the JOLT safety-net pivot baked into the close itself.',
+    guardrail:
+      'When they hesitate, take risk OFF the table (the retro), never dial up FOMO. The per-deal on-ramp ($499-$4,999 per live deal) is the lower-threshold alternative to the subscription for an episodic searcher.',
+  },
+];
+
+// The irresistible pre-revenue offer (NotebookLM `809f5104`, 2026-06-28). You
+// cannot yet pitch third-party trust ("family offices love our audits") — so
+// pitch purely on SELF-VALUE + RISK REVERSAL. Even a "no" on the subscription
+// leaves them better off (they keep the record), which is what makes it
+// irresistible. Edit in lockstep with the stage-6 close above.
+export const ETA_FOUNDING_OFFER = {
+  headline: 'The "Live + Retro" free audit',
+  lines: [
+    'Send me the memo for the deal you are looking at right now, PLUS one that went sideways. I run a 60-second audit on both, free, on a call with you.',
+    'I act as your temporary investment committee — a second set of eyes on the one blind spot that might cost you this deal.',
+    'If it catches deal fever or LOI-price anchoring, you have saved the next ~$20k of diligence. If the memo is clean, you keep the tamper-evident provenance record to hand your capital partners as proof of your rigour.',
+  ],
+  whyIrresistible:
+    'Zero financial commitment upfront. It is the investment committee a solo searcher desperately lacks. And they walk away with a tangible asset (the provenance record) they can use as leverage to raise their equity — so even a "no" on the subscription leaves them better off. Self-value + risk reversal, never a trust-claim you cannot back yet.',
+  founding:
+    'Founding-customer terms: locked price, a direct line to the founder, and you shape the product. The first ~30 closed outcomes you log become a calibration record only YOU can build — your reference library for every future deal.',
+} as const;
