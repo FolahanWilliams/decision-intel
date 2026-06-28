@@ -485,8 +485,15 @@ export function getNextEvent(today: Date = new Date()): PrepEvent | null {
  * before 'medium', tie-broken by date proximity). Includes events that are
  * currently running (not just future-dated ones).
  */
-export function getHighestPriorityUpcomingEvent(today: Date = new Date()): PrepEvent | null {
-  const upcoming = EVENTS.filter(e => !hasEventEnded(e, today));
+export function getHighestPriorityUpcomingEvent(
+  today: Date = new Date(),
+  // Injectable so the selection logic can be locked against a synthetic
+  // calendar, independently of the date-rotating real EVENTS (which no
+  // longer carries a multi-day 'highest' event post the 2026-06-26 ETA
+  // pivot). All real callers pass 0-or-1 args; the default preserves them.
+  events: readonly PrepEvent[] = EVENTS
+): PrepEvent | null {
+  const upcoming = events.filter(e => !hasEventEnded(e, today));
   if (upcoming.length === 0) return null;
   const priorityWeight: Record<PrepEvent['priority'], number> = {
     highest: 3,
