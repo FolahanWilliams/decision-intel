@@ -309,8 +309,8 @@ export default function LandingPage() {
                 marginRight: 'auto',
               }}
             >
-              Only 8% of strategic moves break out of the middle. The other 92% carry biases nobody
-              named in the memo (McKinsey).
+              Only 8% of strategic moves break out of the middle (McKinsey). The other 92% looked
+              just as convincing in the memo.
             </p>
             <p
               style={{
@@ -333,9 +333,9 @@ export default function LandingPage() {
                 marginBottom: 22,
               }}
             >
-              Decision Intel is{' '}
+              The fatal flaw isn&rsquo;t in the numbers.{' '}
               <span style={{ color: C.green, fontStyle: 'italic' }}>
-                the reasoning audit platform.
+                It&rsquo;s in the reasoning.
               </span>
             </h1>
             <p
@@ -350,8 +350,9 @@ export default function LandingPage() {
                 fontWeight: 500,
               }}
             >
-              Most tools audit your data. We audit your reasoning, catching the fatal blind spots in
-              strategic memos before the outcome forces the lesson.
+              Institutional teams attack a thesis before they commit capital. Decision Intel gives
+              you the same discipline: it names the blind spot in your memo before the outcome
+              forces the lesson.
             </p>
             <div
               style={{
@@ -380,7 +381,7 @@ export default function LandingPage() {
                   boxShadow: '0 6px 20px rgba(22,163,74,0.28)',
                 }}
               >
-                Start your first audit <ArrowRight size={16} />
+                Pressure-test a decision <ArrowRight size={16} />
               </Link>
               <Link
                 href="/how-it-works"
@@ -677,8 +678,8 @@ export default function LandingPage() {
                     margin: 0,
                   }}
                 >
-                  second pre-emptive audit. Biases named, counterfactuals quantified, the record
-                  signed and shareable before the deal moves forward.
+                  second reasoning audit. The blind spot named, the counterfactual quantified, the
+                  record signed and shareable before you commit.
                 </p>
               </div>
             </div>
@@ -1664,7 +1665,8 @@ export default function LandingPage() {
           }}
         >
           <span>
-            Built on governance-grade reasoning-audit infrastructure. Operating at Fortune 500 scale?
+            Built on governance-grade reasoning-audit infrastructure. Operating at Fortune 500
+            scale?
           </span>
           <Link
             href="/pricing"

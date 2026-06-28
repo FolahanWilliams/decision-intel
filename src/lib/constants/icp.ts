@@ -49,6 +49,29 @@ export const CATEGORY_CLAIM = 'the reasoning audit platform' as const;
 export const POSITIONING_HERO_PRIMARY = 'Decision Intel is the reasoning audit platform.';
 
 /**
+ * Job-led landing hero (locked 2026-06-28 — DATA-DRIVEN demotion of the
+ * category-claim H1 on the COLD homepage). The homepage led with the category
+ * claim (POSITIONING_HERO_PRIMARY) and bounced hard (~88%, partly bot traffic,
+ * but real visitors had to do mental work to resolve "reasoning audit" before
+ * the sentence completed — and a lot of them went to /faq looking for the
+ * answer the hero didn't give). Per the empathic-mode-first + Problem→Solution
+ * →Value rules — which the category-claim H1 (a WARM-context move) overrode on
+ * the COLDEST surface — the homepage now leads with the JOB: the buyer's pain
+ * ("the fatal flaw isn't where you're looking") + the outcome (commit before
+ * it's irreversible). "Reasoning audit" is demoted to the MECHANISM layer: it
+ * stays the protected category noun site-wide (/how-it-works, /r2f-standard,
+ * pricing) + in the homepage SOLUTION card + footer; it is just no longer the
+ * cold H1. POSITIONING_HERO_PRIMARY remains the canonical category claim for
+ * WARM contexts (pitch-deck slide 1, LinkedIn headline, chat coaching) where
+ * the reader has already earned the category vocabulary.
+ */
+export const POSITIONING_HERO_JOB_LED = {
+  h1: "The fatal flaw isn't in the numbers. It's in the reasoning.",
+  sub: 'Institutional teams attack a thesis before they commit capital. Decision Intel gives you the same discipline: it names the blind spot in your memo before the outcome forces the lesson.',
+  cta: 'Pressure-test a decision',
+};
+
+/**
  * Sub-head / immediate follow-up — the contrast move. Sharpens the
  * differentiator by explicitly distinguishing from existing categories
  * (BI tools audit data; model-risk tools audit algorithms; we audit the
