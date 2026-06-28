@@ -468,7 +468,7 @@ export default function LandingPage() {
                   }}
                 >
                   <AlertCircle size={11} strokeWidth={2.6} />
-                  The problem
+                  The cost
                 </p>
                 <p
                   style={{
@@ -480,7 +480,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  The numbers get audited. The reasoning doesn&rsquo;t.
+                  Months and fees, poured into the deals that died.
                 </p>
                 <p
                   style={{
@@ -490,9 +490,9 @@ export default function LandingPage() {
                     margin: '0 0 6px',
                   }}
                 >
-                  Millions go to the data, the bankers, the diligence. The judgment that actually
-                  commits the capital, the part that decides whether the money was well spent, never
-                  gets a second look.
+                  The diligence, the legal fees, the months of work. Most of it goes into the deals
+                  that fall through. The cost that hurts isn&rsquo;t the one you close; it&rsquo;s
+                  the ones you couldn&rsquo;t see through in time.
                 </p>
                 <p
                   style={{
@@ -503,7 +503,7 @@ export default function LandingPage() {
                     letterSpacing: '0.02em',
                   }}
                 >
-                  The judgment gap, not the data gap.
+                  Decision cost, not deal cost.
                 </p>
               </div>
               {/* PATTERN — amber. The bridge card: surfaces the three
@@ -546,7 +546,7 @@ export default function LandingPage() {
                   }}
                 >
                   <Search size={11} strokeWidth={2.6} />
-                  The pattern
+                  The blind spot
                 </p>
                 <p
                   style={{
@@ -558,7 +558,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  Invisible from the inside.
+                  The clues were already there.
                 </p>
                 <p
                   style={{
@@ -568,9 +568,9 @@ export default function LandingPage() {
                     margin: '0 0 10px',
                   }}
                 >
-                  The fatal assumption looks like conviction to the person who wrote it. You
-                  can&rsquo;t pressure-test the reasoning you&rsquo;re standing inside, so the flaw
-                  survives every read until the outcome names it. An outside view catches it first.
+                  You were too close to see them. The fatal assumption looks like conviction to the
+                  person who wrote the memo, and by the time diligence surfaces it, the time and
+                  money are already gone.
                 </p>
                 <p
                   style={{
@@ -611,7 +611,7 @@ export default function LandingPage() {
                   }}
                 >
                   <ShieldCheck size={11} strokeWidth={2.6} />
-                  The solution
+                  The fix
                 </p>
                 <p
                   style={{
@@ -619,23 +619,33 @@ export default function LandingPage() {
                     fontWeight: 800,
                     color: C.slate900,
                     margin: '0 0 8px',
-                    lineHeight: 1.05,
-                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    lineHeight: 1.1,
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  60
+                  A second set of eyes.
                 </p>
                 <p
                   style={{
-                    fontSize: 12,
+                    fontSize: 12.5,
                     color: C.slate700,
                     lineHeight: 1.5,
-                    margin: 0,
+                    margin: '0 0 6px',
                   }}
                 >
-                  second reasoning audit. The blind spot named, the counterfactual quantified, the
-                  record signed and shareable before you commit.
+                  Decision Intel pressure-tests your reasoning, challenges hidden assumptions, and
+                  surfaces risks before they become expensive.
+                </p>
+                <p
+                  style={{
+                    fontSize: 10,
+                    color: C.slate500,
+                    fontStyle: 'italic',
+                    margin: 0,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  The reasoning audit, in 60 seconds.
                 </p>
               </div>
             </div>
