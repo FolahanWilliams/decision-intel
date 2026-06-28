@@ -47,6 +47,7 @@ import {
   type PersonaId,
 } from '@/lib/data/discovery-pitch-toolkit';
 import { MomDiscoveryFrameworkViz } from './MomDiscoveryFrameworkViz';
+import { EtaCostCalculator } from './EtaCostCalculator';
 
 const C = {
   amber: '#D97706',
@@ -109,10 +110,11 @@ export function DiscoveryPitchPanel() {
             margin: '0 0 14px 0',
           }}
         >
-          The warmer motion — once a self-funded searcher / sponsor agrees to bring a CIM they&rsquo;re
-          actively looking at. Discovery first, then the live audit on <em>their</em> real deal (the
-          leading indicator that predicts conversion, not a generic demo), then the referral the
-          instant a finding lands. The persona openers below are bridge-phase; this is the wedge.
+          The warmer motion — once a self-funded searcher / sponsor agrees to bring a CIM
+          they&rsquo;re actively looking at. Discovery first, then the live audit on <em>their</em>{' '}
+          real deal (the leading indicator that predicts conversion, not a generic demo), then the
+          referral the instant a finding lands. The persona openers below are bridge-phase; this is
+          the wedge.
         </p>
 
         {ETA_CALL_SCRIPT.map(s => (
@@ -280,6 +282,13 @@ export function DiscoveryPitchPanel() {
           </ul>
         </div>
       </div>
+
+      {/* Cost-of-inaction calculator — the screen-share-on-the-call tool that
+          pairs with step 4 of the script (anchor the big number before the
+          price). Net-new piece from the ETA sales-playbook research pack; the
+          rest of the pack (DM copy, discovery, objections, bias map, broker
+          tells) was already built. Self-contained; lock-clean guardrails. */}
+      <EtaCostCalculator />
 
       {/* Mom Discovery Test framework dynamic viz — interactive SVG flow.
           Mounts at the top so the visual lives next to the text-based reference;
