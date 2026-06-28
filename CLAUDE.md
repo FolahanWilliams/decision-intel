@@ -137,8 +137,9 @@ Sub: _"Institutional investors never bet on one person's conviction. Decision In
 
 - **Cloverpop:** _"Cloverpop logs decisions; Decision Intel audits them."_
 - **IBM watsonx.governance:** _"IBM audits the model; Decision Intel audits the human reasoning."_
+- **Taktile / decision-automation platforms (the Gartner Decision-Intelligence crowd — added 2026-06-28, Mr. Reiner / Taktile meeting):** _"Decision-automation platforms run the decisions you make a thousand times; Decision Intel pressure-tests the one you make once, before the capital is committed."_ The category boundary is **operational-vs-strategic + after-vs-before-commitment**: Taktile / FICO / Aera / Quantexa automate decision EXECUTION after the strategy is chosen (approve this loan, flag this fraud); DI sits ONE LAYER ABOVE, pressure-testing the strategic JUDGMENT before the irreversible commit (buy this company, enter this market, raise this round). NEVER let a buyer/investor bucket DI with that workflow-automation crowd — which is precisely why **"decision intelligence platform" stays in `BANNED_VOCABULARY`** (it is THEIR Gartner category, not ours). SSOT: the 3rd entry in `COMPETITIVE_DEFENSIVE_LINES` in [icp.ts](src/lib/constants/icp.ts).
 
-These two lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
+These three lines are the operational follow-through to the pain framing — the pain phrase preserves "reasoning" as the IP differentiator; the defensive lines collect on that preservation when a competitor name comes up.
 
 ### Spend-asymmetry wedge + trust gap — retire the "70-90% of deals fail" headline (locked 2026-06-18 — validated at an angel networking event + a bank-side conversation)
 

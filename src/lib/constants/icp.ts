@@ -392,6 +392,11 @@ export const COMPETITIVE_DEFENSIVE_LINES: ReadonlyArray<{
     line: 'IBM audits the model; Decision Intel audits the human reasoning.',
     why: 'IBM watsonx audits AI model behaviour (model lineage, fairness metrics, drift detection). It does NOT audit the human-authored memo or the human reasoning chain that drove the capital-allocation decision. The "human reasoning" qualifier is the procurement-grade differentiator.',
   },
+  {
+    competitor: 'Taktile / decision-automation platforms (the Gartner Decision Intelligence crowd)',
+    line: 'Decision-automation platforms run the decisions you make a thousand times; Decision Intel pressure-tests the one you make once, before the capital is committed.',
+    why: 'Taktile, FICO, Aera, Quantexa optimize OPERATIONAL decision EXECUTION after the strategy is chosen (approve this loan, flag this fraud, extend this credit limit): input to rules to models to decision to execution. Decision Intel sits one layer ABOVE: it pressure-tests the STRATEGIC JUDGMENT (buy this company, enter this market, raise this round) BEFORE the irreversible capital commitment (narrative to assumptions to hidden reasoning to counterfactuals to blind spots to decision quality). Operational-vs-strategic + after-vs-before-commitment is the category boundary. NEVER let a buyer or investor bucket DI with the Gartner Decision-Intelligence workflow-automation crowd: that crowd automates execution; DI audits judgment. This is exactly why "decision intelligence platform" stays in BANNED_VOCABULARY (it is THEIR Gartner category, not ours). Surfaced from the Mr. Reiner / Taktile meeting 2026-06-28.',
+  },
 ] as const;
 
 /**
