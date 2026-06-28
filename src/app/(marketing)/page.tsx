@@ -70,25 +70,15 @@ const ScrollRevealGraph = dynamic(
     ssr: false,
   }
 );
-import {
-  ArrowRight,
-  Check,
-  ShieldCheck,
-  GraduationCap,
-  Globe2,
-  AlertCircle,
-  Search,
-} from 'lucide-react';
+import { ArrowRight, Check, ShieldCheck, GraduationCap, AlertCircle, Search } from 'lucide-react';
 import { DESIGN_PARTNER_SEATS_AVAILABLE } from '@/lib/constants/company-info';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
-import { getAllRegisteredFrameworks } from '@/lib/compliance/frameworks';
 import {
   SOC2_LANDING_STRIP_LABEL,
   SOC2_LANDING_STRIP_NOTE,
   AI_VERIFY_DISCLAIMER_SHORT,
 } from '@/lib/constants/trust-copy';
 
-const FRAMEWORK_COUNT = getAllRegisteredFrameworks().length;
 // PLATFORM_BASELINE_SNAPSHOT is a tiny no-dep mirror of the live
 // computePlatformCalibrationBaseline(). Importing the live function on
 // this `'use client'` page would pull the 750KB case library into the
@@ -486,24 +476,23 @@ export default function LandingPage() {
                     fontWeight: 800,
                     color: C.slate900,
                     margin: '0 0 8px',
-                    lineHeight: 1.05,
-                    fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+                    lineHeight: 1.1,
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  $0
+                  The numbers get audited. The reasoning doesn&rsquo;t.
                 </p>
                 <p
                   style={{
-                    fontSize: 12,
+                    fontSize: 12.5,
                     color: C.slate700,
                     lineHeight: 1.5,
                     margin: '0 0 6px',
                   }}
                 >
-                  is what most firms systematically spend auditing the judgment behind a major
-                  decision. Millions go to the data, the bankers, the diligence. The reasoning that
-                  actually commits the capital goes unchecked.
+                  Millions go to the data, the bankers, the diligence. The judgment that actually
+                  commits the capital, the part that decides whether the money was well spent, never
+                  gets a second look.
                 </p>
                 <p
                   style={{
@@ -569,53 +558,20 @@ export default function LandingPage() {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  Three named failure modes
+                  Invisible from the inside.
                 </p>
-                <ul
+                <p
                   style={{
-                    listStyle: 'none',
-                    padding: 0,
+                    fontSize: 12.5,
+                    color: C.slate700,
+                    lineHeight: 1.5,
                     margin: '0 0 10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6,
                   }}
                 >
-                  <li
-                    style={{
-                      fontSize: 12,
-                      color: C.slate700,
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    <strong style={{ color: C.slate900, fontWeight: 700 }}>Synergy Mirage</strong>:
-                    projections without named owner, mechanism, or 90-day milestone.
-                  </li>
-                  <li
-                    style={{
-                      fontSize: 12,
-                      color: C.slate700,
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    <strong style={{ color: C.slate900, fontWeight: 700 }}>
-                      Conglomerate Fallacy
-                    </strong>
-                    : far-adjacency target with no &ldquo;why us as parent&rdquo; thesis.
-                  </li>
-                  <li
-                    style={{
-                      fontSize: 12,
-                      color: C.slate700,
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    <strong style={{ color: C.slate900, fontWeight: 700 }}>
-                      Winner&rsquo;s Curse
-                    </strong>
-                    : auction-dynamic anchoring above intrinsic value.
-                  </li>
-                </ul>
+                  The fatal assumption looks like conviction to the person who wrote it. You
+                  can&rsquo;t pressure-test the reasoning you&rsquo;re standing inside, so the flaw
+                  survives every read until the outcome names it. An outside view catches it first.
+                </p>
                 <p
                   style={{
                     fontSize: 11,
@@ -625,7 +581,7 @@ export default function LandingPage() {
                     fontStyle: 'italic',
                   }}
                 >
-                  Hard to spot from inside the deal; easy to surface from outside.
+                  Hard to spot from inside the decision. Easy to surface from outside.
                 </p>
               </div>
               {/* SOLUTION — green */}
@@ -1755,8 +1711,8 @@ export default function LandingPage() {
    framework name we coined and own by usage; AI Verify alignment is
    a real principle-mapping exercise (not a certification claim);
    SOC 2 refers to the infrastructure stack (Vercel + Supabase);
-   The framework count is registry-derived (getAllRegisteredFrameworks().length)
-   so it never drifts when africa-frameworks.ts grows. The Brier
+   The case count is constant-derived (HISTORICAL_CASE_COUNT) so it never
+   drifts as the case library grows. The Brier
    calibration item (added F1 lock 2026-04-29) reads from the bundle-
    safe PLATFORM_BASELINE_SNAPSHOT — no fabricated logos. */
 
@@ -1764,8 +1720,8 @@ function HeroCredibilityStrip() {
   // Tightened 2026-05-01: reduced from 5 items + methodology footnote to
   // 3 items, no footnote. The hero close was over-loaded — too many
   // sub-headings competing for attention. Kept the three strongest
-  // procurement signals (universal SOC 2, the cross-border framework
-  // count, R²F brand claim). Dropped: AI Verify (its disclaimer line
+  // credibility signals (universal SOC 2 infra, the audited case
+  // corpus, R²F brand claim). Dropped: AI Verify (its disclaimer line
   // crowded the strip and the framework is less-recognised) and Brier
   // 0.258 (per GTM v3.3 lock — the Brier number stays in technical
   // surfaces + DPR cover, not in cold-context credibility chips).
@@ -1779,9 +1735,9 @@ function HeroCredibilityStrip() {
       note: SOC2_LANDING_STRIP_NOTE,
     },
     {
-      icon: Globe2,
-      label: `${FRAMEWORK_COUNT} regulatory frameworks`,
-      note: 'G7, EU, GCC, African markets',
+      icon: Search,
+      label: `${HISTORICAL_CASE_COUNT} audited decisions`,
+      note: 'real outcomes behind every score',
     },
     {
       icon: GraduationCap,
