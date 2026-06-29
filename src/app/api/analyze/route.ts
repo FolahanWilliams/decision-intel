@@ -58,8 +58,13 @@ export async function POST(request: NextRequest) {
 
     // Handle direct text analysis (from extension)
     if (!documentId && body.text) {
-      // Validate text length to prevent unbounded storage
-      const MAX_TEXT_LENGTH = 100_000;
+      // Validate text length. Raised 100K → 500K (2026-06-30) so a large
+      // pasted memo / filing section audits. 500K chars (~125K tokens, ~150
+      // pages) is the generous-but-safe ceiling: the audit runs ~17 LLM calls,
+      // so this is bounded by the function timeout + context window + per-audit
+      // cost, NOT an arbitrary number. For a genuinely huge document, save the
+      // TEXT as a .txt and upload it (the file path extracts up to 12M chars).
+      const MAX_TEXT_LENGTH = 500_000;
       if (typeof body.text !== 'string' || body.text.length > MAX_TEXT_LENGTH) {
         return NextResponse.json(
           { error: `Text must be a string of at most ${MAX_TEXT_LENGTH} characters` },

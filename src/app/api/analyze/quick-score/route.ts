@@ -27,7 +27,10 @@ const QuickScoreInput = z.object({
   content: z
     .string()
     .min(1, 'content is required')
-    .max(50_000, 'content must be at most 50000 characters'),
+    // Raised 50K → 200K (2026-06-30). Quick-score is a single lighter pass, so
+    // it can take more text than the full audit; 200K (~60 pages) is the safe
+    // ceiling for one pass.
+    .max(200_000, 'content must be at most 200000 characters'),
   title: z.string().optional(),
   url: z.string().optional(),
 });
