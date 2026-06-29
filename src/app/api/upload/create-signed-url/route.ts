@@ -85,7 +85,9 @@ export async function POST(request: NextRequest) {
     if (fileSize > maxUploadMB * 1024 * 1024) {
       const sizeMb = (fileSize / 1024 / 1024).toFixed(1);
       return NextResponse.json(
-        { error: `File too large (${sizeMb}MB · current upload cap is ${maxUploadMB}MB).` },
+        {
+          error: `Too large at ${sizeMb}MB (limit ${maxUploadMB}MB). A full filing is mostly exhibits and financials — for a sharper audit, upload or paste just the strategic sections (the risk factors, the MD&A, or the thesis), not the whole document.`,
+        },
         { status: 413 }
       );
     }

@@ -278,7 +278,9 @@ async function uploadLargeViaStorage(
       contentType: file.type || undefined,
     });
   if (upErr) {
-    throw new Error(`Direct upload to storage failed: ${upErr.message}`);
+    throw new Error(
+      `Upload to storage failed (${upErr.message}). If the file is large, your storage limit may be lower than the app cap — try uploading just the strategic sections.`
+    );
   }
   onProgress(75);
 
@@ -952,8 +954,14 @@ export default function Dashboard() {
         );
       }
     } catch (err) {
+      const detailedMsg = getDetailedErrorMessage(err);
       log.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
-      setError(getDetailedErrorMessage(err));
+      setError(detailedMsg);
+      // Also fire a visible toast — the inline error banner alone was being
+      // missed (the upload reset to its idle state and the failure read as a
+      // silent glitch). The toast is unmissable and tells the user exactly
+      // what happened (e.g. "Too large at 147MB — upload just the sections").
+      showToast(detailedMsg, 'error');
       errorTracking();
 
       // Mark as error in SWR cache and revalidate to sync with server state
