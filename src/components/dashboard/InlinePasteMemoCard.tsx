@@ -55,7 +55,10 @@ interface InlinePasteMemoCardProps {
 }
 
 const MIN_CONTENT_CHARS = 40;
-const MAX_CONTENT_CHARS = 100_000;
+// Kept in lockstep with the server cap (MAX_TEXT_LENGTH in /api/analyze, raised
+// to 500K on 2026-06-30). ~150 pages — bounded by the audit's function timeout +
+// context window, not arbitrary.
+const MAX_CONTENT_CHARS = 500_000;
 
 const PIPELINE_STEP_NAMES = [
   'GDPR anonymization',
