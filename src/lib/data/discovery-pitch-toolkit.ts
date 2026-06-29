@@ -642,6 +642,10 @@ export const ETA_CALL_PRINCIPLES: string[] = [
   'Ask for the referral the instant a real finding lands — the aha moment is the referral moment, not the contract moment.',
   'Offer the per-deal on-ramp alongside the subscription — episodic searchers say yes faster to a single live-deal run than to a recurring fee during a dry spell.',
   'On hesitation, take risk OFF the table — NEVER dial up FOMO. JOLT: 56% of lost deals trace to fear-of-messing-up, not status-quo bias; pushing "you\'ll miss this deal" on a buyer already terrified of the personal guarantee INCREASES the loss. Pivot to "run it on a deal you\'ve already closed first — zero risk, just see if it would have caught anything."',
+  'LEAD COLD WITH THE RETRO, not the live deal (Josh/Reiner 2026-06-29, the $80M-lost-claims move). A cold prospect will NOT upload a live CIM under LOE to a stranger; a dead deal carries zero confidentiality fear, the cost is already known and felt, and it is emotionally pre-loaded. The forward live-deal audit (fundraising leverage) is the WARM move, once the retro has shown it works.',
+  'Retro honesty guardrail: say "here is what was flaggable in hindsight, before anyone knew how it turned out," never "here is why your deal failed." You cannot prove the bias CAUSED the outcome (the epistemic-honesty lock); a sharp ETA catches the overclaim and you lose the room. Flaggable-in-hindsight is both devastating and defensible.',
+  'Pitch EFFICIENCY KPIs, never OUTCOME KPIs, at the wedge (see EFFICIENCY_KPIS). Taktile shows "approval rate up, review time down" because it runs thousands of fast-resolving operational decisions; you run ONE acquisition every 12-24 months with an outcome years out (n=1). Promise what is measurable NOW (hours saved on CIMs, deals killed before diligence, diligence spend avoided, time CIM-to-decision); the outcome-loop / calibration KPIs are the long-game MOAT, never a number you put on a buyer this week.',
+  '"What do you do that I cannot do myself?" is objectivity + speed, NOT labor. Taktile answers it with "a suite of agents that do the work for you" — do NOT copy that; you do not do the diligence. Your answer: "after six weeks on a deal you are the least objective person in the room to judge it; nobody reliably red-teams their own conviction. This is the structured challenge an institutional IC gives, in 60 seconds, that a solo buyer otherwise never gets."',
 ];
 
 // ── The DECISION COST discovery sequence ────────────────────────────────────
@@ -751,32 +755,67 @@ export const DECISION_COST_DISCOVERY: DiscoveryStage[] = [
   },
   {
     stage: 6,
-    label: 'The conditional close + the founding offer',
+    label: 'The retro-led close + the founding offer',
     kind: 'say',
     ask: [
-      "Send me the deal you're looking at right now, plus one that went sideways. I'll run a 60-second audit on both, free, on a call with you. If it surfaces one thing you hadn't pressure-tested, that's worth more than the $249 a month — and if it's clean, you keep the tamper-evident record to hand your capital partners as proof of your rigour. No pressure: want to start with a deal you've already closed, so it's zero-risk?",
+      "Bring me a deal you already walked away from, or one you regret — not a live one, so there's no confidentiality worry. I'll run a 60-second audit and show you what was flaggable in hindsight, before anyone knew how it turned out. If it surfaces something you'd have wanted to see earlier, that's the whole pitch. Then, once you trust it, you run it on the deal in front of you, where the same audit doubles as your prep to look sharp to investors. It's $249 a month, or a single live deal on its own.",
     ],
     extracts:
-      'Conditional value (their judgment, their number — never a fabricated savings rate), risk reversal (the retro deal = zero-risk proof), and the JOLT safety-net pivot baked into the close itself.',
+      "LEAD with the RETRO (a dead deal), never the live deal, on a cold first-touch: no confidentiality fear, the cost is already felt, and it is the reciprocity reveal (Josh's $80M move). The forward live-deal audit is the WARM follow-on (also their investor-prep leverage). Conditional value, their number, never a fabricated rate.",
     guardrail:
-      'When they hesitate, take risk OFF the table (the retro), never dial up FOMO. The per-deal on-ramp ($499-$4,999 per live deal) is the lower-threshold alternative to the subscription for an episodic searcher.',
+      'Retro honesty: "what was flaggable in hindsight, before the outcome was known" — NEVER "why your deal failed" (causation overclaim, the epistemic-honesty lock). The retro IS the risk-off-the-table move on hesitation; never dial up FOMO. Per-deal on-ramp ($499-$4,999) is the lower-threshold alternative to the subscription.',
   },
 ];
 
-// The irresistible pre-revenue offer (NotebookLM `809f5104`, 2026-06-28). You
-// cannot yet pitch third-party trust ("family offices love our audits") — so
-// pitch purely on SELF-VALUE + RISK REVERSAL. Even a "no" on the subscription
-// leaves them better off (they keep the record), which is what makes it
-// irresistible. Edit in lockstep with the stage-6 close above.
+// The irresistible cold-open offer — LEAD WITH THE RETRO (locked 2026-06-29,
+// Josh/Reiner: the $80M-lost-claims reciprocity move). Updated from the prior
+// "Live + Retro" framing, which led with the live deal: a cold prospect will not
+// upload a live CIM under LOE to a stranger, so the RETRO (a dead deal) is the
+// cold lead — zero confidentiality fear, the cost is already felt, nothing to
+// sell, only to reveal. The forward live-deal audit (fundraising leverage) is
+// the WARM follow-on once trust exists. You cannot pitch third-party trust
+// ("family offices love our audits") yet — pitch SELF-VALUE + RISK REVERSAL.
+// Edit in lockstep with the stage-6 close above.
 export const ETA_FOUNDING_OFFER = {
-  headline: 'The "Live + Retro" free audit',
+  headline: 'The retro audit (the cold-open offer)',
   lines: [
-    'Send me the memo for the deal you are looking at right now, PLUS one that went sideways. I run a 60-second audit on both, free, on a call with you.',
-    'I act as your temporary investment committee — a second set of eyes on the one blind spot that might cost you this deal.',
-    'If it catches deal fever or LOI-price anchoring, you have saved the next ~$20k of diligence. If the memo is clean, you keep the tamper-evident provenance record to hand your capital partners as proof of your rigour.',
+    'Bring me a deal you already walked away from, or one you regret. I run a 60-second audit, free, and show you what was flaggable in hindsight, before anyone knew how it turned out (never "why it failed" — what was visible at the time).',
+    'No live CIM, no confidentiality worry on a dead deal, no risk. The cost is already yours; this just reveals what a second set of eyes would have caught.',
+    'Then, once you have seen it work, you run it on the live deal in front of you, where the same audit doubles as your prep to look sharp to investors. It is $249 a month, or a single live deal on its own.',
   ],
   whyIrresistible:
-    'Zero financial commitment upfront. It is the investment committee a solo searcher desperately lacks. And they walk away with a tangible asset (the provenance record) they can use as leverage to raise their equity — so even a "no" on the subscription leaves them better off. Self-value + risk reversal, never a trust-claim you cannot back yet.',
+    'Zero commitment AND zero confidentiality fear (it is a dead deal), and the cost is already known and felt, so there is nothing to sell, only to reveal (Josh\'s $80M-lost-claims reciprocity move). It is the investment committee a solo searcher lacks, and even a "no" leaves them with a record they keep. Self-value + risk reversal, never a trust-claim you cannot back yet.',
   founding:
     'Founding-customer terms: locked price, a direct line to the founder, and you shape the product. The first ~30 closed outcomes you log become a calibration record only YOU can build — your reference library for every future deal.',
+} as const;
+
+// Efficiency / decision-cost KPIs (the WEDGE metrics, measurable NOW) vs the
+// outcome-loop / calibration KPIs (the long-game MOAT). Locked 2026-06-29
+// (Reiner/Josh KPI lesson). The trap to avoid: Taktile shows OUTCOME KPIs
+// (approval rate up, review time down) because it runs thousands of fast-
+// resolving operational decisions; DI runs ONE acquisition every 12-24 months
+// with an outcome years out (n=1). Promise only what is measurable this week;
+// never put a number on the outcome-loop moat for a buyer at the wedge.
+export const EFFICIENCY_KPIS = {
+  wedge: {
+    label: 'Wedge KPIs — measurable now, what you promise',
+    items: [
+      'Hours saved evaluating each CIM',
+      'Deals killed before expensive diligence',
+      'Diligence spend avoided on rejected deals',
+      'Assumptions surfaced before the LOI',
+      'Time from CIM to a go / no-go decision',
+    ],
+  },
+  moat: {
+    label: 'Outcome-loop KPIs — the long-game moat, NOT a number you quote this week',
+    items: [
+      'Decision outcomes tracked + lessons captured',
+      'Confidence calibration, before vs after, over time',
+      'Repeated mistakes avoided across deals',
+      'The per-firm reference-class library that compounds',
+    ],
+  },
+  discipline:
+    'Lead the WEDGE KPIs on a call (immediately measurable). Name the MOAT KPIs as the direction, never as a number — DI cannot produce Taktile-style outcome statistics at n=1 with an outcome years out, and promising a measurement you cannot deliver is the credibility-killer.',
 } as const;

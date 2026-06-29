@@ -45,6 +45,7 @@ import {
   ETA_CALL_PRINCIPLES,
   DECISION_COST_DISCOVERY,
   ETA_FOUNDING_OFFER,
+  EFFICIENCY_KPIS,
   type PainPattern,
   type PersonaId,
 } from '@/lib/data/discovery-pitch-toolkit';
@@ -473,6 +474,82 @@ export function DiscoveryPitchPanel() {
           rest of the pack (DM copy, discovery, objections, bias map, broker
           tells) was already built. Self-contained; lock-clean guardrails. */}
       <EtaCostCalculator />
+
+      {/* Efficiency vs outcome KPIs — what you can honestly promise NOW vs the
+          long-game moat. Reiner/Josh KPI lesson 2026-06-29; reads EFFICIENCY_KPIS
+          from discovery-pitch-toolkit.ts. The trap: Taktile shows outcome KPIs
+          (n=thousands, fast); DI is n=1, years-out, so promise efficiency now and
+          name the moat as direction, never as a number. */}
+      <div
+        style={{
+          background: C.greenSoft,
+          border: `1px solid ${C.greenBorder}`,
+          borderRadius: 'var(--radius-md)',
+          padding: 16,
+          marginBottom: 18,
+        }}
+      >
+        <div style={blockEyebrow(C.green)}>
+          <Target size={11} /> The KPIs you can honestly promise (vs the moat)
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 14,
+            marginTop: 12,
+          }}
+        >
+          {[EFFICIENCY_KPIS.wedge, EFFICIENCY_KPIS.moat].map((group, gi) => (
+            <div
+              key={group.label}
+              style={{
+                background: 'var(--bg-card)',
+                border: `1px solid ${gi === 0 ? C.greenBorder : 'var(--border-color)'}`,
+                borderRadius: 'var(--radius-sm)',
+                padding: 12,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: gi === 0 ? C.green : 'var(--text-secondary)',
+                  marginBottom: 8,
+                  lineHeight: 1.4,
+                }}
+              >
+                {group.label}
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                {group.items.map(item => (
+                  <li
+                    key={item}
+                    style={{
+                      fontSize: 12.5,
+                      color: 'var(--text-primary)',
+                      lineHeight: 1.5,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p
+          style={{
+            fontSize: 11.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.5,
+            margin: '12px 0 0',
+          }}
+        >
+          {EFFICIENCY_KPIS.discipline}
+        </p>
+      </div>
 
       {/* Mom Discovery Test framework dynamic viz — interactive SVG flow.
           Mounts at the top so the visual lives next to the text-based reference;
