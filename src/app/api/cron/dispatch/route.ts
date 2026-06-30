@@ -94,15 +94,15 @@ export async function GET() {
   const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 1 = Monday
 
   // Jobs that run every day.
-  // NOTE on /api/cron/daily-linkedin (re-enabled Apr 2026): the route now
-  // short-circuits BEFORE calling Gemini if FOUNDER_EMAIL or RESEND_API_KEY
-  // is missing, so it cannot burn budget when email delivery is unavailable
-  // (the original root cause of the April 2026 cost spike).
+  // REMOVED 2026-06-30 (founder runs both via Cloud Cowork instead, human-in-
+  // loop): /api/cron/outreach-intel (the in-app Taktile lead engine) and
+  // /api/cron/daily-linkedin (the daily LinkedIn post email). Cowork's daily
+  // task generates the reciprocity leads + the LinkedIn posts on the founder's
+  // machine, writes a markdown brief + dashboard, and the founder sends by hand.
+  // The routes + the IntelBriefPanel stay (dormant; usable on-demand) — only
+  // the scheduled runs are pulled, so neither duplicates Cowork nor burns budget.
   const dailyJobs = [
     '/api/cron/sync-intelligence',
-    // Must run AFTER sync-intelligence so the NewsArticle table is fresh
-    // before the brief synthesizes the day's corp-dev / M&A signal.
-    '/api/cron/outreach-intel',
     '/api/cron/detect-outcomes',
     // Vector 1 — day-90 operational-proxy Brier backfill (pure;
     // surfaces due proxies via the detail card + the outcome gate).
@@ -110,7 +110,6 @@ export async function GET() {
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
     '/api/cron/google-drive-sync',
-    '/api/cron/daily-linkedin',
     '/api/cron/enforce-retention',
     '/api/cron/vohra-pmf-trigger',
     '/api/cache/cleanup',
