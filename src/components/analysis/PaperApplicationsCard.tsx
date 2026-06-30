@@ -189,12 +189,27 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
   const rubric = decisionRubric;
   const aversion = algorithmAversion;
 
+  // SIGNAL-GATING (2026-06-30): only render a detector card when it carries
+  // real signal. The cold-start / cannot-assess / no-aversion states are dead
+  // weight (the founder: "some aren't even relevant") — they tell the reader
+  // nothing about THIS decision and just inflate the card wall. Validity always
+  // has a band; the rest gate on whether they could actually assess.
+  const showOutsideView = rc.baselineFailureRate !== null || rc.topAnalogs.length > 0;
+  const showAuthorCalibration = fa.verdict === 'adequate' || fa.verdict === 'sparse';
+  const showConfidence = cr.verdict !== 'cannot_assess';
+  const showClassCalibration =
+    frac.verdict !== 'cannot_assess' && frac.verdict !== 'broadly_cold_start';
+  const showRubric = rubric.verdict !== 'cannot_assess';
+  const showAlgoTrust =
+    aversion.verdict !== 'no_aversion_signal' && aversion.verdict !== 'cannot_assess';
+
   return (
     <div style={{ marginBottom: 16 }}>
-      <SignalBlockGrid minWidth={260}>
+      <SignalBlockGrid minWidth={240}>
         {/* Validity (plain-language eyebrow). The technical name and academic
             citation live in the citation footer + tooltip. */}
         <SignalBlock
+          compact
           eyebrow="Validity"
           icon={Telescope}
           verdict={VALIDITY_VERDICT[validityClassification.validityClass]}
@@ -205,90 +220,96 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
         />
 
         {/* Outside View (plain-language eyebrow for Reference Class Forecast). */}
-        <SignalBlock
-          eyebrow="Outside View"
-          icon={History}
-          verdict={RC_VERDICT[rc.predictedOutcomeBand]}
-          band={RC_BAND[rc.predictedOutcomeBand]}
-          metric={
-            rc.baselineFailureRate !== null
-              ? `${Math.round(rc.baselineFailureRate * 100)}% historical fail rate · n=${rc.baselineSampleSize}`
-              : null
-          }
-          rationale={rc.note}
-          tooltip="Reference Class Forecast — Kahneman & Lovallo 2003 HBR 'Delusions of Success.' Top-5 historical analogs from the 143-case library, base-rate failure prediction."
-          citation={<>Kahneman &amp; Lovallo 2003 · 143-case library</>}
-        >
-          {rc.topAnalogs.length > 0 && (
-            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div
-                style={{
-                  fontSize: 'var(--fs-3xs)',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                }}
-              >
-                Closest historical analogs
-              </div>
-              {rc.topAnalogs.slice(0, 3).map(a => (
-                <a
-                  key={a.caseId}
-                  href={`/case-studies/${a.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
+        {showOutsideView && (
+          <SignalBlock
+            compact
+            eyebrow="Outside View"
+            icon={History}
+            verdict={RC_VERDICT[rc.predictedOutcomeBand]}
+            band={RC_BAND[rc.predictedOutcomeBand]}
+            metric={
+              rc.baselineFailureRate !== null
+                ? `${Math.round(rc.baselineFailureRate * 100)}% historical fail rate · n=${rc.baselineSampleSize}`
+                : null
+            }
+            rationale={rc.note}
+            tooltip="Reference Class Forecast — Kahneman & Lovallo 2003 HBR 'Delusions of Success.' Top-5 historical analogs from the 143-case library, base-rate failure prediction."
+            citation={<>Kahneman &amp; Lovallo 2003 · 143-case library</>}
+          >
+            {rc.topAnalogs.length > 0 && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    padding: '6px 8px',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--fs-xs)',
-                    color: 'var(--text-primary)',
-                    textDecoration: 'none',
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
                   }}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {a.company}
-                    </strong>
-                    <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
-                      {a.year}
-                    </span>
-                  </span>
-                  <span
+                  Closest historical analogs
+                </div>
+                {rc.topAnalogs.slice(0, 3).map(a => (
+                  <a
+                    key={a.caseId}
+                    href={`/case-studies/${a.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 4,
-                      fontSize: 'var(--fs-3xs)',
-                      color: 'var(--text-muted)',
-                      flexShrink: 0,
+                      justifyContent: 'space-between',
+                      gap: 8,
+                      padding: '6px 8px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 'var(--fs-xs)',
+                      color: 'var(--text-primary)',
+                      textDecoration: 'none',
                     }}
                   >
-                    sim {Math.round(a.similarityScore * 100)}%
-                    <ExternalLink size={10} aria-hidden />
-                  </span>
-                </a>
-              ))}
-            </div>
-          )}
-        </SignalBlock>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                      <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {a.company}
+                      </strong>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
+                        {a.year}
+                      </span>
+                    </span>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        fontSize: 'var(--fs-3xs)',
+                        color: 'var(--text-muted)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      sim {Math.round(a.similarityScore * 100)}%
+                      <ExternalLink size={10} aria-hidden />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+          </SignalBlock>
+        )}
 
         {/* Author Calibration (plain-language eyebrow for Feedback Adequacy). */}
-        <SignalBlock
-          eyebrow="Author Calibration"
-          icon={Activity}
-          verdict={FA_VERDICT[fa.verdict]}
-          band={FA_BAND[fa.verdict]}
-          rationale={fa.note}
-          tooltip="Feedback Adequacy — Kahneman & Klein 2009 second condition: has the author had enough closed-loop feedback in this domain to be calibrated? An 'adequate' verdict means experience-based confidence in this domain is trustworthy; 'sparse' or 'cold start' means treat experience claims with more scrutiny."
-          citation={<>Kahneman &amp; Klein 2009 · author 18-month closed outcomes</>}
-        />
+        {showAuthorCalibration && (
+          <SignalBlock
+            compact
+            eyebrow="Author Calibration"
+            icon={Activity}
+            verdict={FA_VERDICT[fa.verdict]}
+            band={FA_BAND[fa.verdict]}
+            rationale={fa.note}
+            tooltip="Feedback Adequacy — Kahneman & Klein 2009 second condition: has the author had enough closed-loop feedback in this domain to be calibrated? An 'adequate' verdict means experience-based confidence in this domain is trustworthy; 'sparse' or 'cold start' means treat experience claims with more scrutiny."
+            citation={<>Kahneman &amp; Klein 2009 · author 18-month closed outcomes</>}
+          />
+        )}
 
         {/* Calibrated Rejection (plain-language eyebrow for the verdict
             band that closes both K&K conditions). Item 3 lock 2026-05-07.
@@ -299,60 +320,63 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
             language patterns (illusion_of_validity / overconfidence /
             authority / anchoring). When the gap is material, the audit-
             committee-readiness flag fires. */}
-        <SignalBlock
-          eyebrow="Confidence Calibration"
-          icon={Scale}
-          verdict={calibratedRejectionVerdictLabel(cr.verdict)}
-          band={CR_BAND[cr.verdict]}
-          metric={
-            cr.verdict !== 'cannot_assess'
-              ? `gap ${cr.calibrationGap.toFixed(2)} · rhetoric ${cr.rhetoricalConfidenceScore.toFixed(2)} · earned ${cr.earnedConfidenceScore.toFixed(2)}`
-              : null
-          }
-          rationale={cr.note}
-          tooltip="Calibrated Rejection of Subjective Confidence — Kahneman & Klein 2009 closes both conditions. Subjective confidence is a valid accuracy indicator only when both validity AND feedback adequacy are present. The detector compares the memo's rhetorical confidence (proxied by bias-detective hits on illusion_of_validity / overconfidence / authority / anchoring) against the earned confidence (validity × feedback). Material gaps fire an audit-committee-readiness flag."
-          citation={<>Kahneman &amp; Klein 2009 · paper-application #10</>}
-        >
-          {cr.triggers.length > 0 && (
-            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div
-                style={{
-                  fontSize: 'var(--fs-3xs)',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                }}
-              >
-                Confidence-language triggers
+        {showConfidence && (
+          <SignalBlock
+            compact
+            eyebrow="Confidence Calibration"
+            icon={Scale}
+            verdict={calibratedRejectionVerdictLabel(cr.verdict)}
+            band={CR_BAND[cr.verdict]}
+            metric={
+              cr.verdict !== 'cannot_assess'
+                ? `gap ${cr.calibrationGap.toFixed(2)} · rhetoric ${cr.rhetoricalConfidenceScore.toFixed(2)} · earned ${cr.earnedConfidenceScore.toFixed(2)}`
+                : null
+            }
+            rationale={cr.note}
+            tooltip="Calibrated Rejection of Subjective Confidence — Kahneman & Klein 2009 closes both conditions. Subjective confidence is a valid accuracy indicator only when both validity AND feedback adequacy are present. The detector compares the memo's rhetorical confidence (proxied by bias-detective hits on illusion_of_validity / overconfidence / authority / anchoring) against the earned confidence (validity × feedback). Material gaps fire an audit-committee-readiness flag."
+            citation={<>Kahneman &amp; Klein 2009 · paper-application #10</>}
+          >
+            {cr.triggers.length > 0 && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
+                  style={{
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  Confidence-language triggers
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 4,
+                  }}
+                >
+                  {cr.triggers.slice(0, 4).map((trig, i) => (
+                    <span
+                      key={`${trig}-${i}`}
+                      style={{
+                        fontSize: 'var(--fs-3xs)',
+                        fontFamily: 'ui-monospace, monospace',
+                        padding: '2px 6px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {trig}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 4,
-                }}
-              >
-                {cr.triggers.slice(0, 4).map((trig, i) => (
-                  <span
-                    key={`${trig}-${i}`}
-                    style={{
-                      fontSize: 'var(--fs-3xs)',
-                      fontFamily: 'ui-monospace, monospace',
-                      padding: '2px 6px',
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    {trig}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </SignalBlock>
+            )}
+          </SignalBlock>
+        )}
 
         {/* Fractionation of Expertise — Kahneman & Klein 2009. Wedge-
             batch-4 lock 2026-05-07. Per-class slicing of the author's
@@ -360,177 +384,186 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
             this memo + the comparative track record on other classes.
             The procurement-grade answer to "your feedback is sparse —
             sparse FOR WHICH decision class?" */}
-        <SignalBlock
-          eyebrow="Class-Specific Calibration"
-          icon={Layers}
-          verdict={fractionationVerdictLabel(frac.verdict)}
-          band={FRAC_BAND[frac.verdict]}
-          metric={
-            frac.verdict !== 'cannot_assess'
-              ? `${decisionClassLabel(frac.detectedClass)} · ${frac.thisClassRecentOutcomes} this-class outcomes (18mo)`
-              : null
-          }
-          rationale={frac.note}
-          tooltip="Fractionation of Expertise — Kahneman & Klein 2009 finding that expert validity is sub-domain-specific. A senior expert can be calibrated on M&A integration but cold-start on market entry. The detector slices the author's outcome history by decision class and contrasts this-class to other-class calibration."
-          citation={<>Kahneman &amp; Klein 2009 · paper-application #1</>}
-        >
-          {frac.classBreakdown.length > 1 && (
-            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div
-                style={{
-                  fontSize: 'var(--fs-3xs)',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                }}
-              >
-                Track record by class
-              </div>
-              {frac.classBreakdown.slice(0, 4).map(row => (
+        {showClassCalibration && (
+          <SignalBlock
+            compact
+            eyebrow="Class-Specific Calibration"
+            icon={Layers}
+            verdict={fractionationVerdictLabel(frac.verdict)}
+            band={FRAC_BAND[frac.verdict]}
+            metric={
+              frac.verdict !== 'cannot_assess'
+                ? `${decisionClassLabel(frac.detectedClass)} · ${frac.thisClassRecentOutcomes} this-class outcomes (18mo)`
+                : null
+            }
+            rationale={frac.note}
+            tooltip="Fractionation of Expertise — Kahneman & Klein 2009 finding that expert validity is sub-domain-specific. A senior expert can be calibrated on M&A integration but cold-start on market entry. The detector slices the author's outcome history by decision class and contrasts this-class to other-class calibration."
+            citation={<>Kahneman &amp; Klein 2009 · paper-application #1</>}
+          >
+            {frac.classBreakdown.length > 1 && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div
-                  key={row.decisionClass}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    padding: '4px 8px',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--fs-xs)',
-                    color: 'var(--text-primary)',
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
                   }}
                 >
-                  <span>
-                    {decisionClassLabel(row.decisionClass)}
-                    {row.decisionClass === frac.detectedClass && (
-                      <span
-                        style={{
-                          marginLeft: 6,
-                          fontSize: 'var(--fs-3xs)',
-                          color: 'var(--accent-primary)',
-                          fontWeight: 600,
-                        }}
-                      >
-                        · this memo
-                      </span>
-                    )}
-                  </span>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
-                    {row.recentOutcomes} recent · {row.outcomes} total · {row.verdict}
-                  </span>
+                  Track record by class
                 </div>
-              ))}
-            </div>
-          )}
-        </SignalBlock>
+                {frac.classBreakdown.slice(0, 4).map(row => (
+                  <div
+                    key={row.decisionClass}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                      padding: '4px 8px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: 'var(--fs-xs)',
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    <span>
+                      {decisionClassLabel(row.decisionClass)}
+                      {row.decisionClass === frac.detectedClass && (
+                        <span
+                          style={{
+                            marginLeft: 6,
+                            fontSize: 'var(--fs-3xs)',
+                            color: 'var(--accent-primary)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          · this memo
+                        </span>
+                      )}
+                    </span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 'var(--fs-3xs)' }}>
+                      {row.recentOutcomes} recent · {row.outcomes} total · {row.verdict}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </SignalBlock>
+        )}
 
         {/* Decision Rubric Structure — Dawes 1979 "Improper Linear
             Models." Pure-function scan of bias excerpts for rubric
             markers vs narrative-coherence signals. The procurement-grade
             answer to "did the memo argue narrative coherence or follow
             Dawes' robust pattern?" */}
-        <SignalBlock
-          eyebrow="Rubric Structure"
-          icon={ListChecks}
-          verdict={decisionRubricVerdictLabel(rubric.verdict)}
-          band={RUBRIC_BAND[rubric.verdict]}
-          metric={
-            rubric.verdict !== 'cannot_assess'
-              ? `structure ${rubric.structureScore.toFixed(2)} · narrative ${rubric.narrativeScore.toFixed(2)}`
-              : null
-          }
-          rationale={rubric.note}
-          tooltip="Decision Rubric Structure — Dawes (1979) 'The Robust Beauty of Improper Linear Models in Decision Making.' A simple equal-weight rubric outperforms expert intuition + rubric override. The detector scans for structural rubric markers (criteria + weights + comparison) and contrasts them with narrative-coherence signals (illusion_of_validity / inside_view_dominance hits)."
-          citation={<>Dawes 1979 · paper-application #4</>}
-        >
-          {rubric.structuralMarkers.length > 0 && (
-            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div
-                style={{
-                  fontSize: 'var(--fs-3xs)',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                }}
-              >
-                Structural markers detected
+        {showRubric && (
+          <SignalBlock
+            compact
+            eyebrow="Rubric Structure"
+            icon={ListChecks}
+            verdict={decisionRubricVerdictLabel(rubric.verdict)}
+            band={RUBRIC_BAND[rubric.verdict]}
+            metric={
+              rubric.verdict !== 'cannot_assess'
+                ? `structure ${rubric.structureScore.toFixed(2)} · narrative ${rubric.narrativeScore.toFixed(2)}`
+                : null
+            }
+            rationale={rubric.note}
+            tooltip="Decision Rubric Structure — Dawes (1979) 'The Robust Beauty of Improper Linear Models in Decision Making.' A simple equal-weight rubric outperforms expert intuition + rubric override. The detector scans for structural rubric markers (criteria + weights + comparison) and contrasts them with narrative-coherence signals (illusion_of_validity / inside_view_dominance hits)."
+            citation={<>Dawes 1979 · paper-application #4</>}
+          >
+            {rubric.structuralMarkers.length > 0 && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
+                  style={{
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  Structural markers detected
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {rubric.structuralMarkers.slice(0, 4).map((marker, i) => (
+                    <span
+                      key={`${marker}-${i}`}
+                      style={{
+                        fontSize: 'var(--fs-3xs)',
+                        fontFamily: 'ui-monospace, monospace',
+                        padding: '2px 6px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {marker}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {rubric.structuralMarkers.slice(0, 4).map((marker, i) => (
-                  <span
-                    key={`${marker}-${i}`}
-                    style={{
-                      fontSize: 'var(--fs-3xs)',
-                      fontFamily: 'ui-monospace, monospace',
-                      padding: '2px 6px',
-                      background: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'var(--text-secondary)',
-                    }}
-                  >
-                    {marker}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </SignalBlock>
+            )}
+          </SignalBlock>
+        )}
 
         {/* Algorithm Aversion — Dietvorst, Simmons & Massey 2015.
             Counter-programs the most common buyer objection ("we don't
             want AI overruling our CSO") by naming dismissive-of-
             quantitative language as a documented decision-making error. */}
-        <SignalBlock
-          eyebrow="Algorithm Trust"
-          icon={Calculator}
-          verdict={algorithmAversionVerdictLabel(aversion.verdict)}
-          band={AVERSION_BAND[aversion.verdict]}
-          metric={
-            aversion.verdict !== 'cannot_assess' && aversion.dismissivePhraseCount > 0
-              ? `${aversion.dismissivePhraseCount} dismissive phrase${aversion.dismissivePhraseCount === 1 ? '' : 's'} · score ${aversion.aversionScore.toFixed(2)}`
-              : null
-          }
-          rationale={aversion.note}
-          tooltip="Algorithm Aversion — Dietvorst, Simmons & Massey (2015) 'Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err.' Humans are systematically more forgiving of human errors than equivalent algorithm errors, even when the algorithm is statistically superior. The detector flags dismissive-of-quantitative language as a documented bias rather than letting it pass as judgment."
-          citation={<>Dietvorst, Simmons &amp; Massey 2015 · paper-application #7</>}
-        >
-          {aversion.flaggedSnippets.length > 0 && (
-            <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div
-                style={{
-                  fontSize: 'var(--fs-3xs)',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                }}
-              >
-                Flagged language
-              </div>
-              {aversion.flaggedSnippets.slice(0, 2).map((snip, i) => (
+        {showAlgoTrust && (
+          <SignalBlock
+            compact
+            eyebrow="Algorithm Trust"
+            icon={Calculator}
+            verdict={algorithmAversionVerdictLabel(aversion.verdict)}
+            band={AVERSION_BAND[aversion.verdict]}
+            metric={
+              aversion.verdict !== 'cannot_assess' && aversion.dismissivePhraseCount > 0
+                ? `${aversion.dismissivePhraseCount} dismissive phrase${aversion.dismissivePhraseCount === 1 ? '' : 's'} · score ${aversion.aversionScore.toFixed(2)}`
+                : null
+            }
+            rationale={aversion.note}
+            tooltip="Algorithm Aversion — Dietvorst, Simmons & Massey (2015) 'Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err.' Humans are systematically more forgiving of human errors than equivalent algorithm errors, even when the algorithm is statistically superior. The detector flags dismissive-of-quantitative language as a documented bias rather than letting it pass as judgment."
+            citation={<>Dietvorst, Simmons &amp; Massey 2015 · paper-application #7</>}
+          >
+            {aversion.flaggedSnippets.length > 0 && (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div
-                  key={`${snip}-${i}`}
                   style={{
-                    fontSize: 'var(--fs-xs)',
-                    padding: '4px 8px',
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--text-secondary)',
-                    fontStyle: 'italic',
+                    fontSize: 'var(--fs-3xs)',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
                   }}
                 >
-                  &ldquo;{snip.trim()}&rdquo;
+                  Flagged language
                 </div>
-              ))}
-            </div>
-          )}
-        </SignalBlock>
+                {aversion.flaggedSnippets.slice(0, 2).map((snip, i) => (
+                  <div
+                    key={`${snip}-${i}`}
+                    style={{
+                      fontSize: 'var(--fs-xs)',
+                      padding: '4px 8px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-sm)',
+                      color: 'var(--text-secondary)',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    &ldquo;{snip.trim()}&rdquo;
+                  </div>
+                ))}
+              </div>
+            )}
+          </SignalBlock>
+        )}
       </SignalBlockGrid>
     </div>
   );
