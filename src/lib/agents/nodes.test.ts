@@ -89,8 +89,9 @@ describe('riskScorerNode', () => {
     expect(report.preMortem).toEqual(state.preMortem);
     expect(report.sentiment).toEqual(state.sentimentAnalysis);
 
-    // formula: Score = Base(100) - Noise(2*5=10) - Trust((100-90)*0.3=3) = 87
-    expect(report.overallScore).toBe(87);
+    // formula: Score = Base(100) - Noise(min(22, 2*1.5)=3) - Trust((100-90)*0.3=3) = 94
+    // (noise penalty recalibrated 2026-06-30: rate 5 → 1.5, capped at 22)
+    expect(report.overallScore).toBe(94);
   });
 
   it('should handle missing fields gracefully', async () => {
