@@ -43,6 +43,9 @@ import {
   formatCrossDocContextForPrompt,
 } from '../rag/cross-document-context';
 import { normalizeBiasType } from '../utils/bias-normalize';
+import { gradeFromScore } from '../utils/grade';
+import { formatBiasName } from '../utils/labels';
+import { distillForAudit } from './content-distiller';
 import {
   isInvestmentDocument,
   buildInvestmentBiasOverlay,
@@ -911,7 +914,16 @@ function preRedactPII(text: string): { redacted: string; count: number } {
 }
 
 export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<AuditState>> {
-  const content = state.originalContent;
+  // DISTILL-TO-REASONING (2026-06-30) — the first thing the pipeline does. For
+  // a strategic memo (within budget) this is a no-op. For a real filing / CIM
+  // (1.5M chars), it reduces the document to its most reasoning-dense content
+  // (risk factors / MD&A / strategy) and sets aside the cover page, financial
+  // tables, and exhibits — so the audit reads the REASONING, not the first 50K
+  // of boilerplate. distillationNote is threaded to the summary so the user
+  // sees what was set aside.
+  const distillation = distillForAudit(state.originalContent || '', MAX_INPUT_CHARS);
+  const content = distillation.content;
+  const distillationNote = distillation.note;
 
   // Phase 1: Deterministic regex pre-redaction (catches structured PII —
   // emails / phones / IPs). Always runs, regardless of LLM outcome.
@@ -978,6 +990,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
         anonymizationStatus: 'success',
         structuredContent,
         speakers: [],
+        distillationNote,
       };
     }
 
@@ -1017,6 +1030,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     anonymizationStatus: 'success',
     structuredContent: preRedacted,
     speakers: [],
+    distillationNote,
   };
 }
 
@@ -2003,7 +2017,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 
   // Step 5 — pure-math penalty components
   const noisePenalty = calculateNoisePenalty(state.noiseStats?.stdDev);
-  const { trustScore, trustPenalty } = calculateTrustPenalty(state.factCheckResult);
+  const { trustPenalty } = calculateTrustPenalty(state.factCheckResult);
   const logicPenalty = calculateLogicPenalty(state.logicalAnalysis?.score);
   const diversityPenalty = calculateEchoChamberPenalty(state.cognitiveAnalysis?.blindSpotGap);
 
@@ -2043,6 +2057,26 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     sampleSize: calibrationSampleSize,
   });
 
+  // Content-aware summary (2026-06-30) — replaces the bare template
+  // "Audit complete. Detected N biases. Trust Score X%." which surfaced on the
+  // Executive + Board views. Built deterministically from the real audit data
+  // (DQI + grade + the highest-severity finding) so the one-line summary
+  // actually says something about THIS decision.
+  const summaryBiases = state.biasAnalysis || [];
+  const SEVERITY_RANK: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+  const topFinding = [...summaryBiases].sort(
+    (a, b) =>
+      (SEVERITY_RANK[(b.severity || 'low').toLowerCase()] || 0) -
+      (SEVERITY_RANK[(a.severity || 'low').toLowerCase()] || 0)
+  )[0];
+  const grade = gradeFromScore(overallScore);
+  const baseSummary =
+    summaryBiases.length === 0
+      ? `Clean audit — no reasoning risks flagged. DQI ${overallScore}/100 (grade ${grade}).`
+      : `DQI ${overallScore}/100 (grade ${grade}). ${summaryBiases.length} reasoning ${summaryBiases.length === 1 ? 'risk' : 'risks'} flagged${topFinding?.biasType ? `, led by ${formatBiasName(topFinding.biasType)}` : ''}.`;
+  // Surface the distillation when a large document was reduced to its reasoning.
+  const summary = state.distillationNote ? `${baseSummary} ${state.distillationNote}` : baseSummary;
+
   return {
     finalReport: {
       overallScore,
@@ -2052,7 +2086,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       // (stdDev 28.5 → 86, 9.4 → 28, 2.4 → 7) without changing the DQI penalty
       // (that is the separately-recalibrated calculateNoisePenalty).
       noiseScore: Math.max(0, Math.min(100, Math.round((state.noiseStats?.stdDev || 0) * 3))),
-      summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
+      summary,
       structuredContent: state.structuredContent,
       biases: (state.biasAnalysis || []).map(b => ({
         ...b,

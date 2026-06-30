@@ -198,6 +198,10 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),
+  distillationNote: Annotation<string | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
   recognitionCues: Annotation<RecognitionCuesResult | null>({
     reducer: (x, y) => y ?? x,
     default: () => null,

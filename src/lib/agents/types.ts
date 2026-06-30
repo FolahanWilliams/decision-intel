@@ -123,6 +123,8 @@ export interface AuditState {
   simulation?: SimulationResult;
   institutionalMemory?: InstitutionalMemoryResult;
   metaVerdict?: string;
+  /** Set by the distiller when a large document was reduced to its reasoning. */
+  distillationNote?: string | null;
 
   // Klein RPD Framework
   recognitionCues?: RecognitionCuesResult;
