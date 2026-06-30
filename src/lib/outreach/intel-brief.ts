@@ -42,12 +42,44 @@ export interface IntelSourceArticle {
 }
 
 export interface OutreachIntelItem {
-  /** The corp-dev / M&A event in plain language. */
+  /** The strategic decision in plain language. */
   headline: string;
+  /** The company executing the decision (named, so the founder can target it). */
+  company: string;
+  /**
+   * 'live'   = the thesis is still in progress / just announced — the HIGHEST-value
+   *            target (Roy: flagging a risk on a deal that hasn't closed is what a
+   *            buyer actually pays for; a closed-deal retro is "classic confirmation
+   *            bias").
+   * 'closed' = already executed — the retro post-mortem reveal (still useful as the
+   *            ego-safe, no-confidentiality Taktile cold-open).
+   */
+  decisionStage: 'live' | 'closed';
+  /** The public artifact to audit (e.g. "S-1 prospectus", "M&A announcement", "Q1 earnings call", "10-K", "activist shareholder letter"). */
+  publicDoc: string;
+  /**
+   * true  = a REACHABLE strategic mover (mid-market / PE-backed acquirer, serial
+   *         acquirer, roll-up, fresh deal, new CSO) with a named decision-maker the
+   *         founder can actually reach.
+   * false = an S&P-500 mega-cap — keep as a McKinsey-grade SPECIMEN only; a cold
+   *         retro-audit there dies in procurement. Do NOT cold-outreach.
+   */
+  reachable: boolean;
+  /** The decision-maker role to target (e.g. "Head of Corp Dev", "CSO", "CFO", "Managing Partner"). */
+  targetRole: string;
   /** 1-2 sentence so-what for a strategy / corp-dev / fund operator. */
   whyItMatters: string;
   /** Coarse sector label (maps loosely to the case-library Industry set). */
   sector: string;
+  /**
+   * The Taktile-style reveal — the cold-open the founder leads with. For a LIVE
+   * decision it is forward ("a risk pattern deals like this commonly carry that, if
+   * it's in your thesis, could cost ~$X — want me to run your actual memo?"). For a
+   * CLOSED decision it is retro ("I ran [public doc] through our pipeline; it flagged
+   * [pattern]; here's the same check on your next one"). Honest: what was flaggable,
+   * never "why it failed"; pattern-level, never accusing a named person.
+   */
+  auditAngle: string;
   /** Deal-PATTERN-level cognitive-bias lens — never an accusation. */
   biasAngle: string;
   sourceTitle: string;
@@ -111,6 +143,32 @@ export const CORP_DEV_KEYWORDS: readonly string[] = [
   'due diligence',
   'integration plan',
   'strategic review',
+  // Broadened 2026-06-30 — the Taktile reveal works on ANY big public strategic
+  // decision with a forced-disclosure document, not just M&A.
+  'ipo',
+  's-1',
+  'prospectus',
+  'goes public',
+  'going public',
+  'capital expenditure',
+  'capex',
+  'multibillion',
+  'multi-billion',
+  'expansion plan',
+  'market entry',
+  'roll-up',
+  'rollup',
+  'serial acquirer',
+  'platform acquisition',
+  'restructuring',
+  'turnaround',
+  'strategic pivot',
+  'activist',
+  'shareholder letter',
+  'proxy fight',
+  'new ceo',
+  'chief strategy officer',
+  'corporate development',
 ];
 
 // ─── Pure: date key ──────────────────────────────────────────────────────────
@@ -159,33 +217,45 @@ export function buildIntelSynthesisPrompt(articles: IntelSourceArticle[]): strin
     )
     .join('\n');
 
-  return `You are a corporate-development and M&A intelligence analyst preparing a short morning brief for a solo founder running personalised 1:1 outreach (5-10 messages a week) to four buyer personas: fractional CSOs, mid-market heads of corporate development, smaller-fund GPs, and PE-backed founder/CEOs.
+  return `You are a strategic-decision intelligence analyst building a DAILY lead list for a solo founder of Decision Intel — a reasoning-audit platform. His motion is the "Taktile reveal": he finds a company that has made a big, PUBLIC strategic decision, runs its public document through his audit pipeline, and shows the decision-maker the specific reasoning risk it carries + the rough capital at stake. He sends 3 of these a day, by hand. Your job is to surface the best targets from today's news.
 
-From the articles below, distill the ${MAX_BRIEF_ITEMS} HIGHEST-SIGNAL corp-dev / M&A items worth the founder knowing this morning. Skip anything that is not a strategic-decision / deal / corporate-development signal (ignore pure markets/macro/earnings noise).
+From the articles below, pick the ${MAX_BRIEF_ITEMS} BEST strategic-decision targets. A target = a NAMED company executing a big capital-committing decision (M&A, a fresh IPO / S-1, a multi-billion capex bet, a market entry / roll-up, a restructuring, or an activist situation) that has a PUBLIC document he can audit. Skip pure markets/macro/earnings noise with no underlying decision.
 
-For each item return:
-- sourceIndex: the integer [i] of the article it is drawn from (MUST be one of the indices shown; never invent one)
-- headline: the event in plain language, <= 16 words
-- whyItMatters: 1-2 sentences — the so-what for a strategy / corp-dev / fund operator
-- sector: a coarse sector label (e.g. "Technology", "Financial Services", "Healthcare", "Industrials", "Consumer", "Energy")
-- biasAngle: name the cognitive-bias PATTERN that deals shaped like this commonly carry — written at the deal-pattern level (e.g. "synergy projections of this shape often rest on planning-fallacy + overconfidence"). NEVER assert that a named person or team reasoned badly. Pattern-level only.
+For each target return:
+- sourceIndex: the integer [i] of the article it is drawn from (MUST be one shown; never invent one)
+- company: the named company executing the decision
+- headline: the decision in plain language, <= 16 words
+- decisionStage: "live" if the thesis is still in progress / just announced / not yet closed (THESE ARE THE BEST — a risk flagged before a deal closes is what a buyer pays for); "closed" if it already executed (a retro post-mortem reveal)
+- publicDoc: the public artifact to audit ("S-1 prospectus", "M&A announcement", "Q1 earnings call", "10-K", "activist shareholder letter", etc.)
+- reachable: true if this is a REACHABLE strategic mover (mid-market or PE-backed acquirer, serial acquirer / roll-up, a company with a freshly-announced deal or a new CSO) with a decision-maker he can actually reach; false if it is an S&P-500 MEGA-CAP (keep those as specimens only — a cold audit there dies in procurement)
+- targetRole: the decision-maker to reach ("Head of Corp Dev", "CSO", "CFO", "Managing Partner")
+- sector: coarse label ("Technology", "Financial Services", "Healthcare", "Industrials", "Consumer", "Energy")
+- whyItMatters: 1-2 sentences — the so-what
+- auditAngle: the ONE-LINE cold-open he leads with. For "live": forward — name the risk PATTERN deals like this commonly carry and that, IF it is in their thesis, is expensive, then offer to run their actual memo. For "closed": retro — offer to show what was flaggable in hindsight on the public doc, then the same check on their next one. HONEST: "what was flaggable", NEVER "why it failed" (no causation overclaim); PATTERN-level, never assert a named person reasoned badly.
+- biasAngle: the cognitive-bias PATTERN deals of this shape commonly carry (e.g. "synergy projections of this shape often rest on planning-fallacy + overconfidence"). Pattern-level only.
 
-Also return a 2-3 sentence "summary": the founder's morning read of the day's corp-dev/M&A landscape.
+Rank LIVE + reachable targets first. Also return a 2-3 sentence "summary": the founder's morning read of today's strategic-decision landscape + which 1-2 targets to send first.
 
 Articles:
 ${list}
 
 Return ONLY raw JSON, no markdown:
-{"summary": "...", "items": [{"sourceIndex": 0, "headline": "...", "whyItMatters": "...", "sector": "...", "biasAngle": "..."}]}`;
+{"summary": "...", "items": [{"sourceIndex": 0, "company": "...", "headline": "...", "decisionStage": "live", "publicDoc": "...", "reachable": true, "targetRole": "...", "sector": "...", "whyItMatters": "...", "auditAngle": "...", "biasAngle": "..."}]}`;
 }
 
 // ─── Pure: defensive parse ───────────────────────────────────────────────────
 
 interface RawIntelItem {
   sourceIndex?: unknown;
+  company?: unknown;
   headline?: unknown;
+  decisionStage?: unknown;
+  publicDoc?: unknown;
+  reachable?: unknown;
+  targetRole?: unknown;
   whyItMatters?: unknown;
   sector?: unknown;
+  auditAngle?: unknown;
   biasAngle?: unknown;
 }
 
@@ -235,8 +305,17 @@ export function parseIntelSynthesis(
     if (!headline) continue;
     items.push({
       headline,
+      company: str(r.company, 120) || 'Unnamed company',
+      decisionStage: r.decisionStage === 'live' ? 'live' : 'closed',
+      publicDoc: str(r.publicDoc, 120) || 'public filing',
+      // Default to NOT reachable (specimen-only) unless the model explicitly
+      // says true — conservative so a mega-cap never gets cold-outreached by
+      // accident.
+      reachable: r.reachable === true,
+      targetRole: str(r.targetRole, 80) || 'Head of Corp Dev',
       whyItMatters: str(r.whyItMatters, 400),
       sector: str(r.sector, 60) || 'General',
+      auditAngle: str(r.auditAngle, 600),
       biasAngle: str(r.biasAngle, 300),
       sourceTitle: article.title,
       sourceLink: article.link,

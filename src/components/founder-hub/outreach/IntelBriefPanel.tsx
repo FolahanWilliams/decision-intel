@@ -27,8 +27,14 @@ import { AccentCard } from '@/components/ui/AccentCard';
 
 interface IntelItem {
   headline: string;
+  company: string;
+  decisionStage: 'live' | 'closed';
+  publicDoc: string;
+  reachable: boolean;
+  targetRole: string;
   whyItMatters: string;
   sector: string;
+  auditAngle: string;
   biasAngle: string;
   sourceTitle: string;
   sourceLink: string;
@@ -290,6 +296,60 @@ export function IntelBriefPanel({ founderPass }: Props) {
                     background: 'var(--bg-card)',
                   }}
                 >
+                  {/* Taktile lead header: company + live/retro + reachability */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      flexWrap: 'wrap',
+                      marginBottom: 6,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {item.company}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 'var(--fs-3xs)',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        padding: '2px 7px',
+                        borderRadius: 'var(--radius-full)',
+                        color: item.decisionStage === 'live' ? 'var(--success)' : 'var(--warning)',
+                        background:
+                          item.decisionStage === 'live'
+                            ? 'color-mix(in srgb, var(--success) 12%, transparent)'
+                            : 'color-mix(in srgb, var(--warning) 12%, transparent)',
+                      }}
+                    >
+                      {item.decisionStage === 'live' ? 'Live thesis' : 'Retro'}
+                    </span>
+                    {!item.reachable && (
+                      <span
+                        style={{
+                          fontSize: 'var(--fs-3xs)',
+                          fontWeight: 600,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          padding: '2px 7px',
+                          borderRadius: 'var(--radius-full)',
+                          color: 'var(--text-muted)',
+                          background: 'var(--bg-secondary)',
+                        }}
+                        title="Mega-cap — keep as a specimen, do not cold-outreach"
+                      >
+                        Specimen only
+                      </span>
+                    )}
+                  </div>
                   <div
                     style={{
                       display: 'flex',
@@ -335,6 +395,42 @@ export function IntelBriefPanel({ founderPass }: Props) {
                   >
                     {item.whyItMatters}
                   </p>
+                  {item.auditAngle && (
+                    <div
+                      style={{
+                        margin: '0 0 6px',
+                        padding: '8px 10px',
+                        background: 'color-mix(in srgb, var(--accent-primary) 7%, transparent)',
+                        border:
+                          '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
+                        borderRadius: 'var(--radius-sm)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 'var(--fs-3xs)',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          color: 'var(--accent-primary)',
+                          marginBottom: 3,
+                        }}
+                      >
+                        Cold-open · reach the {item.targetRole}
+                        {item.publicDoc ? ` · audit their ${item.publicDoc}` : ''}
+                      </div>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 'var(--fs-xs)',
+                          color: 'var(--text-primary)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {item.auditAngle}
+                      </p>
+                    </div>
+                  )}
                   {item.biasAngle && (
                     <p
                       style={{

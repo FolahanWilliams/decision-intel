@@ -98,7 +98,7 @@ describe('buildIntelSynthesisPrompt', () => {
     ]);
     expect(p).toContain('[0] "Deal A"');
     expect(p).toContain('[1] "Deal B"');
-    expect(p).toContain('NEVER assert that a named person or team reasoned badly');
+    expect(p).toContain('never assert a named person reasoned badly');
     expect(p).toContain('sourceIndex');
   });
 });

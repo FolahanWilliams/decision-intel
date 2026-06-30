@@ -62,8 +62,15 @@ const TEMPLATES: DmTemplate[] = [
 function item(over: Partial<OutreachIntelItem> = {}): OutreachIntelItem {
   return {
     headline: 'BigCo acquires SmallCo for $3B',
+    company: 'BigCo',
+    decisionStage: 'live',
+    publicDoc: 'M&A announcement',
+    reachable: true,
+    targetRole: 'Head of Corp Dev',
     whyItMatters: 'Integration risk worth watching.',
     sector: 'Technology',
+    auditAngle:
+      'A $3B acquisition of this shape commonly carries synergy-timeline optimism — want me to run your IC memo before close?',
     biasAngle: 'synergy projections of this shape often rest on planning fallacy',
     sourceTitle: 'BigCo buys SmallCo',
     sourceLink: 'https://n.com/a',
