@@ -348,12 +348,30 @@ export async function applyBayesianAdjustment(
 // ─── Pure-math penalty helpers ─────────────────────────────────────────────
 
 /**
- * Noise penalty — stdDev across the noise-jury frames × 5. Captures the
- * "judges disagree → confidence drops" signal.
+ * RECALIBRATED 2026-06-30 (methodology 2.4.0 → 2.5.0). The noise penalty was
+ * `stdDev × 5` UNBOUNDED — a 3-frame jury that disagreed (stdDev 28.5 on the
+ * SpaceX S-1) produced a 142-point penalty that floored the DQI to 0 *by
+ * itself*, regardless of the actual reasoning. Across all 11 real audits this
+ * drove 6/11 to exactly 0 (avg DQI 15.3 — "every audit reads grade F"). Noise
+ * is an ~18% DQI component, not a score-killer, so it is now rate 1.5 capped at
+ * 22 points (≈ its intended weight). stdDev 28.5 → 22, 9.4 → 14, 2.4 → 3.6.
  */
+export const NOISE_PENALTY_RATE = 1.5;
+export const NOISE_PENALTY_CAP = 22;
+
 export function calculateNoisePenalty(stdDev: number | undefined | null): number {
-  return (stdDev || 0) * 5;
+  return Math.min(NOISE_PENALTY_CAP, (stdDev || 0) * NOISE_PENALTY_RATE);
 }
+
+/**
+ * Headline-impact bound on the compound bias deduction (RECALIBRATED 2026-06-30).
+ * The compound engine still computes + persists the FULL deduction (the moat
+ * data is unchanged); this only bounds how far biases alone can drag the
+ * headline overallScore, so a catastrophically-biased memo retains a small
+ * floor (~grade F at ~15-25, like the hand-set sample memos) instead of pinning
+ * to exactly 0 and losing all resolution at the low end.
+ */
+export const BIAS_DEDUCTION_CAP = 75;
 
 /**
  * Trust penalty derived from the fact-check verdict. Missing / errored
@@ -483,9 +501,12 @@ export interface ScoreCompositionInput {
  */
 export function composeOverallScore(input: ScoreCompositionInput): number {
   const base = input.baseScore ?? 100;
+  // Bound the bias deduction's headline impact (see BIAS_DEDUCTION_CAP) so a
+  // very-high-bias memo keeps a small floor instead of pinning to exactly 0.
+  const boundedBias = Math.min(BIAS_DEDUCTION_CAP, input.biasDeductions);
   const raw =
     base -
-    input.biasDeductions -
+    boundedBias -
     input.noisePenalty -
     input.trustPenalty -
     input.logicPenalty -

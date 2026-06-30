@@ -2046,7 +2046,12 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   return {
     finalReport: {
       overallScore,
-      noiseScore: Math.max(0, Math.min(100, (state.noiseStats?.stdDev || 0) * 10)),
+      // Displayed noise metric. Rescaled 2026-06-30 (×10 → ×3): the ×10
+      // multiplier clamped any jury stdDev ≥10 to 100, so "Avg Noise" sat
+      // pinned near 100 (4/11 audits maxed). ×3 spreads it across a real range
+      // (stdDev 28.5 → 86, 9.4 → 28, 2.4 → 7) without changing the DQI penalty
+      // (that is the separately-recalibrated calculateNoisePenalty).
+      noiseScore: Math.max(0, Math.min(100, Math.round((state.noiseStats?.stdDev || 0) * 3))),
       summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
       structuredContent: state.structuredContent,
       biases: (state.biasAnalysis || []).map(b => ({

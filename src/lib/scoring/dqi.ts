@@ -437,6 +437,11 @@ export const GRADE_THRESHOLDS: Array<{
 //   '2.3.0'             — user-adjustable weights (2026-05-10)
 //   '2.4.0'             — 22×22 interaction matrix (DI-B-021 +
 //                         DI-B-022 coverage; 2026-05-13 M-1 ship)
+// NOTE: the 2026-06-30 headline-score recalibration (noise-penalty cap +
+// bias-deduction bound) lives in the PIPELINE composer `composeOverallScore`
+// (risk-compiler.ts), NOT in computeDQI — computeDQI's component methodology is
+// unchanged, so METHODOLOGY_VERSION stays 2.4.0 (the version-assertion tests
+// correctly lock that).
 // METHODOLOGY_VERSION resolves to the latest "compound patterns
 // supplied" stamp. METHODOLOGY_VERSION_2_3_0 stays exported for the
 // user-adjustable path's preserved stamp.

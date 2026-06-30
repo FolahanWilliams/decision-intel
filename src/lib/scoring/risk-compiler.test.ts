@@ -29,10 +29,19 @@ describe('calculateNoisePenalty', () => {
     expect(calculateNoisePenalty(0)).toBe(0);
   });
 
-  it('scales stdDev by 5', () => {
-    expect(calculateNoisePenalty(1)).toBe(5);
-    expect(calculateNoisePenalty(2.5)).toBe(12.5);
-    expect(calculateNoisePenalty(10)).toBe(50);
+  // RECALIBRATED 2026-06-30 (methodology 2.5.0): rate 5 → 1.5, capped at 22.
+  // The old unbounded ×5 let a disagreeing jury (stdDev 28.5) deduct 142 points
+  // and floor the DQI to 0 by itself.
+  it('scales stdDev by 1.5', () => {
+    expect(calculateNoisePenalty(1)).toBe(1.5);
+    expect(calculateNoisePenalty(2.5)).toBe(3.75);
+    expect(calculateNoisePenalty(10)).toBe(15);
+  });
+
+  it('caps the penalty at 22 so noise alone can never floor the DQI', () => {
+    expect(calculateNoisePenalty(15)).toBe(22); // 15 × 1.5 = 22.5 → capped
+    expect(calculateNoisePenalty(28.5)).toBe(22); // the SpaceX case — was 142
+    expect(calculateNoisePenalty(100)).toBe(22);
   });
 });
 
@@ -149,11 +158,25 @@ describe('composeOverallScore', () => {
     ).toBe(96);
   });
 
-  it('clamps below to 0 even when penalties exceed base', () => {
+  it('bounds the bias-deduction headline impact (recalibrated 2026-06-30)', () => {
+    // A catastrophic bias load is capped at BIAS_DEDUCTION_CAP (75), so biases
+    // ALONE keep a small floor (~grade F) instead of pinning to exactly 0 and
+    // losing all low-end resolution. Was `.toBe(0)` pre-recalibration.
+    expect(composeOverallScore({ ...ZERO_PENALTIES, biasDeductions: 200 })).toBe(25);
+    expect(composeOverallScore({ ...ZERO_PENALTIES, biasDeductions: 90 })).toBe(25);
+  });
+
+  it('still clamps to 0 when COMBINED penalties exceed base', () => {
+    // The floor only protects against bias-alone saturation; a memo that is
+    // bad across every axis can still bottom out.
     expect(
       composeOverallScore({
-        ...ZERO_PENALTIES,
-        biasDeductions: 200,
+        biasDeductions: 75,
+        noisePenalty: 22,
+        trustPenalty: 30,
+        logicPenalty: 40,
+        diversityPenalty: 0,
+        feedbackAdjustment: 0,
       })
     ).toBe(0);
   });
