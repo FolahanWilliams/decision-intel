@@ -698,6 +698,14 @@ export async function POST(request: NextRequest) {
                       : undefined
                   ),
                   metaVerdict: (report.metaVerdict as string) || null,
+                  // Persist the market-intelligence summary (2026-06-30). The
+                  // node assembles it + riskScorer puts it in the finalReport,
+                  // but the stream persistence never saved it, so the Analyst
+                  // 'Intelligence' tile greyed on every upload (founder:
+                  // 'current market intelligence doesn't even work').
+                  intelligenceContext: toPrismaJson(
+                    (report as { intelligenceContext?: unknown }).intelligenceContext ?? undefined
+                  ),
                   recognitionCues: toPrismaJson(
                     report.recognitionCues
                       ? RecognitionCuesSchema.safeParse(report.recognitionCues).success
