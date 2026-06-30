@@ -889,8 +889,36 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
                   overridden={!!analysis.marketContextOverride}
                 />
               </ErrorBoundary>
+              {/* Demoted 2026-06-30: the academic R²F detector card was eating
+                  the prime slot above the findings tabs ("the most important
+                  parts are too buried"). Collapsed by default so the verdict +
+                  top fixes + the findings lead; the methodology stays one click
+                  away for the procurement / IP-moat reader (Boomerang-Effect
+                  lock: lead with what the audit caught, not the methodology). */}
               <ErrorBoundary sectionName="Paper applications">
-                <PaperApplicationsCard analysisId={analysis.id} />
+                <details
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 12,
+                  }}
+                >
+                  <summary
+                    style={{
+                      cursor: 'pointer',
+                      padding: '12px 16px',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      userSelect: 'none',
+                    }}
+                  >
+                    R²F methodology signals · validity, reference class, calibration
+                  </summary>
+                  <div style={{ padding: '0 12px 12px' }}>
+                    <PaperApplicationsCard analysisId={analysis.id} />
+                  </div>
+                </details>
               </ErrorBoundary>
             </div>
           ) : null
