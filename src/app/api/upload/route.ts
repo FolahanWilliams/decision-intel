@@ -155,7 +155,11 @@ export async function POST(request: NextRequest) {
       null;
     try {
       existingDoc = await prisma.document.findFirst({
-        where: { contentHash, userId },
+        // deletedAt: null is LOAD-BEARING — without it, re-uploading content
+        // that matches a SOFT-DELETED document returns that dead doc's id as a
+        // "cache hit", and the detail page 404s ("Document not found"). Only a
+        // LIVE prior analysis is a real cache hit.
+        where: { contentHash, userId, deletedAt: null },
         include: {
           analyses: {
             orderBy: { createdAt: 'desc' },
@@ -393,16 +397,18 @@ export async function POST(request: NextRequest) {
           },
         });
       } else if (code === 'P2002') {
-        // Unique constraint violation on contentHash — concurrent upload
-        // of the same file. Return the existing document as a cache hit
-        // instead of creating a duplicate.
+        // Unique constraint on (contentHash, userId). Either a LIVE duplicate
+        // (a genuine cache hit) or a SOFT-DELETED row that still owns the key
+        // but the user can no longer see — handing that dead id back 404s the
+        // detail page ("Document not found"), which is the bug the founder hit
+        // re-pasting the same content.
         const existing = await prisma.document.findFirst({
           where: { contentHash, userId },
           include: {
             analyses: { orderBy: { createdAt: 'desc' }, take: 1, include: { biases: true } },
           },
         });
-        if (existing) {
+        if (existing && !existing.deletedAt) {
           log.info('Concurrent upload resolved as cache hit: ' + existing.id);
           return NextResponse.json({
             id: existing.id,
@@ -413,7 +419,16 @@ export async function POST(request: NextRequest) {
             analysis: (existing.analyses as unknown[])?.[0] || null,
           });
         }
-        // If not found (different user's hash), create without hash
+        if (existing?.deletedAt) {
+          // Purge the soft-deleted row so the fresh upload can re-take the
+          // unique key (cascades to its dead analyses).
+          await prisma.document
+            .delete({ where: { id: existing.id } })
+            .catch(e => log.warn('Failed to purge soft-deleted duplicate before re-create:', e));
+        }
+        // Create fresh — with the contentHash now that the key is free (or this
+        // was a different user's hash collision, which can't happen under the
+        // per-user unique key but the create is harmless either way).
         document = await prisma.document.create({
           data: {
             userId,
@@ -422,8 +437,13 @@ export async function POST(request: NextRequest) {
             fileType: file.type || 'text/plain',
             fileSize: file.size,
             content,
+            ...encryptedFields,
+            contentHash,
             status: 'pending',
             ...(documentType ? { documentType } : {}),
+            ...(parsedStructuredData
+              ? { parsedStructuredData: parsedStructuredData as unknown as Prisma.InputJsonValue }
+              : {}),
             // Container attach via DecisionContainerDocument join row
             // ships in Phase 2; Document.dealId column is removed.
             ...(resolvedParentDocumentId
