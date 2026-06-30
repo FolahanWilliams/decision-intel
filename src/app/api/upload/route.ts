@@ -517,6 +517,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Auto-name (post-response): a pasted memo lands as `paste-<ts>.txt`,
+    // which is meaningless on the doc list + the audit deliverable. Ask the
+    // cheap model for a fitting title from the content and rename. Runs via
+    // `after()` so it never delays the upload yet still reliably completes
+    // (past the response, before the invocation freezes); by the time the
+    // audit finishes the rename has landed. Intentionally-named uploads are
+    // untouched (isGenericFilename guard inside maybeAutoNameDocument).
+    after(
+      import('@/lib/utils/document-title')
+        .then(({ maybeAutoNameDocument }) => maybeAutoNameDocument(document.id, content, file.name))
+        .catch(err => log.warn('auto-name dispatch failed:', err))
+    );
+
     // Pre-warm embedding cache so the analysis pipeline's RAG query
     // hits a warm entry instead of paying the Gemini round-trip live.
     // `after()` keeps the serverless invocation alive past the response.

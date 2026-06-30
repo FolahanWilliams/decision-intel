@@ -359,8 +359,15 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-// Text truncation to prevent timeouts on large documents
-const MAX_INPUT_CHARS = 25000; // ~6K tokens
+// Text truncation to prevent timeouts on large documents. Raised 25K → 50K
+// (2026-06-30) so filings / long memos get ~10 pages audited instead of ~5.
+// ONLY affects docs over 25K chars — a normal memo is under this and passes
+// through smartTruncate unchanged, so the standard-memo DQI distribution is
+// byte-identical (the held-out dqi-distribution-check uses sub-25K synthetic
+// memos). Bounded by the per-node Gemini cost + the 300s function timeout
+// across ~17 calls; for the deepest filing audit, paste just the relevant
+// section (risk factors / MD&A) so the first 50K is pure reasoning.
+const MAX_INPUT_CHARS = 50000; // ~12K tokens
 
 function truncateText(text: string): string {
   return smartTruncate(text, MAX_INPUT_CHARS);
@@ -945,12 +952,31 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
       // documents (SEC filings, analyst reports) often contain no PII
       // beyond what regex catches.
       const redactionCount = Array.isArray(data.redactions) ? data.redactions.length : 0;
-      log.info(
-        `GDPR Anonymization complete. LLM redacted ${redactionCount} PII instances (${preRedactCount} via regex).`
-      );
+
+      // TRUNCATION GUARD (2026-06-30): the anonymizer LLM sometimes returns
+      // only the FIRST section of a long document — a 178K-char S-1 collapsed
+      // to ~1K chars (just the cover page), so every downstream node audited
+      // the cover and the DQI defaulted to 0. If the LLM's structuredContent
+      // is materially shorter than the regex-redacted input it was handed, the
+      // LLM truncated its output; prefer the full regex-redacted text (which
+      // already has structured PII stripped — the same trade-off as the
+      // LLM-failure fallback below). Legitimate anonymization is ~95-105% of
+      // input length, so the 0.6 floor only fires on genuine truncation.
+      const llmStructured = String(data.structuredContent);
+      const llmTruncated = llmStructured.length < truncated.length * 0.6;
+      const structuredContent = llmTruncated ? truncated : llmStructured;
+      if (llmTruncated) {
+        log.warn(
+          `GDPR Anonymizer LLM truncated its output (${llmStructured.length} chars from a ${truncated.length}-char input) — using the full regex-redacted text so the audit sees the whole document, not just the cover page.`
+        );
+      } else {
+        log.info(
+          `GDPR Anonymization complete. LLM redacted ${redactionCount} PII instances (${preRedactCount} via regex).`
+        );
+      }
       return {
         anonymizationStatus: 'success',
-        structuredContent: data.structuredContent,
+        structuredContent,
         speakers: [],
       };
     }
