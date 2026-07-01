@@ -118,7 +118,7 @@ import { getBiasPreview } from '@/lib/utils/bias-preview';
 import { getDocTypeCatch } from '@/lib/data/upload-guidance';
 import { UploadGuidancePanel } from '@/components/upload/UploadGuidancePanel';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
-import { Zap, Lock as LockIcon, Sparkles } from 'lucide-react';
+import { Zap, Lock as LockIcon, Sparkles, EyeOff } from 'lucide-react';
 import { AnalysisShell } from '@/components/analysis/AnalysisShell';
 import {
   InlineAnalysisResultCard,
@@ -392,6 +392,36 @@ export default function Dashboard() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [selectedDocType, setSelectedDocType] = useState<string>('');
   const [selectedDealId, setSelectedDealId] = useState<string>('');
+  // Blind Retro Mode (2026-07-02): per-audit toggle in the pre-analysis
+  // confirm dialog. STICKY via localStorage so a retro batch keeps it on
+  // across uploads (and retries inherit it); the audit record persists the
+  // resolved value (judgeOutputs.blindRetroMode). Server-side env fallback
+  // (PIPELINE_BLIND_MODE) only applies when the client never sends a value —
+  // this UI always sends its current choice.
+  const [blindRetroMode, setBlindRetroMode] = useState(false);
+  useEffect(() => {
+    // Deferred localStorage hydration (react-hooks/set-state-in-effect idiom,
+    // per the FirstRunInlineWalkthrough pattern).
+    const t = setTimeout(() => {
+      try {
+        setBlindRetroMode(localStorage.getItem('di-blind-retro-mode') === '1');
+      } catch {
+        // localStorage unavailable (private mode) — default stays off
+      }
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+  const toggleBlindRetroMode = () => {
+    setBlindRetroMode(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('di-blind-retro-mode', next ? '1' : '0');
+      } catch {
+        // fire-and-forget persistence — the in-memory toggle still applies
+      }
+      return next;
+    });
+  };
   // Bulk upload queue — populated when the user drops or selects 2+ files
   // on the main upload zone. Locked 2026-05-10 streamlining batch — the
   // separate always-visible BulkUploadPanel was killed; the main upload
@@ -904,7 +934,7 @@ export default function Dashboard() {
       noiseScoreRef.current = undefined;
       setLastCompletedAnalysis(null);
       startTracking(uploadData.id, uploadData.filename);
-      const finalResult = await startAnalysis(uploadData.id);
+      const finalResult = await startAnalysis(uploadData.id, { blindMode: blindRetroMode });
 
       if (finalResult) {
         const score = finalResult?.overallScore as number;
@@ -1007,7 +1037,8 @@ export default function Dashboard() {
       noiseScoreRef.current = undefined;
       setLastCompletedAnalysis(null);
       startTracking(docId, retryDoc?.filename || 'Document');
-      const finalResult = await startAnalysis(docId);
+      // Retries inherit the sticky Blind Retro toggle so a blind batch stays blind.
+      const finalResult = await startAnalysis(docId, { blindMode: blindRetroMode });
 
       if (finalResult) {
         const retryScore = finalResult?.overallScore as number;
@@ -1726,6 +1757,94 @@ export default function Dashboard() {
                         </Select>
                       </div>
                     </div>
+
+                    {/* Blind Retro Mode toggle (2026-07-02) — per-audit choice.
+                        For historical documents: disables ALL live data (news,
+                        market intelligence, web search, live financials) so the
+                        audit derives only from the document's own language +
+                        pre-existing analogs. Sticky across uploads for batches. */}
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={blindRetroMode}
+                      onClick={toggleBlindRetroMode}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 12,
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '12px 14px',
+                        borderRadius: 12,
+                        cursor: 'pointer',
+                        transition: 'all 150ms',
+                        background: blindRetroMode
+                          ? 'color-mix(in srgb, var(--info) 8%, transparent)'
+                          : 'var(--bg-card)',
+                        border: blindRetroMode
+                          ? '1px solid color-mix(in srgb, var(--info) 35%, transparent)'
+                          : '1px solid var(--border-color)',
+                      }}
+                    >
+                      <EyeOff
+                        size={16}
+                        style={{
+                          flexShrink: 0,
+                          marginTop: 2,
+                          color: blindRetroMode ? 'var(--info)' : 'var(--text-muted)',
+                        }}
+                      />
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span
+                          className="text-xs font-medium"
+                          style={{
+                            display: 'block',
+                            color: blindRetroMode ? 'var(--info)' : 'var(--text-primary)',
+                          }}
+                        >
+                          Blind Retro Mode{' '}
+                          <span className="text-muted" style={{ fontWeight: 400 }}>
+                            (for historical documents)
+                          </span>
+                        </span>
+                        <span
+                          className="text-xs text-muted"
+                          style={{ display: 'block', marginTop: 3, lineHeight: 1.45 }}
+                        >
+                          Disables all live data (news, market intelligence, web search, live
+                          financials) so the audit can only use the document&apos;s own language
+                          and pre-existing analogs. The audit record notes that live retrieval
+                          was disabled.
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          flexShrink: 0,
+                          marginTop: 2,
+                          width: 34,
+                          height: 20,
+                          borderRadius: 999,
+                          position: 'relative',
+                          transition: 'background 150ms',
+                          background: blindRetroMode ? 'var(--info)' : 'var(--border-color)',
+                        }}
+                      >
+                        <span
+                          style={{
+                            position: 'absolute',
+                            top: 2,
+                            left: blindRetroMode ? 16 : 2,
+                            width: 16,
+                            height: 16,
+                            borderRadius: 999,
+                            background: '#fff',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                            transition: 'left 150ms',
+                          }}
+                        />
+                      </span>
+                    </button>
 
                     {/* Actions */}
                     <DialogFooter>

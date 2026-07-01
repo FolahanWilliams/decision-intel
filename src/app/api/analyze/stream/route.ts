@@ -152,6 +152,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });
     }
 
+    // Blind Retro Mode (2026-07-02): per-audit choice from the pre-analysis
+    // UI toggle. Explicit request value wins; the PIPELINE_BLIND_MODE env var
+    // is the batch-level default fallback. When true, every live-data channel
+    // (market enricher / news / macro / grounded search / benchmarks /
+    // Finnhub) is disabled inside the pipeline so a retro on a historical
+    // filing cannot be contaminated by post-filing data via retrieval.
+    const blindMode: boolean =
+      typeof body.blindMode === 'boolean'
+        ? body.blindMode
+        : (process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on';
+
     // RBAC (3.5): visibility-aware. The streaming pipeline is the most
     // sensitive read path — it decrypts and ships raw content into Gemini,
     // so any leak here is a procurement-grade incident.
@@ -406,6 +417,11 @@ export async function POST(request: NextRequest) {
             // may not be migrated on older deployments.
           }
 
+          if (blindMode) {
+            log.info(
+              `BLIND RETRO MODE active for document ${documentId} — live retrieval channels disabled.`
+            );
+          }
           const auditGraph = await getGraph();
           const eventStream = auditGraph.streamEvents(
             {
@@ -419,6 +435,7 @@ export async function POST(request: NextRequest) {
               dealType,
               dealStage,
               parsedStructuredData,
+              blindMode,
             },
             { version: 'v2' }
           );
@@ -822,8 +839,9 @@ export async function POST(request: NextRequest) {
                     // Finnhub) was disabled for this audit. The honest claim
                     // is "live retrieval disabled", never "the model could
                     // not have known" (training memory can't be switched off).
-                    blindRetroMode:
-                      (process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on',
+                    // Records the RESOLVED per-audit value (UI toggle wins
+                    // over the PIPELINE_BLIND_MODE env fallback).
+                    blindRetroMode: blindMode,
                     // Weights resolution snapshot (locked 2026-05-11 per
                     // Tier 2.1 + P2 ship). Persists the weight vector +
                     // hash + source + methodology version that produced

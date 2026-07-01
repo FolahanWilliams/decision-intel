@@ -193,7 +193,12 @@ export function useAnalysisStream(options: StreamOptions) {
    * Core stream reader — extracted so retries can call it recursively.
    */
   const readStream = useCallback(
-    async (documentId: string, signal: AbortSignal, isRetry = false) => {
+    async (
+      documentId: string,
+      signal: AbortSignal,
+      isRetry = false,
+      analyzeOptions?: { blindMode?: boolean }
+    ) => {
       const headers: HeadersInit = { 'Content-Type': 'application/json' };
 
       // Include Last-Event-ID for resumption on retry
@@ -205,7 +210,14 @@ export function useAnalysisStream(options: StreamOptions) {
       const res = await fetch('/api/analyze/stream', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ documentId }),
+        // blindMode: per-audit Blind Retro toggle (2026-07-02). Only sent
+        // when explicitly chosen so the server's env-var fallback still
+        // governs when the UI doesn't surface the choice.
+        body: JSON.stringify(
+          typeof analyzeOptions?.blindMode === 'boolean'
+            ? { documentId, blindMode: analyzeOptions.blindMode }
+            : { documentId }
+        ),
         signal,
       });
 
@@ -368,7 +380,10 @@ export function useAnalysisStream(options: StreamOptions) {
    * if all retries are exhausted.
    */
   const startAnalysis = useCallback(
-    async (documentId: string): Promise<StreamResult | null> => {
+    async (
+      documentId: string,
+      analyzeOptions?: { blindMode?: boolean }
+    ): Promise<StreamResult | null> => {
       // Cancel any in-flight analysis and clear previous timeout
       abortRef.current?.abort();
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -390,7 +405,12 @@ export function useAnalysisStream(options: StreamOptions) {
 
       const attemptStream = async (isRetryAttempt = false): Promise<StreamResult | null> => {
         try {
-          const streamResult = await readStream(documentId, controller.signal, isRetryAttempt);
+          const streamResult = await readStream(
+            documentId,
+            controller.signal,
+            isRetryAttempt,
+            analyzeOptions
+          );
           setResult(streamResult);
           return streamResult;
         } catch (err) {

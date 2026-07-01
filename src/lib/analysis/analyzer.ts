@@ -51,7 +51,14 @@ export interface ProgressUpdate {
 
 export async function analyzeDocument(
   documentOrId: string | Document,
-  onProgress?: (update: ProgressUpdate) => void
+  onProgress?: (update: ProgressUpdate) => void,
+  options?: {
+    /**
+     * Blind Retro Mode (2026-07-02): per-audit override. Explicit value
+     * wins; falls back to the PIPELINE_BLIND_MODE env var (batch default).
+     */
+    blindMode?: boolean;
+  }
 ): Promise<AnalysisResult> {
   let document: Document;
   let documentId: string;
@@ -172,7 +179,9 @@ export async function analyzeDocument(
         if (onProgress) onProgress(update);
       },
       document.orgId ?? undefined,
-      dealContext
+      dealContext,
+      // Thread the per-audit Blind Retro choice through to the graph seed.
+      options
     );
 
     // Store analysis in database with Schema Drift Protection
@@ -662,6 +671,10 @@ export async function runAnalysis(
     containerKind?: string;
     dealType?: string;
     dealStage?: string;
+  },
+  analyzeOptions?: {
+    /** Blind Retro Mode — explicit per-audit value wins over the env fallback. */
+    blindMode?: boolean;
   }
 ): Promise<AnalysisResult> {
   const auditGraph = await getGraph();
@@ -687,13 +700,16 @@ export async function runAnalysis(
     riskScorer: 'Final Risk Scoring',
   };
 
-  // Blind retro mode (2026-07-02): env-controlled for retro batches.
-  // PIPELINE_BLIND_MODE=on disables every live-data channel pipeline-wide
-  // (market enricher, news, Google-Search grounding, live benchmarks) and
-  // injects the as-of-date discipline block, so a retro on a historical
-  // filing cannot be contaminated by post-filing data via retrieval.
-  // Set it in Vercel env for a blind-retro batch; unset/off for live audits.
-  const blindMode = (process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on';
+  // Blind retro mode (2026-07-02): per-audit choice (options.blindMode from
+  // the pre-analysis UI toggle) with the PIPELINE_BLIND_MODE env var as the
+  // batch-default fallback. Disables every live-data channel pipeline-wide
+  // (market enricher, news, Google-Search grounding, live benchmarks,
+  // Finnhub) and injects the as-of-date discipline block, so a retro on a
+  // historical filing cannot be contaminated by post-filing data via
+  // retrieval.
+  const blindMode =
+    analyzeOptions?.blindMode ??
+    ((process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on');
   if (blindMode) {
     log.info('BLIND RETRO MODE active — live retrieval channels disabled for this audit.');
   }
