@@ -30,7 +30,7 @@ export async function GET() {
     if (!user?.id) {
       return NextResponse.json({ totalDocs: 0, authenticated: false });
     }
-    const count = await prisma.document.count({ where: { userId: user.id } });
+    const count = await prisma.document.count({ where: { userId: user.id, deletedAt: null } });
     return NextResponse.json({ totalDocs: count, authenticated: true });
   } catch (error) {
     log.warn('stats count failed', error instanceof Error ? error.message : error);

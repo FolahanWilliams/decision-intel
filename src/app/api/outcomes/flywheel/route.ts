@@ -154,7 +154,7 @@ export async function GET() {
     const outcomesLogged = outcomes.length;
     try {
       totalDecisions = await prisma.analysis.count({
-        where: orgId ? { document: { orgId } } : { document: { userId: user.id } },
+        where: orgId ? { document: { orgId, deletedAt: null } } : { document: { userId: user.id, deletedAt: null } },
       });
     } catch {
       totalDecisions = outcomesLogged;

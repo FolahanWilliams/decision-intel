@@ -53,7 +53,7 @@ export async function GET() {
       drafts = await prisma.draftOutcome.findMany({
         where: {
           status: 'pending_review',
-          analysis: orgId ? { document: { orgId } } : { document: { userId: user.id } },
+          analysis: orgId ? { document: { orgId, deletedAt: null } } : { document: { userId: user.id, deletedAt: null } },
         },
         select: { source: true, confidence: true, createdAt: true },
       });

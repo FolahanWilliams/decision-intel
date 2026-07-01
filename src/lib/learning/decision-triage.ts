@@ -47,7 +47,7 @@ export async function triageDecisions(orgId: string, limit: number = 5): Promise
     const analyses = await prisma.analysis.findMany({
       where: {
         outcomeStatus: 'pending_outcome',
-        document: { orgId },
+        document: { orgId, deletedAt: null },
       },
       include: {
         biases: { select: { biasType: true, severity: true } },

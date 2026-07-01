@@ -102,7 +102,7 @@ export async function GET() {
         FROM "BiasInstance" bi
         JOIN "Analysis" a ON a.id = bi."analysisId"
         JOIN "Document" d ON d.id = a."documentId"
-        WHERE d."userId" = ${userId}
+        WHERE d."userId" = ${userId} AND d."deletedAt" IS NULL
         GROUP BY bi."biasType", TO_CHAR(a."createdAt", 'YYYY-MM')
         ORDER BY month ASC
       `.catch(() => [] as Array<{ biasType: string; month: string; count: bigint }>),

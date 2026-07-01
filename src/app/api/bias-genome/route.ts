@@ -37,7 +37,7 @@ export async function GET() {
     if (membership?.orgId) {
       try {
         const orgAnalyses = await prisma.analysis.findMany({
-          where: { document: { userId: { in: await getOrgUserIds(membership.orgId) } } },
+          where: { document: { userId: { in: await getOrgUserIds(membership.orgId) }, deletedAt: null } },
           select: {
             biases: { select: { biasType: true } },
           },

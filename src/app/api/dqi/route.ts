@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const analysis = await prisma.analysis.findFirst({
       where: {
         id: analysisId,
-        document: { userId },
+        document: { userId, deletedAt: null },
       },
       select: {
         id: true,

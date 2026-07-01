@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
         status,
         ...(analysisId ? { analysisId } : {}),
         OR: [
-          { analysis: { document: { userId: user.id } } },
+          { analysis: { document: { userId: user.id, deletedAt: null } } },
           ...(userOrgId ? [{ orgId: userOrgId }] : []),
         ],
       },

@@ -37,7 +37,7 @@ export async function GET() {
     try {
       const rawAnalyses = await prisma.analysis.findMany({
         where: {
-          document: { userId },
+          document: { userId, deletedAt: null },
         },
         orderBy: { createdAt: 'desc' },
         include: {

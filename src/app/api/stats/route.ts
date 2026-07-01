@@ -29,17 +29,17 @@ export async function GET() {
     ] = await Promise.all([
       // 1. Total documents count
       prisma.document.count({
-        where: { userId },
+        where: { userId, deletedAt: null },
       }),
 
       // 2. Completed documents count
       prisma.document.count({
-        where: { userId, status: 'complete' },
+        where: { userId, status: 'complete', deletedAt: null },
       }),
 
       // 3. Aggregate avg scores + count (O(1) memory instead of O(n))
       prisma.analysis.aggregate({
-        where: { document: { userId } },
+        where: { document: { userId, deletedAt: null } },
         _avg: {
           overallScore: true,
           noiseScore: true,
@@ -54,7 +54,7 @@ export async function GET() {
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON a.id = bi."analysisId"
                 JOIN "Document" d ON d.id = a."documentId"
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = ${userId} AND d."deletedAt" IS NULL
                 GROUP BY bi."biasType"
                 ORDER BY count DESC
                 LIMIT 5
@@ -66,13 +66,13 @@ export async function GET() {
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON a.id = bi."analysisId"
                 JOIN "Document" d ON d.id = a."documentId"
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = ${userId} AND d."deletedAt" IS NULL
                 GROUP BY bi.severity
             `,
 
       // 6. Recent documents (already limited to 5)
       prisma.document.findMany({
-        where: { userId },
+        where: { userId, deletedAt: null },
         take: 5,
         orderBy: { uploadedAt: 'desc' },
         include: {

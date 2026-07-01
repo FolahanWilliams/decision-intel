@@ -27,7 +27,7 @@ async function loadUserBiasProfile(userId: string): Promise<UserBiasProfile> {
   try {
     // Get bias frequency from all user's analyses
     const documents = await prisma.document.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
       select: { id: true },
     });
     const docIds = documents.map(d => d.id);

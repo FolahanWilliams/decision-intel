@@ -58,7 +58,7 @@ export async function POST() {
     // 1. Gather Context (What is the user interested in?)
     // Fetch last 10 analyses to extract topics/tickers from factCheck
     const recentAnalyses = await prisma.analysis.findMany({
-      where: { document: { userId } },
+      where: { document: { userId, deletedAt: null } },
       orderBy: { createdAt: 'desc' },
       take: 10,
       select: { factCheck: true, summary: true },

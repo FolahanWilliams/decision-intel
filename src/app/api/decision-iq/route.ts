@@ -40,7 +40,7 @@ export async function GET() {
 
     if (!orgId) {
       // Fallback: compute a simplified personal score
-      const totalAnalyses = await prisma.document.count({ where: { userId: user.id } });
+      const totalAnalyses = await prisma.document.count({ where: { userId: user.id, deletedAt: null } });
       let outcomeCount = 0;
       try {
         outcomeCount = await prisma.decisionOutcome.count({ where: { userId: user.id } });

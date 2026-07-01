@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
                 where: {
                   biasType: { in: biasTypes },
                   analysisId: { not: analysisId },
-                  analysis: { document: { orgId } },
+                  analysis: { document: { orgId, deletedAt: null } },
                 },
                 _count: { id: true },
               })

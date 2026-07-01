@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     const MAX_ANALYSES = 500;
     const queryArgs = {
       where: {
-        document: { userId },
+        document: { userId, deletedAt: null },
         createdAt: { gte: startDate },
       },
       orderBy: { createdAt: 'asc' as const },

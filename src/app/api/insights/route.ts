@@ -24,7 +24,7 @@ export async function GET() {
     // All queries scoped to user's documents
     const docIds = (
       await prisma.document.findMany({
-        where: { userId },
+        where: { userId, deletedAt: null },
         select: { id: true },
         take: 200,
         orderBy: { uploadedAt: 'desc' },
@@ -93,7 +93,7 @@ export async function GET() {
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id
                 JOIN "Document" d ON a."documentId" = d.id
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = ${userId} AND d."deletedAt" IS NULL
                 GROUP BY bi."biasType"
                 ORDER BY count DESC
             `,
@@ -104,7 +104,7 @@ export async function GET() {
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id
                 JOIN "Document" d ON a."documentId" = d.id
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = ${userId} AND d."deletedAt" IS NULL
                 GROUP BY bi."severity"
             `,
     ]);

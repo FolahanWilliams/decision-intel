@@ -56,7 +56,7 @@ export async function GET() {
       });
     }
 
-    const analysisScope = orgId ? { document: { orgId } } : { document: { userId: user.id } };
+    const analysisScope = orgId ? { document: { orgId, deletedAt: null } } : { document: { userId: user.id, deletedAt: null } };
     const documentScope = orgId ? { orgId } : { userId: user.id };
 
     const [backlog, outcomesPending, outcomesOverdue, roomsActive] = await Promise.all([

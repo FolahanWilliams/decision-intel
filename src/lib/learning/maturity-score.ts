@@ -59,7 +59,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
     ] = await Promise.all([
       // Total analyses for this org
       prisma.analysis.count({
-        where: { document: { orgId } },
+        where: { document: { orgId, deletedAt: null } },
       }),
 
       // Analyses with outcomes logged
@@ -82,7 +82,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       // Recent decision quality (last 45 days)
       prisma.analysis.aggregate({
         where: {
-          document: { orgId },
+          document: { orgId, deletedAt: null },
           createdAt: { gte: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) },
         },
         _avg: { overallScore: true },
@@ -92,7 +92,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       // Older decision quality (45-90 days ago)
       prisma.analysis.aggregate({
         where: {
-          document: { orgId },
+          document: { orgId, deletedAt: null },
           createdAt: {
             gte: ninetyDaysAgo,
             lt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
@@ -118,7 +118,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       // Decision priors submitted
       prisma.decisionPrior.count({
         where: {
-          analysis: { document: { orgId } },
+          analysis: { document: { orgId, deletedAt: null } },
         },
       }),
     ]);
@@ -209,7 +209,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
         const peerAnalyses = await prisma.analysis.groupBy({
           by: ['documentId'],
           where: {
-            document: { orgId: { in: peerOrgs.map(o => o.id) } },
+            document: { orgId: { in: peerOrgs.map(o => o.id) }, deletedAt: null },
           },
           _count: { id: true },
         });

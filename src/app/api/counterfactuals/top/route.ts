@@ -75,7 +75,7 @@ export async function GET() {
     const analyses = await prisma.analysis.findMany({
       where: {
         createdAt: { gte: since },
-        document: orgId ? { orgId } : { userId: user.id },
+        document: orgId ? { orgId, deletedAt: null } : { userId: user.id, deletedAt: null },
       },
       orderBy: { createdAt: 'desc' },
       take: MAX_ANALYSES,

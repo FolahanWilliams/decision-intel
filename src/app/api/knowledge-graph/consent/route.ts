@@ -56,7 +56,7 @@ export async function GET(): Promise<NextResponse<ConsentResponse | { error: str
 
     // Count the user's personal memos (analyses on documents they uploaded).
     const memoCount = await prisma.analysis
-      .count({ where: { document: { userId: user.id } } })
+      .count({ where: { document: { userId: user.id, deletedAt: null } } })
       .catch(() => 0);
 
     // Resolve status.
