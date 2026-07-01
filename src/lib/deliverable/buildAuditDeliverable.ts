@@ -363,6 +363,7 @@ function bucketCounterfactuals(
       bestCaseDqi,
       scenarioCount: scenarios.length,
       topScenarioLabel,
+      topScenarioDelta: scenarios[0]?.delta,
     });
 
   return {

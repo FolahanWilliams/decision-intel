@@ -51,6 +51,15 @@ export function ScenarioSlider({ currentDqi, scenarios, onEnabledChange }: Scena
   const currentGrade = gradeFromScore(currentDqi);
   const dqiDelta = Math.round(projectedDqi - currentDqi);
 
+  // The full potential — DQI with ALL fixes applied. Shown as a hint on the
+  // empty state so "with selected fixes" doesn't read as stuck at the current
+  // score before the user toggles anything.
+  const allFixesDqi = useMemo(
+    () => Math.min(100, currentDqi + scenarios.reduce((acc, s) => acc + s.delta, 0)),
+    [scenarios, currentDqi]
+  );
+  const allFixesGrade = gradeFromScore(allFixesDqi);
+
   function toggle(id: string) {
     setEnabled(prev => {
       const next = new Set(prev);
@@ -151,6 +160,19 @@ export function ScenarioSlider({ currentDqi, scenarios, onEnabledChange }: Scena
               {Math.round(projectedDqi)}
               <span style={{ fontSize: 16, marginLeft: 6 }}>· {projectedGrade}</span>
             </div>
+            {enabled.size === 0 && allFixesDqi > currentDqi ? (
+              <div
+                style={{
+                  fontSize: 11.5,
+                  color: 'var(--text-muted, #64748B)',
+                  marginTop: 3,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                Select fixes below — up to {Math.round(allFixesDqi)} · {allFixesGrade} with all{' '}
+                {scenarios.length}.
+              </div>
+            ) : null}
           </div>
         </div>
         {dqiDelta > 0 ? (

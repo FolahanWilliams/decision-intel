@@ -253,14 +253,26 @@ interface CounterfactualsTemplateInput {
   bestCaseDqi: number;
   scenarioCount: number;
   topScenarioLabel?: string;
+  /** The TOP scenario's OWN lift — so "mitigating X" claims X's real delta,
+   *  not the whole stack's (the Fermi credibility bug: "X alone → 8-to-39"
+   *  when 39 was the sum of all five fixes). */
+  topScenarioDelta?: number;
 }
 
 export function counterfactualsActionTitle(input: CounterfactualsTemplateInput): string {
-  const { currentDqi, bestCaseDqi, scenarioCount, topScenarioLabel } = input;
+  const { currentDqi, bestCaseDqi, scenarioCount, topScenarioLabel, topScenarioDelta } = input;
   const delta = Math.round(bestCaseDqi - currentDqi);
 
   if (delta > 0 && topScenarioLabel) {
-    return `Mitigating ${shortLabel(topScenarioLabel, 3)} alone raises DQI from ${Math.round(currentDqi)} to ${Math.round(bestCaseDqi)}`;
+    const top = shortLabel(topScenarioLabel, 3);
+    const cur = Math.round(currentDqi);
+    const best = Math.round(bestCaseDqi);
+    // Honest: name the TOP fix's OWN lift, then the all-fixes total.
+    if (scenarioCount > 1 && topScenarioDelta != null && Math.round(topScenarioDelta) > 0) {
+      return `Mitigating ${top} lifts DQI +${Math.round(topScenarioDelta)}; all ${scenarioCount} fixes reach ${best}`;
+    }
+    // Single fix: alone === all, so the plain claim is honest.
+    return `Mitigating ${top} raises DQI from ${cur} to ${best}`;
   }
 
   if (delta > 0) {

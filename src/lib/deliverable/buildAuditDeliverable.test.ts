@@ -4,6 +4,7 @@ import {
   validateActionTitle,
   ACTION_TITLE_WORD_CAP,
   ACTION_TITLE_BANNED_PHRASES,
+  counterfactualsActionTitle,
 } from './actionTitleTemplates';
 import { computeFindingValueAtStake, formatExposureLabel, formatTicketLabel } from './valueAtStake';
 import type { AnalysisResult } from '@/types';
@@ -306,6 +307,33 @@ describe('buildAuditDeliverable', () => {
     expect(pattern!.participatingBiasLabels?.length).toBeGreaterThan(0);
     // Credibility grounding for the pattern (reference class from its bias).
     expect(pattern!.referenceClass?.length).toBeGreaterThan(0);
+  });
+
+  it('counterfactuals title is HONEST — top fix claims its own delta, not the all-fixes sum (Fermi bug)', () => {
+    // Fermi shape: 8 → 39 total, but the TOP fix (Planning Fallacy) is only +8.
+    const title = counterfactualsActionTitle({
+      currentDqi: 8,
+      bestCaseDqi: 39,
+      scenarioCount: 5,
+      topScenarioLabel: 'Planning Fallacy',
+      topScenarioDelta: 8,
+    });
+    // Must NOT claim the top fix alone reaches 39.
+    expect(title).not.toMatch(/alone raises DQI from 8 to 39/);
+    expect(title).toContain('+8'); // the top fix's real lift
+    expect(title).toContain('39'); // the all-fixes total, correctly attributed
+    expect(validateActionTitle(title).ok).toBe(true);
+  });
+
+  it('counterfactuals title with a SINGLE fix states the plain lift (alone === all)', () => {
+    const title = counterfactualsActionTitle({
+      currentDqi: 50,
+      bestCaseDqi: 62,
+      scenarioCount: 1,
+      topScenarioLabel: 'Anchoring',
+      topScenarioDelta: 12,
+    });
+    expect(title).toMatch(/raises DQI from 50 to 62/);
   });
 
   it('cover carries the actuarial quantified exposure when a ticket is supplied', () => {
