@@ -14,10 +14,17 @@
  *   - Cheap-tier / classification / content-gen → Gemini 3.1 Flash Lite
  *     (google/gemini-3.1-flash-lite). Mirrors existing cheap-tier.
  *
- * Phase 3 (pipeline migration) is OUT OF SCOPE here — the analysis
- * pipeline + metaJudge gemini-2.5-pro grounding lock + the 3-frame
- * noise jury all stay on src/lib/ai/providers/gemini.ts direct API
- * until founder-explicit-OK + a regression-test plan.
+ * Phase 3 (pipeline migration) SHIPPED 2026-07-02 with founder-explicit
+ * approval (the frontier model-tier upgrade): the REASONING nodes
+ * (metaJudge / forgottenQuestions / deepAnalysis / simulation / rpd +
+ * two noise-jury arms) route through the gateway to
+ * MODEL_FRONTIER_REASONING / MODEL_STRONG_REASONING below via
+ * `resolveFrontierModel` in src/lib/agents/nodes.ts (per-node env
+ * overrides + PIPELINE_FRONTIER_MODELS=off kill switch = one-env-var
+ * rollback to the legacy all-Gemini pipeline). The GROUNDED nodes
+ * (biasDetective / verification / noise-benchmark / market enricher)
+ * stay on the native Gemini SDK — the gateway doesn't expose Google
+ * Search grounding, and live fact-checking is load-bearing there.
  *
  * To change a Phase 2 surface's model: edit the assignment below. The
  * Vercel AI Gateway routes to the underlying provider transparently;
@@ -78,3 +85,35 @@ export const MODEL_CHEAP = 'google/gemini-3.1-flash-lite';
  * actual value — not the recommendation alone.
  */
 export const MODEL_RECOMMENDATIONS = 'deepseek/deepseek-v4-flash';
+
+/**
+ * Frontier reasoning model — the smartest model in the stack, reserved
+ * for the calls where reasoning depth IS the deliverable (locked
+ * 2026-07-02, frontier model-tier upgrade; founder ranking: "Opus 4.8
+ * is the smartest model, put it where it should be").
+ *
+ * Pipeline consumers (via FRONTIER_NODE_DEFAULTS in agents/nodes.ts):
+ * metaJudge (the final verdict + existential ranking) and
+ * forgottenQuestions (the unknown-unknowns surface — the Fermi retro's
+ * real hits). Also the regulator_hostile noise-jury arm.
+ *
+ * Pricing (2026-07): $5/M input, $25/M output. At pipeline volumes this
+ * adds roughly $1-2/audit — noise against $8-15k retro pricing.
+ *
+ * NOTE: Anthropic 4.7+ models REJECT the temperature parameter (400).
+ * Route pipeline calls through runModelCall (strips it); direct
+ * generateText callers must omit `temperature` for anthropic/* models.
+ */
+export const MODEL_FRONTIER_REASONING = 'anthropic/claude-opus-4-8';
+
+/**
+ * Strong reasoning model — right behind Opus at 60% of the price
+ * ($3/M in, $15/M out; intro $2/$10 through 2026-08-31). Used for the
+ * buyer-facing reasoning that doesn't need the absolute ceiling:
+ * deepAnalysis (SWOT / pre-mortem), simulation (boardroom personas),
+ * rpdRecognition (Klein cues), the contrarian_strategist jury arm, and
+ * the deliverable action-title prose (the headline language a board
+ * forwards — upgraded 2026-07-02 from MODEL_RECOMMENDATIONS/deepseek).
+ * Same no-temperature rule as MODEL_FRONTIER_REASONING.
+ */
+export const MODEL_STRONG_REASONING = 'anthropic/claude-sonnet-5';

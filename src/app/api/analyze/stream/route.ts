@@ -44,10 +44,12 @@ const log = createLogger('StreamRoute');
 // CLAUDE.md "Bias Taxonomy cascade" rule: never literal "20" or "22"; always derive.
 const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 
-// Allow up to 240 seconds for the streaming analysis pipeline.
+// Allow up to 300 seconds for the streaming analysis pipeline.
 // Without this, Vercel defaults to 25s which is far too short for
-// multi-agent LLM pipelines.
-export const maxDuration = 240;
+// multi-agent LLM pipelines. Raised 240 -> 300 (2026-07-02, frontier
+// model-tier upgrade): Opus/Sonnet reasoning nodes are slower than
+// Flash; 300s is the Vercel default ceiling on all plans now.
+export const maxDuration = 300;
 
 // Map agent node names to human-readable labels with dynamic descriptions
 const NODE_LABELS: Record<string, { label: string; description: string }> = {
@@ -426,7 +428,7 @@ export async function POST(request: NextRequest) {
           // Safety timeout: close stream 5s before Vercel maxDuration
           // Declared as let so it's accessible in the catch block
           streamAbsoluteTimeout = setTimeout(() => {
-            log.error('Stream absolute timeout (235s) exceeded — closing');
+            log.error('Stream absolute timeout (295s) exceeded — closing');
             sendUpdate({
               type: 'error',
               message: 'Analysis timeout exceeded. Please try again with a shorter document.',
@@ -457,7 +459,7 @@ export async function POST(request: NextRequest) {
                 log.warn('Timeout cleanup: failed to release reservation:', err);
               }
             })();
-          }, 235_000);
+          }, 295_000);
 
           for await (const event of eventStream) {
             // Track node start events

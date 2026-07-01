@@ -34,6 +34,7 @@ import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embedd
 import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
+import { MODEL_FRONTIER_REASONING, MODEL_STRONG_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
@@ -250,43 +251,65 @@ function isGatewayModel(name: string): boolean {
 }
 
 /**
- * Unified noise-jury judge call — routes by model name. Returns a
- * normalised `{ text }` shape regardless of underlying provider so the
- * jury aggregator stays single-path.
+ * Unified cross-provider model call — routes by model name. Returns a
+ * normalised `{ text }` shape regardless of underlying provider so
+ * consumers (noise jury, frontier-tier reasoning nodes) stay single-path.
  *
- * Locked 2026-05-06 (cross-model jury ship). Two architectural arms
- * are wired by default: native Gemini (gemini-3-flash-preview) +
- * Grok 4.3 via the AI Gateway. Override via NOISE_JURY_MODELS env var.
+ * Locked 2026-05-06 (cross-model jury ship) as `runJudgeCall`; generalized
+ * 2026-07-02 (frontier model-tier upgrade) to serve the reasoning nodes
+ * (metaJudge / forgottenQuestions / deepAnalysis / simulation / rpd) when
+ * they resolve to a gateway-routed Anthropic model.
  *
  * Each provider routes through its own circuit breaker (`gemini` vs
  * `gateway`) so an outage on one side doesn't poison the other arm.
+ * The gateway path carries the SAME retry envelope as the Gemini path
+ * (withRetry 2×, 1s base / 10s max) so a transient gateway blip doesn't
+ * degrade a whole node that Gemini would have retried through.
  */
-async function runJudgeCall(
+async function runModelCall(
   modelName: string,
   prompts: string[],
-  options: { temperature?: number } = {}
+  options: { temperature?: number; timeoutMs?: number; jsonResponse?: boolean } = {}
 ): Promise<{ text: string; modelName: string }> {
   const temperature = options.temperature ?? 0.3;
 
   if (isGatewayModel(modelName)) {
-    // Lazy-import the gateway provider so the noise-jury bundle stays
+    // Lazy-import the gateway provider so the pipeline bundle stays
     // lean when the env doesn't enable cross-model arms.
     const { generateText } = await import('@/lib/ai/providers/gateway');
-    // The gateway expects a single string prompt. The noise-jury frame
-    // is structured as `[basePrompt, contentBlock, seedSuffix]`; join
-    // with double-newline separators so the gateway sees the same
-    // logical message Gemini receives via array-of-parts.
+    // The gateway expects a single string prompt. Callers pass
+    // `[basePrompt, contentBlock, suffix]` arrays; join with
+    // double-newline separators so the gateway sees the same logical
+    // message Gemini receives via array-of-parts.
     const combinedPrompt = prompts.join('\n\n');
+    // Anthropic 4.7+ models (Opus 4.8, Sonnet 5) REJECT the temperature
+    // parameter with a 400 — sampling params were removed from that API
+    // generation. Omit it entirely for anthropic/* models; prompting is
+    // the steering mechanism there. (Grok/Gemini gateway models still
+    // accept it.)
+    const isAnthropic = modelName.startsWith('anthropic/');
+    // Frontier reasoning models are slower than Flash — default their
+    // per-call ceiling to 150s (vs the 90s LLM_TIMEOUT_MS) so a long
+    // Opus verdict isn't killed mid-generation, while still failing
+    // fast enough that the node fallback fires inside the route budget.
+    const timeoutMs = options.timeoutMs ?? (isAnthropic ? 150000 : LLM_TIMEOUT_MS);
     const result = await withCircuitBreaker('gateway', () =>
-      withTimeout(
-        generateText(combinedPrompt, {
-          model: modelName,
-          temperature,
-          // Gateway's default 16384 matches Gemini's maxOutputTokens —
-          // keep cap aligned so JSON outputs from both arms have the
-          // same truncation tolerance.
-          maxOutputTokens: 16384,
-        })
+      withRetry(
+        () =>
+          withTimeout(
+            generateText(combinedPrompt, {
+              model: modelName,
+              ...(isAnthropic ? {} : { temperature }),
+              // Gateway's default 16384 matches Gemini's maxOutputTokens —
+              // keep cap aligned so JSON outputs from both arms have the
+              // same truncation tolerance.
+              maxOutputTokens: 16384,
+            }),
+            timeoutMs
+          ),
+        2,
+        1000,
+        10000
       )
     );
     return { text: result.text, modelName: result.model };
@@ -294,9 +317,14 @@ async function runJudgeCall(
 
   // Native Gemini path — uses the existing createModelByName +
   // withGeminiResilience wrapper for parity with the legacy 3-Gemini
-  // jury.
-  const model = createModelByName(modelName, { temperature });
-  const result = await withGeminiResilience(() => withTimeout(model.generateContent(prompts)));
+  // jury. jsonResponse:false is honoured for prose consumers (metaJudge).
+  const model = createModelByName(modelName, {
+    temperature,
+    jsonResponse: options.jsonResponse,
+  });
+  const result = await withGeminiResilience(() =>
+    withTimeout(model.generateContent(prompts), options.timeoutMs ?? LLM_TIMEOUT_MS)
+  );
   const text = result.response?.text ? result.response.text() : '';
   return { text, modelName };
 }
@@ -305,11 +333,15 @@ async function runJudgeCall(
  * Create a model by explicit name — used for multi-model noise jury.
  * Not cached (each call creates a new instance) since model names vary.
  */
-function createModelByName(name: string, options?: { temperature?: number }): GenerativeModel {
+function createModelByName(
+  name: string,
+  options?: { temperature?: number; jsonResponse?: boolean }
+): GenerativeModel {
   return createModelInstance({
     safetyLevel: 'relaxed',
     modelName: name,
     temperature: options?.temperature,
+    jsonResponse: options?.jsonResponse,
   });
 }
 
@@ -319,23 +351,28 @@ function createModelByName(name: string, options?: { temperature?: number }): Ge
  * Returns empty array if not set (falls back to default single-model jury).
  */
 /**
- * Default cross-model jury — 2 architectures across 3 frames:
- *   [0] analyst_skeptical    → gemini-3-flash-preview (Google)
- *   [1] regulator_hostile    → xai/grok-4.3 (xAI via Vercel AI Gateway)
- *   [2] contrarian_strategist → gemini-3-flash-preview (Google)
+ * Default cross-model jury — 2 model families across 3 frames
+ * (locked 2026-07-02, frontier model-tier upgrade; supersedes the
+ * 2026-05-06 Grok arm — founder-dropped: "Grok is not that good"):
+ *   [0] analyst_skeptical     → gemini-3-flash-preview (Google, native)
+ *   [1] regulator_hostile     → anthropic/claude-opus-4-8 (via AI Gateway)
+ *   [2] contrarian_strategist → anthropic/claude-sonnet-5 (via AI Gateway)
  *
- * The Grok arm fires on the regulator_hostile frame because that's the
- * highest-leverage frame for architectural diversity — a different
- * model family scrutinising the same memo against the same hostile-GC
- * rubric uncovers framing-blind-spots a single-family jury misses. The
- * 2:1 Gemini:Grok ratio means a Grok outage degrades gracefully to
- * all-Gemini (jury still functional, just back to single-architecture
- * diversity). Override via NOISE_JURY_MODELS env var.
+ * Opus 4.8 fires on regulator_hostile because that's the single most
+ * load-bearing frame (the hostile-GC rubric that catches what a friendly
+ * read misses) — it gets the smartest model. Sonnet 5 takes the
+ * contrarian-strategist frame. The Gemini arm stays for architectural
+ * diversity + graceful degradation: a gateway outage degrades to a
+ * 1-valid-judge fallback (aggregator handles it), a Gemini outage leaves
+ * 2 Anthropic arms. Anthropic arms receive NO temperature param (4.7+
+ * models 400 on it — see runModelCall). Override via NOISE_JURY_MODELS
+ * env var (comma-separated 3-model list, e.g. the legacy
+ * "gemini-3-flash-preview,xai/grok-4.3,gemini-3-flash-preview").
  */
 const DEFAULT_NOISE_JURY_MODELS = [
   'gemini-3-flash-preview',
-  'xai/grok-4.3',
-  'gemini-3-flash-preview',
+  MODEL_FRONTIER_REASONING,
+  MODEL_STRONG_REASONING,
 ] as const;
 
 function getNoiseJuryModels(): string[] {
@@ -345,6 +382,98 @@ function getNoiseJuryModels(): string[] {
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
+}
+
+// ============================================================
+// FRONTIER MODEL TIERS (locked 2026-07-02 — founder-approved pipeline change)
+// ============================================================
+//
+// The founder's model ranking, applied where each tier earns its cost:
+// cheap Gemini for mechanical extraction, Gemini-grounded for live
+// fact-checking (grounding is load-bearing there and the Anthropic route
+// can't do Google Search), and Anthropic frontier models for the
+// buyer-facing REASONING — the structural flaws, why they're credible,
+// and the mitigations. That reasoning is the product's deliverable.
+//
+//   metaJudge          → Opus 4.8   (final verdict + ranking — highest single-call leverage)
+//   forgottenQuestions → Opus 4.8   (the Fermi killers: the "I didn't think to ask that" content)
+//   deepAnalysis       → Sonnet 5   (SWOT / pre-mortem / counter-arguments)
+//   simulation         → Sonnet 5   (boardroom persona objections)
+//   rpdRecognition     → Sonnet 5   (Klein recognition cues)
+//   biasDetective      → '' legacy  (grounded Gemini DEFAULT — its prompt fact-checks via
+//                                    Google Search; env-overridable for a founder A/B)
+//
+// Resolution order (per node):
+//   1. Per-node env override (PIPELINE_MODEL_<NODE>) — set to a gateway
+//      model string ('anthropic/claude-sonnet-5'), a native Gemini name,
+//      or the literal 'legacy' to force that node onto its original
+//      Gemini getter.
+//   2. Global kill switch: PIPELINE_FRONTIER_MODELS=off → EVERY node
+//      reverts to its legacy Gemini path (byte-identical to the
+//      pre-2026-07-02 pipeline). This is the one-env-var rollback.
+//   3. The defaults above.
+//
+// Trade recorded honestly: frontier-routed nodes lose the in-call
+// googleSearch tool (the AI Gateway doesn't expose Gemini grounding, and
+// Anthropic models search differently). They RETAIN the injected grounded
+// context (market enricher, intelligence gatherer, RAG, case analogs),
+// and the dedicated verificationNode stays Gemini-grounded downstream.
+// Reasoning depth is what these nodes are for; the grounded nodes keep
+// the fact-checking.
+
+type FrontierNodeKey =
+  | 'metaJudge'
+  | 'forgottenQuestions'
+  | 'deepAnalysis'
+  | 'simulation'
+  | 'rpdRecognition'
+  | 'biasDetective';
+
+const FRONTIER_NODE_DEFAULTS: Record<FrontierNodeKey, string> = {
+  metaJudge: MODEL_FRONTIER_REASONING,
+  forgottenQuestions: MODEL_FRONTIER_REASONING,
+  deepAnalysis: MODEL_STRONG_REASONING,
+  simulation: MODEL_STRONG_REASONING,
+  rpdRecognition: MODEL_STRONG_REASONING,
+  // Empty = legacy grounded Gemini. The bias detective's prompt instructs
+  // live Google-Search verification of claims; routing it to an ungrounded
+  // model makes that instruction unfollowable. Set PIPELINE_MODEL_BIAS_DETECTIVE
+  // to A/B Opus here — the frontier branch swaps the search instruction for
+  // an honest assess-against-provided-context one.
+  biasDetective: '',
+};
+
+const FRONTIER_NODE_ENV: Record<FrontierNodeKey, string> = {
+  metaJudge: 'PIPELINE_MODEL_META_JUDGE',
+  forgottenQuestions: 'PIPELINE_MODEL_FORGOTTEN_QUESTIONS',
+  deepAnalysis: 'PIPELINE_MODEL_DEEP_ANALYSIS',
+  simulation: 'PIPELINE_MODEL_SIMULATION',
+  rpdRecognition: 'PIPELINE_MODEL_RPD_RECOGNITION',
+  biasDetective: 'PIPELINE_MODEL_BIAS_DETECTIVE',
+};
+
+/**
+ * Resolve which model a frontier-tier node should run on.
+ * Returns a model name (gateway or native) to route through
+ * `runModelCall`, or null → the node uses its legacy Gemini path.
+ */
+function resolveFrontierModel(key: FrontierNodeKey): string | null {
+  const override = getOptionalEnvVar(FRONTIER_NODE_ENV[key], '').trim();
+  if (override) return override.toLowerCase() === 'legacy' ? null : override;
+  if (getOptionalEnvVar('PIPELINE_FRONTIER_MODELS', 'on').trim().toLowerCase() === 'off') {
+    return null;
+  }
+  const resolved = FRONTIER_NODE_DEFAULTS[key] || null;
+  // Fail-safe: gateway-routed defaults require AI_GATEWAY_API_KEY. Without
+  // it every frontier call would throw at the env check and degrade the
+  // node to its error fallback — strictly worse than the legacy Gemini
+  // path. Fall back to legacy automatically (local dev / CI / vitest run
+  // without the key). An EXPLICIT env override above is honoured as-is so
+  // a misconfigured override fails loudly rather than silently downgrading.
+  if (resolved && isGatewayModel(resolved) && !process.env.AI_GATEWAY_API_KEY) {
+    return null;
+  }
+  return resolved;
 }
 
 // ============================================================
@@ -634,22 +763,38 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       );
     }
 
-    // Use Grounded Model for primary detection with circuit breaker + retry
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getGroundedModel().generateContent([
-            biasPrompt,
-            `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-            `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}${crossDocPrompt}`,
-          ])
-        ),
-      2, // 2 retries
-      1000, // 1 second base delay
-      10000 // 10 second max delay
-    );
-
-    const response = result.response?.text ? result.response.text() : '';
+    // Frontier tier (2026-07-02): the bias detective DEFAULTS to the legacy
+    // grounded Gemini path — its live Google-Search fact-check is load-bearing
+    // (the 2026-06-09 caching lock names it). PIPELINE_MODEL_BIAS_DETECTIVE is
+    // the founder A/B lever; when set to an ungrounded frontier model, the
+    // search instruction is swapped for an honest assess-against-context one
+    // (an instruction the model can't follow invites fabricated "I searched").
+    const frontierBiasModel = resolveFrontierModel('biasDetective');
+    let response: string;
+    if (frontierBiasModel) {
+      const frontier = await runModelCall(frontierBiasModel, [
+        biasPrompt,
+        `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
+        `IMPORTANT: Assess factual claims against the provided intelligence and cross-document context. You have NO live search access — never claim to have verified a claim externally; mark externally-unverifiable claims as unverified rather than assuming them true or false.${intelPrompt}${crossDocPrompt}`,
+      ]);
+      response = frontier.text;
+    } else {
+      // Use Grounded Model for primary detection with circuit breaker + retry
+      const result = await withGeminiResilience(
+        () =>
+          withTimeout(
+            getGroundedModel().generateContent([
+              biasPrompt,
+              `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
+              `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}${crossDocPrompt}`,
+            ])
+          ),
+        2, // 2 retries
+        1000, // 1 second base delay
+        10000 // 10 second max delay
+      );
+      response = result.response?.text ? result.response.text() : '';
+    }
     const data = parseJSON(response);
     const biases = data?.biases || [];
 
@@ -788,13 +933,15 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
       const framedPrompt = composeFramePrompt(frame.prompt);
       const modelName =
         juryModels[i] ?? juryModels[juryModels.length - 1] ?? 'gemini-3-flash-preview';
-      return runJudgeCall(
+      return runModelCall(
         modelName,
         [
           framedPrompt,
           `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
           `\n(Frame: ${frame.label}; Random Seed: ${Math.random()})`,
         ],
+        // temperature is honoured on Gemini/Grok arms; runModelCall strips
+        // it for anthropic/* (4.7+ models 400 on sampling params).
         { temperature: 0.3 }
       );
     });
@@ -1358,27 +1505,41 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
       ? `\n\nCROSS-DOCUMENT CONTEXT (related documents — use for comparative strategic analysis):\n${sanitizeForPrompt(crossDocBlock, 'cross_doc_context')}`
       : '';
 
-    // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
-    // settings — use standard safety to keep content moderation active.
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getStandardSafetyGroundedModel().generateContent([
-            DEEP_ANALYSIS_SUPER_PROMPT,
-            `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
-          ]),
-          90000 // 90 second timeout
-        ),
-      2,
-      1000,
-      10000
-    );
-
-    const responseText = result.response?.text ? result.response.text() : '';
+    // Frontier tier (2026-07-02): the strategic deep-dive (SWOT, pre-mortem,
+    // counter-arguments) is reasoning-dominant — Sonnet 5 by default.
+    // Legacy grounded Gemini fallback keeps standard safety + live search.
+    // On the frontier path there is no Gemini grounding metadata, so
+    // counter-argument sourceUrls stay empty (the field is optional).
+    const frontierDeepModel = resolveFrontierModel('deepAnalysis');
+    let responseText: string;
+    let searchSources: string[] = [];
+    if (frontierDeepModel) {
+      const frontier = await runModelCall(frontierDeepModel, [
+        DEEP_ANALYSIS_SUPER_PROMPT,
+        `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
+      ]);
+      responseText = frontier.text;
+    } else {
+      // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
+      // settings — use standard safety to keep content moderation active.
+      const result = await withGeminiResilience(
+        () =>
+          withTimeout(
+            getStandardSafetyGroundedModel().generateContent([
+              DEEP_ANALYSIS_SUPER_PROMPT,
+              `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
+            ]),
+            90000 // 90 second timeout
+          ),
+        2,
+        1000,
+        10000
+      );
+      responseText = result.response?.text ? result.response.text() : '';
+      // Extract search sources for counter-arguments (Gemini grounding metadata)
+      searchSources = extractSearchSources(result.response);
+    }
     const data = parseJSON(responseText);
-
-    // Extract search sources for counter-arguments
-    const searchSources = extractSearchSources(result.response);
 
     // Enrich counter-arguments with search sources
     const cognitiveData = data?.cognitiveAnalysis;
@@ -1630,22 +1791,27 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       ? `\n\nCROSS-DOCUMENT CONTEXT (related deals from portfolio — use for historical simulation grounding):\n${sanitizeForPrompt(crossDocSimBlock, 'cross_doc_context')}`
       : '';
 
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getStandardSafetyGroundedModel().generateContent([
-            dynamicPrompt,
-            `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
-            `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
-          ]),
-          90000
-        ),
-      2,
-      1000,
-      10000
-    );
-
-    const text = result.response?.text ? result.response.text() : '';
+    // Frontier tier (2026-07-02): boardroom persona objections are pure
+    // reasoning/roleplay — Sonnet 5 by default; legacy grounded Gemini fallback.
+    const frontierSimModel = resolveFrontierModel('simulation');
+    const simPrompts = [
+      dynamicPrompt,
+      `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
+      `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
+    ];
+    let text: string;
+    if (frontierSimModel) {
+      const frontier = await runModelCall(frontierSimModel, simPrompts);
+      text = frontier.text;
+    } else {
+      const result = await withGeminiResilience(
+        () => withTimeout(getStandardSafetyGroundedModel().generateContent(simPrompts), 90000),
+        2,
+        1000,
+        10000
+      );
+      text = result.response?.text ? result.response.text() : '';
+    }
     const data = parseJSON(text);
 
     log.info(
@@ -1730,22 +1896,27 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
       similarDealCount: similarDocs.length,
     });
 
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getStandardSafetyGroundedModel().generateContent([
-            prompt,
-            `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
-            `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
-          ]),
-          90000
-        ),
-      2,
-      1000,
-      10000
-    );
-
-    const text = result.response?.text ? result.response.text() : '';
+    // Frontier tier (2026-07-02): Klein recognition cues are pattern-matching
+    // over injected historical cases — Sonnet 5 by default; legacy Gemini fallback.
+    const frontierRpdModel = resolveFrontierModel('rpdRecognition');
+    const rpdPrompts = [
+      prompt,
+      `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
+      `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
+    ];
+    let text: string;
+    if (frontierRpdModel) {
+      const frontier = await runModelCall(frontierRpdModel, rpdPrompts);
+      text = frontier.text;
+    } else {
+      const result = await withGeminiResilience(
+        () => withTimeout(getStandardSafetyGroundedModel().generateContent(rpdPrompts), 90000),
+        2,
+        1000,
+        10000
+      );
+      text = result.response?.text ? result.response.text() : '';
+    }
     const data = parseJSON(text);
 
     const recognitionCues = data?.recognitionCues as RecognitionCuesResult | undefined;
@@ -1834,21 +2005,34 @@ export async function forgottenQuestionsNode(state: AuditState): Promise<Partial
       hasDealContext: sector != null || ticketSize != null,
     });
 
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getStandardSafetyGroundedModel().generateContent([
-            prompt,
-            `Memo under review:\n<memo>\n${content}\n</memo>`,
-          ]),
-          75000
-        ),
-      2,
-      1000,
-      10000
-    );
-
-    const text = result.response?.text ? result.response.text() : '';
+    // Frontier tier (2026-07-02): the Forgotten Questions are the audit's
+    // deepest buyer-facing reasoning (the Fermi retro's real hits — the
+    // AIG-collateral / Lehman-veto / Amazon-exit class of "I didn't think
+    // to ask that"). Opus 4.8 by default; legacy grounded Gemini fallback.
+    const frontierFqModel = resolveFrontierModel('forgottenQuestions');
+    let text: string;
+    if (frontierFqModel) {
+      const frontier = await runModelCall(frontierFqModel, [
+        prompt,
+        `Memo under review:\n<memo>\n${content}\n</memo>`,
+      ]);
+      text = frontier.text;
+    } else {
+      const result = await withGeminiResilience(
+        () =>
+          withTimeout(
+            getStandardSafetyGroundedModel().generateContent([
+              prompt,
+              `Memo under review:\n<memo>\n${content}\n</memo>`,
+            ]),
+            75000
+          ),
+        2,
+        1000,
+        10000
+      );
+      text = result.response?.text ? result.response.text() : '';
+    }
     const data = parseJSON(text);
     const parsed = data?.forgottenQuestions as ForgottenQuestionsResult | undefined;
 
@@ -1912,27 +2096,35 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
       };
     }
 
-    const result = await withGeminiResilience(
-      () =>
-        withTimeout(
-          getProStandardSafetyGroundedModel().generateContent([
-            buildMetaJudgePrompt(
-              content,
-              sanitizeForPrompt(failureScenarios, 'failure_scenarios'),
-              sanitizeForPrompt({ factVerifications, biasFindings }, 'objective_findings')
-            ),
-          ]),
-          60000
-        ),
-      2,
-      1000,
-      10000
+    const metaJudgePrompt = buildMetaJudgePrompt(
+      content,
+      sanitizeForPrompt(failureScenarios, 'failure_scenarios'),
+      sanitizeForPrompt({ factVerifications, biasFindings }, 'objective_findings')
     );
 
-    const verdict = result.response?.text
-      ? result.response.text()
-      : 'Meta-Verdict could not be generated.';
-    log.info(`Meta-Judge complete.`);
+    // Frontier tier (2026-07-02): the final verdict is the highest-leverage
+    // single call in the pipeline — Opus 4.8 by default. Prose output, so
+    // the gateway path is parse-risk-free (consumer reads text raw).
+    // Legacy fallback: grounded gemini-2.5-pro (jsonResponse:false).
+    const frontierMetaModel = resolveFrontierModel('metaJudge');
+    let verdict: string;
+    if (frontierMetaModel) {
+      const frontier = await runModelCall(frontierMetaModel, [metaJudgePrompt], {
+        jsonResponse: false,
+      });
+      verdict = frontier.text || 'Meta-Verdict could not be generated.';
+    } else {
+      const result = await withGeminiResilience(
+        () => withTimeout(getProStandardSafetyGroundedModel().generateContent([metaJudgePrompt]), 60000),
+        2,
+        1000,
+        10000
+      );
+      verdict = result.response?.text
+        ? result.response.text()
+        : 'Meta-Verdict could not be generated.';
+    }
+    log.info(`Meta-Judge complete (model=${frontierMetaModel ?? 'legacy-gemini-pro'}).`);
 
     return {
       metaVerdict: verdict,

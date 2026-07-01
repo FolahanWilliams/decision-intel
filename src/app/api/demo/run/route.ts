@@ -12,9 +12,11 @@ import { formatSSE, formatSSEHeartbeat } from '@/lib/sse';
 
 const log = createLogger('DemoRun');
 
-// The demo runs the same ~12-node pipeline as the authed flow (~60-90s).
-// Without this, the platform default would kill the SSE stream early.
-export const maxDuration = 240;
+// The demo runs the same ~12-node pipeline as the authed flow. Raised
+// 240 -> 300 (2026-07-02 frontier model-tier upgrade): the Opus/Sonnet
+// reasoning nodes are slower than Flash. Without this, the platform
+// default would kill the SSE stream early.
+export const maxDuration = 300;
 
 // Demo budget + content guards. The demo runs the *real* 12-node pipeline
 // against a visitor-pasted memo; every audit costs ~£0.40 at Gemini paid

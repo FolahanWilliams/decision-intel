@@ -66,6 +66,13 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-07-02)
 
+**Frontier model-tier upgrade — Opus 4.8 + Sonnet 5 on the reasoning nodes (founder-approved pipeline change; full prose in the CLAUDE.md "Frontier model-tier upgrade" lock).**
+
+- [x] metaJudge + forgottenQuestions → **Opus 4.8**; deepAnalysis + boardroom sim + rpdRecognition → **Sonnet 5**; noise jury → Flash + Opus + Sonnet (**Grok dropped**); deliverable action-titles → Sonnet 5 (was deepseek). Grounded fact-check nodes (biasDetective / verification / benchmark / market enricher) + cheap extraction stay Gemini. SSOT constants in `gateway-models.ts`; `resolveFrontierModel` + `runModelCall` in `nodes.ts`.
+- [x] Guards: no `temperature` on `anthropic/*` (4.7+ models 400 on it — two live traps fixed), missing `AI_GATEWAY_API_KEY` auto-reverts to legacy Gemini, `PIPELINE_FRONTIER_MODELS=off` = one-env-var full rollback, per-node `PIPELINE_MODEL_*` overrides for zero-deploy tuning. `maxDuration` 240→300 on both audit routes. `TOKEN_COSTS` extended.
+- [ ] **FOUNDER PRE-FLIGHT (before the next audit):** run `npm run test:gateway` — now smoke-tests `anthropic/claude-opus-4-8` + `anthropic/claude-sonnet-5` against your real key (~10s). If either fails `model_not_found`, set `PIPELINE_FRONTIER_MODELS=off` in Vercel env and tell Claude the exact error.
+- [ ] **FOUNDER VERIFY (META #11):** re-run Fermi + 1-2 fresh retros on the upgraded pipeline; bring outputs + co-work's fact-check back. Watch: (a) do the killers still lead, (b) is the Forgotten-Questions/boardroom prose visibly sharper, (c) did noiseScore inflate (cross-family jury stdDev — expected drift, tune frames if excessive), (d) per-audit cost in the Vercel AI Gateway dashboard (~$3-5 expected).
+
 **Cross-class attack path — the structural/execution/info conditions that MULTIPLY biases into the outcome (founder "which upgrade makes the buyer bite via the retro, in 1-2 hours" → the Wiz move). Full prose in CLAUDE.md "Cross-class attack path" lock.**
 
 - [x] **The differentiator surface** (`1d5d71aa`) — our audit flagged biases (cognitive nodes); now it surfaces the cross-class chain (17-person board + dominant CEO + hostile bid + 6-hours-diligence + leverage = the collapse) that a bias-only audit misses. [strategic-nodes.ts](src/lib/deliverable/strategic-nodes.ts): 13-node catalog (structural / execution / information) + pure `detectStrategicNodes(content)`. NO LLM, no scoring impact (display-only). Rendered as the "How these risks multiply · the attack path" panel atop the risk pathways.

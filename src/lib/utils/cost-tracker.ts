@@ -47,6 +47,15 @@ const TOKEN_COSTS: Record<string, { input: number; output: number }> = {
   // DeepSeek-v4-Pro reserved for future heavier-reasoning surfaces.
   // Same Gateway routing convention; ~3× the v4-flash rate.
   'deepseek/deepseek-v4-pro': { input: 0.00043, output: 0.00087 },
+  // Anthropic frontier tier via AI Gateway (locked 2026-07-02, frontier
+  // model-tier upgrade). Opus 4.8: $5/M input · $25/M output. Sonnet 5:
+  // $3/M · $15/M list ($2/$10 intro through 2026-08-31 — we book the
+  // LIST rate so cost estimates stay honest when the intro lapses).
+  // Consumers: metaJudge + forgottenQuestions + regulator_hostile jury
+  // arm (Opus); deepAnalysis + simulation + rpdRecognition +
+  // contrarian_strategist arm + deliverable action-titles (Sonnet).
+  'anthropic/claude-opus-4-8': { input: 0.005, output: 0.025 },
+  'anthropic/claude-sonnet-5': { input: 0.003, output: 0.015 },
 };
 
 /**

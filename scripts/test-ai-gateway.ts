@@ -241,12 +241,23 @@ async function main() {
   // route Gemini through the gateway in Phase 2/3.
   const geminiResult = await runGenerateTest('google/gemini-3.1-flash-lite');
 
-  // 3) generateText against Grok 4.3 — the load-bearing third arm of
-  // the cross-model noise jury (locked 2026-05-06). Every doc audit
-  // fires a Grok call on the regulator_hostile frame; this smoke test
-  // catches xAI auth / model-id regressions before they hit the
-  // pipeline at audit time.
+  // 3) generateText against Grok 4.3 — no longer a jury arm (dropped
+  // 2026-07-02, frontier model-tier upgrade) but still the founder-hub
+  // default (MODEL_FOUNDER_HUB: chat / sparring / education graders).
   const grokResult = await runGenerateTest('xai/grok-4.3');
+
+  // 4+5) THE LOAD-BEARING PRE-FLIGHT (added 2026-07-02): the frontier
+  // model-tier upgrade routes the pipeline's reasoning nodes (metaJudge,
+  // forgottenQuestions, deepAnalysis, simulation, rpdRecognition + two
+  // noise-jury arms) + the deliverable action-titles through these two
+  // Anthropic models. Run this BEFORE the first audit after any deploy:
+  // it proves the gateway slugs resolve + auth works with the real key.
+  // If either fails with model_not_found, the fix is the env override
+  // (PIPELINE_FRONTIER_MODELS=off to revert, or the per-node
+  // PIPELINE_MODEL_* vars) while the slug is corrected.
+  // NOTE: no temperature is passed — Anthropic 4.7+ models 400 on it.
+  const opusResult = await runGenerateTest('anthropic/claude-opus-4-8');
+  const sonnetResult = await runGenerateTest('anthropic/claude-sonnet-5');
 
   process.stdout.write('\n─── Summary ───\n');
   process.stdout.write(
@@ -256,13 +267,21 @@ async function main() {
     `google/gemini-3.1-flash-lite (generate): ${geminiResult.success ? 'OK' : `FAILED · ${geminiResult.errorClass}`}\n`
   );
   process.stdout.write(
-    `xai/grok-4.3 (generate · noise jury)   : ${grokResult.success ? 'OK' : `FAILED · ${grokResult.errorClass}`}\n`
+    `xai/grok-4.3 (generate · founder-hub)  : ${grokResult.success ? 'OK' : `FAILED · ${grokResult.errorClass}`}\n`
+  );
+  process.stdout.write(
+    `anthropic/claude-opus-4-8 (PIPELINE)   : ${opusResult.success ? 'OK' : `FAILED · ${opusResult.errorClass}`}\n`
+  );
+  process.stdout.write(
+    `anthropic/claude-sonnet-5 (PIPELINE)   : ${sonnetResult.success ? 'OK' : `FAILED · ${sonnetResult.errorClass}`}\n`
   );
 
   const allErrors = [
     streamResult.errorClass,
     geminiResult.errorClass,
     grokResult.errorClass,
+    opusResult.errorClass,
+    sonnetResult.errorClass,
   ].filter((e): e is GatewayErrorClass => e !== undefined);
 
   // Special-case the free-credit restriction — it indicates the integration
