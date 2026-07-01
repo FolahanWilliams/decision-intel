@@ -64,6 +64,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-07-01)
+
+**Differentiator sharpening — the Taktile "$X at risk" reveal, made to fire on cold audits (founder "strengthen the toxic-combo→monetary side + market intelligence + let the pipeline web-search; the free audits must showcase the value, Taktile's playbook"). Full prose in CLAUDE.md "Differentiator sharpening" lock.**
+
+- [x] **Ticket auto-extraction** (`21df40e2`) — `buildAuditDeliverable` reads the decision size off the document (pure two-tier commitment/valuation scan, nearest-context classification, $1M floor, null→DQI-lift fallback, manual ticket wins) so the $-at-risk reveal fires automatically on cold uploaded audits of public S-1 / M&A / earnings docs. Fixed a latent regex stem bug (`\b(acqui)\b` never matched "acquiring"). 9 tests.
+- [x] **Toxic-combination is the hero** (`4bdc3e33`) — the cover leads with "[Synergy Mirage] compounds into ~$40M at risk at DQI 42" when a compound pattern carries exposure. Names the pattern + the compounding = the moat. Pure composition, no scoring touch.
+- [x] **Live web-grounded market context** (`5232cb1c`, founder-gated pipeline add) — a 6th non-fatal source in `assembleContext`: a live Gemini-grounded (`googleSearch`) search on the named company for current cited developments, fixing the DB-first `newsCount 0` grey tile. Feeds the bias-detective prompt + a new "Live market context" card on the IntelligenceTab. Null-safe, ≤15s (≤ slowest source), anti-fabrication (source-required). 8 parse tests. No DQI/methodology change.
+- [ ] **FOUNDER EYEBALL (META #11 — output plausibility):** run a REAL company audit (a fresh S-1 / M&A announcement) and confirm (a) the hero shows "[pattern] compounds into ~$X at risk", (b) the IntelligenceTab "Live market context" card populates with real, cited signals (not empty, not fabricated). The grounded LLM output can't be exercised in-sandbox — this is the verification loop.
+
 ## Recently Completed (2026-06-28)
 
 **ETA wedge · broker-narrative-tells overlay + live sales-call script (founder-approved "highest ROI overlay improvement" + add to Founder Hub). Pure prompt-overlay + founder-hub data/UI; zero `src/lib/agents/` / DQI / schema change; non-ETA audits byte-identical.**
