@@ -280,6 +280,13 @@ export interface IntelligenceContextSummary {
   assembledAt: string;
   topNews?: Array<{ title: string; source: string; link: string }>;
   topCaseStudies?: Array<{ company: string; outcome: string; biasTypes: string[] }>;
+  /** Live grounded market snapshot on the named company (present when found). */
+  marketSnapshot?: {
+    company: string;
+    summary: string;
+    asOf: string;
+    signals: Array<{ headline: string; detail: string; source: string; date?: string }>;
+  };
 }
 
 export interface SimulationResult {

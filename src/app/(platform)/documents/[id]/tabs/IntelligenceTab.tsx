@@ -1,6 +1,14 @@
 'use client';
 
-import { ExternalLink, Newspaper, BookOpen, Database, Landmark, AlertTriangle } from 'lucide-react';
+import {
+  ExternalLink,
+  Newspaper,
+  BookOpen,
+  Database,
+  Landmark,
+  AlertTriangle,
+  Radar,
+} from 'lucide-react';
 import type { IntelligenceContextSummary } from '@/types';
 import { formatDateTime } from '@/lib/utils/format-date';
 
@@ -59,7 +67,109 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
           value={ctx.industryBenchmarkCount}
           color="#2196F3"
         />
+        <MiniStat
+          icon={<Radar size={16} />}
+          label="Live Signals"
+          value={ctx.marketSnapshot?.signals.length ?? 0}
+          color="var(--accent-primary)"
+        />
       </div>
+
+      {/* Live Market Context — grounded web search on the named company. The
+          most decision-relevant current signal, so it leads. */}
+      {ctx.marketSnapshot && (
+        <div
+          className="card"
+          style={{ padding: '16px', borderLeft: '3px solid var(--accent-primary)' }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '10px',
+            }}
+          >
+            <Radar size={14} style={{ color: 'var(--accent-primary)' }} />
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Live market context · {ctx.marketSnapshot.company}
+            </span>
+            <span
+              style={{
+                fontSize: '9px',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                color: 'var(--accent-primary)',
+              }}
+            >
+              LIVE · WEB
+            </span>
+          </div>
+          {ctx.marketSnapshot.summary && (
+            <p
+              style={{
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.6,
+                marginBottom: ctx.marketSnapshot.signals.length > 0 ? '12px' : 0,
+              }}
+            >
+              {ctx.marketSnapshot.summary}
+            </p>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {ctx.marketSnapshot.signals.map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: '10px 12px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--glass-border)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    gap: '8px',
+                  }}
+                >
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {s.headline}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: 'var(--text-muted)',
+                      whiteSpace: 'nowrap',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                  >
+                    {s.date ? `${s.date} · ` : ''}
+                    {s.source}
+                  </span>
+                </div>
+                {s.detail && (
+                  <p
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.5,
+                      marginTop: '4px',
+                    }}
+                  >
+                    {s.detail}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Macro Summary */}
       {ctx.macroSummary && !ctx.macroSummary.toLowerCase().includes('unavailable') && (

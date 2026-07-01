@@ -18,6 +18,7 @@ import {
   type MacroSnapshot,
   type IndustryBenchmark,
 } from '@/lib/tools/macroContext';
+import { enrichMarketContext, type MarketSnapshot } from '@/lib/intelligence/marketContextEnricher';
 import { withTimeout as utilTimeout, sleep } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 import { prisma } from '@/lib/prisma';
@@ -58,6 +59,8 @@ export interface IntelligenceContext {
   macro: MacroSnapshot | null;
   /** Industry-specific benchmarks */
   industryBenchmarks: IndustryBenchmark[];
+  /** Live grounded market snapshot on the named company (null when none). */
+  marketSnapshot: MarketSnapshot | null;
   /** Metadata about the context assembly */
   meta: {
     assembledAt: string;
@@ -68,6 +71,7 @@ export interface IntelligenceContext {
       caseStudyCount: number;
       macroIndicators: number;
       industryBenchmarks: number;
+      marketSignals: number;
     };
     errors: string[];
   };
@@ -140,13 +144,13 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
   const start = Date.now();
   const errors: string[] = [];
 
-  const { biasTypes, industry, topics } = request;
+  const { biasTypes, industry, topics, companies } = request;
 
   // Ensure news data is fresh (lazy sync if stale)
   await ensureFreshNews();
 
   // Fan out to all intelligence sources in parallel
-  const [newsResult, researchResult, caseStudyResult, macroResult, benchmarkResult] =
+  const [newsResult, researchResult, caseStudyResult, macroResult, benchmarkResult, marketResult] =
     await Promise.allSettled([
       // 1. News: search by bias types + topics + industry
       fetchNewsContext(biasTypes, topics, industry),
@@ -178,6 +182,26 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
       industry
         ? utilTimeout(() => getIndustryBenchmarks(industry), 30_000, 'Industry benchmark timeout')
         : Promise.resolve([] as IndustryBenchmark[]),
+
+      // 6. Live market context (Gemini grounded search on the named company) —
+      // fills the gap the DB-first news layer leaves on a cold, first-time
+      // company. Non-fatal + null-safe: no company / any error / timeout → null,
+      // so the audit is byte-identical to today when no company is named. 15s
+      // ceiling ≤ the slowest existing source (case studies), so it never
+      // extends the critical path.
+      companies && companies.length > 0
+        ? utilTimeout(
+            () =>
+              enrichMarketContext({
+                company: companies[0],
+                industry,
+                decisionSummary:
+                  topics && topics.length > 0 ? topics.slice(0, 5).join(', ') : undefined,
+              }),
+            15_000,
+            'Market context timeout'
+          )
+        : Promise.resolve(null as MarketSnapshot | null),
     ]);
 
   // Extract results with error isolation
@@ -194,6 +218,12 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
     benchmarkResult,
     [],
     'industryBenchmarks',
+    errors
+  );
+  const marketSnapshot = extractResult<MarketSnapshot | null>(
+    marketResult,
+    null,
+    'marketContext',
     errors
   );
 
@@ -219,6 +249,7 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
     caseStudies,
     macro,
     industryBenchmarks,
+    marketSnapshot,
     meta: {
       assembledAt: new Date().toISOString(),
       durationMs,
@@ -228,6 +259,7 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
         caseStudyCount: caseStudies.length,
         macroIndicators: macro?.indicators?.length ?? 0,
         industryBenchmarks: industryBenchmarks.length,
+        marketSignals: marketSnapshot?.signals.length ?? 0,
       },
       errors,
     },
@@ -281,6 +313,18 @@ function extractResult<T>(
  */
 export function formatContextForPrompt(ctx: IntelligenceContext): string {
   const parts: string[] = [];
+
+  // Live market context on the named company — the most decision-relevant
+  // current signal, so it leads the block.
+  if (ctx.marketSnapshot && (ctx.marketSnapshot.summary || ctx.marketSnapshot.signals.length > 0)) {
+    const ms = ctx.marketSnapshot;
+    const lines: string[] = [];
+    if (ms.summary) lines.push(ms.summary);
+    for (const s of ms.signals.slice(0, 5)) {
+      lines.push(`- ${s.headline}${s.date ? ` (${s.date})` : ''} [${s.source}]`);
+    }
+    parts.push(`CURRENT MARKET CONTEXT — ${ms.company}:\n${lines.join('\n')}`);
+  }
 
   // News summary
   if (ctx.news.length > 0) {

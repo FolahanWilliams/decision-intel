@@ -541,7 +541,8 @@ export async function intelligenceNode(state: AuditState): Promise<Partial<Audit
       `Intelligence gathered: news=${intelligenceContext.meta.sources.newsCount}, ` +
         `research=${intelligenceContext.meta.sources.researchCount}, ` +
         `cases=${intelligenceContext.meta.sources.caseStudyCount}, ` +
-        `macro=${intelligenceContext.meta.sources.macroIndicators}`
+        `macro=${intelligenceContext.meta.sources.macroIndicators}, ` +
+        `marketSignals=${intelligenceContext.meta.sources.marketSignals}`
     );
 
     // Assemble cross-document RAG context (non-blocking)
@@ -2126,6 +2127,21 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             topCaseStudies: state.intelligenceContext.caseStudies
               .slice(0, 3)
               .map(c => ({ company: c.company, outcome: c.outcome, biasTypes: c.biasTypes })),
+            marketSnapshot: state.intelligenceContext.marketSnapshot
+              ? {
+                  company: state.intelligenceContext.marketSnapshot.company,
+                  summary: state.intelligenceContext.marketSnapshot.summary,
+                  asOf: state.intelligenceContext.marketSnapshot.asOf,
+                  signals: state.intelligenceContext.marketSnapshot.signals
+                    .slice(0, 6)
+                    .map(s => ({
+                      headline: s.headline,
+                      detail: s.detail,
+                      source: s.source,
+                      date: s.date,
+                    })),
+                }
+              : undefined,
           }
         : undefined,
       compoundScoring: compoundScoreResult
