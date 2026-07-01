@@ -98,12 +98,21 @@ interface CoverTemplateInput {
   projectedLift: number;
   /** Optional exposure amount in the user's currency. */
   exposureLabel?: string;
+  /** Name of the top toxic combination, when a compound pattern led with exposure. */
+  topPatternName?: string;
 }
 
 export function coverActionTitle(input: CoverTemplateInput): string {
   const { dqiScore, grade, totalRisks, criticalRisks, namedPatternCount, projectedLift } = input;
 
-  // Strongest case: exposure was provided (ticket size present)
+  // Strongest case: a named TOXIC COMBINATION fired AND carries exposure — the
+  // differentiator. Lead with "[pattern] compounds into ~$X at risk": the
+  // compounding of biases into a measurable monetary outcome IS the moat.
+  if (input.topPatternName && input.exposureLabel && totalRisks > 0) {
+    return `${input.topPatternName} compounds into ~${input.exposureLabel} at risk at DQI ${Math.round(dqiScore)}`;
+  }
+
+  // Exposure present but no named pattern led — still lead with the dollars.
   if (input.exposureLabel && totalRisks > 0) {
     return `${totalRisks} reasoning risks expose ${input.exposureLabel} on this thesis at DQI ${Math.round(dqiScore)}`;
   }

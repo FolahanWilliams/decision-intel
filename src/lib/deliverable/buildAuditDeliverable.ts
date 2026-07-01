@@ -431,6 +431,11 @@ function composeCover(
       ? formatExposureLabel(topFinding.valueAtStake)
       : undefined;
 
+  // When the highest-severity finding is a compound (toxic-combination) pattern
+  // AND it carries exposure, the hero names that pattern — the differentiator.
+  const topPatternName =
+    topFinding?.kind === 'compound_pattern' && exposureLabel ? topFinding.label : undefined;
+
   const actionTitle =
     options.actionTitles?.cover ??
     coverActionTitle({
@@ -441,6 +446,7 @@ function composeCover(
       namedPatternCount,
       projectedLift,
       exposureLabel,
+      topPatternName,
     });
 
   return {

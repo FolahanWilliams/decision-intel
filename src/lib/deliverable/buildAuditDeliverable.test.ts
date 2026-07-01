@@ -277,6 +277,29 @@ describe('buildAuditDeliverable', () => {
     expect(patternFinding?.valueAtStake?.baseRateSource).toContain('McKinsey');
   });
 
+  it('cover hero NAMES the toxic combination + its exposure when a ticket is supplied', () => {
+    const result = makeResult();
+    const deliverable = buildAuditDeliverable(result, {
+      documentId: 'd',
+      analysisId: null,
+      ticket: { amount: 50_000_000, currency: 'USD' },
+    });
+    // The differentiator: "[Synergy Mirage] compounds into ~$40.0M at risk …"
+    expect(deliverable.cover.actionTitle).toContain('Synergy Mirage');
+    expect(deliverable.cover.actionTitle).toContain('compounds into');
+    expect(deliverable.cover.actionTitle).toContain('at risk');
+    expect(deliverable.cover.actionTitle).toMatch(/\$40(\.0)?M/);
+    expect(validateActionTitle(deliverable.cover.actionTitle).ok).toBe(true);
+  });
+
+  it('cover hero falls back to the count-led headline when NO ticket is supplied', () => {
+    const result = makeResult();
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    // No ticket → no exposure → no pattern-name lead; must NOT say "compounds into"
+    expect(deliverable.cover.actionTitle).not.toContain('compounds into');
+    expect(validateActionTitle(deliverable.cover.actionTitle).ok).toBe(true);
+  });
+
   it('cover action title is non-empty and references real counts', () => {
     const result = makeResult();
     const deliverable = buildAuditDeliverable(result, {
