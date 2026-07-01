@@ -85,6 +85,13 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [x] **Toxic combinations render as buyer-facing RISK PATHWAYS, not a bias catalogue** (`47b9e3b1`, the Wiz insight) — every one of the 13 `NAMED_PATTERNS` gains a buyer-language `consequence` (what it leads to) + `fix` (the pressure-test); the compound-pattern card now LEADS with the business outcome + the ~$X exposure, demotes the pattern name to an eyebrow, and reads How-it-compounds / Why-it's-credible / What-to-do. Display-only, no scoring/methodology change. 6 tests.
 - [ ] **FOUNDER EYEBALL (META #11 — output plausibility):** run a REAL company audit (a fresh S-1 / M&A announcement) and confirm (a) the hero shows "[pattern] compounds into ~$X at risk", (b) the IntelligenceTab "Live market context" card populates with real, cited signals (not empty, not fabricated), (c) the new risk-pathway card reads for a BUYER (outcome-led, not "Synergy Mirage" jargon). The grounded LLM output can't be exercised in-sandbox — this is the verification loop.
 
+**Fermi retro fixes — the founder ran DI BLIND on Fermi America's real S-11 ($20B → $3.4B in 6mo) + graded it: found the killers, ranked them wrong. Three ships (full prose in CLAUDE.md "Fermi retro fixes" lock):**
+
+- [x] **Company-enders are first-class detectors** (`3644b871`) — concentration / valuation-vs-fundamentals / key-person nodes (weight-3), detected from S-1/S-11 risk-factor language; existential weight-DESC sort so the killers lead. Verified against the Fermi shape.
+- [x] **Structural risk LEADS the deliverable** (`6a90c6c2`) — "Structural risk · what could end this" renders first; biases demoted below a "Why the room would miss it" divider. Structure ends the company; biases are why it was missed.
+- [x] **Honest DQI-lift copy** (`4d069efd`) — was "[top] ALONE raises 8→39" (39 = all-fixes sum); now "[top] lifts +8; all N fixes reach 39". + slider empty-state potential hint.
+- [ ] **Next (recorded, founder-gated):** (a) promote the top structural KILLER to the COVER headline (the action-title still leads with the bias/pattern — the remaining half of the ranking fix, a `composeCover` change); (b) public-doc naming (skip the anonymizer on SEC-filing input — pipeline/privacy); (c) DQI percentile on the cover ("bottom ~2% of audited filings") so a harsh 8 reads calibrated.
+
 ## Recently Completed (2026-06-28)
 
 **ETA wedge · broker-narrative-tells overlay + live sales-call script (founder-approved "highest ROI overlay improvement" + add to Founder Hub). Pure prompt-overlay + founder-hub data/UI; zero `src/lib/agents/` / DQI / schema change; non-ETA audits byte-identical.**
