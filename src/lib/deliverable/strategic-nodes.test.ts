@@ -47,6 +47,37 @@ describe('detectStrategicNodes — the four retro case archetypes', () => {
   });
 });
 
+describe('detectStrategicNodes — the company-enders (Fermi S-11 lesson)', () => {
+  it('Fermi shape: single-tenant concentration + valuation-vs-fundamentals + key-person all fire', () => {
+    const text = `Risk factors. We are pre-revenue and have a limited operating history. We depend on a
+      limited number of customers; our first anchor tenant accounts for substantially all of our
+      contracted capacity, and we have no definitive leases in place for the remainder. We depend on
+      our founder and chief executive; the loss of our founder could materially harm the business.`;
+    const got = ids(text);
+    expect(got).toContain('concentration_risk');
+    expect(got).toContain('valuation_vs_fundamentals');
+    expect(got).toContain('key_person_dependency');
+  });
+
+  it('ranks the company-enders (weight 3) ABOVE softer signals — the ranking fix', () => {
+    // A doc with BOTH a company-ender and a lower-weight condition: the ender leads.
+    const nodes = detectStrategicNodes(
+      'the board of 17 approved it; but we depend on a single anchor tenant with no definitive leases.'
+    );
+    expect(nodes[0].id).toBe('concentration_risk'); // weight 3 leads the weight-2 oversized_board
+    expect(nodes[0].weight).toBe(3);
+  });
+
+  it('a healthy, diversified, revenue-generating memo fires none of the enders', () => {
+    const got = ids(
+      'We have a diversified customer base across 40 accounts, $200M of recurring revenue, and a board-approved downside plan.'
+    );
+    expect(got).not.toContain('concentration_risk');
+    expect(got).not.toContain('valuation_vs_fundamentals');
+    expect(got).not.toContain('key_person_dependency');
+  });
+});
+
 describe('detectStrategicNodes — mechanics', () => {
   it('fires nothing on a clean memo with none of the conditions', () => {
     expect(

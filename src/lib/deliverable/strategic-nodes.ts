@@ -38,6 +38,15 @@ export interface StrategicNodeDef {
   amplifies: string;
   /** The suppression edge — what this condition hid from the deciders (when it does). */
   conceals?: string;
+  /**
+   * Existential weight (1-3) — how close this is to ending the company. The
+   * Fermi retro taught the lesson: rank by "what ends the company soonest",
+   * not by a bias label. 3 = a company-ender (concentration / valuation /
+   * key-person / no-diligence); 2 = a serious amplifier; 1 = a softer signal.
+   * The detected list sorts by this DESC so the killers always lead + survive
+   * the cap. Defaults to 2 when omitted.
+   */
+  weight?: number;
   /** Detection patterns (bounded — precision-first, like the PII scanner). */
   signals: RegExp[];
 }
@@ -48,6 +57,8 @@ export interface DetectedStrategicNode {
   label: string;
   amplifies: string;
   conceals?: string;
+  /** Existential weight (1-3) — drives the existential-first ordering. */
+  weight: number;
   /** The matched phrase, for provenance. */
   evidence: string;
 }
@@ -59,6 +70,58 @@ export const STRATEGIC_NODE_CLASS_LABEL: Record<StrategicNodeClass, string> = {
 };
 
 export const STRATEGIC_NODES: StrategicNodeDef[] = [
+  // ─── Company-enders (weight 3) — the structural risks that actually END
+  // the company, promoted to first-class detectors after the Fermi retro
+  // (single-tenant concentration + $20B-on-$0-revenue + key-person all lived
+  // only as Forgotten Questions, while a construction-timeline bias headlined).
+  {
+    id: 'concentration_risk',
+    class: 'structural',
+    label: 'Single-point concentration',
+    weight: 3,
+    amplifies:
+      'One tenant, customer, or counterparty carrying the thesis means one exit collapses it — the #1 killer of pre-revenue infrastructure and single-anchor stories.',
+    conceals: 'The revenue that was never contracted, only assumed.',
+    signals: [
+      /\b(single|sole|primary|anchor|one|lead)[-\s]?(tenant|customer|counterparty|client|off[-\s]?taker|supplier|anchor)\b/i,
+      /\b(customer|tenant|revenue|counterparty|supplier|client) concentration\b/i,
+      /\bno (definitive|signed|binding|executed|firm) (leases|contracts|offtake|agreements|commitments)\b/i,
+      /\b(a |our )?(single|limited number of|few) (customer|client|tenant|counterparty)s?\b.{0,40}\b(account|represent|generat|compris)\w*\b/i,
+      /\bdepend\w*\b.{0,25}\b(a )?(limited number of|single|one|small number of|few) (customers|tenants|clients|counterparties)\b/i,
+    ],
+  },
+  {
+    id: 'valuation_vs_fundamentals',
+    class: 'structural',
+    label: 'Valuation detached from fundamentals',
+    weight: 3,
+    amplifies:
+      'A multi-billion mark on little or no revenue prices the story, not the business — the base case is a repricing to fundamentals.',
+    conceals: 'The cash-flow reality the narrative was built to outrun.',
+    signals: [
+      /\bpre[-\s]revenue\b/i,
+      /\b(no|zero|minimal|little|limited)\b.{0,15}\b(current |material |generated )?(revenue|operating history)\b/i,
+      /\bstory stock\b/i,
+      /\bvaluation\b.{0,30}\b(detached|disconnected|unsupported|speculative|unproven|not supported)\b/i,
+      /\b\$\s?[\d.,]+\s?(b|bn|billion|trillion|tn)\b.{0,60}\b(pre[-\s]revenue|no revenue|zero revenue|no operating history)\b/i,
+    ],
+  },
+  {
+    id: 'key_person_dependency',
+    class: 'structural',
+    label: 'Key-person / founder dependency',
+    weight: 3,
+    amplifies:
+      "A single founder or visionary carrying the vision, with weak board checks, makes one person's judgment or conduct a company-level risk.",
+    conceals: 'The governance guardrail that was never built around the founder.',
+    signals: [
+      /\bkey[-\s](person|man|employee|personnel)\b.{0,20}\b(risk|dependen|loss)\w*\b/i,
+      /\bdepend\w*\b.{0,25}\bon (the |our |its )?(founder|chief executive|ceo|key (person|personnel|management|employees))\b/i,
+      /\bfounder[-\s](led|halo|dependent|driven|controlled)\b/i,
+      /\b(single|sole) (visionary|founder|decision[-\s]?maker)\b/i,
+      /\bloss of (the |our )?(services of )?(our )?(founder|ceo|chief executive|key)\b/i,
+    ],
+  },
   // ─── Structural governance ─────────────────────────────────────────────
   {
     id: 'oversized_board',
@@ -232,6 +295,7 @@ function toDetected(def: StrategicNodeDef, evidence: string): DetectedStrategicN
     label: def.label,
     amplifies: def.amplifies,
     conceals: def.conceals,
+    weight: def.weight ?? 2,
     evidence,
   };
 }
@@ -273,8 +337,11 @@ export function detectStrategicNodes(content: string): DetectedStrategicNode[] {
     }
   }
 
+  // Rank EXISTENTIAL-first (the Fermi lesson: lead with what ends the company
+  // soonest, not a bias label), then by class for a stable read. The killers
+  // (weight 3) always lead and survive the cap.
   const order: StrategicNodeClass[] = ['structural', 'execution', 'informational'];
   return [...found.values()]
-    .sort((a, b) => order.indexOf(a.class) - order.indexOf(b.class))
+    .sort((a, b) => b.weight - a.weight || order.indexOf(a.class) - order.indexOf(b.class))
     .slice(0, MAX_NODES);
 }
