@@ -687,6 +687,17 @@ export async function runAnalysis(
     riskScorer: 'Final Risk Scoring',
   };
 
+  // Blind retro mode (2026-07-02): env-controlled for retro batches.
+  // PIPELINE_BLIND_MODE=on disables every live-data channel pipeline-wide
+  // (market enricher, news, Google-Search grounding, live benchmarks) and
+  // injects the as-of-date discipline block, so a retro on a historical
+  // filing cannot be contaminated by post-filing data via retrieval.
+  // Set it in Vercel env for a blind-retro batch; unset/off for live audits.
+  const blindMode = (process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on';
+  if (blindMode) {
+    log.info('BLIND RETRO MODE active — live retrieval channels disabled for this audit.');
+  }
+
   // Initial step
   sendStep('Initializing audit pipeline', 'running', 5);
 
@@ -706,6 +717,7 @@ export async function runAnalysis(
               containerKind: dealContext?.containerKind || '',
               dealType: dealContext?.dealType || '',
               dealStage: dealContext?.dealStage || '',
+              blindMode,
             },
             { version: 'v2' }
           )
@@ -795,6 +807,7 @@ export async function runAnalysis(
           containerKind: dealContext?.containerKind || '',
           dealType: dealContext?.dealType || '',
           dealStage: dealContext?.dealStage || '',
+          blindMode,
         }),
         timeoutPromise,
       ])) as { finalReport: Record<string, unknown> };

@@ -815,6 +815,15 @@ export async function POST(request: NextRequest) {
                       documentType: documentType ?? null,
                       industry: null,
                     }),
+                    // Blind retro mode posture (locked 2026-07-02). Persisted
+                    // so the audit record — and the DPR built from it — can
+                    // CLAIM the blindness methodology: live retrieval (market
+                    // enricher, news, macro, grounded search, benchmarks,
+                    // Finnhub) was disabled for this audit. The honest claim
+                    // is "live retrieval disabled", never "the model could
+                    // not have known" (training memory can't be switched off).
+                    blindRetroMode:
+                      (process.env.PIPELINE_BLIND_MODE || '').trim().toLowerCase() === 'on',
                     // Weights resolution snapshot (locked 2026-05-11 per
                     // Tier 2.1 + P2 ship). Persists the weight vector +
                     // hash + source + methodology version that produced

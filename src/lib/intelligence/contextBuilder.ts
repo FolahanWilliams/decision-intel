@@ -36,6 +36,16 @@ export interface IntelligenceRequest {
   topics?: string[];
   /** Companies mentioned in the document */
   companies?: string[];
+  /**
+   * Blind retro mode (2026-07-02): when true, every LIVE/current-data
+   * source is skipped — news, macro snapshot (current FRED data), live
+   * industry benchmarks (grounded search), and the market enricher
+   * (grounded search on the named company — the single biggest outcome
+   * leak for a retro). Static sources stay: the case-study analog
+   * library and academic bias research (timeless literature about the
+   * BIASES, not the audited company).
+   */
+  blind?: boolean;
 }
 
 export interface NewsContextItem {
@@ -144,16 +154,22 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
   const start = Date.now();
   const errors: string[] = [];
 
-  const { biasTypes, industry, topics, companies } = request;
+  const { biasTypes, industry, topics, companies, blind } = request;
 
-  // Ensure news data is fresh (lazy sync if stale)
-  await ensureFreshNews();
+  // Ensure news data is fresh (lazy sync if stale). Pointless in blind
+  // mode — news is skipped entirely there.
+  if (!blind) {
+    await ensureFreshNews();
+  }
 
   // Fan out to all intelligence sources in parallel
   const [newsResult, researchResult, caseStudyResult, macroResult, benchmarkResult, marketResult] =
     await Promise.allSettled([
-      // 1. News: search by bias types + topics + industry
-      fetchNewsContext(biasTypes, topics, industry),
+      // 1. News: search by bias types + topics + industry.
+      // BLIND MODE: skipped — current news is outcome contamination on a retro.
+      blind
+        ? Promise.resolve([] as NewsContextItem[])
+        : fetchNewsContext(biasTypes, topics, industry),
 
       // 2. Research: find papers for each detected bias type
       biasTypes.length > 0
@@ -175,11 +191,15 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
           )
         : Promise.resolve([] as CaseStudyMatch[]),
 
-      // 4. Macro snapshot (FRED data)
-      utilTimeout(() => getMacroSnapshot(), 20_000, 'Macro snapshot timeout'),
+      // 4. Macro snapshot (FRED data). BLIND MODE: skipped — the snapshot
+      // is CURRENT macro data, which postdates a retro's filing date.
+      blind
+        ? Promise.resolve(null as MacroSnapshot | null)
+        : utilTimeout(() => getMacroSnapshot(), 20_000, 'Macro snapshot timeout'),
 
-      // 5. Industry benchmarks (Gemini grounded search)
-      industry
+      // 5. Industry benchmarks (Gemini grounded search). BLIND MODE:
+      // skipped — grounded search returns current-day data.
+      industry && !blind
         ? utilTimeout(() => getIndustryBenchmarks(industry), 30_000, 'Industry benchmark timeout')
         : Promise.resolve([] as IndustryBenchmark[]),
 
@@ -189,7 +209,9 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
       // so the audit is byte-identical to today when no company is named. 15s
       // ceiling ≤ the slowest existing source (case studies), so it never
       // extends the critical path.
-      companies && companies.length > 0
+      // BLIND MODE: skipped — a live search on the audited company is the
+      // single biggest outcome leak for a retro (it finds what happened).
+      companies && companies.length > 0 && !blind
         ? utilTimeout(
             () =>
               enrichMarketContext({

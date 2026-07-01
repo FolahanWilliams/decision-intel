@@ -69,6 +69,22 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',
   }),
+  /**
+   * Blind retro mode (locked 2026-07-02): when true, every LIVE-data
+   * channel is disabled — market enricher, news context, Google-Search
+   * grounding on the grounded nodes, live benchmark verification — and
+   * an as-of-the-document's-date discipline block is injected into the
+   * reasoning prompts. Static prior knowledge (the case-study analog
+   * library, the user's own RAG corpus) stays on. Makes the retro's
+   * "found blind" claim defensible: no retrieval channel could have
+   * leaked the outcome. Model training memory cannot be switched off —
+   * the honest claim is "live retrieval disabled + every finding cites
+   * the document's own language", never "the model couldn't know".
+   */
+  blindMode: Annotation<boolean>({
+    reducer: (x, y) => y ?? x ?? false,
+    default: () => false,
+  }),
   originalContent: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',

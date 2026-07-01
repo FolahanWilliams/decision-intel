@@ -36,6 +36,8 @@ export interface AuditState {
   /// Legacy stage label. Now sourced from DecisionContainer.stageId
   /// (mode-specific) — see CONTAINER_MODES for valid values per kind.
   dealStage?: string;
+  /** Blind retro mode — live retrieval disabled pipeline-wide (2026-07-02). */
+  blindMode?: boolean;
   originalContent: string;
 
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing

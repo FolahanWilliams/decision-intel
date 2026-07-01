@@ -477,6 +477,50 @@ function resolveFrontierModel(key: FrontierNodeKey): string | null {
 }
 
 // ============================================================
+// BLIND RETRO MODE (locked 2026-07-02)
+// ============================================================
+//
+// When state.blindMode is true (PIPELINE_BLIND_MODE=on), every LIVE-data
+// channel is disabled so a retro on a historical filing cannot be
+// contaminated by post-filing data via retrieval: the market enricher +
+// news + macro + live benchmarks are gated in contextBuilder; Google-
+// Search grounding is disabled on the grounded nodes here; the Finnhub
+// financial fetch + benchmark verification are skipped; and the
+// discipline block below is appended to every reasoning prompt.
+//
+// HONESTY BOUNDARY: model training memory cannot be switched off. The
+// defensible claim is "live retrieval disabled + every finding cites the
+// document's own language" — never "the model could not have known."
+// The undeniable proof path is forward-looking: audit CURRENT filings,
+// hash-stamp them in the DPR, let outcomes arrive later.
+
+const BLIND_RETRO_DISCIPLINE = `
+
+=== BLIND RETRO DISCIPLINE (live retrieval is DISABLED for this audit) ===
+Assess this document strictly AS OF ITS OWN DATE:
+- Derive EVERY finding from the document's own language, the provided context blocks, and general pre-existing knowledge of decision-making patterns and historical analogs.
+- If you recognize the company or transaction, DO NOT use any knowledge of events, prices, announcements, or outcomes that postdate the document. Never hint at "what happened next."
+- Never claim to have verified a claim externally. Mark externally-unverifiable claims as unverified rather than assuming them true or false.
+- Structural risks must be justified by the document's own disclosures (concentration, capital structure, governance, valuation basis), not by hindsight.`;
+
+// Ungrounded Gemini variants for blind mode — identical config to their
+// grounded siblings minus the googleSearch tool. Lazy singletons like the rest.
+let ungroundedRelaxedInstance: GenerativeModel | null = null;
+function getUngroundedRelaxedModel(): GenerativeModel {
+  if (!ungroundedRelaxedInstance) {
+    ungroundedRelaxedInstance = createModelInstance({ safetyLevel: 'relaxed' });
+  }
+  return ungroundedRelaxedInstance;
+}
+let ungroundedStandardInstance: GenerativeModel | null = null;
+function getUngroundedStandardModel(): GenerativeModel {
+  if (!ungroundedStandardInstance) {
+    ungroundedStandardInstance = createModelInstance({ safetyLevel: 'standard' });
+  }
+  return ungroundedStandardInstance;
+}
+
+// ============================================================
 // SHARED UTILITIES
 // ============================================================
 
@@ -664,6 +708,9 @@ export async function intelligenceNode(state: AuditState): Promise<Partial<Audit
       industry,
       topics,
       companies,
+      // Blind retro mode: live sources (news / macro / benchmarks / market
+      // enricher) are skipped inside assembleContext; static analogs stay.
+      blind: state.blindMode === true,
     });
 
     log.info(
@@ -770,23 +817,31 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     // search instruction is swapped for an honest assess-against-context one
     // (an instruction the model can't follow invites fabricated "I searched").
     const frontierBiasModel = resolveFrontierModel('biasDetective');
+    const bdBlind = state.blindMode === true;
+    const bdBlindBlock = bdBlind ? BLIND_RETRO_DISCIPLINE : '';
+    const bdNoSearchInstruction = `IMPORTANT: Assess factual claims against the provided intelligence and cross-document context. You have NO live search access — never claim to have verified a claim externally; mark externally-unverifiable claims as unverified rather than assuming them true or false.${intelPrompt}${crossDocPrompt}`;
     let response: string;
     if (frontierBiasModel) {
       const frontier = await runModelCall(frontierBiasModel, [
-        biasPrompt,
+        biasPrompt + bdBlindBlock,
         `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-        `IMPORTANT: Assess factual claims against the provided intelligence and cross-document context. You have NO live search access — never claim to have verified a claim externally; mark externally-unverifiable claims as unverified rather than assuming them true or false.${intelPrompt}${crossDocPrompt}`,
+        bdNoSearchInstruction,
       ]);
       response = frontier.text;
     } else {
-      // Use Grounded Model for primary detection with circuit breaker + retry
+      // Grounded Gemini for primary detection with circuit breaker + retry.
+      // BLIND MODE: ungrounded variant + the no-search instruction — a live
+      // search on a retro's claims finds the outcome (contamination).
+      const bdModel = bdBlind ? getUngroundedRelaxedModel() : getGroundedModel();
       const result = await withGeminiResilience(
         () =>
           withTimeout(
-            getGroundedModel().generateContent([
-              biasPrompt,
+            bdModel.generateContent([
+              biasPrompt + bdBlindBlock,
               `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-              `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}${crossDocPrompt}`,
+              bdBlind
+                ? bdNoSearchInstruction
+                : `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}${crossDocPrompt}`,
             ])
           ),
         2, // 2 retries
@@ -936,7 +991,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
       return runModelCall(
         modelName,
         [
-          framedPrompt,
+          framedPrompt + (state.blindMode ? BLIND_RETRO_DISCIPLINE : ''),
           `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
           `\n(Frame: ${frame.label}; Random Seed: ${Math.random()})`,
         ],
@@ -990,9 +1045,11 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         : 0;
     const stdDev = Math.sqrt(variance);
 
-    // Dynamic Retrieval: Verify Benchmarks if found
+    // Dynamic Retrieval: Verify Benchmarks if found.
+    // BLIND MODE: skipped — benchmark verification is a live Google search
+    // on the document's own metrics (finds current-day data on a retro).
     let noiseBenchmarks = [];
-    if (extractedBenchmarks.length > 0) {
+    if (extractedBenchmarks.length > 0 && state.blindMode !== true) {
       log.info(`Verifying ${extractedBenchmarks.length} benchmarks with Google Search...`);
       const benchmarkResult = await withGeminiResilience(() =>
         withTimeout(
@@ -1260,12 +1317,18 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     // Synthesize additional context
     const additionalContext = `${internalKnowledgeContext}${verificationIntelPrompt}${crossDocVerifyPrompt}`;
 
-    // Single grounded LLM call for both fact-check and compliance
+    // Single LLM call for both fact-check and compliance. BLIND MODE:
+    // ungrounded + the discipline block — external claim verification on a
+    // retro finds the outcome; the compliance half (document-vs-regulation
+    // reasoning) and internal-consistency checks remain valid ungrounded.
+    // Ungrounded verifications honestly come back UNVERIFIABLE.
+    const verBlind = state.blindMode === true;
+    const verModel = verBlind ? getUngroundedRelaxedModel() : getGroundedModel();
     const result = await withGeminiResilience(
       () =>
         withTimeout(
-          getGroundedModel().generateContent([
-            VERIFICATION_SUPER_PROMPT,
+          verModel.generateContent([
+            VERIFICATION_SUPER_PROMPT + (verBlind ? BLIND_RETRO_DISCIPLINE : ''),
             `Document to analyze:\n<input_text>\n${content}\n</input_text>${additionalContext}`,
           ]),
           90000 // 90 second timeout for combined verification
@@ -1286,7 +1349,9 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     // Fetch financial data if needed (preserves Finnhub integration)
     const dataRequests = factCheckData?.dataRequests || [];
     let fetchedData: Record<string, unknown> = {};
-    if (dataRequests.length > 0) {
+    // BLIND MODE: skip the Finnhub fetch — live financial data (current
+    // prices/fundamentals) postdates a retro's filing date.
+    if (dataRequests.length > 0 && !verBlind) {
       const validRequests: DataRequest[] = dataRequests
         .filter(
           (r: { ticker?: unknown }) =>
@@ -1513,20 +1578,25 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
     const frontierDeepModel = resolveFrontierModel('deepAnalysis');
     let responseText: string;
     let searchSources: string[] = [];
+    const deepBlindBlock = state.blindMode ? BLIND_RETRO_DISCIPLINE : '';
     if (frontierDeepModel) {
       const frontier = await runModelCall(frontierDeepModel, [
-        DEEP_ANALYSIS_SUPER_PROMPT,
+        DEEP_ANALYSIS_SUPER_PROMPT + deepBlindBlock,
         `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
       ]);
       responseText = frontier.text;
     } else {
       // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
       // settings — use standard safety to keep content moderation active.
+      // BLIND MODE: ungrounded variant (no live search on a retro).
+      const deepModel = state.blindMode
+        ? getUngroundedStandardModel()
+        : getStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
         () =>
           withTimeout(
-            getStandardSafetyGroundedModel().generateContent([
-              DEEP_ANALYSIS_SUPER_PROMPT,
+            deepModel.generateContent([
+              DEEP_ANALYSIS_SUPER_PROMPT + deepBlindBlock,
               `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
             ]),
             90000 // 90 second timeout
@@ -1795,7 +1865,7 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     // reasoning/roleplay — Sonnet 5 by default; legacy grounded Gemini fallback.
     const frontierSimModel = resolveFrontierModel('simulation');
     const simPrompts = [
-      dynamicPrompt,
+      dynamicPrompt + (state.blindMode ? BLIND_RETRO_DISCIPLINE : ''),
       `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
       `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
     ];
@@ -1804,8 +1874,12 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       const frontier = await runModelCall(frontierSimModel, simPrompts);
       text = frontier.text;
     } else {
+      // BLIND MODE: ungrounded variant (no live search on a retro).
+      const simModel = state.blindMode
+        ? getUngroundedStandardModel()
+        : getStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
-        () => withTimeout(getStandardSafetyGroundedModel().generateContent(simPrompts), 90000),
+        () => withTimeout(simModel.generateContent(simPrompts), 90000),
         2,
         1000,
         10000
@@ -1900,7 +1974,7 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
     // over injected historical cases — Sonnet 5 by default; legacy Gemini fallback.
     const frontierRpdModel = resolveFrontierModel('rpdRecognition');
     const rpdPrompts = [
-      prompt,
+      prompt + (state.blindMode ? BLIND_RETRO_DISCIPLINE : ''),
       `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
       `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
     ];
@@ -1909,8 +1983,12 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
       const frontier = await runModelCall(frontierRpdModel, rpdPrompts);
       text = frontier.text;
     } else {
+      // BLIND MODE: ungrounded variant (no live search on a retro).
+      const rpdModel = state.blindMode
+        ? getUngroundedStandardModel()
+        : getStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
-        () => withTimeout(getStandardSafetyGroundedModel().generateContent(rpdPrompts), 90000),
+        () => withTimeout(rpdModel.generateContent(rpdPrompts), 90000),
         2,
         1000,
         10000
@@ -2010,19 +2088,24 @@ export async function forgottenQuestionsNode(state: AuditState): Promise<Partial
     // AIG-collateral / Lehman-veto / Amazon-exit class of "I didn't think
     // to ask that"). Opus 4.8 by default; legacy grounded Gemini fallback.
     const frontierFqModel = resolveFrontierModel('forgottenQuestions');
+    const fqBlindBlock = state.blindMode ? BLIND_RETRO_DISCIPLINE : '';
     let text: string;
     if (frontierFqModel) {
       const frontier = await runModelCall(frontierFqModel, [
-        prompt,
+        prompt + fqBlindBlock,
         `Memo under review:\n<memo>\n${content}\n</memo>`,
       ]);
       text = frontier.text;
     } else {
+      // BLIND MODE: ungrounded variant (no live search on a retro).
+      const fqModel = state.blindMode
+        ? getUngroundedStandardModel()
+        : getStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
         () =>
           withTimeout(
-            getStandardSafetyGroundedModel().generateContent([
-              prompt,
+            fqModel.generateContent([
+              prompt + fqBlindBlock,
               `Memo under review:\n<memo>\n${content}\n</memo>`,
             ]),
             75000
@@ -2107,15 +2190,26 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
     // the gateway path is parse-risk-free (consumer reads text raw).
     // Legacy fallback: grounded gemini-2.5-pro (jsonResponse:false).
     const frontierMetaModel = resolveFrontierModel('metaJudge');
+    const metaBlindPrompt = state.blindMode
+      ? metaJudgePrompt + BLIND_RETRO_DISCIPLINE
+      : metaJudgePrompt;
     let verdict: string;
     if (frontierMetaModel) {
-      const frontier = await runModelCall(frontierMetaModel, [metaJudgePrompt], {
+      const frontier = await runModelCall(frontierMetaModel, [metaBlindPrompt], {
         jsonResponse: false,
       });
       verdict = frontier.text || 'Meta-Verdict could not be generated.';
     } else {
+      // BLIND MODE: ungrounded pro variant (prose output, no live search).
+      const metaModel = state.blindMode
+        ? createModelInstance({
+            safetyLevel: 'standard',
+            modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-2.5-pro'),
+            jsonResponse: false,
+          })
+        : getProStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
-        () => withTimeout(getProStandardSafetyGroundedModel().generateContent([metaJudgePrompt]), 60000),
+        () => withTimeout(metaModel.generateContent([metaBlindPrompt]), 60000),
         2,
         1000,
         10000
