@@ -15,6 +15,11 @@ import { useState } from 'react';
 import { Brain, GitMerge, ExternalLink } from 'lucide-react';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
 import { severityColor } from '@/lib/utils/severity';
+import {
+  STRATEGIC_NODE_CLASS_LABEL,
+  type DetectedStrategicNode,
+  type StrategicNodeClass,
+} from '@/lib/deliverable/strategic-nodes';
 import type {
   ReasoningRiskFinding,
   ReasoningRisksBucket as ReasoningRisksBucketType,
@@ -60,6 +65,12 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
       {/* Visual: severity × confidence scatter — interactive, click a
           bubble to open the same drawer as the cards below. */}
       <BiasSeverityScatter findings={bucket.findings} onSelect={f => setActive(f)} />
+
+      {/* The cross-class attack path — how the structural / execution /
+          information conditions MULTIPLY the biases into the outcome. */}
+      {bucket.strategicExposure && bucket.strategicExposure.length > 0 && (
+        <StrategicAttackPath nodes={bucket.strategicExposure} />
+      )}
 
       {/* Risk pathways — the compound patterns, outcome-led + full width. */}
       {pathways.length > 0 && (
@@ -544,6 +555,128 @@ function Beat({ label, children }: { label: string; children: React.ReactNode })
       <div style={{ fontSize: 13.5, color: 'var(--text-secondary, #475569)', lineHeight: 1.6 }}>
         {children}
       </div>
+    </div>
+  );
+}
+
+/**
+ * StrategicAttackPath — the cross-class "attack path". The differentiator: not
+ * "we found biases", but "here is how the governance STRUCTURE, the deal
+ * EXECUTION pressure, and the INFORMATION gaps multiplied a normal bias into the
+ * outcome — and what your own process concealed from the room." Ego-safe: the
+ * structure is the villain, not the person.
+ */
+function StrategicAttackPath({ nodes }: { nodes: DetectedStrategicNode[] }) {
+  const order: StrategicNodeClass[] = ['structural', 'execution', 'informational'];
+  const groups = order
+    .map(cls => ({ cls, items: nodes.filter(n => n.class === cls) }))
+    .filter(g => g.items.length > 0);
+  const concealed = nodes.filter(n => n.conceals);
+
+  return (
+    <div
+      style={{
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: '4px solid var(--severity-critical, #b91c1c)',
+        borderRadius: 12,
+        padding: '18px 20px',
+        background: 'var(--bg-secondary, #F8FAFC)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <GitMerge size={14} style={{ color: 'var(--severity-critical, #b91c1c)' }} />
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'var(--text-muted, #64748B)',
+          }}
+        >
+          How these risks multiply · the attack path
+        </span>
+      </div>
+
+      <p
+        style={{ margin: 0, fontSize: 14, color: 'var(--text-primary, #0F172A)', lineHeight: 1.5 }}
+      >
+        Each condition below is survivable on its own. Together they form the path that turns a
+        normal bias into a write-down — and it&rsquo;s the <strong>structure</strong>, not the
+        people, that lets them compound.
+      </p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {groups.map(({ cls, items }) => (
+          <div key={cls}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'var(--severity-critical, #b91c1c)',
+                marginBottom: 6,
+              }}
+            >
+              {STRATEGIC_NODE_CLASS_LABEL[cls]}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {items.map(n => (
+                <div key={n.id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <div style={{ fontSize: 13.5, color: 'var(--text-primary, #0F172A)' }}>
+                    <strong>{n.label}.</strong>{' '}
+                    <span style={{ color: 'var(--text-secondary, #475569)' }}>{n.amplifies}</span>
+                  </div>
+                  {n.evidence ? (
+                    <div
+                      style={{
+                        fontSize: 11.5,
+                        color: 'var(--text-muted, #64748B)',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      &ldquo;{n.evidence}&rdquo;
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {concealed.length > 0 ? (
+        <div
+          style={{
+            borderTop: '1px solid var(--border-color, #E2E8F0)',
+            paddingTop: 12,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--text-muted, #64748B)',
+              marginBottom: 6,
+            }}
+          >
+            What your process may have concealed from the room
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+            {concealed.slice(0, 4).map(n => (
+              <li key={n.id} style={{ fontSize: 13, color: 'var(--text-secondary, #475569)' }}>
+                {n.conceals}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -33,6 +33,7 @@ import { computeFindingValueAtStake, formatExposureLabel } from './valueAtStake'
 import { extractTicketFromContent } from './ticket-extractor';
 import { buildReferenceClass } from './referenceClass';
 import { getNamedPattern } from '@/lib/learning/named-patterns';
+import { detectStrategicNodes } from './strategic-nodes';
 import {
   coverActionTitle,
   reasoningRisksActionTitle,
@@ -197,7 +198,17 @@ function bucketReasoningRisks(
     options.actionTitles?.reasoningRisks ??
     reasoningRisksActionTitle({ counts, topBiasLabels, topPatternLabels });
 
-  return { actionTitle, findings, counts };
+  // The cross-class attack path — the structural / execution / information
+  // conditions in the document that multiply the biases into the outcome.
+  // Pure text detection, no LLM, no scoring impact.
+  const strategicExposure = detectStrategicNodes(result.structuredContent ?? '');
+
+  return {
+    actionTitle,
+    findings,
+    counts,
+    ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────

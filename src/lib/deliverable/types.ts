@@ -125,6 +125,10 @@ export interface ReasoningRisksBucket {
     low: number;
     namedPatterns: number;
   };
+  /** The cross-class "attack path": structural / execution / information
+   *  conditions that MULTIPLY the biases into the outcome (the Wiz move).
+   *  Display-only; detected from the document text, no scoring impact. */
+  strategicExposure?: import('./strategic-nodes').DetectedStrategicNode[];
 }
 
 // ──────────────────────────────────────────────────────────────────────

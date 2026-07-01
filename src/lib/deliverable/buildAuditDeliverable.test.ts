@@ -308,6 +308,30 @@ describe('buildAuditDeliverable', () => {
     expect(pattern!.referenceClass?.length).toBeGreaterThan(0);
   });
 
+  it('reasoning-risks bucket surfaces the cross-class attack path from the document text', () => {
+    const result = makeResult({
+      structuredContent:
+        'The dominant CEO sidelined the board of 17 in a hostile bid, on due diligence of only six hours, financed with short-term wholesale funding.',
+    });
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    const exposure = deliverable.reasoningRisks.strategicExposure ?? [];
+    const ids = exposure.map(n => n.id);
+    expect(ids).toContain('dominant_ceo');
+    expect(ids).toContain('oversized_board');
+    expect(ids).toContain('hostile_auction');
+    expect(ids).toContain('compressed_diligence');
+    // Structural nodes lead the path (the render order).
+    expect(exposure[0].class).toBe('structural');
+  });
+
+  it('attack path is ABSENT when the document has none of the conditions', () => {
+    const result = makeResult({
+      structuredContent: 'A staged market pilot with an independent gate review.',
+    });
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    expect(deliverable.reasoningRisks.strategicExposure).toBeUndefined();
+  });
+
   it('cover hero falls back to the count-led headline when NO ticket is supplied', () => {
     const result = makeResult();
     const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
