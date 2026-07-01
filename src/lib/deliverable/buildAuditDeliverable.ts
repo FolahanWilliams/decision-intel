@@ -30,6 +30,7 @@ import { PIPELINE_NODES } from '@/lib/data/pipeline-nodes';
 import { MATRIX_DIMENSION } from '@/lib/ontology/interaction-matrix';
 import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-snapshot';
 import { computeFindingValueAtStake, formatExposureLabel } from './valueAtStake';
+import { extractTicketFromContent } from './ticket-extractor';
 import { buildReferenceClass } from './referenceClass';
 import {
   coverActionTitle,
@@ -485,14 +486,27 @@ export function buildAuditDeliverable(
   result: AnalysisResult,
   options: BuildDeliverableOptions
 ): AuditDeliverable {
-  const reasoningRisks = bucketReasoningRisks(result, options);
-  const stressTest = bucketStressTest(result, options);
-  const historicalAnalogs = bucketHistoricalAnalogs(result, options);
-  const counterfactuals = bucketCounterfactuals(result, options);
-  const provenance = bucketProvenance(result, options);
-  const cover = composeCover(result, reasoningRisks, counterfactuals, options);
+  // Auto-extract the decision size from the document when no ticket was supplied
+  // manually, so the value-at-stake reveal ("this pattern puts ~$X at risk")
+  // fires on cold UPLOADED audits — the Taktile move. Honest: null when nothing
+  // confident is found → the DQI-lift fallback renders (never a fabricated $). A
+  // manual ticket (the /demo form / Decision Frame) always wins.
+  let effectiveOptions = options;
+  if (!options.ticket) {
+    const auto = extractTicketFromContent(result.structuredContent ?? '');
+    if (auto) {
+      effectiveOptions = { ...options, ticket: { amount: auto.amount, currency: auto.currency } };
+    }
+  }
 
-  const id = options.analysisId ?? options.documentId;
+  const reasoningRisks = bucketReasoningRisks(result, effectiveOptions);
+  const stressTest = bucketStressTest(result, effectiveOptions);
+  const historicalAnalogs = bucketHistoricalAnalogs(result, effectiveOptions);
+  const counterfactuals = bucketCounterfactuals(result, effectiveOptions);
+  const provenance = bucketProvenance(result, effectiveOptions);
+  const cover = composeCover(result, reasoningRisks, counterfactuals, effectiveOptions);
+
+  const id = effectiveOptions.analysisId ?? effectiveOptions.documentId;
 
   return {
     id,
@@ -505,9 +519,9 @@ export function buildAuditDeliverable(
     provenance,
     source: {
       analysisResult: result,
-      documentId: options.documentId,
-      analysisId: options.analysisId,
-      ticket: options.ticket,
+      documentId: effectiveOptions.documentId,
+      analysisId: effectiveOptions.analysisId,
+      ticket: effectiveOptions.ticket,
     },
   };
 }
