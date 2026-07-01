@@ -45,8 +45,9 @@ const COMMITMENT_CONTEXT =
 // matches capitalisation / capitalization).
 const VALUATION_CONTEXT = /\b(valued|valuation|market cap|market capitali|worth|equity value)/i;
 
-// $NNN (billion|million|B|M|...). Requires a scale word/letter OR ≥7 digits so a
-// bare "$500" never counts as a strategic ticket.
+// $NNN (billion|million|B|M|...). The scale word/letter is optional, so a bare
+// "$500" DOES match here — it is filtered downstream by the MIN_TICKET floor
+// (see below), which is what keeps a small figure from counting as a strategic ticket.
 const MONEY_RE = /([$£€])\s?([\d][\d,]*(?:\.\d+)?)\s?(trillion|billion|million|bn|tn|[bmt])?\b/gi;
 
 function scaleFor(unit: string | undefined): number {
