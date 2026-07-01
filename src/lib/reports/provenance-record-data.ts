@@ -43,6 +43,10 @@ import { createLogger } from '@/lib/utils/logger';
 import { formatBiasName as formatBiasLabel } from '@/lib/utils/labels';
 import { aggregateBlindPriors, type BlindPriorRow } from '@/lib/learning/blind-prior-aggregate';
 import { computeCounterfactuals } from '@/lib/analysis/counterfactual';
+import {
+  detectStrategicNodes,
+  type DetectedStrategicNode,
+} from '@/lib/deliverable/strategic-nodes';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
 import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import { getFeedbackAdequacy, type FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
@@ -117,6 +121,14 @@ export interface ProvenanceRecordData {
    * for legacy assembled data that pre-dates this field.
    */
   findingsAugment?: Record<string, DprFindingsAugmentRow>;
+  /**
+   * The cross-class "attack path" — the structural / execution / information
+   * conditions in the document that MULTIPLY the biases into the outcome (the
+   * Wiz move, locked 2026-07-02). Pure text detection from the document content,
+   * no LLM, no scoring impact — surfaces as a section on the DPR findings page.
+   * Empty / omitted when the document carries none of the conditions.
+   */
+  strategicExposure?: DetectedStrategicNode[];
   /**
    * Pre-IC blind-prior aggregations attached to this analysis (4.1
    * deep). One entry per Decision Room that ran a blind-prior survey
@@ -1602,6 +1614,11 @@ export async function assembleProvenanceRecordData(
     }
   }
 
+  // The cross-class attack path — the structural / execution / information
+  // conditions that multiply the biases into the outcome. Pure text detection,
+  // no LLM, no scoring impact. Surfaces as a section on the DPR findings page.
+  const strategicExposure = detectStrategicNodes(doc.content ?? '');
+
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
   // reads this map to populate finding cards with verbatim memo
@@ -1635,6 +1652,7 @@ export async function assembleProvenanceRecordData(
     regulatoryMapping,
     pipelineLineage,
     findingsAugment,
+    ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
     blindPriorAggregates,
     counterfactualImpact,
     // reviewerDecisions intentionally undefined in the live assembler —

@@ -27,6 +27,11 @@ import { DprSeverityMeter } from '../primitives/DprSeverityMeter';
 import { DprNotice } from '../primitives/DprNotice';
 import type { DprFinding } from '@/lib/reports/dpr-findings';
 import { scrubClientSafe } from '@/lib/reports/client-safe-scrub';
+import {
+  STRATEGIC_NODE_CLASS_LABEL,
+  type DetectedStrategicNode,
+  type StrategicNodeClass,
+} from '@/lib/deliverable/strategic-nodes';
 
 export interface DprPageFindingsProps {
   findings: DprFinding[];
@@ -42,6 +47,12 @@ export interface DprPageFindingsProps {
    * when the URL carries `?clientSafe=1`.
    */
   clientSafe?: boolean;
+  /**
+   * The cross-class attack path — structural / execution / information
+   * conditions that multiply the biases into the outcome. Rendered as a
+   * §5b section below the findings. Omitted when empty.
+   */
+  strategicExposure?: DetectedStrategicNode[];
 }
 
 export function DprPageFindings(props: DprPageFindingsProps) {
@@ -53,7 +64,13 @@ export function DprPageFindings(props: DprPageFindingsProps) {
     auditTimestamp,
     footerTitle = 'Decision Provenance Record',
     clientSafe = false,
+    strategicExposure,
   } = props;
+
+  const attackPath =
+    strategicExposure && strategicExposure.length > 0 ? (
+      <StrategicExposureSection nodes={strategicExposure} />
+    ) : null;
 
   if (findings.length === 0) {
     return (
@@ -76,6 +93,7 @@ export function DprPageFindings(props: DprPageFindingsProps) {
             reference-class forecast (§4.2) and the validity classification (§4.1) above.
           </DprNotice>
         </DprSection>
+        {attackPath}
       </DprPageShell>
     );
   }
@@ -100,7 +118,77 @@ export function DprPageFindings(props: DprPageFindingsProps) {
           ))}
         </div>
       </DprSection>
+      {attackPath}
     </DprPageShell>
+  );
+}
+
+/**
+ * The cross-class attack path (§5b) — the differentiator: not just the biases,
+ * but the governance STRUCTURE, deal EXECUTION pressure, and INFORMATION gaps
+ * that multiplied them into the outcome, plus what the process CONCEALED from
+ * the room. Ego-safe: the structure is the villain, not the person. Reuses the
+ * proven dpr-finding block/label primitives so it renders on-brand.
+ */
+function StrategicExposureSection({ nodes }: { nodes: DetectedStrategicNode[] }) {
+  const order: StrategicNodeClass[] = ['structural', 'execution', 'informational'];
+  const groups = order
+    .map(cls => ({ cls, items: nodes.filter(n => n.class === cls) }))
+    .filter(g => g.items.length > 0);
+  const concealed = nodes.filter(n => n.conceals);
+
+  return (
+    <DprSection
+      marker="§5b"
+      eyebrow="Strategic exposure"
+      title="How these risks multiply — the attack path"
+      strap="Each finding above is survivable on its own. Together with the governance, execution, and information conditions below, they form the path that turns a normal bias into a write-down — and it is the structure, not the people, that lets them compound."
+    >
+      <div
+        className="dpr-attack-path"
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+      >
+        {groups.map(({ cls, items }) => (
+          <div key={cls} className="dpr-finding-block">
+            <div className="dpr-finding-block-label">
+              <span className="dpr-finding-block-rule" />
+              <span>{STRATEGIC_NODE_CLASS_LABEL[cls]}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {items.map(n => (
+                <div key={n.id} style={{ breakInside: 'avoid' }}>
+                  <p style={{ margin: 0 }}>
+                    <strong>{n.label}.</strong> {n.amplifies}
+                  </p>
+                  {n.evidence ? (
+                    <p
+                      style={{
+                        margin: '2px 0 0',
+                        fontStyle: 'italic',
+                        opacity: 0.72,
+                        fontSize: '0.9em',
+                      }}
+                    >
+                      &ldquo;{n.evidence}&rdquo;
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {concealed.length > 0 ? (
+        <DprNotice mark="What your process may have concealed from the room">
+          <ul style={{ margin: 0, paddingLeft: 18 }}>
+            {concealed.slice(0, 5).map(n => (
+              <li key={n.id}>{n.conceals}</li>
+            ))}
+          </ul>
+        </DprNotice>
+      ) : null}
+    </DprSection>
   );
 }
 

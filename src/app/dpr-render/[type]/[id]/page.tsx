@@ -186,6 +186,7 @@ export default async function DprRenderPage({
         classification={classification}
         auditTimestamp={auditTimestamp}
         clientSafe={clientSafe}
+        strategicExposure={data.strategicExposure}
       />
       {structuralAssumptions.length > 0 && (
         <DprPageStructuralAssumptions
