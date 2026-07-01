@@ -1617,7 +1617,7 @@ export async function assembleProvenanceRecordData(
   // The cross-class attack path — the structural / execution / information
   // conditions that multiply the biases into the outcome. Pure text detection,
   // no LLM, no scoring impact. Surfaces as a section on the DPR findings page.
-  const strategicExposure = detectStrategicNodes(doc.content ?? '');
+  const strategicExposure = detectStrategicNodes(doc?.content ?? '');
 
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render

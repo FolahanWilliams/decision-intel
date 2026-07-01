@@ -15,6 +15,8 @@
 
 import { ShieldCheck } from 'lucide-react';
 import type { SCQAExecutiveSummary as SCQAType } from '@/lib/deliverable/types';
+import type { QuantifiedExposure } from '@/lib/deliverable/quantified-exposure';
+import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
 import { ActionTitle } from './ActionTitle';
 import { DqiRadialGauge } from './charts/DqiRadialGauge';
 
@@ -65,6 +67,13 @@ export function SCQAExecutiveSummary({
             prior circle-with-a-number per the 2026-05-20 visual rebuild. */}
         <DqiRadialGauge score={cover.dqi.score} size={180} />
       </div>
+
+      {/* Actuarial top-line — what this audit is worth. The value statement
+          that makes a buyer bite: ~$X exposure surfaced, the derivation, the
+          precedent. Honest — deal size × a cited base rate, never "we saved you". */}
+      {cover.quantifiedExposure ? (
+        <QuantifiedExposureBanner exposure={cover.quantifiedExposure} />
+      ) : null}
 
       {/* SCQA 4-line grid — the Pyramid apex narrative */}
       <div
@@ -143,6 +152,79 @@ function SCQALabel({
       }}
     >
       {children}
+    </div>
+  );
+}
+
+/**
+ * The actuarial top-line — the Taktile "here is what this audit is worth"
+ * statement. Honest by construction: deal size × a CITED base rate; framed as
+ * "exposure surfaced / the committee would carry uncaught", never "we saved you
+ * $X" (a causal overclaim). Null-safe — only renders when a ticket is present.
+ */
+function QuantifiedExposureBanner({ exposure }: { exposure: QuantifiedExposure }) {
+  const money = (amount: number) =>
+    formatExposureLabel({
+      exposureAmount: amount,
+      ticketAmount: exposure.ticketAmount,
+      ticketCurrency: exposure.currency,
+      baseRateSource: exposure.baseRateSource,
+    });
+  const p = exposure.precedent;
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: '4px solid var(--severity-high, #ef4444)',
+        background: 'var(--bg-secondary, #F8FAFC)',
+        padding: '16px 18px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          color: 'var(--text-muted, #64748B)',
+        }}
+      >
+        What this audit surfaces
+      </div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontSize: 30,
+            fontWeight: 800,
+            color: 'var(--severity-high, #ef4444)',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+          }}
+        >
+          ~{money(exposure.exposureAmount)}
+        </span>
+        <span style={{ fontSize: 13.5, color: 'var(--text-secondary, #475569)' }}>
+          of capital exposure the committee would otherwise carry, uncaught.
+        </span>
+      </div>
+      <p
+        style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted, #64748B)', lineHeight: 1.5 }}
+      >
+        On this {money(exposure.ticketAmount)} decision, the{' '}
+        <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{exposure.drivingLabel}</strong>{' '}
+        pattern this audit flagged carries an ~{exposure.baseRatePct}% historical miss rate across
+        comparable decisions ({exposure.baseRateSource}).
+        {p ? (
+          <>
+            {' '}
+            Precedent: <strong>{p.company}</strong> ({p.year}) · {p.estimatedImpact}.
+          </>
+        ) : null}
+      </p>
     </div>
   );
 }

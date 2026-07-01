@@ -34,6 +34,7 @@ import { extractTicketFromContent } from './ticket-extractor';
 import { buildReferenceClass } from './referenceClass';
 import { getNamedPattern } from '@/lib/learning/named-patterns';
 import { detectStrategicNodes } from './strategic-nodes';
+import { computeQuantifiedExposure } from './quantified-exposure';
 import {
   coverActionTitle,
   reasoningRisksActionTitle,
@@ -475,8 +476,14 @@ function composeCover(
       topPatternName,
     });
 
+  // The actuarial top-line — consolidate the per-finding value-at-stake into
+  // one headline "this audit surfaces ~$X exposure" statement with the
+  // derivation + the precedent. Null-safe (no ticket → no number).
+  const quantifiedExposure = computeQuantifiedExposure(reasoningRisks.findings);
+
   return {
     actionTitle,
+    quantifiedExposure,
     situation: scqaSituation(),
     complication: scqaComplication({
       dqiScore: result.overallScore,

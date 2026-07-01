@@ -271,6 +271,10 @@ export interface SCQAExecutiveSummary {
     score: number;
     grade: 'A' | 'B' | 'C' | 'D' | 'F';
   };
+  /** The actuarial top-line — consolidated capital exposure + the derivation +
+   *  the precedent. The Taktile "here is what this audit is worth" statement.
+   *  Null when no ticket-backed exposure exists (never fabricated). */
+  quantifiedExposure?: import('./quantified-exposure').QuantifiedExposure | null;
 }
 
 // ──────────────────────────────────────────────────────────────────────

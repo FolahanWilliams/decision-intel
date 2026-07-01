@@ -308,6 +308,26 @@ describe('buildAuditDeliverable', () => {
     expect(pattern!.referenceClass?.length).toBeGreaterThan(0);
   });
 
+  it('cover carries the actuarial quantified exposure when a ticket is supplied', () => {
+    const result = makeResult();
+    const deliverable = buildAuditDeliverable(result, {
+      documentId: 'd',
+      analysisId: null,
+      ticket: { amount: 50_000_000, currency: 'USD' },
+    });
+    const q = deliverable.cover.quantifiedExposure;
+    expect(q).toBeTruthy();
+    // Synergy Mirage 80% base rate × $50M ticket → $40M consolidated exposure.
+    expect(q!.exposureAmount).toBe(40_000_000);
+    expect(q!.baseRatePct).toBe(80);
+    expect(q!.drivingKind).toBe('compound_pattern');
+  });
+
+  it('cover has NO quantified exposure when no ticket is supplied (never fabricated)', () => {
+    const deliverable = buildAuditDeliverable(makeResult(), { documentId: 'd', analysisId: null });
+    expect(deliverable.cover.quantifiedExposure ?? null).toBeNull();
+  });
+
   it('reasoning-risks bucket surfaces the cross-class attack path from the document text', () => {
     const result = makeResult({
       structuredContent:
