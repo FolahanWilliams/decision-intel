@@ -55,6 +55,7 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
   const gridFindings = bucket.findings.filter(
     f => !(f.kind === 'compound_pattern' && !!f.consequence)
   );
+  const hasStructural = !!(bucket.strategicExposure && bucket.strategicExposure.length > 0);
 
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -62,15 +63,32 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
         {bucket.actionTitle}
       </ActionTitle>
 
+      {/* STRUCTURAL RISK LEADS — what could end the decision. The Fermi
+          lesson: rank the company-enders (concentration / valuation / key-
+          person) above the cognitive-bias tags; the biases below explain
+          WHY the room would miss the structural risk, not replace it. */}
+      {hasStructural && <StrategicAttackPath nodes={bucket.strategicExposure!} />}
+
+      {/* The reasoning below is demoted from headline to explanation. */}
+      {hasStructural && (pathways.length > 0 || gridFindings.length > 0) && (
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: 'var(--text-muted, #64748B)',
+            borderTop: '1px solid var(--border-color, #E2E8F0)',
+            paddingTop: 14,
+          }}
+        >
+          Why the room would miss it · the reasoning
+        </div>
+      )}
+
       {/* Visual: severity × confidence scatter — interactive, click a
           bubble to open the same drawer as the cards below. */}
       <BiasSeverityScatter findings={bucket.findings} onSelect={f => setActive(f)} />
-
-      {/* The cross-class attack path — how the structural / execution /
-          information conditions MULTIPLY the biases into the outcome. */}
-      {bucket.strategicExposure && bucket.strategicExposure.length > 0 && (
-        <StrategicAttackPath nodes={bucket.strategicExposure} />
-      )}
 
       {/* Risk pathways — the compound patterns, outcome-led + full width. */}
       {pathways.length > 0 && (
@@ -597,16 +615,17 @@ function StrategicAttackPath({ nodes }: { nodes: DetectedStrategicNode[] }) {
             color: 'var(--text-muted, #64748B)',
           }}
         >
-          How these risks multiply · the attack path
+          Structural risk · what could end this decision
         </span>
       </div>
 
       <p
         style={{ margin: 0, fontSize: 14, color: 'var(--text-primary, #0F172A)', lineHeight: 1.5 }}
       >
-        Each condition below is survivable on its own. Together they form the path that turns a
-        normal bias into a write-down — and it&rsquo;s the <strong>structure</strong>, not the
-        people, that lets them compound.
+        These are the conditions that end the company — concentration, capital structure, key-person
+        dependency — not the biases. Each is survivable alone; together they form the path a normal
+        bias turns into a write-down, and it&rsquo;s the <strong>structure</strong>, not the people,
+        that lets them compound.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
