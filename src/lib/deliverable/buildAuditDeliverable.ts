@@ -32,6 +32,7 @@ import { PLATFORM_BASELINE_SNAPSHOT } from '@/lib/learning/platform-baseline-sna
 import { computeFindingValueAtStake, formatExposureLabel } from './valueAtStake';
 import { extractTicketFromContent } from './ticket-extractor';
 import { buildReferenceClass } from './referenceClass';
+import { getNamedPattern } from '@/lib/learning/named-patterns';
 import {
   coverActionTitle,
   reasoningRisksActionTitle,
@@ -140,15 +141,29 @@ function bucketReasoningRisks(
     if (!p.patternLabel) return [];
     const severity = ((p.severity ?? 'high').toLowerCase() as Severity) ?? 'high';
     const ticket = options.ticket;
+    // Join back to the canonical pattern for the buyer-facing narrative: what
+    // it LEADS TO (consequence) + what to DO (fix). The reader reads for these,
+    // not the mechanism name. Null-safe — an unmatched label falls back to the
+    // mechanism-led rendering.
+    const canonical = getNamedPattern(p.patternLabel);
+    const biasKeys = p.biasTypes ?? canonical?.biasTypes ?? [];
     const finding: ReasoningRiskFinding = {
       kind: 'compound_pattern',
       id: p.patternLabel,
       label: p.patternLabel,
       chip: makeChip(severity, undefined),
       excerpt: '',
-      explanation: p.description ?? '',
-      mitigation: '',
-      participatingBiases: p.biasTypes ?? [],
+      // The mechanism / "how it compounds" body — prefer the runtime
+      // description, fall back to the canonical.
+      explanation: p.description ?? canonical?.description ?? '',
+      mitigation: canonical?.fix ?? '',
+      participatingBiases: biasKeys,
+      participatingBiasLabels: biasKeys.map(formatBiasName),
+      consequence: canonical?.consequence,
+      fix: canonical?.fix,
+      // Credibility grounding — where this reasoning risk has appeared before.
+      // For a pattern, anchor on its first constituent bias.
+      referenceClass: biasKeys.length > 0 ? buildReferenceClass(biasKeys[0], 3) : undefined,
       valueAtStake: ticket
         ? computeFindingValueAtStake({
             ticketAmount: ticket.amount,

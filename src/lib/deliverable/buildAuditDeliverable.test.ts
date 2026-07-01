@@ -292,6 +292,22 @@ describe('buildAuditDeliverable', () => {
     expect(validateActionTitle(deliverable.cover.actionTitle).ok).toBe(true);
   });
 
+  it('compound-pattern finding carries the buyer narrative (consequence + fix + plain-language chain)', () => {
+    const result = makeResult();
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    const pattern = deliverable.reasoningRisks.findings.find(f => f.kind === 'compound_pattern');
+    expect(pattern).toBeTruthy();
+    // Joined to the canonical NAMED_PATTERNS (mock label 'Synergy Mirage' →
+    // 'The Synergy Mirage') → the outcome + the fix a buyer reads for.
+    expect(pattern!.consequence).toMatch(/pay a premium|synergies/i);
+    expect(pattern!.fix).toMatch(/mechanism|owner|milestone/i);
+    // Plain-language chain, not raw snake_case.
+    expect(pattern!.participatingBiasLabels?.join(' ')).not.toMatch(/_/);
+    expect(pattern!.participatingBiasLabels?.length).toBeGreaterThan(0);
+    // Credibility grounding for the pattern (reference class from its bias).
+    expect(pattern!.referenceClass?.length).toBeGreaterThan(0);
+  });
+
   it('cover hero falls back to the count-led headline when NO ticket is supplied', () => {
     const result = makeResult();
     const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });

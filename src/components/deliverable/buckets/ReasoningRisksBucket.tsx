@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { Brain, GitMerge, ExternalLink } from 'lucide-react';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
+import { severityColor } from '@/lib/utils/severity';
 import type {
   ReasoningRiskFinding,
   ReasoningRisksBucket as ReasoningRisksBucketType,
@@ -41,6 +42,15 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
     );
   }
 
+  // Compound (toxic-combination) patterns that carry a buyer-facing consequence
+  // lead as full-width RISK PATHWAYS — the "combination → outcome" moment a
+  // buyer actually reads for. Everything else (biases + any pattern with no
+  // canonical narrative) renders in the contributing-biases grid below.
+  const pathways = bucket.findings.filter(f => f.kind === 'compound_pattern' && !!f.consequence);
+  const gridFindings = bucket.findings.filter(
+    f => !(f.kind === 'compound_pattern' && !!f.consequence)
+  );
+
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <ActionTitle eyebrow="What the audit found" accessory={<CountStrip bucket={bucket} />}>
@@ -51,67 +61,97 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
           bubble to open the same drawer as the cards below. */}
       <BiasSeverityScatter findings={bucket.findings} onSelect={f => setActive(f)} />
 
-      <div
-        className="deliverable-finding-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-          gap: 14,
-        }}
-      >
-        {bucket.findings.map(finding => (
-          <FindingCard
-            key={`${finding.kind}-${finding.id}`}
-            title={finding.label}
-            eyebrow={
-              finding.kind === 'compound_pattern' ? 'Compound failure pattern' : 'Cognitive bias'
-            }
-            chip={finding.chip}
-            body={finding.explanation || undefined}
-            excerpt={finding.excerpt || undefined}
-            metaRow={
-              finding.valueAtStake ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: 12.5,
-                  }}
-                >
-                  <span
+      {/* Risk pathways — the compound patterns, outcome-led + full width. */}
+      {pathways.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {pathways.map(finding => (
+            <CompoundRiskCard
+              key={`pathway-${finding.id}`}
+              finding={finding}
+              onOpenDrawer={() => setActive(finding)}
+            />
+          ))}
+        </div>
+      )}
+
+      {gridFindings.length > 0 && pathways.length > 0 && (
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: 'var(--text-muted, #64748B)',
+            marginTop: 4,
+          }}
+        >
+          Contributing biases
+        </div>
+      )}
+
+      {gridFindings.length > 0 && (
+        <div
+          className="deliverable-finding-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: 14,
+          }}
+        >
+          {gridFindings.map(finding => (
+            <FindingCard
+              key={`${finding.kind}-${finding.id}`}
+              title={finding.label}
+              eyebrow={
+                finding.kind === 'compound_pattern' ? 'Compound failure pattern' : 'Cognitive bias'
+              }
+              chip={finding.chip}
+              body={finding.explanation || undefined}
+              excerpt={finding.excerpt || undefined}
+              metaRow={
+                finding.valueAtStake ? (
+                  <div
                     style={{
-                      color: 'var(--text-muted, #64748B)',
-                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      fontSize: 12.5,
                     }}
                   >
-                    Exposure
-                  </span>
-                  <span
-                    style={{
-                      color: 'var(--severity-high, #ef4444)',
-                      fontWeight: 800,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {formatExposureLabel(finding.valueAtStake)}
-                  </span>
-                  <span
-                    style={{
-                      color: 'var(--text-muted, #64748B)',
-                      fontSize: 11,
-                    }}
-                  >
-                    on this ticket
-                  </span>
-                </div>
-              ) : undefined
-            }
-            referenceClass={finding.referenceClass}
-            onOpenDrawer={() => setActive(finding)}
-          />
-        ))}
-      </div>
+                    <span
+                      style={{
+                        color: 'var(--text-muted, #64748B)',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Exposure
+                    </span>
+                    <span
+                      style={{
+                        color: 'var(--severity-high, #ef4444)',
+                        fontWeight: 800,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {formatExposureLabel(finding.valueAtStake)}
+                    </span>
+                    <span
+                      style={{
+                        color: 'var(--text-muted, #64748B)',
+                        fontSize: 11,
+                      }}
+                    >
+                      on this ticket
+                    </span>
+                  </div>
+                ) : undefined
+              }
+              referenceClass={finding.referenceClass}
+              onOpenDrawer={() => setActive(finding)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Audit-trail drawer */}
       <ProgressiveDrawer
@@ -137,13 +177,14 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
             {active.mitigation ? (
               <DrawerBlock label="Recommended mitigation" body={active.mitigation} />
             ) : null}
-            {active.participatingBiases && active.participatingBiases.length > 0 ? (
+            {active.fix ? <DrawerBlock label="What to do" body={active.fix} /> : null}
+            {(active.participatingBiasLabels ?? active.participatingBiases)?.length ? (
               <DrawerBlock
                 label="Constituent biases"
                 body={
                   <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-                    {active.participatingBiases.map(b => (
-                      <li key={b}>{b.replace(/_/g, ' ')}</li>
+                    {(active.participatingBiasLabels ?? active.participatingBiases ?? []).map(b => (
+                      <li key={b}>{b}</li>
                     ))}
                   </ul>
                 }
@@ -336,6 +377,172 @@ function DrawerBlock({ label, body }: { label: string; body: React.ReactNode }) 
         }}
       >
         {body}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * CompoundRiskCard — a toxic-combination rendered as a RISK PATHWAY the way a
+ * buyer reads it: lead with the business OUTCOME (consequence) + the exposure,
+ * demote the pattern name to an eyebrow, then the story — how it compounds, why
+ * it's credible, what to do. This is the differentiator surface: not "we found
+ * a bias", but "here's how these combine into a specific outcome, and how to
+ * close it".
+ */
+function CompoundRiskCard({
+  finding,
+  onOpenDrawer,
+}: {
+  finding: ReasoningRiskFinding;
+  onOpenDrawer: () => void;
+}) {
+  const accent = severityColor(finding.chip.severity);
+  const biasChain = finding.participatingBiasLabels ?? [];
+  return (
+    <div
+      style={{
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: `4px solid ${accent}`,
+        borderRadius: 12,
+        padding: '18px 20px',
+        background: 'var(--bg-card, #fff)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 13,
+      }}
+    >
+      {/* Eyebrow — the mechanism name, demoted. */}
+      <div
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}
+      >
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'var(--text-muted, #64748B)',
+          }}
+        >
+          <GitMerge size={12} />
+          Compound risk · {finding.label}
+        </span>
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            color: accent,
+          }}
+        >
+          {finding.chip.severity}
+        </span>
+      </div>
+
+      {/* LEAD — the business outcome. */}
+      {finding.consequence ? (
+        <div
+          style={{
+            fontSize: 16.5,
+            fontWeight: 700,
+            color: 'var(--text-primary, #0F172A)',
+            lineHeight: 1.4,
+          }}
+        >
+          {finding.consequence}
+        </div>
+      ) : null}
+
+      {/* Exposure. */}
+      {finding.valueAtStake ? (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+          <span
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: 'var(--severity-high, #ef4444)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            ~{formatExposureLabel(finding.valueAtStake)}
+          </span>
+          <span style={{ fontSize: 12.5, color: 'var(--text-muted, #64748B)' }}>
+            at risk on this ticket
+          </span>
+        </div>
+      ) : null}
+
+      {/* How it compounds. */}
+      {finding.explanation || biasChain.length > 0 ? (
+        <Beat label="How it compounds">
+          {biasChain.length > 0 ? (
+            <span style={{ fontWeight: 700, color: 'var(--text-primary, #0F172A)' }}>
+              {biasChain.join(' + ')} reinforce each other.{' '}
+            </span>
+          ) : null}
+          {finding.explanation}
+        </Beat>
+      ) : null}
+
+      {/* Why it's credible. */}
+      {finding.referenceClass?.length || finding.valueAtStake ? (
+        <Beat label="Why it's credible">
+          {finding.referenceClass && finding.referenceClass.length > 0 ? (
+            <ReferenceClassList entries={finding.referenceClass} />
+          ) : null}
+          {finding.valueAtStake ? (
+            <div style={{ fontSize: 12, color: 'var(--text-muted, #64748B)', marginTop: 6 }}>
+              Base rate: {finding.valueAtStake.baseRateSource}
+            </div>
+          ) : null}
+        </Beat>
+      ) : null}
+
+      {/* What to do. */}
+      {finding.fix ? <Beat label="What to do">{finding.fix}</Beat> : null}
+
+      <button
+        type="button"
+        onClick={onOpenDrawer}
+        style={{
+          alignSelf: 'flex-start',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: 'var(--accent-primary, #16A34A)',
+        }}
+      >
+        See the full audit trail →
+      </button>
+    </div>
+  );
+}
+
+function Beat({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em',
+          color: 'var(--text-muted, #64748B)',
+          marginBottom: 5,
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ fontSize: 13.5, color: 'var(--text-secondary, #475569)', lineHeight: 1.6 }}>
+        {children}
       </div>
     </div>
   );

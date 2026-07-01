@@ -97,10 +97,18 @@ export interface ReasoningRiskFinding {
   mitigation: string;
   /** For compound patterns: the constituent bias keys. */
   participatingBiases?: string[];
+  /** For compound patterns: plain-language constituent bias names (the "chain"
+   *  the reader sees), derived from participatingBiases via formatBiasName. */
+  participatingBiasLabels?: string[];
+  /** For compound patterns: the business OUTCOME this leads to, in a buyer's
+   *  language (from the canonical pattern). The card LEADS with this. */
+  consequence?: string;
+  /** For compound patterns: the specific pressure-test that closes it. */
+  fix?: string;
   /** Optional exposure (only when ticket size supplied). */
   valueAtStake?: ValueAtStake | null;
-  /** Top historical cases that carried this reasoning risk (bias findings
-   *  only; failures first, by impact). Correlational grounding, not cause. */
+  /** Top historical cases that carried this reasoning risk (failures first,
+   *  by impact). Correlational grounding, not cause. */
   referenceClass?: ReferenceClassEntry[];
 }
 

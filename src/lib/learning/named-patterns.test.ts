@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { matchNamedPatterns, NAMED_PATTERNS } from './named-patterns';
+import { matchNamedPatterns, NAMED_PATTERNS, getNamedPattern } from './named-patterns';
 
 describe('matchNamedPatterns', () => {
   it('returns empty array when no biases supplied', () => {
@@ -138,5 +138,26 @@ describe('matchNamedPatterns', () => {
     // CLAUDE.md M&A Workflow Native lock + founder-context.ts coaching
     // must update in the same commit. Mirrors the bias-taxonomy cascade.
     expect(NAMED_PATTERNS).toHaveLength(13);
+  });
+
+  it('every pattern carries a buyer-facing consequence + fix (the audit-narrative SSOT)', () => {
+    for (const p of NAMED_PATTERNS) {
+      expect(p.consequence.trim().length, `${p.label} consequence`).toBeGreaterThan(20);
+      expect(p.fix.trim().length, `${p.label} fix`).toBeGreaterThan(20);
+      // Honesty guard: the consequence names a RISK, never a causal guarantee.
+      expect(p.consequence.toLowerCase(), `${p.label} consequence must not overclaim`).not.toMatch(
+        /\bwill (?:cause|fail|lose|destroy)\b/
+      );
+    }
+  });
+
+  it('getNamedPattern matches the runtime label variants (with/without "The", historical suffix)', () => {
+    expect(getNamedPattern('The Synergy Mirage')?.label).toBe('The Synergy Mirage');
+    expect(getNamedPattern('Synergy Mirage')?.label).toBe('The Synergy Mirage');
+    expect(getNamedPattern('synergy mirage (historical)')?.label).toBe('The Synergy Mirage');
+    expect(getNamedPattern("The Winner's Curse")?.label).toBe("The Winner's Curse");
+    expect(getNamedPattern('')).toBeUndefined();
+    expect(getNamedPattern('Not A Real Pattern')).toBeUndefined();
+    expect(getNamedPattern(null)).toBeUndefined();
   });
 });

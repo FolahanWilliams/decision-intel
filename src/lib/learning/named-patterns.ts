@@ -23,6 +23,16 @@ import type { ContextFactors } from './toxic-combinations-types';
 export interface NamedPattern {
   label: string;
   description: string;
+  /**
+   * What this compound pattern LEADS TO, in a buyer's language — the business
+   * outcome you risk, not the mechanism. This is what an executive reads for
+   * ("how could this hurt me?"). Honest risk-indicator framing (you risk / tends
+   * to / statistically), never a causal guarantee. Display-only: does NOT feed
+   * detection or scoring — same class as `description`.
+   */
+  consequence: string;
+  /** The specific pressure-test that closes the pattern. Display-only. */
+  fix: string;
   biasTypes: string[]; // all must be present
   contextRequired: Partial<ContextFactors>;
   baseScore: number; // 0-100 starting score before calibration
@@ -36,6 +46,9 @@ export interface NamedPattern {
 export const NAMED_PATTERNS: NamedPattern[] = [
   {
     label: 'The Echo Chamber',
+    consequence:
+      'The committee approves a thesis it never stress-tested, so the first real market pushback lands after the capital is committed, and the diligence that would have caught it was quietly reframed to fit the conclusion.',
+    fix: 'Assign one member to argue the kill case in writing before the vote, and require every diligence finding that contradicts the thesis to be logged, not reconciled away.',
     description:
       'Groupthink + confirmation bias with no dissenting voices creates a self-reinforcing belief loop where challenging evidence is dismissed. In M&A specifically: an IC where the deal team converged before the CIM landed and is now rationalising every diligence finding into the original thesis.',
     biasTypes: ['groupthink', 'confirmation_bias'],
@@ -44,6 +57,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Sunk Ship',
+    consequence:
+      'You keep funding a losing position because of what you have already spent, so the loss compounds past the point where walking away was the cheaper decision.',
+    fix: 'Re-decide on forward economics only, ignoring the sunk diligence, advisor, and bid costs, and set a hard walk-away number before the next round.',
     description:
       'Sunk cost fallacy + anchoring bias with high monetary stakes leads to doubling down on failing strategies because of prior investment. In M&A specifically: deal-escalation language ("we have already spent $X on diligence and advisor fees") justifies continued bidding past intrinsic value, or rationalises proceeding despite material negative diligence findings. Lockheed Martin reach-forward losses are the canonical anchor.',
     biasTypes: ['sunk_cost_fallacy', 'anchoring_bias'],
@@ -52,6 +68,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Blind Sprint',
+    consequence:
+      'The decision gets anchored on whatever data was easiest to recall, so a material factor that was not top of mind surfaces after commitment and reprices the whole call.',
+    fix: 'Before deciding, name the three data points that would most change the answer and confirm you actually have them, not just the ones that came to mind first.',
     description:
       'Time pressure + availability heuristic + overconfidence leads to fast decisions based on easily recalled (but not necessarily relevant) information.',
     biasTypes: ['availability_heuristic', 'overconfidence_bias'],
@@ -60,6 +79,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Yes Committee',
+    consequence:
+      "The memo ratifies a senior sponsor's pick rather than testing it, so nobody owns the downside, and the risks left unspoken in the room are the ones that show up in the results.",
+    fix: "Collect each member's view independently and in writing before the meeting, and require the sponsor to name the two conditions under which they would walk.",
     description:
       "Authority bias + groupthink with unanimous consensus means the most senior voice dominates and no one challenges the decision. In M&A specifically: an IC memo that reads as a rubber-stamp justification of a CEO or sponsor's pet acquisition with zero documented dissent — the committee acted as a ratifying body rather than an adversarial audit. Microsoft-Nokia is the canonical \\$249B-evaporation anchor.",
     biasTypes: ['groupthink', 'authority_bias'],
@@ -68,6 +90,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Optimism Trap',
+    consequence:
+      'Confidence outruns the evidence on a high-stakes bet, so the base case is really the best case, and the downside you did not model becomes the outcome you have to explain.',
+    fix: "Force a written pre-mortem ('it is 18 months later and this failed, why?') and re-run the numbers at the reference-class base rate, not the pitch case.",
     description:
       'Overconfidence + confirmation bias + high stakes: decision-makers selectively gather supporting evidence while being overly confident in a high-stakes bet.',
     biasTypes: ['overconfidence_bias', 'confirmation_bias'],
@@ -84,6 +109,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   // automatically surface these patterns when the underlying biases co-occur.
   {
     label: 'The Synergy Mirage',
+    consequence:
+      'You pay a premium for synergies that never arrive on the promised timeline, so the deal turns dilutive by year two and the integration budget is spent chasing a number that was never operationally grounded.',
+    fix: 'Require every synergy line to name a mechanism, an accountable owner, and a 90-day milestone (the BCG triad) before the vote, and benchmark the total against realized-synergy rates from comparable deals.',
     description:
       'Overconfidence in projections + planning fallacy: revenue or cost synergy claims projected with hockey-stick precision but lacking a named operational mechanism, named accountable executive, or measurable 90-day milestone. The canonical M&A failure mode — McKinsey + KPMG research finds 70-90% of acquisitions fail to realise projected synergies. Fires when synergy figures appear in the memo without the BCG integration-best-practices triad of (mechanism, owner, milestone). Benchmark against historical realized-synergy rates from the case library.',
     biasTypes: ['overconfidence_bias', 'planning_fallacy'],
@@ -92,6 +120,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Conglomerate Fallacy',
+    consequence:
+      'You buy a strong company you have no advantage owning, so its momentum stalls under a parent that cannot add value, and the premium you paid for its story never comes back.',
+    fix: "State the 'why us as the parent' thesis in one sentence of concrete operational overlap; if it rests on the target's brand or growth rather than what you specifically add, treat the fit as unproven.",
     description:
       'Illusion of validity + halo effect: a far-adjacency acquisition justified primarily by the target\'s growth or brand momentum rather than by core operational overlap or a defensible "why us as parent" thesis (Porter parenting advantage). The narrative coherence of the target\'s success story produces high acquirer-side confidence, while the lack of operational fit is rationalised away. Bed Bath & Beyond + Container Store, AOL + Time Warner, Daimler + Chrysler are the canonical anchors.',
     biasTypes: ['illusion_of_validity', 'halo_effect'],
@@ -100,6 +131,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: "The Winner's Curse",
+    consequence:
+      'You win the auction by overpaying: the bidder most willing to pay the most is statistically the one who misjudged the value most, so winning the deal is the first loss.',
+    fix: "Set your walk-away price from intrinsic value before you see a competing bid, and treat 'strategic necessity' or 'we cannot let them have it' as a signal to stop, not to raise.",
     description:
       'Anchoring bias + overconfidence with auction-dynamic language: the bid is driven by fear of losing the deal rather than intrinsic value. Fires on phrases like "preempting competitor B," "strategic necessity," "competitive process," "we cannot let X get this asset" — these signal that competitive dynamics, not fundamentals, are driving valuation. The acquirer who wins is statistically the acquirer who most overpaid. WeWork S-1, Quibi, the post-2010 SPAC wave are anchor cases.',
     biasTypes: ['anchoring_bias', 'overconfidence_bias'],
@@ -108,6 +142,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Status Quo Lock',
+    consequence:
+      "The team meets a changing market with last cycle's playbook, so the cost shows up as slow erosion rather than a single visible miss, which makes it easy to keep ignoring.",
+    fix: 'Ask whether, deciding fresh today with none of the current commitments, you would choose the same path, and make someone argue for the change.',
     description:
       'Status quo bias + anchoring + absent dissent: the team defaults to "how we\'ve always done it" with nobody pushing for change.',
     biasTypes: ['status_quo_bias', 'anchoring_bias'],
@@ -116,6 +153,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Recency Spiral',
+    consequence:
+      'A recent event drives an urgent decision out of proportion to its real weight, so you over-correct for the last thing that happened and under-weight the longer trend.',
+    fix: 'Place the triggering event on a multi-year timeline before acting, and decide whether it is signal or noise against the base rate, not against last week.',
     description:
       'Recency bias + availability heuristic under time pressure: recent events disproportionately drive urgent decisions.',
     biasTypes: ['recency_bias', 'availability_heuristic'],
@@ -124,6 +164,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Golden Child',
+    consequence:
+      'A charismatic leader or prestige brand creates a halo that suppresses the red flags, so the warning signs are obvious in hindsight but unspeakable in the room until the damage is done.',
+    fix: 'Separate the person from the plan: pressure-test the numbers as if they came from an unknown team, and give someone explicit permission to name the red flags.',
     description:
       'Halo effect + confirmation bias + authority bias: a charismatic leader or prestigious brand creates an aura that blinds the team to red flags.',
     biasTypes: ['halo_effect', 'confirmation_bias', 'authority_bias'],
@@ -132,6 +175,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Doubling Down',
+    consequence:
+      'A belief that the loss has to turn escalates commitment on a losing position, so each rescue round enlarges the crater instead of stopping it.',
+    fix: 'Treat the position as new capital deployed today: would you enter it now, at this size? If not, the only question is how fast to exit, not how much more to add.',
     description:
       "Gambler's fallacy + overconfidence + sunk cost: the belief that losses must reverse leads to escalating commitment on a losing position.",
     biasTypes: ['gamblers_fallacy', 'overconfidence_bias', 'sunk_cost_fallacy'],
@@ -140,6 +186,9 @@ export const NAMED_PATTERNS: NamedPattern[] = [
   },
   {
     label: 'The Deadline Panic',
+    consequence:
+      "The pressure to close compresses the timeline, so the deal gets done on the calendar's terms rather than the diligence's, and the corners cut under the clock are where it later breaks.",
+    fix: 'Separate the real deadline from the felt one, name exactly what breaks if you take another week, and refuse to trade an irreversible commitment for a reversible schedule.',
     description:
       'Zeigarnik effect + planning fallacy under time pressure: incomplete-task anxiety compresses timelines and drives rushed decisions to achieve closure.',
     biasTypes: ['zeigarnik_effect', 'planning_fallacy'],
@@ -147,6 +196,25 @@ export const NAMED_PATTERNS: NamedPattern[] = [
     baseScore: 78,
   },
 ];
+
+/**
+ * Look up a canonical NamedPattern by label, tolerant of the label variants the
+ * runtime produces: with or without the leading "The", a trailing "(historical)"
+ * suffix, and case/whitespace differences. Used by the audit deliverable to join
+ * a fired pattern back to its buyer-facing `consequence` + `fix`. Returns
+ * undefined on no match (the deliverable then falls back gracefully).
+ */
+export function getNamedPattern(label: string | null | undefined): NamedPattern | undefined {
+  if (!label) return undefined;
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/\s*\(historical\)\s*$/, '')
+      .replace(/^the\s+/, '')
+      .trim();
+  const target = norm(label);
+  return NAMED_PATTERNS.find(p => norm(p.label) === target);
+}
 
 // ─── Pure-function pattern matcher (locked 2026-05-09 evening) ─────────────
 //
