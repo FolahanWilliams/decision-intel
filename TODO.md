@@ -64,6 +64,15 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 - [ ] Analyst certification program (revenue opportunity)
 - [ ] CRM integration for auto-pulling deal outcomes (Salesforce, HubSpot)
 
+## Recently Completed (2026-07-02)
+
+**Cross-class attack path — the structural/execution/info conditions that MULTIPLY biases into the outcome (founder "which upgrade makes the buyer bite via the retro, in 1-2 hours" → the Wiz move). Full prose in CLAUDE.md "Cross-class attack path" lock.**
+
+- [x] **The differentiator surface** (`1d5d71aa`) — our audit flagged biases (cognitive nodes); now it surfaces the cross-class chain (17-person board + dominant CEO + hostile bid + 6-hours-diligence + leverage = the collapse) that a bias-only audit misses. [strategic-nodes.ts](src/lib/deliverable/strategic-nodes.ts): 13-node catalog (structural / execution / information) + pure `detectStrategicNodes(content)`. NO LLM, no scoring impact (display-only). Rendered as the "How these risks multiply · the attack path" panel atop the risk pathways.
+- [x] **The novel beat — the suppression edge**: each node names what it CONCEALED from the room ("your structure hid this from you", never "you were biased" — ego-safe, structure-is-the-villain).
+- [x] **Verified in-sandbox against the paper's 4 retro cases as fixtures** (RBS/ABN AMRO, HP/Autonomy, WeWork, Quibi) — 18 tests, all green. META #11 satisfied without an LLM.
+- [ ] **FOUNDER EYEBALL:** run a retro (paste RBS/HP/WeWork/Quibi-style text or a real filing) and confirm the "attack path" panel reads as the differentiator — the structural+execution story that makes a reader go "you caught the real thing." This is the slice of the paper's C/S/I/E model; the FULL version (nodes amplify the compound score with calibrated coupling) is founder-gated, post-retro-signal.
+
 ## Recently Completed (2026-07-01)
 
 **Differentiator sharpening — the Taktile "$X at risk" reveal, made to fire on cold audits (founder "strengthen the toxic-combo→monetary side + market intelligence + let the pipeline web-search; the free audits must showcase the value, Taktile's playbook"). Full prose in CLAUDE.md "Differentiator sharpening" lock.**
