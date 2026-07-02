@@ -324,7 +324,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // 244 → 245 (2026-07-02 multi-doc combine): the combineAndAnalyze handler's
 // `res.json().catch(() => null)` on /api/upload/multi — canonical body-parse
 // exception (surface the API error, else a default; no write swallowed).
-const SILENT_CATCH_BASELINE = 245;
+// 245 → 246 (2026-07-02 clean-cancel): the /api/analyze/cancel route's
+// `request.json().catch(() => null)` — canonical req.json() body-parse
+// exception (falls through to a 400; no write swallowed).
+const SILENT_CATCH_BASELINE = 246;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

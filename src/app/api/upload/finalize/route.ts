@@ -145,6 +145,19 @@ export async function POST(request: NextRequest) {
     });
     if (existing && !existing.deletedAt) {
       await cleanup();
+      // A still-analyzing match means a re-upload while the first audit runs —
+      // surfacing it as "cached" dropped the user on an empty detail page
+      // ("nothing found", 2026-07-02). Signal in-progress so the client points
+      // them at Cancel instead.
+      if (existing.status === 'analyzing') {
+        return NextResponse.json({
+          id: existing.id,
+          filename: existing.filename,
+          status: existing.status,
+          inProgress: true,
+          message: 'This document is already being analyzed. Cancel that audit to run it again.',
+        });
+      }
       return NextResponse.json({
         id: existing.id,
         filename: existing.filename,
@@ -237,9 +250,22 @@ export async function POST(request: NextRequest) {
 
     after(prewarmDocumentEmbedding(content));
 
+    // Auto-name BEFORE returning (2026-07-02) — parity with the direct upload
+    // route. A random-string / hash filename is meaningless on the DPR the
+    // founder forwards; awaited (timeout-guarded + fail-soft) so the real title
+    // lands before the client fires the audit. Good names are left untouched.
+    let finalFilename = doc.filename;
+    try {
+      const { maybeAutoNameDocument } = await import('@/lib/utils/document-title');
+      const renamed = await maybeAutoNameDocument(doc.id, content, doc.filename);
+      if (renamed) finalFilename = renamed;
+    } catch (err) {
+      log.warn('finalize auto-name failed (keeping current name):', err);
+    }
+
     return NextResponse.json({
       id: doc.id,
-      filename: doc.filename,
+      filename: finalFilename,
       status: 'pending',
       message: 'Document uploaded successfully',
     });

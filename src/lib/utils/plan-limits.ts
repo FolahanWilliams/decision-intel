@@ -286,6 +286,22 @@ export async function releaseAnalysisSlot(reservationId: string | null): Promise
 }
 
 /**
+ * Release ALL active reservations for a user (2026-07-02). Used by the audit
+ * cancel endpoint, which does NOT hold the reservationId (that lives server-side
+ * inside the stream route). Analysis is one-at-a-time per user, so freeing the
+ * user's reservations reclaims the stuck slot after a cancel/reload. The stream
+ * cancel() handler releases the slot on a live abort; this covers the reload
+ * case where no stream is running. Schema-drift tolerant.
+ */
+export async function releaseAnalysisSlotsForUser(userId: string): Promise<void> {
+  try {
+    await prisma.analysisReservation.deleteMany({ where: { userId } });
+  } catch (err) {
+    log.warn('releaseAnalysisSlotsForUser: non-fatal', err);
+  }
+}
+
+/**
  * Get the maximum number of bias types allowed for a user's plan.
  *
  * Per the 2026-05-26 soft-limit pass: every plan now sees the FULL

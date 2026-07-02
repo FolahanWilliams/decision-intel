@@ -197,6 +197,28 @@ export async function POST(request: NextRequest) {
     }
 
     if (existingDoc) {
+      // A still-analyzing match means the user re-uploaded the SAME content WHILE
+      // the first audit is running — returning it as a "cache hit" navigated them
+      // to an empty detail page reading "nothing found" (the 2026-07-02 glitch).
+      // Signal in-progress instead so the client points them at Cancel, not a
+      // dead end.
+      if (existingDoc.status === 'analyzing') {
+        log.info(
+          'Re-upload of in-progress document ' +
+            existingDoc.id +
+            ' (status=' +
+            existingDoc.status +
+            ')'
+        );
+        return NextResponse.json({
+          id: existingDoc.id,
+          filename: existingDoc.filename,
+          status: existingDoc.status,
+          inProgress: true,
+          message: 'This document is already being analyzed. Cancel that audit to run it again.',
+        });
+      }
+
       log.info('Cache hit: Document already analyzed ' + existingDoc.id);
 
       // Return cached result with the existing document ID and analysis
@@ -537,18 +559,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Auto-name (post-response): a pasted memo lands as `paste-<ts>.txt`,
-    // which is meaningless on the doc list + the audit deliverable. Ask the
-    // cheap model for a fitting title from the content and rename. Runs via
-    // `after()` so it never delays the upload yet still reliably completes
-    // (past the response, before the invocation freezes); by the time the
-    // audit finishes the rename has landed. Intentionally-named uploads are
-    // untouched (isGenericFilename guard inside maybeAutoNameDocument).
-    after(
-      import('@/lib/utils/document-title')
-        .then(({ maybeAutoNameDocument }) => maybeAutoNameDocument(document.id, content, file.name))
-        .catch(err => log.warn('auto-name dispatch failed:', err))
-    );
+    // Auto-name BEFORE returning (2026-07-02, founder ask: "name it then audit
+    // after so the DPR carries the name"). A random-string / hash / `paste-<ts>`
+    // filename is meaningless on the doc list + the audit deliverable + the DPR
+    // the founder forwards. The prior `after()` was racy + missed real filenames.
+    // Awaited here (timeout-guarded + fail-soft inside) so by the time the client
+    // fires the audit, the real title has landed. Intentionally-named uploads are
+    // untouched (isUninformativeFilename guard inside maybeAutoNameDocument).
+    let finalFilename = document.filename;
+    try {
+      const { maybeAutoNameDocument } = await import('@/lib/utils/document-title');
+      const renamed = await maybeAutoNameDocument(document.id, content, document.filename);
+      if (renamed) finalFilename = renamed;
+    } catch (err) {
+      log.warn('auto-name dispatch failed (keeping current name):', err);
+    }
 
     // Pre-warm embedding cache so the analysis pipeline's RAG query
     // hits a warm entry instead of paying the Gemini round-trip live.
@@ -557,7 +582,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: document.id,
-      filename: document.filename,
+      filename: finalFilename,
       status: document.status,
       message: 'Document uploaded successfully',
     });

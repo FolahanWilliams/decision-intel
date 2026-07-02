@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { isGenericFilename, sanitizeTitle } from './document-title';
+import { isGenericFilename, isUninformativeFilename, sanitizeTitle } from './document-title';
 
-describe('isGenericFilename', () => {
+describe('isGenericFilename (alias of isUninformativeFilename)', () => {
   it('flags the paste-<timestamp> default as generic', () => {
     expect(isGenericFilename('paste-2026-06-30T00-07-44-574Z.txt')).toBe(true);
   });
@@ -24,6 +24,30 @@ describe('isGenericFilename', () => {
   it('handles empty / whitespace input safely', () => {
     expect(isGenericFilename('')).toBe(false);
     expect(isGenericFilename('   ')).toBe(false);
+  });
+});
+
+describe('isUninformativeFilename — random-string / hash / junk detection', () => {
+  it('flags hash / UUID / timestamp filenames (the "random string" case)', () => {
+    expect(isUninformativeFilename('d41d8cd98f00b204e9800998ecf8427e.pdf')).toBe(true); // md5
+    expect(isUninformativeFilename('550e8400-e29b-41d4-a716-446655440000.pdf')).toBe(true); // uuid
+    expect(isUninformativeFilename('1719800000000.txt')).toBe(true); // ms timestamp
+    expect(isUninformativeFilename('a3f9b2c1.html')).toBe(true); // short hex-ish blob
+    expect(isUninformativeFilename('Fq9Xz2Lp8kR3mN7w.pdf')).toBe(true); // 16+ alnum token w/ digit
+  });
+
+  it('flags generic browser / OS junk across ANY extension', () => {
+    expect(isUninformativeFilename('document (3).pdf')).toBe(true);
+    expect(isUninformativeFilename('scan0001.pdf')).toBe(true);
+    expect(isUninformativeFilename('screenshot.png')).toBe(true);
+    expect(isUninformativeFilename('draft.docx')).toBe(true);
+  });
+
+  it('KEEPS informative names (real words / single legit word) regardless of case', () => {
+    expect(isUninformativeFilename('google ipo.html')).toBe(false); // 2 real words
+    expect(isUninformativeFilename('WeWork S-1.pdf')).toBe(false);
+    expect(isUninformativeFilename('Fermi.pdf')).toBe(false); // single real word
+    expect(isUninformativeFilename('Fermi America S-11.pdf')).toBe(false);
   });
 });
 

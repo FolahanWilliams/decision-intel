@@ -191,7 +191,16 @@ function formatFileSize(bytes: number): string {
 }
 
 type UploadMeta = { documentType?: string; containerId?: string; frameId?: string };
-type UploadResult = { id: string; filename: string; cached?: boolean };
+type UploadResult = {
+  id: string;
+  filename: string;
+  cached?: boolean;
+  // Set when the re-uploaded content matches a doc whose audit is still running
+  // (2026-07-02) — the client shows a "cancel to re-run" nudge instead of
+  // navigating to an empty "nothing found" detail page.
+  inProgress?: boolean;
+  status?: string;
+};
 
 // Files at/under this go through the normal multipart POST (has byte-level
 // progress). Larger files MUST bypass it: Vercel serverless functions reject a
@@ -299,7 +308,13 @@ async function uploadLargeViaStorage(
     throw new Error(finData?.error || `Could not finish processing the upload (${finRes.status}).`);
   }
   onProgress(100);
-  return { id: finData.id, filename: finData.filename, cached: finData.cached };
+  return {
+    id: finData.id,
+    filename: finData.filename,
+    cached: finData.cached,
+    inProgress: finData.inProgress,
+    status: finData.status,
+  };
 }
 
 const ROLE_DASHBOARD_SUBTITLE: Record<EmptyStateRole, string> = {
@@ -901,6 +916,19 @@ export default function Dashboard() {
       // SILENT: the progress bar vanished and nothing visible happened, which
       // reads as a broken upload. Now we tell the user + open the existing
       // audit so the click always lands somewhere.
+      // Re-uploaded the SAME content while its first audit is still running —
+      // don't navigate to an empty detail page ("nothing found"). Refresh so the
+      // "Currently Analyzing" card is visible and point the user at Cancel.
+      if (uploadData.inProgress) {
+        await mutateDocs(undefined, { revalidate: true });
+        setUploadPhase('uploading'); // setUploading(false) is handled by the finally
+        showToast(
+          'This document is already being analyzed. Cancel that audit to run it again.',
+          'info'
+        );
+        return;
+      }
+
       if (uploadData.cached) {
         await mutateDocs(undefined, { revalidate: true });
         showToast('You already audited this document — opening your existing audit.', 'info');
@@ -1010,6 +1038,37 @@ export default function Dashboard() {
     } finally {
       setUploading(false);
     }
+  };
+
+  // Cancel a running (or stuck-after-reload) audit so a new one can run cleanly
+  // (2026-07-02). cancelAnalysis() aborts THIS session's live stream if it owns
+  // the doc (a no-op after a reload — the hook never started it); the server
+  // /api/analyze/cancel resets the doc to 'pending' + frees the quota slot, which
+  // is what reclaims control regardless of whether a stream is live.
+  const handleCancelAnalysis = async (docId: string) => {
+    cancelAnalysis();
+    try {
+      await fetch('/api/analyze/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: docId }),
+      });
+    } catch (err) {
+      log.warn('Cancel request failed:', err);
+    }
+    setUploading(false);
+    setLastCompletedAnalysis(prev => (prev?.docId === docId ? null : prev));
+    // Optimistically drop the interrupted doc (the server soft-deletes it); the
+    // revalidate resyncs — a re-run of an already-audited doc comes back as
+    // 'complete'. Either way the "Currently Analyzing" card clears immediately.
+    await mutateDocs(
+      current => {
+        const base = current ?? { documents: [], total: 0, page: 1, totalPages: 1 };
+        return { ...base, documents: base.documents.filter(doc => doc.id !== docId) };
+      },
+      { revalidate: true }
+    );
+    showToast('Audit cancelled — you can run a new one cleanly.', 'info');
   };
 
   const retryAnalysis = async (docId: string) => {
@@ -2577,6 +2636,17 @@ export default function Dashboard() {
                                 size={16}
                                 className="animate-spin text-accent-primary shrink-0"
                               />
+                              <button
+                                type="button"
+                                onClick={() => handleCancelAnalysis(doc.id)}
+                                className="btn btn-danger-outline shrink-0"
+                                title="Cancel this audit so you can run a new one"
+                                aria-label={`Cancel audit for ${doc.filename}`}
+                                style={{ padding: '5px 12px', fontSize: 'var(--fs-2xs)', gap: 5 }}
+                              >
+                                <X size={13} />
+                                Cancel
+                              </button>
                             </div>
                           </div>
                         </div>
