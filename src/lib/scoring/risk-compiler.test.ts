@@ -295,3 +295,99 @@ describe('buildCalibrationInsight', () => {
     expect(insight.headline).toContain('3 more to go');
   });
 });
+
+// ─── Adversarial-signal penalty (2026-07-02 — the blind-Fermi 35 fix) ──────
+
+import { calculateAdversarialSignalPenalty, ADVERSARIAL_SIGNAL_CAPS } from './risk-compiler';
+
+describe('calculateAdversarialSignalPenalty', () => {
+  it('a clean memo gets EXACTLY 0 — every prior clean-memo score is unchanged', () => {
+    expect(
+      calculateAdversarialSignalPenalty({
+        criticalForgottenQuestions: 0,
+        highForgottenQuestions: 0,
+        boardroomRejects: 0,
+        redTeamObjections: 0,
+      })
+    ).toBe(0);
+  });
+
+  it('the blind-Fermi shape (1 critical FQ + 5 high FQ + 1 reject + 4 red team) hits near the cap', () => {
+    const p = calculateAdversarialSignalPenalty({
+      criticalForgottenQuestions: 1,
+      highForgottenQuestions: 5,
+      boardroomRejects: 1,
+      redTeamObjections: 4,
+    });
+    // 4 + min(6, 7.5) + 3 + 4 = 17
+    expect(p).toBe(17);
+    expect(p).toBeLessThanOrEqual(ADVERSARIAL_SIGNAL_CAPS.totalCap);
+  });
+
+  it('per-signal caps bound any single module — 20 critical FQs cannot exceed the critical cap alone', () => {
+    const p = calculateAdversarialSignalPenalty({
+      criticalForgottenQuestions: 20,
+      highForgottenQuestions: 0,
+      boardroomRejects: 0,
+      redTeamObjections: 0,
+    });
+    expect(p).toBe(ADVERSARIAL_SIGNAL_CAPS.criticalFqCap);
+  });
+
+  it('the total cap holds under saturation from every module', () => {
+    const p = calculateAdversarialSignalPenalty({
+      criticalForgottenQuestions: 99,
+      highForgottenQuestions: 99,
+      boardroomRejects: 99,
+      redTeamObjections: 99,
+    });
+    expect(p).toBe(ADVERSARIAL_SIGNAL_CAPS.totalCap);
+  });
+
+  it('negative inputs clamp to zero contribution (defensive)', () => {
+    expect(
+      calculateAdversarialSignalPenalty({
+        criticalForgottenQuestions: -3,
+        highForgottenQuestions: -1,
+        boardroomRejects: -2,
+        redTeamObjections: -5,
+      })
+    ).toBe(0);
+  });
+
+  it('composeOverallScore without adversarialPenalty is byte-identical to before (default 0)', () => {
+    const base = {
+      biasDeductions: 10,
+      noisePenalty: 5,
+      trustPenalty: 5,
+      logicPenalty: 5,
+      diversityPenalty: 5,
+      feedbackAdjustment: 0,
+    };
+    expect(composeOverallScore(base)).toBe(composeOverallScore({ ...base, adversarialPenalty: 0 }));
+    expect(composeOverallScore(base)).toBe(70);
+  });
+
+  it('composeOverallScore subtracts the adversarial penalty and clamps at 0', () => {
+    const base = {
+      biasDeductions: 10,
+      noisePenalty: 5,
+      trustPenalty: 5,
+      logicPenalty: 5,
+      diversityPenalty: 5,
+      feedbackAdjustment: 0,
+    };
+    expect(composeOverallScore({ ...base, adversarialPenalty: 17 })).toBe(53);
+    expect(
+      composeOverallScore({
+        biasDeductions: 60,
+        noisePenalty: 20,
+        trustPenalty: 15,
+        logicPenalty: 20,
+        diversityPenalty: 10,
+        feedbackAdjustment: 0,
+        adversarialPenalty: 18,
+      })
+    ).toBe(0);
+  });
+});

@@ -133,3 +133,26 @@ describe('detectStrategicNodes — mechanics', () => {
     }
   });
 });
+
+// ─── Prompt-context block (2026-07-02 — structural detectors feed the
+//     reasoning nodes) ──────────────────────────────────────────────────
+
+import { buildStrategicConditionsPromptBlock } from './strategic-nodes';
+
+describe('buildStrategicConditionsPromptBlock', () => {
+  it('returns EMPTY STRING when nothing is detected — prompts byte-identical on clean docs', () => {
+    expect(
+      buildStrategicConditionsPromptBlock('A staged market pilot with an independent gate review.')
+    ).toBe('');
+  });
+
+  it('formats detected conditions with class labels + EXISTENTIAL flag + the interrogation instruction', () => {
+    const block = buildStrategicConditionsPromptBlock(
+      'The dominant CEO sidelined the board of 17 in a hostile bid, on due diligence of only six hours.'
+    );
+    expect(block).toContain('DETECTED STRUCTURAL CONDITIONS');
+    expect(block).toContain('Interrogate these conditions DIRECTLY');
+    // Honesty guard — risk indicators, never a prediction of failure.
+    expect(block).toContain('never a prediction that the decision fails');
+  });
+});

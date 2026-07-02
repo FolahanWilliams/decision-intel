@@ -35,6 +35,7 @@ import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
 import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '../ai/gateway-gemini';
+import { buildStrategicConditionsPromptBlock } from '../deliverable/strategic-nodes';
 import { MODEL_FRONTIER_REASONING, MODEL_STRONG_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
@@ -1628,9 +1629,12 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
     let responseText: string;
     let searchSources: string[] = [];
     const deepBlindBlock = state.blindMode ? BLIND_RETRO_DISCIPLINE : '';
+    // Structural-conditions injection (2026-07-02) — the red team + pre-mortem
+    // interrogate the detected company-enders directly. '' when none detected.
+    const deepStructuralBlock = buildStrategicConditionsPromptBlock(state.structuredContent || '');
     if (frontierDeepModel) {
       const frontier = await runModelCall(frontierDeepModel, [
-        DEEP_ANALYSIS_SUPER_PROMPT + deepBlindBlock,
+        DEEP_ANALYSIS_SUPER_PROMPT + deepStructuralBlock + deepBlindBlock,
         `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
       ]);
       responseText = frontier.text;
@@ -1645,7 +1649,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         () =>
           withTimeout(
             deepModel.generateContent([
-              DEEP_ANALYSIS_SUPER_PROMPT + deepBlindBlock,
+              DEEP_ANALYSIS_SUPER_PROMPT + deepStructuralBlock + deepBlindBlock,
               `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
             ]),
             90000 // 90 second timeout
@@ -2138,10 +2142,15 @@ export async function forgottenQuestionsNode(state: AuditState): Promise<Partial
     // to ask that"). Opus 4.8 by default; legacy grounded Gemini fallback.
     const frontierFqModel = resolveFrontierModel('forgottenQuestions');
     const fqBlindBlock = state.blindMode ? BLIND_RETRO_DISCIPLINE : '';
+    // Structural-conditions injection (2026-07-02): the deterministic
+    // company-ender detectors point the audit's strongest generative module
+    // at exactly the concentration / valuation / key-person conditions.
+    // Empty string when none detected — prompt byte-identical to before.
+    const fqStructuralBlock = buildStrategicConditionsPromptBlock(state.structuredContent || '');
     let text: string;
     if (frontierFqModel) {
       const frontier = await runModelCall(frontierFqModel, [
-        prompt + fqBlindBlock,
+        prompt + fqStructuralBlock + fqBlindBlock,
         `Memo under review:\n<memo>\n${content}\n</memo>`,
       ]);
       text = frontier.text;
@@ -2154,7 +2163,7 @@ export async function forgottenQuestionsNode(state: AuditState): Promise<Partial
         () =>
           withTimeout(
             fqModel.generateContent([
-              prompt + fqBlindBlock,
+              prompt + fqStructuralBlock + fqBlindBlock,
               `Memo under review:\n<memo>\n${content}\n</memo>`,
             ]),
             75000
@@ -2237,11 +2246,15 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
     // Frontier tier (2026-07-02): the final verdict is the highest-leverage
     // single call in the pipeline — Opus 4.8 by default. Prose output, so
     // the gateway path is parse-risk-free (consumer reads text raw).
-    // Legacy fallback: grounded gemini-2.5-pro (jsonResponse:false).
+    // Legacy fallback: grounded Gemini 3 Flash (jsonResponse:false; 2.5-pro retired 2026-07-02).
     const frontierMetaModel = resolveFrontierModel('metaJudge');
+    // Structural-conditions injection (2026-07-02) — the final verdict must
+    // weigh the detected company-enders explicitly, not just the upstream
+    // module outputs. '' when none detected (prompt unchanged).
+    const metaStructuralBlock = buildStrategicConditionsPromptBlock(state.structuredContent || '');
     const metaBlindPrompt = state.blindMode
-      ? metaJudgePrompt + BLIND_RETRO_DISCIPLINE
-      : metaJudgePrompt;
+      ? metaJudgePrompt + metaStructuralBlock + BLIND_RETRO_DISCIPLINE
+      : metaJudgePrompt + metaStructuralBlock;
     let verdict: string;
     if (frontierMetaModel) {
       const frontier = await runModelCall(frontierMetaModel, [metaBlindPrompt], {
@@ -2324,6 +2337,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     calculateLogicPenalty,
     calculateEchoChamberPenalty,
     calculateOutcomeFeedbackAdjustment,
+    calculateAdversarialSignalPenalty,
     countCalibrationSamples,
     composeOverallScore,
     buildCalibrationInsight,
@@ -2362,6 +2376,21 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     (state.biasAnalysis || []).map(b => b.biasType || '')
   );
 
+  // Step 6c — adversarial-signal penalty (pipeline composer, 2026-07-02):
+  // the score must hear the adversarial modules. Previously a memo with six
+  // critical unanswered questions + a 0-approve boardroom scored identically
+  // to one with none (the blind-Fermi 35 that deserved single digits —
+  // co-work P0 #2). Capped 18 + per-signal caps; 0 on clean memos so every
+  // prior clean-memo score is unchanged.
+  const fqList = state.forgottenQuestions?.questions ?? [];
+  const twinsList = state.simulation?.twins ?? [];
+  const adversarialPenalty = calculateAdversarialSignalPenalty({
+    criticalForgottenQuestions: fqList.filter(q => q?.severity === 'critical').length,
+    highForgottenQuestions: fqList.filter(q => q?.severity === 'high').length,
+    boardroomRejects: twinsList.filter(t => t?.vote === 'REJECT').length,
+    redTeamObjections: (state.preMortem?.redTeam ?? []).length,
+  });
+
   // Step 7 — compose overall + M10 static-baseline scores
   const overallScore = composeOverallScore({
     biasDeductions,
@@ -2370,6 +2399,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     logicPenalty,
     diversityPenalty,
     feedbackAdjustment,
+    adversarialPenalty,
   });
   const staticOverallScore = composeOverallScore({
     biasDeductions: staticBiasDeductions,
@@ -2378,10 +2408,11 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     logicPenalty,
     diversityPenalty,
     feedbackAdjustment,
+    adversarialPenalty,
   });
 
   log.info(
-    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) = ${overallScore} (static=${staticOverallScore}, Δ=${overallScore - staticOverallScore})`
+    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) - Adversarial(${adversarialPenalty.toFixed(1)}) = ${overallScore} (static=${staticOverallScore}, Δ=${overallScore - staticOverallScore})`
   );
 
   // Step 8 — calibration insight (M10 flywheel surface)

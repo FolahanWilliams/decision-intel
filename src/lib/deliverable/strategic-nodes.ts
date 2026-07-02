@@ -345,3 +345,35 @@ export function detectStrategicNodes(content: string): DetectedStrategicNode[] {
     .sort((a, b) => b.weight - a.weight || order.indexOf(a.class) - order.indexOf(b.class))
     .slice(0, MAX_NODES);
 }
+
+/**
+ * Format the detected structural conditions as a PROMPT CONTEXT block for
+ * the reasoning nodes (locked 2026-07-02, founder-approved pipeline
+ * change — co-work #4 done at the generation layer). The deterministic
+ * detectors (concentration / valuation-vs-fundamentals / key-person /
+ * governance / execution / information) point the strongest generative
+ * modules (forgottenQuestions, deepAnalysis red team, metaJudge) at
+ * exactly the company-enders, instead of leaving them display-only.
+ *
+ * Returns '' when nothing is detected — the prompts are byte-identical
+ * to before on documents with no structural conditions. The block asks
+ * the model to INTERROGATE the conditions (quantify the loss they imply,
+ * name what they conceal), never to assert outcomes — the same
+ * risk-indicator honesty as every other surface.
+ */
+export function buildStrategicConditionsPromptBlock(content: string): string {
+  const nodes = detectStrategicNodes(content);
+  if (nodes.length === 0) return '';
+  const lines = nodes.map(n => {
+    const cls = STRATEGIC_NODE_CLASS_LABEL[n.class];
+    return `- ${n.label} [${cls}${(n.weight ?? 1) >= 3 ? ' · EXISTENTIAL' : ''}]: ${n.amplifies}${
+      n.conceals ? ` What it conceals from the room: ${n.conceals}` : ''
+    }`;
+  });
+  return `
+
+=== DETECTED STRUCTURAL CONDITIONS (deterministic scan of this document — treat as ground truth) ===
+${lines.join('\n')}
+
+Interrogate these conditions DIRECTLY and give them priority over generic risks: quantify the maximum loss each implies from the document's own numbers, stress-test the assumption that makes each survivable, and surface what the deal's structure conceals from its reviewers. These are correlated risk indicators to pressure-test, never a prediction that the decision fails.`;
+}

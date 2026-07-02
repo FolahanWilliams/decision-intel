@@ -482,6 +482,56 @@ export async function countCalibrationSamples(
   }
 }
 
+// ─── Adversarial-signal penalty (pipeline composer, locked 2026-07-02) ─────
+
+export interface AdversarialSignalInput {
+  criticalForgottenQuestions: number;
+  highForgottenQuestions: number;
+  boardroomRejects: number;
+  redTeamObjections: number;
+}
+
+/** Per-signal weights + caps — conservative by design (see the fn JSDoc). */
+export const ADVERSARIAL_SIGNAL_CAPS = {
+  criticalFqWeight: 4,
+  criticalFqCap: 8,
+  highFqWeight: 1.5,
+  highFqCap: 6,
+  rejectWeight: 3,
+  rejectCap: 6,
+  redTeamWeight: 1,
+  redTeamCap: 4,
+  totalCap: 18,
+} as const;
+
+/**
+ * The adversarial modules — Forgotten Questions, the boardroom simulation,
+ * the red team — previously NEVER fed the overall score: a memo with six
+ * critical unanswered questions and a 0-approve boardroom scored identically
+ * to one with none (the blind-Fermi lesson: DQI 35 on a near-insolvency
+ * while the kill-shot sat in Forgotten Questions; co-work P0 #2, confirmed
+ * on two independent fact-checked runs).
+ *
+ * This penalty is deliberately CONSERVATIVE and CAPPED: per-signal caps
+ * bound any single module's influence, and the total cap (18) keeps the
+ * bias/noise/logic components primary. Some overlap with the bias lane is
+ * expected (an unanswered question often shadows a detected bias) — the
+ * caps are the double-counting bound. A clean memo (no critical/high FQs,
+ * no rejects, no red-team objections) gets EXACTLY 0: every prior
+ * clean-memo score is unchanged.
+ */
+export function calculateAdversarialSignalPenalty(input: AdversarialSignalInput): number {
+  const c = ADVERSARIAL_SIGNAL_CAPS;
+  const critical = Math.min(
+    c.criticalFqCap,
+    Math.max(0, input.criticalForgottenQuestions) * c.criticalFqWeight
+  );
+  const high = Math.min(c.highFqCap, Math.max(0, input.highForgottenQuestions) * c.highFqWeight);
+  const rejects = Math.min(c.rejectCap, Math.max(0, input.boardroomRejects) * c.rejectWeight);
+  const redTeam = Math.min(c.redTeamCap, Math.max(0, input.redTeamObjections) * c.redTeamWeight);
+  return Math.min(c.totalCap, critical + high + rejects + redTeam);
+}
+
 // ─── Score composition + calibration ───────────────────────────────────────
 
 export interface ScoreCompositionInput {
@@ -492,6 +542,11 @@ export interface ScoreCompositionInput {
   logicPenalty: number;
   diversityPenalty: number;
   feedbackAdjustment: number;
+  /** Adversarial-signal penalty (2026-07-02) — 0 when absent, so every
+   *  prior caller/test composes byte-identically. Pipeline-composer change,
+   *  same class as the 2026-06-30 recalibration: computeDQI's component
+   *  methodology is unchanged, so METHODOLOGY_VERSION stays 2.4.0. */
+  adversarialPenalty?: number;
 }
 
 /**
@@ -511,7 +566,8 @@ export function composeOverallScore(input: ScoreCompositionInput): number {
     input.trustPenalty -
     input.logicPenalty -
     input.diversityPenalty -
-    input.feedbackAdjustment;
+    input.feedbackAdjustment -
+    (input.adversarialPenalty ?? 0);
   return Math.max(0, Math.min(100, Math.round(raw)));
 }
 

@@ -66,6 +66,10 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-07-02)
 
+**Adversarial-signal penalty + structural-conditions prompt injection (founder-approved pipeline change; full prose in the CLAUDE.md lock).** The score now hears the adversarial modules (critical FQs + boardroom rejects + red team drag it, capped 18 — the blind-Fermi 35-that-deserved-single-digits fix; clean memos exactly 0, unchanged), and the deterministic company-ender detectors now feed the forgottenQuestions / red-team / metaJudge prompts directly ("interrogate these conditions, quantify the max loss"). 9 new tests, 1728/1728 green.
+
+- [ ] **FOUNDER VERIFY on the next runs:** (a) adversarial-heavy audits (Fermi/VS shape) should score materially lower — watch the scoring log's new `Adversarial(N)` term; (b) the forgotten questions should get MORE specific on filings (the detectors point them at concentration/valuation/key-person); (c) if live-deal audits feel over-penalized, `ADVERSARIAL_SIGNAL_CAPS` in risk-compiler.ts is the single tuning surface — bring co-work's grades back and we tune there.
+
 **DPR buyer brief (§1b/§1c) + gemini-2.5-pro retired (founder-directed; full prose in the CLAUDE.md lock).** The PDF leave-behind now answers the buyer's five questions up front, composed from the SAME pure deliverable composer as the website (no drift): §1b = verdict + DQI + blind badge + ~$X exposure w/ precedent + SCQA + structural risks existential-first + the critical unanswered questions; §1c = boardroom verdict + red team + top-5 fixes with DQI lift + Munger inversion + the honest close. Dynamic page numbering; clientSafe scrub; specimens keep the classic record. gemini-2.5-pro is out of every default path (legacy metaJudge fallback → Gemini 3 Flash).
 
 - [ ] **FOUNDER EYEBALL:** after the next audit, hit Export DPR and check §1b/§1c read buyer-first (no puppeteer in the sandbox — the print rendering needs your eyes once).
