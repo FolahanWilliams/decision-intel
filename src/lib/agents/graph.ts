@@ -85,6 +85,20 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x ?? false,
     default: () => false,
   }),
+  /**
+   * Degraded-node honesty ledger (locked 2026-07-02 — the Gemini-billing-
+   * outage lesson). When a LOAD-BEARING detector node errors and falls to
+   * its safe default (biasDetective → [], verification → error stub), the
+   * node appends its name here so the persisted audit record can
+   * DISTINGUISH "the detector ran and found nothing" from "the detector
+   * was unavailable". Downstream surfaces must never render a node ERROR
+   * as a clean pass — the exact plausible-defaults trap that let two
+   * blind runs ship 0 bias findings while every Gemini call 403'd.
+   */
+  degradedNodes: Annotation<string[]>({
+    reducer: (x, y) => [...(x ?? []), ...(y ?? [])],
+    default: () => [],
+  }),
   originalContent: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',

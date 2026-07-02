@@ -112,6 +112,25 @@ export interface ReasoningRiskFinding {
   referenceClass?: ReferenceClassEntry[];
 }
 
+/**
+ * A critical/high finding surfaced by an ADVERSARIAL module (forgotten
+ * questions, red team, boardroom) synthesized into the reasoning lane so
+ * the primary "what the audit found" surface can never read empty while
+ * a kill-shot sits one tab over (the blind-Fermi lesson, 2026-07-02: the
+ * anchor-tenant concentration CRITICAL lived in Forgotten Questions while
+ * the Reasoning tab headlined "0 critical reasoning risks surfaced").
+ */
+export interface SynthesizedCritical {
+  source: 'forgotten_question' | 'red_team' | 'boardroom';
+  severity: Severity;
+  /** The finding itself, in the source module's language. */
+  label: string;
+  /** Why it matters / the reasoning behind it (compact). */
+  detail: string;
+  /** Human label for where it surfaced ("Historical analogs" etc.). */
+  sourceLabel: string;
+}
+
 export interface ReasoningRisksBucket {
   /** LLM-generated or template fallback; ≤15 words, active sentence. */
   actionTitle: string;
@@ -129,6 +148,14 @@ export interface ReasoningRisksBucket {
    *  conditions that MULTIPLY the biases into the outcome (the Wiz move).
    *  Display-only; detected from the document text, no scoring impact. */
   strategicExposure?: import('./strategic-nodes').DetectedStrategicNode[];
+  /** Cross-module synthesis (2026-07-02): when the reasoning lane carries
+   *  ZERO bias-shaped findings but the adversarial modules surfaced
+   *  critical/high findings, those findings render HERE so the primary
+   *  surface never contradicts its siblings. */
+  synthesizedCriticals?: SynthesizedCritical[];
+  /** True when the bias-detector node ERRORED this run (provider outage)
+   *  and its empty result must not be read as a clean pass. */
+  biasDetectionDegraded?: boolean;
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -275,6 +302,15 @@ export interface SCQAExecutiveSummary {
    *  the precedent. The Taktile "here is what this audit is worth" statement.
    *  Null when no ticket-backed exposure exists (never fabricated). */
   quantifiedExposure?: import('./quantified-exposure').QuantifiedExposure | null;
+  /** True when the audit ran in Blind Retro Mode — live retrieval disabled,
+   *  every finding derived from the document alone. Renders the blind
+   *  badge on the cover. The honest claim is "live retrieval disabled",
+   *  never "the model could not have known" (2026-07-02 lock). */
+  blindAudit?: boolean;
+  /** Load-bearing detector nodes that ERRORED this run (from the pipeline's
+   *  degraded-node ledger). Non-empty → the cover renders an honesty strip
+   *  instead of letting the outage read as a clean result. */
+  degradedNodes?: string[];
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -333,6 +369,12 @@ export interface BuildDeliverableOptions {
     counterfactuals: string;
     provenance: string;
   }>;
+  /** True when the audit ran in Blind Retro Mode (read from the persisted
+   *  judgeOutputs.blindRetroMode). Drives the cover blind badge. */
+  blindAudit?: boolean;
+  /** The pipeline's degraded-node ledger (judgeOutputs.degradedNodes) —
+   *  which load-bearing detectors ERRORED this run. */
+  degradedNodes?: string[];
 }
 
 // ──────────────────────────────────────────────────────────────────────

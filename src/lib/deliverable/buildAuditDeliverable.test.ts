@@ -659,3 +659,148 @@ describe('valueAtStake math', () => {
     expect(formatTicketLabel(2_500_000_000, 'GBP')).toBe('£2.5B');
   });
 });
+
+// ──────────────────────────────────────────────────────────────────────
+// Cross-module critical synthesis + audit-posture surfaces (2026-07-02 —
+// the blind-Fermi lesson: the audit caught the kill-shot in Forgotten
+// Questions + red team + boardroom while the Reasoning tab headlined
+// "0 critical reasoning risks surfaced" and the cover said the memo
+// "cleared the audit" at grade F).
+// ──────────────────────────────────────────────────────────────────────
+
+describe('cross-module critical synthesis (blind-Fermi shape)', () => {
+  /** Zero bias-shaped findings, zero compound patterns — all severity
+   *  carried by the adversarial modules, exactly the blind Fermi run. */
+  function blindFermiShape(overrides: Partial<AnalysisResult> = {}): AnalysisResult {
+    return makeResult({
+      overallScore: 35,
+      biases: [],
+      compoundScoring: {
+        calibratedScore: 35,
+        compoundMultiplier: 1,
+        contextAdjustment: 0,
+        confidenceDecay: 0,
+        amplifyingInteractions: [],
+        adjustments: [],
+      },
+      forgottenQuestions: {
+        questions: [
+          {
+            question:
+              'If the first anchor tenant never signs a binding lease, what is the maximum standalone loss?',
+            whyItMatters: 'Tenant revenue was assumed to fund 100% of long lead-time items.',
+            biasGuarded: 'concentration',
+            severity: 'critical',
+            analogCompany: 'Lehman Brothers',
+          },
+          {
+            question: 'What reserves cover the take-or-pay gas minimums?',
+            whyItMatters: 'AIG wrote obligations without posting collateral.',
+            biasGuarded: 'overconfidence_bias',
+            severity: 'high',
+            analogCompany: 'American International Group',
+          },
+        ],
+        headline: 'Questions the analogs had to answer.',
+        analogsUsed: ['Lehman Brothers', 'American International Group'],
+      },
+      ...overrides,
+    } as Partial<AnalysisResult>);
+    // makeResult's base simulation carries 1 REJECT twin + 1 red-team
+    // objection — the adversarial signal this shape depends on.
+  }
+
+  it('reasoning headline never reads "0 critical reasoning risks" while adversarial criticals exist', () => {
+    const d = buildAuditDeliverable(blindFermiShape(), { documentId: 'd', analysisId: null });
+    expect(d.reasoningRisks.actionTitle).not.toContain('0 critical reasoning risks');
+    expect(d.reasoningRisks.actionTitle).toContain('synthesized from the adversarial modules');
+    expect(validateActionTitle(d.reasoningRisks.actionTitle).ok).toBe(true);
+  });
+
+  it('synthesizes the adversarial criticals INTO the reasoning bucket, critical-first, count matching the headline', () => {
+    const d = buildAuditDeliverable(blindFermiShape(), { documentId: 'd', analysisId: null });
+    const synth = d.reasoningRisks.synthesizedCriticals ?? [];
+    // 1 critical FQ + 1 high FQ + 1 red team + 1 boardroom REJECT = 4
+    expect(synth.length).toBe(4);
+    expect(synth[0].severity).toBe('critical');
+    expect(synth[0].source).toBe('forgotten_question');
+    expect(synth[0].label).toContain('anchor tenant');
+    // The headline count IS the list length — one number everywhere.
+    expect(d.reasoningRisks.actionTitle).toContain(`${synth.length} existential risks`);
+    expect(d.cover.actionTitle).toContain(`${synth.length} existential risks`);
+  });
+
+  it('cover reconciles: never "cleared the audit"; complication names the risks; answer demands revision', () => {
+    const d = buildAuditDeliverable(blindFermiShape(), { documentId: 'd', analysisId: null });
+    expect(d.cover.actionTitle).not.toContain('cleared the audit');
+    expect(d.cover.actionTitle).toContain('existential risks');
+    expect(d.cover.complication).toContain('existential risk');
+    expect(d.cover.complication).toContain('anchor tenant');
+    expect(d.cover.answer).toContain('Revise before committee');
+    expect(validateActionTitle(d.cover.actionTitle).ok).toBe(true);
+  });
+
+  it('a genuinely clean memo at a failing grade says "scored", never "cleared"; a passing grade keeps "cleared"', () => {
+    const clean = (score: number) =>
+      buildAuditDeliverable(
+        blindFermiShape({
+          overallScore: score,
+          simulation: { overallVerdict: 'APPROVED', twins: [] },
+          preMortem: { failureScenarios: [], preventiveMeasures: [], inversion: [], redTeam: [] },
+          forgottenQuestions: { questions: [], headline: '', analogsUsed: [] },
+        } as Partial<AnalysisResult>),
+        { documentId: 'd', analysisId: null }
+      );
+    const failing = clean(35);
+    expect(failing.cover.actionTitle).toContain('scored');
+    expect(failing.cover.actionTitle).not.toContain('cleared');
+    const passing = clean(90);
+    expect(passing.cover.actionTitle).toContain('cleared the audit');
+    // Truly clean → no synthesis panel, the clean state stands.
+    expect(failing.reasoningRisks.synthesizedCriticals).toBeUndefined();
+  });
+
+  it('biases-present audits are unaffected: the synthesis never attaches when findings exist', () => {
+    const d = buildAuditDeliverable(makeResult(), { documentId: 'd', analysisId: null });
+    expect(d.reasoningRisks.synthesizedCriticals).toBeUndefined();
+    expect(d.reasoningRisks.findings.length).toBeGreaterThan(0);
+  });
+});
+
+describe('audit posture on the cover (blind badge + degraded-node honesty)', () => {
+  it('blindAudit option surfaces on the cover; absent by default', () => {
+    const on = buildAuditDeliverable(makeResult(), {
+      documentId: 'd',
+      analysisId: null,
+      blindAudit: true,
+    });
+    expect(on.cover.blindAudit).toBe(true);
+    const off = buildAuditDeliverable(makeResult(), { documentId: 'd', analysisId: null });
+    expect(off.cover.blindAudit).toBeUndefined();
+  });
+
+  it('a degraded bias detector NEVER reads as a clean pass — headline + cover + bucket all say unavailable', () => {
+    const result = makeResult({
+      biases: [],
+      compoundScoring: {
+        calibratedScore: 35,
+        compoundMultiplier: 1,
+        contextAdjustment: 0,
+        confidenceDecay: 0,
+        amplifyingInteractions: [],
+        adjustments: [],
+      },
+    } as Partial<AnalysisResult>);
+    const d = buildAuditDeliverable(result, {
+      documentId: 'd',
+      analysisId: null,
+      degradedNodes: ['biasDetective'],
+    });
+    expect(d.reasoningRisks.biasDetectionDegraded).toBe(true);
+    expect(d.reasoningRisks.actionTitle).toContain('unavailable');
+    expect(d.reasoningRisks.actionTitle).not.toContain('0 critical reasoning risks');
+    expect(d.cover.actionTitle).toContain('unavailable');
+    expect(d.cover.degradedNodes).toEqual(['biasDetective']);
+    expect(validateActionTitle(d.cover.actionTitle).ok).toBe(true);
+  });
+});

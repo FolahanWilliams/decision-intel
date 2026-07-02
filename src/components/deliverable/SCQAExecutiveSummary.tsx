@@ -13,7 +13,7 @@
 
 'use client';
 
-import { ShieldCheck } from 'lucide-react';
+import { EyeOff, ShieldCheck, TriangleAlert } from 'lucide-react';
 import type { SCQAExecutiveSummary as SCQAType } from '@/lib/deliverable/types';
 import type { QuantifiedExposure } from '@/lib/deliverable/quantified-exposure';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
@@ -67,6 +67,18 @@ export function SCQAExecutiveSummary({
             prior circle-with-a-number per the 2026-05-20 visual rebuild. */}
         <DqiRadialGauge score={cover.dqi.score} size={180} />
       </div>
+
+      {/* Blind-audit badge (2026-07-02) — the credibility marker for retros.
+          The HONEST claim, verbatim from the lock: live retrieval was
+          disabled and every finding derives from this document alone —
+          never "the model could not have known". */}
+      {cover.blindAudit ? <BlindAuditBadge /> : null}
+
+      {/* Degraded-run honesty strip (2026-07-02) — a detector ERRORED this
+          run; the outage must never read as a clean result. */}
+      {cover.degradedNodes && cover.degradedNodes.length > 0 ? (
+        <DegradedRunStrip nodes={cover.degradedNodes} />
+      ) : null}
 
       {/* Actuarial top-line — what this audit is worth. The value statement
           that makes a buyer bite: ~$X exposure surfaced, the derivation, the
@@ -130,6 +142,70 @@ export function SCQAExecutiveSummary({
         </button>
       ) : null}
     </section>
+  );
+}
+
+/**
+ * The tiny blind-audit credibility card (2026-07-02, founder-requested).
+ * Sent alongside the deliverable, this is the evidence marker that the
+ * engine found what it found from the document alone. The wording is the
+ * locked honesty boundary verbatim: "live retrieval disabled", never
+ * "the model could not have known" (training memory can't be switched off).
+ */
+function BlindAuditBadge() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 10,
+        padding: '10px 14px',
+        borderRadius: 10,
+        border: '1px solid color-mix(in srgb, var(--info, #4F46E5) 30%, transparent)',
+        background: 'color-mix(in srgb, var(--info, #4F46E5) 6%, transparent)',
+      }}
+    >
+      <EyeOff size={15} style={{ color: 'var(--info, #4F46E5)', flexShrink: 0, marginTop: 1 }} />
+      <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-secondary, #475569)' }}>
+        <strong style={{ color: 'var(--info, #4F46E5)' }}>Blind audit.</strong> Live retrieval
+        (news, market data, web search, price feeds) was disabled for this run. Every finding
+        derives from this document&apos;s own language and pre-existing decision-science patterns —
+        no post-dated information was retrievable.
+      </div>
+    </div>
+  );
+}
+
+/** A load-bearing detector ERRORED this run — surface it on the cover so
+ *  the outage can never read as a clean result (2026-07-02). */
+function DegradedRunStrip({ nodes }: { nodes: string[] }) {
+  const NODE_LABEL: Record<string, string> = {
+    biasDetective: 'bias detection',
+    verification: 'claim verification',
+  };
+  const labels = nodes.map(n => NODE_LABEL[n] ?? n).join(' + ');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 10,
+        padding: '10px 14px',
+        borderRadius: 10,
+        border: '1px solid color-mix(in srgb, var(--warning, #d97706) 35%, transparent)',
+        background: 'color-mix(in srgb, var(--warning, #d97706) 7%, transparent)',
+      }}
+    >
+      <TriangleAlert
+        size={15}
+        style={{ color: 'var(--warning, #d97706)', flexShrink: 0, marginTop: 1 }}
+      />
+      <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-secondary, #475569)' }}>
+        <strong style={{ color: 'var(--warning, #d97706)' }}>Partial coverage:</strong> {labels}{' '}
+        was unavailable this run due to a model-provider error. Findings from the other modules are
+        unaffected. Re-run the audit for full coverage.
+      </div>
+    </div>
   );
 }
 

@@ -543,6 +543,19 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
       ]
     : EMPTY_STRESS_SLOTS;
 
+  /* ───── audit posture from the persisted record (2026-07-02) ─────
+     blindRetroMode → the cover blind badge; degradedNodes → the honesty
+     ledger of detector nodes that ERRORED this run (an outage must never
+     read as a clean pass). */
+  const analysisJudgeOutputs = (
+    analysis as unknown as {
+      judgeOutputs?: { blindRetroMode?: boolean; degradedNodes?: string[] } | null;
+    } | null
+  )?.judgeOutputs;
+  const degradedNodesList = Array.isArray(analysisJudgeOutputs?.degradedNodes)
+    ? analysisJudgeOutputs.degradedNodes
+    : [];
+
   /* ───── tab body ───── */
   const tabBody = (() => {
     switch (activeTab) {
@@ -558,6 +571,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
               activeBiasId={activeBiasId}
               onBiasClick={handleBiasClick}
               taxonomyIdByType={taxonomyIdByType}
+              biasDetectionDegraded={degradedNodesList.includes('biasDetective')}
             />
 
             {/* Reference-class match chip + R²F decomposition card —
@@ -809,13 +823,25 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
      AnalysisResult feeds both views (deliverable = composed MECE
      buckets + action titles; analyst = the legacy 5-tab structure).
      Per the 2026-05-20 universal-deliverable lock. */
-  const executiveDeliverable =
-    analysis && viewMode === 'executive'
-      ? buildAuditDeliverable(analysis as unknown as AnalysisResult, {
-          documentId: document.id,
-          analysisId: analysis.id,
-        })
-      : null;
+  const executiveDeliverable = (() => {
+    if (!analysis || viewMode !== 'executive') return null;
+    // The persisted analysis payload doesn't carry structuredContent, so
+    // the composer's document-text features (strategic attack path +
+    // ticket auto-extraction) silently never fired on this page — only on
+    // /demo where the fresh result is in memory (caught 2026-07-02 on the
+    // blind Fermi run: the fixture-verified concentration/valuation nodes
+    // detected nothing). Enrich with the document's own extracted text.
+    const analysisResult = analysis as unknown as AnalysisResult;
+    const enriched: AnalysisResult = analysisResult.structuredContent
+      ? analysisResult
+      : { ...analysisResult, structuredContent: document.content ?? '' };
+    return buildAuditDeliverable(enriched, {
+      documentId: document.id,
+      analysisId: analysis.id,
+      blindAudit: analysisJudgeOutputs?.blindRetroMode === true,
+      degradedNodes: degradedNodesList.length > 0 ? degradedNodesList : undefined,
+    });
+  })();
 
   const viewModeToggleEl = analysis ? (
     <ViewModeToggle value={viewMode} onChange={setViewMode} />

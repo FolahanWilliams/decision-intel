@@ -125,6 +125,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               outcomeStatus: true,
               recalibratedDqi: true,
               outcome: true,
+              // Audit-posture record (2026-07-02): carries blindRetroMode
+              // (the blind-badge signal) + degradedNodes (which detectors
+              // errored this run) + validityClassification. Summary-shaped
+              // JSON, small payload; the deliverable composer reads it.
+              judgeOutputs: true,
             },
           },
         },

@@ -100,10 +100,18 @@ interface CoverTemplateInput {
   exposureLabel?: string;
   /** Name of the top toxic combination, when a compound pattern led with exposure. */
   topPatternName?: string;
+  /** Critical/high findings surfaced by the ADVERSARIAL modules (forgotten
+   *  questions / red team / boardroom). The cover must reconcile with them —
+   *  never headline "cleared" while the room rejects (2026-07-02). */
+  crossModuleCriticals?: number;
+  /** The bias detector ERRORED this run — its empty result is an outage,
+   *  not a clean pass. */
+  biasDetectionDegraded?: boolean;
 }
 
 export function coverActionTitle(input: CoverTemplateInput): string {
   const { dqiScore, grade, totalRisks, criticalRisks, namedPatternCount, projectedLift } = input;
+  const crossModule = input.crossModuleCriticals ?? 0;
 
   // Strongest case: a named TOXIC COMBINATION fired AND carries exposure — the
   // differentiator. Lead with "[pattern] compounds into ~$X at risk": the
@@ -133,8 +141,21 @@ export function coverActionTitle(input: CoverTemplateInput): string {
     return `${totalRisks} reasoning risks shape this thesis at DQI ${Math.round(dqiScore)}, grade ${grade}`;
   }
 
-  // Clean memo
-  return `This memo cleared the audit at DQI ${Math.round(dqiScore)}, grade ${grade}; review the stress test`;
+  // Zero bias-shaped findings from here down. The cover must still
+  // reconcile with the strongest cross-module signal (2026-07-02 — the
+  // blind-Fermi lesson: "cleared the audit at grade F" while a CRITICAL
+  // forgotten question + 4 red-team objections sat one tab over).
+  if (input.biasDetectionDegraded) {
+    return `Bias detection unavailable this run; ${crossModule} adversarial findings still stand at DQI ${Math.round(dqiScore)}`;
+  }
+  if (crossModule > 0) {
+    return `${crossModule} existential risks surfaced beyond the bias lane at DQI ${Math.round(dqiScore)}`;
+  }
+  // Genuinely clean memo — "cleared" is only honest at a passing grade.
+  if (grade === 'A' || grade === 'B') {
+    return `This memo cleared the audit at DQI ${Math.round(dqiScore)}, grade ${grade}; review the stress test`;
+  }
+  return `No bias findings, but the memo scored DQI ${Math.round(dqiScore)}, grade ${grade}; review the stress test`;
 }
 
 // ──────────────────────────────────────────────────────────────────────
@@ -145,11 +166,17 @@ interface ReasoningRisksTemplateInput {
   counts: ReasoningRisksBucket['counts'];
   topBiasLabels: string[]; // up to 3 highest-severity bias display labels
   topPatternLabels: string[]; // up to 2 named pattern labels
+  /** Critical/high findings synthesized from the adversarial modules —
+   *  the headline must never read "0 critical" while these exist. */
+  crossModuleCriticals?: number;
+  /** The bias detector ERRORED this run (outage ≠ clean pass). */
+  biasDetectionDegraded?: boolean;
 }
 
 export function reasoningRisksActionTitle(input: ReasoningRisksTemplateInput): string {
   const { counts, topBiasLabels, topPatternLabels } = input;
   const total = counts.critical + counts.high + counts.medium + counts.low;
+  const crossModule = input.crossModuleCriticals ?? 0;
 
   // Compound patterns are the strongest signal — lead with them
   if (counts.namedPatterns > 0 && topPatternLabels.length > 0) {
@@ -174,7 +201,15 @@ export function reasoningRisksActionTitle(input: ReasoningRisksTemplateInput): s
     return `${total} biases (mostly ${sev}) shape the reasoning behind this memo`;
   }
 
-  // Clean
+  // Zero bias-shaped findings. NEVER say "0 critical reasoning risks"
+  // while the adversarial modules carry criticals, or while the detector
+  // ERRORED (2026-07-02 — the blind-Fermi internal contradiction).
+  if (input.biasDetectionDegraded) {
+    return `Bias detection unavailable for this run; review the ${crossModule} adversarial findings below`;
+  }
+  if (crossModule > 0) {
+    return `0 bias-shaped findings; ${crossModule} existential risks synthesized from the adversarial modules below`;
+  }
   return '0 critical reasoning risks surfaced; secondary signals available in the drill-down';
 }
 
@@ -400,6 +435,14 @@ interface SCQATemplateInput {
   criticalRisks: number;
   topConcern?: string;
   topMitigation?: string;
+  /** Critical/high findings from the adversarial modules (forgotten
+   *  questions / red team / boardroom) — the complication must name them
+   *  when the bias lane is quiet (2026-07-02). */
+  crossModuleCriticals?: number;
+  /** The single strongest cross-module concern (compact). */
+  topCrossModuleConcern?: string;
+  /** The bias detector ERRORED this run. */
+  biasDetectionDegraded?: boolean;
 }
 
 export function scqaSituation(): string {
@@ -407,11 +450,25 @@ export function scqaSituation(): string {
 }
 
 export function scqaComplication(input: SCQATemplateInput): string {
+  const crossModule = input.crossModuleCriticals ?? 0;
   if (input.criticalRisks > 0 && input.topConcern) {
     return `${input.criticalRisks} critical reasoning risk${input.criticalRisks === 1 ? '' : 's'} surfaced, led by ${shortLabel(input.topConcern, 4)}.`;
   }
   if (input.totalRisks > 0) {
-    return `${input.totalRisks} reasoning risk${input.totalRisks === 1 ? '' : 's'} surfaced; none at critical severity.`;
+    const tail =
+      crossModule > 0
+        ? ` ${crossModule} critical finding${crossModule === 1 ? '' : 's'} stand in the adversarial modules.`
+        : '';
+    return `${input.totalRisks} reasoning risk${input.totalRisks === 1 ? '' : 's'} surfaced; none at critical severity.${tail}`;
+  }
+  if (input.biasDetectionDegraded) {
+    return `Bias detection was unavailable for this run (provider error); the adversarial findings below are unaffected and still stand.`;
+  }
+  if (crossModule > 0) {
+    const led = input.topCrossModuleConcern
+      ? `, led by ${shortLabel(input.topCrossModuleConcern, 8)}`
+      : '';
+    return `No bias-shaped findings, but ${crossModule} existential risk${crossModule === 1 ? '' : 's'} surfaced in the stress test and historical analogs${led}.`;
   }
   return 'No critical reasoning risks surfaced, but stress-test objections remain to be reviewed.';
 }
@@ -431,6 +488,11 @@ export function scqaAnswer(input: SCQATemplateInput): string {
   }
   if (input.criticalRisks > 0) {
     return 'Revise before committee — close the critical-severity findings first.';
+  }
+  // Cross-module criticals demand revision even when the bias lane is
+  // quiet — a CRITICAL unanswered question is a reasoning gap (2026-07-02).
+  if ((input.crossModuleCriticals ?? 0) > 0) {
+    return 'Revise before committee — answer the critical unanswered questions first.';
   }
   if (input.totalRisks > 0) {
     return 'Advance with documented mitigations for the surfaced risks.';

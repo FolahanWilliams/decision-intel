@@ -95,6 +95,10 @@ export interface FindingsTabProps {
   onBiasClick?: (bias: BiasInstance) => void;
   /** Map of taxonomyId per biasType (e.g. confirmation_bias -> DI-B-001). */
   taxonomyIdByType?: Record<string, string>;
+  /** True when the bias-detector node ERRORED this run (judgeOutputs.
+   *  degradedNodes) — the zero-bias state is an outage, not a verified
+   *  clean pass, and the reassurance panel must not render (2026-07-02). */
+  biasDetectionDegraded?: boolean;
 }
 
 export function FindingsTab(props: FindingsTabProps) {
@@ -108,6 +112,7 @@ export function FindingsTab(props: FindingsTabProps) {
     activeBiasId,
     onBiasClick,
     taxonomyIdByType,
+    biasDetectionDegraded = false,
   } = props;
 
   const sorted = useMemo(
@@ -141,8 +146,29 @@ export function FindingsTab(props: FindingsTabProps) {
     <div style={{ display: 'grid', gap: 18 }}>
       {/* Clean-audit reassurance — leads the tab when zero biases surfaced
           so the user reads "verified clean" before they read four zeros.
-          Copy SSOT: clean-audit-copy.ts. */}
-      {biases.length === 0 && <CleanAuditPanel />}
+          Copy SSOT: clean-audit-copy.ts. NEVER renders when the detector
+          ERRORED (2026-07-02) — an outage is not a verified clean pass. */}
+      {biases.length === 0 && !biasDetectionDegraded && <CleanAuditPanel />}
+      {biases.length === 0 && biasDetectionDegraded && (
+        <div
+          style={{
+            padding: '14px 16px',
+            borderRadius: 10,
+            border: '1px solid color-mix(in srgb, var(--warning, #d97706) 35%, transparent)',
+            background: 'color-mix(in srgb, var(--warning, #d97706) 8%, transparent)',
+            fontSize: 13,
+            lineHeight: 1.55,
+            color: 'var(--text-secondary, #475569)',
+          }}
+        >
+          <strong style={{ color: 'var(--warning, #d97706)' }}>
+            Bias detection was unavailable for this run
+          </strong>{' '}
+          due to a model-provider error, so the zero count below reflects an outage, not a verified
+          clean pass. The other audit modules ran on independent providers and are unaffected.
+          Re-run the audit for full coverage.
+        </div>
+      )}
 
       {/* Bias frequency strip */}
       <BiasFrequencyStrip counts={counts} total={biases.length} />

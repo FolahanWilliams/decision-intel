@@ -842,6 +842,16 @@ export async function POST(request: NextRequest) {
                     // Records the RESOLVED per-audit value (UI toggle wins
                     // over the PIPELINE_BLIND_MODE env fallback).
                     blindRetroMode: blindMode,
+                    // Degraded-node honesty ledger (2026-07-02): which load-
+                    // bearing detector nodes ERRORED and fell to their safe
+                    // default this run. Empty array = every detector ran.
+                    // Downstream surfaces read this to distinguish "found
+                    // nothing" from "was unavailable" — the Gemini-billing-
+                    // outage lesson (two blind runs shipped 0 bias findings
+                    // while every Gemini call 403'd; the audit read clean).
+                    degradedNodes: Array.isArray(result?.degradedNodes)
+                      ? (result.degradedNodes as string[])
+                      : [],
                     // Weights resolution snapshot (locked 2026-05-11 per
                     // Tier 2.1 + P2 ship). Persists the weight vector +
                     // hash + source + methodology version that produced

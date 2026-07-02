@@ -921,7 +921,13 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     return { biasAnalysis: biases, marketContext: marketContextDetection };
   } catch (e) {
     log.error('Bias Detective failed:', e instanceof Error ? e.message : String(e));
-    return { biasAnalysis: [] };
+    // Degraded-node honesty (2026-07-02): an errored detector must be
+    // DISTINGUISHABLE from a genuinely clean pass. Two blind runs shipped
+    // "0 bias findings" while every Gemini call 403'd on billing — the
+    // empty default read as clean. The ledger entry lets every surface
+    // (deliverable headline, cover SCQA, clean-audit panel) say
+    // "detection unavailable" instead of "nothing found".
+    return { biasAnalysis: [], degradedNodes: ['biasDetective'] };
   }
 }
 
@@ -1518,6 +1524,8 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
         regulations: [],
         searchQueries: [],
       },
+      // Degraded-node honesty ledger (2026-07-02) — see biasDetective catch.
+      degradedNodes: ['verification'],
     };
   }
 }
@@ -2418,14 +2426,12 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
                   company: state.intelligenceContext.marketSnapshot.company,
                   summary: state.intelligenceContext.marketSnapshot.summary,
                   asOf: state.intelligenceContext.marketSnapshot.asOf,
-                  signals: state.intelligenceContext.marketSnapshot.signals
-                    .slice(0, 6)
-                    .map(s => ({
-                      headline: s.headline,
-                      detail: s.detail,
-                      source: s.source,
-                      date: s.date,
-                    })),
+                  signals: state.intelligenceContext.marketSnapshot.signals.slice(0, 6).map(s => ({
+                    headline: s.headline,
+                    detail: s.detail,
+                    source: s.source,
+                    date: s.date,
+                  })),
                 }
               : undefined,
           }

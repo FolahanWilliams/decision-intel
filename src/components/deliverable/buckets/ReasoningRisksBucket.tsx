@@ -39,10 +39,41 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
   const [active, setActive] = useState<ReasoningRiskFinding | null>(null);
 
   if (bucket.findings.length === 0) {
+    // 2026-07-02 (the blind-Fermi lesson): an empty bias lane must never
+    // read as a clean audit while (a) the detector ERRORED, (b) the
+    // structural attack path fired, or (c) the adversarial modules carry
+    // severe findings. Render, in order: the degraded-run notice, the
+    // structural attack path, the synthesized cross-module criticals —
+    // and only fall to the clean state when ALL of those are absent.
+    const synthesized = bucket.synthesizedCriticals ?? [];
+    const emptyHasStructural = !!(bucket.strategicExposure && bucket.strategicExposure.length > 0);
     return (
       <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <ActionTitle eyebrow="What the audit found">{bucket.actionTitle}</ActionTitle>
-        <CleanState />
+        {bucket.biasDetectionDegraded && <DegradedDetectorNotice />}
+        {emptyHasStructural && <StrategicAttackPath nodes={bucket.strategicExposure!} />}
+        {synthesized.length > 0 ? (
+          <>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: 'var(--text-muted, #64748B)',
+              }}
+            >
+              Existential risks · synthesized from the adversarial modules
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {synthesized.map((item, i) => (
+                <SynthesizedCriticalCard key={`synth-${i}`} item={item} />
+              ))}
+            </div>
+          </>
+        ) : (
+          !bucket.biasDetectionDegraded && !emptyHasStructural && <CleanState />
+        )}
       </section>
     );
   }
@@ -276,6 +307,100 @@ function CleanState() {
     >
       No critical reasoning risks surfaced. Review the stress-test and historical-analog buckets for
       adjacent friction worth addressing before the room sees this memo.
+    </div>
+  );
+}
+
+/** The detector ERRORED this run — an outage must never read as a clean
+ *  pass (2026-07-02, the Gemini-billing-outage lesson). */
+function DegradedDetectorNotice() {
+  return (
+    <div
+      style={{
+        padding: '14px 16px',
+        borderRadius: 10,
+        border: '1px solid color-mix(in srgb, var(--warning, #d97706) 35%, transparent)',
+        background: 'color-mix(in srgb, var(--warning, #d97706) 8%, transparent)',
+        fontSize: 13,
+        lineHeight: 1.55,
+        color: 'var(--text-secondary, #475569)',
+      }}
+    >
+      <strong style={{ color: 'var(--warning, #d97706)' }}>
+        Bias detection was unavailable for this run
+      </strong>{' '}
+      due to a model-provider error — its empty result is an outage, not a clean pass. The
+      adversarial findings below ran on independent providers and still stand. Re-run the audit for
+      full coverage.
+    </div>
+  );
+}
+
+/** A severe finding from an adversarial module, rendered in the reasoning
+ *  lane so the primary surface never contradicts its siblings. */
+function SynthesizedCriticalCard({
+  item,
+}: {
+  item: NonNullable<ReasoningRisksBucketType['synthesizedCriticals']>[number];
+}) {
+  const color = severityColor(item.severity);
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: `4px solid ${color}`,
+        background: 'var(--bg-card, #FFFFFF)',
+        padding: '14px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 6,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color,
+          }}
+        >
+          {item.severity}
+        </span>
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            color: 'var(--text-muted, #64748B)',
+          }}
+        >
+          Surfaced in: {item.sourceLabel}
+        </span>
+      </div>
+      <div
+        style={{
+          fontSize: 13.5,
+          fontWeight: 600,
+          color: 'var(--text-primary, #0F172A)',
+          lineHeight: 1.5,
+        }}
+      >
+        {item.label}
+      </div>
+      {item.detail ? (
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12.5,
+            color: 'var(--text-secondary, #475569)',
+            lineHeight: 1.55,
+          }}
+        >
+          {item.detail}
+        </p>
+      ) : null}
     </div>
   );
 }

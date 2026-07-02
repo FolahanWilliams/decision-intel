@@ -38,6 +38,10 @@ export interface AuditState {
   dealStage?: string;
   /** Blind retro mode — live retrieval disabled pipeline-wide (2026-07-02). */
   blindMode?: boolean;
+  /** Load-bearing nodes that ERRORED and fell to their safe default this
+   *  run (e.g. 'biasDetective', 'verification'). Persisted so downstream
+   *  surfaces never render a node outage as a clean pass (2026-07-02). */
+  degradedNodes?: string[];
   originalContent: string;
 
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing

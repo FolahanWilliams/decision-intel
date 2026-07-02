@@ -62,10 +62,84 @@ import type {
   Severity,
   StressTestBucket,
   StressTestObjection,
+  SynthesizedCritical,
   ValueSuppressingChip,
 } from './types';
 
 const SEVERITY_ORDER: Record<Severity, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+
+// ──────────────────────────────────────────────────────────────────────
+// Cross-module critical synthesis (2026-07-02 — the blind-Fermi lesson)
+//
+// The audit caught the kill-shot (anchor-tenant concentration, CRITICAL)
+// in Forgotten Questions + 4 red-team objections + a boardroom REJECT —
+// while the Reasoning tab headlined "0 critical reasoning risks
+// surfaced" and the cover said the memo "cleared the audit". The
+// primary surface must NEVER contradict its sibling modules: when the
+// bias lane is quiet, the severe adversarial findings are synthesized
+// into it, and the cover reconciles with the strongest signal anywhere.
+// ──────────────────────────────────────────────────────────────────────
+
+interface CrossModuleSignals {
+  /** The severe adversarial findings (critical/high FQs + red-team
+   *  objections + boardroom REJECT votes), sorted critical-first,
+   *  capped at 8. The headline count IS this list's length — one
+   *  number everywhere, no count drift. */
+  synthesized: SynthesizedCritical[];
+  /** Compact label of the single strongest finding. */
+  topConcern?: string;
+}
+
+function computeCrossModuleSignals(result: AnalysisResult): CrossModuleSignals {
+  const items: SynthesizedCritical[] = [];
+
+  const fqs = result.forgottenQuestions?.questions ?? [];
+  for (const q of fqs) {
+    const sev = (q.severity as Severity) ?? 'medium';
+    if ((sev === 'critical' || sev === 'high') && q.question) {
+      items.push({
+        source: 'forgotten_question',
+        severity: sev,
+        label: q.question,
+        detail: q.whyItMatters ?? '',
+        sourceLabel: 'Historical analogs',
+      });
+    }
+  }
+
+  const redTeam = result.preMortem?.redTeam ?? [];
+  for (const r of redTeam) {
+    if (!r.objection) continue;
+    items.push({
+      source: 'red_team',
+      severity: 'high',
+      label: r.objection,
+      detail: r.reasoning ?? r.targetClaim ?? '',
+      sourceLabel: 'Stress test · red team',
+    });
+  }
+
+  const twins = result.simulation?.twins ?? [];
+  for (const t of twins) {
+    if (t.vote !== 'REJECT') continue;
+    items.push({
+      source: 'boardroom',
+      severity: 'high',
+      label: `${t.name ?? 'Reviewer'} (${t.role ?? 'boardroom'}) votes REJECT`,
+      detail: t.keyRiskIdentified ?? t.rationale ?? '',
+      sourceLabel: 'Stress test · boardroom',
+    });
+  }
+
+  const synthesized = items
+    .sort((a, b) => SEVERITY_ORDER[b.severity] - SEVERITY_ORDER[a.severity])
+    .slice(0, 8);
+
+  return {
+    synthesized,
+    topConcern: synthesized[0] ? truncate(synthesized[0].label, 90) : undefined,
+  };
+}
 
 function confidenceBand(pct: number | null): ConfidenceBand {
   if (pct === null || !Number.isFinite(pct)) return 'Unknown';
@@ -110,10 +184,12 @@ function extractNamedPatterns(result: AnalysisResult): NamedPatternRaw[] {
 
 function bucketReasoningRisks(
   result: AnalysisResult,
-  options: BuildDeliverableOptions
+  options: BuildDeliverableOptions,
+  crossModule: CrossModuleSignals
 ): ReasoningRisksBucket {
   const biases = (result.biases ?? []).filter(b => b.found !== false);
   const patterns = extractNamedPatterns(result);
+  const biasDetectionDegraded = options.degradedNodes?.includes('biasDetective') === true;
 
   const biasFindings: ReasoningRiskFinding[] = sortBySeverity(biases).map(
     (b: BiasDetectionResult) => {
@@ -198,18 +274,35 @@ function bucketReasoningRisks(
 
   const actionTitle =
     options.actionTitles?.reasoningRisks ??
-    reasoningRisksActionTitle({ counts, topBiasLabels, topPatternLabels });
+    reasoningRisksActionTitle({
+      counts,
+      topBiasLabels,
+      topPatternLabels,
+      crossModuleCriticals: crossModule.synthesized.length,
+      biasDetectionDegraded,
+    });
 
   // The cross-class attack path — the structural / execution / information
   // conditions in the document that multiply the biases into the outcome.
   // Pure text detection, no LLM, no scoring impact.
   const strategicExposure = detectStrategicNodes(result.structuredContent ?? '');
 
+  // Cross-module synthesis (2026-07-02): when the bias lane is empty but
+  // the adversarial modules carry severe findings, they render IN this
+  // bucket — the primary surface must never read empty while the
+  // kill-shot sits one tab over.
+  const synthesizedCriticals =
+    findings.length === 0 && crossModule.synthesized.length > 0
+      ? crossModule.synthesized
+      : undefined;
+
   return {
     actionTitle,
     findings,
     counts,
     ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
+    ...(synthesizedCriticals ? { synthesizedCriticals } : {}),
+    ...(biasDetectionDegraded ? { biasDetectionDegraded } : {}),
   };
 }
 
@@ -485,7 +578,8 @@ function composeCover(
   result: AnalysisResult,
   reasoningRisks: ReasoningRisksBucket,
   counterfactuals: CounterfactualsBucket,
-  options: BuildDeliverableOptions
+  options: BuildDeliverableOptions,
+  crossModule: CrossModuleSignals
 ): SCQAExecutiveSummary {
   const totalRisks =
     reasoningRisks.counts.critical +
@@ -496,6 +590,8 @@ function composeCover(
   const namedPatternCount = reasoningRisks.counts.namedPatterns;
   const projectedLift = Math.max(0, counterfactuals.bestCaseDqi - counterfactuals.currentDqi);
   const grade = gradeFromScore(result.overallScore);
+  const crossModuleCriticals = crossModule.synthesized.length;
+  const biasDetectionDegraded = options.degradedNodes?.includes('biasDetective') === true;
 
   // Top concern: highest-severity finding (bias or pattern)
   const topFinding = reasoningRisks.findings[0];
@@ -524,6 +620,8 @@ function composeCover(
       projectedLift,
       exposureLabel,
       topPatternName,
+      crossModuleCriticals,
+      biasDetectionDegraded,
     });
 
   // The actuarial top-line — consolidate the per-finding value-at-stake into
@@ -542,6 +640,9 @@ function composeCover(
       criticalRisks,
       topConcern: topFinding?.label,
       topMitigation,
+      crossModuleCriticals,
+      topCrossModuleConcern: crossModule.topConcern,
+      biasDetectionDegraded,
     }),
     question: scqaQuestion(),
     answer: scqaAnswer({
@@ -551,11 +652,16 @@ function composeCover(
       criticalRisks,
       topConcern: topFinding?.label,
       topMitigation,
+      crossModuleCriticals,
     }),
     dqi: {
       score: result.overallScore,
       grade,
     },
+    ...(options.blindAudit ? { blindAudit: true } : {}),
+    ...(options.degradedNodes && options.degradedNodes.length > 0
+      ? { degradedNodes: options.degradedNodes }
+      : {}),
   };
 }
 
@@ -588,12 +694,16 @@ export function buildAuditDeliverable(
     }
   }
 
-  const reasoningRisks = bucketReasoningRisks(result, effectiveOptions);
+  // Cross-module signals computed ONCE — the reasoning bucket and the
+  // cover both reconcile against the same list (one number everywhere).
+  const crossModule = computeCrossModuleSignals(result);
+
+  const reasoningRisks = bucketReasoningRisks(result, effectiveOptions, crossModule);
   const stressTest = bucketStressTest(result, effectiveOptions);
   const historicalAnalogs = bucketHistoricalAnalogs(result, effectiveOptions);
   const counterfactuals = bucketCounterfactuals(result, effectiveOptions);
   const provenance = bucketProvenance(result, effectiveOptions);
-  const cover = composeCover(result, reasoningRisks, counterfactuals, effectiveOptions);
+  const cover = composeCover(result, reasoningRisks, counterfactuals, effectiveOptions, crossModule);
 
   const id = effectiveOptions.analysisId ?? effectiveOptions.documentId;
 
