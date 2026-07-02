@@ -156,3 +156,47 @@ describe('buildStrategicConditionsPromptBlock', () => {
     expect(block).toContain('never a prediction that the decision fails');
   });
 });
+
+// ─── Evidence-snippet word-boundary snapping (2026-07-02 — the DPR "pment-stage
+//     company…" mid-word fragment fix) ─────────────────────────────────────
+
+import { evidenceSnippet } from './strategic-nodes';
+
+describe('evidenceSnippet — word-boundary snapping (no mid-word fragments)', () => {
+  it('never emits a mid-word fragment; every token is a whole word from the source', () => {
+    const filler = 'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod ';
+    const text = `${filler}this development-stage company has never generated revenue and may never be profitable at scale`;
+    const idx = text.indexOf('development-stage');
+    const snip = evidenceSnippet(text, idx, 'development-stage'.length);
+    // The matched phrase survives intact.
+    expect(snip).toContain('development-stage');
+    // Strip the excerpt ellipses, then every remaining token must appear as a
+    // WHOLE word in the source — a mid-word fragment ("evelopment") fails this.
+    const core = snip.replace(/^…/, '').replace(/…$/, '').trim();
+    for (const token of core.split(' ')) {
+      const clean = token.replace(/[^\w-]/g, '');
+      if (!clean) continue;
+      const escaped = clean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      expect(new RegExp(`\\b${escaped}\\b`).test(text)).toBe(true);
+    }
+  });
+
+  it('marks a mid-stream excerpt with leading + trailing ellipses', () => {
+    const text =
+      'aaaa bbbb cccc dddd eeee ffff the diligence window was less than six weeks gggg hhhh iiii jjjj';
+    const idx = text.indexOf('diligence window');
+    const snip = evidenceSnippet(text, idx, 'diligence window'.length);
+    expect(snip.startsWith('…')).toBe(true);
+    expect(snip.endsWith('…')).toBe(true);
+    expect(snip).toContain('diligence window');
+  });
+
+  it('no leading ellipsis when the snippet starts at the document head', () => {
+    const snip = evidenceSnippet(
+      'depend on a single anchor tenant for all capacity',
+      0,
+      'depend'.length
+    );
+    expect(snip.startsWith('…')).toBe(false);
+  });
+});

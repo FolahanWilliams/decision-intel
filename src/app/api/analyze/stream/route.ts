@@ -22,6 +22,7 @@ import { checkVohraEligibility, createPendingSurvey } from '@/lib/learning/vohra
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import { getDocumentContent } from '@/lib/utils/encryption';
 import { classifyValidity } from '@/lib/learning/validity-classifier';
+import { buildRuntimeModelLineage } from '@/lib/agents/nodes';
 import { resolveActiveWeightsForUser } from '@/lib/scoring/weight-overrides';
 import { hashWeights } from '@/lib/scoring/dqi';
 import {
@@ -852,6 +853,15 @@ export async function POST(request: NextRequest) {
                     degradedNodes: Array.isArray(result?.degradedNodes)
                       ? (result.degradedNodes as string[])
                       : [],
+                    // Model lineage actually in force this run (2026-07-02):
+                    // the REAL per-node models — Opus 4.8 / Sonnet 5 on the
+                    // reasoning nodes when frontier is on, gateway-mapped
+                    // Gemini otherwise — reconstructed via the pipeline's own
+                    // resolvers so it can't drift from what ran. The DPR
+                    // reproducibility page reads THIS instead of a hardcoded
+                    // all-Gemini constant, so it declares the truth (co-work
+                    // flagged the constant reading Gemini regardless of run).
+                    modelLineage: buildRuntimeModelLineage(),
                     // Weights resolution snapshot (locked 2026-05-11 per
                     // Tier 2.1 + P2 ship). Persists the weight vector +
                     // hash + source + methodology version that produced

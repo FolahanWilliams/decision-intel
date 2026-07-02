@@ -58,4 +58,30 @@ describe('extractTicketFromContent', () => {
     );
     expect(t!.amount).toBe(4_000_000_000);
   });
+
+  // Regression for the Fermi "$5200.0B on a $20B company" bug: a multi-trillion
+  // TAM / market-size figure is NOT a decision and must never become the ticket.
+  it('disqualifies a trillion-scale market/TAM figure (the $5200B bug)', () => {
+    const t = extractTicketFromContent(
+      'We plan to invest heavily to capture the $5.2 trillion global AI data-center market opportunity.'
+    );
+    expect(t?.amount ?? 0).not.toBe(5_200_000_000_000);
+    expect(t?.amount ?? 0).toBeLessThan(1_000_000_000_000);
+  });
+
+  it('picks the real commitment over a giant TAM in the same passage', () => {
+    const t = extractTicketFromContent(
+      'The company will invest $5 billion in new reactors to serve the $5.2 trillion global energy market.'
+    );
+    expect(t!.tier).toBe('commitment');
+    expect(t!.amount).toBe(5_000_000_000); // the $5B raise, not the $5.2T market
+  });
+
+  it('disqualifies a bare TAM figure with no decision context', () => {
+    expect(
+      extractTicketFromContent(
+        'The total addressable market is estimated at $1.5 trillion by 2030.'
+      )
+    ).toBeNull();
+  });
 });

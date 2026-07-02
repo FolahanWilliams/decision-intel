@@ -94,6 +94,14 @@ export interface ReferenceClassForecast {
 const INCLUSION_THRESHOLD = 0.18;
 const TOP_N = 5;
 
+/** Below this similarity, a named analog is too weak to SHOW on a
+ *  procurement-grade record — an opioid-fraud case matched at 22% to a
+ *  nuclear-IPO filing reads as broken pattern-matching. The matched-class
+ *  STATS (size, failure rate) still use the full ≥0.18 class; this floor only
+ *  governs whether we NAME the single top analog. Consumers render the
+ *  cold-start line instead when the best analog is below it. */
+export const MIN_DISPLAY_ANALOG_SIMILARITY = 0.4;
+
 /** Canonical industry tokens used by the case library. Case studies use
  *  string literals from the `Industry` union; this map collapses common
  *  document-industry strings (free-text from the structurer) onto the

@@ -34,7 +34,11 @@ import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embedd
 import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
-import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '../ai/gateway-gemini';
+import {
+  isGatewayGeminiEnabled,
+  gatewayGeminiModelShim,
+  mapGeminiToGateway,
+} from '../ai/gateway-gemini';
 import { buildStrategicConditionsPromptBlock } from '../deliverable/strategic-nodes';
 import { MODEL_FRONTIER_REASONING, MODEL_STRONG_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
@@ -516,6 +520,75 @@ function resolveFrontierModel(key: FrontierNodeKey): string | null {
     return null;
   }
   return resolved;
+}
+
+/**
+ * Build the ACTUAL per-node model lineage for THIS run's environment — the
+ * honest answer to "which models produced this audit?". It reuses the exact
+ * resolvers the pipeline itself uses (`resolveFrontierModel` + the gateway
+ * mapping + `getNoiseJuryModels`), so it cannot drift from what actually ran:
+ * the frontier reasoning nodes report Opus 4.8 / Sonnet 5 when frontier is on,
+ * and fall back to gateway-mapped Gemini exactly as the nodes do (frontier off,
+ * no gateway key, or a per-node PIPELINE_MODEL_* override). Persisted into
+ * judgeOutputs so the DPR reproducibility page declares the truth instead of a
+ * hardcoded all-Gemini constant. Pure — reads env only, no I/O.
+ */
+export function buildRuntimeModelLineage(): Record<
+  string,
+  { model: string; temperature: number; topP: number }
+> {
+  const gw = isGatewayGeminiEnabled();
+  // Map a native Gemini name to its gateway id when the gateway is on; pass a
+  // frontier / already-gateway id through untouched.
+  const m = (name: string): string =>
+    gw && !name.includes('/') && name.startsWith('gemini') ? mapGeminiToGateway(name) : name;
+  // A frontier node's real model, or its legacy grounded-Gemini fallback.
+  const frontierOr = (key: FrontierNodeKey, legacy: string): string =>
+    resolveFrontierModel(key) ?? m(legacy);
+  // The noise jury runs across model families (Flash + Opus + Sonnet by
+  // default); report the set so the page can't claim a single Gemini judge.
+  const jury = getNoiseJuryModels()
+    .map(x => m(x))
+    .join(' + ');
+  return {
+    gdprAnonymizer: { model: m('gemini-3.1-flash-lite'), temperature: 0.0, topP: 0.95 },
+    dataStructurer: { model: m('gemini-3.1-flash-lite'), temperature: 0.0, topP: 0.95 },
+    intelligenceGatherer: { model: m('gemini-3.1-flash-lite'), temperature: 0.2, topP: 0.95 },
+    biasDetective: {
+      model: frontierOr('biasDetective', 'gemini-3-flash-preview'),
+      temperature: 0.2,
+      topP: 0.95,
+    },
+    noiseJudge: { model: jury, temperature: 0.4, topP: 0.95 },
+    statisticalJury: { model: m('gemini-3-flash-preview'), temperature: 0.3, topP: 0.95 },
+    verification: { model: m('gemini-3-flash-preview'), temperature: 0.1, topP: 0.95 },
+    deepAnalysis: {
+      model: frontierOr('deepAnalysis', 'gemini-3-flash-preview'),
+      temperature: 0.3,
+      topP: 0.95,
+    },
+    simulation: {
+      model: frontierOr('simulation', 'gemini-3-flash-preview'),
+      temperature: 0.5,
+      topP: 0.95,
+    },
+    rpdRecognition: {
+      model: frontierOr('rpdRecognition', 'gemini-3-flash-preview'),
+      temperature: 0.25,
+      topP: 0.95,
+    },
+    forgottenQuestions: {
+      model: frontierOr('forgottenQuestions', 'gemini-3-flash-preview'),
+      temperature: 0.35,
+      topP: 0.95,
+    },
+    metaJudge: {
+      model: frontierOr('metaJudge', 'gemini-3-flash-preview'),
+      temperature: 0.15,
+      topP: 0.95,
+    },
+    riskScorer: { model: 'deterministic', temperature: 0.0, topP: 1.0 },
+  };
 }
 
 // ============================================================

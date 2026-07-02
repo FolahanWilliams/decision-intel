@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.hoisted(() => {
   process.env.GOOGLE_API_KEY = 'test-key';
 });
 
-import { riskScorerNode, deepAnalysisNode } from './nodes';
+import { riskScorerNode, deepAnalysisNode, buildRuntimeModelLineage } from './nodes';
 import { AuditState } from './types';
 
 // Hoist mocks
@@ -210,5 +210,72 @@ describe('deepAnalysisNode', () => {
     expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
     expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
     expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+});
+
+// The honest model-lineage fix (2026-07-02): the DPR reproducibility page must
+// show the REAL per-node models (Opus 4.8 / Sonnet 5 on the reasoning nodes),
+// not a hardcoded all-Gemini constant. buildRuntimeModelLineage reuses the same
+// resolvers the pipeline uses, so it can't drift from what actually ran.
+describe('buildRuntimeModelLineage — honest per-node models', () => {
+  const KEYS = [
+    'AI_GATEWAY_API_KEY',
+    'PIPELINE_FRONTIER_MODELS',
+    'PIPELINE_GATEWAY_GEMINI',
+    'NOISE_JURY_MODELS',
+    'PIPELINE_MODEL_META_JUDGE',
+  ];
+  let saved: Record<string, string | undefined>;
+  beforeEach(() => {
+    saved = {};
+    for (const k of KEYS) {
+      saved[k] = process.env[k];
+      delete process.env[k];
+    }
+  });
+  afterEach(() => {
+    for (const k of KEYS) {
+      if (saved[k] === undefined) delete process.env[k];
+      else process.env[k] = saved[k];
+    }
+  });
+
+  it('reports frontier models on the reasoning nodes when frontier is on', () => {
+    process.env.AI_GATEWAY_API_KEY = 'gw-test-key';
+    const l = buildRuntimeModelLineage();
+    expect(l.metaJudge.model).toBe('anthropic/claude-opus-4-8');
+    expect(l.forgottenQuestions.model).toBe('anthropic/claude-opus-4-8');
+    expect(l.deepAnalysis.model).toBe('anthropic/claude-sonnet-5');
+    expect(l.simulation.model).toBe('anthropic/claude-sonnet-5');
+    expect(l.rpdRecognition.model).toBe('anthropic/claude-sonnet-5');
+    // Grounded + preprocessing nodes map to gateway Gemini.
+    expect(l.gdprAnonymizer.model).toBe('google/gemini-3.1-flash-lite');
+    expect(l.biasDetective.model).toBe('google/gemini-3-flash');
+    // The noise jury reports its cross-family set (never a single Gemini judge).
+    expect(l.noiseJudge.model).toContain('anthropic/claude-opus-4-8');
+    expect(l.noiseJudge.model).toContain('anthropic/claude-sonnet-5');
+    expect(l.riskScorer.model).toBe('deterministic');
+  });
+
+  it('falls back to legacy gateway-Gemini on the reasoning nodes when frontier is off', () => {
+    process.env.AI_GATEWAY_API_KEY = 'gw-test-key';
+    process.env.PIPELINE_FRONTIER_MODELS = 'off';
+    const l = buildRuntimeModelLineage();
+    expect(l.metaJudge.model).toBe('google/gemini-3-flash');
+    expect(l.metaJudge.model).not.toContain('anthropic');
+  });
+
+  it('honours a per-node override (PIPELINE_MODEL_META_JUDGE)', () => {
+    process.env.AI_GATEWAY_API_KEY = 'gw-test-key';
+    process.env.PIPELINE_MODEL_META_JUDGE = 'anthropic/claude-sonnet-5';
+    expect(buildRuntimeModelLineage().metaJudge.model).toBe('anthropic/claude-sonnet-5');
+  });
+
+  it('reports native Gemini names when the gateway is off (no anthropic leak)', () => {
+    process.env.PIPELINE_GATEWAY_GEMINI = 'off';
+    const l = buildRuntimeModelLineage();
+    expect(l.gdprAnonymizer.model).toBe('gemini-3.1-flash-lite');
+    expect(l.metaJudge.model).toBe('gemini-3-flash-preview');
+    expect(l.metaJudge.model).not.toContain('anthropic');
   });
 });

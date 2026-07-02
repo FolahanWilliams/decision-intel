@@ -6,11 +6,12 @@
  * findings rigorous. Two sections:
  *
  *   §2 — Judge Variance (Noise Stats)
- *      Mean / std-dev / inter-judge variance / calibration-band, with a
- *      plain-language interpretation: "9.6% inter-judge variance indicates
- *      the jury converged on a strong signal — the audit verdict is robust
- *      across multiple lenses." This is the procurement reader's first
- *      objective signal that the audit is methodologically sound.
+ *      Mean / std-dev / coefficient-of-variation / calibration-band, with a
+ *      plain-language interpretation: a low CV (stdDev relative to the mean)
+ *      means the jury converged on a strong signal — the verdict is robust
+ *      across multiple lenses. (We report CV, a normalized dispersion, NOT the
+ *      raw statistical variance σ², which is not a percentage.) This is the
+ *      procurement reader's first objective signal that the audit is sound.
  *
  *   §3 — Model Lineage & Prompt Fingerprint
  *      Per-node model routing, prompt hash, grounded-retrieval scope,
@@ -55,10 +56,15 @@ export function DprPageTwoMethodology(props: DprPageTwoMethodologyProps) {
   const noiseJudge = judgeVariance.granular?.noiseJudge;
   const biasDetective = judgeVariance.granular?.biasDetective;
 
-  // Compute interpretation band — under 12% inter-judge variance is the
-  // "strong convergence" zone per the noise-jury 3-frame discipline.
-  const variancePct = noiseJudge?.variance ?? null;
-  const convergenceBand = computeConvergenceBand(variancePct);
+  // Dispersion as a coefficient of variation (stdDev relative to the mean noise
+  // score) — the procurement-legible normalized spread. The raw statistical
+  // variance (σ²) is NOT a percentage; rendering it as one produced a nonsense
+  // "13,870%" (σ²≈139 × 100). CV = stdDev / mean, guarded for a near-zero mean
+  // (a very clean memo, where a percentage spread is undefined).
+  const meanNoise = judgeVariance.noiseScore;
+  const cvPct =
+    noiseJudge?.stdDev != null && meanNoise >= 1 ? (noiseJudge.stdDev / meanNoise) * 100 : null;
+  const convergenceBand = computeConvergenceBand(cvPct);
 
   return (
     <DprPageShell
@@ -87,8 +93,8 @@ export function DprPageTwoMethodology(props: DprPageTwoMethodologyProps) {
             foot="Variance across the jury sample. Lower = stronger convergence."
           />
           <DprStatCard
-            label="Inter-judge variance"
-            value={variancePct != null ? `${(variancePct * 100).toFixed(1)}%` : '—'}
+            label="Dispersion (CV)"
+            value={cvPct != null ? `${cvPct.toFixed(1)}%` : '—'}
             foot={convergenceBand.foot}
           />
           <DprStatCard
@@ -160,12 +166,11 @@ function prettyNodeName(nodeId: string): string {
   return nodeId.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, c => c.toUpperCase());
 }
 
-function computeConvergenceBand(variancePct: number | null) {
-  if (variancePct == null) {
-    return { foot: 'Variance not recorded for legacy audits.' };
+function computeConvergenceBand(cvPct: number | null) {
+  if (cvPct == null) {
+    return { foot: 'Dispersion not recorded for legacy audits.' };
   }
-  const pct = variancePct * 100;
-  if (pct < 8) return { foot: 'Robust convergence — the jury agreed across lenses.' };
-  if (pct < 16) return { foot: 'Moderate variance — the verdict survives multiple lenses.' };
-  return { foot: 'High variance — the audit is framing-sensitive; review by lens.' };
+  if (cvPct < 20) return { foot: 'Robust convergence — the jury agreed across lenses.' };
+  if (cvPct < 40) return { foot: 'Moderate spread — the verdict survives multiple lenses.' };
+  return { foot: 'High spread — the audit is framing-sensitive; review by lens.' };
 }

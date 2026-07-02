@@ -45,6 +45,16 @@ const COMMITMENT_CONTEXT =
 // matches capitalisation / capitalization).
 const VALUATION_CONTEXT = /\b(valued|valuation|market cap|market capitali|worth|equity value)/i;
 
+// A figure describing a TOTAL MARKET (TAM / industry size / market opportunity)
+// is NOT a decision — it's the size of the whole pond, not the bet. These
+// routinely run to the trillions and would otherwise masquerade as the biggest
+// "commitment": Fermi's S-11 cites a multi-trillion AI/power market, a nearby
+// "invest" word bound it as the ticket, and being the largest it won → a $5.2T
+// "decision" on a $20B company (which renders "$5200.0B", torpedoing the DPR).
+// When a market-size word is the NEAREST context to a figure, it is DISQUALIFIED.
+const MARKET_SIZE_CONTEXT =
+  /(addressable market|total addressable|\bTAM\b|\bSAM\b|market opportunit|market size|total market|global .{0,15}market|serviceable|market (?:is|will be|was) (?:projected|expected|estimated))/i;
+
 // $NNN (billion|million|B|M|...). The scale word/letter is optional, so a bare
 // "$500" DOES match here — it is filtered downstream by the MIN_TICKET floor
 // (see below), which is what keeps a small figure from counting as a strategic ticket.
@@ -96,7 +106,15 @@ function classifyByNearestContext(
     nearestDistance(VALUATION_CONTEXT, before, true),
     nearestDistance(VALUATION_CONTEXT, after, false)
   );
-  if (commit === Infinity && val === Infinity) return null;
+  const market = Math.min(
+    nearestDistance(MARKET_SIZE_CONTEXT, before, true),
+    nearestDistance(MARKET_SIZE_CONTEXT, after, false)
+  );
+  if (commit === Infinity && val === Infinity && market === Infinity) return null;
+  // A market-size word nearest → this is the size of the whole market, not a
+  // decision. DISQUALIFY (wins ties over commitment/valuation): a "$5.2T market
+  // opportunity" is never the ticket, even with an "invest" word equally near.
+  if (market !== Infinity && market <= commit && market <= val) return null;
   return commit <= val ? 'commitment' : 'valuation';
 }
 

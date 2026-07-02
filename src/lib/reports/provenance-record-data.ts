@@ -1379,6 +1379,22 @@ export async function assembleProvenanceRecordData(
       : 'Legacy analysis — granular per-judge outputs were not captured at run time. Available on request under the DPA from the internal audit log.',
   };
 
+  // Model lineage: the REAL per-node models captured at run time (2026-07-02)
+  // — frontier reasoning nodes on Opus 4.8 / Sonnet 5, grounded + preprocessing
+  // nodes on Gemini via the gateway. Falls back to the legacy constant for
+  // pre-2026-07-02 audits (which genuinely ran all-Gemini, so the constant is
+  // accurate for them). This replaces the old always-Gemini display.
+  const persistedLineageNodes = (
+    judgeOutputs as unknown as { modelLineage?: ModelLineage['nodes'] } | null
+  )?.modelLineage;
+  const modelLineage: ModelLineage =
+    persistedLineageNodes && Object.keys(persistedLineageNodes).length > 0
+      ? {
+          nodes: persistedLineageNodes,
+          note: 'Per-node model routing in force at audit time, captured at run time: the reasoning nodes (meta-judge, forgotten questions, deep analysis, boardroom simulation, recognition) route to frontier models (Opus 4.8 / Sonnet 5); grounded + preprocessing nodes run on Gemini via the Vercel AI Gateway; the final risk score is deterministic. Any re-run under the same configuration reproduces this lineage.',
+        }
+      : CURRENT_MODEL_LINEAGE;
+
   // Decision Room blind-prior aggregates (4.1 deep). Pulls every room
   // whose `analysisId` matches, computes the anonymised aggregate per
   // room, and reduces it down to the procurement-friendly shape stored
@@ -1646,7 +1662,7 @@ export async function assembleProvenanceRecordData(
     orgId,
     promptFingerprint,
     inputHash,
-    modelLineage: CURRENT_MODEL_LINEAGE,
+    modelLineage,
     judgeVariance,
     citations,
     regulatoryMapping,

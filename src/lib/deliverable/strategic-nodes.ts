@@ -281,11 +281,30 @@ const NODE_BY_ID: Record<string, StrategicNodeDef> = Object.fromEntries(
 const SCAN_CAP = 200_000;
 const MAX_NODES = 8;
 
-/** Trim the match into a clean single-line evidence snippet (≤140 chars). */
-function evidenceSnippet(text: string, index: number, matchLen: number): string {
-  const start = Math.max(0, index - 25);
-  const end = Math.min(text.length, index + matchLen + 25);
-  return text.slice(start, end).replace(/\s+/g, ' ').trim().slice(0, 140);
+/** Trim the match into a clean single-line evidence snippet (≤140 chars),
+ *  snapped to word boundaries so it never cuts mid-word — a fragment like
+ *  "pment-stage company" reads as broken on a procurement-grade record. The
+ *  matched signal phrase always survives (it sits inside [index, index+len]);
+ *  only the dangling context words at the padded edges are trimmed, with an
+ *  ellipsis marking the cut. Exported for the boundary unit test. */
+export function evidenceSnippet(text: string, index: number, matchLen: number): string {
+  const PAD = 30;
+  const start = Math.max(0, index - PAD);
+  const end = Math.min(text.length, index + matchLen + PAD);
+  const raw = text.slice(start, end).replace(/\s+/g, ' ').trim();
+  let snip = raw;
+  // Drop a partial leading word (we cut into one) unless we began at the very
+  // start of the document; same for a partial trailing word.
+  if (start > 0) snip = snip.replace(/^\S+\s+/, '');
+  if (end < text.length) snip = snip.replace(/\s+\S+$/, '');
+  if (snip.length > 140) snip = snip.slice(0, 140).replace(/\s+\S*$/, '');
+  snip = snip.trim();
+  // Fail-safe: if boundary-trimming collapsed the snippet (a padded window with
+  // no inner space), fall back to the raw window so the matched signal is never
+  // lost — a longer snippet beats an empty one.
+  if (snip.length < Math.min(matchLen, 12)) snip = raw.slice(0, 140).trim();
+  if (!snip) return '';
+  return `${start > 0 ? '…' : ''}${snip}${end < text.length ? '…' : ''}`;
 }
 
 function toDetected(def: StrategicNodeDef, evidence: string): DetectedStrategicNode {

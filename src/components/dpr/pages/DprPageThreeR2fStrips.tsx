@@ -39,6 +39,7 @@ import { DprRiskStrip, type DprSeverity } from '../primitives/DprRiskStrip';
 import { DprNotice } from '../primitives/DprNotice';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 import type { ValidityClassification } from '@/lib/learning/validity-classifier';
+import { MIN_DISPLAY_ANALOG_SIMILARITY } from '@/lib/learning/reference-class-forecast';
 import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
@@ -235,9 +236,10 @@ function ReferenceClassStrip({ rc }: { rc: ReferenceClassForecast }) {
         },
         {
           k: 'Top analog',
-          v: rc.topAnalogs[0]
-            ? `${rc.topAnalogs[0].title} (${rc.topAnalogs[0].year}) · sim ${(rc.topAnalogs[0].similarityScore * 100).toFixed(0)}%`
-            : '—',
+          v:
+            rc.topAnalogs[0] && rc.topAnalogs[0].similarityScore >= MIN_DISPLAY_ANALOG_SIMILARITY
+              ? `${rc.topAnalogs[0].title} (${rc.topAnalogs[0].year}) · sim ${(rc.topAnalogs[0].similarityScore * 100).toFixed(0)}%`
+              : 'No sufficiently-similar analog — below display threshold',
         },
         {
           k: 'Baseline sample',
