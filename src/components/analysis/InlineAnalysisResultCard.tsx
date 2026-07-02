@@ -13,6 +13,7 @@ import { DqiBreakdownPanel } from '@/components/dqi/DqiBreakdownPanel';
 import { formatBiasName } from '@/lib/utils/labels';
 import { severityColor } from '@/lib/utils/severity';
 import { CLEAN_AUDIT } from '@/lib/data/clean-audit-copy';
+import { noiseConvergenceBand } from '@/lib/scoring/noise-convergence';
 // Type-only import keeps DqiBreakdownPanel and the lazy fetch state in
 // sync with the canonical DQIResult shape without forcing the dqi module
 // onto the post-upload reveal critical path.
@@ -427,12 +428,34 @@ export function InlineAnalysisResultCard({
                     flexWrap: 'wrap',
                   }}
                 >
-                  <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>
+                  {/* Lead with the STABLE band (a 3-frame dispersion is a band,
+                      not a false-precise point that jumps run-to-run); the %
+                      is demoted to a detail chip. */}
+                  <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {noiseConvergenceBand(analysis.noiseScore).label}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: 'var(--text-muted)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 999,
+                      padding: '1px 7px',
+                    }}
+                  >
                     {Math.round(analysis.noiseScore)}%
                   </span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.35 }}>
-                    judge disagreement across 3 independent reads
-                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.4,
+                    marginTop: 3,
+                  }}
+                >
+                  {noiseConvergenceBand(analysis.noiseScore).hint}
                 </div>
               </div>
             </div>
