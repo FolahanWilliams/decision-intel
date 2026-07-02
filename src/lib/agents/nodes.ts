@@ -40,7 +40,7 @@ import {
   mapGeminiToGateway,
 } from '../ai/gateway-gemini';
 import { buildStrategicConditionsPromptBlock } from '../deliverable/strategic-nodes';
-import { MODEL_FRONTIER_REASONING, MODEL_STRONG_REASONING } from '../ai/gateway-models';
+import { MODEL_FRONTIER_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
@@ -399,26 +399,29 @@ function createModelByName(
 /**
  * Default cross-model jury — 2 model families across 3 frames
  * (locked 2026-07-02, frontier model-tier upgrade; supersedes the
- * 2026-05-06 Grok arm — founder-dropped: "Grok is not that good"):
+ * 2026-05-06 Grok arm — founder-dropped: "Grok is not that good"; Sonnet 5
+ * dropped 2026-07-02 — founder-flagged as pricier + slower [p50 1m vs Opus
+ * 19s in the gateway dashboard] + weaker, so the two Anthropic arms are now
+ * both Opus 4.8):
  *   [0] analyst_skeptical     → gemini-3-flash-preview (Google, native)
  *   [1] regulator_hostile     → anthropic/claude-opus-4-8 (via AI Gateway)
- *   [2] contrarian_strategist → anthropic/claude-sonnet-5 (via AI Gateway)
+ *   [2] contrarian_strategist → anthropic/claude-opus-4-8 (via AI Gateway)
  *
- * Opus 4.8 fires on regulator_hostile because that's the single most
- * load-bearing frame (the hostile-GC rubric that catches what a friendly
- * read misses) — it gets the smartest model. Sonnet 5 takes the
- * contrarian-strategist frame. The Gemini arm stays for architectural
- * diversity + graceful degradation: a gateway outage degrades to a
- * 1-valid-judge fallback (aggregator handles it), a Gemini outage leaves
- * 2 Anthropic arms. Anthropic arms receive NO temperature param (4.7+
- * models 400 on it — see runModelCall). Override via NOISE_JURY_MODELS
- * env var (comma-separated 3-model list, e.g. the legacy
+ * The two Anthropic arms run the SAME model but DIFFERENT frames (hostile-GC
+ * rubric vs contrarian-strategist), so they stay decorrelated by framing —
+ * the noise signal comes from stochastic + framing + the Gemini cross-family
+ * arm. The Gemini arm stays for architectural diversity + graceful
+ * degradation: a gateway outage degrades to a 1-valid-judge fallback
+ * (aggregator handles it), a Gemini outage leaves 2 Anthropic arms. Anthropic
+ * arms receive NO temperature param (4.7+ models 400 on it — see
+ * runModelCall). Override via NOISE_JURY_MODELS env var (comma-separated
+ * 3-model list, e.g. the legacy
  * "gemini-3-flash-preview,xai/grok-4.3,gemini-3-flash-preview").
  */
 const DEFAULT_NOISE_JURY_MODELS = [
   'gemini-3-flash-preview',
   MODEL_FRONTIER_REASONING,
-  MODEL_STRONG_REASONING,
+  MODEL_FRONTIER_REASONING,
 ] as const;
 
 function getNoiseJuryModels(): string[] {
@@ -478,9 +481,13 @@ type FrontierNodeKey =
 const FRONTIER_NODE_DEFAULTS: Record<FrontierNodeKey, string> = {
   metaJudge: MODEL_FRONTIER_REASONING,
   forgottenQuestions: MODEL_FRONTIER_REASONING,
-  deepAnalysis: MODEL_STRONG_REASONING,
-  simulation: MODEL_STRONG_REASONING,
-  rpdRecognition: MODEL_STRONG_REASONING,
+  // The reasoning tier is now UNIFORMLY Opus 4.8 (2026-07-02): Sonnet 5 was
+  // founder-dropped as pricier (more total spend, via more nodes) + slower
+  // (p50 1m vs Opus 19s in the gateway dashboard) + weaker. Per-node
+  // PIPELINE_MODEL_{DEEP_ANALYSIS,SIMULATION,RPD_RECOGNITION} still override.
+  deepAnalysis: MODEL_FRONTIER_REASONING,
+  simulation: MODEL_FRONTIER_REASONING,
+  rpdRecognition: MODEL_FRONTIER_REASONING,
   // Empty = legacy grounded Gemini. The bias detective's prompt instructs
   // live Google-Search verification of claims; routing it to an ungrounded
   // model makes that instruction unfollowable. Set PIPELINE_MODEL_BIAS_DETECTIVE

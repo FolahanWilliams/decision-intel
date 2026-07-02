@@ -34,7 +34,7 @@ import { apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { extractIp } from '@/lib/utils/request';
 import { generateText } from '@/lib/ai/providers/gateway';
-import { MODEL_STRONG_REASONING } from '@/lib/ai/gateway-models';
+import { MODEL_FRONTIER_REASONING } from '@/lib/ai/gateway-models';
 import { validateActionTitle } from '@/lib/deliverable/actionTitleTemplates';
 import { buildAuditDeliverable } from '@/lib/deliverable/buildAuditDeliverable';
 import type { AnalysisResult } from '@/types';
@@ -234,13 +234,14 @@ export async function POST(req: NextRequest) {
   let llmTitles: string[] = [];
   try {
     const prompt = buildPrompt(deliverable);
-    // Upgraded deepseek → Sonnet 5 (2026-07-02, frontier model-tier ship):
-    // the action titles are the headline language a board forwards — the
-    // most buyer-visible prose in the deliverable. NO temperature param:
-    // Anthropic 4.7+ models reject it with a 400, which would silently
-    // degrade this route to templates-only via the catch below.
+    // deepseek → Sonnet 5 → Opus 4.8 (2026-07-02): the action titles are the
+    // headline language a board forwards — the most buyer-visible prose in the
+    // deliverable — so they get the ceiling model (Sonnet 5 dropped as pricier +
+    // slower + weaker). NO temperature param: Anthropic 4.7+ models reject it
+    // with a 400, which would silently degrade this route to templates-only via
+    // the catch below.
     const llm = await generateText(prompt, {
-      model: MODEL_STRONG_REASONING,
+      model: MODEL_FRONTIER_REASONING,
       maxOutputTokens: 512,
     });
     llmTitles = parseLLMResponse(llm.text);

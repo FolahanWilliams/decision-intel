@@ -317,8 +317,9 @@ async function main() {
   // (PIPELINE_FRONTIER_MODELS=off to revert, or the per-node
   // PIPELINE_MODEL_* vars) while the slug is corrected.
   // NOTE: no temperature is passed — Anthropic 4.7+ models 400 on it.
+  // Opus 4.8 is the pipeline's sole reasoning model as of 2026-07-02 (Sonnet 5
+  // retired — pricier/slower/weaker per the founder's gateway dashboard read).
   const opusResult = await runGenerateTest('anthropic/claude-opus-4-8');
-  const sonnetResult = await runGenerateTest('anthropic/claude-sonnet-5');
 
   // 6-8) GOOGLE-BILLING MIGRATION PRE-FLIGHT (2026-07-02): the ENTIRE
   // Gemini surface now routes through the gateway. These three prove the
@@ -344,9 +345,6 @@ async function main() {
     `anthropic/claude-opus-4-8 (PIPELINE)   : ${opusResult.success ? 'OK' : `FAILED · ${opusResult.errorClass}`}\n`
   );
   process.stdout.write(
-    `anthropic/claude-sonnet-5 (PIPELINE)   : ${sonnetResult.success ? 'OK' : `FAILED · ${sonnetResult.errorClass}`}\n`
-  );
-  process.stdout.write(
     `google/gemini-3-flash (PIPELINE)       : ${flashResult.success ? 'OK' : `FAILED · ${flashResult.errorClass}`}\n`
   );
   process.stdout.write(
@@ -361,7 +359,6 @@ async function main() {
     geminiResult.errorClass,
     grokResult.errorClass,
     opusResult.errorClass,
-    sonnetResult.errorClass,
     flashResult.errorClass,
     groundedResult.errorClass,
     embedResult.errorClass,

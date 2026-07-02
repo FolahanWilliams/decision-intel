@@ -18,7 +18,7 @@
  * approval (the frontier model-tier upgrade): the REASONING nodes
  * (metaJudge / forgottenQuestions / deepAnalysis / simulation / rpd +
  * two noise-jury arms) route through the gateway to
- * MODEL_FRONTIER_REASONING / MODEL_STRONG_REASONING below via
+ * MODEL_FRONTIER_REASONING below via
  * `resolveFrontierModel` in src/lib/agents/nodes.ts (per-node env
  * overrides + PIPELINE_FRONTIER_MODELS=off kill switch = one-env-var
  * rollback to the legacy all-Gemini pipeline). The GROUNDED nodes
@@ -106,14 +106,10 @@ export const MODEL_RECOMMENDATIONS = 'deepseek/deepseek-v4-flash';
  */
 export const MODEL_FRONTIER_REASONING = 'anthropic/claude-opus-4-8';
 
-/**
- * Strong reasoning model — right behind Opus at 60% of the price
- * ($3/M in, $15/M out; intro $2/$10 through 2026-08-31). Used for the
- * buyer-facing reasoning that doesn't need the absolute ceiling:
- * deepAnalysis (SWOT / pre-mortem), simulation (boardroom personas),
- * rpdRecognition (Klein cues), the contrarian_strategist jury arm, and
- * the deliverable action-title prose (the headline language a board
- * forwards — upgraded 2026-07-02 from MODEL_RECOMMENDATIONS/deepseek).
- * Same no-temperature rule as MODEL_FRONTIER_REASONING.
- */
-export const MODEL_STRONG_REASONING = 'anthropic/claude-sonnet-5';
+// MODEL_STRONG_REASONING (anthropic/claude-sonnet-5) was RETIRED 2026-07-02:
+// the founder flagged Sonnet 5 as pricier (more total pipeline spend, because it
+// ran on more nodes), slower (p50 1m vs Opus 19s in the gateway dashboard), and
+// weaker. The whole reasoning tier is now uniformly MODEL_FRONTIER_REASONING
+// (Opus 4.8). A future mid-tier can be re-introduced here; the per-node
+// PIPELINE_MODEL_* + NOISE_JURY_MODELS env overrides accept any gateway slug
+// (incl. Sonnet) without a code change, so nothing is locked out.

@@ -243,17 +243,19 @@ describe('buildRuntimeModelLineage — honest per-node models', () => {
   it('reports frontier models on the reasoning nodes when frontier is on', () => {
     process.env.AI_GATEWAY_API_KEY = 'gw-test-key';
     const l = buildRuntimeModelLineage();
+    // The reasoning tier is uniformly Opus 4.8 (Sonnet 5 retired 2026-07-02).
     expect(l.metaJudge.model).toBe('anthropic/claude-opus-4-8');
     expect(l.forgottenQuestions.model).toBe('anthropic/claude-opus-4-8');
-    expect(l.deepAnalysis.model).toBe('anthropic/claude-sonnet-5');
-    expect(l.simulation.model).toBe('anthropic/claude-sonnet-5');
-    expect(l.rpdRecognition.model).toBe('anthropic/claude-sonnet-5');
+    expect(l.deepAnalysis.model).toBe('anthropic/claude-opus-4-8');
+    expect(l.simulation.model).toBe('anthropic/claude-opus-4-8');
+    expect(l.rpdRecognition.model).toBe('anthropic/claude-opus-4-8');
     // Grounded + preprocessing nodes map to gateway Gemini.
     expect(l.gdprAnonymizer.model).toBe('google/gemini-3.1-flash-lite');
     expect(l.biasDetective.model).toBe('google/gemini-3-flash');
-    // The noise jury reports its cross-family set (never a single Gemini judge).
+    // The noise jury reports its cross-family set (Gemini + Opus, never a single
+    // Gemini judge). Both Anthropic arms are Opus — decorrelated by framing.
     expect(l.noiseJudge.model).toContain('anthropic/claude-opus-4-8');
-    expect(l.noiseJudge.model).toContain('anthropic/claude-sonnet-5');
+    expect(l.noiseJudge.model).toContain('google/gemini-3-flash');
     expect(l.riskScorer.model).toBe('deterministic');
   });
 
