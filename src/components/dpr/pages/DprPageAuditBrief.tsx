@@ -321,7 +321,13 @@ function StructuralFragilityBlock({ fragility }: { fragility: StructuralFragilit
           <strong>Absorbs shocks:</strong>{' '}
           {fragility.resilienceMarkers.map(m => m.label).join(' · ')}
         </p>
-      ) : null}
+      ) : (
+        <p style={{ margin: '5px 0 0', fontSize: '0.92em' }}>
+          <strong>Absorbs shocks:</strong> None detected — the memo shows no shock-absorbing
+          structure (no staging, kill-trigger, reserve, or disconfirmation loop). Confidence is not
+          a circuit-breaker.
+        </p>
+      )}
       {missing.length > 0 ? (
         <p style={{ margin: '5px 0 0', fontSize: '0.92em' }}>
           <strong>Would make it survivable:</strong>{' '}

@@ -16,14 +16,22 @@ describe('detectResilienceMarkers — the resilience side (the missing half)', (
     expect(got).toContain('disconfirmation');
   });
 
-  it('diversification + optionality + capital access', () => {
+  it('diversification + optionality (mechanisms), and rhetoric is NOT a marker', () => {
     const text = `Revenue is diversified across multiple independent customers, no single counterparty.
       The platform preserves optionality — an option to expand into adjacent markets. We are profitable
       with a strong balance sheet and ample liquidity.`;
     const got = ids(text);
     expect(got).toContain('diversification');
     expect(got).toContain('optionality');
-    expect(got).toContain('capital_access');
+    // "profitable / strong balance sheet / ample liquidity" is RHETORIC, not a
+    // structure — capital_access was deleted 2026-07-02 (the Zillow lesson).
+    expect(got).not.toContain('capital_access');
+  });
+
+  it('pure rhetoric ("strong position / access to capital") fires NO markers', () => {
+    const text = `We are in a strong position, executing with operational rigor, well-capitalised with
+      access to capital and a strong balance sheet.`;
+    expect(detectResilienceMarkers(text)).toHaveLength(0);
   });
 
   it('a concentrated, all-in, irreversible memo fires NO resilience markers', () => {
@@ -33,10 +41,10 @@ describe('detectResilienceMarkers — the resilience side (the missing half)', (
   });
 
   it('circuit-breakers (weight 3) lead the ordering', () => {
-    const text = `We are profitable with a strong balance sheet, and we commit in staged tranches with
-      a reversible pilot and a predefined exit trigger.`;
+    const text = `We commit in staged tranches with a reversible pilot and a predefined exit trigger,
+      and revenue is diversified across many customers.`;
     const first = detectResilienceMarkers(text)[0];
-    expect(first.weight).toBe(3); // staging / reversibility / exit_trigger before capital_access
+    expect(first.weight).toBe(3); // staging / reversibility / exit_trigger lead the weight-2 markers
   });
 
   it('returns [] on empty input; every marker id is a canonical dimension', () => {

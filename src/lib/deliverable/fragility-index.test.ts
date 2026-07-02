@@ -80,3 +80,69 @@ describe('computeStructuralFragility — the second axis (risk × fragility)', (
     expect(buffered.index).toBeGreaterThanOrEqual(0);
   });
 });
+
+// The Zillow un-inversion (locked 2026-07-02). The blind 8-case batch ranked the
+// cases backwards: Zillow's reassuring letter (confronted nothing) scored
+// ABSORBING while Google's candid S-1 scored more fragile. These fixtures lock
+// the fix: a BOLD bet that confronts nothing is FRAGILE regardless of how little
+// it disclosed, and rhetoric ("strong position / capital access") is NOT credited.
+describe('confrontation vs avoidance — the Zillow un-inversion', () => {
+  // A reassuring investor letter: bold (leveraged bet) but confronts NOTHING —
+  // no kill-trigger, no staging, no disconfirmation. Only reassuring rhetoric.
+  const zillowShape =
+    'We made a big bet to participate in the transaction itself, and we are on track with each ' +
+    'of our three- to five-year objectives. We are in a strong position, executing with operational ' +
+    'rigor, well-capitalised with access to capital and a strong balance sheet.';
+
+  it('rhetoric is NOT credited as resilience (capital_access deleted)', () => {
+    // "strong balance sheet / access to capital / operational rigor" → zero markers.
+    expect(detectResilienceMarkers(zillowShape)).toHaveLength(0);
+  });
+
+  it('a BOLD bet that confronts nothing is FLOORED into fragile (not absorbing)', () => {
+    const nodes = detectStrategicNodes(zillowShape);
+    const markers = detectResilienceMarkers(zillowShape);
+    const bold = computeStructuralFragility(nodes, markers, { boldness: 0.75 });
+    expect(['fragile', 'avalanche_zone']).toContain(bold.band);
+    expect(bold.index).toBeGreaterThanOrEqual(70);
+    // Without the boldness signal it would have looked deceptively absorbing —
+    // that was the inversion. The floor is what fixes it.
+    const naive = computeStructuralFragility(nodes, markers);
+    expect(naive.index).toBeLessThan(bold.index);
+  });
+
+  it('a bold bet WITH real mechanisms is NOT floored (Amazon-shape stays lower)', () => {
+    const amazonShape =
+      'A bold, pre-revenue bet. We commit in three gated tranches, each reversible with a predefined ' +
+      'exit trigger; a contingency reserve funds the downside; a pre-mortem runs at each stage-gate.';
+    const nodes = detectStrategicNodes(amazonShape);
+    const markers = detectResilienceMarkers(amazonShape);
+    const resilient = computeStructuralFragility(nodes, markers, { boldness: 0.75 });
+    // Has confrontation → the floor does NOT fire → resilience offset applies.
+    expect(resilient.band).not.toBe('avalanche_zone');
+    expect(resilient.index).toBeLessThan(50);
+  });
+
+  it('UN-INVERSION: the reassuring letter is NOT rated less fragile than a candid, disclosed bet', () => {
+    // The candid S-1 shape discloses (confronts) its concentration + key-person risk.
+    const candidShape =
+      'Risk Factors. We have a limited operating history. We depend on a single anchor customer for ' +
+      'substantially all revenue. We depend on our founder; the loss of key personnel could harm us. ' +
+      'Our valuation is not supported by current revenue.';
+    const zillow = computeStructuralFragility(
+      detectStrategicNodes(zillowShape),
+      detectResilienceMarkers(zillowShape),
+      { boldness: 0.75 }
+    );
+    const candid = computeStructuralFragility(
+      detectStrategicNodes(candidShape),
+      detectResilienceMarkers(candidShape),
+      { boldness: 0.9 }
+    );
+    // The reassuring letter must NOT score as MORE resilient than the candid bet
+    // (that was the exact inversion). Both are bold + confront nothing → both fragile.
+    expect(zillow.index).toBeGreaterThanOrEqual(70);
+    expect(candid.index).toBeGreaterThanOrEqual(70);
+    expect(zillow.index).toBeGreaterThanOrEqual(candid.index - 25);
+  });
+});

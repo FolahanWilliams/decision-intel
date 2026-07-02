@@ -19,6 +19,18 @@
  * whether a trigger cascades. Reversibility, staging, reserves, and optionality
  * are structurally visible; execution quality is not, and we never claim it.
  *
+ * SUBSTANCE, NOT RHETORIC (locked 2026-07-02, the Zillow lesson). Every marker
+ * must be a STRUCTURE (a mechanism the reader could point to), never a reassuring
+ * CLAIM. The blind 8-case batch exposed the failure: Zillow's investor letter
+ * said "strong position / operational rigor / capital access" and the engine
+ * CREDITED it as resilient — then Zillow imploded in 90 days because it had no
+ * kill-trigger, no staging, no disconfirmation. The old `capital_access` marker
+ * ("strong balance sheet / profitable / access to capital") was pure rhetoric,
+ * and worse: capital to double down is the FUEL for an over-commitment, not a
+ * shock-absorber. It was DELETED. What remains are mechanisms: a staged tranche,
+ * a defined reserve, a named kill-trigger, a disconfirmation loop — things a
+ * reassuring narrative cannot fake by sounding confident.
+ *
  * Pure — no I/O, no LLM, no scoring impact. Display-only (feeds the structural-
  * fragility index, a SECOND AXIS alongside the DQI, not the DQI itself).
  */
@@ -34,8 +46,7 @@ export type ResilienceDimension =
   | 'reserves'
   | 'optionality'
   | 'diversification'
-  | 'disconfirmation'
-  | 'capital_access';
+  | 'disconfirmation';
 
 export interface ResilienceMarkerDef {
   id: ResilienceDimension;
@@ -131,16 +142,11 @@ export const RESILIENCE_MARKERS: ResilienceMarkerDef[] = [
       /\b(pre[-\s]?mortem|red[-\s]?team\w*|disconfirm\w+|what would prove (us|this|it) wrong|falsif\w+|kill the (idea|thesis|deal)|leading indicator\w*|early[-\s]warning (signal|indicator)|stage[-\s]?gate review|devil'?s advocate|steel[-\s]?man\w*)\b/i,
     ],
   },
-  {
-    id: 'capital_access',
-    label: 'Capital access / can fund the downturn',
-    weight: 1,
-    absorbs:
-      'The ability to raise or self-fund through a downturn means a liquidity shock is a bad quarter, not insolvency — the buffer leverage removes.',
-    signals: [
-      /\b(strong balance sheet|access to capital|cash reserves|can raise (capital|additional)|self[-\s]?funded|profitab\w+|positive (cash flow|free cash flow|operating cash)|well[-\s]?capitali\w+|ample liquidity|undrawn (facility|credit|revolver))\b/i,
-    ],
-  },
+  // capital_access DELETED 2026-07-02 (the Zillow lesson — see the module header).
+  // "Strong balance sheet / profitable / access to capital" is rhetoric, not a
+  // structure, and capital to double down is the FUEL for an over-commitment, not
+  // a shock-absorber. A genuine reserve/buffer is captured by `reserves` (which
+  // requires a defined cushion), not a confident adjective.
 ];
 
 const SCAN_CAP = 200_000;

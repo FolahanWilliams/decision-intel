@@ -419,7 +419,12 @@ function StructuralFragilityBanner({
             </span>
           ))}
         </div>
-      ) : null}
+      ) : (
+        <p style={{ fontSize: 11, color: '#B91C1C', margin: 0 }}>
+          <strong>Absorbs shocks:</strong> None detected — no staging, kill-trigger, reserve, or
+          disconfirmation loop. Confidence is not a circuit-breaker.
+        </p>
+      )}
       {missing.length > 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted, #64748B)', fontWeight: 700 }}>

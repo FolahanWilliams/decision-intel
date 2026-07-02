@@ -634,14 +634,26 @@ function composeCover(
   // The structural-fragility SECOND AXIS (2026-07-02). The DQI measures risk
   // density (boldness); this measures whether the STRUCTURE absorbs a shock or
   // cascades. Fragility conditions (already detected into strategicExposure)
-  // offset by the resilience markers the engine now CREDITS (staging, reserves,
-  // exit triggers, optionality, diversification). Orthogonal to the DQI,
-  // display-only — the risk × fragility 2×2. Omitted when nothing was detected.
+  // offset by the resilience markers the engine CREDITS (staging, reserves, exit
+  // triggers, optionality, diversification, disconfirmation — SUBSTANCE only, no
+  // rhetoric). Orthogonal to the DQI, display-only — the risk × fragility 2×2.
+  // Omitted when nothing was detected.
   const resilienceMarkers = detectResilienceMarkers(result.structuredContent ?? '');
   const fragilityNodes = reasoningRisks.strategicExposure ?? [];
+  // Boldness (0-1) = how big + unvalidated the bet is, so a bold bet that
+  // confronts NOTHING is floored into fragile (the Zillow un-inversion — a
+  // reassuring letter that disclosed little is opaque, not safe). Derived only
+  // from the DQI risk-density + the strategic conditions (robust, no dependence
+  // on finding internals): a low DQI IS high risk density (the DQI's own design).
+  const dqiScore = typeof result.overallScore === 'number' ? result.overallScore : 50;
+  const boldness = Math.min(
+    1,
+    (dqiScore < 40 ? 0.6 : dqiScore < 55 ? 0.35 : 0) +
+      (fragilityNodes.length >= 2 ? 0.4 : fragilityNodes.length === 1 ? 0.2 : 0)
+  );
   const structuralFragility =
     fragilityNodes.length > 0 || resilienceMarkers.length > 0
-      ? computeStructuralFragility(fragilityNodes, resilienceMarkers)
+      ? computeStructuralFragility(fragilityNodes, resilienceMarkers, { boldness })
       : undefined;
 
   return {

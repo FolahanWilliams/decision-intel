@@ -22,6 +22,21 @@
  *
  * That 2×2 is the discrimination a single score cannot produce.
  *
+ * POLARITY: CONFRONTATION vs AVOIDANCE (locked 2026-07-02, the Zillow lesson).
+ * The blind 8-case batch exposed an inversion: Zillow's reassuring investor
+ * letter — which disclosed few risks and confronted NONE (no kill-trigger, no
+ * staging, no disconfirmation) — scored ABSORBING, while Google's candid,
+ * legally-exhaustive S-1 scored MORE fragile. The engine was reading DISCLOSURE
+ * DENSITY (a reassuring letter hides its risks → few conditions detected → low
+ * fragility) instead of CONFRONTATION. The fix: a BOLD bet that confronts
+ * nothing is the REDDEST flag — the un-stress-tested bet — regardless of how
+ * little it disclosed. Non-disclosure is not safety; it is opacity. So the index
+ * takes a `boldness` signal (from the DQI risk-density + the strategic
+ * conditions), and when a bold bet carries ZERO substantive resilience
+ * mechanisms, it is floored into the fragile band — the absence of a
+ * circuit-breaker, not the presence of a disclosed risk, is what makes a
+ * structure fragile.
+ *
  * HONESTY: this scores the STRUCTURE (snowpack), never the TRIGGER (snowflake).
  * It does not predict the outcome; it measures whether a shock would cascade. And
  * it is a DISPLAY axis — it does NOT feed the DQI. Making fragility a first-class
@@ -59,6 +74,12 @@ const RESILIENCE_POINTS: Record<number, number> = { 3: 16, 2: 10, 1: 6 };
 // concentrated + irreversible structure stays fragile even with some buffers).
 const FRAGILITY_BASE_CAP = 92;
 const RESILIENCE_OFFSET_CAP = 58;
+// The un-stress-tested bet: a BOLD decision (high risk density) that confronts
+// NOTHING (zero substantive resilience mechanisms) is floored into the fragile
+// band, even if it disclosed few conditions. Non-disclosure ≠ safety — the
+// absence of a circuit-breaker is the fragility. (The Zillow inversion fix.)
+const BOLDNESS_THRESHOLD = 0.5;
+const BOLD_NO_CONFRONTATION_FLOOR = 70;
 
 function bandFor(index: number): FragilityBand {
   if (index < 25) return 'absorbing';
@@ -91,10 +112,17 @@ export const FRAGILITY_BAND_LABEL: Record<FragilityBand, string> = {
  * decision-science (a company-ender condition weighs 22, a circuit-breaker
  * absorbs 16), so the ORDERING (Fermi-shape fragile, staged-resilient-shape
  * absorbing) falls out of the structure, not a hand-tuned constant.
+ *
+ * `options.boldness` (0-1): how big + unvalidated the bet is. Derived by the
+ * composer from the DQI risk-density + the strategic conditions. When a bold bet
+ * (>= BOLDNESS_THRESHOLD) confronts NOTHING (zero resilience mechanisms), the
+ * index is floored into the fragile band — the un-stress-tested bet is the reddest
+ * flag, even if it disclosed little (non-disclosure is opacity, not safety).
  */
 export function computeStructuralFragility(
   fragilityNodes: DetectedStrategicNode[],
-  resilienceMarkers: DetectedResilienceMarker[]
+  resilienceMarkers: DetectedResilienceMarker[],
+  options: { boldness?: number } = {}
 ): StructuralFragility {
   const fragilityBase = Math.min(
     FRAGILITY_BASE_CAP,
@@ -104,16 +132,30 @@ export function computeStructuralFragility(
     RESILIENCE_OFFSET_CAP,
     resilienceMarkers.reduce((sum, m) => sum + (RESILIENCE_POINTS[m.weight] ?? 8), 0)
   );
-  const index = Math.max(0, Math.min(100, Math.round(fragilityBase - resilienceOffset)));
+  const computed = Math.max(0, Math.min(100, Math.round(fragilityBase - resilienceOffset)));
+
+  // The un-stress-tested bet: a bold decision with no confrontation is floored
+  // into the fragile band. This is what un-inverts the reassuring-letter case
+  // (Zillow) — it confronted nothing, so it is fragile no matter how little it
+  // disclosed. A bold bet WITH mechanisms (Amazon-shape: staged, reversible,
+  // optionality) keeps its resilience offset and is NOT floored.
+  const boldness = options.boldness ?? 0;
+  const confrontsNothing = resilienceMarkers.length === 0;
+  const boldUnstressTested = boldness >= BOLDNESS_THRESHOLD && confrontsNothing;
+  const index = boldUnstressTested ? Math.max(computed, BOLD_NO_CONFRONTATION_FLOOR) : computed;
+
   const band = bandFor(index);
   const present = new Set(resilienceMarkers.map(m => m.id));
   const missingResilience = RESILIENCE_DIMENSIONS.filter(d => !present.has(d));
+  const headline = boldUnstressTested
+    ? 'A bold bet that confronts nothing — no staging, no kill-trigger, no disconfirmation loop. The un-stress-tested bet is the reddest structural flag, whatever the memo disclosed.'
+    : BAND_HEADLINE[band];
   return {
     index,
     band,
     fragilityDrivers: fragilityNodes,
     resilienceMarkers,
     missingResilience,
-    headline: BAND_HEADLINE[band],
+    headline,
   };
 }
