@@ -131,13 +131,19 @@ export async function POST(request: NextRequest) {
 
     // Per-user dedup: if this exact content already exists under another of the
     // user's docs, drop the placeholder + storage object and return the cached one.
+    // NOTE (2026-07-02): the match deliberately INCLUDES soft-deleted rows so we
+    // can discriminate below — a LIVE match is a genuine cache hit; a SOFT-DELETED
+    // match must be purged, NOT returned. Returning the ghost as "cached" was the
+    // bug the founder hit re-uploading a previously-deleted filing: the dashboard
+    // redirected to the dead doc's id and the detail page (which correctly
+    // excludes soft-deleted docs) 404'd with "Document not found".
     const existing = await prisma.document.findFirst({
       where: { contentHash, userId, id: { not: doc.id } },
       include: {
         analyses: { orderBy: { createdAt: 'desc' }, take: 1, include: { biases: true } },
       },
     });
-    if (existing) {
+    if (existing && !existing.deletedAt) {
       await cleanup();
       return NextResponse.json({
         id: existing.id,
@@ -147,6 +153,18 @@ export async function POST(request: NextRequest) {
         message: 'Document already analyzed (Cached)',
         analysis: (existing.analyses as unknown[])?.[0] || null,
       });
+    }
+    if (existing?.deletedAt) {
+      // Soft-deleted ghost still owns the (userId, contentHash) unique key —
+      // without this purge, the contentHash update below would P2002-collide.
+      // Mirrors the direct upload route's P2002 fallback exactly: hard-delete
+      // the ghost (cascades its dead analyses) so the fresh upload re-takes
+      // the key. Re-uploading identical bytes after deleting is the clearest
+      // "clean rerun" signal — the user gets a fresh document + fresh audit.
+      log.info(`Purging soft-deleted duplicate ${existing.id} so re-upload proceeds fresh`);
+      await prisma.document
+        .delete({ where: { id: existing.id } })
+        .catch(e => log.warn('Failed to purge soft-deleted duplicate before finalize:', e));
     }
 
     const encryptedFields = isDocumentEncryptionEnabled() ? encryptDocumentContent(content) : {};

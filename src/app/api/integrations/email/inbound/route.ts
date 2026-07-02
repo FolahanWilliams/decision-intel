@@ -279,16 +279,26 @@ export async function POST(req: NextRequest) {
           // Generate content hash for deduplication
           const contentHash = createHash('sha256').update(buffer).digest('hex');
 
-          // Skip if identical content already analyzed for this user
+          // Skip if identical content already analyzed for this user.
+          // Soft-deleted matches are PURGED instead of skipped (2026-07-02):
+          // skipping a ghost silently drops the user's re-sent attachment, and
+          // creating over it would P2002-collide on (userId, contentHash) —
+          // same discrimination as the upload + finalize routes.
           const existingDoc = await prisma.document.findFirst({
             where: { contentHash, userId },
-            select: { id: true },
+            select: { id: true, deletedAt: true },
           });
-          if (existingDoc) {
+          if (existingDoc && !existingDoc.deletedAt) {
             log.info(
               `Duplicate content (hash: ${contentHash.slice(0, 8)}...), skipping: ${filename}`
             );
             continue;
+          }
+          if (existingDoc?.deletedAt) {
+            log.info(`Purging soft-deleted duplicate ${existingDoc.id} so re-sent attachment ingests fresh`);
+            await prisma.document
+              .delete({ where: { id: existingDoc.id } })
+              .catch(e => log.warn('Failed to purge soft-deleted duplicate before ingest:', e));
           }
 
           // Encrypt if enabled
