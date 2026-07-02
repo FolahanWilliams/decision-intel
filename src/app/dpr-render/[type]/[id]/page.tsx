@@ -51,7 +51,12 @@ import {
 } from '@/components/dpr/pages/DprPageStructuralAssumptions';
 import { DprPageRegulatoryCrosswalk } from '@/components/dpr/pages/DprPageRegulatoryCrosswalk';
 import { DprPageEngagementAppendix } from '@/components/dpr/pages/DprPageEngagementAppendix';
+import { DprPageAuditBrief, DprPageActionPlan } from '@/components/dpr/pages/DprPageAuditBrief';
 import { deriveDprFindings } from '@/lib/reports/dpr-findings';
+import { buildAuditDeliverable } from '@/lib/deliverable/buildAuditDeliverable';
+import type { AuditDeliverable } from '@/lib/deliverable/types';
+import type { AnalysisResult } from '@/types';
+import { getDocumentContent } from '@/lib/utils/encryption';
 import type { ProvenanceRecordData } from '@/lib/reports/provenance-record-data';
 
 const log = createLogger('DprRenderRoute');
@@ -121,14 +126,34 @@ export default async function DprRenderPage({
   // whether the field is populated.
   const renderEngagementAppendix = data.engagementAppendix != null;
 
+  // The buyer-first executive brief (§1b + §1c, locked 2026-07-02) —
+  // composed from the SAME pure buildAuditDeliverable the website
+  // Executive view renders. Per-document audits only; specimens + legacy
+  // paths skip gracefully (null → the classic 6-page evidence record).
+  const deliverable = type === 'document' ? await loadAuditDeliverableForDpr(id) : null;
+  const renderBrief = deliverable != null;
+
   // Total physical pages: 6 baseline (cover, methodology, R²F strips,
   // findings, structural assumptions when present, regulatory crosswalk),
-  // plus 1 when the engagement appendix renders. The Structural
-  // Assumptions page is conditional but counted in baseline because
-  // specimens always include it; per-document audits skip it silently
-  // when StructuralAssumption rows are absent. Conditional page count
-  // matches what the cover declares.
-  const totalPages = 6 + (renderEngagementAppendix ? 1 : 0);
+  // plus 2 when the buyer brief renders (§1b executive brief + §1c
+  // verdict-and-fixes), plus 1 when the engagement appendix renders. The
+  // Structural Assumptions page is conditional but counted in baseline
+  // because specimens always include it; per-document audits skip it
+  // silently when StructuralAssumption rows are absent. Conditional page
+  // count matches what the cover declares.
+  const totalPages = 6 + (renderBrief ? 2 : 0) + (renderEngagementAppendix ? 1 : 0);
+
+  // Dynamic page numbering — the brief pages shift everything after them.
+  let pageCursor = 1; // cover is page 1
+  const nextPage = () => ++pageCursor;
+  const briefPage = renderBrief ? nextPage() : 0;
+  const actionPage = renderBrief ? nextPage() : 0;
+  const methodologyPage = nextPage();
+  const r2fPage = nextPage();
+  const findingsPage = nextPage();
+  const structuralPage = structuralAssumptions.length > 0 ? nextPage() : 0;
+  const crosswalkPage = nextPage();
+  const appendixPage = renderEngagementAppendix ? nextPage() : 0;
 
   // Defensibility Vector #4 (locked 2026-05-18) — compose the scattered
   // cryptographic pieces into ONE citable evidentiary-standard token a
@@ -164,24 +189,44 @@ export default async function DprRenderPage({
         footerTitle="Decision Provenance Record"
         documentIdentity={buildDocumentIdentity(data, type, id)}
       />
+      {renderBrief && deliverable && (
+        <DprPageAuditBrief
+          deliverable={deliverable}
+          pageNumber={briefPage}
+          totalPages={totalPages}
+          classification={classification}
+          auditTimestamp={auditTimestamp}
+          clientSafe={clientSafe}
+        />
+      )}
+      {renderBrief && deliverable && (
+        <DprPageActionPlan
+          deliverable={deliverable}
+          pageNumber={actionPage}
+          totalPages={totalPages}
+          classification={classification}
+          auditTimestamp={auditTimestamp}
+          clientSafe={clientSafe}
+        />
+      )}
       <DprPageTwoMethodology
         judgeVariance={data.judgeVariance}
         modelLineage={data.modelLineage}
-        pageNumber={2}
+        pageNumber={methodologyPage}
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
       />
       <DprPageThreeR2fStrips
         data={data}
-        pageNumber={3}
+        pageNumber={r2fPage}
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
       />
       <DprPageFindings
         findings={findings}
-        pageNumber={4}
+        pageNumber={findingsPage}
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
@@ -191,7 +236,7 @@ export default async function DprRenderPage({
       {structuralAssumptions.length > 0 && (
         <DprPageStructuralAssumptions
           assumptions={structuralAssumptions}
-          pageNumber={5}
+          pageNumber={structuralPage}
           totalPages={totalPages}
           classification={classification}
           auditTimestamp={auditTimestamp}
@@ -199,7 +244,7 @@ export default async function DprRenderPage({
       )}
       <DprPageRegulatoryCrosswalk
         data={data}
-        pageNumber={6}
+        pageNumber={crosswalkPage}
         totalPages={totalPages}
         classification={classification}
         auditTimestamp={auditTimestamp}
@@ -207,7 +252,7 @@ export default async function DprRenderPage({
       {renderEngagementAppendix && data.engagementAppendix && (
         <DprPageEngagementAppendix
           appendix={data.engagementAppendix}
-          pageNumber={7}
+          pageNumber={appendixPage}
           totalPages={totalPages}
           classification={classification}
           auditTimestamp={auditTimestamp}
@@ -215,6 +260,86 @@ export default async function DprRenderPage({
       )}
     </>
   );
+}
+
+/**
+ * Compose the SAME AuditDeliverable the website Executive view renders,
+ * from the persisted analysis — the buyer-brief pages (§1b/§1c) are a
+ * print rendition of it (one pure composer, web + PDF, no drift; locked
+ * 2026-07-02). Called ONLY after loadDprData has already authorized the
+ * requester on this exact analysis id. Null (graceful skip — the DPR
+ * falls back to its 6 evidence pages) on specimens, legacy paths, or
+ * any load failure.
+ */
+async function loadAuditDeliverableForDpr(analysisId: string): Promise<AuditDeliverable | null> {
+  try {
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: {
+        id: true,
+        overallScore: true,
+        noiseScore: true,
+        summary: true,
+        biases: true,
+        simulation: true,
+        preMortem: true,
+        forgottenQuestions: true,
+        factCheck: true,
+        compliance: true,
+        judgeOutputs: true,
+        document: {
+          select: {
+            id: true,
+            content: true,
+            contentEncrypted: true,
+            contentIv: true,
+            contentTag: true,
+            contentKeyVersion: true,
+          },
+        },
+      },
+    });
+    if (!analysis) return null;
+
+    // Decrypted document text feeds strategic-node detection + ticket
+    // auto-extraction (the same enrichment the web page performs).
+    let content = '';
+    try {
+      content = getDocumentContent(analysis.document);
+    } catch {
+      // @schema-drift-tolerant — an unresolvable encryption key degrades
+      // the brief (no attack path / no $ exposure), never blocks the DPR.
+      content = '';
+    }
+
+    const result = {
+      overallScore: analysis.overallScore,
+      noiseScore: analysis.noiseScore,
+      summary: analysis.summary,
+      biases: analysis.biases,
+      simulation: analysis.simulation,
+      preMortem: analysis.preMortem,
+      forgottenQuestions: analysis.forgottenQuestions,
+      factCheck: analysis.factCheck,
+      compliance: analysis.compliance,
+      structuredContent: content,
+    } as unknown as AnalysisResult;
+
+    const judge = analysis.judgeOutputs as {
+      blindRetroMode?: boolean;
+      degradedNodes?: string[];
+    } | null;
+
+    return buildAuditDeliverable(result, {
+      documentId: analysis.document.id,
+      analysisId: analysis.id,
+      blindAudit: judge?.blindRetroMode === true,
+      degradedNodes: Array.isArray(judge?.degradedNodes) ? judge.degradedNodes : undefined,
+    });
+  } catch (err) {
+    log.warn(`Audit-brief composition failed for analysis ${analysisId} (DPR falls back):`, err);
+    return null;
+  }
 }
 
 async function loadDprData(type: DprType, id: string): Promise<ProvenanceRecordData | null> {

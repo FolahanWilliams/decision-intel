@@ -66,6 +66,10 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-07-02)
 
+**DPR buyer brief (§1b/§1c) + gemini-2.5-pro retired (founder-directed; full prose in the CLAUDE.md lock).** The PDF leave-behind now answers the buyer's five questions up front, composed from the SAME pure deliverable composer as the website (no drift): §1b = verdict + DQI + blind badge + ~$X exposure w/ precedent + SCQA + structural risks existential-first + the critical unanswered questions; §1c = boardroom verdict + red team + top-5 fixes with DQI lift + Munger inversion + the honest close. Dynamic page numbering; clientSafe scrub; specimens keep the classic record. gemini-2.5-pro is out of every default path (legacy metaJudge fallback → Gemini 3 Flash).
+
+- [ ] **FOUNDER EYEBALL:** after the next audit, hit Export DPR and check §1b/§1c read buyer-first (no puppeteer in the sandbox — the print rendering needs your eyes once).
+
 **Gateway-Gemini migration — EVERYTHING off Google billing, onto the Vercel bill (founder-directed after the £150 sibling-project bill; full prose in the CLAUDE.md "Gateway-Gemini migration" lock).** The founder's Google billing is dead; every Gemini surface now routes through the Vercel AI Gateway with ZERO capability loss — all verified LIVE with the real key before shipping:
 
 - [x] **Live-verified before shipping:** `google/gemini-3-flash` serves the pipeline's Flash tier; **search grounding works through the gateway** (probe returned current July-1 market data + 4-5 real sources); **embeddings return exactly 1536 dims** on `google/gemini-embedding-001` (HTTP 200) — the same model + dims as the pgvector store, so NO re-embedding.

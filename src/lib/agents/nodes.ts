@@ -241,20 +241,22 @@ function getCheapModel(): GenerativeModel {
 }
 
 /**
- * Pro model with standard safety + grounding — reserved for the highest-leverage
- * single call in the pipeline (metaJudge's final verdict over 7 parallel signals).
- * Defaults to gemini-2.5-pro. Override with GEMINI_MODEL_PRO env var.
+ * The metaJudge's LEGACY fallback model — only fires when the frontier
+ * tier is unavailable (no AI_GATEWAY_API_KEY or PIPELINE_FRONTIER_MODELS=off);
+ * the default metaJudge is Opus 4.8 via resolveFrontierModel. GEMINI-2.5-PRO
+ * RETIRED 2026-07-02 (founder: "quite a bad model — Gemini 3 Flash is better
+ * in pretty much every way") — the fallback now defaults to the same Flash
+ * tier as the rest of the legacy pipeline. Override with GEMINI_MODEL_PRO.
  */
 function getProStandardSafetyGroundedModel(): GenerativeModel {
   if (!proStandardSafetyGroundedInstance) {
     proStandardSafetyGroundedInstance = createModelInstance({
       grounded: true,
       safetyLevel: 'standard',
-      modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-2.5-pro'),
+      modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-3-flash-preview'),
       // metaJudge prompt ends "Return ONLY the text of the verdict. No JSON."
-      // and the node consumes .text() raw. JSON-mime here is both unwanted
-      // AND fatal (grounding + JSON-mime = 400 on gemini-2.5-pro). This is
-      // THE fix for the Meta Judge failing on every audit.
+      // and the node consumes .text() raw — keep prose mode (also avoids the
+      // grounding + JSON-mime fragile combo, the old metaJudge P0 bug class).
       jsonResponse: false,
     });
   }

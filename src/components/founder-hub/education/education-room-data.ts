@@ -1425,7 +1425,7 @@ const PIPELINE_NODES_CARDS: EducationCard[] = [
     deckId: 'pipeline_nodes',
     prompt: 'What does the metaJudge node do, and why does it run on gemini-2.5-pro?',
     canonicalAnswer:
-      'The final-verdict node. Reviews ALL upstream node outputs (structuralAssumptions, biasDetective, noiseJudge, rpdRecognition, forgottenQuestions, pre-mortem, statisticalJury) and produces the integrated DQI score with explanatory narrative. Runs on gemini-2.5-pro (the Pro-tier exception in the model policy) because reasoning quality matters more than cost on the highest-leverage single call in the pipeline. The metaJudge output is what the buyer SEES first in the analysis — the executive summary, the DQI score, the recommendation. Override via GEMINI_MODEL_PRO env var.',
+      'The final-verdict node. Reviews ALL upstream node outputs (structuralAssumptions, biasDetective, noiseJudge, rpdRecognition, forgottenQuestions, pre-mortem, statisticalJury) and produces the integrated DQI score with explanatory narrative. Runs on Claude Opus 4.8 via the Vercel AI Gateway (the frontier reasoning tier, locked 2026-07-02) because reasoning quality matters more than cost on the highest-leverage single call in the pipeline; the legacy fallback is Gemini 3 Flash (gemini-2.5-pro retired 2026-07-02). The metaJudge output is what the buyer SEES first in the analysis — the executive summary, the DQI score, the recommendation. Override via PIPELINE_MODEL_META_JUDGE env var.',
     difficulty: 'advanced',
     applicationContext: 'CTO asks about the model policy and per-audit cost composition.',
     source: 'CLAUDE.md Gemini model policy lock 2026-04-27',
