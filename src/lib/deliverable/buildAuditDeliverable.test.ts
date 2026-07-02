@@ -239,6 +239,79 @@ describe('buildAuditDeliverable', () => {
     );
   });
 
+  // 2026-07-02 regression — the blind Victoria's Secret shape: ZERO
+  // bias-shaped findings, all severity carried by Forgotten Questions. The
+  // "what to fix" lane must derive mitigation scenarios from the FQs
+  // instead of rendering "No actionable mitigation scenarios" (co-work P1).
+  it('counterfactuals derives scenarios from Forgotten Questions when there are no biases (VS blind-run shape)', () => {
+    const result = makeResult({
+      biases: [],
+      forgottenQuestions: {
+        questions: [
+          {
+            question: 'What operationalizes founder retention over the next 12-24 months?',
+            whyItMatters: 'The thesis rests entirely on the acquired team.',
+            biasGuarded: 'key person dependency',
+            severity: 'critical',
+          },
+          {
+            question: 'What churn data falsifies the accretion claim?',
+            whyItMatters: 'Accretive-by-2023 is asserted, never evidenced.',
+            biasGuarded: 'overconfidence_bias',
+            severity: 'high',
+          },
+        ],
+        headline: 'Two questions the memo never asks.',
+        analogsUsed: ['AIG'],
+        generatedAt: new Date(0).toISOString(),
+      },
+    });
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    const scenarios = deliverable.counterfactuals.scenarios;
+    expect(scenarios.length).toBe(2);
+    // Critical FQ leads; deltas use the same severity heuristic as biases.
+    expect(scenarios[0].targetFindingId).toBe('forgotten_question_0');
+    expect(scenarios[0].delta).toBe(8);
+    expect(scenarios[0].mitigation).toContain('founder retention');
+    expect(scenarios[0].mitigation).toContain('Answer this in the memo before commitment');
+    expect(scenarios[1].delta).toBe(5);
+    expect(deliverable.counterfactuals.bestCaseDqi).toBeGreaterThan(
+      deliverable.counterfactuals.currentDqi
+    );
+  });
+
+  it('FQ scenarios dedupe against bias scenarios guarding the same bias, and bias fixes lead on severity ties', () => {
+    const result = makeResult({
+      forgottenQuestions: {
+        questions: [
+          {
+            // Guards a bias that ALREADY has a bias-derived scenario — skipped.
+            question: 'Is the thesis merely confirming itself?',
+            whyItMatters: 'Duplicate of the confirmation_bias finding.',
+            biasGuarded: 'Confirmation Bias',
+            severity: 'critical',
+          },
+          {
+            // New ground — survives the dedupe and joins the ranking.
+            question: 'What reserves cover a tenant breach beyond 36 months?',
+            whyItMatters: 'The AIG analog had to answer this.',
+            biasGuarded: 'concentration',
+            severity: 'critical',
+          },
+        ],
+        analogsUsed: ['AIG'],
+        generatedAt: new Date(0).toISOString(),
+      },
+    });
+    const deliverable = buildAuditDeliverable(result, { documentId: 'd', analysisId: null });
+    const ids = deliverable.counterfactuals.scenarios.map(sc => sc.targetFindingId);
+    // The duplicated FQ (index 0) is absent; the novel FQ (index 1) present.
+    expect(ids).not.toContain('forgotten_question_0');
+    expect(ids).toContain('forgotten_question_1');
+    // Stable sort: the critical BIAS scenario still leads the critical FQ.
+    expect(ids[0]).toBe('confirmation_bias');
+  });
+
   it('provenance pulls methodology version + node count + Brier baseline from canonical sources', () => {
     const result = makeResult();
     const deliverable = buildAuditDeliverable(result, {

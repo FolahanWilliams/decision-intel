@@ -66,6 +66,10 @@ Claude reads this file at the start of every session via the `@TODO.md` auto-inc
 
 ## Recently Completed (2026-07-02)
 
+**Fixes-lane fix — mitigation scenarios from Forgotten Questions (co-work P1 off the BLIND Victoria's Secret run, 5-for-5 validated).** The VS audit surfaced ALL findings as Forgotten Questions with ZERO bias-shaped findings (production-verified: bias_count=0, blindRetroMode=true), so the "what to fix" lane rendered "No actionable mitigation scenarios" — the 4th thing a buyer reads. [buildAuditDeliverable.ts](src/lib/deliverable/buildAuditDeliverable.ts) now merges bias-derived + FQ-derived mitigation candidates (each FQ's mitigation = answer it in the memo before commitment; same severity→lift heuristic; FQs guarding an already-scenarioed bias are deduped; stable sort keeps bias fixes ahead on ties; ids trace to the original FQ list). 2 regression tests lock the VS shape (65/65 deliverable tests green). Biases-only audits are byte-identical to before.
+
+**Blind-mode production verification (2026-07-02):** VS audit `blindRetroMode=true` ✓ (the toggle worked end-to-end); yesterday's Fermi `null` (pre-blind-mode — co-work's "suspect" call is right; the blind rerun is the clean test). **WATCH on the blind Fermi rerun: bias_count.** VS returned 0 bias findings (non-blind Fermi had 6) — could be a genuinely clean memo, or the blind ungrounded bias-detector pass being too quiet, or a parse failure falling to []. If blind Fermi also returns 0 biases, investigate the blind biasDetective path.
+
 **Frontier model-tier upgrade — Opus 4.8 + Sonnet 5 on the reasoning nodes (founder-approved pipeline change; full prose in the CLAUDE.md "Frontier model-tier upgrade" lock).**
 
 - [x] metaJudge + forgottenQuestions → **Opus 4.8**; deepAnalysis + boardroom sim + rpdRecognition → **Sonnet 5**; noise jury → Flash + Opus + Sonnet (**Grok dropped**); deliverable action-titles → Sonnet 5 (was deepseek). Grounded fact-check nodes (biasDetective / verification / benchmark / market enricher) + cheap extraction stay Gemini. SSOT constants in `gateway-models.ts`; `resolveFrontierModel` + `runModelCall` in `nodes.ts`.

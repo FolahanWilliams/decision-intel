@@ -23,6 +23,7 @@
 import type { AnalysisResult, BiasDetectionResult, DecisionTwin, ForgottenQuestion } from '@/types';
 import { gradeFromScore } from '@/lib/utils/grade';
 import { formatBiasName } from '@/lib/utils/labels';
+import { truncate } from '@/lib/utils/string';
 import { HISTORICAL_CASE_COUNT } from '@/lib/data/case-studies';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
@@ -336,17 +337,65 @@ function bucketCounterfactuals(
     low: 1,
   };
 
-  const scenarios: CounterfactualScenario[] = sortBySeverity(biases)
+  // Bias-derived candidates (the original path). Order preserved so a
+  // biases-only audit produces byte-identical scenarios to the prior code.
+  const biasCandidates = sortBySeverity(
+    biases.map(b => ({ ...b, severity: (b.severity as Severity) ?? ('medium' as Severity) }))
+  ).map(b => ({
+    severity: b.severity as Severity,
+    scenario: {
+      targetFindingId: b.biasType,
+      targetLabel: formatBiasName(b.biasType),
+      mitigation: b.suggestion ?? '',
+    },
+  }));
+
+  // Forgotten-Question-derived candidates (2026-07-02 — co-work P1 from the
+  // blind Victoria's Secret run: ALL findings surfaced as Forgotten
+  // Questions with ZERO bias-shaped findings, so the "what to fix" lane
+  // rendered empty — the 4th thing a buyer reads for. Every Forgotten
+  // Question implies its own mitigation: put the question to the deal team
+  // and answer it in the memo before commitment. FQs whose guarded bias
+  // already has a bias-derived scenario are skipped — the bias card carries
+  // the sharper fix. FQ targetFindingIds deliberately don't match bucket-1
+  // finding ids, so the lift-chart sync simply doesn't highlight them.)
+  const normalizeKey = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const scenarioedBiasKeys = new Set(
+    biasCandidates.map(c => normalizeKey(c.scenario.targetFindingId))
+  );
+  const fqCandidates = (result.forgottenQuestions?.questions ?? [])
+    // Index BEFORE filtering so targetFindingId traces back to the
+    // position in the audit's Forgotten Questions list, not a
+    // filter-dependent renumbering.
+    .map((q, i) => ({ q, i }))
+    .filter(
+      ({ q }) =>
+        q.question && (!q.biasGuarded || !scenarioedBiasKeys.has(normalizeKey(q.biasGuarded)))
+    )
+    .map(({ q, i }) => ({
+      severity: (q.severity as Severity) ?? ('medium' as Severity),
+      scenario: {
+        targetFindingId: `forgotten_question_${i}`,
+        targetLabel: `the unanswered question: "${truncate(q.question, 64)}"`,
+        mitigation:
+          `Answer this in the memo before commitment: ${q.question}` +
+          (q.whyItMatters ? ` Why it matters: ${q.whyItMatters}` : ''),
+      },
+    }));
+
+  // Merge, rank by severity (stable sort keeps bias candidates ahead of
+  // equal-severity FQs — the sharper fix leads), cap at 5, then project the
+  // DQI lift with the same conservative heuristic as before.
+  const scenarios: CounterfactualScenario[] = [...biasCandidates, ...fqCandidates]
+    .sort((a, b) => SEVERITY_ORDER[b.severity] - SEVERITY_ORDER[a.severity])
     .slice(0, 5) // Top 5 mitigation candidates
-    .map(b => {
-      const lift = SEVERITY_LIFT[b.severity as Severity] ?? 1;
+    .map(c => {
+      const lift = SEVERITY_LIFT[c.severity] ?? 1;
       const projectedDqi = Math.min(100, currentDqi + lift);
       return {
-        targetFindingId: b.biasType,
-        targetLabel: formatBiasName(b.biasType),
+        ...c.scenario,
         projectedDqi,
         delta: projectedDqi - currentDqi,
-        mitigation: b.suggestion ?? '',
       };
     });
 
