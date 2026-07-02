@@ -162,7 +162,7 @@ function buildDocumentGraph(
 
   const riskN = biasNodeIds.size;
   decisionData.detail = {
-    subtitle: `Decision Quality Index ${dqi.score} · grade ${dqi.grade}`,
+    subtitle: `Decision Quality Index ${Math.round(dqi.score)} · grade ${dqi.grade}`,
     body:
       riskN > 0
         ? `${riskN} reasoning risk${riskN === 1 ? '' : 's'} mapped around this decision. Hover a node to preview it; click for the full reasoning.`
@@ -196,7 +196,7 @@ function detailForNode(
     return {
       kind: 'decision',
       title: 'This decision',
-      summary: `Decision Quality Index ${dqi.score} (grade ${dqi.grade}) · ${risks} reasoning risk${risks === 1 ? '' : 's'} flagged. Click a surrounding node to see the risk behind it.`,
+      summary: `Decision Quality Index ${Math.round(dqi.score)} (grade ${dqi.grade}) · ${risks} reasoning risk${risks === 1 ? '' : 's'} flagged. Click a surrounding node to see the risk behind it.`,
     };
   }
   if (!nodeId.startsWith('b:')) return null;

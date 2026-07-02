@@ -465,7 +465,10 @@ function formatRecordId(data: ProvenanceRecordData): string {
 
 function pipelineVersionFromLineage(data: ProvenanceRecordData): string {
   const nodes = Object.keys(data.modelLineage.nodes ?? {});
-  return `di-pipeline · ${nodes.length} nodes · v2.1.0`;
+  // Derive the version from the canonical METHODOLOGY_VERSION so it can't drift
+  // out of sync with the DQI-methodology row on the same cover (a hardcoded
+  // "v2.1.0" contradicted the "v2.4.0" methodology row — two versions, one page).
+  return `di-pipeline · ${nodes.length} nodes · v${METHODOLOGY_VERSION}`;
 }
 
 /**

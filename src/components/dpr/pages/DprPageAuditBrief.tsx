@@ -97,7 +97,7 @@ export function DprPageAuditBrief({
               {Math.round(cover.dqi.score)}
             </span>
             <span style={{ fontSize: 15, opacity: 0.75 }}>
-              DQI · grade {cover.dqi.grade} (scale: A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40)
+              DQI · grade {cover.dqi.grade} (scale: A ≥ 85 · B ≥ 70 · C ≥ 55 · D ≥ 40 · F &lt; 40)
             </span>
           </div>
         </div>
@@ -129,20 +129,28 @@ export function DprPageAuditBrief({
             <p style={{ margin: 0 }}>
               <strong className="dpr-display" style={{ fontSize: 20 }}>
                 ~
-                {formatExposureLabel({
-                  exposureAmount: exposure.exposureAmount,
+                {/* clientSafe: mask the reader's own deal/exposure $ — this is a
+                    third-party-shareable export; the % + pattern stay (public). */}
+                {scrub(
+                  formatExposureLabel({
+                    exposureAmount: exposure.exposureAmount,
+                    ticketAmount: exposure.ticketAmount,
+                    ticketCurrency: exposure.currency,
+                    baseRateSource: exposure.baseRateSource,
+                  }),
+                  clientSafe
+                )}
+              </strong>{' '}
+              of capital exposure the committee would otherwise carry, uncaught. On this{' '}
+              {scrub(
+                formatExposureLabel({
+                  exposureAmount: exposure.ticketAmount,
                   ticketAmount: exposure.ticketAmount,
                   ticketCurrency: exposure.currency,
                   baseRateSource: exposure.baseRateSource,
-                })}
-              </strong>{' '}
-              of capital exposure the committee would otherwise carry, uncaught. On this{' '}
-              {formatExposureLabel({
-                exposureAmount: exposure.ticketAmount,
-                ticketAmount: exposure.ticketAmount,
-                ticketCurrency: exposure.currency,
-                baseRateSource: exposure.baseRateSource,
-              })}{' '}
+                }),
+                clientSafe
+              )}{' '}
               decision, the <strong>{exposure.drivingLabel}</strong> pattern carries an ~
               {exposure.baseRatePct}% historical miss rate across comparable decisions (
               {exposure.baseRateSource}).
