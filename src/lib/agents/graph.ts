@@ -13,6 +13,7 @@ import {
   rpdRecognitionNode,
   forgottenQuestionsNode,
   synergyValidationNode,
+  achNode,
 } from './nodes';
 import {
   AnalysisResult,
@@ -30,6 +31,7 @@ import {
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 import { type CrossDocContext } from '@/lib/rag/cross-document-context';
+import { type AchResult } from './ach';
 
 // Define the State using Annotation.Root
 const GraphState = Annotation.Root({
@@ -244,6 +246,11 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),
+  // ACH — competing-hypothesis analysis (the case the memo never argued against).
+  ach: Annotation<AchResult | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
 });
 
 // Routing function: only allow content into the analysis pipeline when
@@ -279,6 +286,7 @@ const workflow = new StateGraph(GraphState)
   // synergyDefensibility for structured signal alongside their LLM
   // judgment paths.
   .addNode('synergyValidationNode', synergyValidationNode)
+  .addNode('achNode', achNode) // ACH — the case the memo never argued against
   .addNode('metaJudgeNode', metaJudgeNode) // debate orchestration
   .addNode('riskScorer', riskScorerNode)
 
@@ -308,8 +316,9 @@ const workflow = new StateGraph(GraphState)
   .addEdge('intelligenceGatherer', 'rpdRecognitionNode')
   .addEdge('intelligenceGatherer', 'forgottenQuestionsNode')
   .addEdge('intelligenceGatherer', 'synergyValidationNode')
+  .addEdge('intelligenceGatherer', 'achNode')
 
-  // Fan-in: all 8 parallel super-nodes → metaJudgeNode
+  // Fan-in: all 9 parallel super-nodes → metaJudgeNode
   .addEdge('biasDetective', 'metaJudgeNode')
   .addEdge('noiseJudge', 'metaJudgeNode')
   .addEdge('verificationNode', 'metaJudgeNode')
@@ -318,6 +327,7 @@ const workflow = new StateGraph(GraphState)
   .addEdge('rpdRecognitionNode', 'metaJudgeNode')
   .addEdge('forgottenQuestionsNode', 'metaJudgeNode')
   .addEdge('synergyValidationNode', 'metaJudgeNode')
+  .addEdge('achNode', 'metaJudgeNode')
 
   // Meta Judge -> Final Risk Scorer
   .addEdge('metaJudgeNode', 'riskScorer')

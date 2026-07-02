@@ -40,6 +40,7 @@ import {
   mapGeminiToGateway,
 } from '../ai/gateway-gemini';
 import { buildStrategicConditionsPromptBlock } from '../deliverable/strategic-nodes';
+import { buildAchPrompt, parseAchResult } from './ach';
 import { MODEL_FRONTIER_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
@@ -480,7 +481,8 @@ type FrontierNodeKey =
   | 'deepAnalysis'
   | 'simulation'
   | 'rpdRecognition'
-  | 'biasDetective';
+  | 'biasDetective'
+  | 'ach';
 
 const FRONTIER_NODE_DEFAULTS: Record<FrontierNodeKey, string> = {
   // metaJudge is the ONLY node on the frontier model by default (2026-07-02
@@ -507,6 +509,12 @@ const FRONTIER_NODE_DEFAULTS: Record<FrontierNodeKey, string> = {
   // to A/B Opus here — the frontier branch swaps the search instruction for
   // an honest assess-against-provided-context one.
   biasDetective: '',
+  // ACH is the EXCEPTION to the Gemini-by-default re-scope: the spec is emphatic
+  // that a cheap model yields a weak bear case, which collapses the whole value.
+  // It is ONE parallel call (not the sequential metaJudge tail), so it defaults
+  // to Opus for a genuinely strong INDEPENDENT bear case. Cost-tune to Gemini via
+  // PIPELINE_MODEL_ACH=legacy; the node fails safe to Gemini on any frontier error.
+  ach: MODEL_FRONTIER_REASONING,
 };
 
 const FRONTIER_NODE_ENV: Record<FrontierNodeKey, string> = {
@@ -516,6 +524,7 @@ const FRONTIER_NODE_ENV: Record<FrontierNodeKey, string> = {
   simulation: 'PIPELINE_MODEL_SIMULATION',
   rpdRecognition: 'PIPELINE_MODEL_RPD_RECOGNITION',
   biasDetective: 'PIPELINE_MODEL_BIAS_DETECTIVE',
+  ach: 'PIPELINE_MODEL_ACH',
 };
 
 /**
@@ -1669,6 +1678,71 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
 // DEEP ANALYSIS SUPER-NODE (linguistic + strategic + cognitiveDiversity)
 // ============================================================
 
+/**
+ * achNode — Analysis of Competing Hypotheses (Heuer). The concrete proof layer
+ * for inside-view dominance + confirmation (DI-B-021 / DI-B-022): it generates
+ * the strongest INDEPENDENT bear case, then classifies how much of the memo's
+ * own support is NON-DIAGNOSTIC (equally true whether the thesis is right or
+ * wrong). A 9th parallel super-node — runs off the intelligenceGatherer state,
+ * independent of the bias detector (independence is the point: the bear case
+ * must not be anchored to the memo's framing). Additive + DISPLAY-ONLY (no DQI /
+ * scoring change). One frontier reasoning call (a cheap model yields a weak bear
+ * case, which collapses the value), tight timeout + retries:0 (parallel, so it
+ * fails fast to the Gemini fallback rather than dragging the fan-in). Blind-mode
+ * compatible: pure reasoning over the document's own content, NO retrieval —
+ * the most blind-proof detector in the pipeline. Fail-safe: any error → no ach.
+ */
+export async function achNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: never reason over un-anonymized content.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('achNode: anonymization not confirmed — skipping to protect PII');
+    return { ach: undefined };
+  }
+  const content = truncateText(state.structuredContent || '');
+  // Below a floor there is no memo to run competing hypotheses over.
+  if (content.trim().length < 200) return { ach: undefined };
+
+  const asOfNote = state.blindMode
+    ? 'BLIND: reason ONLY from the document as of its own date. Do not use any post-dated knowledge; the bear case is constructed from what the filing itself contained.'
+    : undefined;
+  const prompt = buildAchPrompt(content, asOfNote);
+
+  try {
+    const frontierAchModel = resolveFrontierModel('ach');
+    let responseText = '';
+    if (frontierAchModel) {
+      try {
+        // retries:0 — a parallel node must fail fast to the fallback, never sit
+        // through the 3×150s frontier retry envelope and drag the fan-in.
+        const frontier = await runModelCall(frontierAchModel, [prompt], {
+          jsonResponse: true,
+          timeoutMs: 90000,
+          retries: 0,
+        });
+        responseText = frontier.text;
+      } catch (err) {
+        log.warn('achNode: frontier call failed, falling back to Gemini', err);
+      }
+    }
+    if (!responseText) {
+      // Fallback (or the legacy default): ungrounded Gemini — ACH needs NO live
+      // search, so the ungrounded variant is correct in blind AND normal mode.
+      const result = await withGeminiResilience(
+        () => withTimeout(getUngroundedStandardModel().generateContent([prompt]), 60000),
+        1,
+        1000,
+        3000
+      );
+      responseText = result.response?.text ? result.response.text() : '';
+    }
+    const ach = parseAchResult(parseJSON(responseText));
+    return { ach: ach ?? undefined };
+  } catch (err) {
+    log.warn('achNode: analysis unavailable this run', err);
+    return { ach: undefined };
+  }
+}
+
 export async function deepAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
   // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
   if (state.anonymizationStatus !== 'success') {
@@ -2663,6 +2737,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       recognitionCues: state.recognitionCues ?? undefined,
       narrativePreMortem: state.narrativePreMortem ?? undefined,
       forgottenQuestions: state.forgottenQuestions ?? undefined,
+      ach: state.ach ?? undefined,
       marketContextApplied: state.marketContext
         ? {
             context: state.marketContext.context,

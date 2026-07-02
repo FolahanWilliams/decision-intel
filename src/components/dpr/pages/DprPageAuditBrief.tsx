@@ -66,6 +66,7 @@ export function DprPageAuditBrief({
   const cover = deliverable.cover;
   const exposure = cover.quantifiedExposure;
   const structural = deliverable.reasoningRisks.strategicExposure ?? [];
+  const ach = deliverable.reasoningRisks.ach;
   const questions = deliverable.historicalAnalogs.forgottenQuestions.filter(
     q => q.severity === 'critical' || q.severity === 'high'
   );
@@ -218,6 +219,34 @@ export function DprPageAuditBrief({
               </div>
             ))}
           </div>
+        </DprSection>
+      ) : null}
+
+      {/* ACH — the case the memo never argued against. The reasoning sibling
+          of the structural risk above: §1b.1 tests the STRUCTURE, this tests
+          the REASONING (is the argument load-bearing, or confirmation theater?). */}
+      {ach ? (
+        <DprSection
+          marker="§1b.1a"
+          eyebrow="Competing hypotheses"
+          title="The case the memo never argued against"
+          strap={`${Math.round(ach.nonDiagnosticShare * 100)}% of the memo's own supporting evidence is equally consistent with the failure case — it feels convincing without ruling out the opposite outcome. This is a process observation, universal to arguing from a thesis, never a verdict on it.`}
+        >
+          <p style={{ margin: '0 0 8px' }}>
+            <strong>The bear case:</strong> {scrub(ach.competingHypothesis, clientSafe)}
+          </p>
+          {ach.missingDiagnosticTests.length > 0 ? (
+            <>
+              <p style={{ margin: '0 0 2px', fontWeight: 600 }}>
+                The tests that would have settled it, and are absent:
+              </p>
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {ach.missingDiagnosticTests.slice(0, 4).map((t, i) => (
+                  <li key={i}>{scrub(t, clientSafe)}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
         </DprSection>
       ) : null}
 

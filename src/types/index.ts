@@ -88,6 +88,9 @@ export interface AnalysisResult {
   dqChain?: DQChainSummary;
   /** Questions the memo never asks but historical analogs had to answer. */
   forgottenQuestions?: ForgottenQuestionsResult;
+  /** ACH — the case the memo never argued against (competing-hypothesis analysis:
+   *  the bear case + how much of the memo's support is non-diagnostic). */
+  ach?: import('@/lib/agents/ach').AchResult;
   /**
    * Market-context priors applied to overconfidence detection. Surfaces in
    * the analysis detail page as a small chip so the user can see exactly

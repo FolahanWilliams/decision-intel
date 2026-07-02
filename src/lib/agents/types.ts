@@ -139,6 +139,10 @@ export interface AuditState {
   // "Forgotten Questions" — unknown-unknowns the memo never asks
   forgottenQuestions?: ForgottenQuestionsResult;
 
+  // ACH — the case the memo never argued against (competing-hypothesis analysis).
+  // Additive, display-only; produced by achNode, rendered on the deliverable + DPR.
+  ach?: import('./ach').AchResult;
+
   // Final Output
   finalReport?: AnalysisResult;
 }

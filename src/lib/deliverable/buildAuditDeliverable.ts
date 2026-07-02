@@ -315,6 +315,7 @@ function bucketReasoningRisks(
     counts,
     ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
     ...(bowtie ? { bowtie } : {}),
+    ...(result.ach ? { ach: result.ach } : {}),
     ...(synthesizedCriticals ? { synthesizedCriticals } : {}),
     ...(biasDetectionDegraded ? { biasDetectionDegraded } : {}),
   };

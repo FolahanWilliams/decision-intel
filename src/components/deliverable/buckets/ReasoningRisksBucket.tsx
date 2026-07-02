@@ -34,6 +34,7 @@ import type {
   ReferenceClassEntry,
 } from '@/lib/deliverable/types';
 import type { BowtieAnalysis, BowtieBarrier } from '@/lib/deliverable/bowtie';
+import type { AchResult, AchEvidenceItem } from '@/lib/agents/ach';
 import { ActionTitle } from '../ActionTitle';
 import { FindingCard } from '../FindingCard';
 import { ProgressiveDrawer } from '../ProgressiveDrawer';
@@ -62,6 +63,7 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
         {bucket.biasDetectionDegraded && <DegradedDetectorNotice />}
         {emptyHasStructural && <StrategicAttackPath nodes={bucket.strategicExposure!} />}
         {bucket.bowtie && <BowtieVisual analysis={bucket.bowtie} />}
+        {bucket.ach && <AchSection ach={bucket.ach} />}
         {synthesized.length > 0 ? (
           <>
             <div
@@ -114,6 +116,11 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
           committee reads on sight — the killer buyer visual, with the missing
           circuit-breakers named + the Taleb convexity / Perrow coupling verdicts. */}
       {bucket.bowtie && <BowtieVisual analysis={bucket.bowtie} />}
+
+      {/* ACH: the case the memo never argued against. Orthogonal to the bow-tie
+          — the bow-tie tests the STRUCTURE, ACH tests the REASONING (is the
+          argument load-bearing, or confirmation theater?). */}
+      {bucket.ach && <AchSection ach={bucket.ach} />}
 
       {/* The reasoning below is demoted from headline to explanation. */}
       {hasStructural && (pathways.length > 0 || gridFindings.length > 0) && (
@@ -1057,6 +1064,204 @@ function VerdictLine({ label, body }: { label: string; body: string }) {
   return (
     <div style={{ fontSize: 12.5, color: 'var(--text-secondary, #475569)', lineHeight: 1.45 }}>
       <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{label}:</strong> {body}
+    </div>
+  );
+}
+
+/**
+ * AchSection — "The case the memo never argued against" (Analysis of Competing
+ * Hypotheses, Heuer). Leads with the bear case + the one number the buyer feels
+ * (the % of the memo's own support that is non-diagnostic — equally true whether
+ * the thesis is right or wrong), then the missing diagnostic tests. Ego-safe: a
+ * PROCESS observation, universal to arguing FROM a thesis, never a verdict.
+ */
+const ACH_DIAGNOSTICITY_META: Record<
+  AchEvidenceItem['diagnosticity'],
+  { label: string; color: string }
+> = {
+  non_diagnostic: { label: "Doesn't discriminate", color: 'var(--severity-high, #d97706)' },
+  supports_thesis_only: { label: 'Supports the thesis', color: 'var(--success, #16A34A)' },
+  supports_bear_only: {
+    label: 'Cuts toward the bear case',
+    color: 'var(--severity-critical, #b91c1c)',
+  },
+};
+
+function AchSection({ ach }: { ach: AchResult }) {
+  const pct = Math.round(ach.nonDiagnosticShare * 100);
+  const nonDiagnostic = ach.evidence.filter(e => e.diagnosticity === 'non_diagnostic');
+  const diagnostic = ach.evidence.filter(e => e.diagnosticity !== 'non_diagnostic');
+  return (
+    <div
+      style={{
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: '4px solid var(--severity-critical, #b91c1c)',
+        borderRadius: 12,
+        padding: '18px 20px',
+        background: 'var(--bg-secondary, #F8FAFC)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <Brain size={14} style={{ color: 'var(--severity-critical, #b91c1c)' }} />
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'var(--text-muted, #64748B)',
+          }}
+        >
+          The case the memo never argued against
+        </span>
+        <span
+          style={{
+            marginLeft: 'auto',
+            fontSize: 12,
+            fontWeight: 800,
+            color:
+              pct >= 50 ? 'var(--severity-critical, #b91c1c)' : 'var(--severity-high, #d97706)',
+          }}
+        >
+          {pct}% of the support doesn&rsquo;t discriminate
+        </span>
+      </div>
+
+      <p
+        style={{ margin: 0, fontSize: 14, color: 'var(--text-primary, #0F172A)', lineHeight: 1.5 }}
+      >
+        The reasoning never argued against itself. {pct}% of the memo&rsquo;s own supporting
+        evidence is equally consistent with the failure case, so it feels convincing without ruling
+        out the opposite outcome.
+      </p>
+
+      <div>
+        <div
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'var(--severity-critical, #b91c1c)',
+            marginBottom: 4,
+          }}
+        >
+          The bear case it never confronted
+        </div>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13.5,
+            color: 'var(--text-secondary, #475569)',
+            lineHeight: 1.5,
+          }}
+        >
+          {ach.competingHypothesis}
+        </p>
+      </div>
+
+      {/* The non-diagnostic evidence — the confirmation theater */}
+      {nonDiagnostic.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--text-muted, #64748B)',
+            }}
+          >
+            Support that doesn&rsquo;t settle it ({nonDiagnostic.length} of {ach.evidence.length})
+          </div>
+          {nonDiagnostic.slice(0, 5).map((e, i) => (
+            <div
+              key={i}
+              style={{ fontSize: 12.5, color: 'var(--text-primary, #0F172A)', lineHeight: 1.4 }}
+            >
+              <span
+                style={{
+                  color: ACH_DIAGNOSTICITY_META[e.diagnosticity].color,
+                  fontWeight: 700,
+                  marginRight: 4,
+                }}
+              >
+                ·
+              </span>
+              {e.claim}
+              {e.note ? (
+                <span style={{ color: 'var(--text-muted, #64748B)' }}> — {e.note}</span>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* The missing tests — the actionable half */}
+      {ach.missingDiagnosticTests.length > 0 && (
+        <AchList
+          label="The tests that would have settled it (and are absent)"
+          tone="var(--severity-high, #d97706)"
+          items={ach.missingDiagnosticTests}
+        />
+      )}
+      {ach.whatWouldHaveToBeTrue.length > 0 && (
+        <AchList
+          label="What would have to be true for the thesis to win"
+          tone="var(--text-muted, #64748B)"
+          items={ach.whatWouldHaveToBeTrue}
+        />
+      )}
+
+      {diagnostic.length > 0 && (
+        <div style={{ fontSize: 11.5, color: 'var(--text-muted, #64748B)' }}>
+          {diagnostic.length} claim{diagnostic.length === 1 ? '' : 's'} did discriminate — the case
+          isn&rsquo;t empty, it&rsquo;s under-tested.
+        </div>
+      )}
+
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11,
+          color: 'var(--text-muted, #64748B)',
+          lineHeight: 1.5,
+          fontStyle: 'italic',
+        }}
+      >
+        A process observation, not a verdict on the thesis. Every advocacy memo carries this,
+        because it argues for the decision rather than testing it against its strongest rival. The
+        gap is structural, not a competence issue.
+      </p>
+    </div>
+  );
+}
+
+function AchList({ label, tone, items }: { label: string; tone: string; items: string[] }) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: tone,
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.55 }}>
+        {items.slice(0, 5).map((it, i) => (
+          <li key={i} style={{ fontSize: 12.5, color: 'var(--text-secondary, #475569)' }}>
+            {it}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

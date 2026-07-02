@@ -154,6 +154,11 @@ export interface ReasoningRisksBucket {
    *  convexity + Perrow coupling verdicts. Deterministic, display-only. Present
    *  only when `strategicExposure` is. */
   bowtie?: import('./bowtie').BowtieAnalysis;
+  /** ACH — the case the memo never argued against (Heuer competing-hypothesis
+   *  analysis). Orthogonal to the bow-tie: the bow-tie tests the STRUCTURE, ACH
+   *  tests the REASONING (is the argument load-bearing or confirmation theater?).
+   *  Display-only. Present only when achNode produced a result. */
+  ach?: import('@/lib/agents/ach').AchResult;
   /** Cross-module synthesis (2026-07-02): when the reasoning lane carries
    *  ZERO bias-shaped findings but the adversarial modules surfaced
    *  critical/high findings, those findings render HERE so the primary
