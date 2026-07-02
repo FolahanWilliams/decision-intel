@@ -34,7 +34,7 @@ import { apiError } from '@/lib/utils/api-response';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { extractIp } from '@/lib/utils/request';
 import { generateText } from '@/lib/ai/providers/gateway';
-import { MODEL_FRONTIER_REASONING } from '@/lib/ai/gateway-models';
+import { MODEL_ANALYTICAL } from '@/lib/ai/gateway-models';
 import { validateActionTitle } from '@/lib/deliverable/actionTitleTemplates';
 import { buildAuditDeliverable } from '@/lib/deliverable/buildAuditDeliverable';
 import type { AnalysisResult } from '@/types';
@@ -234,14 +234,13 @@ export async function POST(req: NextRequest) {
   let llmTitles: string[] = [];
   try {
     const prompt = buildPrompt(deliverable);
-    // deepseek → Sonnet 5 → Opus 4.8 (2026-07-02): the action titles are the
-    // headline language a board forwards — the most buyer-visible prose in the
-    // deliverable — so they get the ceiling model (Sonnet 5 dropped as pricier +
-    // slower + weaker). NO temperature param: Anthropic 4.7+ models reject it
-    // with a 400, which would silently degrade this route to templates-only via
-    // the catch below.
+    // deepseek → Sonnet 5 → Opus 4.8 → Gemini 3 Flash (2026-07-02 cost pass):
+    // the action titles are the headline language a board forwards, but this is a
+    // short prose-rewrite where Gemini 3 Flash is fine + far cheaper. On any
+    // failure the route degrades to the deterministic templates below.
     const llm = await generateText(prompt, {
-      model: MODEL_FRONTIER_REASONING,
+      model: MODEL_ANALYTICAL,
+      temperature: 0.4,
       maxOutputTokens: 512,
     });
     llmTitles = parseLLMResponse(llm.text);

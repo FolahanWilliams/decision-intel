@@ -443,10 +443,15 @@ export async function POST(request: NextRequest) {
 
           let result: Record<string, unknown> | null = null;
 
-          // Safety timeout: close stream 5s before Vercel maxDuration
+          // Safety timeout: close the stream 20s before the 300s Vercel
+          // maxDuration (was 5s — too tight: the status='error' + reservation
+          // release below raced the function kill and often lost, leaving the
+          // doc stuck 'analyzing'). With the metaJudge-hang fix a healthy audit
+          // now completes ~200s, so this backstop should rarely fire — but when
+          // it does, the wider window makes the cleanup land reliably.
           // Declared as let so it's accessible in the catch block
           streamAbsoluteTimeout = setTimeout(() => {
-            log.error('Stream absolute timeout (295s) exceeded — closing');
+            log.error('Stream absolute timeout (280s) exceeded — closing');
             sendUpdate({
               type: 'error',
               message: 'Analysis timeout exceeded. Please try again with a shorter document.',
@@ -477,7 +482,7 @@ export async function POST(request: NextRequest) {
                 log.warn('Timeout cleanup: failed to release reservation:', err);
               }
             })();
-          }, 295_000);
+          }, 280_000);
 
           for await (const event of eventStream) {
             // Track node start events

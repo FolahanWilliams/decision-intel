@@ -315,9 +315,18 @@ function isGatewayModel(name: string): boolean {
 async function runModelCall(
   modelName: string,
   prompts: string[],
-  options: { temperature?: number; timeoutMs?: number; jsonResponse?: boolean } = {}
+  options: {
+    temperature?: number;
+    timeoutMs?: number;
+    jsonResponse?: boolean;
+    // Retry budget (default 2 = up to 3 attempts). SEQUENTIAL tail nodes on a
+    // frontier model (metaJudge) MUST pass 0 — 3 attempts × a 150s Anthropic
+    // timeout is 450s, which blows the 300s route budget and hangs the audit.
+    retries?: number;
+  } = {}
 ): Promise<{ text: string; modelName: string }> {
   const temperature = options.temperature ?? 0.3;
+  const retries = options.retries ?? 2;
 
   if (isGatewayModel(modelName)) {
     // Lazy-import the gateway provider so the pipeline bundle stays
@@ -353,7 +362,7 @@ async function runModelCall(
             }),
             timeoutMs
           ),
-        2,
+        retries,
         1000,
         10000
       )
@@ -397,31 +406,26 @@ function createModelByName(
  * Returns empty array if not set (falls back to default single-model jury).
  */
 /**
- * Default cross-model jury — 2 model families across 3 frames
- * (locked 2026-07-02, frontier model-tier upgrade; supersedes the
- * 2026-05-06 Grok arm — founder-dropped: "Grok is not that good"; Sonnet 5
- * dropped 2026-07-02 — founder-flagged as pricier + slower [p50 1m vs Opus
- * 19s in the gateway dashboard] + weaker, so the two Anthropic arms are now
- * both Opus 4.8):
- *   [0] analyst_skeptical     → gemini-3-flash-preview (Google, native)
- *   [1] regulator_hostile     → anthropic/claude-opus-4-8 (via AI Gateway)
- *   [2] contrarian_strategist → anthropic/claude-opus-4-8 (via AI Gateway)
+ * Default noise jury — 3 frames on Gemini 3 Flash (locked 2026-07-02 cost +
+ * consistency pass; supersedes the 2026-05-06 Grok arm — "Grok is not that
+ * good" — and the brief Opus/Sonnet arms):
+ *   [0] analyst_skeptical     → gemini-3-flash-preview
+ *   [1] regulator_hostile     → gemini-3-flash-preview
+ *   [2] contrarian_strategist → gemini-3-flash-preview
  *
- * The two Anthropic arms run the SAME model but DIFFERENT frames (hostile-GC
- * rubric vs contrarian-strategist), so they stay decorrelated by framing —
- * the noise signal comes from stochastic + framing + the Gemini cross-family
- * arm. The Gemini arm stays for architectural diversity + graceful
- * degradation: a gateway outage degrades to a 1-valid-judge fallback
- * (aggregator handles it), a Gemini outage leaves 2 Anthropic arms. Anthropic
- * arms receive NO temperature param (4.7+ models 400 on it — see
- * runModelCall). Override via NOISE_JURY_MODELS env var (comma-separated
- * 3-model list, e.g. the legacy
- * "gemini-3-flash-preview,xai/grok-4.3,gemini-3-flash-preview").
+ * The jury MEASURES noise (score variance across decorrelated samples) — it is
+ * not a place the ceiling model earns its cost. The variance comes from the 3
+ * DIFFERENT professional frames (analyst / hostile-GC / contrarian) + stochastic
+ * sampling; cross-family diversity is a nice-to-have, not load-bearing, and an
+ * Opus arm here just adds latency + spend to every audit. Fast + cheap + reliable
+ * is the right call for a variance measurement. Override via NOISE_JURY_MODELS
+ * env var to A/B a cross-model jury (comma-separated 3-model list, e.g.
+ * "gemini-3-flash-preview,anthropic/claude-opus-4-8,gemini-3-flash-preview").
  */
 const DEFAULT_NOISE_JURY_MODELS = [
   'gemini-3-flash-preview',
-  MODEL_FRONTIER_REASONING,
-  MODEL_FRONTIER_REASONING,
+  'gemini-3-flash-preview',
+  'gemini-3-flash-preview',
 ] as const;
 
 function getNoiseJuryModels(): string[] {
@@ -479,15 +483,24 @@ type FrontierNodeKey =
   | 'biasDetective';
 
 const FRONTIER_NODE_DEFAULTS: Record<FrontierNodeKey, string> = {
+  // metaJudge is the ONLY node on the frontier model by default (2026-07-02
+  // cost + consistency pass). It's the final verdict — the single
+  // highest-leverage call — so it gets Opus 4.8; and the metaJudge node
+  // bulletproofs it with a tight 70s / single-attempt budget + a fast Gemini
+  // fallback so it can never hang the audit (the metaJudge-hang fix).
   metaJudge: MODEL_FRONTIER_REASONING,
-  forgottenQuestions: MODEL_FRONTIER_REASONING,
-  // The reasoning tier is now UNIFORMLY Opus 4.8 (2026-07-02): Sonnet 5 was
-  // founder-dropped as pricier (more total spend, via more nodes) + slower
-  // (p50 1m vs Opus 19s in the gateway dashboard) + weaker. Per-node
-  // PIPELINE_MODEL_{DEEP_ANALYSIS,SIMULATION,RPD_RECOGNITION} still override.
-  deepAnalysis: MODEL_FRONTIER_REASONING,
-  simulation: MODEL_FRONTIER_REASONING,
-  rpdRecognition: MODEL_FRONTIER_REASONING,
+  // The SECONDARY reasoning nodes were reverted to their proven, fast, cheap
+  // Gemini path (empty = legacy gateway-Gemini). Founder call: at 10 refinement
+  // audits + ~6/day at GTM, the Opus/Sonnet quality gain on these nodes is
+  // modest and NOT worth the per-audit cost AND the added latency (the extra
+  // slow frontier calls were pushing the pipeline past the 300s ceiling and
+  // hanging it). Fermi proved the ontology carries the value on Gemini 3 Flash.
+  // Per-node PIPELINE_MODEL_{FORGOTTEN_QUESTIONS,DEEP_ANALYSIS,SIMULATION,
+  // RPD_RECOGNITION} override to A/B a frontier model on any of these.
+  forgottenQuestions: '',
+  deepAnalysis: '',
+  simulation: '',
+  rpdRecognition: '',
   // Empty = legacy grounded Gemini. The bias detective's prompt instructs
   // live Google-Search verification of claims; routing it to an ungrounded
   // model makes that instruction unfollowable. Set PIPELINE_MODEL_BIAS_DETECTIVE
@@ -2335,32 +2348,58 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
     const metaBlindPrompt = state.blindMode
       ? metaJudgePrompt + metaStructuralBlock + BLIND_RETRO_DISCIPLINE
       : metaJudgePrompt + metaStructuralBlock;
-    let verdict: string;
+    let verdict = '';
+    let verdictModel = frontierMetaModel ?? 'legacy-gemini';
+
+    // The metaJudge is the LAST, SEQUENTIAL node — by the time it runs, most of
+    // the 300s route budget is spent on the parallel analysis nodes. So when the
+    // verdict is on a frontier model (Opus 4.8, the highest-leverage single
+    // call), it gets a TIGHT budget: ONE attempt, 70s. If Opus is slow or hangs
+    // (the huge synthesis prompt can push it well past its ~19s p50), we do NOT
+    // burn the budget on retries — we fall straight through to the fast Gemini
+    // path below, so the audit ALWAYS lands a real verdict + completes under
+    // maxDuration. (This is the 2026-07-02 metaJudge-hang fix: the old
+    // withRetry(2) × 150s = 450s could exceed the 300s ceiling and leave the
+    // document stuck 'analyzing'.)
     if (frontierMetaModel) {
-      const frontier = await runModelCall(frontierMetaModel, [metaBlindPrompt], {
-        jsonResponse: false,
-      });
-      verdict = frontier.text || 'Meta-Verdict could not be generated.';
-    } else {
-      // BLIND MODE: ungrounded pro variant (prose output, no live search).
+      try {
+        const frontier = await runModelCall(frontierMetaModel, [metaBlindPrompt], {
+          jsonResponse: false,
+          timeoutMs: 70000,
+          retries: 0,
+        });
+        verdict = (frontier.text || '').trim();
+      } catch (frontierErr) {
+        log.warn(
+          `metaJudge frontier model (${frontierMetaModel}) failed/timed out — falling back to fast Gemini: ` +
+            (frontierErr instanceof Error ? frontierErr.message : String(frontierErr))
+        );
+      }
+    }
+
+    // Fast Gemini fallback (also the default path when no frontier model is
+    // configured). Ungrounded in blind mode; grounded Gemini otherwise. Short
+    // timeout + a single retry keeps it well inside the remaining budget.
+    if (!verdict) {
+      verdictModel = state.blindMode ? 'gemini-ungrounded' : 'gemini-grounded';
       const metaModel = state.blindMode
         ? createModelInstance({
             safetyLevel: 'standard',
-            modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-2.5-pro'),
+            modelName: getOptionalEnvVar('GEMINI_MODEL_PRO', 'gemini-3-flash-preview'),
             jsonResponse: false,
           })
         : getProStandardSafetyGroundedModel();
       const result = await withGeminiResilience(
-        () => withTimeout(metaModel.generateContent([metaBlindPrompt]), 60000),
-        2,
+        () => withTimeout(metaModel.generateContent([metaBlindPrompt]), 40000),
+        1,
         1000,
-        10000
+        3000
       );
-      verdict = result.response?.text
-        ? result.response.text()
-        : 'Meta-Verdict could not be generated.';
+      verdict = (result.response?.text ? result.response.text() : '').trim();
     }
-    log.info(`Meta-Judge complete (model=${frontierMetaModel ?? 'legacy-gemini-pro'}).`);
+
+    if (!verdict) verdict = 'Meta-Verdict could not be generated.';
+    log.info(`Meta-Judge complete (model=${verdictModel}).`);
 
     return {
       metaVerdict: verdict,
