@@ -29,6 +29,9 @@ import { DprSection } from '../primitives/DprSection';
 import { DprNotice } from '../primitives/DprNotice';
 import { STRATEGIC_NODE_CLASS_LABEL } from '@/lib/deliverable/strategic-nodes';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
+import type { StructuralFragility } from '@/lib/deliverable/fragility-index';
+import { FRAGILITY_BAND_LABEL } from '@/lib/deliverable/fragility-index';
+import { RESILIENCE_DIMENSION_LABEL } from '@/lib/deliverable/resilience-signature';
 import { scrubClientSafe } from '@/lib/reports/client-safe-scrub';
 import type { AuditDeliverable } from '@/lib/deliverable/types';
 
@@ -165,6 +168,13 @@ export function DprPageAuditBrief({
           </div>
         ) : null}
 
+        {/* Structural fragility — the SECOND AXIS (2026-07-02). The DQI is risk
+            density (how bold); this is whether a shock cascades or is absorbed —
+            the discrimination a single score can't produce. */}
+        {cover.structuralFragility ? (
+          <StructuralFragilityBlock fragility={cover.structuralFragility} />
+        ) : null}
+
         {/* SCQA — the one-glance narrative */}
         <div className="dpr-finding-block" style={{ marginTop: 12 }}>
           <div className="dpr-finding-block-label">
@@ -280,6 +290,45 @@ function ScqaLabel({ children }: { children: React.ReactNode }) {
     >
       {children}
     </span>
+  );
+}
+
+/**
+ * Structural fragility — the SECOND AXIS on the DPR (2026-07-02). The DQI is
+ * risk density (how bold); this is whether a shock cascades (fragile) or is
+ * absorbed (resilient), crediting the staging / reserves / exits the engine
+ * used to ignore, and naming the missing circuit-breakers. Honest boundary: the
+ * structure (snowpack), never the trigger (snowflake). No $ or names → no scrub.
+ */
+function StructuralFragilityBlock({ fragility }: { fragility: StructuralFragility }) {
+  const missing = fragility.missingResilience.slice(0, 4);
+  return (
+    <div className="dpr-finding-block" style={{ marginTop: 12 }}>
+      <div className="dpr-finding-block-label">
+        <span className="dpr-finding-block-rule" />
+        <span>
+          Structural fragility · {FRAGILITY_BAND_LABEL[fragility.band]} ({fragility.index}/100)
+        </span>
+      </div>
+      <p style={{ margin: 0 }}>{fragility.headline}</p>
+      <p style={{ margin: '4px 0 0', fontSize: '0.92em', opacity: 0.82 }}>
+        The DQI measures risk density — how bold this bet is. This axis measures whether a shock
+        would cascade or be absorbed. It reads the structure (the snowpack), not the trigger
+        (execution or an exogenous shift no ex-ante audit can see).
+      </p>
+      {fragility.resilienceMarkers.length > 0 ? (
+        <p style={{ margin: '5px 0 0', fontSize: '0.92em' }}>
+          <strong>Absorbs shocks:</strong>{' '}
+          {fragility.resilienceMarkers.map(m => m.label).join(' · ')}
+        </p>
+      ) : null}
+      {missing.length > 0 ? (
+        <p style={{ margin: '5px 0 0', fontSize: '0.92em' }}>
+          <strong>Would make it survivable:</strong>{' '}
+          {missing.map(d => RESILIENCE_DIMENSION_LABEL[d]).join(' · ')}
+        </p>
+      ) : null}
+    </div>
   );
 }
 

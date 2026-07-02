@@ -425,6 +425,22 @@ export const POSITIONING_EPISTEMIC_HONESTY =
   'Decision Intel identifies reasoning-risk indicators correlated with poor outcomes — it does not claim to establish causation. That honesty is the procurement weapon: a CSO can defend a score that names the risk indicators a committee should pressure-test, not one that pretends to prove the cause.';
 
 /**
+ * Structural-fragility engine — the contrarian reframe (locked 2026-07-02,
+ * five-case blind-calibration validated). The DQI measures RISK DENSITY (how
+ * bold a bet is), which is why it over-flags bold winners — Amazon's 1997 S-1
+ * scored the same 32 as a failure, because boldness looks identical ex ante for
+ * a winner and a zero. The discriminator is FRAGILITY: does the structure
+ * cascade or absorb a shock? You cannot see the snowflake (the trigger —
+ * execution / an exogenous shock, not in the memo); you CAN measure the snowpack
+ * (the structure — concentration / irreversibility / coupling / no-reserves /
+ * no-kill-switch, all in the memo). Surfaced as a SECOND AXIS (risk × fragility)
+ * on the deliverable; making it a first-class DQI input is a founder-gated
+ * methodology change (calibrated against the winner signature + held-out parity).
+ */
+export const POSITIONING_FRAGILITY_ENGINE =
+  "We don't predict the trigger — the snowflake (execution, an exogenous shock) that isn't in the memo, that no one can predict. We measure the snowpack: the structural fragility — concentration, irreversibility, tight coupling, no reserves, no kill-switch — that decides whether a shock cascades into a write-down or gets absorbed. Boldness is not the danger; every frontier bet is bold. A bold bet with no staging, reserve, or exit is. That question is answerable blind, it is the thing a CSO can't see from inside the deal, and we name the specific staging, reserve, or exit trigger that makes it survivable — no outcome-prediction overclaim.";
+
+/**
  * Decision system of record · positioning extension (locked v3.2).
  *
  * Decision Intel is the system of record for DECISIONS specifically — not
@@ -858,6 +874,9 @@ export function buildPositioningPromptBlock(): string {
     competitiveLines,
     ``,
     `EPISTEMIC-HONESTY / CAUSALITY REBUTTAL (locked 2026-05-31 — GPT-pushback-validated; the sharpest sophisticated-buyer challenge): when a CSO / GC says "you flagged a bias and the deal failed, but you can't prove the bias CAUSED it vs the market / rates / integration" — AGREE, then turn it into the moat: "${POSITIONING_EPISTEMIC_HONESTY}" Three beats: (1) concede correlation is not causation; (2) reframe what DI claims — risk INDICATORS the committee should pressure-test, not a proven cause; (3) close on why that is MORE defensible for an audit committee, not less. NEVER let marketing or JSON-LD copy assert a detected bias CAUSED a historical outcome (historical-analysis prose in the 143-case library is fine; product claims are not).`,
+    ``,
+    ``,
+    `STRUCTURAL-FRAGILITY REFRAME (locked 2026-07-02, five-case blind-calibration validated — the contrarian core; deploy when a buyer/investor asks "so you predict good vs bad decisions?" or "how is this different from a bias checklist?"): "${POSITIONING_FRAGILITY_ENGINE}" The DQI measures RISK DENSITY (how bold), NOT outcome — that is why a bold winner (Amazon 1997) scores like a failure blind, and why we NEVER claim to pick winners. The discriminator is the SECOND AXIS, structural fragility: risk × fragility as a 2×2 (Amazon = high-risk / low-fragility = survivable bold; Fermi = high-risk / high-fragility = the avalanche zone). We read the snowpack (structure, in the memo), never the snowflake (the trigger — execution / an exogenous shift, not in the memo). Making fragility feed the DQI score itself is a founder-gated methodology change (calibrated against the winner signature + a held-out parity run) — the SHIPPED version is a display axis, so speak it as "a second axis alongside the DQI", NEVER "we changed the score".`,
     ``,
     `Protected category noun: "${CATEGORY_CLAIM}". Treat like R²F / DPR / DQI — never substitute synonyms in shipped surfaces. Only allowed deviation: "the reasoning audit" (drop "platform") for cold LinkedIn DMs / conference introductions where SaaS-platform vocabulary sounds heavy.`,
     ``,

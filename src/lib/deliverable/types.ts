@@ -311,6 +311,13 @@ export interface SCQAExecutiveSummary {
    *  degraded-node ledger). Non-empty → the cover renders an honesty strip
    *  instead of letting the outage read as a clean result. */
   degradedNodes?: string[];
+  /** The structural-fragility SECOND AXIS (2026-07-02) — orthogonal to the DQI.
+   *  The DQI measures risk density (how bold the bet is); this measures whether
+   *  a shock CASCADES (fragile) or is ABSORBED (resilient). The risk × fragility
+   *  2×2 is the discrimination a single score can't produce (Amazon = high-risk
+   *  / low-fragility; Fermi = high-risk / high-fragility). Display-only — does
+   *  NOT feed the DQI. Absent when no structural signal was detected. */
+  structuralFragility?: import('./fragility-index').StructuralFragility;
 }
 
 // ──────────────────────────────────────────────────────────────────────

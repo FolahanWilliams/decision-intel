@@ -17,6 +17,9 @@ import { EyeOff, ShieldCheck, TriangleAlert } from 'lucide-react';
 import type { SCQAExecutiveSummary as SCQAType } from '@/lib/deliverable/types';
 import type { QuantifiedExposure } from '@/lib/deliverable/quantified-exposure';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
+import type { StructuralFragility } from '@/lib/deliverable/fragility-index';
+import { FRAGILITY_BAND_LABEL } from '@/lib/deliverable/fragility-index';
+import { RESILIENCE_DIMENSION_LABEL } from '@/lib/deliverable/resilience-signature';
 import { ActionTitle } from './ActionTitle';
 import { DqiRadialGauge } from './charts/DqiRadialGauge';
 
@@ -85,6 +88,17 @@ export function SCQAExecutiveSummary({
           precedent. Honest — deal size × a cited base rate, never "we saved you". */}
       {cover.quantifiedExposure ? (
         <QuantifiedExposureBanner exposure={cover.quantifiedExposure} />
+      ) : null}
+
+      {/* Structural fragility — the SECOND AXIS (2026-07-02). The DQI says how
+          BOLD this is (risk density); this says whether the boldness CASCADES
+          or is ABSORBED. The risk × fragility framing is the discrimination a
+          single score can't produce. Display-only — never feeds the DQI. */}
+      {cover.structuralFragility ? (
+        <StructuralFragilityBanner
+          fragility={cover.structuralFragility}
+          dqiScore={cover.dqi.score}
+        />
       ) : null}
 
       {/* SCQA 4-line grid — the Pyramid apex narrative */}
@@ -201,8 +215,8 @@ function DegradedRunStrip({ nodes }: { nodes: string[] }) {
         style={{ color: 'var(--warning, #d97706)', flexShrink: 0, marginTop: 1 }}
       />
       <div style={{ fontSize: 12.5, lineHeight: 1.5, color: 'var(--text-secondary, #475569)' }}>
-        <strong style={{ color: 'var(--warning, #d97706)' }}>Partial coverage:</strong> {labels}{' '}
-        was unavailable this run due to a model-provider error. Findings from the other modules are
+        <strong style={{ color: 'var(--warning, #d97706)' }}>Partial coverage:</strong> {labels} was
+        unavailable this run due to a model-provider error. Findings from the other modules are
         unaffected. Re-run the audit for full coverage.
       </div>
     </div>
@@ -301,6 +315,133 @@ function QuantifiedExposureBanner({ exposure }: { exposure: QuantifiedExposure }
           </>
         ) : null}
       </p>
+    </div>
+  );
+}
+
+const FRAGILITY_ACCENT: Record<
+  StructuralFragility['band'],
+  { bg: string; fg: string; border: string }
+> = {
+  absorbing: { bg: '#F0FDF4', fg: '#15803D', border: '#BBF7D0' },
+  mixed: { bg: '#FEFCE8', fg: '#A16207', border: '#FDE68A' },
+  fragile: { bg: '#FFF7ED', fg: '#C2410C', border: '#FED7AA' },
+  avalanche_zone: { bg: '#FEF2F2', fg: '#B91C1C', border: '#FECACA' },
+};
+
+/**
+ * Structural fragility — the SECOND AXIS (2026-07-02). The DQI measures risk
+ * density (how bold); this measures whether a shock CASCADES or is ABSORBED.
+ * Credits the resilience the engine used to ignore (staging, reserves, exits)
+ * and names the missing circuit-breakers as the actionable "make it survivable".
+ * Honest boundary: it reads the STRUCTURE (snowpack), never the TRIGGER
+ * (snowflake — execution / an exogenous shock no ex-ante audit can see).
+ */
+function StructuralFragilityBanner({
+  fragility,
+  dqiScore,
+}: {
+  fragility: StructuralFragility;
+  dqiScore: number;
+}) {
+  const c = FRAGILITY_ACCENT[fragility.band] ?? FRAGILITY_ACCENT.mixed;
+  const bold = dqiScore < 55; // a low DQI = high risk density (a bold bet)
+  const missing = fragility.missingResilience.slice(0, 4);
+  return (
+    <div
+      style={{
+        border: `1px solid ${c.border}`,
+        background: c.bg,
+        borderRadius: 12,
+        padding: '14px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: c.fg,
+          }}
+        >
+          Structural fragility
+        </span>
+        <span style={{ fontSize: 19, fontWeight: 800, color: c.fg }}>
+          {FRAGILITY_BAND_LABEL[fragility.band]}
+        </span>
+        <span style={{ fontSize: 12, color: 'var(--text-muted, #64748B)' }}>
+          · {fragility.index}/100
+        </span>
+      </div>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 13,
+          lineHeight: 1.5,
+          color: 'var(--text-secondary, #475569)',
+        }}
+      >
+        {fragility.headline}
+      </p>
+      <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: 'var(--text-muted, #64748B)' }}>
+        The DQI measures <strong>risk density</strong> — how bold and unvalidated this bet is. This
+        second axis measures whether a shock would <strong>cascade or be absorbed</strong>.
+        {bold
+          ? ' A bold bet is not the danger; a bold bet with no staging, reserve, or exit is.'
+          : ''}{' '}
+        We read the structure (the snowpack), not the trigger (the snowflake — execution or an
+        exogenous shift no ex-ante audit can see).
+      </p>
+      {fragility.resilienceMarkers.length > 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted, #64748B)', fontWeight: 700 }}>
+            Absorbs shocks:
+          </span>
+          {fragility.resilienceMarkers.map(m => (
+            <span
+              key={m.id}
+              title={m.absorbs}
+              style={{
+                fontSize: 11,
+                padding: '2px 9px',
+                borderRadius: 999,
+                background: '#F0FDF4',
+                color: '#15803D',
+                border: '1px solid #BBF7D0',
+              }}
+            >
+              {m.label}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {missing.length > 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted, #64748B)', fontWeight: 700 }}>
+            Would make it survivable:
+          </span>
+          {missing.map(d => (
+            <span
+              key={d}
+              style={{
+                fontSize: 11,
+                padding: '2px 9px',
+                borderRadius: 999,
+                background: 'var(--bg-secondary, #F8FAFC)',
+                color: 'var(--text-secondary, #475569)',
+                border: '1px dashed var(--border-color, #E2E8F0)',
+              }}
+            >
+              {RESILIENCE_DIMENSION_LABEL[d]}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

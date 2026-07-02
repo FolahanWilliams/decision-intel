@@ -35,6 +35,8 @@ import { extractTicketFromContent } from './ticket-extractor';
 import { buildReferenceClass } from './referenceClass';
 import { getNamedPattern } from '@/lib/learning/named-patterns';
 import { detectStrategicNodes } from './strategic-nodes';
+import { detectResilienceMarkers } from './resilience-signature';
+import { computeStructuralFragility } from './fragility-index';
 import { computeQuantifiedExposure } from './quantified-exposure';
 import {
   coverActionTitle,
@@ -629,6 +631,19 @@ function composeCover(
   // derivation + the precedent. Null-safe (no ticket → no number).
   const quantifiedExposure = computeQuantifiedExposure(reasoningRisks.findings);
 
+  // The structural-fragility SECOND AXIS (2026-07-02). The DQI measures risk
+  // density (boldness); this measures whether the STRUCTURE absorbs a shock or
+  // cascades. Fragility conditions (already detected into strategicExposure)
+  // offset by the resilience markers the engine now CREDITS (staging, reserves,
+  // exit triggers, optionality, diversification). Orthogonal to the DQI,
+  // display-only — the risk × fragility 2×2. Omitted when nothing was detected.
+  const resilienceMarkers = detectResilienceMarkers(result.structuredContent ?? '');
+  const fragilityNodes = reasoningRisks.strategicExposure ?? [];
+  const structuralFragility =
+    fragilityNodes.length > 0 || resilienceMarkers.length > 0
+      ? computeStructuralFragility(fragilityNodes, resilienceMarkers)
+      : undefined;
+
   return {
     actionTitle,
     quantifiedExposure,
@@ -662,6 +677,7 @@ function composeCover(
     ...(options.degradedNodes && options.degradedNodes.length > 0
       ? { degradedNodes: options.degradedNodes }
       : {}),
+    ...(structuralFragility ? { structuralFragility } : {}),
   };
 }
 
@@ -703,7 +719,13 @@ export function buildAuditDeliverable(
   const historicalAnalogs = bucketHistoricalAnalogs(result, effectiveOptions);
   const counterfactuals = bucketCounterfactuals(result, effectiveOptions);
   const provenance = bucketProvenance(result, effectiveOptions);
-  const cover = composeCover(result, reasoningRisks, counterfactuals, effectiveOptions, crossModule);
+  const cover = composeCover(
+    result,
+    reasoningRisks,
+    counterfactuals,
+    effectiveOptions,
+    crossModule
+  );
 
   const id = effectiveOptions.analysisId ?? effectiveOptions.documentId;
 
