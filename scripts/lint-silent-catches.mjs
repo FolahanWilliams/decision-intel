@@ -321,7 +321,10 @@ const SCAN_DIR = join(ROOT, 'src');
 // 244 (2026-07-02 gateway-Gemini migration — +1 canonical res.text() error-body
 // parse in gatewayGeminiEmbed: surfaces the gateway's HTTP error diagnostic in
 // the thrown message; the throw itself fails CLOSED, nothing swallowed)
-const SILENT_CATCH_BASELINE = 244;
+// 244 → 245 (2026-07-02 multi-doc combine): the combineAndAnalyze handler's
+// `res.json().catch(() => null)` on /api/upload/multi — canonical body-parse
+// exception (surface the API error, else a default; no write swallowed).
+const SILENT_CATCH_BASELINE = 245;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

@@ -1118,6 +1118,77 @@ export default function Dashboard() {
     e.target.value = '';
   };
 
+  // Combine 2-N documents into ONE decision (2026-07-02). Sometimes a single
+  // filing isn't the whole decision — it's 2-3 official documents that together
+  // ARE the decision (an S-1 + its 424B4; an 8-K announcement + the deal
+  // exhibit). POST them to /api/upload/multi (stitched with fair per-source
+  // budgeting so every source is thoroughly pulled from) → one Document → the
+  // normal analyze stream. Additive: the single + separate-bulk paths are untouched.
+  const combineAndAnalyze = async (files: File[]) => {
+    if (files.length < 2) return;
+    setBulkFiles(null);
+    setError(null);
+    setUploading(true);
+    setUploadProgress(0);
+    setUploadPhase('uploading');
+    try {
+      const formData = new FormData();
+      for (const f of files) formData.append('files', f);
+      if (selectedDocType) formData.append('documentType', selectedDocType);
+      const res = await fetch('/api/upload/multi', { method: 'POST', body: formData });
+      // canonical res.json() body-parse exception — surface the API error, else a default.
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.id) {
+        throw new Error(data?.error || `Failed to combine documents (${res.status})`);
+      }
+      setUploadPhase('analyzing');
+      if (data.cached) {
+        await mutateDocs(undefined, { revalidate: true });
+        showToast('You already audited this combined decision — opening it.', 'info');
+        router.push(`/documents/${data.id}`);
+        return;
+      }
+      biasCountRef.current = 0;
+      detectedBiasesRef.current = [];
+      noiseScoreRef.current = undefined;
+      setLastCompletedAnalysis(null);
+      startTracking(data.id, data.filename);
+      const finalResult = await startAnalysis(data.id, { blindMode: blindRetroMode });
+      if (finalResult) {
+        const score = finalResult?.overallScore as number;
+        const resolvedAnalysisId =
+          typeof (finalResult as Record<string, unknown>).analysisId === 'string'
+            ? ((finalResult as Record<string, unknown>).analysisId as string)
+            : null;
+        completeTracking(data.id);
+        setLastCompletedAnalysis({
+          docId: data.id,
+          filename: data.filename,
+          overallScore: score,
+          biasCount: biasCountRef.current,
+          noiseScore: noiseScoreRef.current,
+          detectedBiases: [...detectedBiasesRef.current],
+          analysisId: resolvedAnalysisId,
+        });
+        addNotification({
+          type: score < 40 ? 'low_score' : 'analysis_complete',
+          title: score < 40 ? 'Low Score Alert' : 'Analysis Complete',
+          message: `${data.filename} scored ${score}/100`,
+          href: `/documents/${data.id}`,
+        });
+      }
+      await mutateDocs(undefined, { revalidate: true });
+    } catch (err) {
+      const detailedMsg = getDetailedErrorMessage(err);
+      log.error('Combine/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
+      setError(detailedMsg);
+      showToast(detailedMsg, 'error');
+      errorTracking();
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const confirmUpload = async () => {
     if (!pendingFile) return;
     const file = pendingFile;
@@ -1812,9 +1883,9 @@ export default function Dashboard() {
                           style={{ display: 'block', marginTop: 3, lineHeight: 1.45 }}
                         >
                           Disables all live data (news, market intelligence, web search, live
-                          financials) so the audit can only use the document&apos;s own language
-                          and pre-existing analogs. The audit record notes that live retrieval
-                          was disabled.
+                          financials) so the audit can only use the document&apos;s own language and
+                          pre-existing analogs. The audit record notes that live retrieval was
+                          disabled.
                         </span>
                       </span>
                       <span
@@ -2395,6 +2466,60 @@ export default function Dashboard() {
               modal vs bulk queue) — the founder's ask. */}
             {bulkFiles && bulkFiles.length > 0 && (
               <ErrorBoundary sectionName="Bulk Upload">
+                {bulkFiles.length >= 2 && (
+                  <div
+                    style={{
+                      marginBottom: 16,
+                      padding: '14px 16px',
+                      borderRadius: 12,
+                      border: '1px solid var(--border-color)',
+                      borderLeft: '3px solid var(--accent-primary)',
+                      background: 'color-mix(in srgb, var(--accent-primary) 5%, transparent)',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      gap: 12,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13.5,
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                        flex: 1,
+                        minWidth: 240,
+                      }}
+                    >
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        {bulkFiles.length} documents selected.
+                      </strong>{' '}
+                      One decision spread across several official documents (e.g. an S-1 + its
+                      amendment, an 8-K + the deal exhibit)? Combine them into a single audit — each
+                      source is thoroughly pulled from and synthesised into one decision. Otherwise,
+                      analyse them separately below.
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => combineAndAnalyze(bulkFiles)}
+                      disabled={uploading}
+                      style={{
+                        padding: '10px 18px',
+                        borderRadius: 10,
+                        border: 'none',
+                        background: 'var(--accent-primary)',
+                        color: '#fff',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: uploading ? 'not-allowed' : 'pointer',
+                        opacity: uploading ? 0.6 : 1,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Combine into one decision →
+                    </button>
+                  </div>
+                )}
                 <BulkUploadPanel
                   initialFiles={bulkFiles}
                   onComplete={() => mutateDocs?.()}

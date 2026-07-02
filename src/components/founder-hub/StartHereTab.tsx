@@ -33,6 +33,7 @@ import {
   POSITIONING_HERO_CONTRAST,
   POSITIONING_ASYMMETRIC_TAIL_BODY,
   POSITIONING_HERO_SECONDARY,
+  POSITIONING_FRAGILITY_ENGINE,
   CATEGORY_CLAIM,
   IP_MOAT_NAME,
   IP_MOAT_DESCRIPTION,
@@ -328,6 +329,32 @@ function renderPositioningAnchor() {
       <div style={anchorRow}>
         <strong>Category claim:</strong> {CATEGORY_CLAIM} (treated like R²F / DPR / DQI — protected,
         never substituted with synonyms)
+      </div>
+      <div
+        style={{
+          ...anchorRow,
+          borderLeft: '3px solid var(--accent-primary, #16A34A)',
+          paddingLeft: 12,
+          background: 'color-mix(in srgb, var(--accent-primary, #16A34A) 5%, transparent)',
+        }}
+      >
+        <strong>
+          The contrarian frame (locked 2026-07-02 — the five-case blind-calibration insight):
+        </strong>{' '}
+        everyone else audits &ldquo;is the analysis correct?&rdquo; DI audits{' '}
+        <strong>&ldquo;is the structure survivable?&rdquo;</strong> — the question that actually
+        predicts whether a shock becomes a write-down. Buyer line: &ldquo;we surface the structural
+        fragility that turns a shock into a catastrophe — the thing you can&rsquo;t see from inside
+        the deal — and the specific reserve, staging, or kill-switch that makes it
+        survivable.&rdquo; No outcome-prediction overclaim. Freakishly valuable, genuinely novel.
+        The mechanics: the DQI measures <strong>risk density</strong> (how bold); the shipped
+        structural-fragility <strong>SECOND AXIS</strong> measures whether a shock cascades or is
+        absorbed (risk × fragility 2×2 — Amazon = high-risk / low-fragility = survivable bold; Fermi
+        = high-risk / high-fragility = the avalanche zone). We read the snowpack (the structure, in
+        the memo), never the snowflake (the trigger — execution / an exogenous shock, not in the
+        memo). SSOT: <code>POSITIONING_FRAGILITY_ENGINE</code> in icp.ts — &ldquo;
+        {POSITIONING_FRAGILITY_ENGINE}
+        &rdquo;
       </div>
       <div style={anchorRow}>
         <strong>Primary H1:</strong> &ldquo;{POSITIONING_HERO_PRIMARY}&rdquo;
