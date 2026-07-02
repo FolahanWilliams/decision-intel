@@ -15,15 +15,17 @@ const BIAS_COUNT = Object.keys(BIAS_EDUCATION).length;
 // extensions lift this surface automatically (founder-USED rehearsal tab).
 const MATRIX_LABEL = `${MATRIX_DIMENSION}×${MATRIX_DIMENSION}`;
 
-type ModelTier = 'cheap' | 'main' | 'none';
+type ModelTier = 'cheap' | 'main' | 'frontier' | 'none';
 
-// Locked 2026-04-24 (CLAUDE.md "Gemini model policy"): only two models in
-// production. The previous "pro" tier (gemini-2.5-pro for metaJudge) was
-// retired in the model-policy sweep; the meta-judge now runs on the same
-// gemini-3-flash-preview as the main bias pass.
+// Locked 2026-07-02 (CLAUDE.md "Frontier model-tier upgrade"): the reasoning
+// nodes run on frontier models (Opus 4.8 / Sonnet 5 via the Vercel AI Gateway);
+// grounded + preprocessing nodes run on Gemini via the gateway. A previous
+// legend listed a retired "pro" tier that no longer existed in this map, which
+// crashed the render (TIER_META['pro'] was undefined) — replaced by 'frontier'.
 const TIER_META: Record<ModelTier, { color: string; label: string; model: string }> = {
-  cheap: { color: '#22c55e', label: 'Cheap', model: 'gemini-3.1-flash-lite' },
-  main: { color: '#3b82f6', label: 'Main', model: 'gemini-3-flash-preview' },
+  cheap: { color: '#22c55e', label: 'Cheap', model: 'gemini-3.1-flash-lite (gateway)' },
+  main: { color: '#3b82f6', label: 'Grounded', model: 'gemini-3-flash (gateway)' },
+  frontier: { color: '#a855f7', label: 'Frontier', model: 'Opus 4.8 / Sonnet 5' },
   none: { color: '#71717a', label: 'No LLM', model: 'deterministic math' },
 };
 
@@ -34,18 +36,42 @@ const NODE_ROUTING: Array<{ node: string; tier: ModelTier; why: string }> = [
   {
     node: 'biasDetective',
     tier: 'main',
-    why: `${BIAS_COUNT}-bias taxonomy; needs reasoning + grounded search`,
+    why: `${BIAS_COUNT}-bias taxonomy; needs grounded Google-Search fact-checking, so it stays on Gemini`,
   },
-  { node: 'noiseJudge', tier: 'main', why: 'Multi-instance jury for variance measurement' },
-  { node: 'verificationNode', tier: 'main', why: 'Fact-check via search + compliance mapping' },
-  { node: 'deepAnalysisNode', tier: 'main', why: 'Sentiment + logic + SWOT + cognitive diversity' },
-  { node: 'simulationNode', tier: 'main', why: 'Boardroom twin simulation; creative reasoning' },
-  { node: 'rpdRecognitionNode', tier: 'main', why: 'Klein RPD pattern matching against history' },
-  { node: 'forgottenQuestionsNode', tier: 'main', why: 'Unknown-unknowns surfacing; creative' },
+  {
+    node: 'noiseJudge',
+    tier: 'main',
+    why: 'Cross-family jury: Gemini (analyst) + Opus 4.8 (regulator) + Sonnet 5 (contrarian)',
+  },
+  {
+    node: 'verificationNode',
+    tier: 'main',
+    why: 'Fact-check via grounded search + compliance mapping',
+  },
+  {
+    node: 'deepAnalysisNode',
+    tier: 'frontier',
+    why: 'Sentiment + logic + SWOT + cognitive diversity — Sonnet 5',
+  },
+  {
+    node: 'simulationNode',
+    tier: 'frontier',
+    why: 'Boardroom twin simulation; creative reasoning — Sonnet 5',
+  },
+  {
+    node: 'rpdRecognitionNode',
+    tier: 'frontier',
+    why: 'Klein RPD pattern matching against history — Sonnet 5',
+  },
+  {
+    node: 'forgottenQuestionsNode',
+    tier: 'frontier',
+    why: 'Unknown-unknowns surfacing (the Fermi killers) — Opus 4.8',
+  },
   {
     node: 'metaJudgeNode',
-    tier: 'main',
-    why: 'Final verdict over 7 parallel signals — highest leverage; runs on the same gemini-3-flash-preview as biasDetective post the 2026-04-24 model-policy sweep',
+    tier: 'frontier',
+    why: 'Final verdict over parallel signals — highest single-call leverage, runs on Opus 4.8',
   },
   {
     node: 'riskScorer',
@@ -96,10 +122,12 @@ SYNTHESIS (Sequential)
           <Cpu size={18} style={{ color: '#16A34A' }} /> Model Routing & Cost Tiers
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-          Each pipeline node is routed to the cheapest Gemini model that still meets the task&apos;s
-          reasoning bar. Cheap-tier nodes cost ~half the main tier; Pro is reserved for the final
-          verdict call. Override any tier via <code>GEMINI_MODEL_CHEAP</code>,{' '}
-          <code>GEMINI_MODEL_NAME</code>, or <code>GEMINI_MODEL_PRO</code> env vars.
+          Each node routes to the model that fits the task. Preprocessing and grounded fact-checking
+          nodes run on Gemini via the Vercel AI Gateway, where live Google-Search grounding matters;
+          the reasoning nodes — deep analysis, boardroom simulation, forgotten questions, and the
+          meta-judge verdict — run on frontier models (Sonnet 5, and Opus 4.8 for the
+          highest-leverage calls). Override any node via the <code>PIPELINE_MODEL_*</code> env vars,
+          or roll the whole pipeline back to Gemini with <code>PIPELINE_FRONTIER_MODELS=off</code>.
         </p>
 
         {/* Tier legend */}
@@ -111,7 +139,7 @@ SYNTHESIS (Sequential)
             marginBottom: 16,
           }}
         >
-          {(['cheap', 'main', 'pro', 'none'] as ModelTier[]).map(t => {
+          {(['cheap', 'main', 'frontier', 'none'] as ModelTier[]).map(t => {
             const meta = TIER_META[t];
             return (
               <div

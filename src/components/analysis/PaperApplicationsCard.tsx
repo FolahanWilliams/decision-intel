@@ -11,7 +11,10 @@ import {
   Calculator,
 } from 'lucide-react';
 import type { ValidityClassification } from '@/lib/learning/validity-classifier';
-import type { ReferenceClassForecast } from '@/lib/learning/reference-class-forecast';
+import {
+  MIN_DISPLAY_ANALOG_SIMILARITY,
+  type ReferenceClassForecast,
+} from '@/lib/learning/reference-class-forecast';
 import type { FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
 import type { CalibratedRejection } from '@/lib/learning/calibrated-rejection';
 import { calibratedRejectionVerdictLabel } from '@/lib/learning/calibrated-rejection';
@@ -195,6 +198,12 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
   // nothing about THIS decision and just inflate the card wall. Validity always
   // has a band; the rest gate on whether they could actually assess.
   const showOutsideView = rc.baselineFailureRate !== null || rc.topAnalogs.length > 0;
+  // Only NAME analogs that are actually similar — an opioid-fraud case at 22%
+  // on a nuclear-IPO filing reads as broken pattern-matching (same floor as the
+  // DPR strip). The base-rate metric still shows regardless.
+  const displayAnalogs = rc.topAnalogs.filter(
+    a => a.similarityScore >= MIN_DISPLAY_ANALOG_SIMILARITY
+  );
   const showAuthorCalibration = fa.verdict === 'adequate' || fa.verdict === 'sparse';
   const showConfidence = cr.verdict !== 'cannot_assess';
   const showClassCalibration =
@@ -236,7 +245,7 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
             tooltip="Reference Class Forecast — Kahneman & Lovallo 2003 HBR 'Delusions of Success.' Top-5 historical analogs from the 143-case library, base-rate failure prediction."
             citation={<>Kahneman &amp; Lovallo 2003 · 143-case library</>}
           >
-            {rc.topAnalogs.length > 0 && (
+            {displayAnalogs.length > 0 && (
               <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div
                   style={{
@@ -249,7 +258,7 @@ export function PaperApplicationsCard({ analysisId }: { analysisId: string }) {
                 >
                   Closest historical analogs
                 </div>
-                {rc.topAnalogs.slice(0, 3).map(a => (
+                {displayAnalogs.slice(0, 3).map(a => (
                   <a
                     key={a.caseId}
                     href={`/case-studies/${a.slug}`}
