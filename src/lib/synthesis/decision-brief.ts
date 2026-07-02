@@ -9,6 +9,7 @@
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 import { parseJSON } from '@/lib/utils/json';
 import { Prisma } from '@prisma/client';
 import { DecisionBriefSchema, type DecisionBrief } from '@/lib/schemas/decision-brief';
@@ -33,6 +34,15 @@ export interface BriefStreamEvent {
 // ---------------------------------------------------------------------------
 
 function getSynthesisModel() {
+  // GATEWAY-FIRST (2026-07-02 Google-billing migration) — same model via
+  // the Vercel AI Gateway; PIPELINE_GATEWAY_GEMINI=off reverts to direct.
+  if (isGatewayGeminiEnabled()) {
+    return gatewayGeminiModelShim({
+      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+      maxOutputTokens: 16384,
+      safetyLevel: 'standard',
+    }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+  }
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const genAI = new GoogleGenerativeAI(apiKey);
   const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');

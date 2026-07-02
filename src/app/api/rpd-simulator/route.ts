@@ -8,6 +8,7 @@ import { searchSimilarWithOutcomes } from '@/lib/rag/embeddings';
 import { buildRpdSimulatorPrompt } from '@/lib/agents/prompts';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 import { parseJSON } from '@/lib/utils/json';
 import { smartTruncate } from '@/lib/utils/resilience';
 import { RpdSimulationResult } from '@/types';
@@ -98,43 +99,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build and execute the LLM call
-    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-    const genAI = new GoogleGenerativeAI(apiKey);
+    // Build and execute the LLM call.
+    // GATEWAY-FIRST (2026-07-02 Google-billing migration): grounded search
+    // through the Vercel AI Gateway — same generateContent contract.
     const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-
-    const model = genAI.getGenerativeModel({
-      model: modelName,
-      tools: [
-        { googleSearch: {} } as Parameters<
-          typeof genAI.getGenerativeModel
-        >[0]['tools'] extends (infer T)[]
-          ? T
-          : never,
-      ],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        maxOutputTokens: 8192,
-      },
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-    });
+    const model = isGatewayGeminiEnabled()
+      ? (gatewayGeminiModelShim({
+          model: modelName,
+          grounded: true,
+          maxOutputTokens: 8192,
+          safetyLevel: 'standard',
+        }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>)
+      : new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY')).getGenerativeModel({
+          model: modelName,
+          tools: [{ googleSearch: {} } as import('@google/generative-ai').Tool],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            maxOutputTokens: 8192,
+          },
+          safetySettings: [
+            {
+              category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+              threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+              threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+              threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+              threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            },
+          ],
+        });
 
     const prompt = buildRpdSimulatorPrompt();
 

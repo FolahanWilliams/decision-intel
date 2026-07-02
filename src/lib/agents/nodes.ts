@@ -34,6 +34,7 @@ import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embedd
 import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '../ai/gateway-gemini';
 import { MODEL_FRONTIER_REASONING, MODEL_STRONG_REASONING } from '../ai/gateway-models';
 import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
@@ -100,6 +101,18 @@ interface ModelOptions {
 }
 
 function createModelInstance(options: ModelOptions = {}): GenerativeModel {
+  // GATEWAY-FIRST (locked 2026-07-02 — the Google-billing migration).
+  // When the Vercel AI Gateway key is present, EVERY pipeline Gemini call
+  // routes through the gateway (one bill, same models, grounding + safety
+  // settings preserved — see src/lib/ai/gateway-gemini.ts header). The
+  // shim impersonates the native SDK's generateContent contract so all
+  // call sites (including extractSearchSources' groundingMetadata read)
+  // work unchanged. PIPELINE_GATEWAY_GEMINI=off reverts to the legacy
+  // direct SDK below, which then requires a working GOOGLE_API_KEY.
+  if (isGatewayGeminiEnabled()) {
+    return createGatewayGeminiShim(options);
+  }
+
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const genAI = new GoogleGenerativeAI(apiKey);
   const modelName =
@@ -177,6 +190,32 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
     },
     safetySettings,
   });
+}
+
+/**
+ * Gateway shim — impersonates the native SDK's generateContent contract
+ * (`{ response: { text(), candidates[].groundingMetadata } }`) on top of a
+ * gateway-routed call, so every pipeline call site works unchanged:
+ *   - string parts are joined with double newlines (same logical message
+ *    the native SDK receives via array-of-parts);
+ *   - grounded instances attach google_search through the gateway and
+ *    source URLs are reconstructed into groundingChunks so
+ *    extractSearchSources keeps working;
+ *   - no responseMimeType (the gateway path returns plain text; every
+ *    consumer's prompt demands JSON and parses fence-tolerantly — the
+ *    same contract the frontier Anthropic paths run on).
+ * Only `.generateContent` exists on the shim; nodes.ts call sites use
+ * nothing else (verified 2026-07-02), hence the narrow cast.
+ */
+function createGatewayGeminiShim(options: ModelOptions): GenerativeModel {
+  const nativeName =
+    options.modelName || getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
+  return gatewayGeminiModelShim({
+    model: nativeName,
+    grounded: options.grounded === true,
+    temperature: options.temperature,
+    safetyLevel: options.safetyLevel === 'standard' ? 'standard' : 'relaxed',
+  }) as unknown as GenerativeModel;
 }
 
 // Lazy singletons

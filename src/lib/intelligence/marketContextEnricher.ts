@@ -143,15 +143,31 @@ export async function enrichMarketContext(
   if (!company) return null;
 
   try {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const { getRequiredEnvVar } = await import('@/lib/env');
-    const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
-
-    const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
-      tools: [{ googleSearch: {} } as Record<string, unknown>],
-      generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
-    });
+    // GATEWAY-FIRST (2026-07-02 Google-billing migration): the live
+    // grounded search routes through the Vercel AI Gateway (google_search
+    // tool) — same generateContent contract via the shim.
+    const { isGatewayGeminiEnabled, gatewayGeminiModelShim } =
+      await import('@/lib/ai/gateway-gemini');
+    let model: {
+      generateContent: (parts: string) => Promise<{ response: { text: () => string } }>;
+    };
+    if (isGatewayGeminiEnabled()) {
+      model = gatewayGeminiModelShim({
+        model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
+        grounded: true,
+        temperature: 0.1,
+        safetyLevel: 'relaxed',
+      });
+    } else {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+      const { getRequiredEnvVar } = await import('@/lib/env');
+      const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
+      model = genAI.getGenerativeModel({
+        model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
+        tools: [{ googleSearch: {} } as Record<string, unknown>],
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.1 },
+      });
+    }
 
     const result = await withTimeout(
       () => model.generateContent(buildPrompt({ ...req, company })),

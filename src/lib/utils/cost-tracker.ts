@@ -37,7 +37,13 @@ const TOKEN_COSTS: Record<string, { input: number; output: number }> = {
   // rates as the native Gemini calls above; the gateway markup is
   // proportionally tiny on Flash-tier traffic.
   'google/gemini-3-flash-preview': { input: 0.00015, output: 0.0006 },
+  // Gateway-routed Gemini (2026-07-02 Google-billing migration): the gateway
+  // id for gemini-3-flash-preview is google/gemini-3-flash ($0.50/$3.00 per M
+  // per the gateway model list). Embedding is input-only.
+  'google/gemini-3-flash': { input: 0.0005, output: 0.003 },
   'google/gemini-3.1-flash-lite': { input: 0.00005, output: 0.0002 },
+  'google/gemini-2.5-pro': { input: 0.00125, output: 0.01 },
+  'google/gemini-embedding-001': { input: 0.00015, output: 0 },
   // DeepSeek-v4-Flash via AI Gateway — locked 2026-05-10 alongside the
   // Constellation Next Move recommendation engine ship. $0.14/M input
   // ($0.00014 per 1K) + $0.28/M output ($0.00028 per 1K) per the Vercel

@@ -192,6 +192,67 @@ async function runGenerateTest(model: string): Promise<{
   }
 }
 
+/**
+ * Grounded-search test (2026-07-02 Google-billing migration): proves the
+ * gateway serves Google Search grounding on the pipeline's Flash model —
+ * the capability that previously kept the fact-check nodes on the direct
+ * SDK. A current-events question that the model cannot answer from
+ * training data alone forces the search tool to fire.
+ */
+async function runGroundedTest(model: string): Promise<{
+  success: boolean;
+  sourceCount: number;
+  errorClass?: GatewayErrorClass;
+}> {
+  process.stdout.write(`\n─── grounded search test · ${model} ───\n`);
+  try {
+    const { generateText: aiGenerateText } = await import('ai');
+    const { google } = await import('@ai-sdk/google');
+    const result = await aiGenerateText({
+      model,
+      prompt:
+        'Using web search, what is the most recent closing price direction (up or down) of the S&P 500? One sentence, cite the date.',
+      tools: { google_search: google.tools.googleSearch({}) },
+      // Gemini 3 Flash is a THINKING model — reasoning tokens count against
+      // maxOutputTokens. A small cap gets fully consumed by thinking and
+      // returns empty text with finishReason 'length' (verified 2026-07-02).
+      maxOutputTokens: 8192,
+    });
+    const sources = (result.sources ?? []).length;
+    process.stdout.write(result.text.slice(0, 300));
+    process.stdout.write(`\n→ ${sources} search source(s) returned\n`);
+    return { success: true, sourceCount: sources };
+  } catch (err) {
+    printErrorSummary(model, err);
+    return { success: false, sourceCount: 0, errorClass: classifyGatewayError(err) };
+  }
+}
+
+/**
+ * Embedding test (2026-07-02): proves the gateway serves the SAME model +
+ * dimensionality the pgvector store was built with (gemini-embedding-001,
+ * 1536 dims) — a mismatch here means RAG stays on the degraded path.
+ */
+async function runEmbeddingTest(): Promise<{
+  success: boolean;
+  dims: number;
+  errorClass?: GatewayErrorClass;
+}> {
+  process.stdout.write('\n─── embedding test · google/gemini-embedding-001 (1536 dims) ───\n');
+  try {
+    const { gatewayGeminiEmbed } = await import('../src/lib/ai/gateway-gemini');
+    const embeddings = await gatewayGeminiEmbed(['gateway embedding smoke test'], {
+      outputDimensionality: 1536,
+    });
+    const dims = embeddings[0]?.length ?? 0;
+    process.stdout.write(`→ ${dims} dimensions returned (need exactly 1536)\n`);
+    return { success: dims === 1536, dims };
+  } catch (err) {
+    printErrorSummary('google/gemini-embedding-001', err);
+    return { success: false, dims: 0, errorClass: classifyGatewayError(err) };
+  }
+}
+
 async function main() {
   if (!process.env.AI_GATEWAY_API_KEY) {
     process.stderr.write('✗ AI_GATEWAY_API_KEY is not set after loading .env.local.\n');
@@ -259,6 +320,16 @@ async function main() {
   const opusResult = await runGenerateTest('anthropic/claude-opus-4-8');
   const sonnetResult = await runGenerateTest('anthropic/claude-sonnet-5');
 
+  // 6-8) GOOGLE-BILLING MIGRATION PRE-FLIGHT (2026-07-02): the ENTIRE
+  // Gemini surface now routes through the gateway. These three prove the
+  // pipeline's Flash model resolves, search grounding works through the
+  // gateway, and the embedding model returns the pgvector store's exact
+  // 1536 dims. If any fails, PIPELINE_GATEWAY_GEMINI=off reverts to the
+  // direct SDK (which needs a working GOOGLE_API_KEY billing account).
+  const flashResult = await runGenerateTest('google/gemini-3-flash');
+  const groundedResult = await runGroundedTest('google/gemini-3-flash');
+  const embedResult = await runEmbeddingTest();
+
   process.stdout.write('\n─── Summary ───\n');
   process.stdout.write(
     `openai/gpt-5.4 (streamText)            : ${streamResult.success ? 'OK' : `FAILED · ${streamResult.errorClass}`}\n`
@@ -275,6 +346,15 @@ async function main() {
   process.stdout.write(
     `anthropic/claude-sonnet-5 (PIPELINE)   : ${sonnetResult.success ? 'OK' : `FAILED · ${sonnetResult.errorClass}`}\n`
   );
+  process.stdout.write(
+    `google/gemini-3-flash (PIPELINE)       : ${flashResult.success ? 'OK' : `FAILED · ${flashResult.errorClass}`}\n`
+  );
+  process.stdout.write(
+    `google/gemini-3-flash +search (PIPELINE): ${groundedResult.success ? `OK · ${groundedResult.sourceCount} sources` : `FAILED · ${groundedResult.errorClass}`}\n`
+  );
+  process.stdout.write(
+    `google/gemini-embedding-001 (RAG)      : ${embedResult.success ? 'OK · 1536 dims' : `FAILED · dims=${embedResult.dims} ${embedResult.errorClass ?? ''}`}\n`
+  );
 
   const allErrors = [
     streamResult.errorClass,
@@ -282,6 +362,9 @@ async function main() {
     grokResult.errorClass,
     opusResult.errorClass,
     sonnetResult.errorClass,
+    flashResult.errorClass,
+    groundedResult.errorClass,
+    embedResult.errorClass,
   ].filter((e): e is GatewayErrorClass => e !== undefined);
 
   // Special-case the free-credit restriction — it indicates the integration

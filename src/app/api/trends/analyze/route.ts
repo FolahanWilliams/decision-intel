@@ -10,12 +10,23 @@ import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
 import { cacheGet, cacheSet } from '@/lib/utils/cache';
 import { hashContent } from '@/lib/utils/resilience';
 import { apiError } from '@/lib/utils/api-response';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 
 const log = createLogger('TrendsAnalyzeRoute');
 
 // Helper to get Grounded Model — initialised lazily so the missing-key error
 // surfaces at request time with a clear message rather than at module load.
 function getMarketAnalystModel() {
+  // GATEWAY-FIRST (2026-07-02 Google-billing migration): grounded search
+  // through the Vercel AI Gateway — same generateContent contract.
+  if (isGatewayGeminiEnabled()) {
+    return gatewayGeminiModelShim({
+      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+      grounded: true,
+      temperature: 0.2,
+      safetyLevel: 'relaxed',
+    }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+  }
   const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
   return genAI.getGenerativeModel({
     model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),

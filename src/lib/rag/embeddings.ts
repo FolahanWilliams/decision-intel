@@ -8,6 +8,7 @@
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import { getRequiredEnvVar } from '@/lib/env';
+import { isGatewayGeminiEnabled, gatewayGeminiEmbed } from '@/lib/ai/gateway-gemini';
 import { createLogger } from '@/lib/utils/logger';
 import { getCachedEmbedding, cacheEmbedding } from '@/lib/utils/cache';
 import { createHash } from 'crypto';
@@ -53,6 +54,26 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
   if (texts.length === 1) {
     const embedding = await generateEmbedding(texts[0]);
     return [embedding];
+  }
+
+  // GATEWAY-FIRST (2026-07-02 Google-billing migration): the SAME model
+  // (gemini-embedding-001) + task type + 1536 dims through the Vercel AI
+  // Gateway — stored pgvector rows stay in the same embedding space. Any
+  // failure falls through to the legacy direct path (which needs
+  // GOOGLE_API_KEY) and then to the existing per-item fallback.
+  if (isGatewayGeminiEnabled()) {
+    try {
+      const truncated = texts.map(t => t.slice(0, 30000));
+      const embeddings = await gatewayGeminiEmbed(truncated, { outputDimensionality: 1536 });
+      for (const e of embeddings) {
+        if (!e || !Array.isArray(e) || e.length !== 1536) {
+          throw new Error(`Invalid gateway embedding: expected 1536 dimensions, got ${e?.length}`);
+        }
+      }
+      return embeddings;
+    } catch (error) {
+      log.error('Gateway batch embedding failed, falling through to legacy path:', error);
+    }
   }
 
   try {
@@ -136,18 +157,35 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
-    const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
-
     // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
     const truncatedText = text.slice(0, 30000);
 
-    // Check cache first — pre-warmed on upload, hit saves a Gemini round-trip
+    // Check cache first — pre-warmed on upload, hit saves a round-trip
     // during the analysis pipeline's RAG query (typically 300-800ms).
     const cacheKey = hashEmbeddingInput(truncatedText);
     const cached = await getCachedEmbedding(cacheKey).catch(() => null);
     if (cached && cached.length === 1536) {
       return cached;
     }
+
+    // GATEWAY-FIRST (2026-07-02): same model + dims through the Vercel AI
+    // Gateway — see generateEmbeddings above.
+    if (isGatewayGeminiEnabled()) {
+      const [embedding] = await gatewayGeminiEmbed([truncatedText], {
+        outputDimensionality: 1536,
+      });
+      if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
+        throw new Error(
+          `Invalid gateway embedding: expected 1536 dimensions, got ${embedding?.length}`
+        );
+      }
+      void cacheEmbedding(cacheKey, embedding).catch(err =>
+        log.warn('Embedding cache write failed:', err)
+      );
+      return embedding;
+    }
+
+    const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
 
     const result = await model.embedContent({
       content: { role: 'user', parts: [{ text: truncatedText }] },

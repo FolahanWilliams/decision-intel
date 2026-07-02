@@ -65,9 +65,46 @@ export async function generateText(
   prompt: string,
   options?: GenerateTextOptions
 ): Promise<GenerateTextResult> {
-  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const modelName =
     options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
+
+  // GATEWAY-FIRST (locked 2026-07-02 — the Google-billing migration). Same
+  // Gemini models via the Vercel AI Gateway; relaxed safety preserved via
+  // providerOptions. PIPELINE_GATEWAY_GEMINI=off reverts to the legacy
+  // direct SDK below. The timeoutMs contract is preserved with the same
+  // Promise.race semantics.
+  const { isGatewayGeminiEnabled, gatewayGeminiGenerate } = await import('@/lib/ai/gateway-gemini');
+  if (isGatewayGeminiEnabled()) {
+    const start = Date.now();
+    const generate = gatewayGeminiGenerate(prompt, {
+      model: modelName,
+      temperature: options?.temperature,
+      maxOutputTokens: options?.maxTokens ?? 16384,
+      safetyLevel: 'relaxed',
+    });
+    const res = options?.timeoutMs
+      ? await Promise.race([
+          generate,
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error(`Gemini generateText timed out after ${options.timeoutMs}ms`)),
+              options.timeoutMs
+            )
+          ),
+        ])
+      : await generate;
+    const latencyMs = Date.now() - start;
+    log.debug(`Gateway Gemini response (${res.model}): ${res.text.length} chars in ${latencyMs}ms`);
+    return {
+      text: res.text,
+      model: res.model,
+      latencyMs,
+      inputTokens: res.inputTokens,
+      outputTokens: res.outputTokens,
+    };
+  }
+
+  const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
 
   const genAI = getGenAI(apiKey);
 

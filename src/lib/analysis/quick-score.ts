@@ -13,6 +13,7 @@ import {
   type GenerativeModel,
 } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 import { createLogger } from '@/lib/utils/logger';
 import { parseJSON } from '@/lib/utils/json';
 
@@ -39,6 +40,16 @@ let modelInstance: GenerativeModel | null = null;
 
 function getModel(): GenerativeModel {
   if (!modelInstance) {
+    // GATEWAY-FIRST (2026-07-02 Google-billing migration) — same model via
+    // the Vercel AI Gateway; PIPELINE_GATEWAY_GEMINI=off reverts to direct.
+    if (isGatewayGeminiEnabled()) {
+      modelInstance = gatewayGeminiModelShim({
+        model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+        maxOutputTokens: 4096,
+        safetyLevel: 'relaxed',
+      }) as unknown as GenerativeModel;
+      return modelInstance;
+    }
     const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
     const genAI = new GoogleGenerativeAI(apiKey);
     const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');

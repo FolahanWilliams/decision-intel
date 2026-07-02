@@ -318,7 +318,10 @@ const SCAN_DIR = join(ROOT, 'src');
 //     toast, falling back to a default string. No write/delivery swallowed;
 //     the DPR fix shipped the catches without bumping the baseline, so the
 //     pre-commit gate was failing on main.
-const SILENT_CATCH_BASELINE = 243;
+// 244 (2026-07-02 gateway-Gemini migration — +1 canonical res.text() error-body
+// parse in gatewayGeminiEmbed: surfaces the gateway's HTTP error diagnostic in
+// the thrown message; the throw itself fails CLOSED, nothing swallowed)
+const SILENT_CATCH_BASELINE = 244;
 
 // Match `.catch(arg => trivial)` and `.catch((arg) => trivial)` and
 // `.catch(() => trivial)`, where `trivial` is null / undefined / {} / [] /

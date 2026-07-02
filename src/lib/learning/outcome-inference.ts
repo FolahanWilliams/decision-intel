@@ -20,6 +20,7 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
 const log = createLogger('OutcomeInference');
 
@@ -52,6 +53,15 @@ export interface DraftOutcomeData {
 // ─── LLM Setup ──────────────────────────────────────────────────────────────
 
 function getModel() {
+  // GATEWAY-FIRST (2026-07-02 Google-billing migration) — same model via
+  // the Vercel AI Gateway; PIPELINE_GATEWAY_GEMINI=off reverts to direct.
+  if (isGatewayGeminiEnabled()) {
+    return gatewayGeminiModelShim({
+      model: process.env.GEMINI_MODEL_NAME || 'gemini-3.1-flash-lite',
+      maxOutputTokens: 4096,
+      safetyLevel: 'relaxed',
+    }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+  }
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error('GOOGLE_API_KEY not set');
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -498,37 +508,46 @@ export async function detectOutcomesFromWeb(
       if (!searchQuery) continue;
 
       try {
-        // Use Gemini with Google Search grounding for web results
-        const apiKey = process.env.GOOGLE_API_KEY;
-        if (!apiKey) break;
+        // Use Gemini with Google Search grounding for web results.
+        // GATEWAY-FIRST (2026-07-02 Google-billing migration): grounding is
+        // supported through the Vercel AI Gateway (google_search tool) —
+        // the shim exposes the same generateContent contract, so the
+        // downstream parse below is identical on both paths.
+        if (!isGatewayGeminiEnabled() && !process.env.GOOGLE_API_KEY) break;
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const groundedModel = genAI.getGenerativeModel({
-          model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
-          tools: [{ googleSearch: {} } as import('@google/generative-ai').Tool],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            maxOutputTokens: 4096,
-          },
-          safetySettings: [
-            {
-              category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-              threshold: HarmBlockThreshold.BLOCK_NONE,
-            },
-            {
-              category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-              threshold: HarmBlockThreshold.BLOCK_NONE,
-            },
-            {
-              category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-              threshold: HarmBlockThreshold.BLOCK_NONE,
-            },
-            {
-              category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-              threshold: HarmBlockThreshold.BLOCK_NONE,
-            },
-          ],
-        });
+        const groundedModel = isGatewayGeminiEnabled()
+          ? (gatewayGeminiModelShim({
+              model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
+              grounded: true,
+              maxOutputTokens: 4096,
+              safetyLevel: 'relaxed',
+            }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>)
+          : new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string).getGenerativeModel({
+              model: process.env.GEMINI_MODEL_NAME || 'gemini-3-flash-preview',
+              tools: [{ googleSearch: {} } as import('@google/generative-ai').Tool],
+              generationConfig: {
+                responseMimeType: 'application/json',
+                maxOutputTokens: 4096,
+              },
+              safetySettings: [
+                {
+                  category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                  threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                  category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                  threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                  category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                  threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                  category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                  threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+              ],
+            });
 
         const prompt = `Search the web for recent news about: "${searchQuery}"
 

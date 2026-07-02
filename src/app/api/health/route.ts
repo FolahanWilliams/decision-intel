@@ -23,20 +23,31 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
   }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY;
-    if (!apiKey) {
-      return { status: 'misconfigured', error: 'Missing API key' };
+    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
+
+    // GATEWAY-FIRST (2026-07-02 Google-billing migration): the health probe
+    // pings the SAME route the pipeline uses — the Vercel AI Gateway when
+    // enabled, the legacy direct SDK otherwise. Probing the path production
+    // actually runs on is the whole point of the check.
+    const { isGatewayGeminiEnabled, gatewayGeminiGenerate } =
+      await import('@/lib/ai/gateway-gemini');
+    const viaGateway = isGatewayGeminiEnabled();
+    if (!viaGateway && !process.env.GOOGLE_API_KEY) {
+      return { status: 'misconfigured', error: 'No AI_GATEWAY_API_KEY or GOOGLE_API_KEY' };
     }
 
-    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: modelName });
-
     // Lightweight check with 5s timeout to prevent health check hanging
+    const ping = viaGateway
+      ? gatewayGeminiGenerate('ping', { model: modelName, maxOutputTokens: 16 })
+      : (async () => {
+          const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
+          const model = genAI.getGenerativeModel({ model: modelName });
+          await model.generateContent({
+            contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
+          });
+        })();
     await Promise.race([
-      model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
-      }),
+      ping,
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error('LLM health check timed out after 5s')), 5000)
       ),
@@ -44,7 +55,7 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
 
     const health = {
       status: 'healthy',
-      model: modelName,
+      model: viaGateway ? `gateway:${modelName}` : modelName,
     };
 
     healthCache.set('llm', { data: health, expires: Date.now() + CACHE_TTL });

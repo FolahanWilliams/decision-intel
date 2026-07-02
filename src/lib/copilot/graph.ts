@@ -8,6 +8,7 @@
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { isGatewayGeminiEnabled, gatewayGeminiModelShim } from '@/lib/ai/gateway-gemini';
 import { createLogger } from '@/lib/utils/logger';
 import { buildCopilotPrompt, ROUTER_PROMPT } from './prompts';
 import { buildCopilotContext } from './context';
@@ -22,6 +23,14 @@ import {
 const log = createLogger('CopilotGraph');
 
 function getModel() {
+  // GATEWAY-FIRST (2026-07-02 Google-billing migration) — same model via
+  // the Vercel AI Gateway; PIPELINE_GATEWAY_GEMINI=off reverts to direct.
+  if (isGatewayGeminiEnabled()) {
+    return gatewayGeminiModelShim({
+      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+      safetyLevel: 'standard',
+    }) as unknown as ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
+  }
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const genAI = new GoogleGenerativeAI(apiKey);
   const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
