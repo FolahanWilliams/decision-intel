@@ -61,6 +61,7 @@ import { R2FDeepDive } from './path-to-100m/R2FDeepDive';
 import { ThreeLayerModel } from './path-to-100m/ThreeLayerModel';
 import { AiNativeMatrix } from './path-to-100m/AiNativeMatrix';
 import { DefensibilityVectorsCard } from './path-to-100m/DefensibilityVectorsCard';
+import { MechanismLedgerCard } from './path-to-100m/MechanismLedgerCard';
 import { CategoryAndPitchLibrary } from './path-to-100m/CategoryAndPitchLibrary';
 import { RoleOutreachPlaybooks } from './path-to-100m/RoleOutreachPlaybooks';
 import { KillerResponsesPlaybook } from './path-to-100m/KillerResponsesPlaybook';
@@ -187,6 +188,15 @@ export function PathToHundredMillionTab() {
         accent="#0EA5E9"
       >
         <AiNativeMatrix />
+      </Section>
+
+      <Section
+        icon={<Microscope size={16} />}
+        title="Mechanism Hit-Rate Ledger · the proof that matters (not the DQI)"
+        subtitle="The buyer doesn't care about the score — they care whether, on a decision that went badly, the BLIND audit named the mechanism that actually materialized before anyone knew the outcome. This ledger makes that measurable + un-cherry-pickable (verbatim finding + verbatim outcome per row), it's provable NOW (no waiting for the DQI to calibrate), and it's the advisor/investor artifact. Seeded with the confirmed blind retros (Zillow · Fermi · WeWork); fill it as you grade your run. N-floor honest — don't headline a rate below 5 settled cases. The bulletproof version is FORWARD: audit a current filing, hash-stamp the DPR, let the outcome arrive."
+        accent="#16A34A"
+      >
+        <MechanismLedgerCard />
       </Section>
 
       <Section
