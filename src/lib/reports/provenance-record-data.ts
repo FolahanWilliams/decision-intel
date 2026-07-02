@@ -47,6 +47,8 @@ import {
   detectStrategicNodes,
   type DetectedStrategicNode,
 } from '@/lib/deliverable/strategic-nodes';
+import { detectResilienceMarkers } from '@/lib/deliverable/resilience-signature';
+import { buildBowtie } from '@/lib/deliverable/bowtie';
 import { getOrgBrierStats, brierCategory } from '@/lib/learning/brier-scoring';
 import { computePlatformCalibrationBaseline } from '@/lib/learning/platform-baseline';
 import { getFeedbackAdequacy, type FeedbackAdequacy } from '@/lib/learning/feedback-adequacy';
@@ -129,6 +131,14 @@ export interface ProvenanceRecordData {
    * Empty / omitted when the document carries none of the conditions.
    */
   strategicExposure?: DetectedStrategicNode[];
+  /**
+   * The bow-tie: the same strategic exposure structured as the process-safety
+   * visual a risk committee reads on sight — threat → top event → consequence,
+   * prevention + mitigation barriers present/missing, plus the Taleb convexity
+   * + Perrow coupling verdicts (locked 2026-07-02). Deterministic, display-only.
+   * Present only when `strategicExposure` is.
+   */
+  bowtie?: import('../deliverable/bowtie').BowtieAnalysis;
   /**
    * Pre-IC blind-prior aggregations attached to this analysis (4.1
    * deep). One entry per Decision Room that ran a blind-prior survey
@@ -1634,6 +1644,10 @@ export async function assembleProvenanceRecordData(
   // conditions that multiply the biases into the outcome. Pure text detection,
   // no LLM, no scoring impact. Surfaces as a section on the DPR findings page.
   const strategicExposure = detectStrategicNodes(doc?.content ?? '');
+  // The bow-tie: the same threats as the process-safety visual a risk committee
+  // reads on sight (barriers present/missing + convexity/coupling). Deterministic,
+  // display-only — renders as §5b on the DPR findings page. Null without a threat.
+  const bowtie = buildBowtie(strategicExposure, detectResilienceMarkers(doc?.content ?? ''));
 
   // Phase 4 wire-in: build the per-bias findings augment from the live
   // analysis.biases data. The new HTML/CSS DPR render at /dpr-render
@@ -1669,6 +1683,7 @@ export async function assembleProvenanceRecordData(
     pipelineLineage,
     findingsAugment,
     ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
+    ...(bowtie ? { bowtie } : {}),
     blindPriorAggregates,
     counterfactualImpact,
     // reviewerDecisions intentionally undefined in the live assembler —

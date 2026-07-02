@@ -12,7 +12,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Brain, GitMerge, ExternalLink } from 'lucide-react';
+import {
+  Brain,
+  GitMerge,
+  ExternalLink,
+  Network,
+  CheckCircle2,
+  Ban,
+  ArrowRight,
+} from 'lucide-react';
 import { formatExposureLabel } from '@/lib/deliverable/valueAtStake';
 import { severityColor } from '@/lib/utils/severity';
 import {
@@ -25,6 +33,7 @@ import type {
   ReasoningRisksBucket as ReasoningRisksBucketType,
   ReferenceClassEntry,
 } from '@/lib/deliverable/types';
+import type { BowtieAnalysis, BowtieBarrier } from '@/lib/deliverable/bowtie';
 import { ActionTitle } from '../ActionTitle';
 import { FindingCard } from '../FindingCard';
 import { ProgressiveDrawer } from '../ProgressiveDrawer';
@@ -52,6 +61,7 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
         <ActionTitle eyebrow="What the audit found">{bucket.actionTitle}</ActionTitle>
         {bucket.biasDetectionDegraded && <DegradedDetectorNotice />}
         {emptyHasStructural && <StrategicAttackPath nodes={bucket.strategicExposure!} />}
+        {bucket.bowtie && <BowtieVisual analysis={bucket.bowtie} />}
         {synthesized.length > 0 ? (
           <>
             <div
@@ -99,6 +109,11 @@ export function ReasoningRisksBucket({ bucket }: ReasoningRisksBucketProps) {
           person) above the cognitive-bias tags; the biases below explain
           WHY the room would miss the structural risk, not replace it. */}
       {hasStructural && <StrategicAttackPath nodes={bucket.strategicExposure!} />}
+
+      {/* The bow-tie: the same threats as the process-safety visual a risk
+          committee reads on sight — the killer buyer visual, with the missing
+          circuit-breakers named + the Taleb convexity / Perrow coupling verdicts. */}
+      {bucket.bowtie && <BowtieVisual analysis={bucket.bowtie} />}
 
       {/* The reasoning below is demoted from headline to explanation. */}
       {hasStructural && (pathways.length > 0 || gridFindings.length > 0) && (
@@ -821,6 +836,227 @@ function StrategicAttackPath({ nodes }: { nodes: DetectedStrategicNode[] }) {
           </ul>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * BowtieVisual — the killer buyer visual. The same threats as the attack path,
+ * structured as the process-safety bow-tie a risk committee recognizes on sight:
+ * THREATS → the TOP EVENT (the knot) → CONSEQUENCE, with PREVENTION barriers
+ * (stop it firing) and MITIGATION barriers (limit the damage) shown present vs
+ * MISSING. Deterministic (buildBowtie), display-only. The "N barriers missing"
+ * headline is the buyer's actionable takeaway; the Taleb convexity + Perrow
+ * coupling lines are the two structural verdicts they asked for.
+ */
+function BowtieVisual({ analysis }: { analysis: BowtieAnalysis }) {
+  const missing = analysis.missingBarrierCount;
+  const total = analysis.totalCanonicalBarriers;
+  return (
+    <div
+      style={{
+        border: '1px solid var(--border-color, #E2E8F0)',
+        borderLeft: '4px solid var(--severity-high, #d97706)',
+        borderRadius: 12,
+        padding: '18px 20px',
+        background: 'var(--bg-secondary, #F8FAFC)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <Network size={14} style={{ color: 'var(--severity-high, #d97706)' }} />
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'var(--text-muted, #64748B)',
+          }}
+        >
+          Bow-tie · where the circuit-breakers are missing
+        </span>
+        <span
+          style={{
+            marginLeft: 'auto',
+            fontSize: 12,
+            fontWeight: 800,
+            color:
+              missing >= 4 ? 'var(--severity-critical, #b91c1c)' : 'var(--severity-high, #d97706)',
+          }}
+        >
+          {missing} of {total} barriers missing
+        </span>
+      </div>
+
+      {/* Threat → top event → consequence */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'stretch', flexWrap: 'wrap' }}>
+        <BowtieColumn label="Threats" tone="var(--severity-critical, #b91c1c)">
+          <ul style={{ margin: 0, paddingLeft: 16, lineHeight: 1.5 }}>
+            {analysis.threats.slice(0, 5).map(t => (
+              <li key={t.id} style={{ fontSize: 12.5, color: 'var(--text-primary, #0F172A)' }}>
+                {t.label}
+              </li>
+            ))}
+          </ul>
+        </BowtieColumn>
+
+        <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted, #94A3B8)' }}>
+          <ArrowRight size={16} />
+        </div>
+
+        <div
+          style={{
+            flex: '1 1 180px',
+            minWidth: 160,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '12px 14px',
+            borderRadius: 10,
+            background: 'var(--severity-critical, #b91c1c)',
+            color: '#fff',
+            fontSize: 13,
+            fontWeight: 700,
+            lineHeight: 1.35,
+          }}
+        >
+          {analysis.topEvent}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted, #94A3B8)' }}>
+          <ArrowRight size={16} />
+        </div>
+
+        <BowtieColumn label="Consequence" tone="var(--severity-high, #d97706)">
+          <p
+            style={{
+              margin: 0,
+              fontSize: 12.5,
+              color: 'var(--text-secondary, #475569)',
+              lineHeight: 1.45,
+            }}
+          >
+            {analysis.consequence}
+          </p>
+        </BowtieColumn>
+      </div>
+
+      {/* Barriers — present vs missing */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <BarrierRow label="Prevention · stop it firing" barriers={analysis.prevention} />
+        <BarrierRow label="Mitigation · limit the damage" barriers={analysis.mitigation} />
+      </div>
+
+      {/* The two structural verdicts */}
+      <div
+        style={{
+          borderTop: '1px solid var(--border-color, #E2E8F0)',
+          paddingTop: 12,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <VerdictLine label="Convexity (Taleb)" body={analysis.convexity.line} />
+        <VerdictLine label="Coupling (Perrow)" body={analysis.coupling.line} />
+      </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11,
+          color: 'var(--text-muted, #64748B)',
+          lineHeight: 1.5,
+          fontStyle: 'italic',
+        }}
+      >
+        Conditions correlated with a failure archetype, not a claim they caused an outcome. Barriers
+        describe what the document contains; they do not predict the trigger.
+      </p>
+    </div>
+  );
+}
+
+function BowtieColumn({
+  label,
+  tone,
+  children,
+}: {
+  label: string;
+  tone: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ flex: '1 1 180px', minWidth: 150 }}>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: tone,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function BarrierRow({ label, barriers }: { label: string; barriers: BowtieBarrier[] }) {
+  return (
+    <div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 800,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: 'var(--text-muted, #64748B)',
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {barriers.map(b => (
+          <span
+            key={b.dimension}
+            title={b.present ? b.evidence : 'Not found in the document'}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 12,
+              fontWeight: 600,
+              padding: '4px 10px',
+              borderRadius: 999,
+              border: b.present
+                ? '1px solid var(--success, #16A34A)'
+                : '1px dashed var(--severity-critical, #b91c1c)',
+              color: b.present ? 'var(--success, #16A34A)' : 'var(--severity-critical, #b91c1c)',
+              background: b.present ? 'rgba(22,163,74,0.06)' : 'rgba(185,28,28,0.04)',
+            }}
+          >
+            {b.present ? <CheckCircle2 size={12} /> : <Ban size={12} />}
+            {b.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function VerdictLine({ label, body }: { label: string; body: string }) {
+  return (
+    <div style={{ fontSize: 12.5, color: 'var(--text-secondary, #475569)', lineHeight: 1.45 }}>
+      <strong style={{ color: 'var(--text-primary, #0F172A)' }}>{label}:</strong> {body}
     </div>
   );
 }

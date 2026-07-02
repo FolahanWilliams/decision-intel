@@ -148,6 +148,12 @@ export interface ReasoningRisksBucket {
    *  conditions that MULTIPLY the biases into the outcome (the Wiz move).
    *  Display-only; detected from the document text, no scoring impact. */
   strategicExposure?: import('./strategic-nodes').DetectedStrategicNode[];
+  /** The bow-tie: the same strategic exposure structured as the process-safety
+   *  visual a risk committee reads on sight — threat → top event → consequence,
+   *  with prevention + mitigation barriers present/missing, plus the Taleb
+   *  convexity + Perrow coupling verdicts. Deterministic, display-only. Present
+   *  only when `strategicExposure` is. */
+  bowtie?: import('./bowtie').BowtieAnalysis;
   /** Cross-module synthesis (2026-07-02): when the reasoning lane carries
    *  ZERO bias-shaped findings but the adversarial modules surfaced
    *  critical/high findings, those findings render HERE so the primary

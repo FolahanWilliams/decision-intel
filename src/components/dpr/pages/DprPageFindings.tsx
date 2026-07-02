@@ -32,6 +32,7 @@ import {
   type DetectedStrategicNode,
   type StrategicNodeClass,
 } from '@/lib/deliverable/strategic-nodes';
+import type { BowtieAnalysis, BowtieBarrier } from '@/lib/deliverable/bowtie';
 
 export interface DprPageFindingsProps {
   findings: DprFinding[];
@@ -53,6 +54,13 @@ export interface DprPageFindingsProps {
    * §5b section below the findings. Omitted when empty.
    */
   strategicExposure?: DetectedStrategicNode[];
+  /**
+   * The bow-tie (§5c) — the same threats as the process-safety visual a risk
+   * committee reads on sight: threat → top event → consequence, prevention +
+   * mitigation barriers present/missing, plus the Taleb convexity + Perrow
+   * coupling verdicts. Deterministic, display-only. Omitted when no threat.
+   */
+  bowtie?: BowtieAnalysis;
 }
 
 export function DprPageFindings(props: DprPageFindingsProps) {
@@ -65,12 +73,14 @@ export function DprPageFindings(props: DprPageFindingsProps) {
     footerTitle = 'Decision Provenance Record',
     clientSafe = false,
     strategicExposure,
+    bowtie,
   } = props;
 
   const attackPath =
     strategicExposure && strategicExposure.length > 0 ? (
       <StrategicExposureSection nodes={strategicExposure} />
     ) : null;
+  const bowtieSection = bowtie ? <BowtieSection analysis={bowtie} /> : null;
 
   if (findings.length === 0) {
     return (
@@ -94,6 +104,7 @@ export function DprPageFindings(props: DprPageFindingsProps) {
           </DprNotice>
         </DprSection>
         {attackPath}
+        {bowtieSection}
       </DprPageShell>
     );
   }
@@ -119,6 +130,7 @@ export function DprPageFindings(props: DprPageFindingsProps) {
         </div>
       </DprSection>
       {attackPath}
+      {bowtieSection}
     </DprPageShell>
   );
 }
@@ -189,6 +201,86 @@ function StrategicExposureSection({ nodes }: { nodes: DetectedStrategicNode[] })
         </DprNotice>
       ) : null}
     </DprSection>
+  );
+}
+
+/**
+ * The bow-tie (§5c) — the same threats as §5b, structured as the process-safety
+ * visual a risk committee reads on sight: threat → top event → consequence, with
+ * prevention + mitigation barriers present vs MISSING, plus the Taleb convexity +
+ * Perrow coupling verdicts. Deterministic (buildBowtie), display-only. The
+ * "N barriers missing" line is the reviewer's actionable takeaway.
+ */
+function BowtieSection({ analysis }: { analysis: BowtieAnalysis }) {
+  return (
+    <DprSection
+      marker="§5c"
+      eyebrow="Structural fragility"
+      title="The bow-tie — where the circuit-breakers are missing"
+      strap={`${analysis.missingBarrierCount} of ${analysis.totalCanonicalBarriers} circuit-breakers a risk committee would expect are absent. Prevention barriers stop the threat becoming the event; mitigation barriers limit the consequence once it fires. A commitment with barriers missing on both sides is fragile — the conditions are correlated with a failure archetype, never a claim they caused an outcome, and they describe the document, not the trigger.`}
+    >
+      {/* Threat → top event → consequence */}
+      <div className="dpr-finding-block" style={{ breakInside: 'avoid' }}>
+        <div className="dpr-finding-block-label">
+          <span className="dpr-finding-block-rule" />
+          <span>Threat → event → consequence</span>
+        </div>
+        <p style={{ margin: 0 }}>
+          <strong>Threats:</strong> {analysis.threats.map(t => t.label).join(' · ')}
+        </p>
+        <p style={{ margin: '4px 0 0' }}>
+          <strong>Top event:</strong> {analysis.topEvent}. <strong>Consequence:</strong>{' '}
+          {analysis.consequence}
+        </p>
+      </div>
+
+      {/* Barriers */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 14 }}>
+        <DprBarrierRow label="Prevention — stop it firing" barriers={analysis.prevention} />
+        <DprBarrierRow label="Mitigation — limit the damage" barriers={analysis.mitigation} />
+      </div>
+
+      {/* The two structural verdicts */}
+      <DprNotice mark="The structural verdicts">
+        <p style={{ margin: 0 }}>
+          <strong>Convexity (Taleb):</strong> {analysis.convexity.line}
+        </p>
+        <p style={{ margin: '6px 0 0' }}>
+          <strong>Coupling (Perrow):</strong> {analysis.coupling.line}
+        </p>
+      </DprNotice>
+    </DprSection>
+  );
+}
+
+function DprBarrierRow({ label, barriers }: { label: string; barriers: BowtieBarrier[] }) {
+  return (
+    <div style={{ breakInside: 'avoid' }}>
+      <div className="dpr-finding-block-label" style={{ marginBottom: 6 }}>
+        <span className="dpr-finding-block-rule" />
+        <span>{label}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {barriers.map(b => (
+          <span
+            key={b.dimension}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              padding: '3px 10px',
+              borderRadius: 999,
+              border: b.present ? '1px solid #16A34A' : '1px dashed #b91c1c',
+              color: b.present ? '#166534' : '#b91c1c',
+            }}
+          >
+            {b.present ? '✓' : '✕'} {b.label}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 

@@ -37,6 +37,7 @@ import { getNamedPattern } from '@/lib/learning/named-patterns';
 import { detectStrategicNodes } from './strategic-nodes';
 import { detectResilienceMarkers } from './resilience-signature';
 import { computeStructuralFragility } from './fragility-index';
+import { buildBowtie } from './bowtie';
 import { computeQuantifiedExposure } from './quantified-exposure';
 import {
   coverActionTitle,
@@ -289,6 +290,16 @@ function bucketReasoningRisks(
   // Pure text detection, no LLM, no scoring impact.
   const strategicExposure = detectStrategicNodes(result.structuredContent ?? '');
 
+  // The bow-tie: the same threats structured as the process-safety visual a
+  // risk committee recognizes on sight (threat → top event → consequence,
+  // barriers present/missing) + the Taleb convexity + Perrow coupling verdicts.
+  // Deterministic from the shipped detectors, display-only. Null when there is
+  // no threat to anchor it.
+  const bowtie = buildBowtie(
+    strategicExposure,
+    detectResilienceMarkers(result.structuredContent ?? '')
+  );
+
   // Cross-module synthesis (2026-07-02): when the bias lane is empty but
   // the adversarial modules carry severe findings, they render IN this
   // bucket — the primary surface must never read empty while the
@@ -303,6 +314,7 @@ function bucketReasoningRisks(
     findings,
     counts,
     ...(strategicExposure.length > 0 ? { strategicExposure } : {}),
+    ...(bowtie ? { bowtie } : {}),
     ...(synthesizedCriticals ? { synthesizedCriticals } : {}),
     ...(biasDetectionDegraded ? { biasDetectionDegraded } : {}),
   };
