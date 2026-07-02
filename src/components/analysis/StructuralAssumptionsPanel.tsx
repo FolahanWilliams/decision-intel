@@ -287,7 +287,11 @@ export function StructuralAssumptionsPanel({ analysisId, autoRun = true, marketC
               ) : (
                 <div className="space-y-3">
                   {assumptions.map((a, i) => {
-                    const styles = SEVERITY_STYLES[a.severity];
+                    // Fallback-guard the lookup — an unexpected severity string
+                    // must never crash the panel (the exact class as the retired
+                    // CorePipelineTab 'pro'-tier crash); normaliseSeverity keeps
+                    // this in-bounds today, this is defense-in-depth.
+                    const styles = SEVERITY_STYLES[a.severity] ?? SEVERITY_STYLES.medium;
                     return (
                       <div
                         key={`${a.determinantId}-${i}`}

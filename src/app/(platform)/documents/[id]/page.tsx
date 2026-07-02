@@ -57,6 +57,7 @@ import {
   type RegulatoryTabSovereignContext,
 } from '@/components/documents/detail/tabs';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import { METHODOLOGY_VERSION } from '@/lib/scoring/dqi';
 import { extractSynergyDefensibilityFromContent } from '@/lib/parsers/synergy-model-parser';
 import { formatBiasNameCompact as formatBiasLabel } from '@/lib/utils/labels';
 import { LiveRedFlagsAlert } from '@/components/analysis/LiveRedFlagsAlert';
@@ -979,7 +980,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
         onClose={() => setShowSettings(false)}
         methodologySlot={
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-            DQI methodology v2.4.0 · 7 weighted components · noise jury (3 frames ×{' '}
+            DQI methodology v{METHODOLOGY_VERSION} · 7 weighted components · noise jury (3 frames ×{' '}
             {analysis?.noiseScore != null ? Math.round(analysis.noiseScore) : '—'} mean) ·
             validity-aware weight shift per Kahneman & Klein 2009.
           </div>
@@ -995,7 +996,7 @@ export default function DocumentDetailV2Page({ params }: { params: Promise<{ id:
           >
             <div>analysis_id: {analysis?.id ?? '—'}</div>
             <div>document_id: {document.id}</div>
-            <div>methodology: v2.1.0</div>
+            <div>methodology: v{METHODOLOGY_VERSION}</div>
           </div>
         }
         sharingSlot={
